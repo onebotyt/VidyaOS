@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Role & Course Assignments — Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
+      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/devices.html" class="btn btn-secondary btn-sm">ESP32 Terminals</a>
+      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <div class="page-header" style="margin-bottom: 1.5rem;">
+      <div>
+        <h1 class="page-title">Institutional Role & Register Allocations</h1>
+        <p class="page-subtitle">Read-only institutional monitoring of teacher course mappings and official digital registers across departments</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="/admin/faculty.html" class="btn btn-primary">👨‍🏫 Manage HODs</a>
+        <a href="/admin/reports.html" class="btn btn-secondary">📊 Dept Reports</a>
+      </div>
+    </div>
+
+    <!-- Alert / Explanation -->
+    <div style="background: linear-gradient(135deg, #eff6ff, #f0fdf4); border: 1px solid #bfdbfe; border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm); padding: 0.85rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.875rem; color: #1e40af;">
+      <strong>Simplified Hierarchy:</strong> Teacher assignments (Subject Teacher Theory/Practical &amp; Class Teacher) and automatic digital attendance registers are created and managed directly by <strong>Heads of Department (HODs)</strong> in their departmental portals. This console provides institutional read-only monitoring across all academic departments.
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card" style="padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: flex-end;">
+        <div>
+          <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Role Type</label>
+          <select id="filter-type" class="form-select" onchange="filterAssignments()">
+            <option value="">All Roles</option>
+            <option value="SUBJECT_TEACHER">Subject Teacher</option>
+            <option value="CLASS_TEACHER">Class Teacher</option>
+            <option value="HOD">Head of Department</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Department</label>
+          <select id="filter-dept" class="form-select" onchange="filterAssignments()">
+            <option value="">All Departments</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Curriculum Scope</label>
+          <select id="filter-scope" class="form-select" onchange="filterAssignments()">
+            <option value="">All Scopes</option>
+            <option value="THEORY">Theory Only</option>
+            <option value="PRACTICAL">Practical Only</option>
+            <option value="ALL">All Sessions</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assignments Table Card -->
+    <div class="card" style="padding: 0; overflow: visible;">
+      <div class="table-wrapper" style="overflow: visible;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">ID</th>
+              <th>Instructor</th>
+              <th style="width: 140px;">Role Assigned</th>
+              <th>Subject / Scope</th>
+              <th style="width: 150px;">Department & Branch</th>
+              <th style="width: 90px;">Cohort</th>
+              <th>Digital Register Created</th>
+              <th style="width: 90px;">Status</th>
+              <th style="width: 80px; text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="assignments-table-body">
+            <tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading assignments...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Assignment Modal -->
+  <div id="assign-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 540px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 700;">Assign Teacher Role</h2>
+        <button type="button" onclick="closeModal()" style="font-size: 1.25rem; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <form id="assign-form">
+        <div class="form-group">
+          <label class="form-label" for="assign-teacher">Instructor</label>
+          <select id="assign-teacher" class="form-select" required>
+            <option value="">Select Instructor...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="assign-role">Assignment Role</label>
+          <select id="assign-role" class="form-select" required onchange="onRoleChange()">
+            <option value="SUBJECT_TEACHER">SUBJECT_TEACHER (Teaches a course & marks attendance)</option>
+            <option value="CLASS_TEACHER">CLASS_TEACHER (Provisions students & approves self-registrations)</option>
+            <option value="HOD">HOD (Department Supervisor)</option>
+          </select>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label" for="assign-dept">Department</label>
+            <select id="assign-dept" class="form-select" required onchange="onDeptChange()">
+              <option value="">Select Department...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="assign-branch">Branch</label>
+            <select id="assign-branch" class="form-select" required onchange="onCohortChange()">
+              <option value="">Select Branch...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label" for="assign-year">Year (1-4)</label>
+            <select id="assign-year" class="form-select" required onchange="onCohortChange()">
+              <option value="1">Year 1</option>
+              <option value="2" selected>Year 2</option>
+              <option value="3">Year 3</option>
+              <option value="4">Year 4</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="assign-sem">Semester (1-8)</label>
+            <select id="assign-sem" class="form-select" required onchange="onCohortChange()">
+              <option value="1">Sem 1</option><option value="2">Sem 2</option>
+              <option value="3">Sem 3</option><option value="4" selected>Sem 4</option>
+              <option value="5">Sem 5</option><option value="6">Sem 6</option>
+              <option value="7">Sem 7</option><option value="8">Sem 8</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Subject & Scope (for SUBJECT_TEACHER) -->
+        <div id="subject-fields" style="background: var(--bg-surface); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="assign-subject">Course / Subject</label>
+            <select id="assign-subject" class="form-select">
+              <option value="">Select Subject...</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="assign-scope">Curriculum Session Scope</label>
+            <select id="assign-scope" class="form-select">
+              <option value="THEORY">THEORY (Lectures only)</option>
+              <option value="PRACTICAL">PRACTICAL (Lab sessions only)</option>
+              <option value="ALL">ALL (Both Theory and Practical)</option>
+            </select>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
+              If a subject has Theory + Practical, you can assign different teachers to each slot.
+            </span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" id="save-btn" class="btn btn-primary">Save Assignment & Create Register</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- VIEW ASSIGNMENT MODAL -->
+  <div id="view-assignment-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 540px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+        <div>
+          <div id="view-role-badge" style="margin-bottom: 0.35rem;"></div>
+          <h2 id="view-title" style="font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text-main);">Assignment Details</h2>
+        </div>
+        <button type="button" onclick="closeViewModal()" style="font-size: 1.25rem; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-row">
+          <span class="summary-label">Assigned Instructor</span>
+          <span id="view-instructor" class="summary-value" style="color: var(--color-primary);"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Role Type</span>
+          <span id="view-role" class="summary-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Subject & Code</span>
+          <span id="view-subject" class="summary-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Curriculum Scope</span>
+          <span id="view-scope" class="summary-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Department / Branch</span>
+          <span id="view-cohort" class="summary-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Year & Semester</span>
+          <span id="view-year-sem" class="summary-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Academic Year</span>
+          <span id="view-ay" class="summary-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Associated Digital Register</span>
+          <span id="view-register" class="summary-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Attendance Sessions Conducted</span>
+          <span id="view-sessions-count" class="summary-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Status</span>
+          <span id="view-status" class="summary-value"></span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeViewModal()">Close</button>
+        <button type="button" id="view-edit-btn" class="btn btn-primary">Edit Assignment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT ASSIGNMENT MODAL (2-STEP WIZARD) -->
+  <div id="edit-assignment-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 700;">Edit Course Assignment</h2>
+        <button type="button" onclick="closeEditModal()" style="font-size: 1.25rem; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <!-- 2-Step Progress Indicator -->
+      <div class="wizard-steps">
+        <div id="edit-step-pill-1" class="wizard-step-pill active">
+          <span class="wizard-step-num">1</span>
+          <span>Edit Mapping</span>
+        </div>
+        <div id="edit-step-pill-2" class="wizard-step-pill">
+          <span class="wizard-step-num">2</span>
+          <span>Review & Synchronize</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: FORM INPUTS -->
+      <div id="edit-step-1">
+        <div class="form-group">
+          <label class="form-label" for="edit-teacher">Assigned Instructor</label>
+          <select id="edit-teacher" class="form-select" required></select>
+        </div>
+
+        <div class="form-group" id="edit-scope-group">
+          <label class="form-label" for="edit-scope">Curriculum Session Scope</label>
+          <select id="edit-scope" class="form-select">
+            <option value="THEORY">THEORY (Lectures only)</option>
+            <option value="PRACTICAL">PRACTICAL (Lab sessions only)</option>
+            <option value="ALL">ALL (Both Theory and Practical)</option>
+          </select>
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
+            Updating the scope synchronizes the official attendance register for this course.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-active">Assignment Status</label>
+          <select id="edit-active" class="form-select">
+            <option value="1">Active (Currently conducting classes)</option>
+            <option value="0">Inactive / Archived</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="proceedToEditStep2()">Next: Review & Synchronize →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: REVIEW & SYNCHRONIZE -->
+      <div id="edit-step-2" style="display: none;">
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: #1e40af;">
+          <strong>Step 2 of 2:</strong> Please review the reassignment before updating. The official attendance register will be synchronized automatically.
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Course / Subject</span>
+            <span id="confirm-subject" class="summary-value"></span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Instructor</span>
+            <span id="confirm-teacher" class="summary-value" style="color: var(--color-primary);"></span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Curriculum Scope</span>
+            <span id="confirm-scope" class="summary-value"></span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Assignment Status</span>
+            <span id="confirm-status" class="summary-value"></span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Linked Digital Register</span>
+            <span id="confirm-register-note" class="summary-value" style="font-size: 0.8rem;">Will update owner</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: space-between; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="backToEditStep1()">← Back to Edit</button>
+          <button type="button" id="confirm-edit-btn" class="btn btn-primary" onclick="submitEditAssignment()">Confirm & Update Assignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE / ARCHIVE ASSIGNMENT MODAL (2-STEP CONFIRMATION) -->
+  <div id="delete-assignment-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 500px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 700; color: #dc2626;">Archive / Remove Assignment</h2>
+        <button type="button" onclick="closeDeleteModal()" style="font-size: 1.25rem; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <!-- 2-Step Progress Indicator -->
+      <div class="wizard-steps">
+        <div id="del-step-pill-1" class="wizard-step-pill active">
+          <span class="wizard-step-num">1</span>
+          <span>Impact Assessment</span>
+        </div>
+        <div id="del-step-pill-2" class="wizard-step-pill">
+          <span class="wizard-step-num">2</span>
+          <span>Final Confirmation</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: IMPACT CHECK -->
+      <div id="del-step-1">
+        <div style="background: #fef2f2; border: 1px solid #fee2e2; border-left: 4px solid #ef4444; padding: 0.85rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #991b1b; margin-bottom: 1.25rem;">
+          <strong>Warning:</strong> Archiving this assignment deactivates the role mapping and closes its linked digital attendance register. Past attendance records are safely preserved in the database.
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Instructor</span>
+            <span id="del-teacher-name" class="summary-value"></span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Role & Subject</span>
+            <span id="del-subject-name" class="summary-value"></span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Linked Digital Register</span>
+            <span id="del-register-name" class="summary-value" style="color: #ef4444;"></span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Sessions Recorded</span>
+            <span id="del-sessions-recorded" class="summary-value"></span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+          <button type="button" class="btn btn-danger" onclick="proceedToDeleteStep2()">Proceed to Final Confirmation →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: FINAL CONFIRMATION -->
+      <div id="del-step-2" style="display: none;">
+        <div style="padding: 1.25rem; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; margin-bottom: 1.25rem; text-align: center;">
+          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚠️</div>
+          <h3 style="font-size: 1.1rem; color: #9f1239; margin: 0 0 0.5rem 0;">Confirm Assignment Archival</h3>
+          <p style="font-size: 0.85rem; color: #881337; margin: 0;">
+            Are you sure you want to archive this course assignment for <strong id="del-final-teacher"></strong>?
+          </p>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.85rem; color: var(--text-main); cursor: pointer;">
+            <input type="checkbox" id="del-confirm-checkbox" style="margin-top: 0.2rem;" onchange="document.getElementById('exec-del-btn').disabled = !this.checked;">
+            <span>I confirm that I want to deactivate this role assignment and archive its associated attendance register.</span>
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: space-between;">
+          <button type="button" class="btn btn-secondary" onclick="backToDeleteStep1()">← Back</button>
+          <button type="button" id="exec-del-btn" class="btn btn-danger" disabled onclick="submitDeleteAssignment()">Archive Assignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['SYSTEM_ADMIN']);
+
+    let assignmentsList = [];
+    let hierarchyData = null;
+    let teachersList = [];
+    let currentAssignmentData = null;
+    let editingAssignmentId = null;
+    let deletingAssignmentId = null;
+
+    async function init() {
+      try {
+        const [aRes, hRes, tRes] = await Promise.all([
+          fetchApi('/admin/assignments'),
+          fetchApi('/admin/hierarchy'),
+          fetchApi('/admin/teachers')
+        ]);
+
+        if (aRes.success) assignmentsList = aRes.data;
+        if (hRes.success) hierarchyData = hRes.data;
+        if (tRes.success) teachersList = tRes.data;
+
+        populateFormDropdowns();
+        renderTable(assignmentsList);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function populateFormDropdowns() {
+      // Teachers
+      const tSelect = document.getElementById('assign-teacher');
+      const editTSelect = document.getElementById('edit-teacher');
+      tSelect.innerHTML = '<option value="">Select Instructor...</option>';
+      editTSelect.innerHTML = '<option value="">Select Instructor...</option>';
+
+      teachersList.forEach(t => {
+        const opt = `<option value="${t.id}">${t.full_name} (${t.gmail || t.email})</option>`;
+        tSelect.innerHTML += opt;
+        editTSelect.innerHTML += opt;
+      });
+
+      // Departments
+      const dSelect = document.getElementById('assign-dept');
+      const filterDept = document.getElementById('filter-dept');
+      dSelect.innerHTML = '<option value="">Select Department...</option>';
+      filterDept.innerHTML = '<option value="">All Departments</option>';
+
+      if (hierarchyData?.departments) {
+        hierarchyData.departments.forEach(d => {
+          dSelect.innerHTML += `<option value="${d.id}">${d.name} (${d.code})</option>`;
+          filterDept.innerHTML += `<option value="${d.id}">${d.name} (${d.code})</option>`;
+        });
+      }
+    }
+
+    function onRoleChange() {
+      const role = document.getElementById('assign-role').value;
+      const subFields = document.getElementById('subject-fields');
+      const subSelect = document.getElementById('assign-subject');
+
+      if (role === 'SUBJECT_TEACHER') {
+        subFields.style.display = 'block';
+        subSelect.required = true;
+      } else {
+        subFields.style.display = 'none';
+        subSelect.required = false;
+        subSelect.value = '';
+      }
+    }
+
+    function onDeptChange() {
+      const deptId = document.getElementById('assign-dept').value;
+      const branchSelect = document.getElementById('assign-branch');
+      branchSelect.innerHTML = '<option value="">Select Branch...</option>';
+      if (!deptId || !hierarchyData?.branches) return;
+
+      const branches = hierarchyData.branches.filter(b => b.department_id == deptId);
+      branches.forEach(b => {
+        branchSelect.innerHTML += `<option value="${b.id}">${b.name} (${b.code})</option>`;
+      });
+      if (branches.length > 0) {
+        branchSelect.value = branches[0].id;
+      }
+      onCohortChange();
+    }
+
+    function onCohortChange() {
+      const deptId = document.getElementById('assign-dept').value;
+      const branchId = document.getElementById('assign-branch').value;
+      const year = document.getElementById('assign-year').value;
+      const sem = document.getElementById('assign-sem').value;
+      const subSelect = document.getElementById('assign-subject');
+      subSelect.innerHTML = '<option value="">Select Subject...</option>';
+
+      if (!deptId || !branchId || !hierarchyData?.subjects) return;
+
+      const subjects = hierarchyData.subjects.filter(s => 
+        s.department_id == deptId && s.branch_id == branchId && s.year == year && s.semester == sem
+      );
+
+      subjects.forEach(s => {
+        const typeBadge = s.has_practical ? ' (Theory+Lab)' : '';
+        subSelect.innerHTML += `<option value="${s.id}">${s.name} [${s.code}]${typeBadge}</option>`;
+      });
+    }
+
+    function filterAssignments() {
+      const type = document.getElementById('filter-type').value;
+      const dept = document.getElementById('filter-dept').value;
+      const scope = document.getElementById('filter-scope').value;
+
+      let filtered = [...assignmentsList];
+      if (type) filtered = filtered.filter(a => a.assignment_type === type);
+      if (dept) filtered = filtered.filter(a => a.department_id == dept);
+      if (scope) filtered = filtered.filter(a => a.session_type_scope === scope);
+
+      renderTable(filtered);
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById('assignments-table-body');
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">No assignments found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(a => {
+        let roleBadgeClass = 'badge-pending';
+        if (a.assignment_type === 'CLASS_TEACHER') roleBadgeClass = 'badge-late';
+        if (a.assignment_type === 'HOD') roleBadgeClass = 'badge-present';
+
+        return `
+          <tr>
+            <td style="font-weight: 600;">#${a.id}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-main);">${a.teacher_name}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-family-mono);">${a.employee_id}</div>
+            </td>
+            <td><span class="badge ${roleBadgeClass}">${a.assignment_type}</span></td>
+            <td>
+              ${a.subject_name ? `
+                <div style="font-weight: 500;">${a.subject_name}</div>
+                <div style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">Scope: ${a.session_type_scope}</div>
+              ` : `
+                <span style="color: var(--text-muted);">Cohort Scope</span>
+              `}
+            </td>
+            <td>
+              <div>${a.department_code} / ${a.branch_code}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${a.academic_year_label || ''}</div>
+            </td>
+            <td>Y${a.year} S${a.semester}</td>
+            <td>
+              ${a.register_id ? `
+                <span class="badge badge-present" style="font-size: 0.75rem;">Reg #${a.register_id}</span>
+                <div style="font-size: 0.75rem; color: var(--text-muted); max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${a.register_name || ''}</div>
+              ` : `
+                <span style="color: var(--text-muted); font-size: 0.78rem;">None (Admin role)</span>
+              `}
+            </td>
+            <td>
+              <span class="badge ${a.is_active ? 'badge-present' : 'badge-absent'}">
+                ${a.is_active ? 'Active' : 'Inactive'}
+              </span>
+            </td>
+            <td style="text-align: center;">
+              <div class="kebab-menu-container" id="kebab-${a.id}">
+                <button type="button" class="kebab-btn" onclick="toggleKebab(event, ${a.id})" title="Actions">⋮</button>
+                <div class="kebab-dropdown">
+                  <button type="button" class="kebab-item" onclick="viewAssignmentInfo(${a.id})">
+                    <span>👁️</span> View Info
+                  </button>
+                  <button type="button" class="kebab-item" onclick="openEditAssignmentModal(${a.id})">
+                    <span>✏️</span> Edit Mapping
+                  </button>
+                  <div class="kebab-divider"></div>
+                  <button type="button" class="kebab-item danger" onclick="openDeleteAssignmentModal(${a.id})">
+                    <span>🗑️</span> Archive
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // KEBAB MENU HANDLER
+    function toggleKebab(event, id) {
+      event.stopPropagation();
+      const currentContainer = document.getElementById(`kebab-${id}`);
+      const wasOpen = currentContainer.classList.contains('open');
+      closeAllKebabs();
+      if (!wasOpen) {
+        currentContainer.classList.add('open');
+      }
+    }
+
+    function closeAllKebabs() {
+      document.querySelectorAll('.kebab-menu-container.open').forEach(el => el.classList.remove('open'));
+    }
+
+    document.addEventListener('click', () => closeAllKebabs());
+
+    // ─────────────────────────────────────────────────────────
+    // VIEW ASSIGNMENT INFO
+    // ─────────────────────────────────────────────────────────
+    async function viewAssignmentInfo(id) {
+      closeAllKebabs();
+      try {
+        const res = await fetchApi(`/admin/assignments/${id}`);
+        if (!res.success) return;
+        const a = res.data;
+        currentAssignmentData = a;
+
+        let roleBadgeClass = 'badge-pending';
+        if (a.assignment_type === 'CLASS_TEACHER') roleBadgeClass = 'badge-late';
+        if (a.assignment_type === 'HOD') roleBadgeClass = 'badge-present';
+
+        document.getElementById('view-role-badge').innerHTML = `<span class="badge ${roleBadgeClass}">${a.assignment_type}</span>`;
+        document.getElementById('view-title').innerText = a.subject_name || `${a.assignment_type} Mapping`;
+        document.getElementById('view-instructor').innerText = `${a.teacher_name} (${a.employee_id})`;
+        document.getElementById('view-role').innerText = a.assignment_type;
+        document.getElementById('view-subject').innerText = a.subject_name ? `${a.subject_name} [${a.subject_code}]` : 'Cohort-wide';
+        document.getElementById('view-scope').innerText = a.session_type_scope || 'ALL';
+        document.getElementById('view-cohort').innerText = `${a.department_name || a.branch_name} (${a.department_code || a.branch_code})`;
+        document.getElementById('view-year-sem').innerText = `Year ${a.year} • Semester ${a.semester}`;
+        document.getElementById('view-ay').innerText = a.academic_year_label || 'Current Academic Year';
+        document.getElementById('view-register').innerHTML = a.register_id 
+          ? `<span class="badge badge-present">#${a.register_id}</span> ${a.register_name || ''}`
+          : `<span style="color: var(--text-muted);">None</span>`;
+        document.getElementById('view-sessions-count').innerText = `${a.session_count || 0} class sessions`;
+        document.getElementById('view-status').innerHTML = `<span class="badge ${a.is_active ? 'badge-present' : 'badge-absent'}">${a.is_active ? 'Active' : 'Archived'}</span>`;
+
+        document.getElementById('view-edit-btn').onclick = () => {
+          closeViewModal();
+          openEditAssignmentModal(id);
+        };
+
+        document.getElementById('view-assignment-modal').classList.add('open');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function closeViewModal() {
+      document.getElementById('view-assignment-modal').classList.remove('open');
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // EDIT ASSIGNMENT (2-STEP FLOW)
+    // ─────────────────────────────────────────────────────────
+    async function openEditAssignmentModal(id) {
+      closeAllKebabs();
+      editingAssignmentId = id;
+
+      try {
+        const res = await fetchApi(`/admin/assignments/${id}`);
+        if (!res.success) return;
+        const a = res.data;
+        currentAssignmentData = a;
+
+        document.getElementById('edit-teacher').value = a.teacher_id;
+        document.getElementById('edit-scope').value = a.session_type_scope || 'THEORY';
+        document.getElementById('edit-active').value = a.is_active ? '1' : '0';
+
+        const scopeGroup = document.getElementById('edit-scope-group');
+        if (a.assignment_type === 'SUBJECT_TEACHER') {
+          scopeGroup.style.display = 'block';
+        } else {
+          scopeGroup.style.display = 'none';
+        }
+
+        backToEditStep1();
+        document.getElementById('edit-assignment-modal').classList.add('open');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function proceedToEditStep2() {
+      const teacherSelect = document.getElementById('edit-teacher');
+      const teacherId = teacherSelect.value;
+      const teacherText = teacherSelect.options[teacherSelect.selectedIndex]?.text || 'Selected Instructor';
+      const scope = document.getElementById('edit-scope').value;
+      const isActive = document.getElementById('edit-active').value === '1';
+
+      if (!teacherId) {
+        showToast('Please select an instructor.', 'error');
+        return;
+      }
+
+      document.getElementById('confirm-subject').innerText = currentAssignmentData?.subject_name 
+        ? `${currentAssignmentData.subject_name} [${currentAssignmentData.subject_code}]` 
+        : `${currentAssignmentData?.assignment_type} Cohort`;
+      document.getElementById('confirm-teacher').innerText = teacherText;
+      document.getElementById('confirm-scope').innerText = scope;
+      document.getElementById('confirm-status').innerHTML = isActive 
+        ? `<span class="badge badge-present">Active</span>` 
+        : `<span class="badge badge-absent">Inactive / Archived</span>`;
+
+      document.getElementById('confirm-register-note').innerText = currentAssignmentData?.register_id 
+        ? `Will update Register #${currentAssignmentData.register_id} (${currentAssignmentData.register_name || ''})`
+        : `No register required for this role`;
+
+      document.getElementById('edit-step-1').style.display = 'none';
+      document.getElementById('edit-step-2').style.display = 'block';
+      document.getElementById('edit-step-pill-1').classList.remove('active');
+      document.getElementById('edit-step-pill-1').classList.add('completed');
+      document.getElementById('edit-step-pill-2').classList.add('active');
+    }
+
+    function backToEditStep1() {
+      document.getElementById('edit-step-2').style.display = 'none';
+      document.getElementById('edit-step-1').style.display = 'block';
+      document.getElementById('edit-step-pill-2').classList.remove('active');
+      document.getElementById('edit-step-pill-1').classList.remove('completed');
+      document.getElementById('edit-step-pill-1').classList.add('active');
+    }
+
+    async function submitEditAssignment() {
+      const btn = document.getElementById('confirm-edit-btn');
+      btn.disabled = true;
+      btn.innerText = 'Updating Assignment...';
+
+      const payload = {
+        teacher_id: parseInt(document.getElementById('edit-teacher').value, 10),
+        session_type_scope: document.getElementById('edit-scope').value,
+        is_active: document.getElementById('edit-active').value === '1'
+      };
+
+      try {
+        const res = await fetchApi(`/admin/assignments/${editingAssignmentId}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.success) {
+          showToast(res.message || 'Assignment updated successfully!', 'success');
+          closeEditModal();
+          const aRes = await fetchApi('/admin/assignments');
+          if (aRes.success) {
+            assignmentsList = aRes.data;
+            filterAssignments();
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Confirm & Update Assignment';
+      }
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-assignment-modal').classList.remove('open');
+      editingAssignmentId = null;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // DELETE / ARCHIVE ASSIGNMENT (2-STEP CONFIRMATION)
+    // ─────────────────────────────────────────────────────────
+    async function openDeleteAssignmentModal(id) {
+      closeAllKebabs();
+      deletingAssignmentId = id;
+
+      try {
+        const res = await fetchApi(`/admin/assignments/${id}`);
+        if (!res.success) return;
+        const a = res.data;
+        currentAssignmentData = a;
+
+        document.getElementById('del-teacher-name').innerText = `${a.teacher_name} (${a.employee_id})`;
+        document.getElementById('del-subject-name').innerText = `${a.assignment_type} • ${a.subject_name || 'General'}`;
+        document.getElementById('del-register-name').innerText = a.register_id ? `Reg #${a.register_id} (${a.register_name || ''})` : 'None';
+        document.getElementById('del-sessions-recorded').innerText = `${a.session_count || 0} class sessions`;
+
+        document.getElementById('del-final-teacher').innerText = a.teacher_name;
+        document.getElementById('del-confirm-checkbox').checked = false;
+        document.getElementById('exec-del-btn').disabled = true;
+
+        backToDeleteStep1();
+        document.getElementById('delete-assignment-modal').classList.add('open');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function proceedToDeleteStep2() {
+      document.getElementById('del-step-1').style.display = 'none';
+      document.getElementById('del-step-2').style.display = 'block';
+      document.getElementById('del-step-pill-1').classList.remove('active');
+      document.getElementById('del-step-pill-1').classList.add('completed');
+      document.getElementById('del-step-pill-2').classList.add('active');
+    }
+
+    function backToDeleteStep1() {
+      document.getElementById('del-step-2').style.display = 'none';
+      document.getElementById('del-step-1').style.display = 'block';
+      document.getElementById('del-step-pill-2').classList.remove('active');
+      document.getElementById('del-step-pill-1').classList.remove('completed');
+      document.getElementById('del-step-pill-1').classList.add('active');
+    }
+
+    async function submitDeleteAssignment() {
+      const btn = document.getElementById('exec-del-btn');
+      btn.disabled = true;
+      btn.innerText = 'Archiving...';
+
+      try {
+        const res = await fetchApi(`/admin/assignments/${deletingAssignmentId}`, { method: 'DELETE' });
+        if (res.success) {
+          showToast(res.message || 'Assignment archived successfully', 'success');
+          closeDeleteModal();
+          const aRes = await fetchApi('/admin/assignments');
+          if (aRes.success) {
+            assignmentsList = aRes.data;
+            filterAssignments();
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Archive Assignment';
+      }
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('delete-assignment-modal').classList.remove('open');
+      deletingAssignmentId = null;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // CREATE ASSIGNMENT MODAL
+    // ─────────────────────────────────────────────────────────
+    function openCreateModal() {
+      document.getElementById('assign-teacher').value = '';
+      document.getElementById('assign-role').value = 'SUBJECT_TEACHER';
+      document.getElementById('assign-dept').value = '';
+      document.getElementById('assign-branch').innerHTML = '<option value="">Select Department first...</option>';
+      document.getElementById('assign-subject').innerHTML = '<option value="">Select Department and Cohort first...</option>';
+      document.getElementById('assign-scope').value = 'THEORY';
+      onRoleChange();
+      document.getElementById('assign-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('assign-modal').classList.remove('open');
+    }
+
+    document.getElementById('assign-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const teacher_id = parseInt(document.getElementById('assign-teacher').value, 10);
+      const assignment_type = document.getElementById('assign-role').value;
+      const department_id = parseInt(document.getElementById('assign-dept').value, 10);
+      const branch_id = parseInt(document.getElementById('assign-branch').value, 10);
+      const year = parseInt(document.getElementById('assign-year').value, 10);
+      const semester = parseInt(document.getElementById('assign-sem').value, 10);
+      const subject_id = document.getElementById('assign-subject').value ? parseInt(document.getElementById('assign-subject').value, 10) : undefined;
+      const session_type_scope = document.getElementById('assign-scope').value;
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/admin/assignments', {
+          method: 'POST',
+          body: JSON.stringify({
+            teacher_id,
+            assignment_type,
+            department_id,
+            branch_id,
+            year,
+            semester,
+            subject_id,
+            session_type_scope
+          })
+        });
+
+        if (res.success) {
+          showToast(`Assignment created! Official register #${res.data?.register_id || ''} generated.`, 'success');
+          closeModal();
+          const aRes = await fetchApi('/admin/assignments');
+          if (aRes.success) {
+            assignmentsList = aRes.data;
+            filterAssignments();
+          }
+        }
+      } catch (err) {
+        // Handled by fetchApi toast
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

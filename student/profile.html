@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile & Academic Credentials — College Attendance System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .student-id-hero {
+      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-surface) 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      color: var(--text-main);
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .student-id-hero::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -50px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+      opacity: 0.2;
+      pointer-events: none;
+    }
+    .student-id-content {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+    }
+    .student-avatar-wrap {
+      position: relative;
+      width: 84px;
+      height: 84px;
+      flex-shrink: 0;
+    }
+    .student-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--text-white);
+      font-size: 2.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      user-select: none;
+    }
+    .student-beacon {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--status-present);
+      border: 3px solid var(--bg-surface);
+      box-shadow: 0 0 8px var(--status-present);
+    }
+    .student-meta h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: -0.02em;
+    }
+    .student-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0 0 0.85rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .student-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .std-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .std-badge.regular {
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      border: 1px solid var(--status-present);
+    }
+    .std-badge.defaulter {
+      background: var(--status-absent-bg);
+      color: var(--status-absent);
+      border: 1px solid var(--status-absent);
+    }
+    .std-badge.enrolled {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--text-white);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* Attendance Health Card */
+    .attendance-health-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .progress-bar-wrap {
+      width: 100%;
+      height: 12px;
+      background: var(--border-color);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0.75rem 0 0.5rem 0;
+      position: relative;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--status-present);
+      border-radius: 999px;
+      transition: width 0.6s ease;
+    }
+    .progress-bar-fill.defaulter {
+      background: var(--status-absent);
+    }
+
+    /* Password Input Wrapper with Show/Hide */
+    .password-wrap {
+      position: relative;
+    }
+    .password-wrap input {
+      padding-right: 2.75rem;
+    }
+    .password-toggle-btn {
+      position: absolute;
+      right: 0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-muted);
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .password-toggle-btn:hover {
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/student/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-present);">STUDENT</span>
+      <span>Attendance Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/student/attendance.html" class="btn btn-secondary btn-sm">Attendance & Calendar</a>
+      <a href="/student/timetable.html" class="btn btn-secondary btn-sm">Timetable</a>
+      <a href="/student/assignments.html" class="btn btn-secondary btn-sm">Assignments</a>
+      <a href="/student/profile.html" class="btn btn-primary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 920px;">
+    <!-- OFFICIAL DIGITAL STUDENT ID HERO -->
+    <div class="student-id-hero">
+      <div class="student-id-content">
+        <div class="student-avatar-wrap">
+          <div class="student-avatar" id="hero-avatar">🎓</div>
+          <div class="student-beacon" title="Active Student Account"></div>
+        </div>
+
+        <div class="student-meta" style="flex: 1;">
+          <h1 id="hero-name">Student Full Name</h1>
+          <div class="student-subtitle">
+            <span id="hero-dept">Department of Information Technology</span>
+            <span>•</span>
+            <span id="hero-enrollment" style="font-family: var(--font-family-mono); font-weight: 800; color: var(--color-primary);">2024IT001</span>
+          </div>
+
+          <div class="student-badges">
+            <span class="std-badge enrolled" id="hero-roll-badge">Roll: --</span>
+            <span class="std-badge enrolled" id="hero-reg-badge">UBTER Reg: --</span>
+            <span class="std-badge regular" id="hero-standing-badge">Status: Enrolled</span>
+            <span class="std-badge enrolled" id="hero-term-badge">Year -- • Sem --</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REAL-TIME 75% ATTENDANCE HEALTH CARD -->
+    <div class="attendance-health-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+            <span>📊 Cumulative Attendance Health & Exam Eligibility</span>
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
+            Statutory minimum attendance requirement: <strong>75.0%</strong> across all registered subjects.
+          </p>
+        </div>
+
+        <div style="text-align: right;">
+          <div id="health-pct" style="font-size: 1.8rem; font-weight: 900; color: var(--status-present); line-height: 1;">--%</div>
+          <div id="health-status-tag" style="font-size: 0.75rem; font-weight: 700; color: var(--status-present); margin-top: 0.2rem;">Checking records...</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="health-progress-bar" style="width: 0%;"></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          Classes Attended: <strong id="health-attended" style="color: var(--text-main);">--</strong> / <span id="health-total">--</span> total conducted
+        </div>
+        <div>
+          Exam Standing: <strong id="health-exam-standing" style="color: var(--status-present);">Calculating...</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-cols-2" style="gap: 1.5rem; align-items: start;">
+      <!-- Left Column: Academic Cohort & Biometrics -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <!-- Official Academic Cohort Details -->
+        <div class="card" style="padding: 1.75rem;">
+          <h2 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1rem;">
+            🏛️ Academic Cohort Details
+          </h2>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.75rem; font-size: 0.85rem;">
+            <div style="background: var(--bg-surface-secondary); padding: 0.75rem; border-radius: 6px;">
+              <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Enrollment Number</div>
+              <div id="profile-enrollment-no" style="font-family: var(--font-family-mono); font-weight: 800; font-size: 0.95rem; margin-top: 0.2rem;">--</div>
+            </div>
+
+            <div style="background: var(--bg-surface-secondary); padding: 0.75rem; border-radius: 6px;">
+              <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Class Roll Number</div>
+              <div id="profile-roll-no" style="font-weight: 800; font-size: 0.95rem; margin-top: 0.2rem;">--</div>
+            </div>
+
+            <div style="background: var(--bg-surface-secondary); padding: 0.75rem; border-radius: 6px;">
+              <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">UBTER Registration No.</div>
+              <div id="profile-reg-no" style="font-family: var(--font-family-mono); font-weight: 800; font-size: 0.95rem; margin-top: 0.2rem; color: var(--color-primary);">--</div>
+            </div>
+
+            <div style="background: var(--bg-surface-secondary); padding: 0.75rem; border-radius: 6px;">
+              <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Department / Program</div>
+              <div id="profile-department" style="font-weight: 700; margin-top: 0.2rem;">--</div>
+            </div>
+
+            <div style="background: var(--bg-surface-secondary); padding: 0.75rem; border-radius: 6px;">
+              <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Year / Semester</div>
+              <div id="profile-year-sem" style="font-weight: 700; margin-top: 0.2rem;">--</div>
+            </div>
+
+            <div style="background: var(--bg-surface-secondary); padding: 0.75rem; border-radius: 6px;">
+              <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Academic Session</div>
+              <div id="profile-academic-year" style="font-weight: 700; margin-top: 0.2rem;">--</div>
+            </div>
+
+            <div style="background: var(--bg-surface-secondary); padding: 0.75rem; border-radius: 6px;">
+              <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Assigned Class Teacher</div>
+              <div id="profile-class-teacher" style="font-weight: 800; color: var(--color-primary); margin-top: 0.2rem;">--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Biometric Terminal Hardware Status -->
+        <div class="card" style="padding: 1.75rem;">
+          <h2 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1rem;">
+            📡 Hardware Biometrics & Terminal
+          </h2>
+
+          <div id="biometric-status-box" style="display: flex; gap: 1rem; align-items: center;">
+            <div id="biometric-icon" style="width: 46px; height: 46px; border-radius: 8px; background: var(--bg-surface-secondary); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+              📡
+            </div>
+            <div style="flex: 1;">
+              <div id="biometric-headline" style="font-weight: 800; font-size: 0.95rem;">Checking Terminal Status...</div>
+              <p id="biometric-sub" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; margin-bottom: 0;">
+                Optical fingerprint sensor registration status
+              </p>
+            </div>
+          </div>
+
+          <div id="biometric-detail-panel" style="display: none; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color); font-size: 0.825rem; color: var(--text-muted);">
+            <div>Assigned Hardware Slot: <strong id="biometric-slot-val" style="color: var(--text-main); font-family: var(--font-family-mono);">--</strong></div>
+            <div style="margin-top: 0.25rem;">Terminal Unit: <span id="biometric-device-val" style="color: var(--text-main); font-weight: 600;">--</span></div>
+            <div style="margin-top: 0.25rem;">Hardware State: <span style="color: var(--status-present); font-weight: 700;">Synchronized & Online</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Account Security & Password Form -->
+      <div class="card" style="padding: 1.75rem;">
+        <h2 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1.25rem;">
+          🔒 Account & Security
+        </h2>
+
+        <form id="profile-form">
+          <div class="form-group">
+            <label class="form-label">Enrollment Login ID</label>
+            <input type="text" id="profile-username" class="form-control" disabled style="background: var(--bg-surface-secondary); color: var(--text-muted); font-family: var(--font-family-mono); font-weight: 700;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="profile-email">Contact Gmail Address</label>
+            <input type="email" id="profile-email" class="form-control" placeholder="student@gmail.com" required>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Used for institutional attendance notifications and session alerts.
+            </div>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+          <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-main);">Change Account Password</h3>
+
+          <div class="form-group">
+            <label class="form-label" for="current-password">Current Password</label>
+            <div class="password-wrap">
+              <input type="password" id="current-password" class="form-control" placeholder="Required only if changing password">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('current-password', this)" aria-label="Toggle password view">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-password">New Password (min 8 chars)</label>
+            <div class="password-wrap">
+              <input type="password" id="new-password" class="form-control" placeholder="Minimum 8 characters">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('new-password', this)" aria-label="Toggle password view">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm-password">Confirm New Password</label>
+            <div class="password-wrap">
+              <input type="password" id="confirm-password" class="form-control" placeholder="Re-enter new password">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('confirm-password', this)" aria-label="Toggle password view">👁️</button>
+            </div>
+          </div>
+
+          <div id="profile-feedback" style="display: none; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+          <button type="submit" id="save-profile-btn" class="btn btn-primary" style="width: 100%; font-weight: 700; margin-top: 0.5rem;">
+            Save Profile Updates
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script src="/js/utils.js"></script>
+  <script>
+    guardRoute(['STUDENT']);
+
+    function togglePassVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        inp.type = 'password';
+        btn.innerText = '👁️';
+      }
+    }
+
+    async function loadStudentProfile() {
+      try {
+        const res = await fetchApi('/students/me');
+        if (!res.success || !res.data) return;
+
+        const s = res.data;
+
+        // 1. Identity
+        const fullName = s.full_name || 'Student';
+        document.getElementById('hero-name').innerText = fullName;
+        document.getElementById('hero-enrollment').innerText = s.official_enrollment_no || '--';
+        document.getElementById('hero-dept').innerText = `${s.department_name || 'Engineering'} (${s.branch_code || s.department_code || 'DEPT'})`;
+        document.getElementById('hero-roll-badge').innerText = `Roll: ${s.class_roll_no || '--'}`;
+        if (document.getElementById('hero-reg-badge')) {
+          document.getElementById('hero-reg-badge').innerText = `UBTER Reg: ${s.registration_no || '--'}`;
+        }
+        document.getElementById('hero-term-badge').innerText = `Year ${s.year || 1} • Sem ${s.semester || 1}`;
+
+        // Avatar Initials
+        const nameParts = fullName.trim().split(/\s+/);
+        const initials = nameParts.length >= 2 
+          ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+          : fullName.slice(0, 2).toUpperCase();
+        document.getElementById('hero-avatar').innerText = initials;
+
+        // Cohort details
+        document.getElementById('profile-enrollment-no').innerText = s.official_enrollment_no || '--';
+        document.getElementById('profile-roll-no').innerText = s.class_roll_no ? `${s.class_roll_no}` : '--';
+        document.getElementById('profile-reg-no').innerText = s.registration_no || '—';
+        document.getElementById('profile-department').innerText = s.department_name || s.branch_name || '--';
+        document.getElementById('profile-year-sem').innerText = `Year ${s.year} • Semester ${s.semester}`;
+        document.getElementById('profile-academic-year').innerText = s.academic_year_label || 'Current Session';
+        document.getElementById('profile-class-teacher').innerText = s.class_teacher_name || 'Faculty Advisor';
+
+        // Account fields
+        document.getElementById('profile-username').value = s.official_enrollment_no || s.username || '';
+        document.getElementById('profile-email').value = s.email || '';
+
+        // 2. Attendance Health Stats
+        const stats = s.attendance_stats;
+        const standingBadge = document.getElementById('hero-standing-badge');
+        const healthPct = document.getElementById('health-pct');
+        const healthProgressBar = document.getElementById('health-progress-bar');
+        const healthStatusTag = document.getElementById('health-status-tag');
+        const healthAttended = document.getElementById('health-attended');
+        const healthTotal = document.getElementById('health-total');
+        const healthStanding = document.getElementById('health-exam-standing');
+
+        if (stats) {
+          const pct = parseFloat(stats.percentage || 0);
+          healthPct.innerText = `${pct.toFixed(1)}%`;
+          healthProgressBar.style.width = `${Math.min(100, pct)}%`;
+          healthAttended.innerText = stats.total_attended || 0;
+          healthTotal.innerText = stats.total_classes || 0;
+
+          if (pct >= 75) {
+            standingBadge.className = 'std-badge regular';
+            standingBadge.innerText = 'Regular (≥ 75%)';
+            healthPct.style.color = 'var(--status-present)';
+            healthProgressBar.className = 'progress-bar-fill';
+            healthStatusTag.innerText = '✓ Good Standing';
+            healthStatusTag.style.color = 'var(--status-present)';
+            healthStanding.innerText = 'Eligible for End-Semester Examinations';
+            healthStanding.style.color = 'var(--status-present)';
+          } else {
+            standingBadge.className = 'std-badge defaulter';
+            standingBadge.innerText = 'Defaulter (< 75%)';
+            healthPct.style.color = 'var(--status-absent)';
+            healthProgressBar.className = 'progress-bar-fill defaulter';
+            healthStatusTag.innerText = '⚠️ Attendance Shortage';
+            healthStatusTag.style.color = 'var(--status-absent)';
+            healthStanding.innerText = 'Action Required: Minimum 75% needed';
+            healthStanding.style.color = 'var(--status-absent)';
+          }
+        } else {
+          healthPct.innerText = '100%';
+          healthProgressBar.style.width = '100%';
+          healthStatusTag.innerText = '✓ Verified Standing';
+          healthStanding.innerText = 'Eligible for Examinations';
+        }
+
+        // 3. Biometrics
+        const bioIcon = document.getElementById('biometric-icon');
+        const bioHead = document.getElementById('biometric-headline');
+        const bioSub = document.getElementById('biometric-sub');
+        const bioPanel = document.getElementById('biometric-detail-panel');
+
+        if (s.fingerprint_enrolled) {
+          bioIcon.style.background = 'var(--status-present-bg)';
+          bioIcon.style.color = 'var(--status-present)';
+          bioIcon.innerText = '✓';
+          bioHead.innerText = 'Fingerprint Enrolled & Synced';
+          bioSub.innerText = 'Active on hardware attendance terminal';
+          bioPanel.style.display = 'block';
+          document.getElementById('biometric-slot-val').innerText = `#${s.fingerprint_slot}`;
+          document.getElementById('biometric-device-val').innerText = s.fingerprint_device || 'Main Lab Terminal';
+        } else {
+          bioIcon.style.background = 'var(--status-absent-bg)';
+          bioIcon.style.color = 'var(--status-absent)';
+          bioIcon.innerText = '⚠️';
+          bioHead.innerText = 'Not Registered on Terminal';
+          bioSub.innerText = 'Visit your class teacher or lab terminal to register fingerprint template.';
+          bioPanel.style.display = 'none';
+        }
+      } catch (err) {
+        console.error('Failed to load student profile', err);
+      }
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const feedback = document.getElementById('profile-feedback');
+      feedback.style.display = 'none';
+
+      const email = document.getElementById('profile-email').value.trim();
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      if (newPassword && newPassword.length < 8) {
+        feedback.style.display = 'block';
+        feedback.style.background = 'var(--status-absent-bg)';
+        feedback.style.color = 'var(--status-absent)';
+        feedback.innerText = 'New password must be at least 8 characters long.';
+        return;
+      }
+
+      if (newPassword && newPassword !== confirmPassword) {
+        feedback.style.display = 'block';
+        feedback.style.background = 'var(--status-absent-bg)';
+        feedback.style.color = 'var(--status-absent)';
+        feedback.innerText = 'New passwords do not match.';
+        return;
+      }
+
+      const btn = document.getElementById('save-profile-btn');
+      btn.disabled = true;
+
+      try {
+        const payload = { email };
+        if (newPassword) {
+          payload.current_password = currentPassword;
+          payload.new_password = newPassword;
+        }
+
+        const res = await fetchApi('/students/me', {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.success) {
+          showToast('Profile updated successfully!', 'success');
+          document.getElementById('current-password').value = '';
+          document.getElementById('new-password').value = '';
+          document.getElementById('confirm-password').value = '';
+          loadStudentProfile();
+        } else {
+          feedback.style.display = 'block';
+          feedback.style.background = 'var(--status-absent-bg)';
+          feedback.style.color = 'var(--status-absent)';
+          feedback.innerText = res.error?.message || 'Update failed.';
+        }
+      } catch (err) {
+        feedback.style.display = 'block';
+        feedback.style.background = 'var(--status-absent-bg)';
+        feedback.style.color = 'var(--status-absent)';
+        feedback.innerText = err.message || 'An error occurred while updating profile.';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    loadStudentProfile();
+  </script>
+</body>
+</html>

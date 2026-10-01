@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VidyaOS — Institutional Campus Operating System</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <header class="app-header">
+    <a href="/index.html" class="brand">
+      <span class="brand-badge">VidyaOS</span>
+      <span>Campus Operating System</span>
+    </a>
+    <div id="system-status" class="badge badge-present">● System Online</div>
+  </header>
+
+  <main class="container" style="max-width: 900px; padding-top: 3rem;">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <h1 class="page-title" style="font-size: 2.2rem; margin-bottom: 0.75rem;">VidyaOS Institutional Portal</h1>
+      <p class="page-subtitle" style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+        Unified institutional academic engine, biometric attendance, and digital registry suite. Select your gateway below to proceed.
+      </p>
+    </div>
+
+    <div class="grid-cols-2" style="gap: 2rem;">
+      <!-- Faculty Gateway -->
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--color-primary);">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <div style="font-size: 2rem;">👨‍🏫</div>
+            <span class="badge" style="background: var(--color-primary-light); color: var(--color-primary);">Faculty & Staff</span>
+          </div>
+          <h2 class="card-title" style="font-size: 1.3rem; margin-bottom: 0.5rem;">Faculty & Admin Portal</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Manage classroom attendance sessions, 1-click sync ESP32 biometric scanners, review self-attendance requests, and view institutional analytics.
+          </p>
+        </div>
+        <a href="/login/faculty.html" class="btn btn-primary" style="width: 100%; text-align: center;">Faculty Login →</a>
+      </div>
+
+      <!-- Student Gateway -->
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--status-present);">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <div style="font-size: 2rem;">🎓</div>
+            <span class="badge badge-present">Students</span>
+          </div>
+          <h2 class="card-title" style="font-size: 1.3rem; margin-bottom: 0.5rem;">Student Academic Portal</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Monitor live attendance percentage, interact with the 75% threshold predictor, submit active classroom PIN/QR attendance, and check history.
+          </p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <a href="/login/student.html" class="btn btn-success" style="width: 100%; text-align: center;">Student Login →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Info Footer (Hidden on PC/Desktop) -->
+    <div class="system-info-footer" style="margin-top: 3rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+      <p>VidyaOS — Autonomous Institutional Campus &amp; Academic Operating System</p>
+      <p style="margin-top: 0.25rem;">Server Address: <span id="server-addr" style="font-family: var(--font-family-mono);">localhost:3000</span> | Active Engine: SQLite 3.x</p>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('server-addr').innerText = window.location.host;
+    fetch('/api/v1/health')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          document.getElementById('system-status').className = 'badge badge-absent';
+          document.getElementById('system-status').innerText = '● Database Warning';
+        }
+      })
+      .catch(() => {
+        document.getElementById('system-status').className = 'badge badge-absent';
+        document.getElementById('system-status').innerText = '● Offline';
+      });
+  </script>
+</body>
+</html>

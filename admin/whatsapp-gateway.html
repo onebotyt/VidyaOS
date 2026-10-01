@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institutional WhatsApp Gateway — Admin Console</title>
+  <meta name="description"
+    content="Manage the institutional self-hosted WhatsApp Web Bot engine. Delivers free automated OTPs and parent attendance alerts directly from the college SIM phone number.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    /* ==========================================================================
+       Institutional WhatsApp Gateway Console - 100% Theme Tokenized
+       ========================================================================== */
+
+    .page-main-container {
+      padding-top: 1.5rem;
+      padding-bottom: 3.5rem;
+    }
+
+    /* Page Command Header */
+    .gateway-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .gateway-header-title-wrap {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .gateway-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      border: 1px solid var(--status-present);
+      margin-bottom: 0.4rem;
+    }
+
+    .gateway-header-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .gateway-header-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0.35rem 0 0;
+      line-height: 1.45;
+    }
+
+    .gateway-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Telemetry KPI Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .kpi-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.2rem;
+    }
+
+    .kpi-value {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    /* Main Console Layout */
+    .gateway-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .gateway-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .console-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .console-card-header {
+      padding: 1.15rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .console-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .console-card-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin: 0.2rem 0 0;
+    }
+
+    .console-card-body {
+      padding: 1.5rem;
+    }
+
+    /* QR Code Display Frame */
+    .qr-frame-box {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 0.75rem;
+      display: inline-block;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    /* Dispatch Integration Row */
+    .dispatch-channel-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .dispatch-channel-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .channel-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    /* Status Pill */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+      /* Modal Backdrop & Viewport Constraints */
+      .modal-backdrop.open,
+      .modal-backdrop[style*="display: flex"] {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+        padding: 1rem !important;
+        overflow-y: auto !important;
+        box-sizing: border-box !important;
+        z-index: 2500 !important;
+      }
+
+      .modal-card {
+        max-height: calc(100vh - 2.5rem);
+        max-height: calc(100dvh - 2.5rem);
+        overflow-y: auto;
+        box-sizing: border-box;
+        margin: auto;
+      }
+  </style>
+</head>
+
+<body>
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
+      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/whatsapp-gateway.html" class="btn btn-primary btn-sm" style="font-weight: 600;">WhatsApp
+        Gateway</a>
+      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container page-main-container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+
+    <!-- Breadcrumb & Top Bar -->
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+        <a href="/admin/dashboard.html"
+          style="color: var(--color-primary); text-decoration: none; font-weight: 600;">Admin</a>
+        <span>/</span>
+        <span style="color: var(--text-main); font-weight: 600;">WhatsApp Gateway</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm" style="text-decoration: none;">
+          ← Back to Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="gateway-header">
+      <div class="gateway-header-title-wrap">
+        <div class="gateway-badge">
+          <span>⚡</span>
+          <span>Self-Hosted WhatsApp Web Bot Engine</span>
+        </div>
+        <h1 class="gateway-header-title">
+          <span>📱</span>
+          <span>Institutional WhatsApp Gateway</span>
+        </h1>
+        <p class="gateway-header-desc">
+          Free, automated multi-channel WhatsApp messaging service. Once connected via WhatsApp Web, student &amp;
+          faculty verification OTPs, passwordless login tokens, and institutional notifications dispatch directly from
+          the college phone number without Meta Graph API fees.
+        </p>
+      </div>
+      <div class="gateway-header-actions">
+        <!-- Dynamic Status Pill -->
+        <div id="wa-bot-status-pill" class="status-pill">
+          <span id="wa-bot-status-dot">⚪</span>
+          <span id="wa-bot-status-text">Checking status...</span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-wa-bot" onclick="loadWhatsAppBotStatus()"
+          title="Refresh connection telemetry">
+          🔄 Refresh Status
+        </button>
+      </div>
+    </div>
+
+    <!-- Telemetry KPI Summary Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap" style="color: var(--status-present);">
+          🟢
+        </div>
+        <div>
+          <div class="kpi-label">Gateway Engine</div>
+          <div class="kpi-value" id="kpi-engine-status" style="font-size: 1.05rem;">Playwright Chromium</div>
+          <div class="kpi-sub">whatsapp-web.js (LocalAuth)</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap" style="color: var(--color-primary);">
+          💬
+        </div>
+        <div>
+          <div class="kpi-label">Connected Phone</div>
+          <div class="kpi-value" id="kpi-connected-phone" style="font-size: 1.05rem;">Unlinked</div>
+          <div class="kpi-sub" id="kpi-pushname">Awaiting WhatsApp Web scan</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap" style="color: var(--status-present);">
+          💰
+        </div>
+        <div>
+          <div class="kpi-label">API Cost / Fees</div>
+          <div class="kpi-value" style="color: var(--status-present);">$0.00 (100% Free)</div>
+          <div class="kpi-sub">Self-hosted local session</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap" style="color: var(--status-late);">
+          🛡️
+        </div>
+        <div>
+          <div class="kpi-label">Fail-Safe Fallback</div>
+          <div class="kpi-value" style="font-size: 1.05rem;">Dynamic QR + wa.me</div>
+          <div class="kpi-sub">Never blocks registrations</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Layout: Gateway Card + Sidebar Telemetry -->
+    <div class="gateway-layout">
+
+      <!-- Left Column: Primary Bot Gateway Controller -->
+      <div>
+        <div class="console-card" id="whatsapp-bot-gateway-card">
+          <div class="console-card-header">
+            <div>
+              <h2 class="console-card-title">
+                <span>⚡</span>
+                <span>Device Connection &amp; Live Bot Session</span>
+              </h2>
+              <p class="console-card-subtitle">Connect your official college smartphone once to activate instant OTP
+                dispatches.</p>
+            </div>
+            <div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openTestWaModal()"
+                id="btn-test-modal-top">
+                🧪 Test Dispatch
+              </button>
+            </div>
+          </div>
+          <div class="console-card-body" id="wa-bot-content" style="padding: 1.5rem;">
+            <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 2rem;">
+              ⏳ Checking WhatsApp Web Bot connection status...
+            </div>
+          </div>
+        </div>
+
+        <!-- Automated Integration Channels Card -->
+        <div class="console-card">
+          <div class="console-card-header">
+            <div>
+              <h2 class="console-card-title">
+                <span>📡</span>
+                <span>Automated Integration Channels</span>
+              </h2>
+              <p class="console-card-subtitle">Subsystems automatically routing outgoing messages through this WhatsApp
+                gateway.</p>
+            </div>
+          </div>
+          <div class="console-card-body" style="padding: 1.25rem 1.5rem;">
+            <!-- Channel 1: Student Self-Registration -->
+            <div class="dispatch-channel-item">
+              <div style="font-size: 1.35rem;">🎓</div>
+              <div style="flex: 1;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                  <span style="font-weight: 700; color: var(--text-main); font-size: 0.92rem;">Student Self-Registration
+                    Verification</span>
+                  <span class="channel-badge">OTP Service</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.45;">
+                  When prospective students sign up via <a href="/login/student-register.html" target="_blank"
+                    style="color: var(--color-primary); text-decoration: none; font-weight: 600;">/login/student-register.html</a>,
+                  a 6-digit WhatsApp OTP is instantly dispatched to their mobile phone.
+                </p>
+              </div>
+            </div>
+
+            <!-- Channel 2: Faculty Self-Registration -->
+            <div class="dispatch-channel-item">
+              <div style="font-size: 1.35rem;">👨‍🏫</div>
+              <div style="flex: 1;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                  <span style="font-weight: 700; color: var(--text-main); font-size: 0.92rem;">Faculty &amp; HOD
+                    Onboarding Verification</span>
+                  <span class="channel-badge">OTP Service</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.45;">
+                  Teachers onboarding at <a href="/login/faculty-register.html" target="_blank"
+                    style="color: var(--color-primary); text-decoration: none; font-weight: 600;">/login/faculty-register.html</a>
+                  must verify their mobile phone number via WhatsApp OTP before their application routes to the
+                  Department HOD.
+                </p>
+              </div>
+            </div>
+
+            <!-- Channel 3: Passwordless / Account Recovery -->
+            <div class="dispatch-channel-item">
+              <div style="font-size: 1.35rem;">🔑</div>
+              <div style="flex: 1;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                  <span style="font-weight: 700; color: var(--text-main); font-size: 0.92rem;">Passwordless Sign-In
+                    &amp; Password Reset</span>
+                  <span class="channel-badge">Auth Engine</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.45;">
+                  Faculty and students can request a one-time login code delivered to their WhatsApp phone for quick,
+                  zero-friction portal access without typing passwords.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Security, Anti-Ban & Technical Specifications -->
+      <div>
+        <!-- Architecture Card -->
+        <div class="console-card">
+          <div class="console-card-header">
+            <h3 class="console-card-title" style="font-size: 0.95rem;">
+              <span>⚙️</span>
+              <span>Engine Architecture</span>
+            </h3>
+          </div>
+          <div class="console-card-body" style="font-size: 0.82rem; line-height: 1.5; color: var(--text-muted);">
+            <div style="margin-bottom: 0.75rem;">
+              <strong style="color: var(--text-main);">Session Persistence:</strong><br>
+              Tokens are saved in <code>backend/whatsapp_session/</code> using WhatsApp Web <code>LocalAuth</code>.
+              Restarting the server does not log out the connected phone.
+            </div>
+            <div style="margin-bottom: 0.75rem;">
+              <strong style="color: var(--text-main);">Headless Execution:</strong><br>
+              Uses the pre-installed Playwright Chromium binary in headless mode. Consumes ~70MB RAM with zero extra
+              downloads.
+            </div>
+            <div>
+              <strong style="color: var(--text-main);">Anti-Spam Safeguards:</strong><br>
+              Outgoing messages are queued with jittered human delay intervals (200-800ms) to ensure institutional phone
+              accounts remain compliant with WhatsApp usage policies.
+            </div>
+          </div>
+        </div>
+
+        <!-- Fail-Safe Protection Card -->
+        <div class="console-card">
+          <div class="console-card-header">
+            <h3 class="console-card-title" style="font-size: 0.95rem;">
+              <span>🛡️</span>
+              <span>Fail-Safe Fallback Modes</span>
+            </h3>
+          </div>
+          <div class="console-card-body" style="font-size: 0.82rem; line-height: 1.5; color: var(--text-muted);">
+            <p style="margin: 0 0 0.75rem 0;">
+              If the college smartphone loses battery or is disconnected, the system automatically and instantly
+              activates two fallback layers:
+            </p>
+            <div style="display: flex; gap: 0.6rem; margin-bottom: 0.6rem;">
+              <span style="font-size: 1.1rem;">1️⃣</span>
+              <div>
+                <strong style="color: var(--text-main);">Dynamic QR Code:</strong> Users scan a live QR code on screen
+                to retrieve the verification code.
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.6rem; margin-bottom: 0.6rem;">
+              <span style="font-size: 1.1rem;">2️⃣</span>
+              <div>
+                <strong style="color: var(--text-main);">Direct wa.me Chat Link:</strong> Users tap a 1-click WhatsApp
+                link to message the department dispatch assistant.
+              </div>
+            </div>
+            <p style="margin: 0.75rem 0 0 0; font-weight: 600; color: var(--status-present);">
+              ✓ Student onboarding never halts, even during power cuts or offline maintenance.
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Links Card -->
+        <div class="console-card">
+          <div class="console-card-header">
+            <h3 class="console-card-title" style="font-size: 0.95rem;">
+              <span>🔗</span>
+              <span>Admin Shortcuts</span>
+            </h3>
+          </div>
+          <div class="console-card-body" style="padding: 0.75rem 1.25rem;">
+            <ul style="list-style: none; margin: 0; padding: 0; font-size: 0.85rem;">
+              <li style="padding: 0.45rem 0; border-bottom: 1px solid var(--border-color);">
+                <a href="/admin/faculty.html"
+                  style="color: var(--color-primary); text-decoration: none; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+                  <span>👨‍🏫 Faculty Approvals &amp; HODs</span>
+                  <span>&rarr;</span>
+                </a>
+              </li>
+              <li style="padding: 0.45rem 0; border-bottom: 1px solid var(--border-color);">
+                <a href="/admin/students.html"
+                  style="color: var(--color-primary); text-decoration: none; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+                  <span>👥 Student Records Roster</span>
+                  <span>&rarr;</span>
+                </a>
+              </li>
+              <li style="padding: 0.45rem 0; border-bottom: 1px solid var(--border-color);">
+                <a href="/admin/audit-logs.html"
+                  style="color: var(--color-primary); text-decoration: none; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+                  <span>🛡️ Security &amp; Audit Logs</span>
+                  <span>&rarr;</span>
+                </a>
+              </li>
+              <li style="padding: 0.45rem 0;">
+                <a href="/admin/settings.html"
+                  style="color: var(--color-primary); text-decoration: none; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+                  <span>⚙️ Institutional Settings</span>
+                  <span>&rarr;</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Interactive Test WhatsApp Message Modal -->
+  <div id="test-wa-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; width: 92%;">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <h3 class="card-title" style="margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>🧪</span>
+          <span>Send Test WhatsApp Message</span>
+        </h3>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeTestWaModal()"
+          style="padding: 0.2rem 0.6rem;">✕</button>
+      </div>
+
+      <div id="test-wa-err"
+        style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); color: var(--status-absent); padding: 0.6rem 0.85rem; border-radius: var(--radius-md); font-size: 0.8rem; margin-bottom: 1rem; font-weight: 600;">
+      </div>
+      <div id="test-wa-success"
+        style="display: none; background: var(--status-present-bg); border: 1px solid var(--status-present); color: var(--status-present); padding: 0.6rem 0.85rem; border-radius: var(--radius-md); font-size: 0.8rem; margin-bottom: 1rem; font-weight: 600;">
+      </div>
+
+      <form id="test-wa-form" onsubmit="event.preventDefault(); submitTestWaMessage();">
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label" for="test-wa-phone"
+            style="display: block; margin-bottom: 0.35rem; font-size: 0.85rem; font-weight: 700; color: var(--text-main);">
+            Recipient Mobile Phone <span style="color: var(--status-absent);">*</span>
+          </label>
+          <div style="position: relative;">
+            <span
+              style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted); font-size: 0.88rem;">+91</span>
+            <input type="tel" id="test-wa-phone" class="form-control" placeholder="9876543210" required maxlength="10"
+              style="padding-left: 3.25rem; font-family: var(--font-family-mono); font-weight: 600;" />
+          </div>
+          <p class="form-hint" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem;">Must be a valid
+            10-digit Indian mobile number registered on WhatsApp.</p>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label class="form-label" for="test-wa-message"
+            style="display: block; margin-bottom: 0.35rem; font-size: 0.85rem; font-weight: 700; color: var(--text-main);">
+            Message Body <span style="color: var(--status-absent);">*</span>
+          </label>
+          <textarea id="test-wa-message" class="form-control" rows="3" required
+            style="font-size: 0.85rem; line-height: 1.45;"
+            placeholder="Hello! This is a test notification from the Institutional WhatsApp Gateway."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeTestWaModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-send-test-wa" style="font-weight: 700;">
+            🚀 Dispatch Message
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+
+  <script>
+    // ─── Security Guard ──────────────────────────────────────────
+    guardRoute({ requireRoles: ['SYSTEM_ADMIN'] });
+
+    // ─── API & Modal Helpers ─────────────────────────────────────
+    const API = '/api/v1';
+    async function apiFetch(url, options = {}) {
+      const endpoint = url.startsWith('/api/v1') ? url.replace('/api/v1', '') : url;
+      return await fetchApi(endpoint, options);
+    }
+
+    function showModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('open');
+      }
+    }
+
+    function hideModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+
+    // ─── State ───────────────────────────────────────────────────
+    let waBotState = {
+      is_connected: false,
+      status: 'DISCONNECTED',
+      qr_code_url: null,
+      connected_user: null
+    };
+    let waBotPollInterval = null;
+
+    // ─── Lifecycle & Initialization ──────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadWhatsAppBotStatus();
+      // Auto-poll status periodically
+      waBotPollInterval = setInterval(loadWhatsAppBotStatus, 6000);
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (waBotPollInterval) clearInterval(waBotPollInterval);
+    });
+
+    // ─── WhatsApp Web Bot Management Logic ─────────────────────────
+    async function loadWhatsAppBotStatus() {
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/status`);
+        if (res.success && res.data) {
+          waBotState = res.data;
+          renderWhatsAppBotUI(waBotState);
+        }
+      } catch (err) {
+        console.warn('Could not load WhatsApp Bot status:', err);
+      }
+    }
+
+    function renderWhatsAppBotUI(state) {
+      const pill = document.getElementById('wa-bot-status-pill');
+      const dot = document.getElementById('wa-bot-status-dot');
+      const text = document.getElementById('wa-bot-status-text');
+      const content = document.getElementById('wa-bot-content');
+
+      const kpiPhone = document.getElementById('kpi-connected-phone');
+      const kpiPush = document.getElementById('kpi-pushname');
+      const kpiEngine = document.getElementById('kpi-engine-status');
+
+      if (!pill || !dot || !text || !content) return;
+
+      const st = state.status;
+
+      if (st === 'CONNECTED' && state.is_connected) {
+        dot.textContent = '🟢';
+        text.textContent = `Connected (+91 ${state.connected_user?.phone || 'College Phone'})`;
+        pill.style.background = 'var(--status-present-bg)';
+        pill.style.color = 'var(--status-present)';
+        pill.style.borderColor = 'var(--status-present)';
+
+        if (kpiPhone) kpiPhone.textContent = `+91 ${state.connected_user?.phone || 'Connected'}`;
+        if (kpiPush) kpiPush.textContent = state.connected_user?.pushname || 'Active Session';
+        if (kpiEngine) kpiEngine.textContent = 'Active (Online)';
+
+        content.innerHTML = `
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--status-present-bg); color: var(--status-present); display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
+                  📱
+                </div>
+                <div>
+                  <div style="font-weight: 800; font-size: 1.15rem; color: var(--text-main);">+91 ${state.connected_user?.phone || 'College Phone'}</div>
+                  <div style="font-size: 0.82rem; color: var(--text-muted);">${state.connected_user?.pushname || 'Institutional WhatsApp'} • Active Headless Session</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-test-wa-bot" onclick="openTestWaModal()" style="font-weight: 600;">
+                  🧪 Send Test Message
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-disconnect-wa-bot" onclick="disconnectWhatsAppBot()" style="color: var(--status-absent); font-weight: 600;">
+                  🔌 Disconnect Session
+                </button>
+              </div>
+            </div>
+            <div style="background: var(--status-present-bg); border: 1px solid var(--status-present); border-radius: var(--radius-sm); padding: 0.85rem 1.15rem; color: var(--status-present); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.6rem;">
+              <span style="font-size: 1.1rem;">✓</span>
+              <span>Automated 100% Free WhatsApp Web Bot is Active. All student &amp; faculty registration OTPs and parent attendance alerts are automatically dispatched directly from this phone number.</span>
+            </div>
+          </div>
+        `;
+      } else if (st === 'QR_READY' && state.qr_code_url) {
+        dot.textContent = '🟡';
+        text.textContent = 'Scan QR Code to Link';
+        pill.style.background = 'var(--status-late-bg)';
+        pill.style.color = 'var(--status-late)';
+        pill.style.borderColor = 'var(--status-late)';
+
+        if (kpiPhone) kpiPhone.textContent = 'Pairing Device...';
+        if (kpiPush) kpiPush.textContent = 'Scan QR code in WhatsApp';
+        if (kpiEngine) kpiEngine.textContent = 'Awaiting Link';
+
+        content.innerHTML = `
+          <div style="display: grid; grid-template-columns: minmax(180px, 220px) 1fr; gap: 1.75rem; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+            <div style="text-align: center;">
+              <div class="qr-frame-box">
+                <img id="wa-bot-qr-img" src="${state.qr_code_url}" alt="WhatsApp Web Link QR Code" style="width: 190px; height: 190px; display: block; image-rendering: pixelated;" />
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Scan using official college phone</div>
+            </div>
+            <div>
+              <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0 0 0.6rem 0; color: var(--text-main);">Link College Phone via WhatsApp</h3>
+              <ol style="margin: 0 0 1.25rem 1.25rem; padding: 0; font-size: 0.85rem; color: var(--text-main); line-height: 1.65;">
+                <li>Open <strong>WhatsApp</strong> on your official college Android phone or iPhone.</li>
+                <li>Tap <strong>Settings</strong> (iOS) or <strong>⋮ More options</strong> (Android) &rarr; <strong>Linked Devices</strong>.</li>
+                <li>Tap <strong>Link a Device</strong> and point your camera at the QR code on the left.</li>
+                <li>Once scanned, this console will automatically switch to <strong style="color: var(--status-present);">🟢 Connected</strong>.</li>
+              </ol>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="disconnectWhatsAppBot()">✕ Cancel / Reset</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadWhatsAppBotStatus()">🔄 Refresh Status</button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (st === 'INITIALIZING') {
+        dot.textContent = '⏳';
+        text.textContent = 'Initializing Bot...';
+        pill.style.background = 'var(--bg-surface)';
+        pill.style.color = 'var(--color-primary)';
+        pill.style.borderColor = 'var(--color-primary)';
+
+        if (kpiPhone) kpiPhone.textContent = 'Launching...';
+        if (kpiPush) kpiPush.textContent = 'Booting Chromium browser';
+        if (kpiEngine) kpiEngine.textContent = 'Initializing';
+
+        content.innerHTML = `
+          <div style="text-align: center; padding: 2.5rem 1rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⏳</div>
+            <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.35rem;">Starting Headless WhatsApp Engine...</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Launching Chromium and generating secure pairing QR code. This takes ~10-15 seconds.</div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="disconnectWhatsAppBot()">✕ Cancel</button>
+          </div>
+        `;
+      } else {
+        dot.textContent = '⚪';
+        text.textContent = 'Bot Offline / Unlinked';
+        pill.style.background = 'var(--bg-surface)';
+        pill.style.color = 'var(--text-muted)';
+        pill.style.borderColor = 'var(--border-color)';
+
+        if (kpiPhone) kpiPhone.textContent = 'Unlinked';
+        if (kpiPush) kpiPush.textContent = 'Awaiting activation';
+        if (kpiEngine) kpiEngine.textContent = 'Offline';
+
+        content.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+            <div>
+              <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.35rem;">
+                WhatsApp Web Bot is currently unlinked
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); max-width: 540px; line-height: 1.5;">
+                Student &amp; faculty registration OTPs currently fallback to dynamic QR cards &amp; direct chat links. Link your institutional phone once to activate 100% automated direct delivery with zero subscription fees.
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary" id="btn-init-wa-bot" onclick="initWhatsAppBot()" style="font-weight: 700; padding: 0.65rem 1.25rem;">
+                🚀 Link Bot (Generate QR)
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function initWhatsAppBot() {
+      const btn = document.getElementById('btn-init-wa-bot');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Starting Engine...';
+      }
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/initialize`, { method: 'POST' });
+        showToast(res.message || 'WhatsApp Bot initializing. Preparing QR code...', 'info');
+        await loadWhatsAppBotStatus();
+      } catch (err) {
+        showToast(err.message || 'Failed to start WhatsApp Bot.', 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '🚀 Link Bot (Generate QR)';
+        }
+      }
+    }
+
+    async function disconnectWhatsAppBot() {
+      if (!confirm('Are you sure you want to disconnect the WhatsApp Web Bot session? Outgoing messages will temporarily revert to dynamic QR fallback.')) return;
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/disconnect`, { method: 'POST' });
+        showToast(res.message || 'WhatsApp Bot disconnected.', 'info');
+        await loadWhatsAppBotStatus();
+      } catch (err) {
+        showToast(err.message || 'Failed to disconnect bot.', 'error');
+      }
+    }
+
+    // ─── Test Message Modal Handlers ──────────────────────────────
+    function openTestWaModal() {
+      const phoneInput = document.getElementById('test-wa-phone');
+      const msgInput = document.getElementById('test-wa-message');
+      const errEl = document.getElementById('test-wa-err');
+      const succEl = document.getElementById('test-wa-success');
+      if (phoneInput) phoneInput.value = '';
+      if (msgInput) msgInput.value = 'Hello! This is a test notification from the College Attendance WhatsApp Gateway.';
+      if (errEl) errEl.style.display = 'none';
+      if (succEl) succEl.style.display = 'none';
+      showModal('test-wa-modal');
+    }
+
+    function closeTestWaModal() {
+      hideModal('test-wa-modal');
+    }
+
+    async function submitTestWaMessage() {
+      const phoneInput = document.getElementById('test-wa-phone');
+      const msgInput = document.getElementById('test-wa-message');
+      const errEl = document.getElementById('test-wa-err');
+      const succEl = document.getElementById('test-wa-success');
+      const btn = document.getElementById('btn-send-test-wa');
+
+      const phone = phoneInput?.value.trim().replace(/\D/g, '') || '';
+      const message = msgInput?.value.trim() || '';
+
+      if (!phone || phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone)) {
+        if (errEl) {
+          errEl.textContent = 'Please enter a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9).';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      if (!message) {
+        if (errEl) {
+          errEl.textContent = 'Message body cannot be empty.';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      if (errEl) errEl.style.display = 'none';
+      if (succEl) succEl.style.display = 'none';
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+      }
+
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/test-send`, {
+          method: 'POST',
+          body: JSON.stringify({ phone, message })
+        });
+
+        if (succEl) {
+          succEl.textContent = `✓ Message successfully dispatched to +91 ${phone}!`;
+          succEl.style.display = 'block';
+        }
+        showToast('WhatsApp test message delivered successfully!', 'success');
+
+        setTimeout(() => {
+          closeTestWaModal();
+        }, 1800);
+      } catch (err) {
+        if (errEl) {
+          errEl.textContent = err.message || 'Failed to dispatch WhatsApp message. Ensure bot is connected.';
+          errEl.style.display = 'block';
+        }
+        showToast(err.message || 'Dispatch failed', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '🚀 Dispatch Message';
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>

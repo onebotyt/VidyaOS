@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Teachers — HOD Portal</title>
+  <meta name="description" content="Manage faculty, assign subjects, and configure class teachers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .hod-nav-section { border-top: 1px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem; }
+    .hod-nav-label { font-size: 0.68rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); padding: 0 0.25rem; letter-spacing: 0.05em; }
+    
+    .teacher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+    
+    .teacher-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      position: relative;
+      transition: 0.2s;
+    }
+    .teacher-card:hover { border-color: var(--color-primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    
+    .tc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .tc-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--color-primary-light); color: var(--color-primary); font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    
+    .tc-name { font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.1rem; }
+    .tc-empid { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
+    
+    .tc-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
+    
+    /* Dropdown Menu */
+    .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); }
+    .menu-btn:hover { background: var(--bg-surface); color: var(--text-main); }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 1.25rem;
+      top: 3.5rem;
+      background: var(--bg-card);
+      min-width: 180px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      z-index: 10;
+      flex-direction: column;
+    }
+    .dropdown-content.show { display: flex; }
+    .dropdown-item {
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      text-decoration: none;
+      cursor: pointer;
+      text-align: left;
+      border: none;
+      background: none;
+      width: 100%;
+    }
+    .dropdown-item:hover { background: var(--bg-surface); }
+    .dropdown-item.danger { color: var(--status-absent); }
+    .dropdown-item.danger:hover { background: var(--status-absent-bg); }
+    
+    .assignment-chip { display: inline-flex; align-items: center; gap: 0.25rem; background: var(--color-primary-light); color: var(--color-primary); border-radius: 99px; font-size: 0.72rem; font-weight: 600; padding: 0.1rem 0.5rem; }
+    .assignment-chip.practical { background: var(--status-late-bg); color: var(--status-late); }
+    .assignment-chip.class { background: var(--status-present-bg); color: var(--status-present); }
+    .assignment-chip.hod { background: var(--color-primary-light); color: var(--color-primary); }
+
+    /* Ensure modal backdrop is visible and clickable when open */
+    .modal-backdrop.open,
+    .modal-backdrop[style*="display: flex"] {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+  </style>
+</head>
+<body onclick="closeAllDropdowns(event)">
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">HOD</span>
+      <span id="dept-header-name">Department Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <div id="dynamic-teacher-nav" style="display: flex; gap: 0.5rem;"></div>
+      <div class="hod-nav-section" style="border-top: none; padding: 0; margin: 0; display: flex; gap: 0.5rem; align-items: center;">
+        <span class="hod-nav-label">HOD:</span>
+        <a href="/faculty/hod-teachers.html" class="btn btn-primary btn-sm" style="font-weight: 600;">My Teachers</a>
+        <a href="/faculty/hod-subjects.html" class="btn btn-secondary btn-sm">Subjects</a>
+        <a href="/faculty/hod-students.html" class="btn btn-secondary btn-sm">Students</a>
+        <a href="/faculty/hod-archive.html" class="btn btn-secondary btn-sm">Archive</a>
+        <a href="/faculty/hod-reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+        <a href="/faculty/hod-devices.html" class="btn btn-secondary btn-sm">ESP Terminals</a>
+        <a href="/faculty/hod-settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      </div>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <div class="page-header" style="margin-bottom: 2rem;">
+      <div>
+        <h1 class="page-title">Department Teachers</h1>
+        <p class="page-subtitle" id="dept-subtitle">Manage faculty, assign subjects, and configure class teachers.</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="hod-faculty-reg-btn" class="btn btn-secondary" onclick="toggleFacultyRegistration()" style="font-weight: 600; display: inline-flex; align-items: center; gap: 0.45rem;">
+          <span id="hod-reg-indicator">⚪</span>
+          <span id="hod-reg-text">Faculty Reg: Checking...</span>
+        </button>
+        <button class="btn btn-primary" onclick="openCreateModal()">+ Add Teacher</button>
+      </div>
+    </div>
+
+    <!-- Pending Faculty Approvals Queue -->
+    <div class="card" id="pending-faculty-card" style="margin-bottom: 1.5rem; display: none;">
+      <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">⏳</span>
+            <h2 class="card-title" style="font-size: 1.1rem; margin: 0;">Pending Faculty Registrations</h2>
+          </div>
+          <p class="card-subtitle" style="margin-top: 0.2rem;">Self-registered teachers requesting to join your department. Review and approve to activate their teaching account.</p>
+        </div>
+        <div id="pending-faculty-badge" style="background: var(--status-late); color: var(--text-white); border-radius: 999px; padding: 0.2rem 0.75rem; font-size: 0.8rem; font-weight: 700;">0 Pending</div>
+      </div>
+      <div id="pending-faculty-wrap" style="padding: 1rem;">
+        <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem;">Loading pending requests...</div>
+      </div>
+    </div>
+
+    <!-- Search & Grid -->
+    <div style="margin-bottom: 1.5rem; display: flex; justify-content: flex-end;">
+      <input type="text" id="search-box" class="form-control" placeholder="Search by name or Gmail..." style="max-width: 280px;" oninput="filterTeachers(this.value)">
+    </div>
+
+    <div id="teacher-grid" class="teacher-grid">
+      <div style="text-align: center; padding: 2.5rem; color: var(--text-muted); grid-column: 1 / -1;">Loading faculty...</div>
+    </div>
+  </main>
+
+  <!-- CREATE TEACHER MODAL -->
+  <div id="create-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 580px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Add Teacher to Department</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">System generates a secure temporary password automatically.</p>
+        </div>
+        <button type="button" onclick="closeCreateModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <form id="create-form" onsubmit="submitCreateTeacher(event)">
+        <!-- Basic Info -->
+        <div class="form-group">
+          <label class="form-label">Full Name <span style="color: var(--status-absent);">*</span></label>
+          <input type="text" id="t-name" class="form-control" placeholder="Prof. Rahul Verma" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Institutional Gmail (Login ID) <span style="color: var(--status-absent);">*</span></label>
+          <input type="email" id="t-email" class="form-control" placeholder="prof.name@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Initial Password <span style="color: var(--status-absent);">*</span></label>
+          <input type="text" id="t-password" class="form-control" placeholder="Password@123" value="Password@123" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" id="t-phone" class="form-control" placeholder="9876543210">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Employee ID</label>
+            <input type="text" id="t-empid" class="form-control" placeholder="Optional" style="text-transform: uppercase;">
+          </div>
+        </div>
+        
+        <hr style="margin: 1.25rem 0; border: none; border-top: 1px solid var(--border-color);">
+        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem;">Initial Assignments (Optional)</h3>
+
+        <!-- Initial Subject Assignment: Direct Subject Selection -->
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 600;">Assign Initial Subject (Optional)</label>
+          <div style="margin-bottom: 0.5rem;">
+            <select id="t-subject" class="form-control" onchange="onCreateSubjectChange(this.value)">
+              <option value="">— Skip Subject Assignment —</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;" id="t-subject-options">
+            <div>
+              <label class="form-label" style="font-size:0.72rem; color:var(--text-muted);">Scope</label>
+              <select id="t-scope" class="form-control" disabled>
+                <option value="THEORY">THEORY</option>
+                <option value="PRACTICAL">PRACTICAL</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:0.72rem; color:var(--text-muted);">Year</label>
+              <select id="t-year" class="form-control" disabled>
+                <option value="">Year</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:0.72rem; color:var(--text-muted);">Sem</label>
+              <select id="t-sem" class="form-control" disabled>
+                <option value="">Sem</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="create-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.85rem; color: var(--status-absent); margin-top: 1rem;"></div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+          <button type="submit" id="create-btn" class="btn btn-primary">Create Teacher & Assign</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DELETE TEACHER MODAL -->
+  <div id="delete-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--status-absent); margin-bottom: 0.75rem;">Delete Teacher Account?</h2>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        You are about to permanently delete <strong id="del-name"></strong>. This will also remove their subjects and registers.
+      </p>
+      <div style="background: var(--status-absent-bg); border: 1px solid var(--status-absent); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; text-align: left;">
+        <label class="form-label" style="color: var(--status-absent);">Type DELETE to confirm:</label>
+        <input type="text" id="del-confirm-input" class="form-control" placeholder="DELETE" oninput="checkDeleteInput()">
+      </div>
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button id="del-btn" class="btn btn-primary" style="background: var(--status-absent); border-color: var(--status-absent);" onclick="submitDelete()" disabled>Permanently Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESET PASSWORD MODAL -->
+  <div id="reset-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 440px;">
+      <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0 0 1.25rem 0;">Reset Password</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Enter a new password for <strong id="reset-name"></strong>.</p>
+      <form id="reset-form" onsubmit="submitReset(event)">
+        <div class="form-group">
+          <label class="form-label">New Password <span style="color: var(--status-absent);">*</span></label>
+          <input type="text" id="reset-password" class="form-control" placeholder="Password@123" value="Password@123" required>
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+          <button type="submit" id="reset-btn" class="btn btn-primary">Reset Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ASSIGNMENT REASSIGN MODAL (Edit) -->
+  <div id="reassign-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 520px;">
+      <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0 0 1.25rem 0;">Assign Additional Subject</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Assigning another subject to <strong id="reassign-name"></strong>.</p>
+      <form id="reassign-form" onsubmit="submitReassign(event)">
+        <!-- Subject Selection -->
+        <div class="form-group">
+          <label class="form-label">Subject <span style="color: var(--status-absent);">*</span></label>
+          <select id="reassign-subject" class="form-control" required onchange="onReassignSubjectChange(this.value)">
+            <option value="">— Select Subject —</option>
+          </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Scope <span style="color: var(--status-absent);">*</span></label>
+            <select id="reassign-scope" class="form-control" required>
+              <option value="THEORY">THEORY</option>
+              <option value="PRACTICAL">PRACTICAL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Year/Sem <span style="color: var(--status-absent);">*</span></label>
+            <div style="display: flex; gap: 0.25rem;">
+              <select id="reassign-year" class="form-control" required>
+                <option value="">Year</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+              <select id="reassign-sem" class="form-control" required>
+                <option value="">Sem</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div id="reassign-error" style="display: none; background: var(--status-absent-bg); color: var(--status-absent); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-top: 1rem;"></div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeReassignModal()">Cancel</button>
+          <button type="submit" id="reassign-btn" class="btn btn-primary">Assign Subject</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREDENTIALS SLIP -->
+  <div id="cred-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 440px; text-align: center;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎉</div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">Teacher Created Successfully!</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Please share these login credentials securely.</p>
+      
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem; text-align: left; margin-bottom: 1.5rem;">
+        <div style="margin-bottom: 0.75rem;"><span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Name</span><div id="slip-name" style="font-weight: 600; font-size: 1.05rem;"></div></div>
+        <div style="margin-bottom: 0.75rem;"><span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Login ID (Gmail)</span><div id="slip-gmail" style="font-family: monospace; font-size: 1rem; color: var(--color-primary);"></div></div>
+        <div><span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Temporary Password</span><div id="slip-temp" style="font-family: monospace; font-size: 1.2rem; font-weight: 700; letter-spacing: 2px;"></div></div>
+      </div>
+      
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button class="btn btn-secondary" onclick="copyCredentials()">📋 Copy to Clipboard</button>
+        <button class="btn btn-primary" onclick="closeCredModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireHOD: true });
+    const API = '/api/v1/hod';
+    var allTeachers = [];
+    var subjects = [];
+    var branches = [];
+    var defaultBranchId = null;
+    
+    var deleteTargetId = null;
+    var resetTargetId = null;
+    var reassignTargetId = null;
+    var currentUserTeacherId = null;
+
+    var user = null;
+    try {
+      if (typeof getCurrentUser === 'function') user = getCurrentUser();
+    } catch (_) {}
+
+    if (user && user.has_assigned_subjects) {
+      const navEl = document.getElementById('dynamic-teacher-nav');
+      if (navEl) {
+        navEl.innerHTML = `
+          <a href="/faculty/registers.html" class="btn btn-secondary btn-sm">Take Attendance</a>
+          <a href="/faculty/reports.html" class="btn btn-secondary btn-sm">Reports</a>
+        `;
+      }
+    }
+
+    // Modal Helper
+    function showModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = 'flex';
+      el.classList.add('open');
+    }
+    function hideModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('open');
+      el.style.display = 'none';
+    }
+
+    (async function() {
+      try {
+        const h = await apiFetch(`${API}/hierarchy`);
+        branches = h.data.branches || [];
+        subjects = h.data.subjects || [];
+        defaultBranchId = h.data.user_branch_id || (branches[0] ? branches[0].id : null);
+        if (h.data.department_name) {
+          document.getElementById('dept-header-name').textContent = h.data.department_name + ' — Department';
+          document.getElementById('dept-subtitle').textContent = `Faculty in ${h.data.department_name}`;
+        }
+        populateSubjectDropdowns();
+      } catch (err) {
+        console.error('Failed to load department hierarchy:', err);
+      }
+
+      loadFacultyRegistrationStatus();
+      loadTeachers();
+      loadPendingFaculty();
+    })();
+
+    let isFacultyRegOpen = false;
+
+    async function loadFacultyRegistrationStatus() {
+      try {
+        const res = await apiFetch(`${API}/faculty-registration-status`);
+        isFacultyRegOpen = Boolean(res?.data?.is_open);
+        renderFacultyRegButton();
+      } catch (err) {
+        console.warn('Failed to load faculty registration gate status:', err);
+      }
+    }
+
+    function renderFacultyRegButton() {
+      const btn = document.getElementById('hod-faculty-reg-btn');
+      const ind = document.getElementById('hod-reg-indicator');
+      const txt = document.getElementById('hod-reg-text');
+      if (!btn || !txt) return;
+
+      if (isFacultyRegOpen) {
+        ind.textContent = '🟢';
+        txt.textContent = 'Faculty Reg: OPEN';
+        btn.style.borderColor = 'var(--status-present)';
+        btn.style.color = 'var(--status-present)';
+      } else {
+        ind.textContent = '🔒';
+        txt.textContent = 'Faculty Reg: CLOSED';
+        btn.style.borderColor = 'var(--status-absent)';
+        btn.style.color = 'var(--status-absent)';
+      }
+    }
+
+    async function toggleFacultyRegistration() {
+      const btn = document.getElementById('hod-faculty-reg-btn');
+      const txt = document.getElementById('hod-reg-text');
+      const newTarget = !isFacultyRegOpen;
+
+      try {
+        if (btn) btn.disabled = true;
+        if (txt) txt.textContent = 'Updating...';
+
+        const res = await apiFetch(`${API}/faculty-registration-toggle`, {
+          method: 'POST',
+          body: JSON.stringify({ open: newTarget })
+        });
+
+        if (res && res.success) {
+          isFacultyRegOpen = Boolean(res?.data?.is_open);
+          renderFacultyRegButton();
+          if (typeof showToast === 'function') {
+            showToast(`Faculty self-registration for your department is now ${isFacultyRegOpen ? 'OPEN' : 'CLOSED'}`, 'success');
+          }
+        }
+      } catch (err) {
+        if (typeof showToast === 'function') {
+          showToast(err.message || 'Failed to toggle registration gate', 'error');
+        }
+        renderFacultyRegButton();
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function populateSubjectDropdowns() {
+      const currentDeptId = user?.hod_department_id;
+      const deptFiltered = currentDeptId
+        ? subjects.filter(s => !s.department_id || String(s.department_id) === String(currentDeptId))
+        : subjects;
+
+      const subjectOpts = deptFiltered.map(s => {
+        return `<option value="${s.id}">[${s.code}] ${s.name} (Year ${s.year}, Sem ${s.semester})</option>`;
+      }).join('');
+      
+      const tSub = document.getElementById('t-subject');
+      if (tSub) {
+        tSub.innerHTML = '<option value="">— Skip Subject Assignment —</option>' + subjectOpts;
+      }
+      const rSub = document.getElementById('reassign-subject');
+      if (rSub) {
+        rSub.innerHTML = '<option value="">— Select Subject —</option>' + subjectOpts;
+      }
+    }
+
+    function onReassignSubjectChange(subjectId) {
+      if (!subjectId) {
+        document.getElementById('reassign-year').value = '';
+        document.getElementById('reassign-sem').value = '';
+        return;
+      }
+      const sub = subjects.find(s => String(s.id) === String(subjectId));
+      if (sub) {
+        if (sub.year) document.getElementById('reassign-year').value = sub.year;
+        if (sub.semester) document.getElementById('reassign-sem').value = sub.semester;
+      }
+    }
+
+    function onCreateSubjectChange(subjectId) {
+      const hasSub = Boolean(subjectId);
+      ['t-scope', 't-year', 't-sem'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = !hasSub;
+      });
+      if (hasSub) {
+        const sub = subjects.find(s => String(s.id) === String(subjectId));
+        if (sub) {
+          if (sub.year) document.getElementById('t-year').value = sub.year;
+          if (sub.semester) document.getElementById('t-sem').value = sub.semester;
+        }
+      } else {
+        document.getElementById('t-year').value = '';
+        document.getElementById('t-sem').value = '';
+      }
+    }
+
+    async function loadTeachers() {
+      try {
+        const r = await apiFetch(`${API}/teachers`);
+        
+        // Fetch detailed assignments for each teacher to render chips
+        // (In a real production app we'd join this in the backend, but this is fine for this scale)
+        const detailedTeachers = [];
+        for (let t of r.data) {
+          const detailReq = await apiFetch(`${API}/teachers/${t.id}`);
+          detailedTeachers.push(detailReq.data);
+          if (t.user_id === user.id) currentUserTeacherId = t.id;
+        }
+        allTeachers = detailedTeachers;
+        renderTeachers(allTeachers);
+      } catch (e) {
+        document.getElementById('teacher-grid').innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--status-absent); grid-column: 1 / -1;">Error: ${e.message}</div>`;
+      }
+    }
+
+    // ─── Pending Faculty Registrations ───────────────────────
+    var pendingFacultyList = [];
+
+    async function loadPendingFaculty() {
+      try {
+        const r = await apiFetch(`${API}/registrations/pending-faculty`);
+        pendingFacultyList = r.data || [];
+        renderPendingFaculty();
+      } catch (e) {
+        console.error('Failed to load pending faculty registrations:', e);
+      }
+    }
+
+    function renderPendingFaculty() {
+      const card = document.getElementById('pending-faculty-card');
+      const badge = document.getElementById('pending-faculty-badge');
+      const wrap = document.getElementById('pending-faculty-wrap');
+
+      if (!card || !badge || !wrap) return;
+
+      if (!pendingFacultyList.length) {
+        card.style.display = 'none';
+        return;
+      }
+
+      card.style.display = 'block';
+      badge.textContent = `${pendingFacultyList.length} Pending`;
+
+      wrap.innerHTML = `
+        <div style="overflow-x: auto;">
+          <table class="table" style="margin: 0; font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Candidate</th>
+                <th>Institutional Gmail</th>
+                <th>Phone</th>
+                <th>Employee ID</th>
+                <th>Registered On</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pendingFacultyList.map(item => `
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-main);">${esc(item.full_name)}</div>
+                  </td>
+                  <td style="font-family: monospace; font-size: 0.82rem; color: var(--color-primary);">${esc(item.email)}</td>
+                  <td style="font-size: 0.8rem; color: var(--text-muted);">${esc(item.phone || '—')}</td>
+                  <td style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">${esc(item.employee_id || '—')}</td>
+                  <td style="font-size: 0.78rem; color: var(--text-muted);">${new Date(item.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <div style="display: flex; gap: 0.4rem; align-items: center;">
+                      <button type="button" class="btn btn-primary btn-sm" onclick="approveFaculty(${item.id}, '${esc(item.full_name)}')">Approve Faculty</button>
+                      <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent); border-color: var(--status-absent);" onclick="rejectFaculty(${item.id}, '${esc(item.full_name)}')">Reject</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    async function approveFaculty(reqId, name) {
+      if (!confirm(`Approve ${name} to join as an active faculty member in your department?`)) return;
+
+      try {
+        const res = await apiFetch(`${API}/registrations/faculty/${reqId}/approve`, {
+          method: 'POST'
+        });
+        showToast(res.message || 'Faculty approved successfully!', 'success');
+        await loadPendingFaculty();
+        await loadTeachers();
+      } catch (err) {
+        showToast(err.message || 'Failed to approve faculty.', 'error');
+      }
+    }
+
+    async function rejectFaculty(reqId, name) {
+      const reason = prompt(`Enter rejection reason for ${name}:`, 'Application requirements not met');
+      if (reason === null) return;
+
+      try {
+        const res = await apiFetch(`${API}/registrations/faculty/${reqId}/reject`, {
+          method: 'POST',
+          body: JSON.stringify({ reason: reason.trim() || 'Application not approved' })
+        });
+        showToast(res.message || 'Faculty registration rejected.', 'info');
+        await loadPendingFaculty();
+      } catch (err) {
+        showToast(err.message || 'Failed to reject registration.', 'error');
+      }
+    }
+
+    function filterTeachers(q) {
+      const filtered = allTeachers.filter(t =>
+        (t.full_name || '').toLowerCase().includes(q.toLowerCase()) ||
+        (t.gmail || '').toLowerCase().includes(q.toLowerCase())
+      );
+      renderTeachers(filtered);
+    }
+
+    function renderTeachers(list) {
+      const grid = document.getElementById('teacher-grid');
+      if (!list.length) {
+        grid.innerHTML = `<div style="text-align: center; padding: 2.5rem; color: var(--text-muted); grid-column: 1 / -1;">
+          <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">👨‍🏫</div>
+          <div style="font-weight: 600;">No teachers found.</div>
+          <div style="font-size: 0.85rem; margin-top: 0.25rem;">Add your first teacher using the button above.</div>
+        </div>`;
+        return;
+      }
+      grid.innerHTML = list.map(t => {
+        const isSelf = t.user_id === user.id;
+        let chips = '';
+        if (t.assignments && t.assignments.length) {
+          chips = t.assignments.map(a => {
+            const cls = a.assignment_type === 'HOD' ? 'hod' : a.assignment_type === 'CLASS_TEACHER' ? 'class' : a.session_type_scope === 'PRACTICAL' ? 'practical' : '';
+            const lbl = a.assignment_type === 'SUBJECT_TEACHER' ? `${a.subject_code} (${a.session_type_scope.substring(0,3)})` : a.assignment_type.replace('_',' ');
+            const removeBtn = a.assignment_type !== 'HOD' 
+              ? `<span onclick="deleteAssignment(event, ${a.id}, '${esc(t.full_name)}', '${esc(lbl)}')" title="Unassign subject" style="margin-left: 6px; cursor: pointer; opacity: 0.7; font-weight: bold; font-size: 0.85rem;">✕</span>`
+              : '';
+            return `<span class="assignment-chip ${cls}" style="display: inline-flex; align-items: center;">${lbl}${removeBtn}</span>`;
+          }).join(' ');
+        } else {
+          chips = `<span style="font-size:0.75rem; color:var(--text-muted);">No assignments</span>`;
+        }
+
+        return `
+        <div class="teacher-card">
+          <div class="tc-header">
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <div class="tc-avatar">${(t.full_name||'T')[0].toUpperCase()}</div>
+              <div>
+                <div class="tc-name">${esc(t.full_name)} ${isSelf ? '<span style="color: var(--status-present); font-size: 0.75rem;">(You)</span>':''}</div>
+                <div class="tc-empid">${esc(t.gmail)}</div>
+              </div>
+            </div>
+            
+            <div style="position: relative;">
+              <button class="menu-btn" onclick="toggleDropdown(event, 'dd-${t.id}')">⋮</button>
+              <div id="dd-${t.id}" class="dropdown-content">
+                <button class="dropdown-item" onclick="openReassignModal(${t.id}, '${esc(t.full_name)}')">➕ Assign Subject</button>
+                ${!isSelf ? `
+                  <button class="dropdown-item" onclick="openResetModal(${t.id}, '${esc(t.full_name)}')">🔑 Reset Password</button>
+                  <hr style="margin:0;border:none;border-top:1px solid var(--border-color);">
+                  <button class="dropdown-item danger" onclick="openDeleteModal(${t.id}, '${esc(t.full_name)}')">🗑️ Delete Teacher</button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+          
+          <div class="tc-meta">
+            ${t.employee_id ? `<div><strong>Emp ID:</strong> ${esc(t.employee_id)}</div>` : ''}
+            <div><strong>Status:</strong> ${t.must_change_password ? `<span style="color: var(--status-late);">Pending Login</span>` : `<span style="color: var(--status-present);">Active</span>`}</div>
+          </div>
+          
+          <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+            ${chips}
+          </div>
+        </div>
+      `}).join('');
+    }
+
+    // ─── Dropdowns ───────────────────────────────────────────
+    function toggleDropdown(e, id) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      document.getElementById(id).classList.add('show');
+    }
+    function closeAllDropdowns(e) {
+      document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+    }
+
+    // ─── Create Teacher + Assign ─────────────────────────────
+    function openCreateModal() {
+      document.getElementById('create-form').reset();
+      document.getElementById('create-error').style.display = 'none';
+      populateSubjectDropdowns();
+      onCreateSubjectChange('');
+      showModal('create-modal');
+    }
+    function closeCreateModal() { hideModal('create-modal'); }
+
+    async function submitCreateTeacher(e) {
+      e.preventDefault();
+      const btn = document.getElementById('create-btn');
+      const errEl = document.getElementById('create-error');
+      btn.disabled = true; btn.textContent = 'Creating...'; errEl.style.display = 'none';
+
+      try {
+        // 1. Create Teacher
+        const payload = {
+          full_name: document.getElementById('t-name').value.trim(),
+          email: document.getElementById('t-email').value.trim(),
+          password: document.getElementById('t-password').value.trim(),
+          phone: document.getElementById('t-phone').value.trim() || undefined,
+          employee_id: document.getElementById('t-empid').value.trim() || undefined
+        };
+        const r = await apiFetch(`${API}/teachers`, { method: 'POST', body: JSON.stringify(payload) });
+        const newTeacherId = r.data.teacher_id;
+
+        // 2. Initial Subject Assignment (if chosen)
+        const subId = document.getElementById('t-subject').value;
+        if (subId) {
+          const selectedSub = subjects.find(s => String(s.id) === String(subId));
+          const subBranchId = selectedSub?.branch_id || selectedSub?.department_id || defaultBranchId;
+          await apiFetch(`${API}/assignments/subject-teacher`, { method: 'POST', body: JSON.stringify({
+            teacher_id: newTeacherId,
+            subject_id: parseInt(subId),
+            session_type_scope: document.getElementById('t-scope').value,
+            branch_id: subBranchId ? parseInt(subBranchId) : undefined,
+            year: parseInt(document.getElementById('t-year').value),
+            semester: parseInt(document.getElementById('t-sem').value)
+          })});
+        }
+
+        document.getElementById('slip-name').textContent = r.data.full_name;
+        document.getElementById('slip-gmail').textContent = r.data.gmail;
+        document.getElementById('slip-temp').textContent = r.data.temporary_password;
+        closeCreateModal();
+        showModal('cred-modal');
+        loadTeachers();
+      } catch (err) {
+        errEl.textContent = err.message; errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Create Teacher & Assign';
+      }
+    }
+
+    function closeCredModal() { hideModal('cred-modal'); }
+    function copyCredentials() {
+      const text = `Name: ${document.getElementById('slip-name').textContent}\nLogin ID: ${document.getElementById('slip-gmail').textContent}\nTemp Password: ${document.getElementById('slip-temp').textContent}`;
+      navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'success'));
+    }
+
+    // ─── Delete Teacher ──────────────────────────────────────
+    function openDeleteModal(id, name) {
+      deleteTargetId = id;
+      document.getElementById('del-name').textContent = name;
+      document.getElementById('del-confirm-input').value = '';
+      document.getElementById('del-btn').disabled = true;
+      showModal('delete-modal');
+    }
+    function closeDeleteModal() { hideModal('delete-modal'); }
+    function checkDeleteInput() {
+      const val = document.getElementById('del-confirm-input').value;
+      document.getElementById('del-btn').disabled = val !== 'DELETE';
+    }
+    async function submitDelete() {
+      if (!deleteTargetId) return;
+      const btn = document.getElementById('del-btn');
+      btn.disabled = true; btn.textContent = 'Deleting...';
+      try {
+        await apiFetch(`${API}/teachers/${deleteTargetId}`, { method: 'DELETE' });
+        showToast('Teacher and assignments deleted.', 'success');
+        closeDeleteModal();
+        loadTeachers();
+      } catch (err) {
+        showToast('Failed: ' + err.message, 'error');
+        btn.disabled = false; btn.textContent = 'Permanently Delete';
+      }
+    }
+
+    // ─── Reset Password ──────────────────────────────────────
+    function openResetModal(id, name) {
+      resetTargetId = id;
+      document.getElementById('reset-name').textContent = name;
+      document.getElementById('reset-form').reset();
+      showModal('reset-modal');
+    }
+    function closeResetModal() { hideModal('reset-modal'); }
+    
+    async function submitReset(e) {
+      e.preventDefault();
+      if (!resetTargetId) return;
+      const newPassword = document.getElementById('reset-password').value.trim();
+      const btn = document.getElementById('reset-btn');
+      btn.disabled = true; btn.textContent = 'Resetting...';
+      try {
+        const r = await apiFetch(`${API}/teachers/${resetTargetId}/reset-password`, { 
+          method: 'POST', 
+          body: JSON.stringify({ new_password: newPassword })
+        });
+        showToast(r.message, 'success');
+        closeResetModal();
+        loadTeachers();
+      } catch (err) {
+        showToast('Failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Reset Password';
+      }
+    }
+
+    // ─── Reassign (Additional Subject) ───────────────────────
+    function openReassignModal(id, name) {
+      reassignTargetId = id;
+      document.getElementById('reassign-name').textContent = name;
+      document.getElementById('reassign-form').reset();
+      document.getElementById('reassign-error').style.display = 'none';
+      populateSubjectDropdowns();
+      showModal('reassign-modal');
+    }
+    function closeReassignModal() { hideModal('reassign-modal'); }
+    
+    async function submitReassign(e) {
+      e.preventDefault();
+      const btn = document.getElementById('reassign-btn');
+      const errEl = document.getElementById('reassign-error');
+      btn.disabled = true; btn.textContent = 'Assigning...'; errEl.style.display = 'none';
+      
+      try {
+        const subId = document.getElementById('reassign-subject').value;
+        const selectedSub = subjects.find(s => String(s.id) === String(subId));
+        const subBranchId = selectedSub?.branch_id || selectedSub?.department_id || defaultBranchId;
+        await apiFetch(`${API}/assignments/subject-teacher`, { method: 'POST', body: JSON.stringify({
+          teacher_id: reassignTargetId,
+          subject_id: parseInt(subId),
+          session_type_scope: document.getElementById('reassign-scope').value,
+          branch_id: subBranchId ? parseInt(subBranchId) : undefined,
+          year: parseInt(document.getElementById('reassign-year').value),
+          semester: parseInt(document.getElementById('reassign-sem').value)
+        })});
+        showToast('Successfully assigned subject!', 'success');
+        closeReassignModal();
+
+        // If HOD assigned a subject to themselves, update session & reload to show dynamic nav
+        if (reassignTargetId === currentUserTeacherId) {
+          const user = getCurrentUser();
+          if (user && !user.has_assigned_subjects) {
+            user.has_assigned_subjects = true;
+            setAuthSession(getAuthToken(), user);
+            setTimeout(() => window.location.reload(), 600);
+            return;
+          }
+        }
+        loadTeachers();
+      } catch (err) {
+        errEl.textContent = err.message; errEl.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Assign Subject';
+      }
+    }
+
+    async function deleteAssignment(e, assignmentId, teacherName, subjectLabel) {
+      if (e) e.stopPropagation();
+      if (!confirm(`Are you sure you want to remove "${subjectLabel}" from ${teacherName}?`)) {
+        return;
+      }
+      try {
+        await apiFetch(`${API}/assignments/${assignmentId}`, { method: 'DELETE' });
+        showToast(`Assignment "${subjectLabel}" removed successfully.`, 'success');
+        loadTeachers();
+      } catch (err) {
+        showToast('Failed to remove assignment: ' + err.message, 'error');
+      }
+    }
+
+    // ─── Utils ────────────────────────────────────────────────
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function showToast(msg, type = 'info') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.display = 'block';
+      t.style.background = type === 'error' ? 'var(--status-absent)' : type === 'success' ? 'var(--status-present)' : 'var(--color-primary)';
+      t.style.color = 'var(--text-white)';
+      setTimeout(() => t.style.display = 'none', 4500);
+    }
+    async function apiFetch(url, opts = {}) {
+      let token = localStorage.getItem('access_token');
+      const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(opts.headers || {}) };
+      let r = await fetch(url, { ...opts, headers });
+
+      if (r.status === 401) {
+        try {
+          const refreshRes = await fetch('/api/v1/auth/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          if (refreshRes.ok) {
+            const refreshData = await refreshRes.json();
+            if (refreshData.success && refreshData.data?.access_token) {
+              token = refreshData.data.access_token;
+              localStorage.setItem('access_token', token);
+              headers['Authorization'] = `Bearer ${token}`;
+              r = await fetch(url, { ...opts, headers });
+            }
+          }
+        } catch (_) {}
+      }
+
+      const data = await r.json().catch(() => ({}));
+      if (r.status === 401) {
+        localStorage.removeItem('access_token');
+        showToast('Your session has expired. Redirecting to login...', 'error');
+        setTimeout(() => { window.location.href = '/index.html'; }, 1200);
+        throw new Error('Authentication session expired. Please log in again.');
+      }
+      if (!r.ok || !data.success) throw new Error(data?.error?.message || `HTTP ${r.status}`);
+      return data;
+    }
+  </script>
+</body>
+</html>

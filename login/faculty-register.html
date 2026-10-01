@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty & HOD Registration — College Attendance System</title>
+  <meta name="description" content="Register as a faculty member or Head of Department. Applications are reviewed by departmental and institutional authorities.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-app);
+      padding: 2rem 1rem 3rem;
+    }
+    .reg-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      box-shadow: var(--shadow-lg);
+    }
+    .account-type-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.35rem;
+      margin-bottom: 1.25rem;
+    }
+    .type-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem 0.5rem;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .type-btn span.type-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .type-btn span.type-sub {
+      font-size: 0.72rem;
+      margin-top: 0.15rem;
+      opacity: 0.8;
+    }
+    .type-btn.active {
+      background: var(--bg-card);
+      color: var(--color-primary);
+      box-shadow: var(--shadow-xs);
+    }
+    .routing-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      line-height: 1.45;
+    }
+    .routing-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .routing-target {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="reg-card">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <a href="/index.html" class="brand" style="justify-content: center; margin-bottom: 0.5rem;">
+        <span class="brand-badge">UIT</span>
+        <span>Institutional Portal</span>
+      </a>
+      <h1 class="page-title" style="font-size: 1.35rem; margin-bottom: 0.25rem;">Faculty &amp; HOD Registration</h1>
+      <p class="page-subtitle" style="font-size: 0.85rem;">Create your academic teaching or departmental leadership account</p>
+    </div>
+
+    <!-- Registration Form -->
+    <form id="faculty-reg-form" onsubmit="handleRegistration(event)">
+      <!-- Account Type Toggle -->
+      <label class="form-label" style="font-weight: 700; margin-bottom: 0.4rem;">Select Account Type</label>
+      <div class="account-type-toggle">
+        <button type="button" id="btn-type-faculty" class="type-btn active" onclick="setAccountType('FACULTY')">
+          <span class="type-title">👨‍🏫 Faculty Member</span>
+          <span class="type-sub">Department or Common</span>
+        </button>
+        <button type="button" id="btn-type-hod" class="type-btn" onclick="setAccountType('HOD')">
+          <span class="type-title">🏛️ Head of Department</span>
+          <span class="type-sub">Department Leadership</span>
+        </button>
+      </div>
+
+      <!-- Routing Info Callout -->
+      <div id="routing-callout" class="routing-banner">
+        <span class="routing-icon">🛡️</span>
+        <div>
+          <span class="routing-target" id="routing-authority-text">Department HOD Review</span>:
+          <span id="routing-explanation-text">Your registration will be submitted to the Head of Department for authorization.</span>
+        </div>
+      </div>
+
+      <!-- Full Name -->
+      <div class="form-group">
+        <label class="form-label" for="full_name">Full Name <span style="color: var(--status-absent);">*</span></label>
+        <input type="text" id="full_name" class="form-control" placeholder="e.g. Dr. Ramesh Joshi" required autocomplete="name">
+      </div>
+
+      <!-- Institutional Gmail Address -->
+      <div class="form-group">
+        <label class="form-label" for="email">Institutional Gmail Address <span style="color: var(--status-absent);">*</span></label>
+        <input type="email" id="email" class="form-control" placeholder="e.g. ramesh.joshi@gmail.com" required autocomplete="email">
+        <div id="email-hint" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+          Must be a valid Gmail address used for 1-click Google sign-in.
+        </div>
+      </div>
+
+      <!-- Department Selector -->
+      <div class="form-group">
+        <label class="form-label" for="department_id">Department / Affiliation <span style="color: var(--status-absent);">*</span></label>
+        <select id="department_id" class="form-control" onchange="updateRoutingDisplay()" required>
+          <option value="">Loading institutional departments...</option>
+        </select>
+        <div id="dept-hint" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+          Select your institutional department or Common Faculty for inter-disciplinary subjects.
+        </div>
+      </div>
+
+      <!-- WhatsApp Mobile Number & OTP Verification Widget -->
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <label class="form-label" for="phone" style="margin-bottom: 0;">
+            WhatsApp Mobile Number <span style="color: var(--status-absent);">*</span>
+          </label>
+          <span id="otp-verified-badge" class="badge" style="display: none; background: var(--status-present-bg); color: var(--status-present); font-size: 0.72rem; font-weight: 700;">
+            ✓ WhatsApp Verified via OTP
+          </span>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0 0.65rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
+            🇮🇳 +91
+          </div>
+          <input type="tel" id="phone" class="form-control" placeholder="9876543210" maxlength="10" pattern="[6-9][0-9]{9}" required style="flex: 1; font-family: var(--font-family-mono); letter-spacing: 0.05em;" autocomplete="tel">
+          <button type="button" id="btn-send-otp" class="btn btn-outline" onclick="handleSendOtp()" style="white-space: nowrap; font-size: 0.8rem; padding: 0.5rem 0.85rem; font-weight: 600;">
+            💬 Send WhatsApp OTP
+          </button>
+        </div>
+        <div id="phone-hint" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+          10-digit mobile number registered with WhatsApp for instant OTP code verification.
+        </div>
+
+        <!-- Expandable WhatsApp OTP Box -->
+        <div id="otp-box" style="display: none; margin-top: 0.75rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.95rem; animation: fadeInUp 0.25s ease-out;">
+          
+          <!-- Scan WhatsApp QR Code Card -->
+          <div id="wa-qr-card" style="display: flex; gap: 0.85rem; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 0.75rem;">
+            <div style="background: var(--text-white); padding: 0.35rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <img id="wa-qr-img" src="" alt="Scan WhatsApp QR" style="width: 100px; height: 100px; display: block; object-fit: contain;">
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; color: var(--status-present);">
+                <span>📷 Scan with Phone Camera / WhatsApp</span>
+              </div>
+              <p style="margin: 0.25rem 0 0.5rem; font-size: 0.74rem; color: var(--text-muted); line-height: 1.35;">
+                Scan the QR code to open your WhatsApp verification chat, or tap the button below:
+              </p>
+              <a id="wa-direct-link" href="#" target="_blank" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--status-present); border-color: var(--status-present); text-decoration: none; border-radius: var(--radius-sm);">
+                💬 Open WhatsApp Direct Chat &rarr;
+              </a>
+            </div>
+          </div>
+
+          <!-- OTP Code Input Row -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-main);">
+              🔐 Enter 6-Digit WhatsApp OTP Code
+            </span>
+            <span id="otp-timer" style="font-size: 0.75rem; font-family: var(--font-family-mono); color: var(--text-muted); font-weight: 600;">
+              ⏳ 05:00
+            </span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="faculty-otp" class="form-control" placeholder="••••••" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" style="letter-spacing: 0.35em; font-family: var(--font-family-mono); font-size: 1.1rem; text-align: center; font-weight: 700; width: 140px;">
+            <button type="button" id="btn-verify-otp" class="btn btn-primary" onclick="handleVerifyOtp()" style="flex: 1; font-size: 0.82rem; font-weight: 700; padding: 0.5rem 0.75rem;">
+              Verify OTP ✓
+            </button>
+          </div>
+
+          <!-- Feedback & Demo Auto-Fill -->
+          <div id="otp-feedback-msg" style="margin-top: 0.55rem; font-size: 0.74rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.35rem;">
+            <span>Code sent to your WhatsApp.</span>
+          </div>
+          <div style="display: flex; justify-content: flex-end; margin-top: 0.35rem;">
+            <button type="button" id="btn-resend-otp" onclick="handleSendOtp(true)" style="background: none; border: none; padding: 0; color: var(--color-primary); cursor: pointer; text-decoration: underline; font-size: 0.74rem;" disabled>
+              Resend WhatsApp OTP
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employee ID (Optional) -->
+      <div class="form-group">
+        <label class="form-label" for="employee_id">Employee ID <span style="font-size: 0.75rem; font-weight: normal; color: var(--text-muted);">(Optional)</span></label>
+        <input type="text" id="employee_id" class="form-control" placeholder="e.g. FAC-2026-042">
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label class="form-label" for="password">Create Password <span style="color: var(--status-absent);">*</span></label>
+        <div style="position: relative;">
+          <input type="password" id="password" class="form-control" minlength="8" required placeholder="Minimum 8 characters" style="padding-right: 2.5rem;">
+          <button type="button" onclick="togglePw('password', this)" style="position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.1rem; padding: 0;" title="Show/Hide Password">👁️</button>
+        </div>
+      </div>
+
+      <!-- Error / Feedback Alert -->
+      <div id="alert-box" style="display: none; padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 1.25rem;"></div>
+
+      <!-- Submit Button -->
+      <button type="submit" id="btn-submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 700; font-size: 0.95rem;">
+        Submit Registration Request &rarr;
+      </button>
+    </form>
+
+    <!-- Success State View (Initially Hidden) -->
+    <div id="success-view" style="display: none; text-align: center; padding: 1.5rem 0.5rem;">
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">✅</div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">Registration Submitted!</h2>
+      <p id="success-desc" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+        Your application has been received and routed for administrative authorization.
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; text-align: left; margin-bottom: 1.5rem; font-size: 0.82rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+          <span style="color: var(--text-muted);">Applicant Name:</span>
+          <strong id="res-name" style="color: var(--text-main);">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+          <span style="color: var(--text-muted);">Gmail Address:</span>
+          <strong id="res-email" style="color: var(--text-main);">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+          <span style="color: var(--text-muted);">WhatsApp Mobile:</span>
+          <strong id="res-phone" style="color: var(--status-present); font-family: var(--font-family-mono);">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+          <span style="color: var(--text-muted);">Account Type:</span>
+          <strong id="res-type" style="color: var(--color-primary);">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">Review Authority:</span>
+          <strong id="res-authority" style="color: var(--text-main);">--</strong>
+        </div>
+      </div>
+
+      <a href="/login/faculty.html" class="btn btn-primary" style="display: block; width: 100%; padding: 0.65rem; text-decoration: none;">
+        &larr; Return to Faculty Login
+      </a>
+    </div>
+
+    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.85rem;">
+      <span style="color: var(--text-muted);">Already have an account?</span>
+      <a href="/login/faculty.html" style="color: var(--color-primary); font-weight: 600; margin-left: 0.35rem;">Sign In</a>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let currentType = 'FACULTY';
+    let departmentsList = [];
+    let registrationGates = null;
+    let verifiedOtpToken = null;
+    let otpCountdownTimer = null;
+    let isGateOpen = false;
+    let gateClosedReason = '';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadRegistrationGates();
+      await loadDepartments();
+      updateRoutingDisplay();
+    });
+
+    async function loadRegistrationGates() {
+      try {
+        const res = await apiRequest('/api/v1/auth/registration-gates');
+        registrationGates = res?.data;
+      } catch (err) {
+        console.warn('Could not load registration gates:', err);
+      }
+    }
+
+    async function loadDepartments() {
+      const select = document.getElementById('department_id');
+      try {
+        const res = await apiRequest('/api/v1/departments');
+        departmentsList = res?.data || [];
+        populateDepartmentDropdown();
+      } catch (err) {
+        // Fallback to standard institutional departments
+        departmentsList = [
+          { id: 4, name: 'Information Technology', code: 'IT' },
+          { id: 2, name: 'Electronics & Communication Engineering', code: 'ECE' },
+          { id: 3, name: 'Electrical Engineering', code: 'EE' },
+          { id: 5, name: 'Mechanical Engineering', code: 'ME' },
+          { id: 6, name: 'Civil Engineering', code: 'CE' },
+          { id: 7, name: 'Pharmacy', code: 'PHARM' }
+        ];
+        populateDepartmentDropdown();
+      }
+    }
+
+    function populateDepartmentDropdown() {
+      const select = document.getElementById('department_id');
+      if (!select) return;
+
+      let html = '<option value="">-- Select Department --</option>';
+
+      // Add departments
+      departmentsList.forEach(dept => {
+        html += `<option value="${dept.id}">${escapeHtml(dept.name)} (${dept.code})</option>`;
+      });
+
+      // Add Common Faculty option for teachers
+      if (currentType === 'FACULTY') {
+        html += '<option value="COMMON">🌐 No Department / Common Faculty (First Year / General)</option>';
+      }
+
+      select.innerHTML = html;
+    }
+
+    function setAccountType(type) {
+      currentType = type;
+      const btnFac = document.getElementById('btn-type-faculty');
+      const btnHod = document.getElementById('btn-type-hod');
+      const deptHint = document.getElementById('dept-hint');
+
+      if (type === 'FACULTY') {
+        btnFac?.classList.add('active');
+        btnHod?.classList.remove('active');
+        if (deptHint) deptHint.textContent = 'Select your institutional department or Common Faculty for inter-disciplinary subjects.';
+      } else {
+        btnHod?.classList.add('active');
+        btnFac?.classList.remove('active');
+        if (deptHint) deptHint.textContent = 'Department selection is mandatory for Head of Department appointments.';
+      }
+
+      populateDepartmentDropdown();
+      updateRoutingDisplay();
+    }
+
+    function updateRoutingDisplay() {
+      const deptSelect = document.getElementById('department_id');
+      const selectedVal = deptSelect?.value;
+      const callout = document.getElementById('routing-callout');
+      const iconEl = callout ? callout.querySelector('.routing-icon') : null;
+      const authEl = document.getElementById('routing-authority-text');
+      const expEl = document.getElementById('routing-explanation-text');
+
+      // Reset styling
+      if (callout) {
+        callout.style.background = 'var(--bg-surface)';
+        callout.style.borderColor = 'var(--border-color)';
+      }
+
+      if (currentType === 'HOD') {
+        const isHodOpen = registrationGates?.admin?.hod_registration_open;
+        if (isHodOpen === false) {
+          isGateOpen = false;
+          gateClosedReason = '🚫 HOD Registration Closed';
+          if (iconEl) iconEl.textContent = '🔒';
+          if (callout) {
+            callout.style.background = 'var(--chip-admin-bg)';
+            callout.style.borderColor = 'var(--status-absent)';
+          }
+          if (authEl) authEl.textContent = 'Registration Closed';
+          if (expEl) expEl.textContent = registrationGates?.admin?.hod_closed_reason || 'Institutional Administration has not opened Head of Department (HOD) registration at this time.';
+          updateSubmitButtonState();
+          return;
+        }
+
+        isGateOpen = true;
+        if (iconEl) iconEl.textContent = '🏛️';
+        if (authEl) authEl.textContent = 'System Administrator Review (Open)';
+        if (expEl) expEl.textContent = 'HOD appointments must be directly verified and authorized by the System Administrator.';
+        updateSubmitButtonState();
+      } else {
+        // FACULTY
+        if (selectedVal === 'COMMON') {
+          const isCommonOpen = registrationGates?.admin?.common_faculty_registration_open;
+          if (isCommonOpen === false) {
+            isGateOpen = false;
+            gateClosedReason = '🚫 Common Faculty Registration Closed';
+            if (iconEl) iconEl.textContent = '🔒';
+            if (callout) {
+              callout.style.background = 'var(--chip-admin-bg)';
+              callout.style.borderColor = 'var(--status-absent)';
+            }
+            if (authEl) authEl.textContent = 'Registration Closed';
+            if (expEl) expEl.textContent = registrationGates?.admin?.common_faculty_closed_reason || 'Institutional Administration has not opened Common Faculty registration at this time.';
+            updateSubmitButtonState();
+            return;
+          }
+
+          isGateOpen = true;
+          if (iconEl) iconEl.textContent = '🌐';
+          if (authEl) authEl.textContent = 'Common Faculty Manager Review (Open)';
+          if (expEl) expEl.textContent = 'Common faculty registrations are reviewed by the Common Faculty Manager for inter-departmental teaching.';
+          updateSubmitButtonState();
+        } else if (selectedVal) {
+          const dept = (registrationGates?.departments || []).find(d => String(d.id) === String(selectedVal)) ||
+                       departmentsList.find(d => String(d.id) === String(selectedVal));
+          const deptName = dept ? dept.name : 'Department';
+
+          if (dept && dept.hod_active === false) {
+            isGateOpen = false;
+            gateClosedReason = '🚫 Registration Closed (No HOD)';
+            if (iconEl) iconEl.textContent = '🔒';
+            if (callout) {
+              callout.style.background = 'var(--chip-admin-bg)';
+              callout.style.borderColor = 'var(--status-absent)';
+            }
+            if (authEl) authEl.textContent = 'Registration Closed (No Active HOD)';
+            if (expEl) expEl.textContent = dept.faculty_closed_reason || `No active Head of Department (HOD) is currently appointed for ${deptName} to open registration. Applications cannot be submitted until an HOD is appointed.`;
+            updateSubmitButtonState();
+            return;
+          }
+
+          if (dept && dept.faculty_registration_open === false) {
+            isGateOpen = false;
+            gateClosedReason = '🚫 Faculty Registration Closed';
+            if (iconEl) iconEl.textContent = '🔒';
+            if (callout) {
+              callout.style.background = 'var(--chip-admin-bg)';
+              callout.style.borderColor = 'var(--status-absent)';
+            }
+            if (authEl) authEl.textContent = 'Registration Closed';
+            if (expEl) expEl.textContent = dept.faculty_closed_reason || `The ${deptName} Head of Department has not opened faculty registration at this time.`;
+            updateSubmitButtonState();
+            return;
+          }
+
+          // Open!
+          isGateOpen = true;
+          if (iconEl) iconEl.textContent = '🟢';
+          if (callout) {
+            callout.style.background = 'var(--status-present-bg)';
+            callout.style.borderColor = 'var(--status-present)';
+          }
+          if (authEl) authEl.textContent = `${deptName} HOD Review (Open)`;
+          if (expEl) expEl.textContent = `Your faculty registration will be reviewed and approved by the ${deptName} Head of Department (${dept?.hod_name || 'HOD'}).`;
+          updateSubmitButtonState();
+        } else {
+          isGateOpen = false;
+          gateClosedReason = 'Select Department';
+          if (iconEl) iconEl.textContent = '📋';
+          if (authEl) authEl.textContent = 'Departmental Authorization';
+          if (expEl) expEl.textContent = 'Select a department above to check if faculty registration is open.';
+          updateSubmitButtonState();
+        }
+      }
+    }
+
+    function updateSubmitButtonState() {
+      const submitBtn = document.getElementById('btn-submit');
+      if (!submitBtn) return;
+
+      if (!isGateOpen) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = gateClosedReason ? `${gateClosedReason}` : '🚫 Registration Closed';
+      } else if (!verifiedOtpToken) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '🔒 Verify OTP to Register';
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Registration Request →';
+      }
+    }
+
+    // ─── WhatsApp OTP Handlers ──────────────────────────────
+    async function handleSendOtp(isResend = false) {
+      const phoneInput = document.getElementById('phone');
+      const rawPhone = phoneInput?.value.trim() || '';
+      const cleanPhone = rawPhone.replace(/\D/g, '');
+      const sendBtn = document.getElementById('btn-send-otp');
+      const resendBtn = document.getElementById('btn-resend-otp');
+      const otpBox = document.getElementById('otp-box');
+      const feedbackMsg = document.getElementById('otp-feedback-msg');
+      const qrImg = document.getElementById('wa-qr-img');
+      const waLinkBtn = document.getElementById('wa-direct-link');
+
+      if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        showAlert('Please enter a valid 10-digit WhatsApp mobile number before requesting OTP', 'danger');
+        phoneInput?.focus();
+        return;
+      }
+
+      try {
+        if (sendBtn) {
+          sendBtn.disabled = true;
+          sendBtn.textContent = 'Sending...';
+        }
+        if (resendBtn) resendBtn.disabled = true;
+
+        const res = await apiRequest('/api/v1/auth/otp/send', {
+          method: 'POST',
+          body: JSON.stringify({ identifier: cleanPhone, purpose: 'REGISTRATION' })
+        });
+
+        if (res && res.success) {
+          if (otpBox) otpBox.style.display = 'block';
+          showAlert('OTP sent successfully to your WhatsApp!', 'success');
+          startOtpCountdown(300);
+
+          const waLink = res.data?.wa_link || `https://wa.me/91${cleanPhone}?text=OTP`;
+          if (qrImg) {
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(waLink)}&margin=4`;
+          }
+          if (waLinkBtn) {
+            waLinkBtn.href = waLink;
+          }
+
+          if (feedbackMsg) {
+            if (res.data?.debug_otp) {
+              feedbackMsg.innerHTML = `
+                <span style="color:var(--status-present); font-weight:600;">✓ Code sent to WhatsApp (+91 ${cleanPhone})! Demo Code: <strong>${res.data.debug_otp}</strong></span>
+                <button type="button" class="btn btn-sm" onclick="autoFillOtp('${res.data.debug_otp}')" style="padding:0.18rem 0.5rem; font-size:0.72rem; background:var(--status-present-bg); color:var(--status-present); border:1px solid var(--status-present); font-weight:700; border-radius:var(--radius-sm); cursor:pointer;">⚡ Auto-Fill Code</button>
+              `;
+            } else {
+              feedbackMsg.innerHTML = `<span>6-digit code sent to WhatsApp (+91 ${cleanPhone}). Valid for 5 minutes.</span>`;
+              feedbackMsg.style.color = 'var(--text-muted)';
+            }
+          }
+          const otpInput = document.getElementById('faculty-otp');
+          if (otpInput) {
+            otpInput.value = '';
+            otpInput.focus();
+          }
+        } else {
+          showAlert(res?.error?.message || 'Could not send WhatsApp OTP. Please try again.', 'danger');
+          if (feedbackMsg) {
+            feedbackMsg.textContent = res?.error?.message || 'Could not send WhatsApp OTP.';
+            feedbackMsg.style.color = 'var(--status-absent)';
+          }
+        }
+      } catch (err) {
+        showAlert(err.message || 'Network error while requesting WhatsApp OTP', 'danger');
+      } finally {
+        if (sendBtn && !verifiedOtpToken) {
+          sendBtn.disabled = false;
+          sendBtn.textContent = isResend ? '💬 Resend WhatsApp OTP' : '💬 Send WhatsApp OTP';
+        }
+      }
+    }
+
+    function autoFillOtp(code) {
+      const otpInput = document.getElementById('faculty-otp');
+      if (otpInput) {
+        otpInput.value = code;
+        handleVerifyOtp();
+      }
+    }
+
+    function startOtpCountdown(durationSeconds) {
+      if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+      let remaining = durationSeconds;
+      const timerEl = document.getElementById('otp-timer');
+      const resendBtn = document.getElementById('btn-resend-otp');
+      if (resendBtn) resendBtn.disabled = true;
+
+      function updateDisplay() {
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        if (timerEl) {
+          timerEl.textContent = `⏳ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        if (remaining <= 270 && resendBtn) {
+          resendBtn.disabled = false;
+        }
+        if (remaining <= 0) {
+          clearInterval(otpCountdownTimer);
+          if (timerEl) timerEl.textContent = '⏳ Expired';
+          if (resendBtn) resendBtn.disabled = false;
+        }
+        remaining--;
+      }
+
+      updateDisplay();
+      otpCountdownTimer = setInterval(updateDisplay, 1000);
+    }
+
+    async function handleVerifyOtp() {
+      const phoneInput = document.getElementById('phone');
+      const rawPhone = phoneInput?.value.trim() || '';
+      const cleanPhone = rawPhone.replace(/\D/g, '');
+      const otpCode = document.getElementById('faculty-otp')?.value.trim();
+      const verifyBtn = document.getElementById('btn-verify-otp');
+      const feedbackMsg = document.getElementById('otp-feedback-msg');
+
+      if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        showAlert('Please enter a valid 10-digit WhatsApp mobile number', 'danger');
+        phoneInput?.focus();
+        return;
+      }
+
+      if (!otpCode || otpCode.length !== 6) {
+        showAlert('Please enter the complete 6-digit OTP code', 'danger');
+        document.getElementById('faculty-otp')?.focus();
+        return;
+      }
+
+      try {
+        if (verifyBtn) {
+          verifyBtn.disabled = true;
+          verifyBtn.textContent = 'Verifying...';
+        }
+
+        const res = await apiRequest('/api/v1/auth/otp/verify', {
+          method: 'POST',
+          body: JSON.stringify({ identifier: cleanPhone, otp_code: otpCode, purpose: 'REGISTRATION' })
+        });
+
+        if (res && res.success && res.data?.verification_token) {
+          verifiedOtpToken = res.data.verification_token;
+          if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+
+          document.getElementById('otp-box').style.display = 'none';
+          document.getElementById('otp-verified-badge').style.display = 'inline-flex';
+
+          phoneInput.readOnly = true;
+
+          const sendBtn = document.getElementById('btn-send-otp');
+          sendBtn.textContent = 'Change';
+          sendBtn.classList.remove('btn-outline');
+          sendBtn.classList.add('btn-secondary');
+          sendBtn.onclick = resetOtpVerification;
+
+          showAlert('✓ WhatsApp mobile number verified successfully!', 'success');
+          updateSubmitButtonState();
+        } else {
+          const errText = res?.error?.message || 'Invalid OTP code. Please try again.';
+          showAlert(errText, 'danger');
+          if (feedbackMsg) {
+            feedbackMsg.textContent = errText;
+            feedbackMsg.style.color = 'var(--status-absent)';
+          }
+        }
+      } catch (err) {
+        showAlert(err.message || 'OTP verification failed', 'danger');
+      } finally {
+        if (verifyBtn) {
+          verifyBtn.disabled = false;
+          verifyBtn.textContent = 'Verify OTP ✓';
+        }
+      }
+    }
+
+    function resetOtpVerification() {
+      verifiedOtpToken = null;
+      if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+
+      const phoneInput = document.getElementById('phone');
+      phoneInput.readOnly = false;
+      phoneInput.focus();
+
+      document.getElementById('otp-verified-badge').style.display = 'none';
+      document.getElementById('otp-box').style.display = 'none';
+
+      const sendBtn = document.getElementById('btn-send-otp');
+      sendBtn.textContent = '💬 Send WhatsApp OTP';
+      sendBtn.classList.remove('btn-secondary');
+      sendBtn.classList.add('btn-outline');
+      sendBtn.onclick = () => handleSendOtp(false);
+
+      updateSubmitButtonState();
+    }
+
+    async function handleRegistration(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById('alert-box');
+      const submitBtn = document.getElementById('btn-submit');
+
+      const fullName = document.getElementById('full_name')?.value.trim();
+      const email = document.getElementById('email')?.value.trim();
+      const deptVal = document.getElementById('department_id')?.value;
+      const empId = document.getElementById('employee_id')?.value.trim();
+      const rawPhone = document.getElementById('phone')?.value.trim() || '';
+      const cleanPhone = rawPhone.replace(/\D/g, '');
+      const password = document.getElementById('password')?.value;
+
+      if (!fullName || !email || !password) {
+        showAlert('Please fill in all mandatory fields.', 'danger');
+        return;
+      }
+
+      if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        showAlert('Please enter a valid 10-digit WhatsApp mobile number.', 'danger');
+        document.getElementById('phone')?.focus();
+        return;
+      }
+
+      if (!verifiedOtpToken) {
+        showAlert('Please verify your WhatsApp mobile number with OTP before submitting.', 'danger');
+        handleSendOtp();
+        return;
+      }
+
+      if (currentType === 'HOD' && (!deptVal || deptVal === 'COMMON')) {
+        showAlert('Department selection is mandatory for HOD registration.', 'danger');
+        return;
+      }
+
+      if (!deptVal) {
+        showAlert('Please select your department or choose Common Faculty.', 'danger');
+        return;
+      }
+
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Submitting Request...';
+        }
+        if (alertBox) alertBox.style.display = 'none';
+
+        const payload = {
+          full_name: fullName,
+          email,
+          password,
+          account_type: currentType,
+          department_id: deptVal === 'COMMON' ? null : Number(deptVal),
+          employee_id: empId || undefined,
+          phone: cleanPhone,
+          otp_verification_token: verifiedOtpToken
+        };
+
+        const res = await apiRequest('/api/v1/auth/faculty/register', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (res && res.success) {
+          showSuccessView(res.data, res.message, cleanPhone);
+        } else {
+          throw new Error(res?.error?.message || 'Registration failed');
+        }
+      } catch (err) {
+        showAlert(err.message || 'Registration request failed. Please check details.', 'danger');
+        await loadRegistrationGates();
+        updateRoutingDisplay();
+      } finally {
+        if (submitBtn && submitBtn.textContent === 'Submitting Request...') {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Registration Request →';
+        }
+      }
+    }
+
+    function showSuccessView(data, message, phoneNum = '') {
+      const form = document.getElementById('faculty-reg-form');
+      const successView = document.getElementById('success-view');
+
+      if (form) form.style.display = 'none';
+      if (successView) successView.style.display = 'block';
+
+      const desc = document.getElementById('success-desc');
+      const rName = document.getElementById('res-name');
+      const rEmail = document.getElementById('res-email');
+      const rPhone = document.getElementById('res-phone');
+      const rType = document.getElementById('res-type');
+      const rAuth = document.getElementById('res-authority');
+
+      if (rPhone) {
+        const ph = data?.phone || phoneNum;
+        rPhone.textContent = ph ? `💬 +91 ${ph}` : '--';
+      }
+
+      if (desc && message) desc.textContent = message;
+      if (rName) rName.textContent = data.full_name;
+      if (rEmail) rEmail.textContent = data.email;
+      if (rType) rType.textContent = data.account_type === 'HOD' ? 'Head of Department' : 'Faculty Member';
+
+      if (rAuth) {
+        if (data.approval_type === 'ADMIN') rAuth.textContent = 'System Administrator';
+        else if (data.approval_type === 'COMMON_FACULTY_MANAGER') rAuth.textContent = 'Common Faculty Manager';
+        else rAuth.textContent = 'Department HOD';
+      }
+    }
+
+    function showAlert(msg, type) {
+      const alertBox = document.getElementById('alert-box');
+      if (!alertBox) return;
+      alertBox.textContent = msg;
+      alertBox.style.display = 'block';
+      if (type === 'danger') {
+        alertBox.style.background = 'var(--chip-admin-bg)';
+        alertBox.style.color = 'var(--status-absent)';
+        alertBox.style.border = '1px solid var(--status-absent)';
+      } else {
+        alertBox.style.background = 'var(--chip-faculty-bg)';
+        alertBox.style.color = 'var(--color-primary)';
+        alertBox.style.border = '1px solid var(--color-primary)';
+      }
+    }
+
+    function togglePw(id, btn) {
+      const input = document.getElementById(id);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🔒';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>

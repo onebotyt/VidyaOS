@@ -1,0 +1,3120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Internal Evaluation Spreadsheet — Faculty Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    /* Pure Fixed-Viewport Desktop App Architecture (Zero Window Scrolling) */
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-surface);
+    }
+    .app-header {
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    /* Evaluation Layout Container - Fills Viewport Between App Header & Bottom */
+    .eval-main-layout {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 0.35rem 0.65rem 0.35rem 0.65rem !important;
+      box-sizing: border-box;
+      overflow: hidden;
+      transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1), width 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    body.sidebar-open .eval-main-layout {
+      margin-left: 260px !important;
+      width: calc(100% - 260px) !important;
+      max-width: calc(100% - 260px) !important;
+    }
+    body:not(.sidebar-open) .eval-main-layout {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    #internal-eval-content {
+      flex: 1 1 0;
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Sticky Command Bar (Sticks on top of Sheet Header) */
+    .sticky-top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 120;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      margin: 0;
+      border-radius: 0;
+    }
+    .eval-command-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.35rem;
+      padding: 0.3rem 0.5rem;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+      z-index: 30;
+    }
+    .eval-command-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      flex-shrink: 0;
+    }
+
+    /* Scheme Badge & Modal Scheme Controls */
+    .eval-scheme-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-main);
+      background: var(--bg-card);
+      padding: 0.22rem 0.6rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      user-select: none;
+    }
+    .eval-scheme-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.28rem;
+      background: var(--bg-card);
+      padding: 0.15rem 0.4rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      flex-shrink: 0;
+    }
+    .scheme-controls-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .scheme-ctrl-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+      font-size: 0.73rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .scheme-ctrl-input {
+      width: 44px;
+      padding: 0.2rem 0.3rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-align: center;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .scheme-ctrl-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-subtle);
+    }
+    .scheme-ctrl-total {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      background: var(--bg-surface-secondary);
+      padding: 0.15rem 0.35rem;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Spreadsheet Studio & Viewport */
+    .sheet-studio-container {
+      flex: 1 1 0;
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      margin-top: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--table-border-strong);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .sheet-header-banner {
+      flex-shrink: 0;
+      padding: 0.55rem 1rem;
+      text-align: center;
+      background: var(--bg-surface-secondary);
+      color: var(--text-main);
+      border: 1px solid var(--table-border-strong);
+      border-bottom: 1px solid var(--table-border-strong);
+      z-index: 25;
+      box-sizing: border-box;
+    }
+    .sheet-inst-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      margin: 0;
+      color: var(--text-main);
+      line-height: 1.25;
+    }
+    .sheet-session-label {
+      font-weight: 700;
+      font-size: 0.88rem;
+      margin-top: 0.2rem;
+      color: var(--text-main);
+      line-height: 1.25;
+    }
+    .sheet-header-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    .sheet-subject-select {
+      background: var(--bg-surface);
+      color: var(--color-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.65rem;
+      font-weight: 800;
+      font-size: 0.86rem;
+      cursor: pointer;
+      outline: none;
+      max-width: 520px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .sheet-subject-select:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-subtle);
+    }
+
+    /* Interactive Webpage Filter & Search Bar */
+    .eval-filter-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding: 0.42rem 0.85rem;
+      background: var(--bg-card);
+      border-left: 1px solid var(--table-border-strong);
+      border-right: 1px solid var(--table-border-strong);
+      border-bottom: 1px solid var(--table-border-strong);
+      z-index: 24;
+      box-sizing: border-box;
+    }
+    .eval-filter-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      flex: 1;
+      min-width: 280px;
+    }
+    .eval-search-input-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-width: 240px;
+      max-width: 380px;
+      flex: 1;
+    }
+    .eval-search-icon {
+      position: absolute;
+      left: 0.6rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .eval-search-input {
+      width: 100%;
+      padding: 0.28rem 1.8rem 0.28rem 1.9rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .eval-search-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-subtle);
+    }
+    .eval-search-clear-btn {
+      position: absolute;
+      right: 0.45rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.3rem;
+      border-radius: 50%;
+      line-height: 1;
+    }
+    .eval-search-clear-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-surface-secondary);
+    }
+    .eval-quick-filter-wrap,
+    .eval-quick-sort-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .eval-filter-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+      margin: 0;
+    }
+    .eval-filter-select {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .eval-filter-select:focus {
+      border-color: var(--color-primary);
+    }
+    .eval-filter-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .eval-filter-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      padding: 0.22rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+    .eval-filter-badge strong {
+      color: var(--color-primary);
+      margin: 0 0.2rem;
+    }
+    .th-sortable {
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    .th-sortable:hover {
+      background: var(--bg-surface-secondary) !important;
+    }
+    .excel-sheet-viewport {
+      --sheet-zoom: 1;
+      --sheet-font-scale: 1;
+      flex: 1 1 0;
+      min-height: 0;
+      width: 100%;
+      overflow: auto;
+      background: var(--bg-card);
+      padding: 0;
+      position: relative;
+    }
+
+    /* Spreadsheet Table - Authentic Excel Grid & Layout */
+    table.excel-table,
+    table.sheet-table {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-family: var(--font-family-sans);
+      font-size: calc(0.82rem * var(--sheet-font-scale, 1));
+      color: var(--text-main);
+      table-layout: fixed;
+      background: var(--bg-card);
+      zoom: var(--sheet-zoom, 1);
+    }
+    table.excel-table th,
+    table.excel-table td,
+    table.sheet-table th,
+    table.sheet-table td {
+      border-right: 1px solid var(--table-border-strong) !important;
+      border-bottom: 1px solid var(--table-border-strong) !important;
+      border-top: none !important;
+      border-left: none !important;
+      padding: calc(0.35rem * var(--sheet-font-scale, 1)) calc(0.45rem * var(--sheet-font-scale, 1));
+      text-align: center;
+      vertical-align: middle;
+      box-sizing: border-box;
+      text-transform: none !important;
+    }
+    table.excel-table th,
+    table.sheet-table th {
+      white-space: normal !important;
+      word-break: break-word !important;
+      overflow-wrap: break-word !important;
+      line-height: 1.25 !important;
+      text-overflow: clip !important;
+      overflow: hidden;
+    }
+    /* Allow th cells containing an editable input to show full input without clipping */
+    table.sheet-table th:has(.sheet-th-input) {
+      overflow: visible;
+    }
+    table.excel-table td,
+    table.sheet-table td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    table.sheet-table thead tr:first-child th {
+      border-top: 1px solid var(--table-border-strong) !important;
+    }
+    table.sheet-table tr th:first-child,
+    table.sheet-table tr td:first-child {
+      border-left: 1px solid var(--table-border-strong) !important;
+    }
+
+    /* Primary Table Header - Sticky Inside Excel Sheet Viewport */
+    table.sheet-table thead {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    table.sheet-table thead tr:first-child th {
+      position: sticky;
+      top: 0;
+      z-index: 22;
+      background: var(--bg-surface-secondary);
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: calc(0.78rem * var(--sheet-font-scale, 1));
+      border: 1px solid var(--table-border-strong) !important;
+      padding: calc(0.45rem * var(--sheet-font-scale, 1)) calc(0.55rem * var(--sheet-font-scale, 1));
+      user-select: none;
+      background-clip: padding-box;
+    }
+    table.sheet-table thead tr:nth-child(2) th {
+      position: sticky;
+      top: var(--th-row1-height, 31px);
+      z-index: 21;
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: calc(0.76rem * var(--sheet-font-scale, 1));
+      padding: calc(0.28rem * var(--sheet-font-scale, 1)) calc(0.35rem * var(--sheet-font-scale, 1));
+      border: 1px solid var(--table-border-strong) !important;
+      user-select: none;
+      background-clip: padding-box;
+    }
+
+    /* Student Name & Roll Cells - Zero Overlap Guaranteed */
+    table.sheet-table td.cell-student-name {
+      text-align: left;
+      font-weight: 700;
+      padding: calc(0.35rem * var(--sheet-font-scale, 1)) calc(0.65rem * var(--sheet-font-scale, 1));
+      white-space: normal !important;
+      word-break: break-word !important;
+      overflow-wrap: break-word !important;
+      line-height: 1.25 !important;
+      text-overflow: clip !important;
+    }
+    table.sheet-table div.sheet-th-input[contenteditable] {
+      background: var(--bg-surface) !important;
+      border: 1px dashed var(--color-primary) !important;
+      border-radius: var(--radius-sm) !important;
+      color: var(--text-main) !important;
+      padding: 0.15rem 0.25rem !important;
+      text-align: center !important;
+      font-weight: 700 !important;
+      max-width: 95% !important;
+      box-sizing: border-box !important;
+      font-family: inherit !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+      overflow-wrap: break-word !important;
+      line-height: 1.25 !important;
+      cursor: text !important;
+      min-height: 1.4em !important;
+    }
+    table.sheet-table td.cell-roll {
+      font-family: var(--font-family-mono);
+      font-weight: 700;
+      font-size: calc(0.82rem * var(--sheet-font-scale, 1));
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    table.sheet-table td.excel-cell-sr {
+      font-weight: 700;
+      min-width: 45px;
+    }
+    table.sheet-table td.cell-total {
+      font-weight: 800;
+      font-size: calc(0.92rem * var(--sheet-font-scale, 1));
+      background: var(--bg-surface-secondary);
+    }
+
+    /* Input Cells */
+    table.sheet-table input.excel-cell-input,
+    table.sheet-table input.sheet-cell-input {
+      width: 100% !important;
+      padding: calc(0.2rem * var(--sheet-font-scale, 1)) calc(0.2rem * var(--sheet-font-scale, 1)) !important;
+      border: 1px solid transparent !important;
+      border-radius: 2px !important;
+      background: transparent !important;
+      text-align: center !important;
+      font-size: calc(0.82rem * var(--sheet-font-scale, 1)) !important;
+      font-weight: 700 !important;
+      color: var(--text-main) !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      height: calc(1.75rem * var(--sheet-font-scale, 1)) !important;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    table.sheet-table input.excel-cell-input[data-col],
+    table.sheet-table input.sheet-cell-input[data-col] {
+      max-width: 100% !important;
+    }
+    table.sheet-table input.excel-cell-input[readonly],
+    table.sheet-table input.sheet-cell-input[readonly] {
+      background: transparent !important;
+      border-color: transparent !important;
+      cursor: default;
+      pointer-events: none;
+    }
+    table.sheet-table input.excel-cell-input.is-editable,
+    table.sheet-table input.sheet-cell-input.is-editable {
+      background: var(--bg-surface) !important;
+      border: 1px solid var(--border-color) !important;
+      cursor: text;
+      pointer-events: auto;
+    }
+    table.sheet-table input.excel-cell-input.is-editable:hover,
+    table.sheet-table input.sheet-cell-input.is-editable:hover {
+      background: var(--bg-surface-secondary) !important;
+      border-color: var(--border-color) !important;
+    }
+    table.sheet-table input.excel-cell-input.is-editable:focus,
+    table.sheet-table input.sheet-cell-input.is-editable:focus {
+      background: var(--bg-card) !important;
+      border-color: var(--color-primary) !important;
+      outline: 2px solid var(--color-primary) !important;
+      outline-offset: -1px !important;
+    }
+    .scheme-ctrl-input[readonly] {
+      background: transparent !important;
+      border-color: transparent !important;
+      cursor: default;
+    }
+
+    /* Editable Column Header Labels in Edit Mode — contenteditable div */
+    .sheet-th-input {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px dashed var(--color-primary);
+      border-radius: var(--radius-sm);
+      padding: 0.12rem 0.3rem;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      text-align: center;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      cursor: text;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      line-height: 1.25;
+      min-height: 1.4em;
+    }
+    .sheet-th-input:focus {
+      border-color: var(--color-primary);
+      border-style: solid;
+      box-shadow: 0 0 0 2px var(--color-primary-subtle);
+      background: var(--bg-card);
+    }
+    .sheet-th-sub-input {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px dashed var(--color-primary);
+      border-radius: var(--radius-sm);
+      padding: 0.08rem 0.2rem;
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-align: center;
+      box-sizing: border-box;
+      outline: none;
+      width: 100%;
+      max-width: 36px;
+      margin: 0 auto;
+      display: block;
+    }
+    .sheet-th-sub-input:focus {
+      border-color: var(--color-primary);
+      border-style: solid;
+      box-shadow: 0 0 0 2px var(--color-primary-subtle);
+      background: var(--bg-card);
+    }
+
+    /* Clean Spreadsheet Inputs: Completely Remove Native Spin Stepper Arrows */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button,
+    table.sheet-table input::-webkit-inner-spin-button,
+    table.sheet-table input::-webkit-outer-spin-button {
+      -webkit-appearance: none !important;
+      margin: 0 !important;
+      display: none !important;
+    }
+    input[type=number],
+    table.sheet-table input {
+      -moz-appearance: textfield !important;
+      appearance: textfield !important;
+    }
+
+    /* Excel-Style Command Bar Widgets */
+    .excel-view-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--bg-card);
+      padding: 0.2rem 0.45rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      flex-shrink: 0;
+    }
+    .excel-ctrl-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 0.15rem;
+    }
+    .btn-excel-tool {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.18rem 0.4rem;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      box-sizing: border-box;
+    }
+    .btn-excel-tool:hover {
+      background: var(--bg-surface-secondary);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .excel-tool-display {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      min-width: 44px;
+      text-align: center;
+      cursor: pointer;
+      padding: 0.15rem 0.25rem;
+      border-radius: var(--radius-sm);
+      user-select: none;
+    }
+    .excel-tool-display:hover {
+      background: var(--color-primary-subtle);
+    }
+    .excel-tool-select {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.15rem 0.35rem;
+      outline: none;
+      cursor: pointer;
+      height: 24px;
+    }
+
+    /* Banner Input Styles in Edit Mode */
+    .sheet-banner-input {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px dashed var(--color-primary);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.6rem;
+      text-align: center;
+      outline: none;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    .sheet-banner-input:focus {
+      border-color: var(--color-primary);
+      border-style: solid;
+      box-shadow: 0 0 0 2px var(--color-primary-subtle);
+      background: var(--bg-card);
+    }
+    .sheet-inst-title-input {
+      font-size: 1.15rem;
+      font-weight: 800;
+      width: min(720px, 94vw);
+    }
+    .sheet-session-title-input {
+      font-size: 0.92rem;
+      font-weight: 700;
+      width: min(480px, 88vw);
+    }
+    .sheet-dept-meta-input {
+      font-size: 0.84rem;
+      font-weight: 700;
+      width: 280px;
+    }
+
+    /* Modal Backdrop & Dialog */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 99999 !important;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      box-sizing: border-box;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-backdrop.open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+    .modal-card {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      box-sizing: border-box;
+      pointer-events: auto !important;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+    .modal-body {
+      margin: 1.25rem 0;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.75rem;
+    }
+
+    /* Status Footer Bar with Excel Zoom Slider */
+    .sheet-statusbar {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding: 0.4rem 1rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      user-select: none;
+      z-index: 30;
+    }
+    .sheet-statusbar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .sheet-statusbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .excel-zoom-slider-container {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-sm);
+    }
+    .zoom-slider-range {
+      width: 105px;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+      accent-color: var(--color-primary);
+    }
+
+    /* Confirmation Modals for 2-Click Save & 2-Click Cancel */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">FACULTY</span>
+      <span>Attendance Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" id="top-nav-bar">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm" id="nav-reg">Take Attendance & Registers</a>
+      <a href="/faculty/assignments.html" class="btn btn-secondary btn-sm" id="nav-assign">Assignments & Coursework</a>
+      <a href="/faculty/tests.html" class="btn btn-secondary btn-sm" id="nav-marks">Test Marks & Exams</a>
+      <a href="/faculty/evaluation.html" class="btn btn-primary btn-sm" id="nav-eval">Internal Evaluation</a>
+      <a href="/faculty/reports.html" class="btn btn-secondary btn-sm" id="nav-reports">Analytics & Reports</a>
+      <a href="/faculty/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container eval-main-layout" id="eval-main-layout">
+    
+    <!-- HIDDEN METADATA BINDINGS (Keeps data-binding references intact with zero visual footprint) -->
+    <div id="eval-meta-hidden" style="display: none;" aria-hidden="true">
+      <span id="meta-subject-name">—</span>
+      <span id="meta-subject-code">—</span>
+      <span id="meta-dept-name">—</span>
+      <span id="meta-year-sem">—</span>
+      <span id="meta-student-count">0</span>
+    </div>
+
+    <!-- SPREADSHEET STUDIO CONTENT -->
+    <div id="internal-eval-content">
+      <div class="card" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+        Loading internal evaluation spreadsheet...
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireSubjects: true });
+
+    function getToken() {
+      return typeof getAuthToken === 'function' ? getAuthToken() : (localStorage.getItem('access_token') || '');
+    }
+
+    let allRegisters = [];
+    let currentRegisterId = null;
+    let registerData = null;
+    window.currentEvalSheetState = null;
+    let isEditMode = false;
+    window.isEditMode = false;
+
+    async function loadRegistersList() {
+      try {
+        const res = await fetchApi('/faculty/registers');
+        if (res.success) {
+          allRegisters = res.data || [];
+          if (!allRegisters.length) {
+            document.getElementById('internal-eval-content').innerHTML = `
+              <div class="card" style="text-align: center; padding: 3.5rem 2rem; color: var(--text-muted); background: var(--bg-surface); border: 1px dashed var(--border-color);">
+                <div style="font-size: 2.8rem; margin-bottom: 0.75rem;">📚</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main);">No Teaching Registers Allocated</h3>
+                <p style="font-size: 0.875rem; color: var(--text-muted); max-width: 540px; margin: 0 auto 1.5rem; line-height: 1.5;">
+                  Your Department HOD has not allocated any subject registers to your profile yet. Once assigned, your internal evaluation sheets will appear here.
+                </p>
+                <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+              </div>
+            `;
+            return;
+          }
+
+          renderRegisterSwitcher();
+
+          const urlParams = new URLSearchParams(window.location.search);
+          const regParam = urlParams.get('id');
+          let targetId = regParam ? Number(regParam) : null;
+          if (!targetId || !allRegisters.some(r => r.id === targetId)) {
+            targetId = allRegisters[0]?.id;
+          }
+          if (targetId) {
+            await selectRegister(targetId);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load registers:', err);
+      }
+    }
+
+    function renderRegisterSwitcher() {
+      const sel = document.getElementById('register-switcher-select');
+      const aliasSel = document.getElementById('eval-switcher-select');
+      if (!sel) return;
+      const opts = allRegisters.map(r => {
+        const isSel = r.id === currentRegisterId;
+        const subj = r.subject_name || r.name || 'Subject';
+        const code = r.subject_code ? `[${r.subject_code}]` : '';
+        return `<option value="${r.id}" ${isSel ? 'selected' : ''}>${subj} ${code}</option>`;
+      }).join('');
+      sel.innerHTML = opts;
+      if (aliasSel) aliasSel.innerHTML = opts;
+    }
+
+    async function selectRegister(regId) {
+      currentRegisterId = Number(regId);
+      const url = new URL(window.location);
+      url.searchParams.set('id', currentRegisterId);
+      window.history.replaceState({}, '', url);
+
+      renderRegisterSwitcher();
+
+      // Quick links updates
+      const matrixBtn = document.getElementById('btn-quick-matrix');
+      if (matrixBtn) matrixBtn.href = `/faculty/registers.html?id=${currentRegisterId}`;
+      const assignBtn = document.getElementById('btn-quick-assignments');
+      if (assignBtn) assignBtn.href = `/faculty/assignments.html?id=${currentRegisterId}`;
+      const testBtn = document.getElementById('btn-quick-tests');
+      if (testBtn) testBtn.href = `/faculty/tests.html?id=${currentRegisterId}`;
+
+      try {
+        const res = await fetchApi(`/faculty/registers/${currentRegisterId}`);
+        if (res.success) {
+          const raw = res.data;
+          registerData = raw.register || raw;
+          if (raw.grid && raw.grid.students) {
+            registerData.students = raw.grid.students;
+          }
+          updateMetaStrip();
+          await loadInternalEvaluationData();
+        }
+      } catch (err) {
+        console.error('Error fetching register details:', err);
+      }
+    }
+
+    function onRegisterChange(newId) {
+      if (newId) selectRegister(newId);
+    }
+
+    function updateMetaStrip() {
+      if (!registerData) return;
+      document.getElementById('meta-subject-name').innerText = registerData.subject_name || registerData.name || '—';
+      document.getElementById('meta-subject-code').innerText = registerData.subject_code || '—';
+      document.getElementById('meta-dept-name').innerText = registerData.department_name || registerData.department_code || '—';
+      document.getElementById('meta-year-sem').innerText = `Year ${registerData.year || 1} • Sem ${registerData.semester || 1}`;
+      const rosterCount = (registerData.students && registerData.students.length) || (registerData.enrolled_count) || 0;
+      document.getElementById('meta-student-count').innerText = `${rosterCount} Students Enrolled`;
+    }
+
+    async function loadInternalEvaluationData() {
+      if (!registerData) return;
+      const content = document.getElementById('internal-eval-content');
+      content.innerHTML = '<div style="text-align:center; padding:3rem; color:var(--text-muted);">Loading internal evaluation data...</div>';
+
+      try {
+        const res = await fetchApi(`/faculty/registers/${currentRegisterId}/internal-evaluation`);
+        if (!res.success) {
+          content.innerHTML = `<div class="card" style="color:var(--status-absent); padding:1.5rem;">Failed to load evaluation sheet: ${escapeHtml(res.error?.message || 'Error')}</div>`;
+          return;
+        }
+
+        const d = res.data;
+        const assignList = Array.isArray(d.assignments) && d.assignments.length ? d.assignments : [
+          { id: 1, name: '1' }, { id: 2, name: '2' }, { id: 3, name: '3' }, { id: 4, name: '4' }, { id: 5, name: '5' }
+        ];
+        const examList = Array.isArray(d.exams) && d.exams.length ? d.exams : [
+          { id: 1, name: '1' }, { id: 2, name: '2' }, { id: 3, name: '3' }, { id: 4, name: '4' }
+        ];
+
+        const studentRawList = Array.isArray(d.roster) ? d.roster : (Array.isArray(d.students) ? d.students : []);
+
+        const deptCode = (registerData && (registerData.department_code || registerData.department_name)) || 'IT';
+        const sem = (registerData && registerData.semester) || 5;
+
+        window.currentEvalSheetState = {
+          register: registerData,
+          institution_name: d.institution_name || (registerData && registerData.institution_name) || 'Uttarakhand Government Institute of Polytechnic, Srinagar Garhwal',
+          session_label: d.session_label || (registerData && registerData.session_label) || 'Internal Evaluation Sheet 2026-27 (Winter)',
+          dept_semester_text: d.dept_semester_text || `Department (${deptCode}) - ${sem} Semester`,
+          scheme: {
+            // assign_avg_max / exam_avg_max = target weight of the AVERAGE in final marks
+            // Individual assignment/exam max marks come from assessments.max_marks
+            assign_avg_max: 15,
+            exam_avg_max: 20,
+            att_max: 10,
+            pres_max: 5,
+            total_max: 50
+          },
+          assignments: assignList,
+          exams: examList,
+          custom_columns: Array.isArray(d.custom_columns) ? d.custom_columns : [],
+          students: studentRawList.map((s, idx) => {
+            const aScores = assignList.map((a, i) => {
+              if (s.assignment_scores && s.assignment_scores[i] !== undefined && s.assignment_scores[i] !== '') {
+                return Number(s.assignment_scores[i]);
+              }
+              // Default to 60% of assignment's own max_marks
+              return Math.round((a.max_marks || 25) * 0.6);
+            });
+            const eScores = [];
+            const eAb = [];
+            examList.forEach((_, i) => {
+              const ex = s.exam_scores && s.exam_scores[i];
+              if (typeof ex === 'object' && ex !== null) {
+                eScores.push((ex.marks !== '' && ex.marks !== undefined && ex.marks !== null) ? Number(ex.marks) : 0);
+                eAb.push(Boolean(ex.is_absent));
+              } else if (ex !== undefined && ex !== '') {
+                eScores.push(Number(ex));
+                eAb.push(Boolean(s.exam_absent && s.exam_absent[i]));
+              } else {
+                // Default to 60% of exam's own max_marks
+                eScores.push(Math.round((examList[i].max_marks || 25) * 0.6));
+                eAb.push(false);
+              }
+            });
+            const attSc = s.attendance_score !== undefined ? Number(s.attendance_score) : (s.attendance_percentage !== undefined ? Math.round((s.attendance_percentage / 10) * 10) / 10 : 9);
+            const presSc = s.presentation_score !== undefined ? Number(s.presentation_score) : 4.5;
+            
+            const studentObj = {
+              student_id: s.student_id || (idx + 1),
+              class_roll_no: s.class_roll_no || idx + 1,
+              registration_no: s.registration_no || null,
+              official_enrollment_no: s.official_enrollment_no || '—',
+              full_name: s.full_name || 'Student ' + (idx + 1),
+              attendance_percentage: s.attendance_percentage !== undefined ? s.attendance_percentage : 85,
+              assignment_scores: aScores,
+              assignment_avg: 0,
+              exam_scores: eScores,
+              exam_absent: eAb,
+              exam_avg: 0,
+              attendance_score: attSc,
+              presentation_score: presSc,
+              custom_scores: [],
+              grand_total: 0
+            };
+            recalculateEvalRow(studentObj);
+            return studentObj;
+          })
+        };
+
+        try {
+          const cached = localStorage.getItem(`eval_sheet_state_${currentRegisterId}`);
+          if (cached) {
+            const saved = JSON.parse(cached);
+            if (saved.institution_name) window.currentEvalSheetState.institution_name = saved.institution_name;
+            if (saved.session_label) window.currentEvalSheetState.session_label = saved.session_label;
+            if (saved.dept_semester_text) window.currentEvalSheetState.dept_semester_text = saved.dept_semester_text;
+            if (saved.scheme) window.currentEvalSheetState.scheme = saved.scheme;
+            if (Array.isArray(saved.custom_columns) && saved.custom_columns.length) {
+              window.currentEvalSheetState.custom_columns = saved.custom_columns;
+              window.currentEvalSheetState.students.forEach(st => {
+                const savedSt = (saved.students || []).find(x => x.student_id === st.student_id);
+                if (savedSt && Array.isArray(savedSt.custom_scores)) {
+                  st.custom_scores = savedSt.custom_scores;
+                } else {
+                  st.custom_scores = window.currentEvalSheetState.custom_columns.map(() => 0);
+                }
+                recalculateEvalRow(st);
+              });
+            }
+          }
+
+          const cachedWidths = localStorage.getItem(`eval_col_widths_${currentRegisterId}`);
+          if (cachedWidths) window.currentColWidths = JSON.parse(cachedWidths);
+          else window.currentColWidths = {};
+
+          const cachedScales = localStorage.getItem(`eval_col_font_scales_${currentRegisterId}`);
+          if (cachedScales) window.currentColFontScales = JSON.parse(cachedScales);
+          else window.currentColFontScales = {};
+
+          const cachedZoom = localStorage.getItem('eval_sheet_zoom');
+          if (cachedZoom) window.currentSheetZoom = parseInt(cachedZoom, 10);
+          else window.currentSheetZoom = 100;
+
+          const cachedFont = localStorage.getItem('eval_sheet_font_scale');
+          if (cachedFont) window.currentSheetFontScale = parseFloat(cachedFont);
+          else window.currentSheetFontScale = 1.0;
+        } catch (e) {}
+
+        renderInternalEvalGrid();
+      } catch (err) {
+        content.innerHTML = `<div class="card" style="color:var(--status-absent); padding:1.5rem;">Error loading evaluation sheet: ${err.message}</div>`;
+      }
+    }
+
+    function recalculateEvalRow(s) {
+      if (!s) return;
+      const state = window.currentEvalSheetState;
+      const scheme = (state && state.scheme) || {
+        assign_avg_max: 15,
+        exam_avg_max: 20,
+        att_max: 10,
+        pres_max: 5,
+        total_max: 50
+      };
+      // Scheme avg max weights (target weight of average in final marks)
+      const assignAvgMax = Number(scheme.assign_avg_max || scheme.assign_max || 15);
+      const examAvgMax = Number(scheme.exam_avg_max || scheme.exam_max || 20);
+
+      // Assignments: scale earned/possible to assignAvgMax
+      const assignments = (state && state.assignments) || [];
+      let aEarned = 0;
+      let aPossible = 0;
+      s.assignment_scores.forEach((v, i) => {
+        if (v !== '' && v !== null && !isNaN(v)) {
+          const aMax = Number((assignments[i] && assignments[i].max_marks) || 25);
+          aEarned += Number(v);
+          aPossible += aMax;
+        }
+      });
+      // Scaled assignment avg: (earned / possible) * assignAvgMax
+      s.assignment_avg = aPossible > 0
+        ? Math.round((aEarned / aPossible) * assignAvgMax * 10) / 10
+        : 0;
+
+      // Exams: scale earned/possible to examAvgMax
+      const exams = (state && state.exams) || [];
+      let eEarned = 0;
+      let ePossible = 0;
+      s.exam_scores.forEach((sc, i) => {
+        if (!s.exam_absent[i] && sc !== '' && sc !== null && !isNaN(sc)) {
+          const eMax = Number((exams[i] && exams[i].max_marks) || 25);
+          eEarned += Number(sc);
+          ePossible += eMax;
+        }
+      });
+      // Scaled exam avg: (earned / possible) * examAvgMax
+      s.exam_avg = ePossible > 0
+        ? Math.round((eEarned / ePossible) * examAvgMax * 10) / 10
+        : 0;
+
+      const cSum = (s.custom_scores || []).reduce((sum, v) => sum + (Number(v) || 0), 0);
+
+      const tot = (Number(s.assignment_avg) || 0) + (Number(s.exam_avg) || 0) + (Number(s.attendance_score) || 0) + (Number(s.presentation_score) || 0) + cSum;
+      s.grand_total = Math.round(tot * 10) / 10;
+
+      const tr = document.getElementById(`eval-student-row-${s.student_id}`);
+      if (tr) {
+        tr.setAttribute('data-total', s.grand_total);
+        tr.setAttribute('data-att', s.attendance_score !== undefined ? s.attendance_score : scheme.att_max);
+        tr.setAttribute('data-has-absent', Boolean(s.exam_absent && s.exam_absent.some(Boolean)));
+      }
+    }
+
+    /* ---- Interactive Webpage Student Search, Marks Filter & Sorting ---- */
+    window.evalSearchQuery = '';
+    window.evalMarksFilter = 'ALL';
+    window.evalSortOrder = 'ROLL_ASC';
+
+    function onEvalSearchInput(query) {
+      window.evalSearchQuery = (query || '').trim();
+      applyEvalFilters();
+    }
+
+    function clearEvalSearch() {
+      window.evalSearchQuery = '';
+      const input = document.getElementById('eval-search-input');
+      if (input) input.value = '';
+      applyEvalFilters();
+    }
+
+    function onEvalMarksFilterChange(filterVal) {
+      window.evalMarksFilter = filterVal || 'ALL';
+      applyEvalFilters();
+    }
+
+    function onEvalSortChange(sortVal) {
+      window.evalSortOrder = sortVal || 'ROLL_ASC';
+      sortEvalTableRows(window.evalSortOrder);
+    }
+
+    function toggleEvalSort(colType) {
+      if (isEditMode) return; // In edit mode, allow contenteditable focus
+      let nextOrder = 'ROLL_ASC';
+      if (colType === 'roll') {
+        nextOrder = window.evalSortOrder === 'ROLL_ASC' ? 'ROLL_DESC' : 'ROLL_ASC';
+      } else if (colType === 'name') {
+        nextOrder = window.evalSortOrder === 'NAME_ASC' ? 'NAME_DESC' : 'NAME_ASC';
+      } else if (colType === 'total') {
+        nextOrder = window.evalSortOrder === 'TOTAL_DESC' ? 'TOTAL_ASC' : 'TOTAL_DESC';
+      } else if (colType === 'att') {
+        nextOrder = window.evalSortOrder === 'ATT_DESC' ? 'ATT_ASC' : 'ATT_DESC';
+      }
+      window.evalSortOrder = nextOrder;
+      const select = document.getElementById('eval-sort-select');
+      if (select) select.value = nextOrder;
+      sortEvalTableRows(nextOrder);
+    }
+
+    function sortEvalTableRows(sortOrder) {
+      const tbody = document.querySelector('#eval-table tbody');
+      if (!tbody) return;
+      const rows = Array.from(tbody.querySelectorAll('.eval-student-row'));
+      if (!rows.length) return;
+
+      rows.sort((a, b) => {
+        if (sortOrder === 'ROLL_ASC') {
+          return (parseInt(a.getAttribute('data-roll')) || 0) - (parseInt(b.getAttribute('data-roll')) || 0);
+        } else if (sortOrder === 'ROLL_DESC') {
+          return (parseInt(b.getAttribute('data-roll')) || 0) - (parseInt(a.getAttribute('data-roll')) || 0);
+        } else if (sortOrder === 'NAME_ASC') {
+          return (a.getAttribute('data-name') || '').localeCompare(b.getAttribute('data-name') || '');
+        } else if (sortOrder === 'NAME_DESC') {
+          return (b.getAttribute('data-name') || '').localeCompare(a.getAttribute('data-name') || '');
+        } else if (sortOrder === 'TOTAL_DESC') {
+          return (parseFloat(b.getAttribute('data-total')) || 0) - (parseFloat(a.getAttribute('data-total')) || 0);
+        } else if (sortOrder === 'TOTAL_ASC') {
+          return (parseFloat(a.getAttribute('data-total')) || 0) - (parseFloat(b.getAttribute('data-total')) || 0);
+        } else if (sortOrder === 'ATT_DESC') {
+          return (parseFloat(b.getAttribute('data-att')) || 0) - (parseFloat(a.getAttribute('data-att')) || 0);
+        } else if (sortOrder === 'ATT_ASC') {
+          return (parseFloat(a.getAttribute('data-att')) || 0) - (parseFloat(b.getAttribute('data-att')) || 0);
+        }
+        return 0;
+      });
+
+      const noMatchRow = document.getElementById('eval-no-filter-match-row');
+      rows.forEach(r => tbody.appendChild(r));
+      if (noMatchRow) tbody.appendChild(noMatchRow);
+
+      applyEvalFilters();
+    }
+
+    function resetAllEvalFilters() {
+      window.evalSearchQuery = '';
+      window.evalMarksFilter = 'ALL';
+      window.evalSortOrder = 'ROLL_ASC';
+      const searchInput = document.getElementById('eval-search-input');
+      if (searchInput) searchInput.value = '';
+      const filterSelect = document.getElementById('eval-marks-filter-select');
+      if (filterSelect) filterSelect.value = 'ALL';
+      const sortSelect = document.getElementById('eval-sort-select');
+      if (sortSelect) sortSelect.value = 'ROLL_ASC';
+      sortEvalTableRows('ROLL_ASC');
+    }
+
+    function applyEvalFilters() {
+      const query = (window.evalSearchQuery || '').toLowerCase().trim();
+      const filterType = window.evalMarksFilter || 'ALL';
+      const rows = document.querySelectorAll('.eval-student-row');
+      const state = window.currentEvalSheetState;
+      const totalMax = (state && state.scheme && state.scheme.total_max) ? Number(state.scheme.total_max) : 50;
+      const attMax = (state && state.scheme && state.scheme.att_max) ? Number(state.scheme.att_max) : 10;
+
+      let visibleCount = 0;
+      const totalCount = rows.length;
+
+      rows.forEach(row => {
+        const name = (row.getAttribute('data-name') || '').toLowerCase();
+        const roll = (row.getAttribute('data-roll') || '').toLowerCase();
+        const enr = (row.getAttribute('data-enrollment') || '').toLowerCase();
+        const reg = (row.getAttribute('data-reg') || '').toLowerCase();
+        const total = parseFloat(row.getAttribute('data-total') || '0');
+        const att = parseFloat(row.getAttribute('data-att') || '0');
+        const hasAbsent = row.getAttribute('data-has-absent') === 'true';
+
+        // 1. Text Search matching name, roll, enrollment, reg
+        let matchesSearch = true;
+        if (query) {
+          matchesSearch = name.includes(query) || roll.includes(query) || enr.includes(query) || reg.includes(query);
+        }
+
+        // 2. Marks & Performance threshold filter
+        let matchesFilter = true;
+        if (filterType === 'TOP') {
+          matchesFilter = total >= (0.75 * totalMax);
+        } else if (filterType === 'AVERAGE') {
+          matchesFilter = total >= (0.50 * totalMax) && total < (0.75 * totalMax);
+        } else if (filterType === 'LOW') {
+          matchesFilter = total < (0.50 * totalMax);
+        } else if (filterType === 'ATT_LOW') {
+          matchesFilter = att < (0.75 * attMax);
+        } else if (filterType === 'UT_AB') {
+          matchesFilter = hasAbsent;
+        }
+
+        const isVisible = matchesSearch && matchesFilter;
+        row.style.display = isVisible ? '' : 'none';
+        if (isVisible) visibleCount++;
+      });
+
+      // Update counter badge
+      const countEl = document.getElementById('eval-visible-count');
+      if (countEl) countEl.innerText = visibleCount;
+
+      // Toggle clear search button
+      const clearBtn = document.getElementById('btn-eval-search-clear');
+      if (clearBtn) clearBtn.style.display = query ? 'inline-flex' : 'none';
+
+      // Toggle reset filter button
+      const resetBtn = document.getElementById('btn-reset-eval-filter');
+      const isFiltered = Boolean(query || filterType !== 'ALL' || (window.evalSortOrder && window.evalSortOrder !== 'ROLL_ASC'));
+      if (resetBtn) resetBtn.style.display = isFiltered ? 'inline-flex' : 'none';
+
+      // Show empty state row when no students match
+      const noMatchRow = document.getElementById('eval-no-filter-match-row');
+      if (noMatchRow) {
+        noMatchRow.style.display = (visibleCount === 0 && totalCount > 0) ? '' : 'none';
+      }
+    }
+
+    function handleEditSaveClick(force = false) {
+      if (!isEditMode) {
+        window.evalSheetBackupState = JSON.parse(JSON.stringify(window.currentEvalSheetState));
+        isEditMode = true;
+        window.isEditMode = true;
+        renderInternalEvalGrid();
+        showToast('✏️ Edit Mode Active: Headers, scheme in ( ), scores, and column controls are now editable.', 'info');
+      } else {
+        if (force) {
+          confirmSaveEvaluation();
+        } else {
+          openSaveConfirmModal();
+        }
+      }
+    }
+
+    function cancelEditMode(force = false) {
+      if (force) {
+        confirmCancelEdit();
+      } else {
+        openCancelConfirmModal();
+      }
+    }
+
+    function openSaveConfirmModal() {
+      const modal = document.getElementById('save-confirm-modal');
+      if (!modal) return;
+      const state = window.currentEvalSheetState;
+      const regSel = document.getElementById('register-switcher-select');
+      const subjName = regSel?.options[regSel.selectedIndex]?.text || 'Active Register';
+      const subjEl = document.getElementById('save-modal-subject-name');
+      if (subjEl) subjEl.innerText = subjName;
+      const countEl = document.getElementById('save-modal-student-count');
+      if (countEl) countEl.innerText = (state?.students?.length || 0) + ' Students';
+      const totalEl = document.getElementById('save-modal-scheme-total');
+      if (totalEl) totalEl.innerText = (state?.scheme?.total_max || 50) + ' Marks';
+      modal.style.display = 'flex';
+      modal.classList.add('open');
+    }
+
+    function closeSaveConfirmModal() {
+      const modal = document.getElementById('save-confirm-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+
+    function confirmSaveEvaluation() {
+      saveInternalEvalGrid();
+      window.evalSheetBackupState = null;
+      isEditMode = false;
+      window.isEditMode = false;
+      closeSaveConfirmModal();
+      renderInternalEvalGrid();
+      showToast('💾 Evaluation saved successfully! View mode locked.', 'success');
+    }
+
+    function openCancelConfirmModal() {
+      const modal = document.getElementById('cancel-confirm-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('open');
+      }
+    }
+
+    function closeCancelConfirmModal() {
+      const modal = document.getElementById('cancel-confirm-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+
+    function confirmCancelEdit() {
+      if (window.evalSheetBackupState) {
+        window.currentEvalSheetState = JSON.parse(JSON.stringify(window.evalSheetBackupState));
+        window.evalSheetBackupState = null;
+      }
+      isEditMode = false;
+      window.isEditMode = false;
+      closeCancelConfirmModal();
+      renderInternalEvalGrid();
+      showToast('Exited edit mode without saving changes.', 'info');
+    }
+
+    function onHeaderLabelChange(field, val) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      if (!state.scheme) state.scheme = {};
+      state.scheme[field] = val;
+    }
+
+    /* ---- Header Edit: Expand on Focus, Collapse on Blur ---- */
+    function expandHeaderForEdit(div) {
+      const th = div.closest('th');
+      if (!th) return;
+      const colIdx = parseInt(th.getAttribute('data-col-idx'));
+      if (isNaN(colIdx)) return;
+
+      // Remember original column width to restore on blur
+      div._editColIdx = colIdx;
+      div._editOrigWidth = th.offsetWidth;
+
+      // Remove text wrap so full text is visible as one line
+      div.style.whiteSpace = 'nowrap';
+      div.style.overflow = 'visible';
+      th.style.overflow = 'visible';
+
+      // Measure text-based ideal width
+      const text = (div.innerText || '').replace(/\n/g, ' ').trim();
+      const textBasedWidth = Math.round(text.length * 9.5 + 48);
+
+      // Calculate available space from the th's left edge to the viewport right edge
+      // getBoundingClientRect returns zoomed visual coordinates, so divide by zoom
+      const viewport = document.querySelector('.excel-sheet-viewport');
+      const currentZoom = (window.currentSheetZoom || 100) / 100;
+      const thRect = th.getBoundingClientRect();
+      const vpRect = viewport ? viewport.getBoundingClientRect() : { right: window.innerWidth };
+
+      // Visual pixels available → convert to unzoomed CSS pixels for setColumnWidth
+      const availableVisualPx = vpRect.right - thRect.left - 10; // 10px breathing room
+      const maxFromEdge = Math.max(div._editOrigWidth, Math.round(availableVisualPx / currentZoom));
+
+      const targetWidth = Math.min(maxFromEdge, Math.max(div._editOrigWidth, textBasedWidth));
+
+      // Use temp setter — does NOT persist to localStorage so refresh restores original
+      setColumnWidthTemp(colIdx, targetWidth);
+
+      // Scroll the viewport so the expanded column is fully visible
+      setTimeout(() => {
+        if (!viewport) return;
+        const expandedRect = th.getBoundingClientRect();
+        const vpR = viewport.getBoundingClientRect();
+        if (expandedRect.right > vpR.right) {
+          // Column right edge is off screen — scroll just enough to bring it in
+          viewport.scrollLeft += Math.ceil((expandedRect.right - vpR.right) / currentZoom) + 8;
+        }
+      }, 30);
+    }
+
+    function collapseHeaderAfterEdit(div) {
+      // Restore text wrap
+      div.style.whiteSpace = '';
+      div.style.overflow = '';
+      const th = div.closest('th');
+      if (th) th.style.overflow = '';
+
+      // Restore original column width so wrapped layout is preserved
+      const colIdx = div._editColIdx;
+      const origWidth = div._editOrigWidth;
+      if (!isNaN(colIdx) && origWidth > 0) {
+        setTimeout(() => setColumnWidth(colIdx, origWidth), 30);
+      }
+    }
+
+    function initHeaderEditBehavior() {
+      const table = document.getElementById('eval-table');
+      if (!table) return;
+
+      table.addEventListener('focusin', (e) => {
+        const div = e.target.closest('.sheet-th-input[contenteditable]');
+        if (div) expandHeaderForEdit(div);
+      });
+
+      table.addEventListener('focusout', (e) => {
+        const div = e.target.closest('.sheet-th-input[contenteditable]');
+        if (div) collapseHeaderAfterEdit(div);
+      });
+    }
+
+
+    function onCustomColumnNameChange(idx, val) {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.scheme || !state.scheme.custom_columns) return;
+      if (state.scheme.custom_columns[idx]) {
+        state.scheme.custom_columns[idx].name = val;
+      }
+      if (state.custom_columns && state.custom_columns[idx]) {
+        state.custom_columns[idx].name = val;
+      }
+      const labelEl = document.querySelector(`#scheme-ctrl-custom-${idx} .scheme-custom-name-label`);
+      if (labelEl) labelEl.innerText = `${val}:`;
+    }
+
+    function onAssignmentTitleChange(idx, val) {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.assignments) return;
+      if (state.assignments[idx]) {
+        state.assignments[idx].title = val;
+      }
+    }
+
+    function onExamTitleChange(idx, val) {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.exams) return;
+      if (state.exams[idx]) {
+        state.exams[idx].title = val;
+      }
+    }
+
+    function toggleEditMode() {
+      handleEditSaveClick();
+    }
+
+    function onInstTitleChange(val) {
+      const state = window.currentEvalSheetState;
+      if (state) state.institution_name = val.trim();
+    }
+
+    function onSessionTitleChange(val) {
+      const state = window.currentEvalSheetState;
+      if (state) state.session_label = val.trim();
+    }
+
+    function onDeptMetaChange(val) {
+      const state = window.currentEvalSheetState;
+      if (state) state.dept_semester_text = val.trim();
+    }
+
+    function onCustomSchemeMarksChange(cIdx, val) {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.custom_columns || !state.custom_columns[cIdx]) return;
+      const num = Math.max(1, parseFloat(val) || 0);
+      state.custom_columns[cIdx].max = num;
+
+      const th = document.getElementById(`th-custom-group-${cIdx}`);
+      if (th) th.innerText = `${state.custom_columns[cIdx].name} (${num})`;
+
+      document.querySelectorAll(`input[data-col="c${cIdx + 1}"]`).forEach(inp => {
+        inp.setAttribute('max', num);
+        if (parseFloat(inp.value) > num) inp.value = num;
+      });
+
+      const customTotal = (state.custom_columns || []).reduce((sum, c) => sum + (Number(c.max) || 0), 0);
+      state.scheme.total_max = state.scheme.assign_max + state.scheme.exam_max + state.scheme.att_max + state.scheme.pres_max + customTotal;
+
+      const badgeTot = document.getElementById('scheme-grand-total-max');
+      if (badgeTot) badgeTot.innerText = String(state.scheme.total_max);
+
+      const modalTot = document.getElementById('modal-scheme-total-display');
+      if (modalTot) modalTot.innerText = String(state.scheme.total_max);
+      const saveModalTot = document.getElementById('save-modal-scheme-total');
+      if (saveModalTot) saveModalTot.innerText = String(state.scheme.total_max);
+
+      const thTot = document.getElementById('th-total-group');
+      if (thTot) thTot.innerText = `Total Marks (${state.scheme.total_max})`;
+
+      state.students.forEach(st => {
+        if (Array.isArray(st.custom_scores) && st.custom_scores[cIdx] > num) {
+          st.custom_scores[cIdx] = num;
+        }
+        recalculateEvalRow(st);
+        const cell = document.getElementById(`eval-grand-total-${st.student_id}`);
+        if (cell) cell.innerText = st.grand_total;
+      });
+    }
+
+    function openEditMarksModal() {
+      populateEditMarksModal();
+      const modal = document.getElementById('edit-total-marks-modal');
+      if (modal) {
+        modal.classList.add('open');
+        modal.style.display = 'flex';
+      }
+    }
+
+    function closeEditMarksModal() {
+      const modal = document.getElementById('edit-total-marks-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+
+    function applyAndCloseEditMarksModal() {
+      closeEditMarksModal();
+      showToast('Evaluation scheme marks updated successfully!', 'success');
+    }
+
+    function populateEditMarksModal() {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.scheme) return;
+
+      const aInp = document.getElementById('scheme-assign-max');
+      if (aInp) aInp.value = state.scheme.assign_avg_max || state.scheme.assign_max || 15;
+      const eInp = document.getElementById('scheme-exam-max');
+      if (eInp) eInp.value = state.scheme.exam_avg_max || state.scheme.exam_max || 20;
+      const attInp = document.getElementById('scheme-att-max');
+      if (attInp) attInp.value = state.scheme.att_max;
+      const pInp = document.getElementById('scheme-pres-max');
+      if (pInp) pInp.value = state.scheme.pres_max;
+
+      const cContainer = document.getElementById('modal-custom-cols-container');
+      if (cContainer) {
+        const cCols = state.custom_columns || [];
+        if (cCols.length === 0) {
+          cContainer.innerHTML = '';
+        } else {
+          cContainer.innerHTML = `
+            <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.5px;">Custom Assessment Columns</div>
+            <div class="scheme-form-grid" style="display: grid; grid-template-columns: 1fr auto; gap: 0.75rem; align-items: center; background: var(--bg-surface); padding: 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+              ${cCols.map((c, cIdx) => `
+                <div id="scheme-ctrl-custom-${cIdx}">
+                  <label for="scheme-custom-max-${cIdx}" style="display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.15rem;">
+                    <span class="scheme-custom-name-label">${escapeHtml(c.name)}</span> Max Marks
+                  </label>
+                  <div style="font-size: 0.74rem; color: var(--text-muted);">Custom assessment column</div>
+                </div>
+                <div>
+                  <input type="number" id="scheme-custom-max-${cIdx}" class="scheme-ctrl-input" style="width: 60px; padding: 0.35rem; font-size: 0.88rem;" value="${c.max || 10}" min="1" max="100" oninput="onCustomSchemeMarksChange(${cIdx}, this.value)">
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+      }
+
+      const modalTot = document.getElementById('modal-scheme-total-display');
+      if (modalTot) modalTot.innerText = String(state.scheme.total_max);
+    }
+
+    function openAddColumnModal() {
+      const modal = document.getElementById('add-column-modal');
+      if (!modal) return;
+      const state = window.currentEvalSheetState;
+      const nextNum = ((state && state.custom_columns) || []).length + 1;
+      const titleInput = document.getElementById('new-col-title');
+      const maxInput = document.getElementById('new-col-max');
+      if (titleInput) titleInput.value = `Viva / Quiz ${nextNum}`;
+      if (maxInput) maxInput.value = '10';
+      modal.style.display = 'flex';
+      modal.classList.add('open');
+      setTimeout(() => {
+        if (titleInput) titleInput.focus();
+      }, 50);
+    }
+
+    function closeAddColumnModal() {
+      const modal = document.getElementById('add-column-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+
+    function confirmAddInternalEvalColumn() {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const titleInput = document.getElementById('new-col-title');
+      const maxInput = document.getElementById('new-col-max');
+
+      const title = (titleInput && titleInput.value.trim()) || `Viva / Quiz ${(state.custom_columns || []).length + 1}`;
+      const maxMarks = Math.max(1, parseInt(maxInput && maxInput.value, 10) || 10);
+
+      if (!Array.isArray(state.custom_columns)) state.custom_columns = [];
+      state.custom_columns.push({
+        id: 'col_' + Date.now(),
+        name: title,
+        max: maxMarks
+      });
+
+      state.students.forEach(s => {
+        if (!Array.isArray(s.custom_scores)) s.custom_scores = [];
+        s.custom_scores.push(0);
+        recalculateEvalRow(s);
+      });
+
+      const customTotal = state.custom_columns.reduce((sum, c) => sum + (Number(c.max) || 0), 0);
+      state.scheme.total_max = state.scheme.assign_max + state.scheme.exam_max + state.scheme.att_max + state.scheme.pres_max + customTotal;
+
+      closeAddColumnModal();
+      renderInternalEvalGrid();
+      showToast(`Added assessment column: ${title} (${maxMarks} marks)!`, 'success');
+    }
+
+    function addInternalEvalColumn() {
+      openAddColumnModal();
+    }
+
+    function openRemoveColumnModal() {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.custom_columns || !state.custom_columns.length) {
+        showToast('No custom assessment columns to remove.', 'info');
+        return;
+      }
+      const modal = document.getElementById('remove-column-modal');
+      if (!modal) return;
+      const lastCol = state.custom_columns[state.custom_columns.length - 1];
+      const nameDisp = document.getElementById('remove-col-name-display');
+      if (nameDisp) {
+        nameDisp.innerText = `${lastCol.name} (${lastCol.max || 10} marks)`;
+      }
+      modal.style.display = 'flex';
+      modal.classList.add('open');
+    }
+
+    function closeRemoveColumnModal() {
+      const modal = document.getElementById('remove-column-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+
+    function confirmRemoveInternalEvalColumn() {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.custom_columns || !state.custom_columns.length) {
+        closeRemoveColumnModal();
+        return;
+      }
+      const removedCol = state.custom_columns.pop();
+      state.students.forEach(s => {
+        if (Array.isArray(s.custom_scores)) s.custom_scores.pop();
+        recalculateEvalRow(s);
+      });
+
+      const customTotal = state.custom_columns.reduce((sum, c) => sum + (Number(c.max) || 0), 0);
+      state.scheme.total_max = (state.scheme.assign_avg_max || state.scheme.assign_max || 15) + (state.scheme.exam_avg_max || state.scheme.exam_max || 20) + state.scheme.att_max + state.scheme.pres_max + customTotal;
+
+      closeRemoveColumnModal();
+      renderInternalEvalGrid();
+      showToast(`Removed assessment column: ${removedCol.name}`, 'info');
+    }
+
+    function removeInternalEvalColumn() {
+      openRemoveColumnModal();
+    }
+
+    function onSchemeMarksChange(type, val) {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.scheme) return;
+      const num = Math.max(1, parseFloat(val) || 0);
+      // assign / exam change the AVG column weight, NOT per-assessment max marks
+      if (type === 'assign') {
+        state.scheme.assign_avg_max = num;
+        // Recalculate scaled averages (individual scores stay the same)
+      }
+      if (type === 'exam') {
+        state.scheme.exam_avg_max = num;
+      }
+      if (type === 'att') {
+        state.scheme.att_max = num;
+        state.students.forEach(st => {
+          const pct = st.attendance_percentage !== undefined ? st.attendance_percentage : 85;
+          st.attendance_score = Math.min(num, Math.round((pct / 100) * num * 10) / 10);
+          const attInp = document.querySelector(`input[data-student-att="${st.student_id}"]`);
+          if (attInp) {
+            attInp.setAttribute('max', num);
+            attInp.value = st.attendance_score;
+          }
+        });
+      }
+      if (type === 'pres') {
+        state.scheme.pres_max = num;
+        state.students.forEach(st => {
+          st.presentation_score = Math.min(st.presentation_score, num);
+          const presInp = document.querySelector(`input[data-student-pres="${st.student_id}"]`);
+          if (presInp) {
+            presInp.setAttribute('max', num);
+            presInp.value = st.presentation_score;
+          }
+        });
+      }
+
+      const customTotal = (state.custom_columns || []).reduce((sum, c) => sum + (Number(c.max) || 0), 0);
+      const assignAvgMax = state.scheme.assign_avg_max || state.scheme.assign_max || 15;
+      const examAvgMax = state.scheme.exam_avg_max || state.scheme.exam_max || 20;
+      state.scheme.total_max = assignAvgMax + examAvgMax + state.scheme.att_max + state.scheme.pres_max + customTotal;
+
+      // Group headers show avg weight, not individual marks
+      const thA = document.getElementById('th-assign-group');
+      if (thA) thA.innerText = `Assignment Marks`;
+      const thE = document.getElementById('th-exam-group');
+      if (thE) thE.innerText = `Unit Test Marks`;
+      const thAtt = document.getElementById('th-att-group');
+      if (thAtt) thAtt.innerText = `Total Attendance (${state.scheme.att_max})`;
+      const thPres = document.getElementById('th-pres-group');
+      if (thPres) thPres.innerText = `${state.scheme.pres_label || 'Problem Solving Skills / Presentation'} (${state.scheme.pres_max})`;
+      const thTot = document.getElementById('th-total-group');
+      if (thTot) thTot.innerText = `Total Marks (${state.scheme.total_max})`;
+
+      const badgeTot = document.getElementById('scheme-grand-total-max');
+      if (badgeTot) badgeTot.innerText = String(state.scheme.total_max);
+
+      const modalTot = document.getElementById('modal-scheme-total-display');
+      if (modalTot) modalTot.innerText = String(state.scheme.total_max);
+      const saveModalTot = document.getElementById('save-modal-scheme-total');
+      if (saveModalTot) saveModalTot.innerText = String(state.scheme.total_max);
+
+      state.students.forEach(st => {
+        recalculateEvalRow(st);
+        const cell = document.getElementById(`eval-grand-total-${st.student_id}`);
+        if (cell) cell.innerText = st.grand_total;
+        const avgElA = document.getElementById(`eval-assign-avg-${st.student_id}`);
+        if (avgElA) avgElA.innerText = st.assignment_avg.toFixed(1);
+        const avgElE = document.getElementById(`eval-exam-avg-${st.student_id}`);
+        if (avgElE) avgElE.innerText = st.exam_avg.toFixed(1);
+      });
+    }
+
+    function renderInternalEvalGrid() {
+      const content = document.getElementById('internal-eval-content');
+      const state = window.currentEvalSheetState;
+      if (!content || !state) return;
+
+      const aCount = state.assignments.length;
+      const eCount = state.exams.length;
+      const cCols = state.custom_columns || [];
+
+      const deptCode = escapeHtml((registerData && (registerData.department_code || registerData.department_name)) || 'IT');
+      const sem = (registerData && registerData.semester) || 5;
+
+      const registerOpts = allRegisters.map(r => {
+        const isSel = r.id === currentRegisterId;
+        const subj = r.subject_name || r.name || 'Subject';
+        const code = r.subject_code ? `[${r.subject_code}]` : '';
+        return `<option value="${r.id}" ${isSel ? 'selected' : ''}>${subj} ${code}</option>`;
+      }).join('');
+
+      const leafCols = getEvalLeafColumns();
+      const savedWidths = window.currentColWidths || {};
+
+      content.innerHTML = `
+        <div class="sheet-studio-container">
+          
+          <!-- STICKY COMMAND BAR (ON TOP OF SHEET HEADER, STICKS TO TOP) -->
+          <div class="eval-command-bar sticky-top-bar" id="eval-sticky-command-bar">
+            <!-- Dynamic Column Controls & Edit Active Badge (Shown in Edit Mode) -->
+            <div class="eval-command-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-add-column" onclick="openAddColumnModal()" title="Add custom evaluation column (e.g. Viva, Quiz, Mini-Project)" style="${isEditMode ? 'display: inline-flex;' : 'display: none;'}">
+                + Add Column
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-remove-column" onclick="openRemoveColumnModal()" title="Remove custom assessment column" style="${isEditMode ? 'display: inline-flex;' : 'display: none;'}">
+                - Remove Column
+              </button>
+              <span id="edit-mode-badge" style="${isEditMode ? 'display: inline-flex;' : 'display: none;'} font-size: 0.72rem; font-weight: 800; color: var(--color-primary); background: var(--color-primary-subtle); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); align-items: center; gap: 0.25rem;">
+                ⚡ EDIT MODE ACTIVE
+              </span>
+            </div>
+
+            <!-- Edit Total Marks Button & Scheme Summary Badge -->
+            <div class="eval-scheme-summary" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-edit-total-marks" onclick="openEditMarksModal()" title="Edit total evaluation marks & breakdown scheme" style="font-weight: 700;">
+                ⚙️ Edit Total Marks
+              </button>
+              <div class="eval-scheme-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 700; color: var(--text-main); background: var(--bg-card); padding: 0.22rem 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                <span style="color: var(--text-muted); font-size: 0.74rem;">Marks in ( ):</span>
+                <strong id="scheme-grand-total-max" style="color: var(--color-primary); font-size: 0.88rem;">${state.scheme.total_max}</strong>
+              </div>
+            </div>
+
+            <!-- Action Buttons: Edit in place of Save, becomes Save in Edit Mode -->
+            <div class="eval-command-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-eval" onclick="loadInternalEvaluationData()" title="Reload data">
+                🔄 Refresh
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-excel" onclick="exportInternalEvalExcel()" title="Export directly to native Microsoft Excel / Google Sheets (.xlsx)" style="font-weight: 700; color: var(--status-present);">
+                📥 Export
+              </button>
+              ${isEditMode ? `
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-edit" onclick="cancelEditMode()" title="Exit edit mode without saving changes" style="font-weight: 700;">
+                  ✕ Cancel
+                </button>
+              ` : ''}
+              <button type="button" class="btn ${isEditMode ? 'btn-primary' : 'btn-secondary'} btn-sm" id="btn-toggle-edit" onclick="handleEditSaveClick()" title="${isEditMode ? 'Save evaluation and lock view' : 'Edit headers, marks in ( ), scores, and columns'}" style="font-weight: 700;">
+                ${isEditMode ? '💾 Save' : '✏️ Edit'}
+              </button>
+              <button type="button" id="btn-save-eval" onclick="handleEditSaveClick(true)" style="display: none;"></button>
+            </div>
+          </div>
+
+          <!-- INSTITUTIONAL SHEET HEADER BANNER -->
+          <div class="sheet-header-banner">
+            <h1 class="sheet-inst-title" id="heading-inst-title" style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-main);">
+              ${isEditMode 
+                ? `<input type="text" class="sheet-banner-input sheet-inst-title-input" id="input-inst-title" value="${escapeHtml(state.institution_name)}" oninput="onInstTitleChange(this.value)" placeholder="Institution & Department Title" title="Edit Institution Title">`
+                : `${escapeHtml(state.institution_name)}`
+              }
+            </h1>
+            <div class="sheet-session-label" id="sheet-session-label-display" style="margin-top: 0.3rem;">
+              ${isEditMode 
+                ? `<input type="text" class="sheet-banner-input sheet-session-title-input" id="input-session-title" value="${escapeHtml(state.session_label)}" oninput="onSessionTitleChange(this.value)" placeholder="Internal Evaluation Sheet Session" title="Edit Session Title">`
+                : `${escapeHtml(state.session_label)}`
+              }
+            </div>
+            <div class="sheet-header-meta" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.4rem;">
+              <span id="display-dept-meta">
+                ${isEditMode 
+                  ? `<input type="text" class="sheet-banner-input sheet-dept-meta-input" id="input-dept-meta" value="${escapeHtml(state.dept_semester_text || `Department (${deptCode}) - ${sem} Semester`)}" oninput="onDeptMetaChange(this.value)" placeholder="Department - Semester" title="Edit Department - Semester"> - `
+                  : `Department (<strong>${deptCode}</strong>) - <strong>${sem} Semester</strong> - `
+                }
+              </span>
+              <select id="register-switcher-select" class="sheet-subject-select" onchange="onRegisterChange(this.value)" title="Change Subject Register">
+                ${registerOpts}
+              </select>
+              <select id="eval-switcher-select" style="display: none;" aria-hidden="true">${registerOpts}</select>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE WEBPAGE FILTER & SEARCH STRIP -->
+          <div class="eval-filter-toolbar" id="eval-filter-toolbar">
+            <div class="eval-filter-left">
+              <div class="eval-search-input-wrap">
+                <span class="eval-search-icon">🔍</span>
+                <input type="text" 
+                       id="eval-search-input" 
+                       class="eval-search-input" 
+                       placeholder="Filter by student name, roll no, enrollment, reg no..." 
+                       value="${escapeHtml(window.evalSearchQuery || '')}"
+                       oninput="onEvalSearchInput(this.value)"
+                       autocomplete="off">
+                <button type="button" 
+                        class="eval-search-clear-btn" 
+                        id="btn-eval-search-clear" 
+                        onclick="clearEvalSearch()" 
+                        style="${window.evalSearchQuery ? 'display: inline-flex;' : 'display: none;'}" 
+                        title="Clear search">✕</button>
+              </div>
+
+              <div class="eval-quick-filter-wrap">
+                <label for="eval-marks-filter-select" class="eval-filter-label">Filter:</label>
+                <select id="eval-marks-filter-select" class="eval-filter-select" onchange="onEvalMarksFilterChange(this.value)" title="Filter by student performance">
+                  <option value="ALL" ${(!window.evalMarksFilter || window.evalMarksFilter === 'ALL') ? 'selected' : ''}>All Students</option>
+                  <option value="TOP" ${window.evalMarksFilter === 'TOP' ? 'selected' : ''}>🌟 Top Marks (≥ 75%)</option>
+                  <option value="AVERAGE" ${window.evalMarksFilter === 'AVERAGE' ? 'selected' : ''}>📊 Average (50% – 74%)</option>
+                  <option value="LOW" ${window.evalMarksFilter === 'LOW' ? 'selected' : ''}>⚠️ Low Marks (&lt; 50%)</option>
+                  <option value="ATT_LOW" ${window.evalMarksFilter === 'ATT_LOW' ? 'selected' : ''}>🚨 Low Attendance (&lt; 75%)</option>
+                  <option value="UT_AB" ${window.evalMarksFilter === 'UT_AB' ? 'selected' : ''}>🔴 Absent in Any Test</option>
+                </select>
+              </div>
+
+              <div class="eval-quick-sort-wrap">
+                <label for="eval-sort-select" class="eval-filter-label">Sort:</label>
+                <select id="eval-sort-select" class="eval-filter-select" onchange="onEvalSortChange(this.value)" title="Sort student roster">
+                  <option value="ROLL_ASC" ${(!window.evalSortOrder || window.evalSortOrder === 'ROLL_ASC') ? 'selected' : ''}>Roll No (Ascending)</option>
+                  <option value="ROLL_DESC" ${window.evalSortOrder === 'ROLL_DESC' ? 'selected' : ''}>Roll No (Descending)</option>
+                  <option value="NAME_ASC" ${window.evalSortOrder === 'NAME_ASC' ? 'selected' : ''}>Name (A → Z)</option>
+                  <option value="NAME_DESC" ${window.evalSortOrder === 'NAME_DESC' ? 'selected' : ''}>Name (Z → A)</option>
+                  <option value="TOTAL_DESC" ${window.evalSortOrder === 'TOTAL_DESC' ? 'selected' : ''}>Total Marks (High → Low)</option>
+                  <option value="TOTAL_ASC" ${window.evalSortOrder === 'TOTAL_ASC' ? 'selected' : ''}>Total Marks (Low → High)</option>
+                  <option value="ATT_DESC" ${window.evalSortOrder === 'ATT_DESC' ? 'selected' : ''}>Attendance (High → Low)</option>
+                  <option value="ATT_ASC" ${window.evalSortOrder === 'ATT_ASC' ? 'selected' : ''}>Attendance (Low → High)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="eval-filter-right">
+              <span class="eval-filter-badge" id="eval-filter-status-badge">
+                Showing <strong id="eval-visible-count">${state.students.length}</strong> of ${state.students.length} students
+              </span>
+              <button type="button" 
+                      class="btn btn-secondary btn-sm" 
+                      id="btn-reset-eval-filter" 
+                      onclick="resetAllEvalFilters()" 
+                      style="${(window.evalSearchQuery || (window.evalMarksFilter && window.evalMarksFilter !== 'ALL') || (window.evalSortOrder && window.evalSortOrder !== 'ROLL_ASC')) ? 'display: inline-flex;' : 'display: none;'} font-size: 0.72rem; padding: 0.2rem 0.5rem;"
+                      title="Reset all filters">
+                ✕ Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- SPREADSHEET TABLE -->
+          <div class="excel-sheet-viewport">
+            <table class="excel-table sheet-table" id="eval-table">
+              <colgroup id="eval-colgroup">
+                ${leafCols.map((col, idx) => {
+                  const w = (savedWidths && savedWidths[idx]) || col.defaultWidth;
+                  return `<col id="eval-col-${idx}" style="width: ${w}px;">`;
+                }).join('')}
+              </colgroup>
+              <thead>
+                <tr>
+                  <th rowspan="2" class="resizable-th" data-col-idx="0" style="width: ${(savedWidths && savedWidths[0]) || 70}px;" ondblclick="autoFitColumn(0)" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('roll_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Roll No Header" style="font-weight: 700; font-size: 0.72rem;">${escapeHtml(state.scheme.roll_label || 'ROLL NO')}</div>`
+                      : `${escapeHtml(state.scheme.roll_label || 'ROLL NO')}`
+                    }
+                  </th>
+                  <th rowspan="2" class="resizable-th" data-col-idx="1" style="width: ${(savedWidths && savedWidths[1]) || 135}px;" ondblclick="autoFitColumn(1)" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('enroll_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Enrollment No Header" style="font-weight: 700; font-size: 0.72rem;">${escapeHtml(state.scheme.enroll_label || 'ENROLLMENT NO')}</div>`
+                      : `${escapeHtml(state.scheme.enroll_label || 'ENROLLMENT NO')}`
+                    }
+                  </th>
+                  <th rowspan="2" class="resizable-th" data-col-idx="2" style="width: ${(savedWidths && savedWidths[2]) || 135}px;" ondblclick="autoFitColumn(2)" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('reg_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Reg No Header" style="font-weight: 700; font-size: 0.72rem;">${escapeHtml(state.scheme.reg_label || 'REG NO')}</div>`
+                      : `${escapeHtml(state.scheme.reg_label || 'REG NO')}`
+                    }
+                  </th>
+                  <th rowspan="2" class="resizable-th" data-col-idx="3" style="width: ${(savedWidths && savedWidths[3]) || 200}px; text-align: left;" ondblclick="autoFitColumn(3)" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('name_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Student Name Header" style="font-weight: 700; font-size: 0.72rem; text-align: left;">${escapeHtml(state.scheme.name_label || 'STUDENT NAME')}</div>`
+                      : `${escapeHtml(state.scheme.name_label || 'STUDENT NAME')}`
+                    }
+                  </th>
+                  <th colspan="${aCount}" id="th-assign-group">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('assign_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Assignment Header" style="font-weight: 700; font-size: 0.75rem; width: auto; max-width: 140px; display: inline-block;">${escapeHtml(state.scheme.assign_label || 'Assignment Marks')}</div>`
+                      : `${escapeHtml(state.scheme.assign_label || 'Assignment Marks')}`
+                    }
+                  </th>
+                  <th rowspan="2" class="resizable-th" data-col-idx="${4 + aCount}" style="width: ${(savedWidths && savedWidths[4 + aCount]) || 95}px;" ondblclick="autoFitColumn(${4 + aCount})" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('assign_avg_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Assignment Avg Header" style="font-weight: 700; font-size: 0.70rem;">${escapeHtml(state.scheme.assign_avg_label || 'Assign Avg')}</div> (${state.scheme.assign_avg_max || state.scheme.assign_max || 15})`
+                      : `${escapeHtml(state.scheme.assign_avg_label || 'Assign Avg')} (${state.scheme.assign_avg_max || state.scheme.assign_max || 15})`
+                    }
+                  </th>
+                  <th colspan="${eCount}" id="th-exam-group">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('exam_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Unit Test Header" style="font-weight: 700; font-size: 0.75rem; width: auto; max-width: 120px; display: inline-block;">${escapeHtml(state.scheme.exam_label || 'Unit Test Marks')}</div>`
+                      : `${escapeHtml(state.scheme.exam_label || 'Unit Test Marks')}`
+                    }
+                  </th>
+                  <th rowspan="2" class="resizable-th" data-col-idx="${5 + aCount + eCount}" style="width: ${(savedWidths && savedWidths[5 + aCount + eCount]) || 85}px;" ondblclick="autoFitColumn(${5 + aCount + eCount})" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('exam_avg_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit UT Avg Header" style="font-weight: 700; font-size: 0.70rem;">${escapeHtml(state.scheme.exam_avg_label || 'UT Avg')}</div> (${state.scheme.exam_avg_max || state.scheme.exam_max || 20})`
+                      : `${escapeHtml(state.scheme.exam_avg_label || 'UT Avg')} (${state.scheme.exam_avg_max || state.scheme.exam_max || 20})`
+                    }
+                  </th>
+                  <th rowspan="2" class="resizable-th" data-col-idx="${6 + aCount + eCount}" style="width: ${(savedWidths && savedWidths[6 + aCount + eCount]) || 90}px;" id="th-att-group" ondblclick="autoFitColumn(${6 + aCount + eCount})" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('att_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Attendance Header" style="font-weight: 700; font-size: 0.70rem;">${escapeHtml(state.scheme.att_label || 'Total Attendance')}</div> (${state.scheme.att_max})`
+                      : `${escapeHtml(state.scheme.att_label || 'Total Attendance')} (${state.scheme.att_max})`
+                    }
+                  </th>
+                  <th rowspan="2" class="resizable-th" data-col-idx="${7 + aCount + eCount}" style="width: ${(savedWidths && savedWidths[7 + aCount + eCount]) || 115}px;" id="th-pres-group" ondblclick="autoFitColumn(${7 + aCount + eCount})" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('pres_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Presentation Header" style="font-weight: 700; font-size: 0.70rem;">${escapeHtml(state.scheme.pres_label || 'Problem Solving Skills / Presentation')}</div> (${state.scheme.pres_max})`
+                      : `${escapeHtml(state.scheme.pres_label || 'Problem Solving Skills / Presentation')} (${state.scheme.pres_max})`
+                    }
+                  </th>
+                  ${cCols.map((c, idx) => {
+                    const colIdx = 8 + aCount + eCount + idx;
+                    const w = (savedWidths && savedWidths[colIdx]) || 95;
+                    return `
+                      <th rowspan="2" class="resizable-th" data-col-idx="${colIdx}" style="width: ${w}px;" id="th-custom-group-${idx}" ondblclick="autoFitColumn(${colIdx})" title="Double-click to auto-fit">
+                        ${isEditMode 
+                          ? `<span style="font-size:0;opacity:0;position:absolute;pointer-events:none;">${escapeHtml(c.name)}</span><div class="sheet-th-input" contenteditable="true" oninput="onCustomColumnNameChange(${idx}, this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Column Name" style="font-weight: 700; font-size: 0.72rem; width: 90%;">${escapeHtml(c.name)}</div> (${c.max || 10})`
+                          : `${escapeHtml(c.name)} (${c.max || 10})`
+                        }
+                      </th>
+                    `;
+                  }).join('')}
+                  <th rowspan="2" class="resizable-th" data-col-idx="${8 + aCount + eCount + cCols.length}" style="width: ${(savedWidths && savedWidths[8 + aCount + eCount + cCols.length]) || 85}px; font-weight: 800;" id="th-total-group" ondblclick="autoFitColumn(${8 + aCount + eCount + cCols.length})" title="Double-click to auto-fit">
+                    ${isEditMode 
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('total_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Total Marks Header" style="font-weight: 800; font-size: 0.72rem;">${escapeHtml(state.scheme.total_label || 'Total Marks')}</div> (${state.scheme.total_max})`
+                      : `${escapeHtml(state.scheme.total_label || 'Total Marks')} (${state.scheme.total_max})`
+                    }
+                  </th>
+                </tr>
+                <tr>
+                  ${state.assignments.map((a, i) => {
+                    const colIdx = 4 + i;
+                    const w = (savedWidths && savedWidths[colIdx]) || 46;
+                    const aMaxMark = a.max_marks || 25;
+                    return `
+                      <th class="th-secondary resizable-th" data-col-idx="${colIdx}" style="width: ${w}px;" ondblclick="autoFitColumn(${colIdx})" title="Double-click to auto-fit">
+                        ${isEditMode 
+                          ? `<input type="text" class="sheet-th-sub-input" value="${escapeHtml(a.title || (i + 1))}" oninput="onAssignmentTitleChange(${i}, this.value)" title="Edit Assignment Header"> <span style='font-size:0.65rem;opacity:0.7'>(${aMaxMark})</span>`
+                          : `${escapeHtml(a.title || a.name || (i + 1))} <span style='font-size:0.7rem;opacity:0.75'>(${aMaxMark})</span>`
+                        }
+                      </th>
+                    `;
+                  }).join('')}
+                  ${state.exams.map((e, i) => {
+                    const colIdx = 5 + aCount + i;
+                    const w = (savedWidths && savedWidths[colIdx]) || 46;
+                    const eMaxMark = e.max_marks || 25;
+                    return `
+                      <th class="th-secondary resizable-th" data-col-idx="${colIdx}" style="width: ${w}px;" ondblclick="autoFitColumn(${colIdx})" title="Double-click to auto-fit">
+                        ${isEditMode 
+                          ? `<input type="text" class="sheet-th-sub-input" value="${escapeHtml(e.title || e.name || (i + 1))}" oninput="onExamTitleChange(${i}, this.value)" title="Edit UT Header"> <span style='font-size:0.65rem;opacity:0.7'>(${eMaxMark})</span>`
+                          : `${escapeHtml(e.title || e.name || (i + 1))} <span style='font-size:0.7rem;opacity:0.75'>(${eMaxMark})</span>`
+                        }
+                      </th>
+                    `;
+                  }).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${state.students.map((s, idx) => `
+                  <tr class="eval-student-row" id="eval-student-row-${s.student_id}"
+                      data-student-id="${s.student_id}"
+                      data-name="${escapeHtml(s.full_name || '').toLowerCase()}"
+                      data-roll="${escapeHtml(String(s.class_roll_no || '')).toLowerCase()}"
+                      data-enrollment="${escapeHtml(s.official_enrollment_no || '').toLowerCase()}"
+                      data-reg="${escapeHtml(s.registration_no || '').toLowerCase()}"
+                      data-total="${s.grand_total}"
+                      data-att="${s.attendance_score ?? state.scheme.att_max}"
+                      data-has-absent="${Boolean(s.exam_absent && s.exam_absent.some(Boolean))}">
+                    <td class="cell-roll col-cell col-idx-0" data-col-idx="0">
+                      ${escapeHtml(String(s.class_roll_no))}
+                    </td>
+                    <td class="col-cell col-idx-1" data-col-idx="1" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">
+                      ${escapeHtml(s.official_enrollment_no || '—')}
+                    </td>
+                    <td class="col-cell col-idx-2" data-col-idx="2" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">
+                      ${escapeHtml(s.registration_no || '—')}
+                    </td>
+                    <td class="cell-student-name col-cell col-idx-3" data-col-idx="3" title="${escapeHtml(s.full_name)}">
+                      <span style="font-weight: 700; text-transform: uppercase;">${escapeHtml(s.full_name)}</span>
+                    </td>
+                    ${state.assignments.map((a, aIdx) => `
+                      <td class="col-cell col-idx-${4 + aIdx}" data-col-idx="${4 + aIdx}">
+                        <input type="number" 
+                               class="excel-cell-input sheet-cell-input ${isEditMode ? 'is-editable' : ''}" 
+                               data-col="a${aIdx + 1}"
+                               data-student-assign="${s.student_id}_${aIdx}"
+                               value="${s.assignment_scores[aIdx] ?? 0}" 
+                               min="0" 
+                               max="${a.max_marks || 25}" 
+                               step="0.5" 
+                               ${isEditMode ? '' : 'readonly'}
+                               oninput="onEvalAssignmentScoreChange(${s.student_id}, ${aIdx}, this.value, this)">
+                      </td>
+                    `).join('')}
+                    <td class="col-cell col-idx-${4 + aCount}" data-col-idx="${4 + aCount}" style="font-weight: 700; background: var(--bg-surface-secondary);" id="eval-assign-avg-${s.student_id}">${s.assignment_avg.toFixed(1)}</td>
+                    ${state.exams.map((_, eIdx) => {
+                      const isAb = Boolean(s.exam_absent[eIdx]);
+                      const val = isAb ? 'AB' : (s.exam_scores[eIdx] ?? 0);
+                      return `
+                        <td class="col-cell col-idx-${5 + aCount + eIdx}" data-col-idx="${5 + aCount + eIdx}">
+                          <input type="text" 
+                                 class="excel-cell-input sheet-cell-input ${isEditMode ? 'is-editable' : ''}" 
+                                 data-col="ut${eIdx + 1}"
+                                 data-student-exam="${s.student_id}_${eIdx}"
+                                 style="${isAb ? 'color: var(--status-absent) !important; font-weight: 800 !important; background: var(--status-absent-bg) !important;' : ''}" 
+                                 value="${val}" 
+                                 ${isEditMode ? '' : 'readonly'}
+                                 title="Type score (0-${state.scheme.exam_max}) or AB for Absent"
+                                 oninput="onEvalExamScoreChange(${s.student_id}, ${eIdx}, this.value, this)"
+                                 onchange="onEvalExamScoreChange(${s.student_id}, ${eIdx}, this.value, this)">
+                        </td>
+                      `;
+                    }).join('')}
+                    <td class="col-cell col-idx-${5 + aCount + eCount}" data-col-idx="${5 + aCount + eCount}" style="font-weight: 700; background: var(--bg-surface-secondary);" id="eval-exam-avg-${s.student_id}">${s.exam_avg.toFixed(1)}</td>
+                    <td class="col-cell col-idx-${6 + aCount + eCount}" data-col-idx="${6 + aCount + eCount}">
+                      <input type="number" 
+                             class="excel-cell-input sheet-cell-input ${isEditMode ? 'is-editable' : ''}" 
+                             data-col="att"
+                             data-student-att="${s.student_id}"
+                             value="${s.attendance_score ?? state.scheme.att_max}" 
+                             min="0" 
+                             max="${state.scheme.att_max}" 
+                             step="0.5" 
+                             ${isEditMode ? '' : 'readonly'}
+                             oninput="onEvalAttendanceScoreChange(${s.student_id}, this.value, this)">
+                    </td>
+                    <td class="col-cell col-idx-${7 + aCount + eCount}" data-col-idx="${7 + aCount + eCount}">
+                      <input type="number" 
+                             class="excel-cell-input sheet-cell-input ${isEditMode ? 'is-editable' : ''}" 
+                             data-col="pres"
+                             data-student-pres="${s.student_id}"
+                             value="${s.presentation_score ?? state.scheme.pres_max}" 
+                             min="0" 
+                             max="${state.scheme.pres_max}" 
+                             step="0.5" 
+                             ${isEditMode ? '' : 'readonly'}
+                             oninput="onEvalPresentationScoreChange(${s.student_id}, this.value, this)">
+                    </td>
+                    ${cCols.map((c, cIdx) => `
+                      <td class="col-cell col-idx-${8 + aCount + eCount + cIdx}" data-col-idx="${8 + aCount + eCount + cIdx}">
+                        <input type="number" 
+                               class="excel-cell-input sheet-cell-input ${isEditMode ? 'is-editable' : ''}" 
+                               data-col="c${cIdx + 1}"
+                               data-student-custom="${s.student_id}_${cIdx}"
+                               value="${s.custom_scores[cIdx] ?? 0}" 
+                               min="0" 
+                               max="${c.max || 10}" 
+                               step="0.5" 
+                               ${isEditMode ? '' : 'readonly'}
+                               oninput="onEvalCustomScoreChange(${s.student_id}, ${cIdx}, this.value, this)">
+                      </td>
+                    `).join('')}
+                    <td class="cell-total col-cell col-idx-${8 + aCount + eCount + cCols.length}" data-col-idx="${8 + aCount + eCount + cCols.length}" id="eval-grand-total-${s.student_id}">
+                      ${s.grand_total}
+                    </td>
+                  </tr>
+                `).join('')}
+                <tr id="eval-no-filter-match-row" style="display: none;">
+                  <td colspan="${leafCols.length}" style="text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-weight: 700; font-size: 0.88rem; background: var(--bg-surface);">
+                    🔍 No students match the filter criteria. <button type="button" class="btn btn-secondary btn-sm" onclick="resetAllEvalFilters()" style="margin-left: 0.5rem; font-weight: 700;">Reset Filters</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- EXCEL-STYLE STATUS BAR FOOTER WITH ZOOM SLIDER -->
+          <div class="sheet-statusbar">
+            <div class="sheet-statusbar-left">
+              <span>Ready. ${isEditMode ? '✏️ Edit Mode Active' : 'View Mode'}</span>
+              <span>•</span>
+              <span>Cohort Roster: <strong>${state.students.length} Students</strong></span>
+              <span>•</span>
+              <span id="sheet-save-indicator" style="color: var(--color-primary); font-weight: 700;">Synced</span>
+            </div>
+            <div class="sheet-statusbar-right">
+
+              <!-- Zoom Slider Container -->
+              <div class="excel-zoom-slider-container" title="Zoom Sheet (Ctrl + Scroll / Ctrl +/-)">
+                <button type="button" class="btn-excel-tool" onclick="adjustSheetZoom(-10)" title="Zoom Out (Ctrl -)">➖</button>
+                <input type="range" class="zoom-slider-range" id="zoom-slider" min="50" max="150" step="5" value="${window.currentSheetZoom || 100}" oninput="setSheetZoom(this.value)">
+                <button type="button" class="btn-excel-tool" onclick="adjustSheetZoom(10)" title="Zoom In (Ctrl +)">➕</button>
+                <span class="excel-tool-display" id="zoom-status-display" onclick="setSheetZoom(100)" title="Click to reset zoom to 100%">${window.currentSheetZoom || 100}%</span>
+                <button type="button" class="btn-excel-tool" onclick="fitSheetToWindow()" title="Fit sheet to screen width">⛶ Fit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      initColumnResize();
+      applyColFontScales();
+      populateEditMarksModal();
+      initHeaderEditBehavior();
+
+      const curZoom = window.currentSheetZoom || 100;
+      const curFont = window.currentSheetFontScale || 1.0;
+      const vp = document.querySelector('.excel-sheet-viewport');
+      const tbl = document.getElementById('eval-table');
+      if (vp) {
+        vp.style.setProperty('--sheet-zoom', curZoom / 100);
+        vp.style.setProperty('--sheet-font-scale', curFont);
+      }
+      if (tbl) {
+        tbl.style.zoom = curZoom / 100;
+      }
+
+      initViewportAutoFitObserver();
+      applyEvalFilters();
+
+      setTimeout(() => {
+        recalcHeaderRowHeights();
+        fitSheetToWindow(true);
+      }, 50);
+    }
+
+    function getEvalLeafColumns() {
+      const state = window.currentEvalSheetState;
+      if (!state) return [];
+      const aCount = state.assignments.length;
+      const eCount = state.exams.length;
+      const cCols = state.custom_columns || [];
+
+      const cols = [
+        { key: 'roll', label: 'ROLL NO', defaultWidth: 70, minWidth: 50 },
+        { key: 'enrollment', label: 'ENROLLMENT NO', defaultWidth: 135, minWidth: 85 },
+        { key: 'reg', label: 'REG NO', defaultWidth: 135, minWidth: 85 },
+        { key: 'name', label: 'STUDENT NAME', defaultWidth: 200, minWidth: 120, align: 'left' }
+      ];
+
+      for (let i = 0; i < aCount; i++) {
+        cols.push({
+          key: `assign_${i}`,
+          label: `Assign ${i + 1}`,
+          shortLabel: `${i + 1}`,
+          defaultWidth: 46,
+          minWidth: 36
+        });
+      }
+
+      cols.push({
+        key: 'assign_avg',
+        label: 'Assignment Total Marks (Avg)',
+        shortLabel: 'Avg',
+        defaultWidth: 95,
+        minWidth: 65
+      });
+
+      for (let i = 0; i < eCount; i++) {
+        cols.push({
+          key: `exam_${i}`,
+          label: `UT ${i + 1}`,
+          shortLabel: `${i + 1}`,
+          defaultWidth: 46,
+          minWidth: 36
+        });
+      }
+
+      cols.push({
+        key: 'exam_avg',
+        label: 'UT Total Marks (Avg)',
+        shortLabel: 'UT Avg',
+        defaultWidth: 85,
+        minWidth: 65
+      });
+
+      cols.push({
+        key: 'att',
+        label: `Total Attendance (${state.scheme.att_max})`,
+        shortLabel: 'Att',
+        defaultWidth: 90,
+        minWidth: 65
+      });
+
+      cols.push({
+        key: 'pres',
+        label: `Problem Solving Skills/Presentation (${state.scheme.pres_max})`,
+        shortLabel: 'Pres',
+        defaultWidth: 115,
+        minWidth: 75
+      });
+
+      cCols.forEach((c, idx) => {
+        cols.push({
+          key: `custom_${idx}`,
+          label: `${c.name} (${c.max || 10})`,
+          shortLabel: c.name,
+          defaultWidth: 95,
+          minWidth: 65
+        });
+      });
+
+      cols.push({
+        key: 'total',
+        label: `Total Marks (${state.scheme.total_max})`,
+        shortLabel: 'Total',
+        defaultWidth: 85,
+        minWidth: 70
+      });
+
+      return cols;
+    }
+
+    function setColumnWidth(colIdx, width) {
+      const leafCols = getEvalLeafColumns();
+      if (!leafCols[colIdx]) return;
+      const minW = leafCols[colIdx].minWidth || 36;
+      const finalW = Math.max(minW, Math.round(width));
+
+      const colEl = document.getElementById(`eval-col-${colIdx}`);
+      if (colEl) colEl.style.width = finalW + 'px';
+
+      const thEl = document.querySelector(`th[data-col-idx="${colIdx}"]`);
+      if (thEl) {
+        thEl.style.width = finalW + 'px';
+        thEl.style.minWidth = finalW + 'px';
+      }
+
+      if (!window.currentColWidths) window.currentColWidths = {};
+      window.currentColWidths[colIdx] = finalW;
+
+      try {
+        if (currentRegisterId) {
+          localStorage.setItem(`eval_col_widths_${currentRegisterId}`, JSON.stringify(window.currentColWidths));
+        }
+      } catch (e) {}
+    }
+
+    // Temporary visual-only width: does NOT save to localStorage or currentColWidths.
+    // Used for the focus-expand animation so the expanded state never persists on refresh.
+    function setColumnWidthTemp(colIdx, width) {
+      const leafCols = getEvalLeafColumns();
+      if (!leafCols[colIdx]) return;
+      const minW = leafCols[colIdx].minWidth || 36;
+      const finalW = Math.max(minW, Math.round(width));
+
+      const colEl = document.getElementById(`eval-col-${colIdx}`);
+      if (colEl) colEl.style.width = finalW + 'px';
+
+      const thEl = document.querySelector(`th[data-col-idx="${colIdx}"]`);
+      if (thEl) {
+        thEl.style.width = finalW + 'px';
+        thEl.style.minWidth = finalW + 'px';
+      }
+      // Intentionally no localStorage save
+    }
+
+    function resetColumnWidths() {
+      if (currentRegisterId) {
+        try {
+          localStorage.removeItem(`eval_col_widths_${currentRegisterId}`);
+        } catch (e) {}
+      }
+      window.currentColWidths = {};
+      const leafCols = getEvalLeafColumns();
+      leafCols.forEach((col, idx) => {
+        const colEl = document.getElementById(`eval-col-${idx}`);
+        const thEl = document.querySelector(`th[data-col-idx="${idx}"]`);
+        if (colEl) colEl.style.width = col.defaultWidth + 'px';
+        if (thEl) {
+          thEl.style.width = col.defaultWidth + 'px';
+          thEl.style.minWidth = col.minWidth + 'px';
+        }
+      });
+      showToast('Column widths reset to institutional defaults', 'info');
+    }
+
+    function resetSingleColumnWidth(colIdx) {
+      const leafCols = getEvalLeafColumns();
+      if (!leafCols[colIdx]) return;
+      const defW = leafCols[colIdx].defaultWidth;
+      setColumnWidth(colIdx, defW);
+      showToast(`Reset "${leafCols[colIdx].label}" width to ${defW}px`, 'info');
+    }
+
+    function autoFitColumn(colIdx) {
+      const leafCols = getEvalLeafColumns();
+      if (colIdx < 0 || colIdx >= leafCols.length) return;
+      const colDef = leafCols[colIdx];
+      const table = document.getElementById('eval-table');
+      if (!table) return;
+
+      const viewport = document.querySelector('.excel-sheet-viewport');
+      const viewportWidth = viewport ? viewport.clientWidth : window.innerWidth;
+
+      const cells = table.querySelectorAll(`.col-idx-${colIdx}`);
+
+      // Measure data cells only — headers already wrap so don't drive column width
+      let maxContentWidth = Math.max(colDef.minWidth || 36, 50);
+
+      cells.forEach(cell => {
+        const input = cell.querySelector('input');
+        if (input) {
+          const valLen = String(input.value || '').length;
+          maxContentWidth = Math.max(maxContentWidth, valLen * 9 + 22);
+        } else {
+          const textLen = (cell.innerText || '').trim().length;
+          maxContentWidth = Math.max(maxContentWidth, textLen * 8.5 + 24);
+        }
+      });
+
+      // Cap at 30% of viewport so one column never dominates the sheet
+      const maxAllowed = Math.round(viewportWidth * 0.30);
+      const finalWidth = Math.min(maxAllowed, Math.max(colDef.minWidth, Math.round(maxContentWidth)));
+      setColumnWidth(colIdx, finalWidth);
+      showToast(`Auto-fitted "${colDef.label || 'Column'}" to ${finalWidth}px`, 'info');
+    }
+
+
+    let isResizing = false;
+    let currentResizingColIdx = null;
+    let resizeStartX = 0;
+    let resizeStartWidth = 0;
+
+    function initColumnResize() {
+      // Column drag handles eliminated in favor of auto-fit and fixed/responsive sizing.
+    }
+
+    function adjustSheetZoom(delta) {
+      const current = window.currentSheetZoom || 100;
+      const next = Math.min(150, Math.max(50, Math.round(current + delta)));
+      setSheetZoom(next);
+    }
+
+    function setSheetZoom(val) {
+      const zoomNum = Math.min(150, Math.max(50, parseInt(val, 10) || 100));
+      window.currentSheetZoom = zoomNum;
+      const scale = zoomNum / 100;
+
+      const viewport = document.querySelector('.excel-sheet-viewport');
+      const table = document.getElementById('eval-table');
+      if (viewport) viewport.style.setProperty('--sheet-zoom', scale);
+      if (table) {
+        table.style.zoom = scale;
+        const firstRowTh = table.querySelector('thead tr:first-child th[colspan]');
+        if (firstRowTh && firstRowTh.offsetHeight > 0) {
+          table.style.setProperty('--th-row1-height', `${firstRowTh.offsetHeight}px`);
+        }
+      }
+
+      const slider = document.getElementById('zoom-slider');
+      if (slider) slider.value = zoomNum;
+
+      const statusDisp = document.getElementById('zoom-status-display');
+      if (statusDisp) statusDisp.innerText = `${zoomNum}%`;
+
+      try {
+        localStorage.setItem('eval_sheet_zoom', zoomNum);
+      } catch (e) {}
+    }
+
+    function fitSheetToWindow(silent = false) {
+      const viewport = document.querySelector('.excel-sheet-viewport');
+      const table = document.getElementById('eval-table');
+      if (!viewport || !table) return;
+
+      viewport.style.setProperty('--sheet-zoom', 1);
+      table.style.zoom = 1;
+
+      const viewportWidth = viewport.clientWidth - 4;
+      const tableWidth = table.scrollWidth;
+
+      if (tableWidth > 0 && viewportWidth > 0) {
+        let optimalZoom = Math.round((viewportWidth / tableWidth) * 100);
+        // Never shrink below 75% — keeps data rows readable
+        optimalZoom = Math.min(125, Math.max(75, optimalZoom));
+        setSheetZoom(optimalZoom);
+        if (!silent) {
+          showToast(`Fitted sheet to screen (${optimalZoom}%)`, 'info');
+        }
+      } else {
+        setSheetZoom(100);
+      }
+    }
+
+    function recalcHeaderRowHeights() {
+      const table = document.getElementById('eval-table');
+      if (!table) return;
+      const firstRowTh = table.querySelector('thead tr:first-child th[colspan]');
+      if (firstRowTh && firstRowTh.offsetHeight > 0) {
+        table.style.setProperty('--th-row1-height', `${firstRowTh.offsetHeight}px`);
+      }
+    }
+
+    let autoFitResizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(autoFitResizeTimer);
+      autoFitResizeTimer = setTimeout(() => {
+        recalcHeaderRowHeights();
+        fitSheetToWindow(true);
+      }, 120);
+    });
+
+    let vpResizeObserver = null;
+    function initViewportAutoFitObserver() {
+      const vp = document.querySelector('.excel-sheet-viewport');
+      if (!vp || vpResizeObserver) return;
+      let lastWidth = vp.clientWidth;
+      vpResizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const newW = entry.contentRect.width;
+          if (Math.abs(newW - lastWidth) > 10) {
+            lastWidth = newW;
+            clearTimeout(autoFitResizeTimer);
+            autoFitResizeTimer = setTimeout(() => {
+              recalcHeaderRowHeights();
+              fitSheetToWindow(true);
+            }, 120);
+          }
+        }
+      });
+      vpResizeObserver.observe(vp);
+    }
+
+    function adjustSheetFontScale(delta) {
+      const current = window.currentSheetFontScale || 1.0;
+      const next = Math.min(1.4, Math.max(0.7, Math.round((current + delta) * 100) / 100));
+      setSheetFontScale(next);
+    }
+
+    function setSheetFontScale(scale) {
+      const val = Math.min(1.4, Math.max(0.7, parseFloat(scale) || 1.0));
+      window.currentSheetFontScale = val;
+
+      const viewport = document.querySelector('.excel-sheet-viewport');
+      if (viewport) viewport.style.setProperty('--sheet-font-scale', val);
+
+      const disp = document.getElementById('sheet-font-scale-display');
+      if (disp) disp.innerText = `${Math.round(val * 100)}%`;
+
+      applyColFontScales();
+
+      const tbl = document.getElementById('eval-table');
+      if (tbl) {
+        const firstRowTh = tbl.querySelector('thead tr:first-child th[colspan]');
+        if (firstRowTh && firstRowTh.offsetHeight > 0) {
+          tbl.style.setProperty('--th-row1-height', `${firstRowTh.offsetHeight}px`);
+        }
+      }
+
+      try {
+        localStorage.setItem('eval_sheet_font_scale', val);
+      } catch (e) {}
+    }
+
+    function setColumnFontScale(colIdx, scale) {
+      if (colIdx === undefined || colIdx === null) return;
+      if (!window.currentColFontScales) window.currentColFontScales = {};
+
+      if (scale === 1.0 || !scale) {
+        delete window.currentColFontScales[colIdx];
+      } else {
+        window.currentColFontScales[colIdx] = scale;
+      }
+
+      applyColFontScales();
+      closeColMenu();
+
+      try {
+        if (currentRegisterId) {
+          localStorage.setItem(`eval_col_font_scales_${currentRegisterId}`, JSON.stringify(window.currentColFontScales));
+        }
+      } catch (e) {}
+
+      const leafCols = getEvalLeafColumns();
+      const label = (leafCols[colIdx] && leafCols[colIdx].label) || 'Column';
+      showToast(`Set text size for "${label}" to ${Math.round((scale || 1) * 100)}%`, 'info');
+    }
+
+    function applyColFontScales() {
+      const leafCols = getEvalLeafColumns();
+      const fontScales = window.currentColFontScales || {};
+      const baseScale = window.currentSheetFontScale || 1.0;
+
+      let styleEl = document.getElementById('eval-dynamic-col-styles');
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'eval-dynamic-col-styles';
+        document.head.appendChild(styleEl);
+      }
+
+      let css = '';
+      leafCols.forEach((col, idx) => {
+        const scale = fontScales[idx];
+        if (scale && scale !== 1.0) {
+          css += `
+            #eval-table .col-idx-${idx},
+            #eval-table .col-idx-${idx} input {
+              font-size: calc(0.82rem * ${baseScale} * ${scale}) !important;
+            }
+          `;
+        }
+      });
+      styleEl.textContent = css;
+    }
+
+    let activePopoverColIdx = null;
+
+    function openColMenu(event, colIdx) {
+      // Column popover menu eliminated. Text scale is managed globally in footer status bar.
+    }
+
+    function closeColMenu() {
+      // Clean no-op
+    }
+
+    function onEvalAssignmentScoreChange(studentId, aIdx, val, inputEl) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+
+      // Clamp to the individual assignment's own max_marks, not the scheme avg weight
+      const assignment = state.assignments && state.assignments[aIdx];
+      const max = Number((assignment && assignment.max_marks) || 25);
+      let num = parseFloat(val);
+      if (isNaN(num) || val === '') {
+        num = 0;
+      } else if (num > max) {
+        num = max;
+        if (inputEl) inputEl.value = max;
+        else {
+          const inp = document.querySelector(`input[data-student-assign="${studentId}_${aIdx}"]`);
+          if (inp) inp.value = max;
+        }
+      } else if (num < 0) {
+        num = 0;
+        if (inputEl) inputEl.value = 0;
+      }
+
+      student.assignment_scores[aIdx] = num;
+      recalculateEvalRow(student);
+      const avgEl = document.getElementById(`eval-assign-avg-${studentId}`);
+      if (avgEl) avgEl.innerText = student.assignment_avg.toFixed(1);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    function onEvalExamScoreChange(studentId, eIdx, val, inputEl) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+
+      const trimmed = String(val).trim().toUpperCase();
+      if (trimmed === 'AB' || trimmed === 'ABSENT' || trimmed === 'A') {
+        student.exam_absent[eIdx] = true;
+        student.exam_scores[eIdx] = 0;
+        if (inputEl) {
+          inputEl.style.color = 'var(--status-absent)';
+          inputEl.style.fontWeight = '800';
+          inputEl.style.background = 'var(--status-absent-bg)';
+        }
+      } else {
+        student.exam_absent[eIdx] = false;
+        if (inputEl) {
+          inputEl.style.color = '';
+          inputEl.style.fontWeight = '';
+          inputEl.style.background = '';
+        }
+        // Clamp to the individual exam's own max_marks, not the scheme avg weight
+        const exam = state.exams && state.exams[eIdx];
+        const max = Number((exam && exam.max_marks) || 25);
+        let num = parseFloat(trimmed);
+        if (isNaN(num) || val === '') {
+          num = 0;
+        } else if (num > max) {
+          num = max;
+          if (inputEl) inputEl.value = max;
+          else {
+            const inp = document.querySelector(`input[data-student-exam="${studentId}_${eIdx}"]`);
+            if (inp) inp.value = max;
+          }
+        } else if (num < 0) {
+          num = 0;
+          if (inputEl) inputEl.value = 0;
+        }
+        student.exam_scores[eIdx] = num;
+      }
+
+      recalculateEvalRow(student);
+      const avgEl = document.getElementById(`eval-exam-avg-${studentId}`);
+      if (avgEl) avgEl.innerText = student.exam_avg.toFixed(1);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    function onEvalAttendanceScoreChange(studentId, val, inputEl) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+
+      const max = (state.scheme && state.scheme.att_max) || 10;
+      let num = parseFloat(val);
+      if (isNaN(num) || val === '') {
+        num = 0;
+      } else if (num > max) {
+        num = max;
+        if (inputEl) inputEl.value = max;
+        else {
+          const inp = document.querySelector(`input[data-student-att="${studentId}"]`);
+          if (inp) inp.value = max;
+        }
+      } else if (num < 0) {
+        num = 0;
+        if (inputEl) inputEl.value = 0;
+      }
+
+      student.attendance_score = num;
+      recalculateEvalRow(student);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    function onEvalPresentationScoreChange(studentId, val, inputEl) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+
+      const max = (state.scheme && state.scheme.pres_max) || 5;
+      let num = parseFloat(val);
+      if (isNaN(num) || val === '') {
+        num = 0;
+      } else if (num > max) {
+        num = max;
+        if (inputEl) inputEl.value = max;
+        else {
+          const inp = document.querySelector(`input[data-student-pres="${studentId}"]`);
+          if (inp) inp.value = max;
+        }
+      } else if (num < 0) {
+        num = 0;
+        if (inputEl) inputEl.value = 0;
+      }
+
+      student.presentation_score = num;
+      recalculateEvalRow(student);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    function onEvalCustomScoreChange(studentId, cIdx, val, inputEl) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+
+      const max = (state.custom_columns && state.custom_columns[cIdx] && state.custom_columns[cIdx].max) || 10;
+      let num = parseFloat(val);
+      if (isNaN(num) || val === '') {
+        num = 0;
+      } else if (num > max) {
+        num = max;
+        if (inputEl) inputEl.value = max;
+        else {
+          const inp = document.querySelector(`input[data-student-custom="${studentId}_${cIdx}"]`);
+          if (inp) inp.value = max;
+        }
+      } else if (num < 0) {
+        num = 0;
+        if (inputEl) inputEl.value = 0;
+      }
+
+      if (!Array.isArray(student.custom_scores)) student.custom_scores = [];
+      student.custom_scores[cIdx] = num;
+      recalculateEvalRow(student);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    async function exportInternalEvalExcel() {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      try {
+        showToast('Generating official Internal Evaluation Excel (.xlsx)...', 'info');
+        const payload = {
+          institution_name: state.institution_name,
+          session_label: state.session_label,
+          dept_semester_text: state.dept_semester_text,
+          department_name: (registerData && registerData.department_name) || 'Information Technology',
+          department_code: (registerData && registerData.department_code) || 'IT',
+          subject_name: (registerData && registerData.subject_name) || 'Subject',
+          semester: (registerData && registerData.semester) || 5,
+          assignments: state.assignments,
+          exams: state.exams,
+          custom_columns: state.custom_columns,
+          marks_scheme: state.scheme,
+          students: state.students
+        };
+
+        const res = await fetch(`/api/v1/faculty/registers/${currentRegisterId}/export/internal-evaluation-excel`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Export failed');
+        const blob = await res.blob();
+        downloadBlob(blob, `Internal_Evaluation_Sheet_${((registerData && registerData.subject_code) || 'Subject').replace(/[^a-zA-Z0-9_-]/g, '_')}.xlsx`);
+        showToast('Master Evaluation Sheet (.xlsx) downloaded successfully!', 'success');
+      } catch (err) {
+        showToast('Export failed: ' + err.message, 'error');
+      }
+    }
+
+    function saveInternalEvalGrid() {
+      try {
+        const state = window.currentEvalSheetState;
+        if (state && currentRegisterId) {
+          localStorage.setItem(`eval_sheet_state_${currentRegisterId}`, JSON.stringify({
+            institution_name: state.institution_name,
+            session_label: state.session_label,
+            dept_semester_text: state.dept_semester_text,
+            scheme: state.scheme,
+            custom_columns: state.custom_columns,
+            students: state.students
+          }));
+        }
+      } catch (e) {
+        console.warn('Failed to save evaluation state in local storage:', e);
+      }
+      showToast('Internal evaluation spreadsheet synced and saved!', 'success');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAddColumnModal();
+        closeRemoveColumnModal();
+        closeSaveConfirmModal();
+        closeCancelConfirmModal();
+        closeEditMarksModal();
+        closeColMenu();
+      }
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === '=' || e.key === '+') {
+          e.preventDefault();
+          adjustSheetZoom(10);
+        } else if (e.key === '-') {
+          e.preventDefault();
+          adjustSheetZoom(-10);
+        } else if (e.key === '0') {
+          e.preventDefault();
+          setSheetZoom(100);
+        }
+      }
+    });
+
+    function downloadBlob(blob, filename) {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        if (document.body.contains(a)) document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 200);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRegistersList();
+    });
+  </script>
+
+  <!-- ADD COLUMN MODAL -->
+  <div id="add-column-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="add-col-title-heading" onclick="if (event.target === this) closeAddColumnModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="add-col-title-heading" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-main);">➕ Add Assessment Column</h3>
+        <button type="button" class="btn-close" onclick="closeAddColumnModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);" title="Close">✕</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div>
+          <label for="new-col-title" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">Column Title</label>
+          <input type="text" id="new-col-title" class="form-input" placeholder="e.g. Viva / Quiz 1" style="width: 100%; box-sizing: border-box; padding: 0.45rem 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main); font-weight: 600; font-family: inherit; font-size: 0.85rem;">
+        </div>
+        <div>
+          <label for="new-col-max" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">Maximum Marks</label>
+          <input type="number" id="new-col-max" class="form-input" value="10" min="1" max="100" style="width: 100%; box-sizing: border-box; padding: 0.45rem 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main); font-weight: 600; font-family: inherit; font-size: 0.85rem;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-add-col" onclick="closeAddColumnModal()">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-add-col" onclick="confirmAddInternalEvalColumn()">Confirm & Add Column</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REMOVE COLUMN CONFIRMATION MODAL -->
+  <div id="remove-column-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="remove-col-title-heading" onclick="if (event.target === this) closeRemoveColumnModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="remove-col-title-heading" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--status-absent);">⚠️ Remove Assessment Column</h3>
+        <button type="button" class="btn-close" onclick="closeRemoveColumnModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);" title="Close">✕</button>
+      </div>
+      <div class="modal-body" style="color: var(--text-main); font-size: 0.88rem; line-height: 1.5;">
+        <p style="margin: 0 0 0.5rem 0;">
+          Are you sure you want to remove the assessment column: <strong id="remove-col-name-display" style="color: var(--color-primary);"></strong>?
+        </p>
+        <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">
+          This will permanently remove all recorded scores for this column across all students.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-remove-col" onclick="closeRemoveColumnModal()">Cancel</button>
+        <button type="button" class="btn btn-danger btn-sm" id="btn-confirm-remove-col" onclick="confirmRemoveInternalEvalColumn()">Yes, Remove Column</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVE CONFIRMATION MODAL (2-CLICK FLOW) -->
+  <div id="save-confirm-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="save-confirm-title" onclick="if (event.target === this) closeSaveConfirmModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="save-confirm-title" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--color-primary);">💾 Save Internal Evaluation Sheet</h3>
+        <button type="button" class="btn-close" onclick="closeSaveConfirmModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);" title="Close">✕</button>
+      </div>
+      <div class="modal-body" style="color: var(--text-main); font-size: 0.88rem; line-height: 1.5;">
+        <p style="margin: 0 0 0.6rem 0;">
+          Are you sure you want to save all changes to this internal evaluation sheet?
+        </p>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; font-size: 0.82rem; margin-bottom: 0.6rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+            <span style="color: var(--text-muted);">Subject Register:</span>
+            <strong id="save-modal-subject-name" style="color: var(--text-main); font-weight: 700;">Active Register</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+            <span style="color: var(--text-muted);">Students Evaluated:</span>
+            <strong id="save-modal-student-count" style="color: var(--text-main); font-weight: 700;">0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);">Scheme Total Max:</span>
+            <strong id="save-modal-scheme-total" style="color: var(--color-primary); font-weight: 800;">50</strong>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">
+          All updated student scores, customized column headers, and scheme marks will be saved and the spreadsheet will return to locked View Mode.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-save-modal" onclick="closeSaveConfirmModal()">Back to Editing</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-save" onclick="confirmSaveEvaluation()">💾 Confirm & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANCEL CONFIRMATION MODAL (2-CLICK FLOW) -->
+  <div id="cancel-confirm-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cancel-confirm-title" onclick="if (event.target === this) closeCancelConfirmModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="cancel-confirm-title" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--status-absent);">✕ Discard Changes & Exit</h3>
+        <button type="button" class="btn-close" onclick="closeCancelConfirmModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);" title="Close">✕</button>
+      </div>
+      <div class="modal-body" style="color: var(--text-main); font-size: 0.88rem; line-height: 1.5;">
+        <p style="margin: 0 0 0.5rem 0;">
+          Are you sure you want to discard all unsaved changes and exit Edit Mode?
+        </p>
+        <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">
+          All recent modifications to student scores, scheme settings, and editable column headers will be reverted to the last saved state.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-keep-editing-modal" onclick="closeCancelConfirmModal()">Keep Editing</button>
+        <button type="button" class="btn btn-danger btn-sm" id="btn-confirm-cancel" onclick="confirmCancelEdit()">✕ Discard & Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT TOTAL MARKS & SCHEME MODAL -->
+  <div id="edit-total-marks-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="edit-marks-modal-title" onclick="if (event.target === this) closeEditMarksModal()">
+    <div class="modal-card" style="max-width: 520px; width: 90%;">
+      <div class="modal-header">
+        <div>
+          <h3 id="edit-marks-modal-title" style="margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+            ⚙️ Edit Total Marks & Scheme
+          </h3>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Adjust maximum marks allocation for each assessment category.
+          </div>
+        </div>
+        <button type="button" class="btn-close" onclick="closeEditMarksModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);" title="Close">✕</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 0.85rem; max-height: 60vh; overflow-y: auto;">
+        
+        <div class="scheme-form-grid" style="display: grid; grid-template-columns: 1fr auto; gap: 0.75rem; align-items: center; background: var(--bg-surface); padding: 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+          <div>
+            <label for="scheme-assign-max" style="display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.15rem;">Assignment Avg Max Marks</label>
+            <div style="font-size: 0.74rem; color: var(--text-muted);">Target weight of Assignment Average in final score (individual assignment max set per assignment)</div>
+          </div>
+          <div>
+            <input type="number" id="scheme-assign-max" class="scheme-ctrl-input" style="width: 60px; padding: 0.35rem; font-size: 0.88rem;" min="1" max="100" oninput="onSchemeMarksChange('assign', this.value)">
+          </div>
+
+          <div>
+            <label for="scheme-exam-max" style="display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.15rem;">Unit Test Avg Max Marks</label>
+            <div style="font-size: 0.74rem; color: var(--text-muted);">Target weight of UT Average in final score (individual UT max set per exam)</div>
+          </div>
+          <div>
+            <input type="number" id="scheme-exam-max" class="scheme-ctrl-input" style="width: 60px; padding: 0.35rem; font-size: 0.88rem;" min="1" max="100" oninput="onSchemeMarksChange('exam', this.value)">
+          </div>
+
+          <div>
+            <label for="scheme-att-max" style="display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.15rem;">Attendance Max Marks</label>
+            <div style="font-size: 0.74rem; color: var(--text-muted);">Allocated marks derived from attendance percentage</div>
+          </div>
+          <div>
+            <input type="number" id="scheme-att-max" class="scheme-ctrl-input" style="width: 60px; padding: 0.35rem; font-size: 0.88rem;" min="1" max="100" oninput="onSchemeMarksChange('att', this.value)">
+          </div>
+
+          <div>
+            <label for="scheme-pres-max" style="display: block; font-size: 0.84rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.15rem;">Problem Solving / Presentation</label>
+            <div style="font-size: 0.74rem; color: var(--text-muted);">Presentation, seminar or soft-skills max marks</div>
+          </div>
+          <div>
+            <input type="number" id="scheme-pres-max" class="scheme-ctrl-input" style="width: 60px; padding: 0.35rem; font-size: 0.88rem;" min="1" max="100" oninput="onSchemeMarksChange('pres', this.value)">
+          </div>
+        </div>
+
+        <!-- Dynamic Custom Columns inside Modal -->
+        <div id="modal-custom-cols-container" style="display: flex; flex-direction: column; gap: 0.5rem;">
+        </div>
+
+        <!-- Grand Total Preview Card -->
+        <div style="background: var(--bg-surface-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="color: var(--text-main); font-size: 0.9rem;">Total Maximum Marks</strong>
+            <div style="font-size: 0.74rem; color: var(--text-muted);">Sum of all active assessment components</div>
+          </div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-primary);" id="modal-scheme-total-display">
+            50
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-scheme-modal" onclick="closeEditMarksModal()">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-apply-scheme-modal" onclick="applyAndCloseEditMarksModal()">Apply Scheme</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

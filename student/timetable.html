@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Timetable — Student Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .day-col { min-width: 200px; }
+    .week-grid { display: flex; gap: 0.8rem; overflow-x: auto; padding-bottom: 0.5rem; margin-top: 1rem; }
+    .day-header { font-weight: 800; font-size: 0.85rem; text-align: center; padding: 0.5rem; background: var(--bg-surface); border-radius: var(--radius-sm); margin-bottom: 0.6rem; }
+    .slot-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.6rem; font-size: 0.82rem; }
+    .slot-time { font-weight: 700; color: var(--color-primary); }
+    .slot-subject { font-weight: 700; margin-top: 0.15rem; }
+    .slot-meta { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/student/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-present);">STUDENT</span>
+      <span>Timetable</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/student/attendance.html" class="btn btn-secondary btn-sm">Attendance &amp; Calendar</a>
+      <a href="/student/timetable.html" class="btn btn-primary btn-sm">Timetable</a>
+      <a href="/student/assignments.html" class="btn btn-secondary btn-sm">Assignments</a>
+      <a href="/student/scores.html" class="btn btn-secondary btn-sm">Test Scores</a>
+      <a href="/student/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 1100px;">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">My Timetable</h1>
+        <p class="page-subtitle">Your weekly class schedule.</p>
+      </div>
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    <div class="week-grid" id="week-grid"></div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['STUDENT']);
+    const DAYS = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    async function loadTimetable() {
+      const res = await fetchApi('/timetable');
+      const grid = document.getElementById('week-grid');
+      const slots = res.success ? res.data : [];
+
+      if (!slots.length) {
+        grid.innerHTML = `<div class="card" style="text-align:center; padding:2rem; color:var(--text-muted); width:100%;">No timetable has been set up yet.</div>`;
+        return;
+      }
+
+      grid.innerHTML = [1,2,3,4,5,6].map(day => {
+        const daySlots = slots.filter(s => s.day_of_week === day);
+        return `
+          <div class="day-col">
+            <div class="day-header">${DAYS[day]}</div>
+            ${daySlots.length ? daySlots.map(s => `
+              <div class="slot-card">
+                <div class="slot-time">${s.start_time} – ${s.end_time}</div>
+                <div class="slot-subject">${s.subject_name || 'Class'}</div>
+                <div class="slot-meta">${s.teacher_name || ''}${s.room ? ' · ' + s.room : ''}</div>
+              </div>
+            `).join('') : `<div style="font-size:0.78rem; color:var(--text-muted); text-align:center; padding:1rem 0;">No classes</div>`}
+          </div>
+        `;
+      }).join('');
+    }
+
+    loadTimetable();
+  </script>
+</body>
+</html>

@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOD Management — Admin Console</title>
+  <meta name="description" content="Manage Heads of Department — create HOD accounts and assign them to departments.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    /* Ensure modal backdrop is visible, scrollable, and never pushes cards outside screen */
+    .modal-backdrop.open,
+    .modal-backdrop[style*="display: flex"] {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+      padding: 1rem !important;
+      overflow-y: auto !important;
+      box-sizing: border-box !important;
+      z-index: 2500 !important;
+    }
+    .modal-card {
+      max-height: calc(100vh - 2.5rem);
+      max-height: calc(100dvh - 2.5rem);
+      overflow-y: auto;
+      box-sizing: border-box;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
+      <a href="/admin/faculty.html" class="btn btn-primary btn-sm" style="font-weight: 600;">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/whatsapp-gateway.html" class="btn btn-secondary btn-sm">WhatsApp Gateway</a>
+      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <div class="page-header" style="margin-bottom: 2rem;">
+      <div>
+        <h1 class="page-title">HOD Management</h1>
+        <p class="page-subtitle">Create HOD accounts and assign them to departments. HODs create teachers, subjects, and assignments within their department.</p>
+      </div>
+      <div>
+        <button class="btn btn-primary" id="create-hod-btn" onclick="openCreateModal()">
+          👨‍🏫 + Create HOD Account
+        </button>
+      </div>
+    </div>
+
+    <!-- Hierarchy Info Banner -->
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.75rem; font-size: 0.85rem;">
+      <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--color-primary);">
+          <span style="font-weight: 700; font-size: 1rem;">ADMIN</span>
+          <span>→ Creates HOD, assigns to Department</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--status-present);">
+          <span style="font-weight: 700; font-size: 1rem;">HOD</span>
+          <span>→ Creates Teachers, Subjects, and Assignments (THEORY / PRACTICAL)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--status-late);">
+          <span style="font-weight: 700; font-size: 1rem;">Class Teacher</span>
+          <span>→ Provisions Students for their cohort</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registration Anti-Spam Gate Control Card -->
+    <div class="card" id="admin-reg-gates-card" style="margin-bottom: 1.5rem;">
+      <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">🛡️</span>
+            <h2 class="card-title" style="font-size: 1.1rem; margin: 0;">Self-Registration Anti-Spam Gates</h2>
+          </div>
+          <p class="card-subtitle" style="margin-top: 0.2rem;">Protect institutional access. External HODs and Common Faculty can only register when Administration opens these gates.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <!-- HOD Gate Toggle -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.35rem 0.75rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">HOD Registration:</span>
+            <button type="button" id="btn-toggle-hod-gate" class="btn btn-secondary btn-sm" onclick="toggleAdminGate('HOD')" style="font-weight: 700; padding: 0.2rem 0.65rem;">
+              <span id="hod-gate-icon">⚪</span> <span id="hod-gate-label">Loading...</span>
+            </button>
+          </div>
+
+          <!-- Common Faculty Gate Toggle -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.35rem 0.75rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">Common Faculty:</span>
+            <button type="button" id="btn-toggle-common-gate" class="btn btn-secondary btn-sm" onclick="toggleAdminGate('COMMON_FACULTY')" style="font-weight: 700; padding: 0.2rem 0.65rem;">
+              <span id="common-gate-icon">⚪</span> <span id="common-gate-label">Loading...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Institutional WhatsApp Gateway Card (Self-Hosted Bot) -->
+    <div class="card" id="whatsapp-bot-gateway-card" style="margin-bottom: 1.5rem;">
+      <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">📱</span>
+            <h2 class="card-title" style="font-size: 1.1rem; margin: 0;">Institutional WhatsApp Gateway (Self-Hosted Bot)</h2>
+          </div>
+          <p class="card-subtitle" style="margin-top: 0.2rem;">Free, automated WhatsApp delivery powered by WhatsApp Web. Once linked, OTPs and parent attendance notices dispatch directly from your college SIM/phone.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          <a href="/admin/whatsapp-gateway.html" class="btn btn-primary btn-sm" style="text-decoration: none; font-weight: 700;">
+            Open Gateway Console →
+          </a>
+          <div id="wa-bot-status-pill" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-muted);">
+            <span id="wa-bot-status-dot">⚪</span>
+            <span id="wa-bot-status-text">Checking status...</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-wa-bot" onclick="loadWhatsAppBotStatus()" title="Refresh connection status">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+      <div id="wa-bot-content" style="padding: 1.25rem;">
+        <div style="color: var(--text-muted); font-size: 0.85rem;">Checking WhatsApp Web Bot connection status...</div>
+      </div>
+    </div>
+
+    <!-- Common Faculty Manager Command Strip -->
+    <div class="card" id="common-faculty-mgr-card" style="margin-bottom: 1.5rem;">
+      <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">🌐</span>
+            <h2 class="card-title" style="font-size: 1.1rem; margin: 0;">Common Faculty Manager</h2>
+          </div>
+          <p class="card-subtitle" style="margin-top: 0.2rem;">Oversees cross-department faculty (instructors with no single department home who teach shared courses).</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-appoint-common-mgr" onclick="openAppointCommonMgrModal()">
+            ⚙️ Appoint / Change Manager
+          </button>
+        </div>
+      </div>
+      <div id="common-mgr-content" style="padding: 1.25rem;">
+        <div style="color: var(--text-muted); font-size: 0.85rem;">Loading Common Faculty Manager details...</div>
+      </div>
+    </div>
+
+    <!-- Pending HOD Registrations Queue -->
+    <div class="card" id="pending-hods-card" style="margin-bottom: 1.5rem;">
+      <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">⏳</span>
+            <h2 class="card-title" style="font-size: 1.1rem; margin: 0;">Pending HOD Registrations</h2>
+          </div>
+          <p class="card-subtitle" style="margin-top: 0.2rem;">Prospective Heads of Department awaiting Admin approval to assume department leadership.</p>
+        </div>
+        <div id="pending-hods-badge" style="background: var(--status-late); color: var(--text-white); border-radius: 999px; padding: 0.2rem 0.75rem; font-size: 0.8rem; font-weight: 700;">0 Pending</div>
+      </div>
+      <div id="pending-hods-wrap" style="padding: 1rem;">
+        <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem;">Loading pending HOD registrations...</div>
+      </div>
+    </div>
+
+    <!-- HOD List -->
+    <div class="card" id="hod-list-card">
+      <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <h2 class="card-title">All HOD Accounts</h2>
+          <p class="card-subtitle">HODs appointed to departments. Each HOD administers their department independently.</p>
+        </div>
+        <div id="hod-count-badge" style="background: var(--color-primary); color: var(--text-white); border-radius: 999px; padding: 0.2rem 0.75rem; font-size: 0.8rem; font-weight: 700;">0 HODs</div>
+      </div>
+      <div id="hod-table-wrap">
+        <div style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">👨‍🏫</div>
+          <div>Loading HODs...</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CREATE / APPOINT HOD MODAL -->
+  <div id="create-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 490px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+        <div>
+          <h2 id="modal-title-hod" style="font-size: 1.2rem; font-weight: 700; margin: 0;">Appoint Head of Department</h2>
+          <p id="modal-sub-hod" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Search faculty by Gmail to assign HOD powers while keeping their existing roles.</p>
+        </div>
+        <button type="button" onclick="closeCreateModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- Mode Selector Pills -->
+      <div style="display: flex; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.25rem; margin-bottom: 1.1rem; gap: 0.25rem;">
+        <button type="button" id="tab-btn-search" onclick="setHODModalMode('search')" style="flex: 1; font-weight: 600; font-size: 0.82rem; border-radius: var(--radius-sm); border: none; background: var(--color-primary); color: var(--text-white); cursor: pointer; padding: 0.45rem 0.65rem; transition: all 0.2s;">
+          🔍 Search Existing Faculty
+        </button>
+        <button type="button" id="tab-btn-create" onclick="setHODModalMode('create')" style="flex: 1; font-weight: 600; font-size: 0.82rem; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-muted); cursor: pointer; padding: 0.45rem 0.65rem; transition: all 0.2s;">
+          ➕ Create New Account
+        </button>
+      </div>
+
+      <!-- SECTION 1: SEARCH & APPOINT EXISTING FACULTY -->
+      <div id="section-search-faculty">
+        <div class="form-group" style="margin-bottom: 0.85rem;">
+          <label class="form-label" for="search-faculty-email">Faculty Institutional Gmail <span style="color: var(--status-absent);">*</span></label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="email" id="search-faculty-email" class="form-control" placeholder="e.g. classteacher@gmail.com" onkeydown="if(event.key==='Enter'){event.preventDefault();searchFacultyByEmail();}">
+            <button type="button" class="btn btn-secondary" id="btn-search-faculty" onclick="searchFacultyByEmail()" style="white-space: nowrap; font-weight: 600;">Find</button>
+          </div>
+          <span style="font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Enter the teacher's login Gmail to look up their current profile and roles.</span>
+        </div>
+
+        <div id="search-status-box" style="display: none; font-size: 0.82rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); margin-bottom: 0.85rem;"></div>
+
+        <!-- Found Faculty Details Card -->
+        <div id="found-faculty-card" style="display: none; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.9rem; margin-bottom: 0.9rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.65rem;">
+            <div id="found-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; flex-shrink: 0;">F</div>
+            <div style="flex: 1; min-width: 0;">
+              <div id="found-name" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</div>
+              <div id="found-gmail" style="font-size: 0.78rem; color: var(--color-primary); font-family: var(--font-family-mono, monospace);">—</div>
+            </div>
+            <div id="found-status-badge" class="badge badge-present" style="font-size: 0.75rem;">Active Faculty</div>
+          </div>
+
+          <div style="font-size: 0.8rem; line-height: 1.55; border-top: 1px dashed var(--border-color); padding-top: 0.5rem; margin-bottom: 0.6rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
+              <span style="color: var(--text-muted);">Current Dept:</span>
+              <strong id="found-dept" style="color: var(--text-main);">—</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; gap: 0.5rem;">
+              <span style="color: var(--text-muted); white-space: nowrap;">Active Roles:</span>
+              <strong id="found-roles" style="color: var(--color-primary); text-align: right;">—</strong>
+            </div>
+          </div>
+
+          <div style="background: var(--status-present-bg); border: 1px solid var(--status-present); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; font-size: 0.76rem; color: var(--text-main); display: flex; gap: 0.45rem; align-items: flex-start;">
+            <span style="font-size: 0.95rem; line-height: 1;">⚡</span>
+            <span><strong>Combined Powers:</strong> Assigning HOD will grant full Department HOD administration powers <em>while preserving all their existing teaching registers, class teacher cohorts, and marks!</em></span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0.85rem;">
+          <label class="form-label" for="assign-existing-dept">Department to Lead as HOD <span style="color: var(--status-absent);">*</span></label>
+          <select id="assign-existing-dept" class="form-control" required>
+            <option value="">— Select Department —</option>
+          </select>
+        </div>
+
+        <div id="assign-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.1rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+          <button type="button" id="btn-submit-assign" class="btn btn-primary" onclick="submitAssignExistingHOD()" disabled>⚡ Assign HOD Role</button>
+        </div>
+      </div>
+
+      <!-- SECTION 2: CREATE BRAND NEW HOD ACCOUNT -->
+      <div id="section-create-new" style="display: none;">
+        <form id="create-hod-form" onsubmit="submitCreateHOD(event)">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="hod-name">Full Name <span style="color: var(--status-absent);">*</span></label>
+            <input type="text" id="hod-name" class="form-control" placeholder="Dr. Girdhar Dhami">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="hod-email">Institutional Gmail (Login ID) <span style="color: var(--status-absent);">*</span></label>
+            <input type="email" id="hod-email" class="form-control" placeholder="hod.it@gmail.com">
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.2rem;">This Gmail becomes the HOD's permanent login ID. They will connect Google on first login.</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="hod-password">Initial Password <span style="color: var(--status-absent);">*</span></label>
+              <input type="text" id="hod-password" class="form-control" placeholder="Password@123" value="Password@123">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="hod-phone">Phone Number</label>
+              <input type="tel" id="hod-phone" class="form-control" placeholder="9876543210">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="hod-dept">Department <span style="color: var(--status-absent);">*</span></label>
+            <select id="hod-dept" class="form-control">
+              <option value="">— Select Department —</option>
+            </select>
+          </div>
+
+          <div id="create-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: var(--status-absent);"></div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.1rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+            <button type="submit" id="create-submit-btn" class="btn btn-primary">Generate HOD Account &amp; Temp Password</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CREDENTIALS / CONFIRMATION SLIP MODAL -->
+  <div id="cred-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto; text-align: center;">
+      <div style="width: 56px; height: 56px; background: var(--status-present-bg); color: var(--status-present); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.75rem;">✓</div>
+      <h2 id="cred-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">HOD Account Ready!</h2>
+      <p id="cred-sub" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        HOD role has been granted successfully.
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; text-align: left; margin-bottom: 1.25rem; font-family: var(--font-family-mono); font-size: 0.85rem;">
+        <div style="margin-bottom: 0.5rem;"><span style="color: var(--text-muted); font-family: var(--font-family-sans);">Name:</span><strong id="slip-name" style="float: right; font-family: var(--font-family-sans);"></strong></div>
+        <div style="margin-bottom: 0.5rem;"><span style="color: var(--text-muted); font-family: var(--font-family-sans);">Department:</span><strong id="slip-dept" style="float: right; font-family: var(--font-family-sans); color: var(--status-present);"></strong></div>
+        <div style="margin-bottom: 0.5rem;"><span style="color: var(--text-muted); font-family: var(--font-family-sans);">Login ID (Gmail):</span><strong id="slip-gmail" style="color: var(--color-primary); float: right;"></strong></div>
+        <div id="slip-temp-row"><span style="color: var(--text-muted); font-family: var(--font-family-sans);">Temp Password:</span><strong id="slip-temp" style="color: var(--status-absent); font-size: 1.1rem; float: right; letter-spacing: 0.1em;"></strong></div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button type="button" id="slip-copy-btn" class="btn btn-secondary" onclick="copyCredentials()">📋 Copy Details</button>
+        <button type="button" class="btn btn-primary" onclick="closeCredModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REASSIGN DEPARTMENT MODAL (2-STEP) -->
+  <div id="reassign-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; box-sizing: border-box; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Reassign HOD Department</h2>
+        <button type="button" onclick="closeReassignModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- 2-Step Progress Indicator -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; background: var(--bg-surface); padding: 0.4rem 0.65rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 600;">
+        <div id="reassign-stepper-1" style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-primary);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span>
+          <span>Select Dept</span>
+        </div>
+        <div style="color: var(--text-muted);">➔</div>
+        <div id="reassign-stepper-2" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span>
+          <span>Review &amp; Transfer</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Select Target Department -->
+      <div id="reassign-step-1">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1.1rem; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Faculty Member</div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;" id="reassign-hod-name"></div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Current Dept</div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--color-primary);" id="reassign-current-dept">—</div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0.5rem;">
+          <label class="form-label" style="font-weight: 600;">New Target Department <span style="color: var(--status-absent);">*</span></label>
+          <select id="reassign-dept" class="form-control" onchange="clearReassignStep1Error()">
+            <option value="">— Select Department —</option>
+          </select>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            Select the new department this faculty will be transferred to lead as HOD.
+          </div>
+        </div>
+
+        <div id="reassign-step1-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.6rem 0.75rem; margin-top: 0.75rem; font-size: 0.8rem; color: var(--status-absent);"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeReassignModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" id="reassign-step1-btn" onclick="goToReassignStep2()">Next: Review Transfer ➔</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Transfer Impact & Governance Confirmation -->
+      <div id="reassign-step-2" style="display: none;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Transfer Route Overview</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+            <div style="flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.55rem; text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">Relinquishing</div>
+              <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem;" id="reassign-preview-from">—</div>
+            </div>
+            <div style="font-size: 1.2rem; color: var(--color-primary);">➔</div>
+            <div style="flex: 1; background: var(--bg-card); border: 1px solid var(--color-primary); border-radius: var(--radius-sm); padding: 0.55rem; text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--color-primary); font-weight: 600;">Assuming HOD</div>
+              <div style="font-weight: 700; color: var(--color-primary); font-size: 0.85rem;" id="reassign-preview-to">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.8rem; margin-bottom: 1rem; font-size: 0.8rem; line-height: 1.45;">
+          <div style="display: flex; align-items: flex-start; gap: 0.4rem; margin-bottom: 0.5rem;">
+            <span style="color: var(--status-present);">🛡️</span>
+            <div><strong>Branch Data 100% Intact:</strong> Student rosters, attendance matrix, coursework, and marks in <span id="reassign-protect-dept" style="font-weight: 600;"></span> stay safely preserved under the department.</div>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 0.4rem;">
+            <span style="color: var(--color-primary);">👑</span>
+            <div><strong>Leadership Transfer:</strong> Previous department leadership will become <strong>UNASSIGNED</strong>. <span id="reassign-preview-name" style="font-weight: 600;"></span> will assume active HOD leadership of the target department.</div>
+          </div>
+        </div>
+
+        <div id="reassign-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: space-between; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="goToReassignStep1()">← Back to Step 1</button>
+          <button type="button" class="btn btn-primary" id="reassign-submit-btn" onclick="submitReassign()">Confirm Reassignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESET PASSWORD MODAL (2-STEP) -->
+  <div id="reset-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; box-sizing: border-box; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Reset Faculty Password</h2>
+        <button type="button" onclick="closeResetModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- 2-Step Progress Indicator -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; background: var(--bg-surface); padding: 0.4rem 0.65rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 600;">
+        <div id="reset-stepper-1" style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-primary);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span>
+          <span>Set Password</span>
+        </div>
+        <div style="color: var(--text-muted);">➔</div>
+        <div id="reset-stepper-2" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span>
+          <span>Security Review</span>
+        </div>
+      </div>
+
+      <form id="reset-form" onsubmit="handleResetFormSubmit(event)">
+        <!-- STEP 1: Enter & Confirm Password -->
+        <div id="reset-step-1">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1.1rem; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Target Faculty</div>
+              <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;" id="reset-name"></div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Login ID</div>
+              <div style="font-size: 0.8rem; font-family: monospace; color: var(--color-primary);" id="reset-gmail">—</div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" style="margin: 0; font-weight: 600;">New Password <span style="color: var(--status-absent);">*</span></label>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="generateRandomResetPassword()" style="font-size: 0.75rem; padding: 0.15rem 0.5rem;">🎲 Suggest Secure</button>
+            </div>
+            <div style="position: relative;">
+              <input type="password" id="reset-password" class="form-control" placeholder="Min 6 chars (e.g. Password@123)" value="Password@123" required style="padding-right: 2.5rem;" oninput="clearResetStep1Error()">
+              <button type="button" onclick="togglePassVisibility('reset-password', this)" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.9rem;" title="Show/Hide">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label class="form-label" style="font-weight: 600;">Confirm New Password <span style="color: var(--status-absent);">*</span></label>
+            <div style="position: relative;">
+              <input type="password" id="reset-password-confirm" class="form-control" placeholder="Re-type new password" value="Password@123" required style="padding-right: 2.5rem;" oninput="clearResetStep1Error()">
+              <button type="button" onclick="togglePassVisibility('reset-password-confirm', this)" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.9rem;" title="Show/Hide">👁️</button>
+            </div>
+          </div>
+
+          <div id="reset-step1-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-top: 0.5rem; font-size: 0.8rem; color: var(--status-absent);"></div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" id="reset-step1-btn" onclick="goToResetStep2()">Next: Review &amp; Confirm ➔</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Security Review & Session Notice -->
+        <div id="reset-step-2" style="display: none;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1rem;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.6rem;">Target Account &amp; Password Preview</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="color: var(--text-muted); font-size: 0.85rem;">Account:</span>
+              <strong style="color: var(--text-main); font-size: 0.85rem;" id="reset-preview-user">—</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.45rem; border-top: 1px dashed var(--border-color);">
+              <span style="color: var(--text-muted); font-size: 0.85rem;">New Password:</span>
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span id="reset-preview-pass" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; color: var(--color-primary); letter-spacing: 0.08em;">••••••••</span>
+                <button type="button" id="reset-preview-eye-btn" onclick="toggleResetPassPreview()" class="btn btn-secondary btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem;">👁️ Reveal</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem; font-size: 0.8rem; color: var(--status-absent); line-height: 1.45;">
+            <div style="font-weight: 700; margin-bottom: 0.25rem;">⚠️ Active Sessions Invalidation Notice</div>
+            <div style="color: var(--text-main);">Confirming this reset will immediately terminate all active sessions for this account across all devices. The faculty member must use this new password on next login.</div>
+          </div>
+
+          <div id="reset-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: space-between; margin-top: 1.25rem;">
+            <button type="button" class="btn btn-secondary" onclick="goToResetStep1()">← Back to Edit</button>
+            <button type="submit" class="btn btn-primary" id="reset-btn">Confirm &amp; Reset Password</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DELETE HOD MODAL (2-STEP) -->
+  <div id="delete-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 500px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; box-sizing: border-box; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--status-absent);">Remove HOD Role</h2>
+        <button type="button" onclick="closeDeleteModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- 2-Step Progress Indicator -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; background: var(--bg-surface); padding: 0.4rem 0.65rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 600;">
+        <div id="delete-stepper-1" style="display: flex; align-items: center; gap: 0.35rem; color: var(--status-absent);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--status-absent); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span>
+          <span>Impact Assessment</span>
+        </div>
+        <div style="color: var(--text-muted);">➔</div>
+        <div id="delete-stepper-2" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span>
+          <span>Safeguard Confirmation</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Impact Assessment & Institutional Guarantees -->
+      <div id="delete-step-1">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1rem 0;">
+          Review institutional safeguards before removing <strong id="delete-hod-name" style="color: var(--text-main);"></strong> from HOD leadership:
+        </p>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Assigned Department</div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;" id="delete-dept-name">—</div>
+          </div>
+          <span class="badge badge-warning" id="delete-dept-status">Active HOD</span>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.8rem; color: var(--text-main);">
+          <div style="font-weight: 700; color: var(--status-present); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span>🛡️</span><span>Branch Data is 100% Protected</span>
+          </div>
+          <p style="margin: 0 0 0.65rem 0; color: var(--text-muted); line-height: 1.45;">
+            All student enrollments, subjects, attendance registers, and marks remain <strong>intact under the department</strong>. Department status switches to <strong>UNASSIGNED</strong> and will automatically link to the next appointed HOD.
+          </p>
+
+          <div style="font-weight: 700; color: var(--color-primary); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span>👥</span><span>Teaching Roles Retained</span>
+          </div>
+          <p style="margin: 0; color: var(--text-muted); line-height: 1.45;">
+            If this faculty member holds Class Teacher or Subject Teacher roles, only their HOD assignment is revoked. Their teaching account, class rosters, and gradebooks remain active.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" id="delete-step1-btn" style="background: var(--status-absent); border-color: var(--status-absent);" onclick="goToDeleteStep2()">Proceed to Safeguard Confirmation ➔</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Typed Safeguard Verification -->
+      <div id="delete-step-2" style="display: none; text-align: center;">
+        <div style="font-size: 2.25rem; margin-bottom: 0.35rem;">🚨</div>
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--status-absent); margin: 0 0 0.5rem 0;">Confirm Removal Safeguard</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.45;">
+          To permanently remove <strong id="delete-step2-name" style="color: var(--text-main);"></strong> from the HOD position, type <code style="background: var(--status-absent-bg); color: var(--status-absent); padding: 0.15rem 0.45rem; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.9rem;">DELETE</code> in the field below to unlock the button:
+        </p>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <input type="text" id="delete-confirm-input" class="form-control" placeholder="Type DELETE to confirm" autocomplete="off" oninput="checkDeleteConfirmation()" style="text-align: center; font-size: 1rem; font-weight: 700; letter-spacing: 0.08em; border-color: var(--border-color);">
+        </div>
+
+        <div id="delete-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--status-absent); text-align: left;"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: space-between; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="goToDeleteStep1()">← Back to Step 1</button>
+          <button type="button" id="delete-btn" class="btn btn-primary" style="background: var(--status-absent); border-color: var(--status-absent); opacity: 0.45; cursor: not-allowed;" disabled onclick="submitDeleteHOD()">Permanently Remove HOD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPROVE HOD CONFIRMATION MODAL -->
+  <div id="approve-hod-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 520px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Approve HOD Registration</h2>
+        <button type="button" onclick="closeApproveHodModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+      <div id="approve-hod-body">
+        <!-- Populated dynamically -->
+      </div>
+      <div id="approve-hod-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-top: 0.75rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeApproveHodModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-approve-hod" onclick="confirmApproveHod()">Confirm &amp; Activate HOD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPOINT COMMON FACULTY MANAGER MODAL -->
+  <div id="appoint-common-mgr-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 500px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Appoint Common Faculty Manager</h2>
+        <button type="button" onclick="closeAppointCommonMgrModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Select an active faculty member to appoint as Common Faculty Manager. They will review and approve common (cross-department) faculty registration requests.
+      </p>
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label class="form-label" style="font-weight: 600;">Select Faculty Member <span style="color: var(--status-absent);">*</span></label>
+        <select id="common-mgr-teacher-select" class="form-control">
+          <option value="">— Select an active faculty member —</option>
+        </select>
+      </div>
+      <div id="appoint-common-mgr-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-top: 0.75rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeAppointCommonMgrModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-common-mgr" onclick="submitAppointCommonMgr()">Save Appointment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST WHATSAPP MESSAGE MODAL -->
+  <div id="test-wa-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; width: 100%; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.25rem;">🧪</span>
+          <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Test WhatsApp Gateway</h2>
+        </div>
+        <button type="button" onclick="closeTestWaModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Send a test message or sample OTP directly to any WhatsApp number to verify that your connected college bot is dispatching cleanly.
+      </p>
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label class="form-label" for="test-wa-phone" style="font-weight: 700; font-size: 0.85rem; color: var(--text-main); margin-bottom: 0.4rem; display: block;">Recipient WhatsApp Number <span style="color: var(--status-absent);">*</span></label>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="padding: 0.5rem 0.75rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">🇮🇳 +91</span>
+          <input type="tel" id="test-wa-phone" class="form-control" placeholder="e.g. 9876543210" maxlength="10" style="flex: 1;" />
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label class="form-label" for="test-wa-message" style="font-weight: 700; font-size: 0.85rem; color: var(--text-main); margin-bottom: 0.4rem; display: block;">Message Text</label>
+        <textarea id="test-wa-message" class="form-control" rows="3" style="width: 100%; resize: vertical;" placeholder="Government Polytechnic College: Test dispatch from WhatsApp Web Bot gateway..."></textarea>
+      </div>
+      <div id="test-wa-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+      <div id="test-wa-success" style="display: none; background: var(--status-present-bg); border: 1px solid var(--status-present); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.82rem; color: var(--status-present); font-weight: 600;"></div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeTestWaModal()">Close</button>
+        <button type="button" class="btn btn-primary" id="btn-send-test-wa" onclick="submitTestWaMessage()">🚀 Send Direct WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    try {
+      if (typeof guardRoute === 'function') guardRoute(['SYSTEM_ADMIN']);
+    } catch (_) {}
+    const API = '/api/v1';
+    var hodData = [];
+    var departments = [];
+    var selectedTeacherId = null;
+    var resetTargetId = null;
+
+    // Modal Helper
+    function showModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = 'flex';
+      el.classList.add('open');
+    }
+    function hideModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('open');
+      el.style.display = 'none';
+    }
+
+    // ─── Bootstrap ────────────────────────────────────────────
+    (async function init() {
+      await loadDepartments();
+      await loadHODs();
+      await loadPendingHods();
+      await loadCommonFacultyManager();
+      await loadRegistrationGates();
+      await loadWhatsAppBotStatus();
+    })();
+
+    // ─── WhatsApp Web Bot Management (Self-Hosted Option 2) ───
+    let waBotState = {
+      status: 'DISCONNECTED',
+      is_connected: false,
+      is_qr_ready: false,
+      qr_code_url: null,
+      connected_user: null,
+      last_error: null
+    };
+    let waBotPollTimer = null;
+
+    async function loadWhatsAppBotStatus(silent = false) {
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/status`);
+        if (res && res.success && res.data) {
+          waBotState = res.data;
+          renderWhatsAppBotUI();
+
+          // Auto-poll while initializing or QR is waiting to be scanned
+          if (waBotState.status === 'INITIALIZING' || waBotState.status === 'QR_READY') {
+            if (!waBotPollTimer) {
+              waBotPollTimer = setTimeout(() => {
+                waBotPollTimer = null;
+                loadWhatsAppBotStatus(true);
+              }, 3000);
+            }
+          } else {
+            if (waBotPollTimer) {
+              clearTimeout(waBotPollTimer);
+              waBotPollTimer = null;
+            }
+          }
+        }
+      } catch (err) {
+        if (!silent) console.warn('Failed to load WhatsApp Bot status:', err);
+      }
+    }
+
+    function renderWhatsAppBotUI() {
+      const pill = document.getElementById('wa-bot-status-pill');
+      const dot = document.getElementById('wa-bot-status-dot');
+      const text = document.getElementById('wa-bot-status-text');
+      const content = document.getElementById('wa-bot-content');
+      if (!pill || !dot || !text || !content) return;
+
+      const st = waBotState.status;
+
+      if (st === 'CONNECTED' && waBotState.is_connected) {
+        dot.textContent = '🟢';
+        text.textContent = `Connected (+91 ${waBotState.connected_user?.phone || 'College Phone'})`;
+        pill.style.background = 'var(--status-present-bg)';
+        pill.style.color = 'var(--status-present)';
+        pill.style.borderColor = 'var(--status-present)';
+
+        content.innerHTML = `
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--status-present-bg); color: var(--status-present); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                  📱
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main);">+91 ${waBotState.connected_user?.phone || 'College Phone'}</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">${waBotState.connected_user?.pushname || 'Institutional WhatsApp'} • Active Session</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-test-wa-bot" onclick="openTestWaModal()" style="font-weight: 600;">
+                  🧪 Send Test Message
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-disconnect-wa-bot" onclick="disconnectWhatsAppBot()" style="color: var(--status-absent); font-weight: 600;">
+                  🔌 Disconnect Session
+                </button>
+              </div>
+            </div>
+            <div style="background: var(--status-present-bg); border: 1px solid var(--status-present); border-radius: var(--radius-sm); padding: 0.75rem 1rem; color: var(--status-present); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+              <span>✓</span>
+              <span>Automated 100% Free WhatsApp Web Bot is Active. All student &amp; faculty registration OTPs and parent attendance alerts are automatically dispatched directly from this phone number.</span>
+            </div>
+          </div>
+        `;
+      } else if (st === 'QR_READY' && waBotState.qr_code_url) {
+        dot.textContent = '🟡';
+        text.textContent = 'Scan QR Code to Link';
+        pill.style.background = 'var(--status-late-bg)';
+        pill.style.color = 'var(--status-late)';
+        pill.style.borderColor = 'var(--status-late)';
+
+        content.innerHTML = `
+          <div style="display: grid; grid-template-columns: minmax(180px, 220px) 1fr; gap: 1.5rem; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+            <div style="text-align: center;">
+              <div style="background: var(--bg-card); padding: 0.5rem; border: 2px solid var(--border-color); border-radius: var(--radius-md); display: inline-block;">
+                <img id="wa-bot-qr-img" src="${waBotState.qr_code_url}" alt="WhatsApp Web Link QR Code" style="width: 180px; height: 180px; display: block; image-rendering: pixelated;" />
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Scan using official college phone</div>
+            </div>
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 700; margin: 0 0 0.5rem 0; color: var(--text-main);">Link College Phone via WhatsApp</h3>
+              <ol style="margin: 0 0 1rem 1.25rem; padding: 0; font-size: 0.85rem; color: var(--text-main); line-height: 1.6;">
+                <li>Open <strong>WhatsApp</strong> on your official college Android phone or iPhone.</li>
+                <li>Tap <strong>Settings</strong> (iOS) or <strong>⋮ More options</strong> (Android) &rarr; <strong>Linked Devices</strong>.</li>
+                <li>Tap <strong>Link a Device</strong> and point your camera at the QR code on the left.</li>
+                <li>Once scanned, this card will automatically switch to <strong style="color: var(--status-present);">🟢 Connected</strong>.</li>
+              </ol>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="disconnectWhatsAppBot()">✕ Cancel / Reset</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadWhatsAppBotStatus()">🔄 Refresh Status</button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (st === 'INITIALIZING') {
+        dot.textContent = '⏳';
+        text.textContent = 'Initializing Bot...';
+        pill.style.background = 'var(--bg-surface)';
+        pill.style.color = 'var(--color-primary)';
+        pill.style.borderColor = 'var(--color-primary)';
+
+        content.innerHTML = `
+          <div style="text-align: center; padding: 2rem 1rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⏳</div>
+            <div style="font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom: 0.25rem;">Starting Headless WhatsApp Engine...</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Generating secure link QR code. This takes ~10-15 seconds on initial startup.</div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="disconnectWhatsAppBot()">✕ Cancel</button>
+          </div>
+        `;
+      } else {
+        dot.textContent = '⚪';
+        text.textContent = 'Bot Offline / Unlinked';
+        pill.style.background = 'var(--bg-surface)';
+        pill.style.color = 'var(--text-muted)';
+        pill.style.borderColor = 'var(--border-color)';
+
+        content.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+            <div>
+              <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.25rem;">
+                WhatsApp Web Bot is currently unlinked
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">
+                Registration OTPs currently fallback to dynamic QR cards &amp; direct chat links. Connect your college phone once to activate 100% automated direct delivery.
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary" id="btn-init-wa-bot" onclick="initWhatsAppBot()" style="font-weight: 700;">
+                🚀 Link Bot (Generate QR)
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function initWhatsAppBot() {
+      const btn = document.getElementById('btn-init-wa-bot');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Starting Engine...';
+      }
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/initialize`, { method: 'POST' });
+        showToast(res.message || 'WhatsApp Bot initializing. Preparing QR code...', 'info');
+        await loadWhatsAppBotStatus();
+      } catch (err) {
+        showToast(err.message || 'Failed to start WhatsApp Bot.', 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '🚀 Link Bot (Generate QR)';
+        }
+      }
+    }
+
+    async function disconnectWhatsAppBot() {
+      if (!confirm('Are you sure you want to disconnect the WhatsApp Web Bot session?')) return;
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/disconnect`, { method: 'POST' });
+        showToast(res.message || 'WhatsApp Bot disconnected.', 'info');
+        await loadWhatsAppBotStatus();
+      } catch (err) {
+        showToast(err.message || 'Failed to disconnect bot.', 'error');
+      }
+    }
+
+    function openTestWaModal() {
+      const phoneInput = document.getElementById('test-wa-phone');
+      const msgInput = document.getElementById('test-wa-message');
+      const errEl = document.getElementById('test-wa-err');
+      const succEl = document.getElementById('test-wa-success');
+      if (phoneInput) phoneInput.value = '';
+      if (msgInput) msgInput.value = '';
+      if (errEl) errEl.style.display = 'none';
+      if (succEl) succEl.style.display = 'none';
+      showModal('test-wa-modal');
+    }
+
+    function closeTestWaModal() {
+      hideModal('test-wa-modal');
+    }
+
+    async function submitTestWaMessage() {
+      const phoneInput = document.getElementById('test-wa-phone');
+      const msgInput = document.getElementById('test-wa-message');
+      const errEl = document.getElementById('test-wa-err');
+      const succEl = document.getElementById('test-wa-success');
+      const btn = document.getElementById('btn-send-test-wa');
+
+      const phone = phoneInput?.value.trim().replace(/\D/g, '') || '';
+      const message = msgInput?.value.trim() || '';
+
+      if (!phone || phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone)) {
+        if (errEl) {
+          errEl.textContent = 'Please enter a valid 10-digit Indian WhatsApp mobile number (starts with 6, 7, 8, 9).';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      if (errEl) errEl.style.display = 'none';
+      if (succEl) succEl.style.display = 'none';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+      }
+
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/test-send`, {
+          method: 'POST',
+          body: JSON.stringify({ phone, message })
+        });
+        if (succEl) {
+          succEl.textContent = `✓ ${res.message || 'Test message sent successfully!'}`;
+          succEl.style.display = 'block';
+        }
+        showToast('Test WhatsApp message delivered!', 'success');
+      } catch (err) {
+        if (errEl) {
+          errEl.textContent = err.message || 'Could not send test message. Ensure bot is connected.';
+          errEl.style.display = 'block';
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '🚀 Send Direct WhatsApp';
+        }
+      }
+    }
+
+    // ─── Anti-Spam Registration Gates ─────────────────────────
+    let adminGates = {
+      hod_open: false,
+      common_faculty_open: false
+    };
+
+    async function loadRegistrationGates() {
+      try {
+        const res = await apiFetch(`${API}/admin/registration-gates`);
+        if (res && res.success && res.data) {
+          adminGates = res.data;
+          renderRegistrationGates();
+        }
+      } catch (err) {
+        console.warn('Failed to load admin registration gates:', err);
+      }
+    }
+
+    function renderRegistrationGates() {
+      // HOD Gate UI
+      const hodBtn = document.getElementById('btn-toggle-hod-gate');
+      const hodIcon = document.getElementById('hod-gate-icon');
+      const hodLabel = document.getElementById('hod-gate-label');
+      if (hodBtn && hodIcon && hodLabel) {
+        if (adminGates.hod_open) {
+          hodIcon.textContent = '🟢';
+          hodLabel.textContent = 'OPEN (Accepting)';
+          hodBtn.style.borderColor = 'var(--status-present)';
+          hodBtn.style.color = 'var(--status-present)';
+        } else {
+          hodIcon.textContent = '🔒';
+          hodLabel.textContent = 'CLOSED (Blocked)';
+          hodBtn.style.borderColor = 'var(--status-absent)';
+          hodBtn.style.color = 'var(--status-absent)';
+        }
+      }
+
+      // Common Faculty Gate UI
+      const comBtn = document.getElementById('btn-toggle-common-gate');
+      const comIcon = document.getElementById('common-gate-icon');
+      const comLabel = document.getElementById('common-gate-label');
+      if (comBtn && comIcon && comLabel) {
+        if (adminGates.common_faculty_open) {
+          comIcon.textContent = '🟢';
+          comLabel.textContent = 'OPEN (Accepting)';
+          comBtn.style.borderColor = 'var(--status-present)';
+          comBtn.style.color = 'var(--status-present)';
+        } else {
+          comIcon.textContent = '🔒';
+          comLabel.textContent = 'CLOSED (Blocked)';
+          comBtn.style.borderColor = 'var(--status-absent)';
+          comBtn.style.color = 'var(--status-absent)';
+        }
+      }
+    }
+
+    async function toggleAdminGate(target) {
+      const isHod = target === 'HOD';
+      const btn = document.getElementById(isHod ? 'btn-toggle-hod-gate' : 'btn-toggle-common-gate');
+      const label = document.getElementById(isHod ? 'hod-gate-label' : 'common-gate-label');
+      const current = isHod ? adminGates.hod_open : adminGates.common_faculty_open;
+      const next = !current;
+
+      try {
+        if (btn) btn.disabled = true;
+        if (label) label.textContent = 'Updating...';
+
+        const res = await apiFetch(`${API}/admin/registration-gates/toggle`, {
+          method: 'POST',
+          body: JSON.stringify({ target, open: next })
+        });
+
+        if (res && res.success) {
+          if (isHod) {
+            adminGates.hod_open = Boolean(res.data?.is_open);
+          } else {
+            adminGates.common_faculty_open = Boolean(res.data?.is_open);
+          }
+          renderRegistrationGates();
+          showToast(res.message || `${isHod ? 'HOD' : 'Common Faculty'} registration updated!`, 'success');
+        }
+      } catch (err) {
+        renderRegistrationGates();
+        showToast(err.message || 'Failed to toggle registration gate.', 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    // ─── Load Departments ─────────────────────────────────────
+    async function loadDepartments() {
+      try {
+        const r = await apiFetch(`${API}/admin/hierarchy`);
+        departments = r.data.departments || [];
+        populateDeptDropdown('hod-dept');
+        populateDeptDropdown('assign-existing-dept');
+        populateDeptDropdown('reassign-dept');
+      } catch (e) {
+        console.error('Failed to load departments:', e);
+      }
+    }
+
+    function populateDeptDropdown(selectId) {
+      const sel = document.getElementById(selectId);
+      const current = sel.value;
+      sel.innerHTML = '<option value="">— Select Department —</option>';
+      departments.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = `${d.name} (${d.code})`;
+        if (String(d.id) === String(current)) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+
+    // ─── Load HODs ────────────────────────────────────────────
+    async function loadHODs() {
+      try {
+        const r = await apiFetch(`${API}/admin/hods`);
+        hodData = r.data || [];
+        renderHODs();
+      } catch (e) {
+        document.getElementById('hod-table-wrap').innerHTML =
+          `<div style="text-align: center; padding: 2rem; color: var(--status-absent);">Failed to load HODs: ${e.message}</div>`;
+      }
+    }
+
+    function renderHODs() {
+      const wrap = document.getElementById('hod-table-wrap');
+      document.getElementById('hod-count-badge').textContent = `${hodData.length} HOD${hodData.length !== 1 ? 's' : ''}`;
+
+      if (!hodData.length) {
+        wrap.innerHTML = `
+          <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">👨‍🏫</div>
+            <div style="font-weight: 600; margin-bottom: 0.25rem;">No HODs created yet</div>
+            <div style="font-size: 0.85rem;">Create the first HOD account to get started.</div>
+          </div>`;
+        return;
+      }
+
+      wrap.innerHTML = `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>HOD</th>
+              <th>Department</th>
+              <th>Gmail (Login ID)</th>
+              <th>Status</th>
+              <th>Google</th>
+              <th>Since</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="hod-tbody">
+            ${hodData.map(h => `
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary-light); color: var(--color-primary); font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0;">
+                      ${(h.full_name || 'H').charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div style="font-weight: 600; color: var(--text-main);">${escHtml(h.full_name)}</div>
+                      ${h.employee_id ? `<div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">${escHtml(h.employee_id)}</div>` : ''}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  ${h.department_name
+                    ? `<span style="background: var(--status-present-bg); color: var(--status-present); border-radius: var(--radius-sm); padding: 0.2rem 0.6rem; font-size: 0.8rem; font-weight: 600;">${escHtml(h.department_name)}</span>`
+                    : `<span style="color: var(--text-muted); font-size: 0.8rem;">Unassigned</span>`}
+                </td>
+                <td style="font-family: monospace; font-size: 0.85rem; color: var(--color-primary);">${escHtml(h.gmail || '')}</td>
+                <td>
+                  ${h.must_change_password
+                    ? `<span class="badge badge-warning">Pending Login</span>`
+                    : `<span class="badge badge-present">Active</span>`}
+                </td>
+                <td>
+                  ${h.google_linked
+                    ? `<span style="color: var(--status-present); font-size: 0.8rem;">✓ Linked</span>`
+                    : `<span style="color: var(--text-muted); font-size: 0.8rem;">Not linked</span>`}
+                </td>
+                <td style="font-size: 0.8rem; color: var(--text-muted);">${fmtDate(h.created_at)}</td>
+                <td>
+                  <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                    <button class="btn btn-secondary btn-sm" onclick="openReassignModal(${h.teacher_id}, '${escHtml(h.full_name)}')">Reassign Dept</button>
+                    <button class="btn btn-secondary btn-sm" onclick="openResetModal(${h.teacher_id}, '${escHtml(h.full_name)}')">Reset Pwd</button>
+                    <button class="btn btn-secondary btn-sm" style="color: var(--status-absent); border-color: var(--status-absent);" onclick="openDeleteModal(${h.teacher_id}, '${escHtml(h.full_name)}')">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    // ─── Create / Appoint HOD ─────────────────────────────────
+    var currentHODMode = 'search';
+    var currentFoundFaculty = null;
+
+    function openCreateModal() {
+      setHODModalMode('search');
+      document.getElementById('search-faculty-email').value = '';
+      document.getElementById('search-status-box').style.display = 'none';
+      document.getElementById('found-faculty-card').style.display = 'none';
+      document.getElementById('assign-existing-dept').value = '';
+      document.getElementById('assign-error').style.display = 'none';
+      document.getElementById('btn-submit-assign').disabled = true;
+      currentFoundFaculty = null;
+
+      document.getElementById('create-hod-form').reset();
+      document.getElementById('create-error').style.display = 'none';
+      showModal('create-modal');
+    }
+    function closeCreateModal() { hideModal('create-modal'); }
+
+    function setHODModalMode(mode) {
+      currentHODMode = mode;
+      const btnSearch = document.getElementById('tab-btn-search');
+      const btnCreate = document.getElementById('tab-btn-create');
+      const secSearch = document.getElementById('section-search-faculty');
+      const secCreate = document.getElementById('section-create-new');
+
+      if (mode === 'search') {
+        btnSearch.style.background = 'var(--color-primary)';
+        btnSearch.style.color = 'var(--text-white)';
+        btnCreate.style.background = 'transparent';
+        btnCreate.style.color = 'var(--text-muted)';
+        secSearch.style.display = 'block';
+        secCreate.style.display = 'none';
+        document.getElementById('modal-title-hod').textContent = 'Appoint Head of Department';
+        document.getElementById('modal-sub-hod').textContent = 'Search faculty by Gmail to assign HOD powers while keeping their existing roles.';
+      } else {
+        btnCreate.style.background = 'var(--color-primary)';
+        btnCreate.style.color = 'var(--text-white)';
+        btnSearch.style.background = 'transparent';
+        btnSearch.style.color = 'var(--text-muted)';
+        secSearch.style.display = 'none';
+        secCreate.style.display = 'block';
+        document.getElementById('modal-title-hod').textContent = 'Create New HOD Account';
+        document.getElementById('modal-sub-hod').textContent = 'Creates a brand-new teacher account and appoints them as HOD for a department.';
+      }
+    }
+
+    async function searchFacultyByEmail() {
+      const email = document.getElementById('search-faculty-email').value.trim();
+      const statusBox = document.getElementById('search-status-box');
+      const foundCard = document.getElementById('found-faculty-card');
+      const submitBtn = document.getElementById('btn-submit-assign');
+      const searchBtn = document.getElementById('btn-search-faculty');
+
+      if (!email) {
+        statusBox.textContent = 'Please enter a faculty Gmail address.';
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'var(--status-absent-bg)';
+        statusBox.style.color = 'var(--status-absent)';
+        statusBox.style.border = '1px solid var(--status-absent)';
+        foundCard.style.display = 'none';
+        submitBtn.disabled = true;
+        currentFoundFaculty = null;
+        return;
+      }
+
+      searchBtn.disabled = true;
+      searchBtn.textContent = 'Finding...';
+      statusBox.style.display = 'none';
+      foundCard.style.display = 'none';
+      submitBtn.disabled = true;
+      currentFoundFaculty = null;
+
+      try {
+        const r = await apiFetch(`${API}/admin/faculty/search?email=${encodeURIComponent(email)}`);
+        const f = r.data;
+        currentFoundFaculty = f;
+
+        document.getElementById('found-avatar').textContent = (f.full_name || 'F').charAt(0).toUpperCase();
+        document.getElementById('found-name').textContent = f.full_name;
+        document.getElementById('found-gmail').textContent = f.gmail;
+        document.getElementById('found-dept').textContent = f.department_name || 'Unassigned';
+        document.getElementById('found-roles').textContent = f.current_roles || 'Faculty Member';
+        
+        // If they belong to a department, auto-select it in the dropdown
+        if (f.department_id) {
+          document.getElementById('assign-existing-dept').value = f.department_id;
+        }
+
+        foundCard.style.display = 'block';
+        submitBtn.disabled = false;
+      } catch (err) {
+        statusBox.textContent = err.message || 'No faculty found with this Gmail. Check spelling or use "Create New Account" tab.';
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'var(--status-absent-bg)';
+        statusBox.style.color = 'var(--status-absent)';
+        statusBox.style.border = '1px solid var(--status-absent)';
+      } finally {
+        searchBtn.disabled = false;
+        searchBtn.textContent = 'Find';
+      }
+    }
+
+    async function submitAssignExistingHOD() {
+      if (!currentFoundFaculty) return;
+      const deptId = document.getElementById('assign-existing-dept').value;
+      const errEl = document.getElementById('assign-error');
+      const btn = document.getElementById('btn-submit-assign');
+
+      if (!deptId) {
+        errEl.textContent = 'Please select a department to lead as HOD.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Appointing...';
+      errEl.style.display = 'none';
+
+      try {
+        const r = await apiFetch(`${API}/admin/hods/assign-existing`, {
+          method: 'POST',
+          body: JSON.stringify({
+            teacher_id: currentFoundFaculty.teacher_id,
+            department_id: parseInt(deptId)
+          })
+        });
+
+        const d = r.data;
+        const dept = departments.find(dep => dep.id === parseInt(deptId));
+
+        document.getElementById('cred-title').textContent = 'HOD Role Appointed!';
+        document.getElementById('cred-sub').textContent = `${d.full_name} now holds full HOD powers while retaining all their existing faculty roles.`;
+        document.getElementById('slip-name').textContent = d.full_name;
+        document.getElementById('slip-dept').textContent = dept?.name || `Dept #${deptId}`;
+        document.getElementById('slip-gmail').textContent = d.gmail;
+        document.getElementById('slip-temp-row').innerHTML =
+          `<span style="color: var(--text-muted); font-family: var(--font-family-sans);">Access Status:</span>` +
+          `<strong style="color: var(--status-present); float: right; font-family: var(--font-family-sans);">Active (Existing Credentials)</strong>`;
+
+        closeCreateModal();
+        showModal('cred-modal');
+        showToast('HOD role assigned successfully!', 'success');
+        await loadHODs();
+        await loadDepartments();
+      } catch (err) {
+        errEl.textContent = err.message || 'Failed to assign HOD role.';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '⚡ Assign HOD Role';
+      }
+    }
+
+    async function submitCreateHOD(e) {
+      e.preventDefault();
+      const btn = document.getElementById('create-submit-btn');
+      const errEl = document.getElementById('create-error');
+      btn.disabled = true; btn.textContent = 'Creating...';
+      errEl.style.display = 'none';
+
+      const payload = {
+        full_name: document.getElementById('hod-name').value.trim(),
+        email: document.getElementById('hod-email').value.trim(),
+        password: document.getElementById('hod-password').value.trim(),
+        phone: document.getElementById('hod-phone').value.trim() || undefined,
+        department_id: parseInt(document.getElementById('hod-dept').value)
+      };
+
+      if (!payload.full_name || !payload.email || !payload.password || !payload.department_id) {
+        errEl.textContent = 'Please fill out all required fields (*).';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Generate HOD Account & Temp Password';
+        return;
+      }
+
+      try {
+        const r = await apiFetch(`${API}/admin/hods`, { method: 'POST', body: JSON.stringify(payload) });
+        const d = r.data;
+        const dept = departments.find(dep => dep.id === payload.department_id);
+        document.getElementById('cred-title').textContent = 'HOD Account Created!';
+        document.getElementById('cred-sub').textContent = 'Share these credentials with the HOD. They will connect Google on first login.';
+        document.getElementById('slip-name').textContent = d.full_name;
+        document.getElementById('slip-dept').textContent = dept?.name || `Dept #${payload.department_id}`;
+        document.getElementById('slip-gmail').textContent = d.gmail;
+        document.getElementById('slip-temp-row').innerHTML =
+          `<span style="color: var(--text-muted); font-family: var(--font-family-sans);">Temp Password:</span>` +
+          `<strong id="slip-temp" style="color: var(--status-absent); font-size: 1.1rem; float: right; letter-spacing: 0.1em;">${escHtml(d.temporary_password)}</strong>`;
+        closeCreateModal();
+        showModal('cred-modal');
+        showToast('HOD account created successfully!', 'success');
+        await loadHODs();
+        await loadDepartments();
+      } catch (err) {
+        errEl.textContent = err.message || 'Failed to create HOD account.';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Generate HOD Account & Temp Password';
+      }
+    }
+
+    // ─── Credentials Slip ─────────────────────────────────────
+    function closeCredModal() { hideModal('cred-modal'); }
+
+    function copyCredentials() {
+      const name = document.getElementById('slip-name').textContent;
+      const dept = document.getElementById('slip-dept').textContent;
+      const gmail = document.getElementById('slip-gmail').textContent;
+      const tempEl = document.getElementById('slip-temp');
+      const temp = tempEl ? tempEl.textContent : 'Existing Password';
+
+      const text = `Name: ${name}\n` +
+                   `Department: ${dept}\n` +
+                   `Login ID (Gmail): ${gmail}\n` +
+                   `Password / Access: ${temp}`;
+      navigator.clipboard.writeText(text).then(() => showToast('Details copied to clipboard!', 'success'));
+    }
+
+    // ─── Reassign Department (2-Step Flow) ────────────────────
+    var currentReassignHod = null;
+
+    function setReassignStep(step) {
+      const s1 = document.getElementById('reassign-step-1');
+      const s2 = document.getElementById('reassign-step-2');
+      const step1Indicator = document.getElementById('reassign-stepper-1');
+      const step2Indicator = document.getElementById('reassign-stepper-2');
+
+      if (step === 1) {
+        if (s1) s1.style.display = 'block';
+        if (s2) s2.style.display = 'none';
+        if (step1Indicator) {
+          step1Indicator.style.color = 'var(--color-primary)';
+          step1Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span><span>Select Dept</span>`;
+        }
+        if (step2Indicator) {
+          step2Indicator.style.color = 'var(--text-muted)';
+          step2Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span><span>Review &amp; Transfer</span>`;
+        }
+      } else {
+        if (s1) s1.style.display = 'none';
+        if (s2) s2.style.display = 'block';
+        if (step1Indicator) {
+          step1Indicator.style.color = 'var(--status-present)';
+          step1Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--status-present); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">✓</span><span>Selected</span>`;
+        }
+        if (step2Indicator) {
+          step2Indicator.style.color = 'var(--color-primary)';
+          step2Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span><span>Review &amp; Transfer</span>`;
+        }
+      }
+    }
+
+    function clearReassignStep1Error() {
+      const err = document.getElementById('reassign-step1-err');
+      if (err) err.style.display = 'none';
+    }
+
+    function openReassignModal(teacherId, name) {
+      selectedTeacherId = teacherId;
+      currentReassignHod = hodData.find(h => h.teacher_id === teacherId);
+      const currentDept = currentReassignHod ? (currentReassignHod.department_name || 'Unassigned') : 'Unassigned';
+
+      document.getElementById('reassign-hod-name').textContent = name;
+      document.getElementById('reassign-current-dept').textContent = currentDept;
+      document.getElementById('reassign-dept').value = '';
+      clearReassignStep1Error();
+      document.getElementById('reassign-error').style.display = 'none';
+
+      setReassignStep(1);
+      showModal('reassign-modal');
+    }
+
+    function closeReassignModal() {
+      hideModal('reassign-modal');
+      selectedTeacherId = null;
+      currentReassignHod = null;
+    }
+
+    function goToReassignStep2() {
+      const deptId = document.getElementById('reassign-dept').value;
+      const err = document.getElementById('reassign-step1-err');
+
+      if (!deptId) {
+        err.textContent = 'Please select a target department to proceed.';
+        err.style.display = 'block';
+        return;
+      }
+
+      const targetDeptId = parseInt(deptId);
+      const currentDeptId = currentReassignHod?.department_id;
+      if (currentDeptId && targetDeptId === currentDeptId) {
+        err.textContent = 'Faculty is already assigned to this department. Please choose a different department.';
+        err.style.display = 'block';
+        return;
+      }
+
+      err.style.display = 'none';
+      const targetDept = departments.find(d => d.id === targetDeptId);
+      const fromDeptName = currentReassignHod ? (currentReassignHod.department_name || 'Unassigned') : 'Unassigned';
+      const toDeptName = targetDept ? targetDept.name : `Dept #${targetDeptId}`;
+      const hodName = currentReassignHod ? currentReassignHod.full_name : document.getElementById('reassign-hod-name').textContent;
+
+      document.getElementById('reassign-preview-from').textContent = fromDeptName;
+      document.getElementById('reassign-preview-to').textContent = toDeptName;
+      document.getElementById('reassign-protect-dept').textContent = fromDeptName;
+      document.getElementById('reassign-preview-name').textContent = hodName;
+      document.getElementById('reassign-error').style.display = 'none';
+
+      setReassignStep(2);
+    }
+
+    function goToReassignStep1() {
+      setReassignStep(1);
+    }
+
+    async function submitReassign() {
+      const deptId = document.getElementById('reassign-dept').value;
+      if (!deptId) { goToReassignStep1(); return; }
+      const btn = document.getElementById('reassign-submit-btn');
+      const errEl = document.getElementById('reassign-error');
+      btn.disabled = true; btn.textContent = 'Reassigning...';
+      errEl.style.display = 'none';
+      try {
+        await apiFetch(`${API}/admin/hods/${selectedTeacherId}/department`, {
+          method: 'PUT', body: JSON.stringify({ department_id: parseInt(deptId) })
+        });
+        closeReassignModal();
+        showToast('HOD reassigned successfully', 'success');
+        await loadHODs();
+        await loadDepartments();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Confirm Reassignment';
+      }
+    }
+
+    // ─── Reset Password (2-Step Flow) ─────────────────────────
+    var currentResetHod = null;
+    var isResetPassRevealed = false;
+    var validatedResetPassword = '';
+
+    function setResetStep(step) {
+      const s1 = document.getElementById('reset-step-1');
+      const s2 = document.getElementById('reset-step-2');
+      const step1Indicator = document.getElementById('reset-stepper-1');
+      const step2Indicator = document.getElementById('reset-stepper-2');
+
+      if (step === 1) {
+        if (s1) s1.style.display = 'block';
+        if (s2) s2.style.display = 'none';
+        if (step1Indicator) {
+          step1Indicator.style.color = 'var(--color-primary)';
+          step1Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span><span>Set Password</span>`;
+        }
+        if (step2Indicator) {
+          step2Indicator.style.color = 'var(--text-muted)';
+          step2Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span><span>Security Review</span>`;
+        }
+      } else {
+        if (s1) s1.style.display = 'none';
+        if (s2) s2.style.display = 'block';
+        if (step1Indicator) {
+          step1Indicator.style.color = 'var(--status-present)';
+          step1Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--status-present); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">✓</span><span>Password Set</span>`;
+        }
+        if (step2Indicator) {
+          step2Indicator.style.color = 'var(--color-primary)';
+          step2Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span><span>Security Review</span>`;
+        }
+      }
+    }
+
+    function clearResetStep1Error() {
+      const err = document.getElementById('reset-step1-err');
+      if (err) err.style.display = 'none';
+    }
+
+    function togglePassVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.textContent = '🔒';
+      } else {
+        inp.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    function toggleResetPassPreview() {
+      const previewEl = document.getElementById('reset-preview-pass');
+      const btn = document.getElementById('reset-preview-eye-btn');
+      isResetPassRevealed = !isResetPassRevealed;
+      if (isResetPassRevealed) {
+        previewEl.textContent = validatedResetPassword;
+        btn.textContent = '🔒 Hide';
+      } else {
+        previewEl.textContent = '••••••••';
+        btn.textContent = '👁️ Reveal';
+      }
+    }
+
+    function generateRandomResetPassword() {
+      const randomSuffix = Math.floor(100 + Math.random() * 900);
+      const pass = `Faculty@${randomSuffix}`;
+      document.getElementById('reset-password').value = pass;
+      document.getElementById('reset-password-confirm').value = pass;
+      clearResetStep1Error();
+    }
+
+    function openResetModal(teacherId, name) {
+      resetTargetId = teacherId;
+      currentResetHod = hodData.find(h => h.teacher_id === teacherId);
+
+      document.getElementById('reset-name').textContent = name;
+      document.getElementById('reset-gmail').textContent = currentResetHod ? (currentResetHod.gmail || '—') : '—';
+      document.getElementById('reset-password').value = 'Password@123';
+      document.getElementById('reset-password-confirm').value = 'Password@123';
+      clearResetStep1Error();
+      document.getElementById('reset-error').style.display = 'none';
+      isResetPassRevealed = false;
+
+      setResetStep(1);
+      showModal('reset-modal');
+    }
+
+    function closeResetModal() {
+      hideModal('reset-modal');
+      resetTargetId = null;
+      currentResetHod = null;
+      validatedResetPassword = '';
+    }
+
+    function goToResetStep2() {
+      const p1 = document.getElementById('reset-password').value.trim();
+      const p2 = document.getElementById('reset-password-confirm').value.trim();
+      const err = document.getElementById('reset-step1-err');
+
+      if (!p1) {
+        err.textContent = 'Please enter a new password.';
+        err.style.display = 'block';
+        return;
+      }
+      if (p1.length < 6) {
+        err.textContent = 'Password must be at least 6 characters long.';
+        err.style.display = 'block';
+        return;
+      }
+      if (p1 !== p2) {
+        err.textContent = 'Passwords do not match. Please re-check confirm password.';
+        err.style.display = 'block';
+        return;
+      }
+
+      err.style.display = 'none';
+      validatedResetPassword = p1;
+
+      const hodName = currentResetHod ? currentResetHod.full_name : document.getElementById('reset-name').textContent;
+      const hodGmail = currentResetHod ? currentResetHod.gmail : '';
+      document.getElementById('reset-preview-user').textContent = `${hodName} (${hodGmail})`;
+
+      isResetPassRevealed = false;
+      document.getElementById('reset-preview-pass').textContent = '••••••••';
+      document.getElementById('reset-preview-eye-btn').textContent = '👁️ Reveal';
+      document.getElementById('reset-error').style.display = 'none';
+
+      setResetStep(2);
+    }
+
+    function goToResetStep1() {
+      setResetStep(1);
+    }
+
+    function handleResetFormSubmit(e) {
+      e.preventDefault();
+      // If currently on step 1, advance to step 2
+      const s1 = document.getElementById('reset-step-1');
+      if (s1 && s1.style.display !== 'none') {
+        goToResetStep2();
+      } else {
+        submitReset();
+      }
+    }
+
+    async function submitReset(e) {
+      if (e && typeof e.preventDefault === 'function') e.preventDefault();
+      if (!resetTargetId || !validatedResetPassword) {
+        goToResetStep1();
+        return;
+      }
+      const btn = document.getElementById('reset-btn');
+      const errEl = document.getElementById('reset-error');
+      btn.disabled = true; btn.textContent = 'Resetting...';
+      errEl.style.display = 'none';
+
+      try {
+        const r = await apiFetch(`${API}/admin/hods/${resetTargetId}/reset-password`, { 
+          method: 'POST', 
+          body: JSON.stringify({ new_password: validatedResetPassword })
+        });
+        showToast(r.message || 'Password reset successfully.', 'success');
+        closeResetModal();
+        await loadHODs();
+      } catch (err) {
+        errEl.textContent = `Failed: ${err.message}`;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Confirm & Reset Password';
+      }
+    }
+
+    // ─── Delete HOD (2-Step Safeguard Flow) ───────────────────
+    var deleteTargetId = null;
+    var currentDeleteHod = null;
+
+    function setDeleteStep(step) {
+      const s1 = document.getElementById('delete-step-1');
+      const s2 = document.getElementById('delete-step-2');
+      const step1Indicator = document.getElementById('delete-stepper-1');
+      const step2Indicator = document.getElementById('delete-stepper-2');
+
+      if (step === 1) {
+        if (s1) s1.style.display = 'block';
+        if (s2) s2.style.display = 'none';
+        if (step1Indicator) {
+          step1Indicator.style.color = 'var(--status-absent)';
+          step1Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--status-absent); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span><span>Impact Assessment</span>`;
+        }
+        if (step2Indicator) {
+          step2Indicator.style.color = 'var(--text-muted)';
+          step2Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span><span>Safeguard Confirmation</span>`;
+        }
+      } else {
+        if (s1) s1.style.display = 'none';
+        if (s2) s2.style.display = 'block';
+        if (step1Indicator) {
+          step1Indicator.style.color = 'var(--status-present)';
+          step1Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--status-present); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">✓</span><span>Impact Reviewed</span>`;
+        }
+        if (step2Indicator) {
+          step2Indicator.style.color = 'var(--status-absent)';
+          step2Indicator.innerHTML = `<span style="width: 20px; height: 20px; border-radius: 50%; background: var(--status-absent); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span><span>Safeguard Confirmation</span>`;
+        }
+      }
+    }
+
+    function checkDeleteConfirmation() {
+      const val = (document.getElementById('delete-confirm-input').value || '').trim();
+      const btn = document.getElementById('delete-btn');
+      if (val === 'DELETE') {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.45';
+        btn.style.cursor = 'not-allowed';
+      }
+    }
+
+    function openDeleteModal(teacherId, name) {
+      deleteTargetId = teacherId;
+      currentDeleteHod = hodData.find(h => h.teacher_id === teacherId);
+
+      document.getElementById('delete-hod-name').textContent = name;
+      document.getElementById('delete-step2-name').textContent = name;
+      document.getElementById('delete-dept-name').textContent = currentDeleteHod ? (currentDeleteHod.department_name || 'Unassigned') : 'Unassigned';
+      document.getElementById('delete-confirm-input').value = '';
+      document.getElementById('delete-error').style.display = 'none';
+
+      checkDeleteConfirmation();
+      setDeleteStep(1);
+      showModal('delete-modal');
+    }
+
+    function closeDeleteModal() {
+      hideModal('delete-modal');
+      deleteTargetId = null;
+      currentDeleteHod = null;
+    }
+
+    function goToDeleteStep2() {
+      document.getElementById('delete-confirm-input').value = '';
+      checkDeleteConfirmation();
+      document.getElementById('delete-error').style.display = 'none';
+      setDeleteStep(2);
+      setTimeout(() => {
+        const inp = document.getElementById('delete-confirm-input');
+        if (inp) inp.focus();
+      }, 50);
+    }
+
+    function goToDeleteStep1() {
+      setDeleteStep(1);
+    }
+
+    async function submitDeleteHOD() {
+      if (!deleteTargetId) return;
+      const confirmVal = (document.getElementById('delete-confirm-input').value || '').trim();
+      if (confirmVal !== 'DELETE') {
+        const errEl = document.getElementById('delete-error');
+        errEl.textContent = 'Please type DELETE into the confirmation box to proceed.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      const btn = document.getElementById('delete-btn');
+      const errEl = document.getElementById('delete-error');
+      btn.disabled = true;
+      btn.textContent = 'Removing...';
+      errEl.style.display = 'none';
+
+      try {
+        const r = await apiFetch(`${API}/admin/hods/${deleteTargetId}`, { method: 'DELETE' });
+        closeDeleteModal();
+        showToast(r.message || 'HOD removed successfully', 'success');
+        await loadHODs();
+        await loadDepartments();
+      } catch (err) {
+        if (err.message && (err.message.includes('not found') || err.message.includes('cleared'))) {
+          closeDeleteModal();
+          showToast('HOD record updated.', 'info');
+          await loadHODs();
+          await loadDepartments();
+        } else {
+          errEl.textContent = err.message || 'Failed to delete HOD';
+          errEl.style.display = 'block';
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Permanently Remove HOD';
+        checkDeleteConfirmation();
+      }
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────
+    function escHtml(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function fmtDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function showToast(message, type = 'info', duration = 4000) {
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.position = 'fixed';
+        container.style.bottom = '1.5rem';
+        container.style.right = '1.5rem';
+        container.style.zIndex = '9999';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.gap = '0.5rem';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.style.background = type === 'error' ? 'var(--status-absent)' : (type === 'success' ? 'var(--status-present)' : 'var(--color-primary)');
+      toast.style.color = 'var(--text-white)';
+      toast.style.padding = '0.65rem 1.1rem';
+      toast.style.borderRadius = 'var(--radius-md)';
+      toast.style.boxShadow = 'var(--shadow-md)';
+      toast.style.fontSize = '0.85rem';
+      toast.style.fontWeight = '500';
+      toast.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+      toast.textContent = message;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 250);
+      }, duration);
+    }
+
+    async function apiFetch(url, opts = {}) {
+      const token = localStorage.getItem('access_token');
+      const r = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        ...opts
+      });
+      const data = await r.json();
+      if (!r.ok || !data.success) throw new Error(data?.error?.message || `HTTP ${r.status}`);
+      return data;
+    }
+    // ─── Pending HOD Registrations ───────────────────────────
+    var pendingHodsList = [];
+    var targetApproveHodId = null;
+    var allTeachersList = [];
+
+    async function loadPendingHods() {
+      try {
+        const r = await apiFetch(`${API}/admin/registrations/pending-hods`);
+        pendingHodsList = r.data || [];
+        renderPendingHods();
+      } catch (e) {
+        console.error('Failed to load pending HODs:', e);
+        document.getElementById('pending-hods-wrap').innerHTML =
+          `<div style="color: var(--status-absent); font-size: 0.85rem; text-align: center; padding: 1rem;">Failed to load pending HODs: ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderPendingHods() {
+      const badge = document.getElementById('pending-hods-badge');
+      const wrap = document.getElementById('pending-hods-wrap');
+      badge.textContent = `${pendingHodsList.length} Pending`;
+
+      if (!pendingHodsList.length) {
+        wrap.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+            <div style="font-weight: 600; color: var(--text-main);">No Pending HOD Registrations</div>
+            <div style="font-size: 0.8rem; margin-top: 0.25rem;">All registration applications for Head of Department have been reviewed.</div>
+          </div>`;
+        return;
+      }
+
+      wrap.innerHTML = `
+        <div style="overflow-x: auto;">
+          <table class="table" style="margin: 0; font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Candidate</th>
+                <th>Requested Dept</th>
+                <th>Institutional Gmail</th>
+                <th>Phone</th>
+                <th>Governance Impact</th>
+                <th>Applied On</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pendingHodsList.map(item => {
+                const hasCurrentHod = !!item.current_hod;
+                const impactTag = hasCurrentHod
+                  ? `<span style="display: inline-flex; align-items: center; gap: 0.3rem; background: var(--status-late-bg); color: var(--status-late); border-radius: var(--radius-sm); padding: 0.2rem 0.55rem; font-size: 0.76rem; font-weight: 600;">⚠️ Replaces ${escHtml(item.current_hod.full_name)}</span>`
+                  : `<span style="display: inline-flex; align-items: center; gap: 0.3rem; background: var(--status-present-bg); color: var(--status-present); border-radius: var(--radius-sm); padding: 0.2rem 0.55rem; font-size: 0.76rem; font-weight: 600;">✨ Vacant Department</span>`;
+
+                return `
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600; color: var(--text-main);">${escHtml(item.full_name)}</div>
+                      ${item.employee_id ? `<div style="font-size: 0.74rem; color: var(--text-muted); font-family: monospace;">Emp ID: ${escHtml(item.employee_id)}</div>` : ''}
+                    </td>
+                    <td>
+                      <span style="font-weight: 700; color: var(--color-primary);">${escHtml(item.department_name || '')} (${escHtml(item.department_code || '')})</span>
+                    </td>
+                    <td style="font-family: monospace; font-size: 0.82rem; color: var(--color-primary);">${escHtml(item.email)}</td>
+                    <td style="font-size: 0.8rem; color: var(--text-muted);">${escHtml(item.phone || '—')}</td>
+                    <td>${impactTag}</td>
+                    <td style="font-size: 0.78rem; color: var(--text-muted);">${fmtDate(item.created_at)}</td>
+                    <td>
+                      <div style="display: flex; gap: 0.4rem; align-items: center;">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="openApproveHodModal(${item.id})">Approve HOD</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent); border-color: var(--status-absent);" onclick="promptRejectHod(${item.id}, '${escHtml(item.full_name)}')">Reject</button>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function openApproveHodModal(reqId) {
+      targetApproveHodId = reqId;
+      const item = pendingHodsList.find(p => p.id === reqId);
+      if (!item) return;
+
+      const errEl = document.getElementById('approve-hod-err');
+      errEl.style.display = 'none';
+
+      const hasCurrentHod = !!item.current_hod;
+      document.getElementById('approve-hod-body').innerHTML = `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Candidate</span>
+            <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">${escHtml(item.full_name)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Institutional Gmail:</span>
+            <span style="font-family: monospace; font-size: 0.85rem; color: var(--color-primary); font-weight: 600;">${escHtml(item.email)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Department:</span>
+            <span style="font-weight: 700; color: var(--color-primary);">${escHtml(item.department_name)} (${escHtml(item.department_code)})</span>
+          </div>
+        </div>
+
+        ${hasCurrentHod ? `
+          <div style="background: var(--status-late-bg); border: 1px solid var(--status-late); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--text-main); line-height: 1.45;">
+            <div style="font-weight: 700; color: var(--status-late); margin-bottom: 0.25rem;">⚠️ Active HOD Replacement Notice (1 HOD Invariant)</div>
+            <div>Department <strong>${escHtml(item.department_name)}</strong> is currently led by <strong>${escHtml(item.current_hod.full_name)}</strong> (${escHtml(item.current_hod.gmail)}). Approving this candidate will automatically deactivate the prior HOD appointment and transfer official department leadership to <strong>${escHtml(item.full_name)}</strong>.</div>
+          </div>
+        ` : `
+          <div style="background: var(--status-present-bg); border: 1px solid var(--status-present); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--text-main); line-height: 1.45;">
+            <div style="font-weight: 700; color: var(--status-present); margin-bottom: 0.2rem;">✨ Vacant Department Leadership</div>
+            <div>This department currently has no active HOD. Approving will activate the user account and appoint them as the sole official Head of Department.</div>
+          </div>
+        `}
+      `;
+
+      showModal('approve-hod-modal');
+    }
+
+    function closeApproveHodModal() {
+      hideModal('approve-hod-modal');
+      targetApproveHodId = null;
+    }
+
+    async function confirmApproveHod() {
+      if (!targetApproveHodId) return;
+      const btn = document.getElementById('btn-confirm-approve-hod');
+      const errEl = document.getElementById('approve-hod-err');
+      btn.disabled = true;
+      btn.textContent = 'Activating...';
+      errEl.style.display = 'none';
+
+      try {
+        const res = await apiFetch(`${API}/admin/registrations/hods/${targetApproveHodId}/approve`, {
+          method: 'POST'
+        });
+        closeApproveHodModal();
+        showToast(res.message || 'HOD approved and activated successfully!', 'success');
+        await loadPendingHods();
+        await loadHODs();
+      } catch (err) {
+        errEl.textContent = err.message || 'Failed to approve HOD registration.';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Confirm & Activate HOD';
+      }
+    }
+
+    async function promptRejectHod(reqId, name) {
+      const reason = prompt(`Enter rejection reason for prospective HOD ${name}:`, 'Application requirements not met');
+      if (reason === null) return;
+
+      try {
+        const res = await apiFetch(`${API}/admin/registrations/hods/${reqId}/reject`, {
+          method: 'POST',
+          body: JSON.stringify({ reason: reason.trim() || 'Application not approved' })
+        });
+        showToast(res.message || 'HOD registration rejected.', 'info');
+        await loadPendingHods();
+      } catch (err) {
+        showToast(err.message || 'Failed to reject registration.', 'error');
+      }
+    }
+
+    // ─── Common Faculty Manager ──────────────────────────────
+    async function loadCommonFacultyManager() {
+      try {
+        const r = await apiFetch(`${API}/admin/common-faculty-manager`);
+        renderCommonFacultyManager(r.data);
+      } catch (e) {
+        console.error('Failed to load Common Faculty Manager:', e);
+        document.getElementById('common-mgr-content').innerHTML =
+          `<div style="color: var(--status-absent); font-size: 0.85rem;">Failed to load manager: ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderCommonFacultyManager(manager) {
+      const wrap = document.getElementById('common-mgr-content');
+      if (!manager) {
+        wrap.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.1rem 1.25rem;">
+            <div>
+              <div style="font-weight: 600; color: var(--text-main); font-size: 0.95rem;">No Common Faculty Manager Appointed</div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">Cross-department/common faculty registrations cannot be approved until a Common Faculty Manager or System Admin reviews them.</div>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openAppointCommonMgrModal()">+ Appoint Manager</button>
+          </div>`;
+        return;
+      }
+
+      wrap.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+              ${(manager.full_name || 'M').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">${escHtml(manager.full_name)}</span>
+                <span class="badge badge-present" style="font-size: 0.75rem;">Active Manager</span>
+                ${manager.department_name ? `<span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">(${escHtml(manager.department_name)})</span>` : ''}
+              </div>
+              <div style="display: flex; gap: 1rem; font-size: 0.82rem; margin-top: 0.25rem; flex-wrap: wrap;">
+                <span style="font-family: monospace; color: var(--color-primary);">${escHtml(manager.gmail)}</span>
+                ${manager.employee_id ? `<span style="color: var(--text-muted);">Emp ID: ${escHtml(manager.employee_id)}</span>` : ''}
+                <span style="color: var(--text-muted);">Appointed: ${fmtDate(manager.assigned_at)}</span>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openAppointCommonMgrModal()">Change</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent); border-color: var(--status-absent);" onclick="removeCommonMgr('${escHtml(manager.full_name)}')">Remove Role</button>
+          </div>
+        </div>`;
+    }
+
+    async function openAppointCommonMgrModal() {
+      const select = document.getElementById('common-mgr-teacher-select');
+      const errEl = document.getElementById('appoint-common-mgr-err');
+      errEl.style.display = 'none';
+      select.innerHTML = '<option value="">Loading faculty list...</option>';
+      showModal('appoint-common-mgr-modal');
+
+      try {
+        const r = await apiFetch(`${API}/admin/teachers`);
+        allTeachersList = r.data || [];
+        select.innerHTML = '<option value="">— Select an active faculty member —</option>';
+        allTeachersList.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t.teacher_id;
+          opt.textContent = `${t.full_name} (${t.gmail})${t.department_name ? ' — ' + t.department_name : ' — Common'}`;
+          select.appendChild(opt);
+        });
+      } catch (e) {
+        select.innerHTML = '<option value="">Failed to load teachers</option>';
+        errEl.textContent = e.message || 'Could not load faculty list.';
+        errEl.style.display = 'block';
+      }
+    }
+
+    function closeAppointCommonMgrModal() {
+      hideModal('appoint-common-mgr-modal');
+    }
+
+    async function submitAppointCommonMgr() {
+      const select = document.getElementById('common-mgr-teacher-select');
+      const teacherId = select.value;
+      const errEl = document.getElementById('appoint-common-mgr-err');
+      const btn = document.getElementById('btn-submit-common-mgr');
+
+      if (!teacherId) {
+        errEl.textContent = 'Please select a faculty member.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      errEl.style.display = 'none';
+
+      try {
+        const res = await apiFetch(`${API}/admin/common-faculty-manager`, {
+          method: 'POST',
+          body: JSON.stringify({ teacher_id: parseInt(teacherId) })
+        });
+        closeAppointCommonMgrModal();
+        showToast(res.message || 'Common Faculty Manager appointed successfully!', 'success');
+        await loadCommonFacultyManager();
+      } catch (err) {
+        errEl.textContent = err.message || 'Failed to appoint Common Faculty Manager.';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Appointment';
+      }
+    }
+
+    async function removeCommonMgr(name) {
+      if (!confirm(`Are you sure you want to remove ${name} from the Common Faculty Manager role?`)) return;
+
+      try {
+        const res = await apiFetch(`${API}/admin/common-faculty-manager`, { method: 'DELETE' });
+        showToast(res.message || 'Common Faculty Manager removed.', 'info');
+        await loadCommonFacultyManager();
+      } catch (err) {
+        showToast(err.message || 'Failed to remove manager.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Self-Registration — College Attendance System</title>
+  <meta name="description" content="Register for your academic branch. Your Department Faculty will review and approve your enrollment request.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-app);
+      padding: 2rem 1rem 3rem;
+      font-family: var(--font-family-sans);
+      color: var(--text-main);
+    }
+
+    .reg-wrapper {
+      width: 100%;
+      max-width: 540px;
+    }
+
+    .reg-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* ── Header ── */
+    .reg-header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .reg-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.01em;
+    }
+
+    .page-subtitle {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* ── Form Layout ── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin-bottom: 1.15rem;
+    }
+
+    @media (max-width: 500px) {
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--text-main);
+    }
+
+    .form-hint {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      line-height: 1.35;
+    }
+
+    /* ── Branch & Routing Banner ── */
+    .routing-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      line-height: 1.45;
+    }
+
+    .routing-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .routing-target {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* ── Password strength ── */
+    .pw-strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      margin-top: 6px;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    /* ── Success Card View ── */
+    .success-view {
+      display: none;
+      text-align: center;
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-ring {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.3rem;
+      font-weight: 800;
+      margin: 0 auto 1.25rem;
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .progress-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--text-white);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .summary-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.1rem;
+      text-align: left;
+      font-size: 0.83rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .summary-label {
+      color: var(--text-muted);
+    }
+
+    .summary-value {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="reg-wrapper">
+
+    <!-- Header -->
+    <div class="reg-header">
+      <a href="/index.html" class="brand" style="justify-content: center; margin-bottom: 0.4rem; text-decoration: none;">
+        <span class="reg-badge">STUDENT PORTAL</span>
+      </a>
+      <h1 class="page-title">Student Self-Registration</h1>
+      <p class="page-subtitle">Register for your branch — your Department Faculty will review and approve.</p>
+    </div>
+
+    <!-- Registration Card -->
+    <div class="reg-card">
+
+      <!-- Active Form View -->
+      <div id="form-view">
+        <!-- 1-Click Google Sign-Up / Auto-Fill Details -->
+        <div style="margin-bottom: 1.15rem;">
+          <button type="button" id="google-signup-btn" class="btn-google" onclick="initiateGoogleSignUp()">
+            <svg viewBox="0 0 24 24">
+              <path fill="rgb(66, 133, 244)" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="rgb(52, 168, 83)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="rgb(251, 188, 5)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="rgb(234, 67, 53)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span id="google-signup-btn-text">Sign up with Google</span>
+          </button>
+
+          <!-- Google Connected Details Banner -->
+          <div id="google-connected-badge" style="display: none; margin-top: 0.65rem; background: var(--status-present-bg); border: 1px solid var(--status-present); border-radius: var(--radius-md); padding: 0.7rem 0.9rem; font-size: 0.8rem; color: var(--status-present); align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; min-width: 0;">
+              <span style="font-size: 1.1rem; flex-shrink: 0;">✓</span>
+              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span style="font-weight: 700;" id="google-badge-name">Google Connected</span>
+                <span id="google-badge-email" style="opacity: 0.85; margin-left: 0.35rem; font-family: var(--font-family-mono); font-size: 0.76rem;">(email)</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm" onclick="resetGoogleRegistration()" style="padding: 0.2rem 0.55rem; font-size: 0.72rem; background: none; border: 1px solid var(--status-present); color: var(--status-present); border-radius: var(--radius-sm); cursor: pointer; flex-shrink: 0;">Change</button>
+          </div>
+
+          <div style="text-align: center; margin-top: 0.4rem;">
+            <a href="javascript:void(0)" onclick="openGoogleCardForRegistration()" style="font-size: 0.73rem; color: var(--text-muted); text-decoration: none; opacity: 0.85;">Offline / Demo Mode</a>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; margin: 1.15rem 0; gap: 0.75rem;">
+          <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+          <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">or fill details manually</span>
+          <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+        </div>
+
+        <form id="registration-form" novalidate>
+
+          <!-- Branch and Semester Dropdowns -->
+          <div class="form-row">
+            <div>
+              <label class="form-label" for="reg-department">
+                Branch / Department <span style="color:var(--status-absent);">*</span>
+              </label>
+              <select id="reg-department" class="form-control" required onchange="handleDepartmentChange()">
+                <option value="">Loading branches...</option>
+              </select>
+              <p class="form-hint">Academic home & faculty review authority.</p>
+            </div>
+
+            <div>
+              <label class="form-label" for="reg-semester">
+                Current Semester <span style="color:var(--status-absent);">*</span>
+              </label>
+              <select id="reg-semester" class="form-control" required disabled onchange="updateRoutingDisplay()">
+                <option value="">-- Select Branch First --</option>
+              </select>
+              <p class="form-hint" id="semester-hint">Academic semester term.</p>
+            </div>
+          </div>
+
+          <!-- Dynamic Departmental Routing Banner -->
+          <div class="routing-banner" id="routing-banner">
+            <span class="routing-icon">🏛️</span>
+            <div>
+              <span class="routing-target" id="routing-target-text">Departmental Branch Ownership</span>
+              <p style="margin: 0.2rem 0 0; font-size: 0.77rem; line-height: 1.4;" id="routing-desc-text">
+                Select your branch above. Student accounts belong to their academic department. Your registration will be reviewed and approved by that branch's faculty.
+              </p>
+            </div>
+          </div>
+
+          <!-- Full Name -->
+          <div class="form-group">
+            <label class="form-label" for="reg-fullname">
+              Full Name <span style="color:var(--status-absent);">*</span>
+            </label>
+            <input type="text" id="reg-fullname" class="form-control" placeholder="e.g. Rahul Kumar" required autocomplete="name">
+          </div>
+
+          <!-- Enrollment Number & Optional UBTER Registration No -->
+          <div class="form-row">
+            <div>
+              <label class="form-label" for="reg-enroll">
+                Enrollment Number <span style="color:var(--status-absent);">*</span>
+              </label>
+              <input type="text" id="reg-enroll" class="form-control" placeholder="e.g. 2024IT001" required style="text-transform: uppercase; font-family: var(--font-family-mono);" autocomplete="off">
+              <p class="form-hint">College admission enrollment number.</p>
+            </div>
+
+            <div>
+              <label class="form-label" for="reg-ubter">
+                UBTER Reg No. <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(Optional)</span>
+              </label>
+              <input type="text" id="reg-ubter" class="form-control" placeholder="e.g. 24101054001" style="text-transform: uppercase; font-family: var(--font-family-mono);" autocomplete="off">
+              <p class="form-hint">Board exam roll / registration number.</p>
+            </div>
+          </div>
+
+          <!-- Gmail Address -->
+          <div class="form-group">
+            <label class="form-label" for="reg-email">
+              Gmail Address <span style="color:var(--status-absent);">*</span>
+            </label>
+            <input type="email" id="reg-email" class="form-control" placeholder="your.name@gmail.com" required autocomplete="email">
+            <p class="form-hint" id="email-hint">Institutional or personal Gmail used to sign in to the student portal.</p>
+          </div>
+
+          <!-- WhatsApp Mobile Number & OTP Verification Widget -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <label class="form-label" for="reg-phone" style="margin-bottom: 0;">
+                WhatsApp Mobile Number <span style="color:var(--status-absent);">*</span>
+              </label>
+              <span id="otp-verified-badge" class="badge" style="display: none; background: var(--status-present-bg); color: var(--status-present); font-size: 0.72rem; font-weight: 700;">
+                ✓ WhatsApp Verified via OTP
+              </span>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0 0.65rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
+                🇮🇳 +91
+              </div>
+              <input type="tel" id="reg-phone" class="form-control" placeholder="9876543210" maxlength="10" pattern="[6-9][0-9]{9}" required style="flex: 1; font-family: var(--font-family-mono); letter-spacing: 0.05em;" autocomplete="tel">
+              <button type="button" id="btn-send-otp" class="btn btn-outline" onclick="handleSendOtp()" style="white-space: nowrap; font-size: 0.8rem; padding: 0.5rem 0.85rem; font-weight: 600;">
+                💬 Send WhatsApp OTP
+              </button>
+            </div>
+            <p class="form-hint" id="phone-hint">10-digit mobile number registered with WhatsApp for instant OTP code verification.</p>
+
+            <!-- Expandable WhatsApp OTP Box -->
+            <div id="otp-box" style="display: none; margin-top: 0.75rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.95rem; animation: fadeInUp 0.25s ease-out;">
+              
+              <!-- Scan WhatsApp QR Code Card -->
+              <div id="wa-qr-card" style="display: flex; gap: 0.85rem; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="background: var(--text-white); padding: 0.35rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <img id="wa-qr-img" src="" alt="Scan WhatsApp QR" style="width: 100px; height: 100px; display: block; object-fit: contain;">
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; color: var(--status-present);">
+                    <span>📷 Scan with Phone Camera / WhatsApp</span>
+                  </div>
+                  <p style="margin: 0.25rem 0 0.5rem; font-size: 0.74rem; color: var(--text-muted); line-height: 1.35;">
+                    Scan the QR code to open your WhatsApp verification chat, or tap the button below:
+                  </p>
+                  <a id="wa-direct-link" href="#" target="_blank" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.65rem; font-size: 0.75rem; font-weight: 700; color: var(--status-present); border-color: var(--status-present); text-decoration: none; border-radius: var(--radius-sm);">
+                    💬 Open WhatsApp Direct Chat &rarr;
+                  </a>
+                </div>
+              </div>
+
+              <!-- OTP Code Input Row -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-main);">
+                  🔐 Enter 6-Digit WhatsApp OTP Code
+                </span>
+                <span id="otp-timer" style="font-size: 0.75rem; font-family: var(--font-family-mono); color: var(--text-muted); font-weight: 600;">
+                  ⏳ 05:00
+                </span>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="reg-otp" class="form-control" placeholder="••••••" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" style="letter-spacing: 0.35em; font-family: var(--font-family-mono); font-size: 1.1rem; text-align: center; font-weight: 700; width: 140px;">
+                <button type="button" id="btn-verify-otp" class="btn btn-primary" onclick="handleVerifyOtp()" style="flex: 1; font-size: 0.82rem; font-weight: 700; padding: 0.5rem 0.75rem;">
+                  Verify OTP ✓
+                </button>
+              </div>
+
+              <!-- Feedback & Demo Auto-Fill -->
+              <div id="otp-feedback-msg" style="margin-top: 0.55rem; font-size: 0.74rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.35rem;">
+                <span>Code sent to your WhatsApp.</span>
+              </div>
+              <div style="display: flex; justify-content: flex-end; margin-top: 0.35rem;">
+                <button type="button" id="btn-resend-otp" onclick="handleSendOtp(true)" style="background: none; border: none; padding: 0; color: var(--color-primary); cursor: pointer; text-decoration: underline; font-size: 0.74rem;" disabled>
+                  Resend WhatsApp OTP
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password and Confirm Password -->
+          <div class="form-row">
+            <div>
+              <label class="form-label" for="reg-password">
+                Password <span style="color:var(--status-absent);">*</span>
+              </label>
+              <div style="position: relative;">
+                <input type="password" id="reg-password" class="form-control" placeholder="Min. 8 characters" required minlength="8" style="padding-right: 2.25rem;" oninput="updateStrength()" autocomplete="new-password">
+                <button type="button" onclick="togglePw('reg-password', this)" style="position: absolute; right: 0.55rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.95rem;">👁️</button>
+              </div>
+              <div id="pw-strength-bar" class="pw-strength-bar" style="width: 0; background: var(--status-absent);"></div>
+              <p id="pw-strength-label" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;"></p>
+            </div>
+
+            <div>
+              <label class="form-label" for="reg-confirm">
+                Confirm Password <span style="color:var(--status-absent);">*</span>
+              </label>
+              <div style="position: relative;">
+                <input type="password" id="reg-confirm" class="form-control" placeholder="Re-enter password" required minlength="8" style="padding-right: 2.25rem;" autocomplete="new-password">
+                <button type="button" onclick="togglePw('reg-confirm', this)" style="position: absolute; right: 0.55rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.95rem;">👁️</button>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem 1rem; font-weight: 700;">
+            Submit Registration Request →
+          </button>
+        </form>
+      </div>
+
+      <!-- Success Confirmation View -->
+      <div id="success-view" class="success-view">
+        <div class="success-ring">✓</div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.4rem;">Registration Submitted!</h2>
+        <p style="color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; margin-bottom: 1.35rem;" id="success-message-text">
+          Your account request has been submitted to your Department Faculty for review.
+        </p>
+
+        <div class="summary-box" id="success-summary-box">
+          <!-- Populated by JS -->
+        </div>
+
+        <div style="background: var(--status-pending-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; font-size: 0.8rem; color: var(--text-main); margin-bottom: 1.5rem; text-align: left; line-height: 1.45;">
+          💡 <strong>What happens next?</strong> Your Department Faculty will verify your enrollment and assign your class roll number. If faculty accounts are not yet made for your branch, your application safely remains in <strong>Pending Approval</strong> until an instructor onboards. Once approved, you can sign in directly.
+        </div>
+
+        <a href="/login/student.html" class="btn btn-primary" style="width: 100%; padding: 0.75rem 1rem; font-weight: 700; text-decoration: none; display: block;">
+          Go to Student Login →
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Footer link -->
+    <div style="text-align: center; margin-top: 1.25rem; font-size: 0.82rem; color: var(--text-muted);">
+      Already have an account? <a href="/login/student.html" style="color: var(--color-primary); font-weight: 600; text-decoration: none;">Sign In →</a>
+      &nbsp;·&nbsp;
+      <a href="/login/faculty.html" style="color: var(--text-muted); text-decoration: none;">Faculty Login</a>
+    </div>
+
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    // ─── State ───────────────────────────────────────────────
+    let departmentsList = [];
+    let selectedDepartment = null;
+    let verifiedOtpToken = null;
+    let otpCountdownTimer = null;
+    let isCohortRegistrationOpen = false;
+    let googleRegistrationData = null;
+
+    // ─── Initialize ──────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadDepartments();
+
+      // Check URL query parameters for Google pre-fill (e.g. redirected from Google OAuth or student.html)
+      const urlParams = new URLSearchParams(window.location.search);
+      const qEmail = urlParams.get('google_email');
+      const qName = urlParams.get('google_name');
+      const qSub = urlParams.get('google_sub');
+      if (qEmail && qEmail.includes('@')) {
+        selectGoogleAccount(qEmail, qName, qSub);
+      }
+    });
+
+    // ─── Official Google OAuth Window & Auto-Fetch ────────────
+    async function initiateGoogleSignUp() {
+      // Check if test/mock mode requested (e.g. via URL param ?mock=1 or global flag)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('mock') === '1' || window.__USE_MOCK_GOOGLE__) {
+        openGoogleCardForRegistration();
+        return;
+      }
+
+      const btnText = document.getElementById('google-signup-btn-text');
+      const originalText = btnText ? btnText.textContent : 'Sign up with Google';
+      if (btnText) btnText.textContent = 'Opening Google Sign-In...';
+
+      try {
+        const res = await fetchApi('/auth/google/url?mode=STUDENT_REGISTER');
+        if (res.success && res.data?.url) {
+          // Open centered official Google OAuth Account Chooser window
+          const width = 500;
+          const height = 650;
+          const left = window.screenX + (window.outerWidth - width) / 2;
+          const top = window.screenY + (window.outerHeight - height) / 2;
+          const popup = window.open(
+            res.data.url,
+            'google_account_chooser',
+            `width=${width},height=${height},left=${left},top=${top},status=0,menubar=0,toolbar=0`
+          );
+
+          if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            // Popup blocker intercepted -> Navigate in same window
+            window.location.href = res.data.url;
+            return;
+          } else {
+            popup.focus();
+          }
+        } else {
+          openGoogleCardForRegistration();
+        }
+      } catch (err) {
+        console.warn('Google OAuth URL fetch failed, falling back to local modal:', err);
+        openGoogleCardForRegistration();
+      } finally {
+        setTimeout(() => {
+          if (btnText && !googleRegistrationData) {
+            btnText.textContent = originalText;
+          }
+        }, 1500);
+      }
+    }
+
+    // Listen for authentication message from Google OAuth callback popup window
+    window.addEventListener('message', (event) => {
+      if (!event.data) return;
+      if (event.data.type === 'GOOGLE_AUTH_SUCCESS') {
+        const payload = event.data.payload;
+        if (payload) {
+          if (payload.already_registered && payload.status === 'ACTIVE') {
+            if (typeof showToast === 'function') {
+              showToast('An active student account already exists for this Google email. Redirecting to login...', 'info');
+            }
+            setTimeout(() => {
+              window.location.href = '/login/student.html';
+            }, 1200);
+            return;
+          }
+          if (payload.action === 'STUDENT_REGISTER' || payload.google_email) {
+            selectGoogleAccount(payload.google_email, payload.google_name, payload.google_sub);
+          }
+        }
+      } else if (event.data.type === 'GOOGLE_AUTH_ERROR') {
+        if (typeof showToast === 'function') {
+          showToast(event.data.message || 'Google verification failed or cancelled.', 'warning');
+        }
+      }
+    });
+
+    // ─── Google Registration & Auto-Fetch Details ────────────
+    function openGoogleCardForRegistration() {
+      const modal = document.getElementById('google-signin-modal');
+      const errorBox = document.getElementById('google-card-error');
+      if (errorBox) errorBox.style.display = 'none';
+
+      document.getElementById('google-accounts-view').style.display = 'block';
+      document.getElementById('google-input-view').style.display = 'none';
+      document.getElementById('google-loading-view').style.display = 'none';
+      document.getElementById('google-manual-email').value = '';
+
+      const accountList = document.getElementById('google-account-list');
+      const currentEmail = document.getElementById('reg-email')?.value.trim();
+
+      const candidateEmails = new Set();
+      if (currentEmail && currentEmail.includes('@')) candidateEmails.add(currentEmail);
+      candidateEmails.add('aarav.sharma@gmail.com');
+      candidateEmails.add('priya.verma@gmail.com');
+      candidateEmails.add('student.it01@college.edu');
+
+      accountList.innerHTML = Array.from(candidateEmails).map(email => {
+        const initial = email.charAt(0).toUpperCase();
+        const displayName = email.split('@')[0].replace(/[\._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return `
+          <li class="google-account-item" onclick="selectGoogleAccount('${email}', '${displayName}')">
+            <div class="google-account-avatar">${initial}</div>
+            <div class="google-account-details">
+              <div class="google-account-name">${displayName}</div>
+              <div class="google-account-email">${email}</div>
+            </div>
+            <span class="google-signed-in-badge">Google</span>
+          </li>
+        `;
+      }).join('');
+
+      modal.style.display = 'flex';
+    }
+
+    function closeGoogleCard() {
+      const modal = document.getElementById('google-signin-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function showGoogleEmailInput() {
+      document.getElementById('google-accounts-view').style.display = 'none';
+      document.getElementById('google-input-view').style.display = 'block';
+      document.getElementById('google-manual-email').focus();
+    }
+
+    function showGoogleAccountList() {
+      document.getElementById('google-input-view').style.display = 'none';
+      document.getElementById('google-accounts-view').style.display = 'block';
+      const errorBox = document.getElementById('google-card-error');
+      if (errorBox) errorBox.style.display = 'none';
+    }
+
+    function submitGoogleEmail() {
+      const email = document.getElementById('google-manual-email').value.trim();
+      if (!email || !email.includes('@')) {
+        const errorBox = document.getElementById('google-card-error');
+        if (errorBox) {
+          errorBox.innerText = 'Please enter a valid Google email address.';
+          errorBox.style.display = 'block';
+        }
+        return;
+      }
+      selectGoogleAccount(email);
+    }
+
+    function selectGoogleAccount(email, customName = null, googleSub = null) {
+      const cleanEmail = email.trim().toLowerCase();
+      const displayName = customName || cleanEmail.split('@')[0].replace(/[\._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+      googleRegistrationData = {
+        email: cleanEmail,
+        name: displayName,
+        sub: googleSub || `google_sub_${btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`
+      };
+
+      // Automatically auto-populate Full Name and Gmail
+      const nameInput = document.getElementById('reg-fullname');
+      const emailInput = document.getElementById('reg-email');
+
+      if (nameInput) {
+        nameInput.value = displayName;
+        nameInput.style.borderColor = 'var(--status-present)';
+      }
+      if (emailInput) {
+        emailInput.value = cleanEmail;
+        emailInput.readOnly = true;
+        emailInput.style.borderColor = 'var(--status-present)';
+      }
+
+      // Display Connected Badge
+      const badge = document.getElementById('google-connected-badge');
+      const badgeName = document.getElementById('google-badge-name');
+      const badgeEmail = document.getElementById('google-badge-email');
+      const btnText = document.getElementById('google-signup-btn-text');
+
+      if (badgeName) badgeName.textContent = displayName;
+      if (badgeEmail) badgeEmail.textContent = `(${cleanEmail})`;
+      if (badge) badge.style.display = 'flex';
+      if (btnText) btnText.textContent = `Google Connected: ${displayName}`;
+
+      closeGoogleCard();
+
+      showToast(`✓ Google details fetched! Name & Gmail filled automatically. Please complete your branch and WhatsApp verification.`, 'success');
+
+      // Focus next uncompleted field
+      const deptSelect = document.getElementById('reg-department');
+      if (deptSelect && !deptSelect.value) {
+        deptSelect.focus();
+      } else {
+        const enrollInput = document.getElementById('reg-enroll');
+        if (enrollInput && !enrollInput.value) enrollInput.focus();
+      }
+    }
+
+    function resetGoogleRegistration() {
+      googleRegistrationData = null;
+      const emailInput = document.getElementById('reg-email');
+      if (emailInput) {
+        emailInput.readOnly = false;
+        emailInput.style.borderColor = '';
+      }
+      const nameInput = document.getElementById('reg-fullname');
+      if (nameInput) {
+        nameInput.style.borderColor = '';
+      }
+
+      const badge = document.getElementById('google-connected-badge');
+      if (badge) badge.style.display = 'none';
+
+      const btnText = document.getElementById('google-signup-btn-text');
+      if (btnText) btnText.textContent = 'Sign up with Google';
+
+      showToast('Google account disconnected. You can fill details manually or connect another account.', 'info');
+    }
+
+    async function loadDepartments() {
+      const select = document.getElementById('reg-department');
+      try {
+        const res = await fetchApi('/departments');
+        if (res.success && res.data && res.data.length > 0) {
+          departmentsList = res.data;
+        } else {
+          // Fallback to /auth/departments
+          const fallbackRes = await fetchApi('/auth/departments');
+          if (fallbackRes.success && fallbackRes.data) {
+            departmentsList = fallbackRes.data;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch departments list, using institutional defaults:', err.message);
+      }
+
+      if (!departmentsList || departmentsList.length === 0) {
+        departmentsList = [
+          { id: 4, name: 'Information Technology', code: 'IT', degree_duration_years: 3 },
+          { id: 2, name: 'Electronics Engineering', code: 'ECE', degree_duration_years: 3 },
+          { id: 3, name: 'Electrical Engineering', code: 'EE', degree_duration_years: 3 },
+          { id: 5, name: 'Mechanical Engineering', code: 'ME', degree_duration_years: 3 },
+          { id: 6, name: 'Civil Engineering', code: 'CE', degree_duration_years: 3 },
+          { id: 7, name: 'Pharmacy', code: 'PHARM', degree_duration_years: 2 }
+        ];
+      }
+
+      populateDepartmentDropdown();
+    }
+
+    function populateDepartmentDropdown() {
+      const select = document.getElementById('reg-department');
+      let html = '<option value="">-- Select Branch / Department --</option>';
+      departmentsList.forEach(d => {
+        html += `<option value="${d.id}">${escapeHtml(d.name)} (${d.code})</option>`;
+      });
+      select.innerHTML = html;
+    }
+
+    function handleDepartmentChange() {
+      const deptId = document.getElementById('reg-department').value;
+      const semSelect = document.getElementById('reg-semester');
+      const hint = document.getElementById('semester-hint');
+
+      if (!deptId) {
+        selectedDepartment = null;
+        semSelect.innerHTML = '<option value="">-- Select Branch First --</option>';
+        semSelect.disabled = true;
+        hint.textContent = 'Academic semester term.';
+        updateRoutingDisplay();
+        return;
+      }
+
+      selectedDepartment = departmentsList.find(d => String(d.id) === String(deptId));
+      const durationYears = selectedDepartment?.degree_duration_years || 3;
+      const totalSemesters = durationYears * 2;
+
+      let semHtml = '<option value="">-- Select Semester --</option>';
+      for (let s = 1; s <= totalSemesters; s++) {
+        const year = Math.ceil(s / 2);
+        semHtml += `<option value="${s}">Semester ${s} (Year ${year})</option>`;
+      }
+
+      semSelect.innerHTML = semHtml;
+      semSelect.disabled = false;
+      hint.textContent = `${durationYears}-year program (${totalSemesters} semesters).`;
+
+      updateRoutingDisplay();
+    }
+
+    async function updateRoutingDisplay() {
+      const banner = document.getElementById('routing-banner');
+      const icon = banner ? banner.querySelector('.routing-icon') : null;
+      const targetText = document.getElementById('routing-target-text');
+      const descText = document.getElementById('routing-desc-text');
+      const semVal = document.getElementById('reg-semester').value;
+
+      if (!selectedDepartment) {
+        isCohortRegistrationOpen = false;
+        if (icon) icon.textContent = '🏛️';
+        if (targetText) targetText.textContent = 'Departmental Branch Ownership';
+        if (descText) descText.textContent = 'Select your branch above. Student accounts belong to their academic department. Your registration will be reviewed and approved by that branch faculty.';
+        if (banner) {
+          banner.style.borderColor = 'var(--border-color)';
+          banner.style.background = 'var(--bg-surface)';
+        }
+        updateSubmitButtonState();
+        return;
+      }
+
+      const branchName = selectedDepartment.name;
+      if (!semVal) {
+        isCohortRegistrationOpen = false;
+        if (icon) icon.textContent = '📋';
+        if (targetText) targetText.textContent = `${branchName} — Select Semester`;
+        if (descText) descText.textContent = 'Please choose your current semester to check if student registration is open for your cohort.';
+        if (banner) {
+          banner.style.borderColor = 'var(--border-color)';
+          banner.style.background = 'var(--bg-surface)';
+        }
+        updateSubmitButtonState();
+        return;
+      }
+
+      // Check real-time registration status via API
+      try {
+        const res = await apiRequest(`/api/v1/auth/student/registration/status?department_id=${selectedDepartment.id}&semester=${semVal}`);
+        const statusData = res?.data;
+
+        if (statusData && statusData.is_open) {
+          isCohortRegistrationOpen = true;
+          if (icon) icon.textContent = '🟢';
+          if (targetText) targetText.textContent = `Registration Open — ${branchName} Sem ${semVal}`;
+          if (descText) descText.textContent = statusData.reason || `Your student account belongs to ${branchName}. Applications are reviewed and approved by Department Faculty.`;
+          if (banner) {
+            banner.style.borderColor = 'var(--status-present)';
+            banner.style.background = 'var(--status-present-bg)';
+          }
+        } else {
+          isCohortRegistrationOpen = false;
+          if (icon) icon.textContent = '🔒';
+          if (targetText) targetText.textContent = 'Registration Closed';
+          if (descText) descText.textContent = statusData?.reason || `Registration is currently closed for ${branchName} Semester ${semVal}. Department faculty must open registration before applications can be submitted.`;
+          if (banner) {
+            banner.style.borderColor = 'var(--status-absent)';
+            banner.style.background = 'var(--chip-admin-bg)';
+          }
+        }
+        updateSubmitButtonState();
+      } catch (err) {
+        isCohortRegistrationOpen = false;
+        if (icon) icon.textContent = '⚠️';
+        if (targetText) targetText.textContent = 'Status Check Unavailable';
+        if (descText) descText.textContent = 'Could not verify cohort registration status. Please try again.';
+        updateSubmitButtonState();
+      }
+    }
+
+    function updateSubmitButtonState() {
+      const submitBtn = document.getElementById('submit-btn');
+      if (!submitBtn) return;
+
+      if (!isCohortRegistrationOpen) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '🚫 Registration Closed';
+      } else if (!verifiedOtpToken) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '🔒 Verify OTP to Register';
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Registration Request →';
+      }
+    }
+
+    // ─── WhatsApp OTP Verification Handlers ──────────────────
+    async function handleSendOtp(isResend = false) {
+      const phoneInput = document.getElementById('reg-phone');
+      const rawPhone = phoneInput?.value.trim() || '';
+      const cleanPhone = rawPhone.replace(/\D/g, '');
+      const sendBtn = document.getElementById('btn-send-otp');
+      const resendBtn = document.getElementById('btn-resend-otp');
+      const otpBox = document.getElementById('otp-box');
+      const feedbackMsg = document.getElementById('otp-feedback-msg');
+      const qrImg = document.getElementById('wa-qr-img');
+      const waLinkBtn = document.getElementById('wa-direct-link');
+
+      if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        showToast('Please enter a valid 10-digit WhatsApp mobile number before requesting OTP', 'error');
+        phoneInput?.focus();
+        return;
+      }
+
+      try {
+        if (sendBtn) {
+          sendBtn.disabled = true;
+          sendBtn.innerHTML = '<span class="progress-spinner"></span> Sending...';
+        }
+        if (resendBtn) resendBtn.disabled = true;
+
+        const res = await fetchApi('/auth/otp/send', {
+          method: 'POST',
+          body: JSON.stringify({ identifier: cleanPhone, purpose: 'REGISTRATION' })
+        });
+
+        if (res.success) {
+          if (otpBox) otpBox.style.display = 'block';
+          showToast(res.message || 'OTP sent successfully to your WhatsApp!', 'success');
+          startOtpCountdown(300);
+
+          const waLink = res.data?.wa_link || `https://wa.me/91${cleanPhone}?text=OTP`;
+          if (qrImg) {
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(waLink)}&margin=4`;
+          }
+          if (waLinkBtn) {
+            waLinkBtn.href = waLink;
+          }
+
+          if (feedbackMsg) {
+            if (res.data?.debug_otp) {
+              feedbackMsg.innerHTML = `
+                <span style="color:var(--status-present); font-weight:600;">✓ Code sent to WhatsApp (+91 ${cleanPhone})! Demo Code: <strong>${res.data.debug_otp}</strong></span>
+                <button type="button" class="btn btn-sm" onclick="autoFillOtp('${res.data.debug_otp}')" style="padding:0.18rem 0.5rem; font-size:0.72rem; background:var(--status-present-bg); color:var(--status-present); border:1px solid var(--status-present); font-weight:700; border-radius:var(--radius-sm); cursor:pointer;">⚡ Auto-Fill Code</button>
+              `;
+            } else {
+              feedbackMsg.innerHTML = `<span>6-digit code sent to WhatsApp (+91 ${cleanPhone}). Valid for 5 minutes.</span>`;
+              feedbackMsg.style.color = 'var(--text-muted)';
+            }
+          }
+          const otpInput = document.getElementById('reg-otp');
+          if (otpInput) {
+            otpInput.value = '';
+            otpInput.focus();
+          }
+        } else {
+          showToast(res.error?.message || 'Could not send WhatsApp OTP. Please try again.', 'error');
+          if (feedbackMsg) {
+            feedbackMsg.textContent = res.error?.message || 'Could not send WhatsApp OTP.';
+            feedbackMsg.style.color = 'var(--status-absent)';
+          }
+        }
+      } catch (err) {
+        showToast(err.message || 'Network error while requesting WhatsApp OTP', 'error');
+      } finally {
+        if (sendBtn && !verifiedOtpToken) {
+          sendBtn.disabled = false;
+          sendBtn.textContent = isResend ? '💬 Resend WhatsApp OTP' : '💬 Send WhatsApp OTP';
+        }
+      }
+    }
+
+    function autoFillOtp(code) {
+      const otpInput = document.getElementById('reg-otp');
+      if (otpInput) {
+        otpInput.value = code;
+        handleVerifyOtp();
+      }
+    }
+
+    function startOtpCountdown(durationSeconds) {
+      if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+      let remaining = durationSeconds;
+      const timerEl = document.getElementById('otp-timer');
+      const resendBtn = document.getElementById('btn-resend-otp');
+      if (resendBtn) resendBtn.disabled = true;
+
+      function updateDisplay() {
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        if (timerEl) {
+          timerEl.textContent = `⏳ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        if (remaining <= 270 && resendBtn) {
+          resendBtn.disabled = false;
+        }
+        if (remaining <= 0) {
+          clearInterval(otpCountdownTimer);
+          if (timerEl) timerEl.textContent = '⏳ Expired';
+          if (resendBtn) resendBtn.disabled = false;
+        }
+        remaining--;
+      }
+
+      updateDisplay();
+      otpCountdownTimer = setInterval(updateDisplay, 1000);
+    }
+
+    async function handleVerifyOtp() {
+      const phoneInput = document.getElementById('reg-phone');
+      const rawPhone = phoneInput?.value.trim() || '';
+      const cleanPhone = rawPhone.replace(/\D/g, '');
+      const otpCode = document.getElementById('reg-otp')?.value.trim();
+      const verifyBtn = document.getElementById('btn-verify-otp');
+      const feedbackMsg = document.getElementById('otp-feedback-msg');
+
+      if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        showToast('Please enter a valid 10-digit WhatsApp mobile number', 'error');
+        phoneInput?.focus();
+        return;
+      }
+
+      if (!otpCode || otpCode.length !== 6) {
+        showToast('Please enter the complete 6-digit OTP code', 'error');
+        document.getElementById('reg-otp')?.focus();
+        return;
+      }
+
+      try {
+        if (verifyBtn) {
+          verifyBtn.disabled = true;
+          verifyBtn.innerHTML = '<span class="progress-spinner"></span> Verifying...';
+        }
+
+        const res = await fetchApi('/auth/otp/verify', {
+          method: 'POST',
+          body: JSON.stringify({ identifier: cleanPhone, otp_code: otpCode, purpose: 'REGISTRATION' })
+        });
+
+        if (res.success && res.data?.verification_token) {
+          verifiedOtpToken = res.data.verification_token;
+          if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+
+          document.getElementById('otp-box').style.display = 'none';
+          document.getElementById('otp-verified-badge').style.display = 'inline-flex';
+          
+          phoneInput.readOnly = true;
+
+          const sendBtn = document.getElementById('btn-send-otp');
+          sendBtn.textContent = 'Change';
+          sendBtn.classList.remove('btn-outline');
+          sendBtn.classList.add('btn-secondary');
+          sendBtn.onclick = resetOtpVerification;
+
+          showToast('✓ WhatsApp mobile number verified successfully!', 'success');
+          updateSubmitButtonState();
+        } else {
+          const errText = res.error?.message || 'Invalid OTP code. Please try again.';
+          showToast(errText, 'error');
+          if (feedbackMsg) {
+            feedbackMsg.textContent = errText;
+            feedbackMsg.style.color = 'var(--status-absent)';
+          }
+        }
+      } catch (err) {
+        showToast(err.message || 'OTP verification failed', 'error');
+      } finally {
+        if (verifyBtn) {
+          verifyBtn.disabled = false;
+          verifyBtn.textContent = 'Verify OTP ✓';
+        }
+      }
+    }
+
+    function resetOtpVerification() {
+      verifiedOtpToken = null;
+      if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+      
+      const phoneInput = document.getElementById('reg-phone');
+      phoneInput.readOnly = false;
+      phoneInput.focus();
+
+      document.getElementById('otp-verified-badge').style.display = 'none';
+      document.getElementById('otp-box').style.display = 'none';
+
+      const sendBtn = document.getElementById('btn-send-otp');
+      sendBtn.textContent = '💬 Send WhatsApp OTP';
+      sendBtn.classList.remove('btn-secondary');
+      sendBtn.classList.add('btn-outline');
+      sendBtn.onclick = () => handleSendOtp(false);
+
+      updateSubmitButtonState();
+    }
+
+    // ─── Password Strength ────────────────────────────────────
+    function updateStrength() {
+      const pw = document.getElementById('reg-password').value;
+      const bar = document.getElementById('pw-strength-bar');
+      const label = document.getElementById('pw-strength-label');
+      let score = 0;
+      if (pw.length >= 8)  score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^a-zA-Z0-9]/.test(pw)) score++;
+
+      const widths = ['0%', '30%', '55%', '80%', '100%'];
+      const colors = ['transparent', 'var(--status-absent)', 'var(--status-late)', 'var(--color-primary)', 'var(--status-present)'];
+      const labels = ['', 'Too weak', 'Weak', 'Good', 'Strong ✓'];
+
+      bar.style.width = widths[score];
+      bar.style.background = colors[score];
+      label.textContent = labels[score];
+      label.style.color = colors[score];
+    }
+
+    function togglePw(id, btn) {
+      const input = document.getElementById(id);
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+    }
+
+    // ─── Form Submit ──────────────────────────────────────────
+    document.getElementById('registration-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const department_id = document.getElementById('reg-department').value;
+      const semester = document.getElementById('reg-semester').value;
+      const full_name = document.getElementById('reg-fullname').value.trim();
+      const official_enrollment_no = document.getElementById('reg-enroll').value.trim().toUpperCase();
+      const registration_no = (document.getElementById('reg-ubter').value.trim().toUpperCase()) || null;
+      const email = document.getElementById('reg-email').value.trim();
+      const rawPhone = document.getElementById('reg-phone')?.value.trim() || '';
+      const cleanPhone = rawPhone.replace(/\D/g, '');
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+
+      // Validation
+      if (!department_id) { showToast('Please select your academic branch / department', 'error'); return; }
+      if (!semester) { showToast('Please select your current semester', 'error'); return; }
+      if (!full_name) { showToast('Please enter your full name', 'error'); return; }
+      if (!official_enrollment_no) { showToast('Please enter your enrollment number', 'error'); return; }
+      if (!email || !email.includes('@')) { showToast('Please enter a valid Gmail address', 'error'); return; }
+      if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+        showToast('Please enter a valid 10-digit WhatsApp mobile number', 'error');
+        document.getElementById('reg-phone')?.focus();
+        return;
+      }
+      if (!verifiedOtpToken) {
+        showToast('Please verify your WhatsApp mobile number with OTP before submitting.', 'error');
+        handleSendOtp();
+        return;
+      }
+      if (password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+      if (password !== confirm) { showToast('Passwords do not match', 'error'); return; }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="progress-spinner"></span>Submitting Registration...';
+
+      const year = Math.ceil(Number(semester) / 2);
+
+      try {
+        const res = await fetchApi('/auth/student/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            full_name,
+            official_enrollment_no,
+            registration_no,
+            email,
+            phone: cleanPhone,
+            password,
+            otp_verification_token: verifiedOtpToken,
+            department_id: Number(department_id),
+            branch_id: Number(department_id),
+            year,
+            semester: Number(semester),
+            google_sub: googleRegistrationData ? googleRegistrationData.sub : null,
+            google_id_token: googleRegistrationData ? `google_${googleRegistrationData.email}` : null
+          })
+        });
+
+        if (res.success) {
+          const deptName = selectedDepartment?.name || 'Department';
+          const deptCode = selectedDepartment?.code || '';
+
+          document.getElementById('form-view').style.display = 'none';
+          const successView = document.getElementById('success-view');
+          successView.style.display = 'block';
+
+          if (res.message) {
+            document.getElementById('success-message-text').textContent = res.message;
+          }
+
+          document.getElementById('success-summary-box').innerHTML = `
+            <div class="summary-row">
+              <span class="summary-label">Student Name</span>
+              <span class="summary-value">${escapeHtml(full_name)}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Enrollment No.</span>
+              <span class="summary-value" style="font-family:var(--font-family-mono); color:var(--color-primary);">${escapeHtml(official_enrollment_no)}</span>
+            </div>
+            ${registration_no ? `
+            <div class="summary-row">
+              <span class="summary-label">UBTER Reg No.</span>
+              <span class="summary-value" style="font-family:var(--font-family-mono);">${escapeHtml(registration_no)}</span>
+            </div>` : ''}
+            <div class="summary-row">
+              <span class="summary-label">WhatsApp Mobile</span>
+              <span class="summary-value" style="font-family:var(--font-family-mono); color:var(--status-present);">💬 +91 ${escapeHtml(cleanPhone)}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Gmail Address</span>
+              <span class="summary-value">${escapeHtml(email)}</span>
+            </div>
+            ${googleRegistrationData ? `
+            <div class="summary-row">
+              <span class="summary-label">Google Account</span>
+              <span class="summary-value" style="color:var(--status-present);">✓ Connected (${escapeHtml(googleRegistrationData.email)})</span>
+            </div>` : ''}
+            <div class="summary-row">
+              <span class="summary-label">Branch / Department</span>
+              <span class="summary-value">${escapeHtml(deptName)} (${escapeHtml(deptCode)})</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Semester & Year</span>
+              <span class="summary-value">Semester ${semester} (Year ${year})</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Account Status</span>
+              <span class="badge badge-pending">⏳ Pending Faculty Approval</span>
+            </div>
+          `;
+        } else {
+          const msg = res.error?.message || 'Registration failed. Please check your information.';
+          showToast(msg, 'error');
+          if (res.error?.code === 'REGISTRATION_CLOSED') {
+            await updateRoutingDisplay();
+          } else {
+            btn.disabled = false;
+            btn.innerHTML = 'Submit Registration →';
+          }
+        }
+      } catch (err) {
+        showToast(err.message || 'Registration failed. Please try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'Submit Registration →';
+      }
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // ─── Toast Notification ──────────────────────────────────
+    function showToast(message, type = 'info', duration = 4000) {
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;';
+        document.body.appendChild(container);
+      }
+      const toast = document.createElement('div');
+      toast.style.cssText = 'padding:0.75rem 1rem;border-radius:8px;font-size:0.875rem;color:var(--text-white);box-shadow:var(--shadow-md);max-width:320px;word-break:break-word;';
+      toast.style.background = type === 'error' ? 'var(--status-absent)' : type === 'success' ? 'var(--status-present)' : 'var(--color-primary)';
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, duration);
+    }
+  </script>
+
+  <!-- GOOGLE SIGN-UP OFFICIAL / SIMULATED CARD MODAL -->
+  <div id="google-signin-modal" class="google-modal-overlay" style="display: none;" onclick="if(event.target===this)closeGoogleCard()">
+    <div class="google-card" role="dialog" aria-labelledby="google-modal-title">
+      <button type="button" class="google-card-close" onclick="closeGoogleCard()" aria-label="Close Google sign-up">✕</button>
+      
+      <div class="google-card-header">
+        <div class="google-logo-icon">
+          <svg viewBox="0 0 48 48" width="32" height="32">
+            <path fill="rgb(234, 67, 53)" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="rgb(66, 133, 244)" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="rgb(251, 188, 5)" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z"/>
+            <path fill="rgb(52, 168, 83)" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+        </div>
+        <h2 id="google-modal-title" class="google-card-title">Register with Google</h2>
+        <div id="google-modal-subtitle" class="google-card-subtitle">Choose an account to auto-fill details</div>
+        <div class="google-card-app">to continue to College Attendance System</div>
+      </div>
+
+      <!-- Alert Message Box -->
+      <div id="google-card-error" class="google-card-alert" style="display: none;"></div>
+
+      <!-- Main Accounts List View -->
+      <div id="google-accounts-view">
+        <ul id="google-account-list" class="google-account-list"></ul>
+
+        <div class="google-use-another" onclick="showGoogleEmailInput()">
+          <span style="font-size: 1.15rem; color: var(--text-muted);">👤</span>
+          <span>Use another account</span>
+        </div>
+      </div>
+
+      <!-- Email Input View -->
+      <div id="google-input-view" style="display: none;" class="google-card-input-panel">
+        <div style="font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 500;">
+          Enter your Google account email:
+        </div>
+        <input type="email" id="google-manual-email" class="google-input-field" placeholder="Email or phone" onkeydown="if(event.key==='Enter')submitGoogleEmail()">
+        
+        <div class="google-card-actions">
+          <button type="button" class="google-btn-text" onclick="showGoogleAccountList()">Back</button>
+          <button type="button" id="google-submit-manual-btn" class="google-btn-blue" onclick="submitGoogleEmail()">Next</button>
+        </div>
+      </div>
+
+      <!-- Loading View -->
+      <div id="google-loading-view" style="display: none; padding: 2.5rem; text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 0.75rem; display: inline-block;">⏳</div>
+        <div style="font-size: 0.95rem; font-weight: 500; color: var(--text-main);">Fetching account details...</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Connecting to Google profile</div>
+      </div>
+
+      <div class="google-card-footer">
+        To continue, Google will share your name and email address with College Attendance System to auto-fill your registration form.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

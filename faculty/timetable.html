@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timetable — Faculty Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .day-col { min-width: 220px; }
+    .week-grid { display: flex; gap: 0.8rem; overflow-x: auto; padding-bottom: 0.5rem; margin-top: 1rem; }
+    .day-header { font-weight: 800; font-size: 0.85rem; text-align: center; padding: 0.5rem; background: var(--bg-surface); border-radius: var(--radius-sm); margin-bottom: 0.6rem; }
+    .slot-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.6rem; font-size: 0.82rem; }
+    .slot-time { font-weight: 700; color: var(--color-primary); }
+    .slot-subject { font-weight: 700; margin-top: 0.15rem; }
+    .slot-meta { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem; }
+    .remove-btn { float: right; background: none; border: none; color: var(--status-absent); cursor: pointer; font-size: 0.75rem; font-weight: 700; }
+    form.add-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+    form.add-form label { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display:block; margin-bottom: 0.25rem; }
+    form.add-form select, form.add-form input {
+      width: 100%; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">FACULTY</span>
+      <span>Timetable</span>
+    </a>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 1100px;">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Timetable</h1>
+        <p class="page-subtitle">Pick a class, then view or add its weekly schedule.</p>
+      </div>
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    <div class="card" style="margin-bottom: 1.25rem;">
+      <label style="font-size:0.85rem; font-weight:600;">Class</label>
+      <select id="class-select" onchange="onClassChange()" style="width:100%; padding:0.6rem; margin-top:0.4rem; border-radius: var(--radius-sm); border:1px solid var(--border-color);">
+        <option>Loading classes...</option>
+      </select>
+    </div>
+
+    <div class="week-grid" id="week-grid"></div>
+
+    <div class="card" style="margin-top: 1.5rem;">
+      <h3 style="font-size:1rem; font-weight:700; margin-bottom:0.5rem;">Add a Class Slot</h3>
+      <form class="add-form" onsubmit="addSlot(event)">
+        <div>
+          <label>Day</label>
+          <select id="f-day" required>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+          </select>
+        </div>
+        <div><label>Start Time</label><input type="time" id="f-start" required></div>
+        <div><label>End Time</label><input type="time" id="f-end" required></div>
+        <div><label>Room (optional)</label><input type="text" id="f-room" placeholder="e.g. Lab 2"></div>
+        <div><label>Type</label>
+          <select id="f-type">
+            <option value="THEORY">Theory</option>
+            <option value="PRACTICAL">Practical</option>
+          </select>
+        </div>
+        <div style="align-self:end;"><button class="btn btn-primary" type="submit" style="width:100%;">+ Add Slot</button></div>
+      </form>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireSubjects: true });
+
+    const DAYS = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    let classes = [];
+    let selectedClass = null;
+
+    async function loadClasses() {
+      const res = await fetchApi('/faculty/my-classes');
+      classes = res.success ? res.data : [];
+      const sel = document.getElementById('class-select');
+      if (!classes.length) {
+        sel.innerHTML = '<option>No classes assigned</option>';
+        return;
+      }
+      sel.innerHTML = classes.map((c, i) => `<option value="${i}">${c.subject_name} — Year ${c.year} Sem ${c.semester}</option>`).join('');
+      onClassChange();
+    }
+
+    function onClassChange() {
+      const idx = document.getElementById('class-select').value;
+      selectedClass = classes[idx];
+      loadTimetable();
+    }
+
+    async function loadTimetable() {
+      if (!selectedClass) return;
+      const c = selectedClass;
+      const qs = `department_id=${c.department_id}&branch_id=${c.branch_id}&year=${c.year}&semester=${c.semester}&academic_year_id=${c.academic_year_id}`;
+      const res = await fetchApi(`/timetable?${qs}`);
+      const grid = document.getElementById('week-grid');
+      const slots = res.success ? res.data : [];
+
+      grid.innerHTML = [1,2,3,4,5,6].map(day => {
+        const daySlots = slots.filter(s => s.day_of_week === day);
+        return `
+          <div class="day-col">
+            <div class="day-header">${DAYS[day]}</div>
+            ${daySlots.length ? daySlots.map(s => `
+              <div class="slot-card">
+                <button class="remove-btn" onclick="removeSlot(${s.id})">✕</button>
+                <div class="slot-time">${s.start_time} – ${s.end_time}</div>
+                <div class="slot-subject">${s.subject_name || 'Class'}</div>
+                <div class="slot-meta">${s.room ? s.room + ' · ' : ''}${s.session_type}</div>
+              </div>
+            `).join('') : `<div style="font-size:0.78rem; color:var(--text-muted); text-align:center; padding:1rem 0;">No classes</div>`}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function addSlot(e) {
+      e.preventDefault();
+      if (!selectedClass) return;
+      const c = selectedClass;
+      const res = await fetchApi('/timetable', {
+        method: 'POST',
+        body: JSON.stringify({
+          department_id: c.department_id, branch_id: c.branch_id, year: c.year, semester: c.semester,
+          academic_year_id: c.academic_year_id, subject_id: c.subject_id,
+          day_of_week: Number(document.getElementById('f-day').value),
+          start_time: document.getElementById('f-start').value,
+          end_time: document.getElementById('f-end').value,
+          room: document.getElementById('f-room').value,
+          session_type: document.getElementById('f-type').value
+        })
+      });
+      if (res.success) {
+        document.getElementById('f-room').value = '';
+        loadTimetable();
+      }
+    }
+
+    async function removeSlot(id) {
+      if (!confirm('Remove this class slot?')) return;
+      const res = await fetchApi(`/timetable/${id}`, { method: 'DELETE' });
+      if (res.success) loadTimetable();
+    }
+
+    loadClasses();
+  </script>
+</body>
+</html>

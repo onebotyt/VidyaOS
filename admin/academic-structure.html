@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Departments &amp; Branches — Admin Console</title>
+  <meta name="description" content="Manage academic departments, degree branches, and appointed HODs in one unified console.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    /* ==========================================================================
+       Academic Departments & Catalog - Minimal & Responsive Layout
+       ========================================================================== */
+
+    .page-main-container {
+      padding-top: 1.25rem;
+      padding-bottom: 3rem;
+    }
+
+    /* Page Header */
+    .academic-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .academic-header-title-wrap {
+      flex: 1;
+      min-width: 240px;
+    }
+    .academic-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Autonomous Academic Session Command Card */
+    .autonomous-session-card {
+      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-surface-secondary) 100%);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--color-primary);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .autonomous-session-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+    .session-info-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      flex: 1;
+      min-width: 260px;
+    }
+    .session-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.45rem;
+      flex-shrink: 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .session-text-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .session-top-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .session-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .session-active-heading {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+    .session-dates-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-family: var(--font-family-mono);
+      background: var(--bg-surface);
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+    .session-rollover-line {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .session-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* KPI Quick Stat Grid */
+    .quick-stat-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .quick-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.95rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .quick-stat:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .quick-stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .quick-stat-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .quick-stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .quick-stat-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+      margin-top: 0.1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .quick-stat-subtext {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Catalog Card & Minimal Toolbar */
+    .catalog-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .catalog-card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: var(--bg-surface-secondary);
+    }
+    .catalog-title-wrap {
+      flex: 1;
+      min-width: 220px;
+    }
+    .catalog-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--text-main);
+    }
+    .catalog-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 0.2rem 0 0 0;
+    }
+    .catalog-toolbar {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+    .search-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
+    .search-input-wrap input {
+      padding-left: 2.1rem;
+      height: 38px;
+      width: 240px;
+      font-size: 0.875rem;
+      transition: width 0.2s ease, border-color 0.2s ease;
+    }
+    .search-input-icon {
+      position: absolute;
+      left: 0.7rem;
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 0.85rem;
+    }
+
+    /* Responsive Buttons */
+    .btn-add-dept {
+      height: 38px;
+      padding: 0 0.95rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+    .btn-text-short {
+      display: none;
+    }
+    .btn-text-full {
+      display: inline;
+    }
+
+    /* Danger Soft Button */
+    .btn-danger-soft {
+      background: var(--status-absent-bg);
+      color: var(--status-absent);
+      border: 1px solid var(--status-absent);
+      padding: 0.25rem 0.55rem;
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .btn-danger-soft:hover {
+      background: var(--status-absent);
+      color: var(--text-white);
+    }
+
+    .btn-danger {
+      background: var(--status-absent);
+      color: var(--text-white);
+      border: 1px solid var(--status-absent);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+    }
+    .btn-danger:hover {
+      filter: brightness(0.92);
+    }
+    .btn-danger:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Table Scroll & Responsive Mobile Card View */
+    .table-scroll-wrapper {
+      width: 100%;
+    }
+    .table-scroll-hint {
+      display: none;
+    }
+
+    .academic-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--table-bg);
+    }
+    .academic-table th {
+      background: var(--table-th-bg);
+      color: var(--text-muted);
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1.15rem;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+    }
+    .academic-table td {
+      padding: 0.9rem 1.15rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.875rem;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    .academic-table tbody tr {
+      transition: background-color 0.15s ease;
+    }
+    .academic-table tbody tr:hover {
+      background-color: var(--table-hover-bg);
+    }
+
+    /* Display Utility Classes */
+    .d-mobile-only {
+      display: none !important;
+    }
+    .d-desktop-only {
+      display: table-cell !important;
+    }
+
+    /* Code Badge */
+    .code-badge {
+      font-family: var(--font-family-mono);
+      font-weight: 700;
+      font-size: 0.88rem;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      padding: 0.25rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid currentColor;
+      display: inline-block;
+      letter-spacing: 0.04em;
+    }
+
+    .row-actions-group {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.4rem;
+    }
+
+    /* Modal Backdrop & Card */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    .modal-backdrop.open,
+    .modal-backdrop[style*="display: flex"] {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 460px;
+      padding: 1.4rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideIn {
+      from { transform: translateY(10px) scale(0.97); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* ==========================================================================
+       Responsive Media Queries for Mobile & Tablets
+       ========================================================================== */
+
+    /* Tablet (<= 1024px) */
+    @media (max-width: 1024px) {
+      .quick-stat-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Small Tablet & Mobile (<= 768px): Native Mobile Cards & Minimal UI */
+    @media (max-width: 768px) {
+      .page-main-container {
+        padding-top: 0.75rem !important;
+        padding-bottom: 2rem !important;
+      }
+      .academic-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem !important;
+      }
+      .page-subtitle {
+        display: none !important;
+      }
+      .academic-header-actions {
+        width: 100%;
+      }
+      .academic-header-actions .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      /* Compact Autonomous Session Card: Slim 1-2 line strip */
+      .autonomous-session-card {
+        padding: 0.5rem 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+        gap: 0.4rem !important;
+      }
+      .session-icon-box {
+        display: none !important;
+      }
+      .session-top-meta {
+        display: none !important;
+      }
+      .session-dates-tag {
+        display: none !important;
+      }
+      .session-badge-wrap {
+        display: none !important;
+      }
+      .session-active-heading {
+        font-size: 0.95rem !important;
+      }
+      .session-rollover-line {
+        font-size: 0.72rem !important;
+      }
+
+      /* Quick Stats Bar on Mobile: Sleek 2-Column Strip */
+      .quick-stat-bar {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+      /* Hide secondary stats on mobile to keep catalog in direct view */
+      .kpi-secondary {
+        display: none !important;
+      }
+      .quick-stat {
+        padding: 0.5rem 0.75rem !important;
+        gap: 0.5rem !important;
+      }
+      .quick-stat-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1rem !important;
+      }
+      .quick-stat-label {
+        font-size: 0.65rem !important;
+      }
+      .quick-stat-value {
+        font-size: 1.15rem !important;
+        margin-top: 0 !important;
+      }
+      .quick-stat-subtext {
+        display: none !important;
+      }
+
+      /* Catalog Card & Toolbar on Mobile: Compact Single Row */
+      .catalog-card-header {
+        padding: 0.75rem 0.85rem !important;
+        gap: 0.5rem !important;
+      }
+      .catalog-subtitle {
+        display: none !important; /* Hide bulky description on mobile */
+      }
+      .catalog-toolbar {
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.45rem !important;
+      }
+      .search-input-wrap {
+        flex: 1 !important;
+      }
+      .search-input-wrap input {
+        width: 100% !important;
+        height: 36px !important;
+        font-size: 0.82rem !important;
+        padding-left: 1.9rem !important;
+      }
+      .search-input-icon {
+        left: 0.6rem !important;
+        font-size: 0.8rem !important;
+      }
+      .btn-add-dept {
+        height: 36px !important;
+        padding: 0 0.75rem !important;
+        font-size: 0.82rem !important;
+      }
+      .btn-text-full {
+        display: none !important;
+      }
+      .btn-text-short {
+        display: inline !important;
+      }
+
+      /* Display Utilities on Mobile */
+      .d-mobile-only {
+        display: inline-flex !important;
+      }
+      .d-desktop-only {
+        display: none !important;
+      }
+
+      /* Convert Table into Smooth Native Mobile Cards (Zero Horizontal Scroll) */
+      .table-scroll-wrapper {
+        overflow-x: hidden !important;
+        padding: 0 !important;
+      }
+      .academic-table {
+        display: block !important;
+        min-width: 100% !important;
+        width: 100% !important;
+        border-collapse: separate !important;
+      }
+      .academic-table thead {
+        display: none !important;
+      }
+      .academic-table tbody {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.65rem !important;
+        padding: 0.65rem !important;
+      }
+      .academic-table tbody tr {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-md) !important;
+        padding: 0.75rem 0.85rem !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+      }
+      .academic-table tbody td {
+        display: block !important;
+        padding: 0 !important;
+        border: none !important;
+      }
+
+      /* Mobile Card Rows */
+      .td-mobile-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+      }
+      .td-mobile-hod {
+        background: var(--bg-surface-secondary) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-sm) !important;
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.8rem !important;
+      }
+      .td-mobile-actions {
+        margin-top: 0.2rem !important;
+        padding-top: 0.45rem !important;
+        border-top: 1px dashed var(--border-color) !important;
+      }
+      .row-actions-group {
+        display: flex !important;
+        justify-content: stretch !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+      }
+      .row-actions-group .btn,
+      .row-actions-group .btn-danger-soft {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.82rem !important;
+      }
+
+      .modal-card {
+        padding: 1.15rem !important;
+        max-width: min(440px, 94vw) !important;
+      }
+    }
+
+    /* Small Mobile (<= 540px): Ultra-Minimal Space Saver */
+    @media (max-width: 540px) {
+      .quick-stat-bar {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.45rem !important;
+      }
+      .quick-stat {
+        padding: 0.45rem 0.65rem !important;
+      }
+      .quick-stat-icon {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.95rem !important;
+      }
+      .quick-stat-value {
+        font-size: 1.05rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Departments &amp; Branches</a>
+      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/whatsapp-gateway.html" class="btn btn-secondary btn-sm">WhatsApp Gateway</a>
+      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container page-main-container">
+    <!-- Page Header -->
+    <div class="page-header academic-header">
+      <div class="academic-header-title-wrap">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <span class="badge badge-present" style="font-size: 0.72rem;">UNIFIED CATALOG</span>
+          <span style="color: var(--text-muted); font-size: 0.8rem;">Single Code • Single Catalog</span>
+        </div>
+        <h1 class="page-title">Departments &amp; Programs Catalog</h1>
+        <p class="page-subtitle">Consolidated management of academic departments &amp; programs and appointed HODs</p>
+      </div>
+      <div class="academic-header-actions">
+        <a href="/admin/dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Autonomous Academic Session Command Bar (Zero Maintenance Engine) -->
+    <div class="autonomous-session-card">
+      <div class="session-info-left">
+        <div class="session-icon-box">
+          🎓
+        </div>
+        <div class="session-text-group">
+          <div class="session-top-meta">
+            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">CURRENT ACADEMIC SESSION</span>
+            <span class="badge badge-present" style="font-size: 0.68rem; font-weight: 800;">🟢 AUTO-ACTIVE</span>
+          </div>
+          <div class="session-title-row">
+            <span id="session-active-label" class="session-active-heading">Loading Session...</span>
+            <span id="session-dates-label" class="session-dates-tag"></span>
+          </div>
+          <div id="session-rollover-text" class="session-rollover-line">
+            Calculating automatic calendar rollover...
+          </div>
+        </div>
+      </div>
+      <div class="session-badge-wrap">
+        <span class="badge badge-present" style="font-size: 0.72rem; font-weight: 700; padding: 0.35rem 0.75rem; letter-spacing: 0.03em;">
+          ⚡ FULLY AUTONOMOUS • ZERO MAINTENANCE
+        </span>
+      </div>
+    </div>
+
+    <!-- Quick Stat Bar (Minimal & Space-Saving) -->
+    <div class="quick-stat-bar">
+      <div class="quick-stat">
+        <div class="quick-stat-icon" style="background: var(--color-primary-light); color: var(--color-primary);">🏛️</div>
+        <div class="quick-stat-content">
+          <div class="quick-stat-label">DEPARTMENTS / PROGRAMS</div>
+          <div id="stat-dept-count" class="quick-stat-value">0</div>
+          <div class="quick-stat-subtext">Active Units</div>
+        </div>
+      </div>
+
+      <div class="quick-stat">
+        <div class="quick-stat-icon" style="background: var(--status-present-bg); color: var(--status-present);">👨‍🏫</div>
+        <div class="quick-stat-content">
+          <div class="quick-stat-label">APPOINTED HODs</div>
+          <div id="stat-hod-count" class="quick-stat-value">0</div>
+          <div class="quick-stat-subtext">Leadership</div>
+        </div>
+      </div>
+
+      <div class="quick-stat kpi-secondary">
+        <div class="quick-stat-icon" style="background: var(--status-late-bg); color: var(--status-late);">📅</div>
+        <div class="quick-stat-content">
+          <div class="quick-stat-label">CALENDAR CYCLE</div>
+          <div id="stat-session-term" class="quick-stat-value" style="font-size: 1.15rem;">Winter Term</div>
+          <div class="quick-stat-subtext">Automated Roll</div>
+        </div>
+      </div>
+
+      <div class="quick-stat kpi-secondary">
+        <div class="quick-stat-icon" style="background: var(--status-present-bg); color: var(--status-present);">⚡</div>
+        <div class="quick-stat-content">
+          <div class="quick-stat-label">SYSTEM OPERATION</div>
+          <div class="quick-stat-value" style="font-size: 1.15rem;">Zero Maint.</div>
+          <div class="quick-stat-subtext">Self-Maintaining</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Departments & Programs Catalog Card -->
+    <div class="catalog-card">
+      <div class="catalog-card-header">
+        <div class="catalog-title-wrap">
+          <h2 class="catalog-title">
+            <span>Departments &amp; Programs</span>
+            <span id="catalog-count-badge" class="badge" style="background: var(--color-primary-light); color: var(--color-primary); font-weight: 700; font-size: 0.72rem;">0 Programs</span>
+          </h2>
+          <p class="catalog-subtitle">
+            Unified academic divisions. Each department code represents both department and program.
+          </p>
+        </div>
+        <div class="catalog-toolbar">
+          <div class="search-input-wrap">
+            <span class="search-input-icon">🔍</span>
+            <input type="text" id="dept-search" class="form-control" placeholder="Search by code or name..." oninput="renderDepartments()">
+          </div>
+          <button type="button" class="btn btn-primary btn-add-dept" onclick="openDeptModal()">
+            <span class="btn-text-full">+ Add Department</span>
+            <span class="btn-text-short">+ Add</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table / Mobile Cards Scroll Wrapper -->
+      <div class="table-scroll-wrapper">
+        <table class="table academic-table">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Code</th>
+              <th>Department / Program Name</th>
+              <th>Current Appointed HOD</th>
+              <th style="width: 120px; text-align: center;">Status</th>
+              <th style="width: 160px; text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dept-tbody">
+            <tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading academic catalog...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Department & Branch Unified Modal -->
+  <div id="dept-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <div>
+          <h2 id="dept-modal-title" style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Add Department</h2>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Single code defines both department and program.</p>
+        </div>
+        <button type="button" onclick="closeDeptModal()" style="font-size: 1.4rem; background: none; border: none; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
+      </div>
+      <form id="dept-form" onsubmit="saveDepartment(event)">
+        <input type="hidden" id="dept-id">
+        <div class="form-group" id="dept-preset-group">
+          <label class="form-label" for="dept-preset-select">Standard Institutional Presets</label>
+          <select id="dept-preset-select" class="form-select" onchange="applyDeptPreset(this.value)">
+            <option value="">-- Quick Select Standard Polytechnic Department --</option>
+            <option value="ECE|Electronics Engineering|3">📟 Electronics Engineering (ECE - 3 Years)</option>
+            <option value="EE|Electrical Engineering|3">⚡ Electrical Engineering (EE - 3 Years)</option>
+            <option value="IT|Information Technology|3">💻 Information Technology (IT - 3 Years)</option>
+            <option value="ME|Mechanical Engineering|3">⚙️ Mechanical Engineering (ME - 3 Years)</option>
+            <option value="CE|Civil Engineering|3">🏛️ Civil Engineering (CE - 3 Years)</option>
+            <option value="PHARM|Pharmacy|2">🧪 Pharmacy (D.Pharm - 2 Years)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dept-code">
+            Department / Branch Code <span style="color: var(--status-absent);">*</span>
+          </label>
+          <input type="text" id="dept-code" class="form-control" placeholder="e.g. IT, CE, ME, CL, EE" required style="text-transform: uppercase; font-family: var(--font-family-mono); font-weight: 700; font-size: 1rem; letter-spacing: 1px;">
+          <span style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
+            Unique identifier used across registers and attendance.
+          </span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dept-name">
+            Department / Program Full Name <span style="color: var(--status-absent);">*</span>
+          </label>
+          <input type="text" id="dept-name" class="form-control" placeholder="e.g. Information Technology" required style="font-weight: 500;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dept-duration">Degree / Program Duration</label>
+          <select id="dept-duration" class="form-select">
+            <option value="4" selected>4 Years (Standard Bachelor's)</option>
+            <option value="3">3 Years (Diploma / BCA / Lateral)</option>
+            <option value="2">2 Years (Master's / M.Tech / MCA)</option>
+            <option value="1">1 Year (PG Diploma / Certificate)</option>
+          </select>
+        </div>
+        <div class="form-group" id="dept-status-group" style="display: none;">
+          <label class="form-label" for="dept-status">Operational Status</label>
+          <select id="dept-status" class="form-select">
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
+          </select>
+        </div>
+        <div id="dept-modal-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); color: var(--status-absent); padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-top: 0.5rem;"></div>
+        <div style="display: flex; gap: 0.6rem; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+          <div>
+            <button type="button" id="dept-delete-btn" class="btn-danger-soft" style="display: none;" onclick="deleteCurrentDeptFromModal()">
+              <span>🗑️</span><span>Delete</span>
+            </button>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeDeptModal()">Cancel</button>
+            <button type="submit" id="dept-submit-btn" class="btn btn-primary">Save Department</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom In-App Delete / Archive Confirmation Modal (Zero Native Browser Prompts) -->
+  <div id="delete-confirm-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 440px; text-align: center; padding: 1.5rem 1.25rem;">
+      <div id="delete-modal-icon" style="width: 48px; height: 48px; border-radius: 50%; background: var(--status-absent-bg); color: var(--status-absent); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 0.85rem auto;">
+        🗑️
+      </div>
+      <h3 id="delete-modal-title" style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">
+        Delete Department?
+      </h3>
+      <p id="delete-modal-msg" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
+        Department: <strong id="delete-modal-dept-name" style="color: var(--text-main);"></strong>
+      </p>
+      
+      <!-- Step 1: Pre-deletion Archive notice (when not archived) -->
+      <div id="delete-modal-archive-notice" style="display: none; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; text-align: left; font-size: 0.8rem; line-height: 1.45; margin-bottom: 1rem;">
+        <div style="font-weight: 700; color: var(--status-late); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+          <span>📦</span><span>Mandatory Pre-Deletion Archive</span>
+        </div>
+        <p style="margin: 0; color: var(--text-muted);">
+          To protect student records and prevent accidental 1-click loss, this branch must be <strong>Archived</strong> before it can be deleted. Archiving preserves attendance logs and closes active registers.
+        </p>
+      </div>
+
+      <!-- Step 2: Typed confirmation input (when already archived) -->
+      <div id="delete-modal-type-confirm" style="display: none; text-align: left; margin-bottom: 1rem;">
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 0.35rem;">
+          Type <span id="delete-modal-confirm-target" style="color: var(--status-absent); font-family: monospace; font-weight: 700;"></span> to confirm permanent deletion:
+        </label>
+        <input type="text" id="delete-modal-code-input" class="form-control" placeholder="Type department code here" oninput="handleDeleteCodeInput(this.value)" autocomplete="off" style="font-family: monospace; letter-spacing: 0.05em;">
+      </div>
+
+      <!-- Dynamic error/warning box -->
+      <div id="delete-modal-warning" style="display: none; background: var(--status-late-bg); border: 1px solid var(--status-late); color: var(--text-main); padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); font-size: 0.8rem; line-height: 1.4; text-align: left; margin-bottom: 1rem;">
+      </div>
+
+      <div style="display: flex; gap: 0.6rem; justify-content: center; margin-top: 0.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()" style="flex: 1; justify-content: center;">
+          Cancel
+        </button>
+        <button type="button" id="delete-modal-confirm-btn" class="btn-danger" onclick="executeDeleteDepartment()" style="flex: 1; justify-content: center;">
+          <span id="delete-modal-btn-icon">🗑️</span><span id="delete-modal-btn-label">Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['SYSTEM_ADMIN']);
+
+    let allDepartments = [];
+    let hodInfoMap = {};
+    let currentSessionData = null;
+
+    // ─── Bootstrap ────────────────────────────────────────────
+    async function init() {
+      await Promise.all([loadAllData(), loadSessionStatus()]);
+    }
+
+    // ─── Load Session Automation Status ───────────────────────
+    async function loadSessionStatus() {
+      try {
+        const res = await fetchApi('/admin/session/status');
+        if (res.success && res.data) {
+          currentSessionData = res.data;
+          const s = res.data;
+          const activeEl = document.getElementById('session-active-label');
+          if (activeEl) activeEl.textContent = s.session_label;
+          const datesEl = document.getElementById('session-dates-label');
+          if (datesEl) datesEl.textContent = `(${s.start_date} to ${s.end_date})`;
+          const rollEl = document.getElementById('session-rollover-text');
+          if (rollEl) {
+            rollEl.innerHTML = `Automatic Calendar Rollover: Advances to <strong>${esc(s.next_session_label)}</strong> on ${esc(s.next_rollover_date)} (in ${s.days_remaining} days)`;
+          }
+          const statTermEl = document.getElementById('stat-session-term');
+          if (statTermEl) {
+            statTermEl.textContent = s.session_label.includes('Winter') ? 'Winter Term' : s.session_label.includes('Summer') ? 'Summer Term' : s.session_label;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not load session status:', err);
+      }
+    }
+
+    // ─── Load All Master Data ─────────────────────────────────
+    async function loadAllData() {
+      try {
+        const [deptsRes, hodsRes] = await Promise.all([
+          fetchApi('/admin/departments'),
+          fetchApi('/admin/hods')
+        ]);
+
+        allDepartments = deptsRes.data || [];
+
+        // Map HODs by department_id
+        hodInfoMap = {};
+        const hodsList = hodsRes.data || [];
+        hodsList.forEach(h => {
+          if (h.department_id) {
+            hodInfoMap[h.department_id] = h;
+          }
+        });
+
+        // Update stats
+        const deptCountEl = document.getElementById('stat-dept-count');
+        if (deptCountEl) deptCountEl.textContent = allDepartments.length;
+        
+        const appointedHodsCount = Object.keys(hodInfoMap).length;
+        const hodCountEl = document.getElementById('stat-hod-count');
+        if (hodCountEl) hodCountEl.textContent = `${appointedHodsCount} / ${allDepartments.length}`;
+
+        const badgeEl = document.getElementById('catalog-count-badge');
+        if (badgeEl) {
+          badgeEl.textContent = `${allDepartments.length} ${allDepartments.length === 1 ? 'Program' : 'Programs'}`;
+        }
+
+        renderDepartments();
+      } catch (err) {
+        showToast('Failed to load departments: ' + err.message, 'error');
+      }
+    }
+
+    // Helper: Institutional Department Icon Mapper
+    const HARDCODED_DEPT_CODES = ['CE', 'EE', 'ECE', 'IT', 'ME', 'PHARM'];
+
+    function isHardcodedDept(code) {
+      if (!code) return false;
+      return HARDCODED_DEPT_CODES.includes(String(code).toUpperCase().trim());
+    }
+
+    function getDeptIcon(code, name) {
+      const c = (code || '').toUpperCase();
+      const n = (name || '').toLowerCase();
+      if (c.includes('EC') || n.includes('electronics')) return '📟';
+      if (c.includes('EE') || n.includes('electrical')) return '⚡';
+      if (c.includes('IT') || n.includes('information')) return '💻';
+      if (c.includes('ME') || n.includes('mechanical')) return '⚙️';
+      if (c.includes('CE') || c.includes('CL') || n.includes('civil')) return '🏛️';
+      if (c.includes('PHARM') || n.includes('pharmacy')) return '🧪';
+      return '🏛️';
+    }
+
+    function applyDeptPreset(val) {
+      if (!val) return;
+      const [code, name, duration] = val.split('|');
+      const codeEl = document.getElementById('dept-code');
+      const nameEl = document.getElementById('dept-name');
+      const durEl = document.getElementById('dept-duration');
+      if (codeEl && !codeEl.readOnly) codeEl.value = code;
+      if (nameEl) nameEl.value = name;
+      if (durEl) durEl.value = duration || '4';
+    }
+
+    // ─── Render Departments ───────────────────────────────────
+    function renderDepartments() {
+      const q = (document.getElementById('dept-search').value || '').toLowerCase().trim();
+      const filtered = allDepartments.filter(d => 
+        (d.name || '').toLowerCase().includes(q) || 
+        (d.code || '').toLowerCase().includes(q)
+      );
+
+      const tbody = document.getElementById('dept-tbody');
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">${q ? 'No matching departments found.' : 'No departments configured yet.'}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(d => {
+        const hod = hodInfoMap[d.id];
+        const deptIcon = getDeptIcon(d.code, d.name);
+        const hodDisplay = hod
+          ? `<div style="font-weight: 600; color: var(--text-main); font-size: 0.88rem;">👨‍🏫 ${esc(hod.full_name)}</div>
+             <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem;">${esc(hod.email || hod.username)}</div>`
+          : `<span class="badge" style="background: var(--bg-surface); color: var(--text-muted); font-weight: 500; font-size: 0.72rem;">Unassigned</span>`;
+
+        const statusBadge = d.is_archived === 1
+          ? `<span class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.75rem; border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 0.3rem;"><span style="width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted);"></span>Archived</span>`
+          : d.is_active
+            ? `<span class="badge badge-present" style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem;"><span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span>Active</span>`
+            : `<span class="badge badge-absent" style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem;"><span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span>Inactive</span>`;
+
+        const progLabel = d.code === 'PHARM' ? 'Diploma in Pharmacy (D.Pharm)' : 'Diploma in Engineering';
+        const progDuration = d.degree_duration_years || (d.code === 'PHARM' ? 2 : 3);
+        const isHardcoded = d.is_hardcoded === 1 || isHardcodedDept(d.code);
+
+        return `
+          <tr class="dept-row-card">
+            <td class="td-mobile-header">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="code-badge">${esc(d.code)}</span>
+                <span class="d-mobile-only" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">${deptIcon} ${esc(d.name)}</span>
+              </div>
+              <span class="d-mobile-only">${statusBadge}</span>
+            </td>
+            <td class="td-mobile-title d-desktop-only">
+              <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+                <span style="font-size: 1.05rem;">${deptIcon}</span>
+                <span>${esc(d.name)}</span>
+              </div>
+              <div style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.1rem;">${progDuration} Years • ${progLabel}</div>
+            </td>
+            <td class="td-mobile-hod">
+              ${hodDisplay}
+            </td>
+            <td class="d-desktop-only" style="text-align: center;">
+              ${statusBadge}
+            </td>
+            <td class="td-mobile-actions">
+              ${isHardcoded
+                ? `<div class="row-actions-group">
+                    <button class="btn btn-secondary btn-sm" onclick="editDepartment(${d.id})" style="padding: 0.25rem 0.55rem; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                      <span>✏️</span><span>Edit</span>
+                    </button>
+                    <span class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.72rem; padding: 0.25rem 0.55rem; border: 1px solid var(--border-color); display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;" title="Standard institutional department cannot be deleted">
+                      <span>🔒</span><span>Core</span>
+                    </span>
+                  </div>`
+                : `<div class="row-actions-group">
+                    <button class="btn btn-secondary btn-sm" onclick="editDepartment(${d.id})" style="padding: 0.25rem 0.55rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                      <span>✏️</span><span>Edit</span>
+                    </button>
+                    <button class="btn-danger-soft" onclick="deleteDepartment(${d.id}, '${esc(d.name)}', '${esc(d.code)}')" title="${d.is_archived === 1 ? 'Permanently Delete Archived Department' : 'Delete Department (Requires Archiving First)'}">
+                      <span>🗑️</span><span>Delete</span>
+                    </button>
+                  </div>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ─── Department Modal Actions ─────────────────────────────
+    function openDeptModal(id = null) {
+      const form = document.getElementById('dept-form');
+      form.reset();
+      document.getElementById('dept-modal-err').style.display = 'none';
+      document.getElementById('dept-status-group').style.display = 'none';
+      const delBtn = document.getElementById('dept-delete-btn');
+      const durationEl = document.getElementById('dept-duration');
+      const presetGroup = document.getElementById('dept-preset-group');
+      const presetSelect = document.getElementById('dept-preset-select');
+      if (presetSelect) presetSelect.value = '';
+
+      if (id) {
+        const d = allDepartments.find(item => item.id === id);
+        if (!d) return;
+        document.getElementById('dept-modal-title').textContent = 'Edit Department';
+        document.getElementById('dept-id').value = d.id;
+        document.getElementById('dept-code').value = d.code;
+        document.getElementById('dept-code').readOnly = true;
+        document.getElementById('dept-name').value = d.name;
+        if (durationEl) durationEl.value = String(d.degree_duration_years || 4);
+        document.getElementById('dept-status').value = d.is_active ? '1' : '0';
+        document.getElementById('dept-status-group').style.display = 'block';
+        const isHardcoded = d.is_hardcoded === 1 || isHardcodedDept(d.code);
+        if (delBtn) delBtn.style.display = isHardcoded ? 'none' : 'inline-flex';
+        if (presetGroup) presetGroup.style.display = 'none';
+      } else {
+        document.getElementById('dept-modal-title').textContent = 'Add Department';
+        document.getElementById('dept-id').value = '';
+        document.getElementById('dept-code').readOnly = false;
+        if (durationEl) durationEl.value = '4';
+        if (delBtn) delBtn.style.display = 'none';
+        if (presetGroup) presetGroup.style.display = 'block';
+      }
+
+      const modal = document.getElementById('dept-modal');
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+      setTimeout(() => document.getElementById('dept-code').focus(), 100);
+    }
+
+    function closeDeptModal() {
+      const modal = document.getElementById('dept-modal');
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+    }
+
+    async function editDepartment(id) {
+      openDeptModal(id);
+    }
+
+    let pendingDeleteDept = null;
+
+    // ─── Delete Department Flow (In-App Modal, Zero Native Prompts) ──
+    function deleteDepartment(id, name, code) {
+      if (isHardcodedDept(code)) {
+        showToast(`Standard institutional department "${name}" (${code}) is protected and cannot be deleted.`, 'error');
+        return;
+      }
+      openDeleteModal(id, name, code);
+    }
+
+    function openDeleteModal(id, name, code) {
+      if (isHardcodedDept(code)) {
+        showToast(`Standard institutional department "${name}" (${code}) is protected and cannot be deleted.`, 'error');
+        return;
+      }
+      const dept = allDepartments.find(d => d.id === parseInt(id, 10));
+      const isArchived = dept ? dept.is_archived === 1 : false;
+
+      pendingDeleteDept = { id: parseInt(id, 10), name: name || code || 'this department', code: code || '', isArchived };
+      const nameEl = document.getElementById('delete-modal-dept-name');
+      if (nameEl) nameEl.textContent = `"${pendingDeleteDept.name}" (${pendingDeleteDept.code})`;
+
+      const archiveNotice = document.getElementById('delete-modal-archive-notice');
+      const typeConfirm = document.getElementById('delete-modal-type-confirm');
+      const targetSpan = document.getElementById('delete-modal-confirm-target');
+      const codeInput = document.getElementById('delete-modal-code-input');
+      const btn = document.getElementById('delete-modal-confirm-btn');
+      const btnLabel = document.getElementById('delete-modal-btn-label');
+      const btnIcon = document.getElementById('delete-modal-btn-icon');
+      const titleEl = document.getElementById('delete-modal-title');
+      const iconEl = document.getElementById('delete-modal-icon');
+      const warningEl = document.getElementById('delete-modal-warning');
+      if (warningEl) { warningEl.style.display = 'none'; warningEl.innerHTML = ''; }
+
+      if (!isArchived) {
+        // Stage 1: Must archive department first
+        if (titleEl) titleEl.textContent = 'Archive Department Data';
+        if (iconEl) iconEl.textContent = '📦';
+        if (archiveNotice) archiveNotice.style.display = 'block';
+        if (typeConfirm) typeConfirm.style.display = 'none';
+        if (btn) btn.disabled = false;
+        if (btnLabel) btnLabel.textContent = 'Archive Department First';
+        if (btnIcon) btnIcon.textContent = '📦';
+      } else {
+        // Stage 2: Already archived -> Require typed confirmation of code (not in 1 click!)
+        if (titleEl) titleEl.textContent = 'Permanent Deletion';
+        if (iconEl) iconEl.textContent = '🗑️';
+        if (archiveNotice) archiveNotice.style.display = 'none';
+        if (typeConfirm) typeConfirm.style.display = 'block';
+        if (targetSpan) targetSpan.textContent = pendingDeleteDept.code;
+        if (codeInput) { codeInput.value = ''; }
+        if (btn) btn.disabled = true; // disabled until typed!
+        if (btnLabel) btnLabel.textContent = 'Permanently Delete';
+        if (btnIcon) btnIcon.textContent = '🗑️';
+      }
+
+      const modal = document.getElementById('delete-confirm-modal');
+      if (modal) {
+        modal.classList.add('open');
+        modal.style.display = 'flex';
+      }
+    }
+
+    function handleDeleteCodeInput(val) {
+      const btn = document.getElementById('delete-modal-confirm-btn');
+      if (!pendingDeleteDept || !btn) return;
+      if (val.trim().toUpperCase() === pendingDeleteDept.code.toUpperCase()) {
+        btn.disabled = false;
+      } else {
+        btn.disabled = true;
+      }
+    }
+
+    function closeDeleteModal() {
+      const modal = document.getElementById('delete-confirm-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+      pendingDeleteDept = null;
+    }
+
+    async function executeDeleteDepartment() {
+      if (!pendingDeleteDept) return;
+
+      const btn = document.getElementById('delete-modal-confirm-btn');
+      const btnLabel = document.getElementById('delete-modal-btn-label');
+      const warningEl = document.getElementById('delete-modal-warning');
+
+      if (!pendingDeleteDept.isArchived) {
+        // Step 1: Archive department first
+        btn.disabled = true;
+        btnLabel.textContent = 'Archiving...';
+        try {
+          const res = await fetchApi(`/admin/departments/${pendingDeleteDept.id}/archive`, { method: 'POST' });
+          if (res.success) {
+            closeDeleteModal();
+            showToast(res.message || 'Department archived successfully', 'success');
+            await loadAllData();
+          } else {
+            showToast(res.error?.message || 'Failed to archive department', 'error');
+            btn.disabled = false;
+            btnLabel.textContent = 'Archive Department First';
+          }
+        } catch (err) {
+          showToast(err.message || 'Failed to archive department', 'error');
+          btn.disabled = false;
+          btnLabel.textContent = 'Archive Department First';
+        }
+      } else {
+        // Step 2: Delete archived department with typed confirmation
+        btn.disabled = true;
+        btnLabel.textContent = 'Deleting...';
+        const codeInput = document.getElementById('delete-modal-code-input');
+        const typedCode = codeInput ? codeInput.value.trim() : pendingDeleteDept.code;
+
+        try {
+          const res = await fetchApi(`/admin/departments/${pendingDeleteDept.id}`, {
+            method: 'DELETE',
+            body: JSON.stringify({ confirm_code: typedCode })
+          });
+          if (res.success) {
+            closeDeleteModal();
+            showToast(res.message || `Department "${pendingDeleteDept.code}" permanently deleted`, 'success');
+            await loadAllData();
+          } else {
+            showToast(res.error?.message || 'Failed to delete department', 'error');
+            btn.disabled = false;
+            btnLabel.textContent = 'Permanently Delete';
+          }
+        } catch (err) {
+          showToast(err.message || 'Failed to delete department', 'error');
+          btn.disabled = false;
+          btnLabel.textContent = 'Permanently Delete';
+        }
+      }
+    }
+
+    async function deleteCurrentDeptFromModal() {
+      const id = document.getElementById('dept-id').value;
+      if (!id) return;
+      const d = allDepartments.find(item => item.id === parseInt(id, 10));
+      closeDeptModal();
+      openDeleteModal(id, d?.name, d?.code);
+    }
+
+    async function saveDepartment(e) {
+      e.preventDefault();
+      const id = document.getElementById('dept-id').value;
+      const code = document.getElementById('dept-code').value.trim().toUpperCase();
+      const name = document.getElementById('dept-name').value.trim();
+      const is_active = document.getElementById('dept-status').value === '1';
+      const durationEl = document.getElementById('dept-duration');
+      const degree_duration_years = durationEl ? parseInt(durationEl.value, 10) : 4;
+
+      const btn = document.getElementById('dept-submit-btn');
+      const errEl = document.getElementById('dept-modal-err');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      errEl.style.display = 'none';
+
+      try {
+        if (id) {
+          await fetchApi(`/admin/departments/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ name, is_active, degree_duration_years })
+          });
+          showToast('Department updated successfully', 'success');
+        } else {
+          await fetchApi('/admin/departments', {
+            method: 'POST',
+            body: JSON.stringify({ code, name, degree_duration_years })
+          });
+          showToast('Department created successfully', 'success');
+        }
+        closeDeptModal();
+        await loadAllData();
+      } catch (err) {
+        errEl.textContent = err.message || 'Failed to save department';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Save Department';
+      }
+    }
+
+    // Modal backdrop click & escape key listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      const deptModal = document.getElementById('dept-modal');
+      if (deptModal) {
+        deptModal.addEventListener('click', (e) => {
+          if (e.target === deptModal) closeDeptModal();
+        });
+      }
+      const delModal = document.getElementById('delete-confirm-modal');
+      if (delModal) {
+        delModal.addEventListener('click', (e) => {
+          if (e.target === delModal) closeDeleteModal();
+        });
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeDeptModal();
+          closeDeleteModal();
+        }
+      });
+    });
+
+    // ─── Helpers ──────────────────────────────────────────────
+    function esc(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showToast(msg, type = 'info') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      t.style.background = type === 'error' ? 'var(--status-absent)' : type === 'success' ? 'var(--status-present)' : 'var(--color-primary)';
+      t.style.color = 'var(--text-white)';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    init();
+  </script>
+</body>
+</html>

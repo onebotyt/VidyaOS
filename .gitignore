@@ -1,0 +1,17 @@
+# Node & Dependency Dirs
+node_modules/
+package-lock.json
+
+# Local Environment Overrides
+.env
+.env.local
+
+# OS Artifacts
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

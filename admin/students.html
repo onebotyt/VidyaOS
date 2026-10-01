@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Analytics & Demographics — Admin Console</title>
+  <meta name="description" content="Institutional student enrollment analytics, department distributions, biometric hardware coverage, and on-demand cohort rosters.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--kpi-color, var(--color-primary));
+    }
+    .kpi-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+    }
+    .kpi-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+    }
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .chart-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+    .chart-card-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 260px;
+      width: 100%;
+    }
+    .roster-toggle-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .collapsible-roster {
+      display: none;
+      animation: slideDown 0.25s ease-out;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .btn-toggle-roster {
+      background: var(--bg-card);
+      border: 2px solid var(--color-primary);
+      color: var(--color-primary);
+      font-weight: 700;
+      padding: 0.6rem 1.25rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease;
+    }
+    .btn-toggle-roster:hover {
+      background: var(--color-primary);
+      color: var(--text-white);
+    }
+    .btn-toggle-roster.active {
+      background: var(--color-primary);
+      color: var(--text-white);
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
+      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/whatsapp-gateway.html" class="btn btn-secondary btn-sm">WhatsApp Gateway</a>
+      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem;">
+    <!-- Page Header -->
+    <div class="page-header" style="margin-bottom: 1.5rem;">
+      <div>
+        <h1 class="page-title">Student Demographics & Analytics</h1>
+        <p class="page-subtitle">Institutional student enrollment intelligence, cohort distributions, and biometric coverage</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <a href="/admin/dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Hierarchy Note Banner -->
+    <div style="background: var(--status-present-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--status-present); border-radius: var(--radius-sm); padding: 0.75rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--status-present); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <strong>Institutional Model Rule:</strong> Student provisioning is maintained exclusively by designated <strong>Class Teachers</strong> for their cohorts. Admin has institutional read/oversight and analytics visibility.
+      </div>
+      <span style="font-size: 0.78rem; background: var(--status-present-bg); color: var(--status-present); font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; border: 1px solid var(--border-color);">Admin Oversight View</span>
+    </div>
+
+    <!-- Top Filter & On-Demand Roster Toggle Bar -->
+    <div class="roster-toggle-bar">
+      <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <label for="dept-filter" style="font-weight: 700; font-size: 0.9rem; color: var(--text-main); margin: 0;">Department View:</label>
+        <select id="dept-filter" class="form-select" style="width: 260px; font-weight: 600;" onchange="onDepartmentFilterChange()">
+          <option value="">🏛️ All Departments (College-wide)</option>
+        </select>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadAllAnalytics()">🔄 Refresh</button>
+      </div>
+      <div>
+        <button type="button" id="toggle-roster-btn" class="btn-toggle-roster" onclick="toggleRosterView()">
+          <span id="toggle-icon">👁️</span>
+          <span id="toggle-text">View Student Roster</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 1: ANALYSIS & CHARTS PART (VISIBLE BY DEFAULT ON OPEN) -->
+    <!-- ================================================================= -->
+    <div id="analysis-section">
+      <!-- 4 Hero Stat Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card" style="--kpi-color: var(--color-primary);">
+          <div class="kpi-label">Total Enrolled Students</div>
+          <div class="kpi-value" id="kpi-total-students">0</div>
+          <div class="kpi-sub" id="kpi-total-sub">Class teacher provisioned</div>
+        </div>
+
+        <div class="kpi-card" style="--kpi-color: var(--status-present);">
+          <div class="kpi-label">Biometric Coverage</div>
+          <div class="kpi-value" id="kpi-biometric-pct">0%</div>
+          <div class="kpi-sub" id="kpi-biometric-sub">0 of 0 enrolled on touch terminals</div>
+        </div>
+
+        <div class="kpi-card" style="--kpi-color: var(--color-secondary, var(--color-primary));">
+          <div class="kpi-label">Active Account Ratio</div>
+          <div class="kpi-value" id="kpi-active-pct">0%</div>
+          <div class="kpi-sub" id="kpi-active-sub">0 active accounts in system</div>
+        </div>
+
+        <div class="kpi-card" style="--kpi-color: var(--status-late);">
+          <div class="kpi-label">Active Cohorts</div>
+          <div class="kpi-value" id="kpi-cohorts-count">0</div>
+          <div class="kpi-sub" id="kpi-cohorts-sub">Diploma & Degree classes</div>
+        </div>
+      </div>
+
+      <!-- Graph Charts Grid -->
+      <div class="charts-grid">
+        <!-- Chart 1: Department Enrollment Distribution -->
+        <div class="chart-card">
+          <div class="chart-card-title">Department Enrollment Distribution</div>
+          <div class="chart-card-sub">Student enrollment breakdown across academic departments</div>
+          <div class="chart-wrap">
+            <canvas id="chart-departments"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Biometric Hardware Coverage -->
+        <div class="chart-card">
+          <div class="chart-card-title">Biometric Touch Terminal Coverage</div>
+          <div class="chart-card-sub">Fingerprint registered slots vs pending hardware enrollment</div>
+          <div class="chart-wrap">
+            <canvas id="chart-biometrics"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Cohort & Semester Distribution -->
+        <div class="chart-card">
+          <div class="chart-card-title">Academic Cohorts Breakdown</div>
+          <div class="chart-card-sub">Enrolled students per department & cohort year/semester</div>
+          <div class="chart-wrap">
+            <canvas id="chart-cohorts"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Department Cohorts Summary Table -->
+      <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2rem;">
+        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">Department Cohorts Overview</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
+              Enrolled cohort groups, designated class teachers, and hardware biometric registration rates
+            </p>
+          </div>
+          <div id="cohorts-badge" class="badge badge-present">0 Cohorts</div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Department / Program</th>
+                <th style="width: 140px; text-align: center;">Cohort</th>
+                <th style="width: 150px; text-align: center;">Enrolled Students</th>
+                <th style="width: 170px; text-align: center;">Biometric Registered</th>
+                <th>Designated Class Teacher</th>
+              </tr>
+            </thead>
+            <tbody id="cohort-summary-tbody">
+              <tr><td colspan="5" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading cohort summaries...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 2: STUDENT ROSTER (HIDDEN BY DEFAULT, SHOWN ON DEMAND) -->
+    <!-- ================================================================= -->
+    <div id="roster-section" class="collapsible-roster">
+      <div class="card" style="padding: 0; overflow: hidden; border-top: 4px solid var(--color-primary);">
+        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: var(--bg-surface);">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Department Student Roster</h3>
+              <span id="roster-count-badge" class="badge badge-present">0 Students</span>
+            </div>
+            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">
+              Detailed student records filtered by current department selection. Read-only institutional directory.
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="roster-search" class="form-control" placeholder="Search by name, roll, enrollment, UBTER reg..." style="width: 320px;" oninput="onRosterSearch()">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleRosterView()">✖️ Hide Roster</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 70px; text-align: center;">Roll No</th>
+                <th style="width: 130px;">Enrollment No</th>
+                <th style="width: 140px;">UBTER Reg No</th>
+                <th>Student Full Name</th>
+                <th>Department</th>
+                <th style="width: 100px; text-align: center;">Cohort</th>
+                <th style="width: 170px;">Biometric Terminal</th>
+                <th style="width: 110px; text-align: center;">Account Status</th>
+                <th style="width: 100px; text-align: center;">Google Link</th>
+              </tr>
+            </thead>
+            <tbody id="roster-tbody">
+              <tr><td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Click 'View Student Roster' above to view records.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['SYSTEM_ADMIN']);
+
+    let allDepartments = [];
+    let allBranches = [];
+    let currentAnalytics = null;
+    let rosterStudents = [];
+    let isRosterVisible = false;
+    let searchDebounce = null;
+
+    // Chart.js instances
+    let chartDeptsInstance = null;
+    let chartBiometricsInstance = null;
+    let chartCohortsInstance = null;
+
+    // ─── Bootstrap ────────────────────────────────────────────
+    async function init() {
+      await loadDepartments();
+      await loadAllAnalytics();
+    }
+
+    // ─── Load Departments for Filter ──────────────────────────
+    async function loadDepartments() {
+      try {
+        const res = await fetchApi('/admin/departments');
+        allDepartments = res.data || [];
+        const deptSelect = document.getElementById('dept-filter');
+        deptSelect.innerHTML = '<option value="">🏛️ All Departments (College-wide)</option>';
+        allDepartments.forEach(d => {
+          deptSelect.innerHTML += `<option value="${d.id}">🏛️ ${esc(d.name)} (${esc(d.code)})</option>`;
+        });
+
+        const branchRes = await fetchApi('/admin/branches');
+        allBranches = branchRes.data || [];
+      } catch (err) {
+        console.error('Failed to load departments:', err);
+      }
+    }
+
+    function onDepartmentFilterChange() {
+      loadAllAnalytics();
+      if (isRosterVisible) {
+        loadRoster();
+      }
+    }
+
+    // ─── Load Analytics & Charts ──────────────────────────────
+    async function loadAllAnalytics() {
+      const deptId = document.getElementById('dept-filter').value;
+      const url = deptId ? `/admin/students/analytics?department_id=${deptId}` : '/admin/students/analytics';
+
+      try {
+        const res = await fetchApi(url);
+        if (!res.success) throw new Error(res.error?.message || 'Failed to load analytics');
+        currentAnalytics = res.data;
+
+        renderKPIs(currentAnalytics);
+        renderCharts(currentAnalytics);
+        renderCohortSummary(currentAnalytics.cohort_breakdown || []);
+      } catch (err) {
+        showToast('Error loading analytics: ' + err.message, 'error');
+      }
+    }
+
+    function renderKPIs(data) {
+      document.getElementById('kpi-total-students').textContent = data.total_students;
+      document.getElementById('kpi-total-sub').textContent = `${data.active_students} Active • ${data.provisioned_students} Provisioned`;
+
+      document.getElementById('kpi-biometric-pct').textContent = `${data.biometric_coverage_pct}%`;
+      document.getElementById('kpi-biometric-sub').textContent = `${data.biometric_enrolled_students} of ${data.total_students} registered on touch terminals`;
+
+      const activePct = data.total_students > 0 ? Math.round((data.active_students / data.total_students) * 100) : 0;
+      document.getElementById('kpi-active-pct').textContent = `${activePct}%`;
+      document.getElementById('kpi-active-sub').textContent = `${data.google_linked_students} linked Google SSO account`;
+
+      document.getElementById('kpi-cohorts-count').textContent = data.cohorts_count;
+      document.getElementById('kpi-cohorts-sub').textContent = `Across active department curricula`;
+    }
+
+    function renderCharts(data) {
+      // 1. Departments Distribution Chart
+      const deptLabels = (data.department_breakdown || []).map(d => d.department_code || d.department_name);
+      const deptCounts = (data.department_breakdown || []).map(d => d.student_count);
+      const deptBioCounts = (data.department_breakdown || []).map(d => d.biometric_count);
+
+      const colPrimary = getCssVar('--color-primary');
+      const colPresent = getCssVar('--status-present');
+      const colLate = getCssVar('--status-late');
+      const colBgCard = getCssVar('--bg-card');
+
+      const ctxDepts = document.getElementById('chart-departments').getContext('2d');
+      if (chartDeptsInstance) chartDeptsInstance.destroy();
+
+      chartDeptsInstance = new Chart(ctxDepts, {
+        type: 'bar',
+        data: {
+          labels: deptLabels.length ? deptLabels : ['None'],
+          datasets: [
+            {
+              label: 'Total Students',
+              data: deptCounts.length ? deptCounts : [0],
+              backgroundColor: colPrimary,
+              borderRadius: 6
+            },
+            {
+              label: 'Biometric Registered',
+              data: deptBioCounts.length ? deptBioCounts : [0],
+              backgroundColor: colPresent,
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+          }
+        }
+      });
+
+      // 2. Biometric Coverage Doughnut Chart
+      const bioRegistered = data.biometric_enrolled_students || 0;
+      const bioPending = Math.max(0, (data.total_students || 0) - bioRegistered);
+
+      const ctxBio = document.getElementById('chart-biometrics').getContext('2d');
+      if (chartBiometricsInstance) chartBiometricsInstance.destroy();
+
+      chartBiometricsInstance = new Chart(ctxBio, {
+        type: 'doughnut',
+        data: {
+          labels: ['Biometric Registered', 'Pending Terminal Registration'],
+          datasets: [{
+            data: [bioRegistered, bioPending],
+            backgroundColor: [colPresent, colLate],
+            borderWidth: 2,
+            borderColor: colBgCard
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          cutout: '68%'
+        }
+      });
+
+      // 3. Cohort Distribution Bar Chart
+      const cohortLabels = (data.cohort_breakdown || []).map(c => `${c.department_code} Y${c.year}S${c.semester}`);
+      const cohortCounts = (data.cohort_breakdown || []).map(c => c.student_count);
+
+      const ctxCohorts = document.getElementById('chart-cohorts').getContext('2d');
+      if (chartCohortsInstance) chartCohortsInstance.destroy();
+
+      chartCohortsInstance = new Chart(ctxCohorts, {
+        type: 'bar',
+        data: {
+          labels: cohortLabels.length ? cohortLabels : ['None'],
+          datasets: [{
+            label: 'Students in Cohort',
+            data: cohortCounts.length ? cohortCounts : [0],
+            backgroundColor: [colPrimary, colPresent, colLate, colPrimary, colPresent],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+          }
+        }
+      });
+    }
+
+    // ─── Render Cohort Breakdown Table ────────────────────────
+    function renderCohortSummaryTable(cohorts) {
+      document.getElementById('cohorts-badge').textContent = `${cohorts.length} Active Cohort${cohorts.length !== 1 ? 's' : ''}`;
+      const tbody = document.getElementById('cohort-summary-tbody');
+
+      if (!cohorts.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">No enrolled cohorts found for this selection.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = cohorts.map(c => {
+        const bioPct = c.student_count > 0 ? Math.round((c.biometric_count / c.student_count) * 100) : 0;
+        const ctCell = c.class_teacher_name 
+          ? `<span style="font-weight: 600; color: var(--text-main);">👨‍🏫 ${esc(c.class_teacher_name)}</span>`
+          : `<span style="color: var(--text-muted); font-size: 0.8rem;">— Not Assigned</span>`;
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight: 600; color: var(--text-main);">${esc(c.department_name)}</div>
+              <span class="code-badge" style="font-size: 0.75rem; padding: 0.1rem 0.4rem;">${esc(c.department_code || c.branch_code)}</span>
+            </td>
+            <td style="text-align: center;">
+              <span class="badge badge-pending">Year ${c.year} • Sem ${c.semester}</span>
+            </td>
+            <td style="text-align: center; font-weight: 700; font-size: 1.05rem;">
+              ${c.student_count}
+            </td>
+            <td style="text-align: center;">
+              <span style="font-weight: 700; color: ${bioPct >= 50 ? 'var(--status-present)' : 'var(--status-late)'};">
+                ${c.biometric_count} / ${c.student_count} (${bioPct}%)
+              </span>
+            </td>
+            <td>${ctCell}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ─── Collapsible Roster Logic ─────────────────────────────
+    function toggleRosterView() {
+      const rosterSec = document.getElementById('roster-section');
+      const toggleBtn = document.getElementById('toggle-roster-btn');
+      const toggleIcon = document.getElementById('toggle-icon');
+      const toggleText = document.getElementById('toggle-text');
+
+      isRosterVisible = !isRosterVisible;
+
+      if (isRosterVisible) {
+        rosterSec.style.display = 'block';
+        toggleBtn.classList.add('active');
+        toggleIcon.textContent = '✖️';
+        toggleText.textContent = 'Hide Student Roster';
+        loadRoster();
+
+        // Smooth scroll to roster section
+        setTimeout(() => {
+          rosterSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } else {
+        rosterSec.style.display = 'none';
+        toggleBtn.classList.remove('active');
+        toggleIcon.textContent = '👁️';
+        toggleText.textContent = 'View Student Roster';
+      }
+    }
+
+    function onRosterSearch() {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        loadRoster();
+      }, 300);
+    }
+
+    async function loadRoster() {
+      const tbody = document.getElementById('roster-tbody');
+      const countBadge = document.getElementById('roster-count-badge');
+      const searchVal = document.getElementById('roster-search').value.trim();
+      const deptFilter = document.getElementById('dept-filter').value;
+
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">Filtering roster records...</td></tr>`;
+
+      try {
+        let url = `/admin/students/roster?limit=250`;
+        if (deptFilter) url += `&department_id=${encodeURIComponent(deptFilter)}`;
+        if (searchVal) url += `&search=${encodeURIComponent(searchVal)}`;
+
+        const res = await fetchApi(url);
+        if (!res.success) throw new Error(res.error?.message || 'Failed to fetch roster');
+
+        rosterStudents = res.data?.students || [];
+        const total = res.data?.total || rosterStudents.length;
+
+        countBadge.textContent = `${total} Student${total !== 1 ? 's' : ''}`;
+        renderRosterTable(rosterStudents);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--status-absent); padding: 2rem;">Failed to load roster: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderRosterTable(students) {
+      const tbody = document.getElementById('roster-tbody');
+      if (!students.length) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No students found matching your filter criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = students.map(s => {
+        let statusBadge = `<span class="badge badge-present">ACTIVE</span>`;
+        if (s.user_status === 'PROVISIONED') statusBadge = `<span class="badge badge-late">PROVISIONED</span>`;
+        else if (s.user_status === 'SUSPENDED') statusBadge = `<span class="badge badge-absent">SUSPENDED</span>`;
+
+        const bioCell = s.biometric_slot_id
+          ? `<span style="font-weight: 600; color: var(--status-present); font-size: 0.85rem;">
+               📟 Slot #${s.biometric_slot_id} <span style="font-size: 0.75rem; color: var(--text-muted);">(${esc(s.device_name || 'Terminal')})</span>
+             </span>`
+          : `<span style="color: var(--text-muted); font-size: 0.8rem;">— Pending Slot</span>`;
+
+        const googleBadge = s.google_linked
+          ? `<span style="color: var(--status-present); font-weight: 700; font-size: 0.85rem;">✓ Linked</span>`
+          : `<span style="color: var(--text-muted); font-size: 0.78rem;">—</span>`;
+
+        return `
+          <tr>
+            <td style="text-align: center; font-weight: 700;">${s.class_roll_no || '—'}</td>
+            <td>
+              <span style="font-family: var(--font-family-mono); font-weight: 700; color: var(--color-primary);">
+                ${esc(s.official_enrollment_no)}
+              </span>
+            </td>
+            <td>
+              <span class="badge" style="background: var(--bg-surface-secondary); font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--color-primary); font-weight: 700;">
+                ${esc(s.registration_no || '—')}
+              </span>
+            </td>
+            <td style="font-weight: 600; color: var(--text-main);">
+              ${esc(s.full_name)}
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${esc(s.email || '')}</div>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-main);">${esc(s.department_name)}</div>
+              <span class="code-badge" style="font-size: 0.75rem; padding: 0.1rem 0.4rem;">${esc(s.department_code || s.branch_code || '')}</span>
+            </td>
+            <td style="text-align: center;">
+              <span class="badge badge-pending">Y${s.year} S${s.semester}</span>
+            </td>
+            <td>${bioCell}</td>
+            <td style="text-align: center;">${statusBadge}</td>
+            <td style="text-align: center;">${googleBadge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────
+    function esc(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function getCssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function showToast(msg, type = 'info') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      t.style.background = type === 'error' ? 'var(--status-absent)' : type === 'success' ? 'var(--status-present)' : 'var(--color-primary)';
+      t.style.color = 'var(--text-white)';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    init();
+  </script>
+</body>
+</html>

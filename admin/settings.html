@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institutional Accreditation &amp; Identity — Admin Console</title>
+  <meta name="description" content="Configure official institution name, state affiliation, accreditation codes, and campus identity metadata appearing on attendance marksheets and official registers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .identity-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.75rem;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .identity-layout { grid-template-columns: 1fr; }
+    }
+    .identity-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .identity-card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .identity-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .identity-card-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin: 0.2rem 0 0;
+    }
+    .identity-card-body { padding: 1.5rem; }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 640px) {
+      .field-row { grid-template-columns: 1fr; gap: 1rem; }
+    }
+    .form-label-strong {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      display: block;
+      line-height: 1.4;
+    }
+    .required-star { color: var(--status-absent); }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-color);
+      margin-top: 1.5rem;
+    }
+    .preview-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .preview-panel-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.85rem;
+    }
+    .letterhead-mock {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.1rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .letterhead-mock::before {
+      content: 'REGISTER HEADER PREVIEW';
+      position: absolute;
+      top: -0.55rem;
+      left: 0.85rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      padding: 0 0.35rem;
+    }
+    .letterhead-inst-name {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-main);
+      margin-bottom: 0.2rem;
+      line-height: 1.25;
+    }
+    .letterhead-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: 0.3rem;
+    }
+    .letterhead-affil {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px dashed var(--border-color);
+      font-size: 0.8rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row-lbl { color: var(--text-muted); flex-shrink: 0; }
+    .info-row-val { font-weight: 700; color: var(--text-main); text-align: right; word-break: break-word; }
+    .invariants-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      margin-top: 1.25rem;
+    }
+    .invariant-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .invariant-item:first-of-type { padding-top: 0.5rem; }
+    .invariant-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .invariant-icon {
+      font-size: 1.1rem;
+      padding: 0.35rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+    .invariant-title { font-weight: 700; font-size: 0.82rem; color: var(--text-main); }
+    .invariant-desc { font-size: 0.73rem; color: var(--text-muted); margin-top: 0.12rem; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
+      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/whatsapp-gateway.html" class="btn btn-secondary btn-sm">WhatsApp Gateway</a>
+      <a href="/admin/settings.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Settings</a>
+      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.75rem; padding-bottom: 3.5rem;">
+
+    <!-- Page Header -->
+    <div style="margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <span class="badge" style="background: var(--color-primary-light); color: var(--color-primary); font-size: 0.72rem; font-weight: 700;">
+            ADMIN CONSOLE
+          </span>
+          <span style="color: var(--text-muted); font-size: 0.8rem;">Official institutional metadata &amp; registry</span>
+        </div>
+        <h1 class="page-title">Institutional Accreditation &amp; Identity</h1>
+        <p class="page-subtitle">Configure the official institution name, state affiliation, accreditation codes, and campus location that appear on attendance registers, marksheets, and exported documents.</p>
+      </div>
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+        <button type="button" class="btn btn-secondary" onclick="loadSettings(true)" title="Reload from database">
+          🔄 Reload
+        </button>
+        <button type="submit" form="identity-form" id="save-settings-btn" class="btn btn-primary" style="font-weight: 600; padding: 0.6rem 1.4rem;">
+          💾 Save Identity
+        </button>
+      </div>
+    </div>
+
+    <!-- Two-Column Layout -->
+    <div class="identity-layout">
+
+      <!-- LEFT: Identity Form -->
+      <div>
+        <div class="identity-card">
+          <div class="identity-card-header">
+            <div>
+              <h2 class="identity-card-title">
+                <span>🏛️</span> Official Institution Details
+              </h2>
+              <p class="identity-card-subtitle">Accreditation metadata appearing on all official registers, hall tickets, and marksheets.</p>
+            </div>
+            <span class="badge" style="background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.72rem; font-weight: 600;">
+              Official Master
+            </span>
+          </div>
+
+          <div class="identity-card-body">
+            <form id="identity-form">
+
+              <!-- Row 1: Name + Code -->
+              <div class="field-row">
+                <div>
+                  <label class="form-label-strong" for="setting-inst-name">
+                    Institution Official Name <span class="required-star">*</span>
+                  </label>
+                  <input type="text" id="setting-inst-name" class="form-control"
+                    placeholder="e.g. Government Polytechnic College"
+                    required oninput="updateLivePreview()">
+                  <span class="field-hint">Rendered on header banners, official register books, and exported documents.</span>
+                </div>
+                <div>
+                  <label class="form-label-strong" for="setting-inst-code">
+                    Institution / College Code <span class="required-star">*</span>
+                  </label>
+                  <input type="text" id="setting-inst-code" class="form-control"
+                    placeholder="e.g. GP-UBTER-101"
+                    required oninput="updateLivePreview()">
+                  <span class="field-hint">State Board of Technical Education accreditation code.</span>
+                </div>
+              </div>
+
+              <!-- Row 2: Affiliating Body + Location -->
+              <div class="field-row" style="margin-bottom: 0;">
+                <div>
+                  <label class="form-label-strong" for="setting-affiliating-body">
+                    Affiliating Board &amp; Curriculum Directorate
+                  </label>
+                  <input type="text" id="setting-affiliating-body" class="form-control"
+                    placeholder="e.g. UBTER / IRDT Uttarakhand"
+                    oninput="updateLivePreview()">
+                  <span class="field-hint">Governing technical examination authority and syllabus board.</span>
+                </div>
+                <div>
+                  <label class="form-label-strong" for="setting-location">
+                    Campus Region / Headquarters
+                  </label>
+                  <input type="text" id="setting-location" class="form-control"
+                    placeholder="e.g. Uttarakhand, India"
+                    oninput="updateLivePreview()">
+                  <span class="field-hint">Institutional jurisdiction and campus location for register headers.</span>
+                </div>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="resetToOfficialDefaults()">
+                  🔄 Reset to Defaults
+                </button>
+                <button type="submit" class="btn btn-primary" style="font-weight: 600; padding: 0.6rem 1.4rem;">
+                  💾 Save Identity
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live Preview + Invariants -->
+      <div>
+
+        <!-- Live Register Header Preview -->
+        <div class="preview-panel">
+          <div class="preview-panel-title">
+            <span>👁️</span> Live Preview
+            <span class="badge" style="background: var(--status-present-bg); color: var(--status-present); font-size: 0.65rem; font-weight: 700; margin-left: auto;">REAL-TIME</span>
+          </div>
+
+          <div class="letterhead-mock">
+            <div class="letterhead-inst-name" id="preview-inst-name">Government Polytechnic College</div>
+            <div class="letterhead-code" id="preview-inst-code">GP-UBTER-101</div>
+            <div class="letterhead-affil" id="preview-affil">UBTER / IRDT Uttarakhand &bull; Uttarakhand, India</div>
+          </div>
+
+          <div>
+            <div class="info-row">
+              <span class="info-row-lbl">Institution:</span>
+              <span class="info-row-val" id="preview-name-val">Government Polytechnic College</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-lbl">Code:</span>
+              <span class="info-row-val" id="preview-code-val" style="font-family: 'JetBrains Mono', monospace; color: var(--color-primary);">GP-UBTER-101</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-lbl">Board:</span>
+              <span class="info-row-val" id="preview-board-val">UBTER / IRDT</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-lbl">Campus:</span>
+              <span class="info-row-val" id="preview-campus-val">Uttarakhand, India</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Invariants -->
+        <div class="invariants-card">
+          <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>🛡️</span> System Governance
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; line-height: 1.4;">
+            Core policies enforced autonomously by the platform to ensure zero data loss.
+          </p>
+
+          <div class="invariant-item">
+            <div class="invariant-icon">🏢</div>
+            <div>
+              <div class="invariant-title">Branch Data Ownership</div>
+              <div class="invariant-desc">Registers, enrollments, and marks belong permanently to the academic branch — never an individual faculty member.</div>
+            </div>
+          </div>
+
+          <div class="invariant-item">
+            <div class="invariant-icon">👥</div>
+            <div>
+              <div class="invariant-title">1 HOD &amp; 1 Class Teacher per Branch</div>
+              <div class="invariant-desc">Exactly 1 active HOD per department. Reassignments rotate roles atomically without conflicts.</div>
+            </div>
+          </div>
+
+          <div class="invariant-item">
+            <div class="invariant-icon">🔒</div>
+            <div>
+              <div class="invariant-title">2-Step Safeguard on Mutations</div>
+              <div class="invariant-desc">No 1-click execution for destructive admin actions — department reassignment, password reset, and typed deletion all require confirmation.</div>
+            </div>
+          </div>
+
+          <div class="invariant-item">
+            <div class="invariant-icon">🎓</div>
+            <div>
+              <div class="invariant-title">Autonomous Academic Session</div>
+              <div class="invariant-desc">Zero-maintenance calendar engine auto-synchronizes Winter/Summer terms without any manual intervention.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['SYSTEM_ADMIN']);
+
+    async function loadSettings(isManual = false) {
+      try {
+        const res = await fetchApi('/admin/settings');
+        if (res.success && res.data) {
+          const s = res.data.map || res.data || {};
+          document.getElementById('setting-inst-name').value        = s.institution_name  || 'Government Polytechnic College';
+          document.getElementById('setting-inst-code').value        = s.institution_code  || 'GP-UBTER-101';
+          document.getElementById('setting-affiliating-body').value = s.affiliating_body  || 'UBTER (Uttarakhand Board of Technical Education) / IRDT';
+          document.getElementById('setting-location').value         = s.campus_location   || 'Uttarakhand, India';
+          updateLivePreview();
+          if (isManual && typeof showToast === 'function') {
+            showToast('Settings reloaded from database', 'info');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load settings:', err);
+      }
+    }
+
+    function updateLivePreview() {
+      const name  = document.getElementById('setting-inst-name').value.trim()        || 'Government Polytechnic College';
+      const code  = document.getElementById('setting-inst-code').value.trim()        || 'GP-UBTER-101';
+      const affil = document.getElementById('setting-affiliating-body').value.trim() || 'UBTER / IRDT Uttarakhand';
+      const loc   = document.getElementById('setting-location').value.trim()         || 'Uttarakhand, India';
+
+      document.getElementById('preview-inst-name').textContent  = name;
+      document.getElementById('preview-inst-code').textContent  = code;
+      document.getElementById('preview-affil').textContent      = affil + ' \u2022 ' + loc;
+      document.getElementById('preview-name-val').textContent   = name;
+      document.getElementById('preview-code-val').textContent   = code;
+      document.getElementById('preview-board-val').textContent  = affil || '\u2014';
+      document.getElementById('preview-campus-val').textContent = loc   || '\u2014';
+    }
+
+    function resetToOfficialDefaults() {
+      document.getElementById('setting-inst-name').value        = 'Government Polytechnic College';
+      document.getElementById('setting-inst-code').value        = 'GP-UBTER-101';
+      document.getElementById('setting-affiliating-body').value = 'UBTER (Uttarakhand Board of Technical Education) / IRDT';
+      document.getElementById('setting-location').value         = 'Uttarakhand, India';
+      updateLivePreview();
+      if (typeof showToast === 'function') {
+        showToast('Form filled with official UBTER defaults. Click Save to apply.', 'info');
+      }
+    }
+
+    document.getElementById('identity-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('save-settings-btn');
+      btn.disabled = true;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '&#9203; Saving...';
+
+      try {
+        const res = await fetchApi('/admin/settings', {
+          method: 'PUT',
+          body: JSON.stringify({
+            settings: {
+              institution_name: document.getElementById('setting-inst-name').value.trim(),
+              institution_code: document.getElementById('setting-inst-code').value.trim(),
+              affiliating_body: document.getElementById('setting-affiliating-body').value.trim(),
+              campus_location:  document.getElementById('setting-location').value.trim()
+            }
+          })
+        });
+        if (res.success) {
+          if (typeof showToast === 'function') showToast('Institutional identity saved successfully', 'success');
+          await loadSettings();
+        } else {
+          throw new Error(res.error?.message || 'Failed to save settings');
+        }
+      } catch (err) {
+        console.error('Error saving settings:', err);
+        if (typeof showToast === 'function') showToast('Failed to save: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
+
+    loadSettings();
+  </script>
+</body>
+</html>

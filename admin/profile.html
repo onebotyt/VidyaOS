@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Profile & Security — Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .admin-hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      color: #ffffff;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.35);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .admin-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(220, 38, 38, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .admin-hero-content {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+    }
+    .admin-avatar-wrap {
+      position: relative;
+      width: 84px;
+      height: 84px;
+      flex-shrink: 0;
+    }
+    .admin-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      color: #ffffff;
+      font-size: 2.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      user-select: none;
+    }
+    .admin-beacon {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 3px solid #0f172a;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+    }
+    .admin-meta h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: -0.02em;
+    }
+    .admin-subtitle {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin: 0 0 0.85rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .admin-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .admin-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .admin-chip.super {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .admin-chip.verified {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* Governance Grid */
+    .gov-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .gov-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .gov-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .gov-card-title {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+    .gov-card-val {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--color-primary);
+      line-height: 1.1;
+    }
+    .gov-card-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Password Input Wrapper with Show/Hide */
+    .password-wrap {
+      position: relative;
+    }
+    .password-wrap input {
+      padding-right: 2.75rem;
+    }
+    .password-toggle-btn {
+      position: absolute;
+      right: 0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #64748b;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .password-toggle-btn:hover {
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
+      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      <a href="/admin/profile.html" class="btn btn-primary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 920px;">
+    <!-- HERO ADMINISTRATOR BANNER -->
+    <div class="admin-hero">
+      <div class="admin-hero-content">
+        <div class="admin-avatar-wrap">
+          <div class="admin-avatar" id="hero-avatar">SA</div>
+          <div class="admin-beacon" title="Super Administrator Session Active"></div>
+        </div>
+
+        <div class="admin-meta" style="flex: 1;">
+          <h1 id="hero-name">System Administrator</h1>
+          <div class="admin-subtitle">
+            <span>Universal Institute of Technology</span>
+            <span>•</span>
+            <span id="hero-email" style="font-family: var(--font-family-mono); font-weight: 700; color: #fca5a5;">admin@college.edu</span>
+          </div>
+
+          <div class="admin-badges">
+            <span class="admin-chip super">🛡️ Institutional Superuser</span>
+            <span class="admin-chip verified">✓ Full Master Authority</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GOVERNANCE METRICS STRIP -->
+    <div class="gov-grid">
+      <div class="gov-card">
+        <div class="gov-card-title">Departments</div>
+        <div class="gov-card-val" id="stat-dept">—</div>
+        <div class="gov-card-sub">Academic programs</div>
+      </div>
+
+      <div class="gov-card">
+        <div class="gov-card-title">Faculty Members</div>
+        <div class="gov-card-val" id="stat-teachers">—</div>
+        <div class="gov-card-sub">HODs & teaching staff</div>
+      </div>
+
+      <div class="gov-card">
+        <div class="gov-card-title">Students Enrolled</div>
+        <div class="gov-card-val" id="stat-students">—</div>
+        <div class="gov-card-sub">Total student body</div>
+      </div>
+
+      <div class="gov-card">
+        <div class="gov-card-title">Active Registers</div>
+        <div class="gov-card-val" id="stat-registers">—</div>
+        <div class="gov-card-sub">Digital lecture books</div>
+      </div>
+
+      <div class="gov-card">
+        <div class="gov-card-title">ESP32 Terminals</div>
+        <div class="gov-card-val" id="stat-devices" style="color: #16a34a;">—</div>
+        <div class="gov-card-sub">Biometric hardware units</div>
+      </div>
+    </div>
+
+    <div class="grid-cols-2" style="gap: 1.5rem; align-items: start;">
+      <!-- Editable Admin Details -->
+      <div class="card" style="padding: 1.75rem;">
+        <h2 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1.25rem;">
+          👤 Administrator Identity
+        </h2>
+
+        <form id="admin-profile-form">
+          <div class="form-group">
+            <label class="form-label" for="admin-username">Admin Username</label>
+            <input type="text" id="admin-username" class="form-control" required style="font-family: var(--font-family-mono); font-weight: 700;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-email">Institutional Admin Email</label>
+            <input type="email" id="admin-email" class="form-control" required>
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+              Primary contact for institutional audit and system alerts.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role Classification</label>
+            <input type="text" class="form-control" value="SYSTEM_ADMIN (Root System Master Authority)" disabled style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+            <button type="submit" id="save-admin-btn" class="btn btn-primary" style="font-weight: 700;">
+              Update Admin Profile
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Password & Security Form -->
+      <div class="card" style="padding: 1.75rem;">
+        <h2 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1.25rem;">
+          🔒 Master Password Management
+        </h2>
+
+        <form id="admin-pass-form">
+          <div class="form-group">
+            <label class="form-label" for="admin-current-pass">Current Master Password</label>
+            <div class="password-wrap">
+              <input type="password" id="admin-current-pass" class="form-control" required placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-current-pass', this)" aria-label="Toggle password view">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-new-pass">New Password (min 8 chars)</label>
+            <div class="password-wrap">
+              <input type="password" id="admin-new-pass" class="form-control" required minlength="8" placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-new-pass', this)" aria-label="Toggle password view">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-confirm-pass">Confirm New Password</label>
+            <div class="password-wrap">
+              <input type="password" id="admin-confirm-pass" class="form-control" required minlength="8" placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-confirm-pass', this)" aria-label="Toggle password view">👁️</button>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+            <button type="submit" id="save-pass-btn" class="btn btn-secondary" style="font-weight: 700;">
+              Update Master Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['SYSTEM_ADMIN']);
+
+    function togglePassVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        inp.type = 'password';
+        btn.innerText = '👁️';
+      }
+    }
+
+    async function loadAdminProfile() {
+      try {
+        const res = await fetchApi('/admin/profile');
+        if (res.success && res.data) {
+          const a = res.data;
+          document.getElementById('hero-name').innerText = a.username || 'System Administrator';
+          document.getElementById('hero-email').innerText = a.email || 'admin@college.edu';
+
+          const initials = (a.username || 'SA').slice(0, 2).toUpperCase();
+          document.getElementById('hero-avatar').innerText = initials;
+
+          // Form fields
+          document.getElementById('admin-username').value = a.username || '';
+          document.getElementById('admin-email').value = a.email || '';
+
+          // Governance metrics
+          const m = a.metrics || {};
+          document.getElementById('stat-dept').innerText = m.departments_count || 0;
+          document.getElementById('stat-teachers').innerText = m.teachers_count || 0;
+          document.getElementById('stat-students').innerText = m.students_count || 0;
+          document.getElementById('stat-registers').innerText = m.registers_count || 0;
+          document.getElementById('stat-devices').innerText = m.devices_count || 0;
+        }
+      } catch (err) {
+        console.error('Failed to load administrator profile', err);
+      }
+    }
+
+    document.getElementById('admin-profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('admin-username').value.trim();
+      const email = document.getElementById('admin-email').value.trim();
+      const btn = document.getElementById('save-admin-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/admin/profile', {
+          method: 'PUT',
+          body: JSON.stringify({ username, email })
+        });
+        if (res.success) {
+          showToast('Administrator profile updated successfully!', 'success');
+          loadAdminProfile();
+        }
+      } catch (err) {
+        // Handled by toast
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById('admin-pass-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const current_password = document.getElementById('admin-current-pass').value;
+      const new_password = document.getElementById('admin-new-pass').value;
+      const confirm_password = document.getElementById('admin-confirm-pass').value;
+
+      if (new_password !== confirm_password) {
+        showToast('New passwords do not match', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('save-pass-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/admin/profile', {
+          method: 'PUT',
+          body: JSON.stringify({ current_password, new_password })
+        });
+        if (res.success) {
+          showToast('Master password changed successfully!', 'success');
+          document.getElementById('admin-current-pass').value = '';
+          document.getElementById('admin-new-pass').value = '';
+          document.getElementById('admin-confirm-pass').value = '';
+        }
+      } catch (err) {
+        // Handled by toast
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    loadAdminProfile();
+  </script>
+</body>
+</html>

@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Department Students &amp; Enrollment — Faculty Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">FACULTY</span>
+      <span>Attendance Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm">My Registers</a>
+      <a href="/faculty/students.html" class="btn btn-primary btn-sm">Students & Provision</a>
+      <a href="/faculty/reports.html" class="btn btn-secondary btn-sm">Reports</a>
+      <a href="/faculty/profile.html" class="btn btn-secondary btn-sm">Profile & Google</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <div class="page-header" style="margin-bottom: 1.5rem;">
+      <div>
+        <h1 class="page-title">Department Students &amp; Enrollment</h1>
+        <p class="page-subtitle">View student rosters, manage self-registration, and process student enrollment approvals for your department.</p>
+      </div>
+      <div id="provision-btn-container">
+        <span class="badge badge-pending" style="padding: 0.5rem 0.75rem; font-size: 0.82rem;">ℹ️ Student admissions & promotions managed by HOD</span>
+      </div>
+    </div>
+
+    <!-- Cohort Selector Card -->
+    <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <label class="form-label" style="margin-bottom: 0; font-size: 0.9rem;">Department Cohort:</label>
+        <select id="cohort-select" class="form-select" style="max-width: 320px;" onchange="loadCohortStudents()">
+          <option value="">Loading assigned cohorts...</option>
+        </select>
+        <span id="class-teacher-badge" class="badge" style="display: none; background: var(--bg-surface-secondary); color: var(--color-primary); font-weight: 600;">Department Faculty Access</span>
+      </div>
+    </div>
+
+    <!-- Page Tabs: Roster | Pending Approvals -->
+    <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; border-bottom:2px solid var(--border-color); padding-bottom:0;">
+      <button id="tab-roster-btn" class="btn btn-primary btn-sm" onclick="showMainTab('roster')" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; border-bottom:2px solid var(--color-primary); margin-bottom:-2px;">📋 Student Roster</button>
+      <button id="tab-pending-btn" class="btn btn-secondary btn-sm" onclick="showMainTab('pending')" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; margin-bottom:-2px; position:relative;">
+        ⏳ Pending Approvals
+        <span id="pending-badge" style="display:none; position:absolute; top:-6px; right:-6px; background:var(--status-absent); color:white; border-radius:50%; width:18px; height:18px; font-size:0.65rem; font-weight:700; display:flex; align-items:center; justify-content:center;"></span>
+      </button>
+    </div>
+
+    <!-- TAB: Student Roster -->
+    <div id="tab-roster-panel">
+      <!-- Registration Toggle (Department Faculty) -->
+      <div id="reg-toggle-card" class="card" style="padding: 1rem 1.25rem; margin-bottom: 1.5rem; display:none;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.2rem;">🎓 Student Self-Registration</div>
+            <div style="font-size:0.78rem; color:var(--text-muted);">When open, students can self-register for this cohort via the student portal.</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <span id="reg-toggle-status" class="badge" style="font-size:0.78rem;">Checking...</span>
+            <button id="reg-toggle-btn" class="btn btn-secondary btn-sm" onclick="toggleRegistration()" disabled>Toggle</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Roster Table Card -->
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 70px; text-align: center;">Roll No</th>
+                <th style="width: 140px;">Enrollment No</th>
+                <th style="width: 140px;">UBTER Reg No</th>
+                <th>Student Full Name</th>
+                <th>Entry Mode</th>
+                <th style="width: 170px;">Biometric Hardware Slot</th>
+                <th style="width: 120px; text-align: right;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody">
+              <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">Select a cohort to view students.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Pending Approvals -->
+    <div id="tab-pending-panel" style="display:none;">
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <div style="font-weight:700; font-size:1rem; margin-bottom:0.15rem;">Pending Registration Requests</div>
+            <div style="font-size:0.8rem; color:var(--text-muted);">Students who self-registered and are awaiting your approval.</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadPendingRegistrations()">↻ Refresh</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Enrollment No</th>
+                <th>UBTER Reg No</th>
+                <th>Email / Gmail</th>
+                <th style="width:130px;">Registered At</th>
+                <th style="width:90px;">Source</th>
+                <th style="width:160px; text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pending-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:2.5rem;color:var(--text-muted);">Loading pending requests...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Provision Student Modal (Single & Bulk) -->
+  <div id="provision-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 540px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 700;">Provision Student Account</h2>
+        <button onclick="closeModal()" style="font-size: 1.25rem; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        <button type="button" id="tab-single-btn" class="btn btn-primary btn-sm" onclick="switchProvTab('single')">Single Student</button>
+        <button type="button" id="tab-bulk-btn" class="btn btn-secondary btn-sm" onclick="switchProvTab('bulk')">Bulk CSV Import</button>
+      </div>
+
+      <!-- Single Provision Form -->
+      <form id="single-prov-form">
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label" for="prov-roll">Class Roll Number <span style="color:var(--status-absent)">*</span></label>
+            <input type="number" id="prov-roll" class="form-control" placeholder="e.g. 1" min="1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prov-enroll">Official Enrollment No <span style="color:var(--status-absent)">*</span></label>
+            <input type="text" id="prov-enroll" class="form-control" placeholder="e.g. 2024IT002" required style="text-transform: uppercase;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prov-reg">UBTER Registration Number <span style="font-size: 0.78rem; font-weight: normal; color: var(--text-muted);">(Optional / UBTER Exam)</span></label>
+          <input type="text" id="prov-reg" class="form-control" placeholder="e.g. 24101054001" style="text-transform: uppercase;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prov-name">Student Full Name <span style="color:var(--status-absent)">*</span></label>
+          <input type="text" id="prov-name" class="form-control" placeholder="e.g. Priya Mukherjee" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prov-email">Email (Optional)</label>
+          <input type="email" id="prov-email" class="form-control" placeholder="priya@student.local">
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" id="prov-single-btn" class="btn btn-primary">Provision & Generate Temp Pass</button>
+        </div>
+      </form>
+
+      <!-- Bulk Provision Form -->
+      <form id="bulk-prov-form" style="display: none;">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          Paste CSV rows with headers: <code>roll_no,enrollment_no,full_name,email</code>
+        </p>
+        <div class="form-group">
+          <textarea id="bulk-csv-input" class="form-control" rows="7" placeholder="1,2024IT001,Rahul Sharma,rahul@mail.com&#10;2,2024IT002,Priya Patel,priya@mail.com" style="font-family: var(--font-family-mono); font-size: 0.8rem;"></textarea>
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" id="prov-bulk-btn" class="btn btn-primary">Process Bulk Batch</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Credentials Slip Modal -->
+  <div id="slip-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 480px; text-align: center;">
+      <div style="width: 50px; height: 50px; background: var(--status-present-bg); color: var(--status-present); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.75rem;">
+        ✓
+      </div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">Student Provisioned!</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        Give these credentials to the student for their first-time portal login.
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; text-align: left; margin-bottom: 1.25rem; font-family: var(--font-family-mono); font-size: 0.85rem;">
+        <div style="margin-bottom: 0.5rem;">
+          <span style="color: var(--text-muted); font-family: var(--font-family-sans);">Enrollment No:</span>
+          <strong id="slip-student-enroll" style="color: var(--color-primary); float: right;"></strong>
+        </div>
+        <div id="slip-student-reg-row" style="margin-bottom: 0.5rem; display: none;">
+          <span style="color: var(--text-muted); font-family: var(--font-family-sans);">UBTER Reg No:</span>
+          <strong id="slip-student-reg" style="color: var(--color-primary); float: right;"></strong>
+        </div>
+        <div style="margin-bottom: 0.5rem;">
+          <span style="color: var(--text-muted); font-family: var(--font-family-sans);">Class Roll:</span>
+          <strong id="slip-student-roll" style="color: var(--text-main); float: right;"></strong>
+        </div>
+        <div>
+          <span style="color: var(--text-muted); font-family: var(--font-family-sans);">Temp Password:</span>
+          <strong id="slip-student-pass" style="color: var(--status-absent); font-size: 1.05rem; float: right;"></strong>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button class="btn btn-secondary" onclick="copyStudentSlip()">📋 Copy Slip</button>
+        <button class="btn btn-primary" onclick="closeSlipModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approve Modal -->
+  <div id="approve-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width:400px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2 style="font-size:1.1rem;font-weight:700;">✅ Approve Registration</h2>
+        <button onclick="document.getElementById('approve-modal').classList.remove('open')" style="font-size:1.25rem;color:var(--text-muted);">&#x2715;</button>
+      </div>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.25rem;">Assign a class roll number to enroll this student in your cohort.</p>
+      <div id="approve-student-name" style="font-weight:600;margin-bottom:1rem;"></div>
+      <div class="form-group">
+        <label class="form-label" for="approve-roll">Class Roll Number <span style="color:var(--status-absent)">*</span></label>
+        <input type="number" id="approve-roll" class="form-control" placeholder="e.g. 25" min="1" required>
+      </div>
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem;">
+        <button class="btn btn-secondary" onclick="document.getElementById('approve-modal').classList.remove('open')">Cancel</button>
+        <button id="approve-confirm-btn" class="btn btn-primary" onclick="submitApproval()">Approve &amp; Enroll</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject Modal -->
+  <div id="reject-modal" class="modal-backdrop">
+    <div class="modal-card" style="max-width:400px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2 style="font-size:1.1rem;font-weight:700;">❌ Reject Registration</h2>
+        <button onclick="document.getElementById('reject-modal').classList.remove('open')" style="font-size:1.25rem;color:var(--text-muted);">&#x2715;</button>
+      </div>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.25rem;">Provide a reason so the student knows why their registration was rejected.</p>
+      <div id="reject-student-name" style="font-weight:600;margin-bottom:1rem;"></div>
+      <div class="form-group">
+        <label class="form-label" for="reject-reason">Rejection Reason</label>
+        <textarea id="reject-reason" class="form-control" rows="3" placeholder="e.g. Enrollment number does not match college records."></textarea>
+      </div>
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem;">
+        <button class="btn btn-secondary" onclick="document.getElementById('reject-modal').classList.remove('open')">Cancel</button>
+        <button id="reject-confirm-btn" class="btn btn-secondary" style="background:var(--status-absent);color:white;border-color:transparent;" onclick="submitRejection()">Reject Registration</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireDepartmentFaculty: true });
+
+    let activeCohorts = [];
+    let currentCohort = null;
+    let pendingStudentId = null;  // for approve/reject modals
+    let regOpen = false;          // current registration toggle state
+
+    // ── Tab switching ────────────────────────────────────────
+    function showMainTab(tab) {
+      const isRoster = tab === 'roster';
+      document.getElementById('tab-roster-panel').style.display = isRoster ? 'block' : 'none';
+      document.getElementById('tab-pending-panel').style.display = isRoster ? 'none' : 'block';
+      document.getElementById('tab-roster-btn').className = isRoster ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+      document.getElementById('tab-pending-btn').className = isRoster ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm';
+      if (!isRoster) loadPendingRegistrations();
+    }
+
+    // ── Pending count badge ──────────────────────────────────
+    async function loadPendingCount() {
+      try {
+        const qs = currentCohort ? `?department_id=${currentCohort.department_id}&branch_id=${currentCohort.branch_id}&year=${currentCohort.year}&semester=${currentCohort.semester}` : '';
+        const res = await fetchApi(`/students/registrations/count${qs}`);
+        if (res.success) {
+          const count = res.data.count;
+          const badge = document.getElementById('pending-badge');
+          if (badge) {
+            if (count > 0) {
+              badge.textContent = count;
+              badge.style.display = 'flex';
+            } else {
+              badge.style.display = 'none';
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    // ── Pending registrations table ──────────────────────────
+    async function loadPendingRegistrations() {
+      const tbody = document.getElementById('pending-tbody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--text-muted);">Loading...</td></tr>';
+      try {
+        const qs = currentCohort ? `?department_id=${currentCohort.department_id}&branch_id=${currentCohort.branch_id}&year=${currentCohort.year}&semester=${currentCohort.semester}` : '';
+        const res = await fetchApi(`/students/registrations/pending${qs}`);
+        if (res.success) {
+          renderPending(res.data || []);
+          loadPendingCount();
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--status-absent);">Failed to load pending requests.</td></tr>`;
+      }
+    }
+
+    function renderPending(students) {
+      const tbody = document.getElementById('pending-tbody');
+      if (!students.length) {
+        tbody.innerHTML = `
+          <tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-muted);">
+            <div style="font-size:2rem;margin-bottom:0.75rem;">✅</div>
+            <div style="font-weight:600;margin-bottom:0.25rem;">No pending requests</div>
+            <div style="font-size:0.82rem;">All self-registrations have been reviewed.</div>
+          </td></tr>
+        `;
+        return;
+      }
+      tbody.innerHTML = students.map(s => `
+        <tr>
+          <td>
+            <div style="font-weight:600;">${s.full_name}</div>
+          </td>
+          <td><span class="badge badge-pending" style="font-family:var(--font-family-mono);font-size:0.78rem;">${s.official_enrollment_no}</span></td>
+          <td><span class="badge" style="background:var(--bg-surface-secondary);font-family:var(--font-family-mono);font-size:0.78rem;color:var(--color-primary);font-weight:700;">${s.registration_no || '—'}</span></td>
+          <td style="font-size:0.82rem;color:var(--text-muted);">${s.email}</td>
+          <td style="font-size:0.78rem;color:var(--text-muted);">${formatDate(s.registered_at)}</td>
+          <td><span class="badge" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.72rem;">${s.entry_mode === 'self_registered' ? '🖊️ Self' : '👨‍🏫 Teacher'}</span></td>
+          <td style="text-align:right;">
+            <div style="display:flex;gap:0.4rem;justify-content:flex-end;">
+              <button class="btn btn-sm" style="background:var(--status-present);color:white;border:none;font-size:0.78rem;padding:0.3rem 0.7rem;" onclick="openApprove(${s.student_id}, '${esc(s.full_name)}')">
+                ✓ Approve
+              </button>
+              <button class="btn btn-sm" style="background:var(--status-absent);color:white;border:none;font-size:0.78rem;padding:0.3rem 0.7rem;" onclick="openReject(${s.student_id}, '${esc(s.full_name)}')">
+                ✗ Reject
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function esc(str) { return (str || '').replace(/'/g, "\\'"); }
+    function formatDate(dt) {
+      if (!dt) return '—';
+      const d = new Date(dt);
+      return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' }) + ' ' + d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    }
+
+    // ── Approve / Reject Modals ──────────────────────────────
+    function openApprove(studentId, name) {
+      pendingStudentId = studentId;
+      document.getElementById('approve-student-name').textContent = `Student: ${name}`;
+      document.getElementById('approve-roll').value = '';
+      document.getElementById('approve-modal').classList.add('open');
+      setTimeout(() => document.getElementById('approve-roll').focus(), 100);
+    }
+
+    function openReject(studentId, name) {
+      pendingStudentId = studentId;
+      document.getElementById('reject-student-name').textContent = `Student: ${name}`;
+      document.getElementById('reject-reason').value = '';
+      document.getElementById('reject-modal').classList.add('open');
+    }
+
+    async function submitApproval() {
+      const rollNo = parseInt(document.getElementById('approve-roll').value, 10);
+      if (!rollNo || rollNo < 1) { showToast('Please enter a valid roll number', 'error'); return; }
+      const btn = document.getElementById('approve-confirm-btn');
+      btn.disabled = true; btn.textContent = 'Approving...';
+      try {
+        const res = await fetchApi(`/students/registrations/${pendingStudentId}/adjudicate`, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'APPROVE', class_roll_no: rollNo })
+        });
+        if (res.success) {
+          document.getElementById('approve-modal').classList.remove('open');
+          showToast('Student approved and enrolled! ✓', 'success');
+          loadPendingRegistrations();
+        }
+      } catch (err) {
+        showToast(err.message || 'Approval failed', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Approve & Enroll';
+      }
+    }
+
+    async function submitRejection() {
+      const reason = document.getElementById('reject-reason').value.trim();
+      const btn = document.getElementById('reject-confirm-btn');
+      btn.disabled = true; btn.textContent = 'Rejecting...';
+      try {
+        const res = await fetchApi(`/students/registrations/${pendingStudentId}/adjudicate`, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'REJECT', rejection_reason: reason || 'Registration rejected by Class Teacher' })
+        });
+        if (res.success) {
+          document.getElementById('reject-modal').classList.remove('open');
+          showToast('Registration rejected.', 'info');
+          loadPendingRegistrations();
+        }
+      } catch (err) {
+        showToast(err.message || 'Rejection failed', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Reject Registration';
+      }
+    }
+
+    // ── Registration Toggle ──────────────────────────────────
+    async function loadRegistrationStatus() {
+      if (!currentCohort) return;
+      const card = document.getElementById('reg-toggle-card');
+      card.style.display = 'block';
+      try {
+        const res = await fetchApi(`/faculty/cohorts/registration-status?department_id=${currentCohort.department_id}&branch_id=${currentCohort.branch_id}&year=${currentCohort.year}&semester=${currentCohort.semester}`);
+        if (res.success) {
+          regOpen = res.data?.is_open;
+          updateRegToggleUI();
+        }
+      } catch (_) {}
+      document.getElementById('reg-toggle-btn').disabled = false;
+    }
+
+    function updateRegToggleUI() {
+      const status = document.getElementById('reg-toggle-status');
+      const btn = document.getElementById('reg-toggle-btn');
+      if (regOpen) {
+        status.textContent = '🟢 Open';
+        status.style.background = 'var(--status-present-bg)';
+        status.style.color = 'var(--status-present)';
+        btn.textContent = 'Close Registration';
+        btn.style.borderColor = 'var(--status-absent)';
+        btn.style.color = 'var(--status-absent)';
+      } else {
+        status.textContent = '🔴 Closed';
+        status.style.background = 'var(--status-absent-bg)';
+        status.style.color = 'var(--status-absent)';
+        btn.textContent = 'Open Registration';
+        btn.style.borderColor = 'var(--status-present)';
+        btn.style.color = 'var(--status-present)';
+      }
+    }
+
+    async function toggleRegistration() {
+      if (!currentCohort) return;
+      const btn = document.getElementById('reg-toggle-btn');
+      btn.disabled = true;
+      try {
+        const res = await fetchApi('/faculty/cohorts/registration-toggle', {
+          method: 'POST',
+          body: JSON.stringify({
+            department_id: currentCohort.department_id,
+            branch_id: currentCohort.branch_id,
+            year: currentCohort.year,
+            semester: currentCohort.semester,
+            open: !regOpen
+          })
+        });
+        if (res.success) {
+          regOpen = !regOpen;
+          updateRegToggleUI();
+          showToast(`Student self-registration ${regOpen ? 'opened' : 'closed'} for this cohort.`, regOpen ? 'success' : 'info');
+        }
+      } catch (err) {
+        showToast(err.message || 'Toggle failed', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function init() {
+      loadPendingCount();
+      try {
+        const res = await fetchApi('/faculty/cohorts');
+        if (res.success && res.data) {
+          activeCohorts = res.data;
+          const select = document.getElementById('cohort-select');
+          select.innerHTML = '';
+
+          if (!activeCohorts.length) {
+            select.innerHTML = '<option value="">No department cohorts found</option>';
+            document.getElementById('provision-btn-container').style.display = 'none';
+            return;
+          }
+
+          document.getElementById('class-teacher-badge').style.display = 'inline-block';
+          const isClassTeacher = activeCohorts.some(c => c.assignment_type === 'CLASS_TEACHER');
+          if (isClassTeacher) {
+            document.getElementById('class-teacher-badge').textContent = 'Class Teacher & Department Access';
+          } else {
+            document.getElementById('class-teacher-badge').textContent = 'Department Faculty Access';
+          }
+
+          const user = getCurrentUser();
+          if (user && (user.roles?.includes('HOD') || user.is_hod)) {
+            document.getElementById('provision-btn-container').innerHTML = `
+              <a href="/faculty/hod-students.html" class="btn btn-primary btn-sm">Manage Students in HOD Portal &rarr;</a>
+            `;
+          }
+
+          activeCohorts.forEach((c, idx) => {
+            const roleTag = c.assignment_type === 'CLASS_TEACHER' ? 'Class Teacher' : (c.assignment_type === 'HOD' ? 'HOD' : 'Dept Faculty');
+            select.innerHTML += `
+              <option value="${idx}">
+                ${c.department_name || c.branch_name} (Year ${c.year}, Sem ${c.semester}) [${roleTag}]
+              </option>
+            `;
+          });
+
+          loadCohortStudents();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadCohortStudents() {
+      const idx = document.getElementById('cohort-select').value;
+      if (idx === '') return;
+      currentCohort = activeCohorts[parseInt(idx, 10)];
+
+      loadRegistrationStatus();
+      loadPendingCount();
+
+      const tbody = document.getElementById('students-tbody');
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading students roster...</td></tr>';
+
+      try {
+        const res = await fetchApi(`/faculty/cohorts/students?department_id=${currentCohort.department_id}&branch_id=${currentCohort.branch_id}&year=${currentCohort.year}&semester=${currentCohort.semester}`);
+        if (res.success) {
+          renderStudents(res.data || []);
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--status-absent); padding: 2rem;">Failed to load roster</td></tr>`;
+      }
+    }
+
+    function renderStudents(students) {
+      const tbody = document.getElementById('students-tbody');
+      if (!students.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+              No students enrolled in this cohort yet. Click "+ Provision Student" to add students.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = students.map(s => `
+        <tr>
+          <td style="text-align: center; font-weight: 700;">${s.class_roll_no}</td>
+          <td><span class="badge badge-pending" style="font-family: var(--font-family-mono);">${s.official_enrollment_no}</span></td>
+          <td><span class="badge" style="background: var(--bg-surface-secondary); font-family: var(--font-family-mono); color: var(--color-primary); font-weight: 700; font-size: 0.8rem;">${s.registration_no || '—'}</span></td>
+          <td style="font-weight: 600; color: var(--text-main);">${s.full_name}</td>
+          <td><span style="font-size: 0.8rem; color: var(--text-muted);">${s.entry_mode || 'provisioned'}</span></td>
+          <td>
+            ${s.slot_id ? `
+              <span class="badge badge-present" style="font-size: 0.75rem;">Slot #${s.slot_id} (${s.device_name || 'Terminal'})</span>
+            ` : `
+              <span class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.75rem;">Not Enrolled</span>
+            `}
+          </td>
+          <td style="text-align: right;">
+            <span class="badge ${s.enrollment_status === 'ENROLLED' ? 'badge-present' : 'badge-late'}">
+              ${s.enrollment_status || 'ENROLLED'}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openProvisionModal() {
+      document.getElementById('prov-roll').value = '';
+      document.getElementById('prov-enroll').value = '';
+      document.getElementById('prov-reg').value = '';
+      document.getElementById('prov-name').value = '';
+      document.getElementById('prov-email').value = '';
+      document.getElementById('provision-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('provision-modal').classList.remove('open');
+    }
+
+    function closeSlipModal() {
+      document.getElementById('slip-modal').classList.remove('open');
+      loadCohortStudents();
+    }
+
+    function switchProvTab(tab) {
+      if (tab === 'single') {
+        document.getElementById('single-prov-form').style.display = 'block';
+        document.getElementById('bulk-prov-form').style.display = 'none';
+        document.getElementById('tab-single-btn').className = 'btn btn-primary btn-sm';
+        document.getElementById('tab-bulk-btn').className = 'btn btn-secondary btn-sm';
+      } else {
+        document.getElementById('single-prov-form').style.display = 'none';
+        document.getElementById('bulk-prov-form').style.display = 'block';
+        document.getElementById('tab-single-btn').className = 'btn btn-secondary btn-sm';
+        document.getElementById('tab-bulk-btn').className = 'btn btn-primary btn-sm';
+      }
+    }
+
+    // Single student provision handler
+    document.getElementById('single-prov-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentCohort) {
+        showToast('Please select a cohort first', 'error');
+        return;
+      }
+
+      const class_roll_no = parseInt(document.getElementById('prov-roll').value, 10);
+      const official_enrollment_no = document.getElementById('prov-enroll').value.trim().toUpperCase();
+      const registration_no = (document.getElementById('prov-reg').value.trim().toUpperCase()) || null;
+      const full_name = document.getElementById('prov-name').value.trim();
+      const email = document.getElementById('prov-email').value.trim();
+      const btn = document.getElementById('prov-single-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/students/provision', {
+          method: 'POST',
+          body: JSON.stringify({
+            class_roll_no,
+            official_enrollment_no,
+            registration_no,
+            full_name,
+            email,
+            department_id: currentCohort.department_id,
+            branch_id: currentCohort.branch_id,
+            year: currentCohort.year,
+            semester: currentCohort.semester
+          })
+        });
+
+        if (res.success) {
+          closeModal();
+          document.getElementById('slip-student-enroll').innerText = res.data.official_enrollment_no;
+          if (res.data.registration_no || registration_no) {
+            document.getElementById('slip-student-reg').innerText = res.data.registration_no || registration_no;
+            document.getElementById('slip-student-reg-row').style.display = 'block';
+          } else {
+            document.getElementById('slip-student-reg-row').style.display = 'none';
+          }
+          document.getElementById('slip-student-roll').innerText = `${res.data.class_roll_no}`;
+          document.getElementById('slip-student-pass').innerText = res.data.temporary_password;
+          document.getElementById('slip-modal').classList.add('open');
+        }
+      } catch (err) {
+        // Handled by toast
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // Bulk student provision handler
+    document.getElementById('bulk-prov-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentCohort) return;
+
+      const raw = document.getElementById('bulk-csv-input').value.trim();
+      const lines = raw.split('\n').filter(l => l.trim().length > 0);
+      const students = [];
+
+      for (const line of lines) {
+        const parts = line.split(',').map(p => p.trim());
+        if (parts.length >= 3) {
+          const roll = parseInt(parts[0], 10);
+          if (!isNaN(roll)) {
+            students.push({
+              class_roll_no: roll,
+              official_enrollment_no: parts[1].toUpperCase(),
+              full_name: parts[2],
+              email: parts[3] || null
+            });
+          }
+        }
+      }
+
+      if (!students.length) {
+        showToast('No valid CSV rows parsed. Format: roll_no,enrollment_no,full_name,email', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('prov-bulk-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/students/provision/bulk', {
+          method: 'POST',
+          body: JSON.stringify({
+            department_id: currentCohort.department_id,
+            branch_id: currentCohort.branch_id,
+            year: currentCohort.year,
+            semester: currentCohort.semester,
+            students
+          })
+        });
+
+        if (res.success) {
+          showToast(`Bulk provision processed: ${res.data?.provisioned?.length || 0} students enrolled!`, 'success');
+          closeModal();
+          loadCohortStudents();
+        }
+      } catch (err) {
+        // Handled by toast
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function copyStudentSlip() {
+      const enroll = document.getElementById('slip-student-enroll').innerText;
+      const roll = document.getElementById('slip-student-roll').innerText;
+      const pass = document.getElementById('slip-student-pass').innerText;
+      const text = `College Attendance Portal — Student Credentials\nEnrollment No: ${enroll}\nRoll: ${roll}\nTemporary Password: ${pass}\n\nLogin at: http://${window.location.host}/login/student.html`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Credentials slip copied!', 'success');
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

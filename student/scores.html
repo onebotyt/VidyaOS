@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Test Scores — Student Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    table.scores-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-color); }
+    table.scores-table th, table.scores-table td { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.88rem; }
+    table.scores-table th { background: var(--bg-surface); font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em; }
+    .score-value { font-weight: 700; }
+    .score-value.good { color: var(--status-present); }
+    .score-value.low { color: var(--status-absent); }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/student/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-present);">STUDENT</span>
+      <span>Test Scores</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/student/attendance.html" class="btn btn-secondary btn-sm">Attendance &amp; Calendar</a>
+      <a href="/student/timetable.html" class="btn btn-secondary btn-sm">Timetable</a>
+      <a href="/student/assignments.html" class="btn btn-secondary btn-sm">Assignments</a>
+      <a href="/student/scores.html" class="btn btn-primary btn-sm">Test Scores</a>
+      <a href="/student/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem; max-width: 880px;">
+    <!-- Student Identity Card -->
+    <div id="student-id-card" class="card" style="display: none; margin-bottom: 1.5rem; border-left: 4px solid var(--color-primary); background: var(--bg-card);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.25rem;">
+            <h2 id="scores-student-name" style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-main);">Student Name</h2>
+            <span id="scores-cohort-badge" class="badge badge-pending">Cohort</span>
+          </div>
+          <div id="scores-dept-info" style="font-size: 0.825rem; color: var(--text-muted);">Department / Course</div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          <span class="badge badge-present" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;">
+            Roll: <strong id="scores-roll-no">—</strong>
+          </span>
+          <span class="badge" style="background: var(--bg-surface-secondary); font-family: var(--font-family-mono); font-size: 0.82rem; color: var(--color-primary); font-weight: 700; padding: 0.35rem 0.75rem;">
+            UBTER Reg: <strong id="scores-reg-no">—</strong>
+          </span>
+          <span class="badge" style="background: var(--bg-surface-secondary); font-family: var(--font-family-mono); font-size: 0.82rem; color: var(--text-muted); padding: 0.35rem 0.75rem;">
+            <span id="scores-enrollment-no">—</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header" style="margin-bottom: 1.25rem;">
+      <div>
+        <h1 class="page-title">My Test Scores &amp; Internal Evaluation</h1>
+        <p class="page-subtitle">Recorded unit tests, class assessments, and coursework evaluations</p>
+      </div>
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    <div id="scores-wrap">
+      <div class="card" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        Loading your test scores...
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['STUDENT']);
+
+    async function init() {
+      await loadProfileHeader();
+      await loadScores();
+    }
+
+    async function loadProfileHeader() {
+      try {
+        const res = await fetchApi('/students/me');
+        if (res.success && res.data) {
+          const s = res.data;
+          document.getElementById('scores-student-name').textContent = s.full_name || 'Student';
+          document.getElementById('scores-cohort-badge').textContent = `Year ${s.year || 1} • Sem ${s.semester || 1}`;
+          document.getElementById('scores-dept-info').textContent = `${s.department_name || 'Department'} (${s.branch_code || s.department_code || ''}) • ${s.academic_year_label || 'Current Session'}`;
+          document.getElementById('scores-roll-no').textContent = s.class_roll_no ? `${s.class_roll_no}` : '—';
+          document.getElementById('scores-reg-no').textContent = s.registration_no || '—';
+          document.getElementById('scores-enrollment-no').textContent = s.official_enrollment_no || '—';
+          document.getElementById('student-id-card').style.display = 'block';
+        }
+      } catch (err) {
+        console.warn('Could not load student profile header:', err);
+      }
+    }
+
+    async function loadScores() {
+      const wrap = document.getElementById('scores-wrap');
+      try {
+        const res = await fetchApi('/exams');
+        if (!res.success || !res.data || !res.data.length) {
+          wrap.innerHTML = `<div class="card" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No exams or unit test scores have been recorded yet.</div>`;
+          return;
+        }
+
+        wrap.innerHTML = `
+          <table class="scores-table">
+            <thead>
+              <tr>
+                <th>Test / Examination</th>
+                <th>Subject &amp; Code</th>
+                <th style="width: 130px;">Exam Date</th>
+                <th style="width: 140px; text-align: right;">Score Obtained</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${res.data.map(ex => {
+                const hasScore = ex.marks_obtained !== null && ex.marks_obtained !== undefined;
+                const pct = hasScore && ex.max_marks ? (ex.marks_obtained / ex.max_marks) * 100 : null;
+                const isGood = pct !== null && pct >= 40;
+                return `
+                <tr>
+                  <td style="font-weight: 600; color: var(--text-main);">${escapeHtml(ex.name)}</td>
+                  <td>${escapeHtml(ex.subject_name || '')} <span class="code-badge" style="font-size: 0.72rem;">${escapeHtml(ex.subject_code || '')}</span></td>
+                  <td>${ex.exam_date ? new Date(ex.exam_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</td>
+                  <td style="text-align: right;" class="score-value ${pct !== null ? (isGood ? 'good' : 'low') : ''}">
+                    ${hasScore ? `${ex.marks_obtained} / ${ex.max_marks}` : '<span style="color: var(--text-muted); font-weight: normal; font-size: 0.8rem;">Pending Entry</span>'}
+                  </td>
+                </tr>
+              `;
+              }).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (err) {
+        wrap.innerHTML = `<div class="card" style="color: var(--status-absent); padding: 1.5rem;">Failed to load test scores: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    init();
+  </script>
+</body>
+</html>

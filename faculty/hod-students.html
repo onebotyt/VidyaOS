@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Department Students &amp; Promotion — HOD Portal</title>
+  <meta name="description" content="Manage enrolled students, provision new admissions, handle student withdrawals, and run 1-click semester promotions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .hod-nav-section { border-top: 1px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem; }
+    .hod-nav-label { font-size: 0.68rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); padding: 0 0.25rem; letter-spacing: 0.05em; }
+    .stat-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.25rem; }
+    .stat-val { font-size: 1.6rem; font-weight: 800; margin: 0.15rem 0; }
+    .stat-lbl { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      padding: 0.85rem 1.4rem; border-radius: var(--radius-sm);
+      font-size: 0.875rem; font-weight: 600; z-index: 9999;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">HOD</span>
+      <span id="dept-header-name">Department Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm">My Registers</a>
+      <div class="hod-nav-section" style="border-top: none; padding: 0; margin: 0; display: flex; gap: 0.5rem; align-items: center;">
+        <span class="hod-nav-label">HOD:</span>
+        <a href="/faculty/hod-teachers.html" class="btn btn-secondary btn-sm">My Teachers</a>
+        <a href="/faculty/hod-subjects.html" class="btn btn-secondary btn-sm">Subjects</a>
+        <a href="/faculty/hod-students.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Students</a>
+        <a href="/faculty/hod-archive.html" class="btn btn-secondary btn-sm">Archive</a>
+        <a href="/faculty/hod-reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+        <a href="/faculty/hod-devices.html" class="btn btn-secondary btn-sm">ESP Terminals</a>
+        <a href="/faculty/hod-settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      </div>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <!-- Page Header & Action Buttons -->
+    <div class="page-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-title">Department Students &amp; Semester Lifecycle</h1>
+        <p class="page-subtitle" id="dept-subtitle">Manage student enrollment, dynamic alphabetical class roll numbers, and semester promotion &amp; demotion lifecycle.</p>
+      </div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+        <a href="/faculty/hod-archive.html" class="btn btn-secondary btn-sm" style="font-weight: 600;">🎓 Alumni Archive</a>
+        <button class="btn btn-secondary btn-sm" onclick="openReindexModal()" style="font-weight: 600;">🔤 Re-order Roll #</button>
+        <button class="btn btn-secondary btn-sm" onclick="openBulkModal()" style="font-weight: 600;">📁 Bulk CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()" style="font-weight: 600;">+ Add Student</button>
+        <button class="btn btn-primary btn-sm" onclick="openPromotionModal()" style="font-weight: 700;">🔄 Semester Promotion &amp; Demotion</button>
+      </div>
+    </div>
+
+    <div style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+      💡 Class roll numbers are automatically assigned in <strong>alphabetical order (A–Z)</strong> without gaps.
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid-cols-4" style="gap: 1rem; margin-bottom: 1.5rem;">
+      <div class="stat-box">
+        <div class="stat-lbl">Department Students</div>
+        <div class="stat-val" id="stat-total" style="color: var(--color-primary);">0</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Total active enrolled</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-lbl">Active Accounts</div>
+        <div class="stat-val" id="stat-active" style="color: var(--status-present);">0</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Logged in / verified</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-lbl">Provisioned Accounts</div>
+        <div class="stat-val" id="stat-provisioned" style="color: var(--status-late);">0</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Initial password set</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-lbl">Google Connected</div>
+        <div class="stat-val" id="stat-google" style="color: var(--color-primary);">0</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Linked Google accounts</div>
+      </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 220px;">
+          <label class="form-label" style="margin-bottom: 0.25rem;">Search Student</label>
+          <input type="text" id="search-input" class="form-control" placeholder="Search by name, roll #, or enrollment no..." oninput="applyFilter()">
+        </div>
+        <div style="width: 130px;">
+          <label class="form-label" style="margin-bottom: 0.25rem;">Year</label>
+          <select id="filter-year" class="form-select" onchange="loadStudents()">
+            <option value="">All Years</option>
+            <option value="1">Year 1</option>
+            <option value="2">Year 2</option>
+            <option value="3">Year 3</option>
+          </select>
+        </div>
+        <div style="width: 140px;">
+          <label class="form-label" style="margin-bottom: 0.25rem;">Semester</label>
+          <select id="filter-sem" class="form-select" onchange="loadStudents()">
+            <option value="">All Sems</option>
+            <option value="1">Sem 1</option>
+            <option value="2">Sem 2</option>
+            <option value="3">Sem 3</option>
+            <option value="4">Sem 4</option>
+            <option value="5">Sem 5</option>
+            <option value="6">Sem 6</option>
+          </select>
+        </div>
+        <div style="margin-top: 1.25rem;">
+          <button class="btn btn-secondary btn-sm" onclick="resetFilters()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students Table Card -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem;">
+        <div>
+          <h2 class="card-title" style="margin: 0;">Enrolled Students</h2>
+          <p class="card-subtitle" id="table-subtitle" style="margin-top: 0.25rem;">Showing all students in your department.</p>
+        </div>
+        <div id="student-count-badge" style="background: var(--color-primary); color: var(--text-inverse, var(--bg-card)); border-radius: 999px; padding: 0.2rem 0.75rem; font-size: 0.8rem; font-weight: 700;">
+          0 Students
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="table" style="font-size: 0.875rem;">
+          <thead>
+            <tr>
+              <th style="width: 80px; text-align: center;">Class Roll No</th>
+              <th style="width: 150px;">UBTER Reg No</th>
+              <th style="width: 150px;">Board Enrollment No</th>
+              <th>Student Full Name</th>
+              <th>Program &amp; Cohort</th>
+              <th style="width: 120px; text-align: center;">Enrollment</th>
+              <th style="width: 120px; text-align: center;">Account</th>
+              <th style="width: 110px; text-align: center;">Google</th>
+              <th style="width: 100px; text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody">
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                Loading students directory...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ─── ADD STUDENT MODAL ──────────────────────────────────────── -->
+  <div id="add-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0;">+ Add Student</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Enroll student into your department curriculum.</p>
+        </div>
+        <button type="button" onclick="closeAddModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <form id="add-form" onsubmit="submitAddStudent(event)">
+        <div class="form-group">
+          <label class="form-label">Board / Official Enrollment No <span style="color: var(--status-absent);">*</span></label>
+          <input type="text" id="add-enrollment-no" class="form-control" placeholder="e.g. 2024IT001" required style="font-family: var(--font-family-mono); font-weight: 700;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">Permanent board registration / PRN number.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">UBTER Registration Number <span style="font-size: 0.78rem; font-weight: normal; color: var(--text-muted);">(Optional / UBTER Exam)</span></label>
+          <input type="text" id="add-reg-no" class="form-control" placeholder="e.g. 24101054001" style="font-family: var(--font-family-mono); text-transform: uppercase;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">Official examination registration number issued by UBTER.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Student Full Name <span style="color: var(--status-absent);">*</span></label>
+          <input type="text" id="add-name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Student / Institutional Email</label>
+          <input type="email" id="add-email" class="form-control" placeholder="e.g. rahul.sharma@gmail.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Academic Year (Session) <span style="color: var(--status-absent);">*</span></label>
+          <select id="add-academic-year" class="form-control" required></select>
+          <span style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">Active academic year session from institutional database.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Initial Temporary Password <span style="color: var(--status-absent);">*</span></label>
+          <input type="text" id="add-password" class="form-control" value="Password@123" placeholder="Password@123" required>
+          <span style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">Given to the student for their initial portal login.</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Class / Study Year <span style="color: var(--status-absent);">*</span></label>
+            <select id="add-year" class="form-control" required onchange="onAddYearChange()"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Semester <span style="color: var(--status-absent);">*</span></label>
+            <select id="add-sem" class="form-control" required></select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.5rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+            <input type="checkbox" id="add-lateral">
+            <span>Lateral Entry Student (D2D / Direct 2nd Year)</span>
+          </label>
+        </div>
+
+        <div style="background: var(--status-present-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.8rem; color: var(--status-present); margin-top: 0.5rem;">
+          ℹ️ <strong>Alphabetical Roll Numbers:</strong> Class roll number will be automatically assigned according to student name order.
+        </div>
+
+        <div id="add-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.85rem; color: var(--status-absent); margin-top: 0.75rem;"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+          <button type="submit" id="add-submit-btn" class="btn btn-primary">Enroll Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── BULK CSV UPLOAD MODAL ──────────────────────────────────── -->
+  <div id="bulk-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 540px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0;">📁 Bulk CSV Student Provisioning</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Import cohort roster and auto-assign alphabetical roll numbers.</p>
+        </div>
+        <button type="button" onclick="closeBulkModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <form id="bulk-form" onsubmit="submitBulkStudents(event)">
+        <div class="form-group" style="margin-bottom: 0.85rem;">
+          <label class="form-label">Academic Year (Session) <span style="color: var(--status-absent);">*</span></label>
+          <select id="bulk-academic-year" class="form-control" required></select>
+          <span style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">Active academic year session from institutional database.</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Class / Study Year <span style="color: var(--status-absent);">*</span></label>
+            <select id="bulk-year" class="form-control" required onchange="onBulkYearChange()"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Semester <span style="color: var(--status-absent);">*</span></label>
+            <select id="bulk-sem" class="form-control" required></select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Paste CSV Content or Roster Lines <span style="color: var(--status-absent);">*</span></label>
+          <textarea id="bulk-csv-input" class="form-control" rows="7" placeholder="EnrollmentNo, UBTER_RegNo, FullName, Email&#10;2024IT011, 24101054011, Aarav Verma, aarav@gmail.com&#10;2024IT012, 24101054012, Bhavna Patel, bhavna@gmail.com" required style="font-family: var(--font-family-mono); font-size: 0.825rem;"></textarea>
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem; display: block;">Format: <code>EnrollmentNo, UBTER_RegNo (optional), Full Name, Email (optional)</code> — one per line.</span>
+        </div>
+
+        <div id="bulk-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.85rem; color: var(--status-absent); margin-top: 0.75rem;"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeBulkModal()">Cancel</button>
+          <button type="submit" id="bulk-submit-btn" class="btn btn-primary">Process &amp; Enroll</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── SEMESTER PROMOTION & DEMOTION MODAL ─────────────────── -->
+  <div id="promotion-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 720px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin: 0; color: var(--color-primary);">🔄 Semester Promotion &amp; Demotion Control</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Preview, verify, and execute cohort semester progression or demotion rollback.</p>
+        </div>
+        <button type="button" onclick="closePromotionModal()" style="font-size: 1.3rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; background: var(--bg-surface); padding: 0.35rem; border-radius: var(--radius-sm);">
+        <button type="button" id="tab-mode-promote" class="btn btn-sm" onclick="switchPromoMode('promote')" style="flex: 1; font-weight: 700; background: var(--color-primary); color: var(--text-inverse, var(--bg-card)); border: none; border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; transition: all 0.15s ease;">
+          ▲ Promote Cohorts (+1 Sem)
+        </button>
+        <button type="button" id="tab-mode-demote" class="btn btn-sm" onclick="switchPromoMode('demote')" style="flex: 1; font-weight: 700; background: transparent; color: var(--text-muted); border: none; border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; transition: all 0.15s ease;">
+          ▼ Demote / Revert Cohorts (-1 Sem)
+        </button>
+      </div>
+
+      <div id="promotion-loading" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+        <div>Loading cohort preview...</div>
+      </div>
+
+      <div id="promotion-body" style="display: none;">
+        <div id="promotion-summary-banner" style="padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.875rem;"></div>
+
+        <div style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 0.75rem;">
+          <table class="table" style="font-size: 0.825rem; margin: 0;">
+            <thead style="position: sticky; top: 0; background: var(--bg-surface); z-index: 1;">
+              <tr>
+                <th style="width: 40px; text-align: center;"><input type="checkbox" id="promo-select-all" checked onchange="toggleAllPromotion(this.checked)"></th>
+                <th>Student Full Name</th>
+                <th>Enrollment / Roll #</th>
+                <th>Current Status</th>
+                <th id="promo-target-th">Target Cohort</th>
+              </tr>
+            </thead>
+            <tbody id="promo-table-body"></tbody>
+          </table>
+        </div>
+
+        <div id="promo-mode-hint" style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          💡 <strong>Detained / Repeaters:</strong> Uncheck any student who has backlogs or must repeat the semester.
+        </div>
+
+        <!-- Accidental Click Safety Protection Box -->
+        <div id="promo-safety-card" style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <div style="font-size: 0.825rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem;">
+                <span>🛡️ Accidental Modification Protection</span>
+              </div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+                To confirm this cohort update, enter your Department Code (<strong id="promo-dept-code-label" style="color: var(--text-main); font-family: var(--font-family-mono); font-size: 0.85rem;">IT</strong>):
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="text" id="promo-confirm-code" class="form-control" placeholder="Code" style="text-transform: uppercase; font-family: var(--font-family-mono); font-weight: 700; width: 110px; padding: 0.45rem 0.6rem; text-align: center; letter-spacing: 0.08em; font-size: 0.9rem;" oninput="checkPromoCodeMatch()" autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <div id="promotion-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.85rem; color: var(--status-absent); margin-bottom: 1rem;"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; align-items: center;">
+          <button type="button" class="btn btn-secondary" onclick="closePromotionModal()">Cancel</button>
+          <button type="button" id="promo-confirm-btn" class="btn btn-primary" onclick="executePromotion()" disabled style="background: var(--bg-surface); border-color: var(--border-color); color: var(--text-muted); font-weight: 700; opacity: 0.65; cursor: not-allowed; transition: all 0.2s ease;">
+            Enter Department Code to Enable
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DELETE STUDENT (LEFT COLLEGE) MODAL ────────────────────── -->
+  <div id="delete-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 450px;">
+      <div style="margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--status-absent); margin: 0;">Remove Student (Left College)</h2>
+        <p style="font-size: 0.825rem; color: var(--text-muted); margin-top: 0.25rem;">Terminate active enrollment and re-index class roll numbers.</p>
+      </div>
+
+      <div style="background: var(--status-absent-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; font-size: 0.85rem; color: var(--status-absent); margin-bottom: 1rem;">
+        Are you sure you want to mark <strong id="del-name">Student</strong> (<span id="del-roll" style="font-family: var(--font-family-mono); font-weight: 700;">—</span>) as withdrawn?
+        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--status-absent);">
+          ✓ Remaining students in this cohort will have their class roll numbers <strong>automatically re-sequenced without gaps</strong>.
+        </div>
+      </div>
+
+      <div id="del-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.85rem; color: var(--status-absent); margin-bottom: 1rem;"></div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" id="del-confirm-btn" class="btn btn-primary" onclick="submitDeleteStudent()" style="background: var(--status-absent); border-color: var(--status-absent);">
+          Confirm Withdrawal
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── RE-INDEX ROLL NUMBERS MODAL ────────────────────────────── -->
+  <div id="reindex-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 440px;">
+      <div style="margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0;">🔤 Re-order Class Roll Numbers</h2>
+        <p style="font-size: 0.825rem; color: var(--text-muted); margin-top: 0.25rem;">Re-sequence roll numbers (1 to N) alphabetically by student name.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+        <div class="form-group">
+          <label class="form-label">Academic Year</label>
+          <select id="reindex-year" class="form-control">
+            <option value="1">Year 1</option>
+            <option value="2">Year 2</option>
+            <option value="3">Year 3</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Semester</label>
+          <select id="reindex-sem" class="form-control">
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+          </select>
+        </div>
+      </div>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Useful after manual additions or lateral entry admissions to guarantee complete alphabetical ordering.
+      </p>
+
+      <div id="reindex-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.85rem; color: var(--status-absent); margin-bottom: 1rem;"></div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="closeReindexModal()">Cancel</button>
+        <button type="button" id="reindex-submit-btn" class="btn btn-primary" onclick="submitReindexRoll()">Re-order Alphabetically</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STUDENT CREDENTIALS SLIP MODAL ───────────────────────── -->
+  <div id="cred-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; text-align: center;">
+      <div style="width: 56px; height: 56px; background: var(--status-present-bg); color: var(--status-present); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.75rem;">✓</div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">Student Enrolled!</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        Share these login credentials with the student for their portal access.
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; text-align: left; margin-bottom: 1.25rem; font-size: 0.85rem;">
+        <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Student Name:</span><strong id="slip-name"></strong></div>
+        <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Class Roll #:</span><strong id="slip-roll" style="color: var(--color-primary);"></strong></div>
+        <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Enrollment No (Login ID):</span><strong id="slip-enroll" style="color: var(--color-primary); font-family: var(--font-family-mono);"></strong></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem;"><span style="color: var(--text-muted);">Temporary Password:</span><strong id="slip-temp" style="color: var(--status-absent); font-size: 1.1rem; letter-spacing: 0.05em; font-family: var(--font-family-mono);"></strong></div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button type="button" class="btn btn-secondary" onclick="copyStudentCredentials()">📋 Copy Credentials</button>
+        <button type="button" class="btn btn-primary" onclick="closeCredModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── BULK PROVISIONING CREDENTIALS MODAL ─────────────────── -->
+  <div id="bulk-result-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 650px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--status-present);">✓ Bulk Students Provisioned</h2>
+        <button type="button" onclick="closeBulkResultModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Below are the provisioned students and their temporary passwords for initial student login.
+      </p>
+      <div style="max-height: 280px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 1.25rem;">
+        <table class="table" style="font-size: 0.82rem; margin: 0;">
+          <thead>
+            <tr>
+              <th style="width: 60px; text-align: center;">Roll</th>
+              <th>Enrollment No</th>
+              <th>Full Name</th>
+              <th>Temp Password</th>
+            </tr>
+          </thead>
+          <tbody id="bulk-result-tbody"></tbody>
+        </table>
+      </div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="copyBulkCredentials()">📋 Copy All Credentials</button>
+        <button type="button" class="btn btn-primary" onclick="closeBulkResultModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── RESET STUDENT PASSWORD MODAL ───────────────────────── -->
+  <div id="reset-student-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 440px;">
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 0.5rem 0;">Reset Student Password</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+        Set a new temporary login password for <strong id="reset-student-name"></strong> (<span id="reset-student-enroll" style="font-family: monospace;"></span>).
+      </p>
+      <form id="reset-student-form" onsubmit="submitResetStudentPassword(event)">
+        <div class="form-group">
+          <label class="form-label">New Password <span style="color: var(--status-absent);">*</span></label>
+          <input type="text" id="reset-student-password" class="form-control" value="Password@123" required>
+        </div>
+        <div id="reset-student-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; color: var(--status-absent);"></div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeResetStudentModal()">Cancel</button>
+          <button type="submit" id="reset-student-btn" class="btn btn-primary">Reset Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireHOD: true });
+    const API = '/hod';
+    var allStudents = [];
+    var departmentData = null;
+    var currentDeleteStudentId = null;
+    var promotionPreviewData = null;
+
+    function showModal(id) {
+      const el = document.getElementById(id);
+      if (el) { el.style.display = 'flex'; el.classList.add('open'); }
+    }
+    function hideModal(id) {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('open'); el.style.display = 'none'; }
+    }
+
+    function showToast(msg, type = 'info') {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.style.display = 'block';
+      t.style.background = type === 'error' ? 'var(--status-absent)' : type === 'success' ? 'var(--status-present)' : 'var(--color-primary)';
+      t.style.color = 'var(--text-inverse, var(--bg-card))';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    async function init() {
+      try {
+        const hierRes = await fetchApi(`${API}/hierarchy`);
+        if (hierRes.success && hierRes.data) {
+          departmentData = hierRes.data;
+          currentPromoDeptCode = departmentData.department_code || 'IT';
+          const codeLabel = document.getElementById('promo-dept-code-label');
+          if (codeLabel) codeLabel.innerText = currentPromoDeptCode;
+
+          document.getElementById('dept-header-name').innerText = (departmentData.department_name || 'Department') + ' — Portal';
+          document.getElementById('dept-subtitle').innerText =
+            `Manage enrolled students, enrollment numbers, and semester promotion & demotion lifecycle in ${departmentData.department_name}.`;
+
+          const durationYears = departmentData.degree_duration_years || 4;
+          updateCohortFilters(durationYears, departmentData.academicYears || []);
+        }
+      } catch (err) {
+        console.warn('Hierarchy load warning:', err.message);
+      }
+
+      await loadStudents();
+    }
+
+    function updateCohortFilters(durationYears, academicYears = []) {
+      const maxSem = durationYears * 2;
+      const fYear = document.getElementById('filter-year');
+      const addYear = document.getElementById('add-year');
+      const bulkYear = document.getElementById('bulk-year');
+      const reindexYear = document.getElementById('reindex-year');
+
+      // Populate Academic Year (Session from database, e.g. 2026-27)
+      if (academicYears && academicYears.length) {
+        let ayOpts = '';
+        academicYears.forEach(ay => {
+          ayOpts += `<option value="${ay.id}" ${ay.is_current ? 'selected' : ''}>${esc(ay.label)}${ay.is_current ? ' (Current Active Session)' : ''}</option>`;
+        });
+        const addAy = document.getElementById('add-academic-year');
+        const bulkAy = document.getElementById('bulk-academic-year');
+        if (addAy) addAy.innerHTML = ayOpts;
+        if (bulkAy) bulkAy.innerHTML = ayOpts;
+      }
+
+      // Populate Class / Study Year dropdowns (Year 1 to Year N)
+      let yOpts = '<option value="">All Years</option>';
+      let yReqOpts = '';
+      for (let y = 1; y <= durationYears; y++) {
+        yOpts += `<option value="${y}">Year ${y}</option>`;
+        yReqOpts += `<option value="${y}">Year ${y}</option>`;
+      }
+      if (fYear) fYear.innerHTML = yOpts;
+      if (addYear) addYear.innerHTML = yReqOpts;
+      if (bulkYear) bulkYear.innerHTML = yReqOpts;
+      if (reindexYear) reindexYear.innerHTML = yReqOpts;
+
+      // Filter bar semester dropdown (All Sems + Sem 1 to maxSem)
+      const fSem = document.getElementById('filter-sem');
+      const reindexSem = document.getElementById('reindex-sem');
+
+      let sOpts = '<option value="">All Sems</option>';
+      let sReqOpts = '';
+      for (let s = 1; s <= maxSem; s++) {
+        sOpts += `<option value="${s}">Sem ${s}</option>`;
+        sReqOpts += `<option value="${s}">Semester ${s}</option>`;
+      }
+      if (fSem) fSem.innerHTML = sOpts;
+      if (reindexSem) reindexSem.innerHTML = sReqOpts;
+
+      // Auto-populate semesters for currently selected years
+      onAddYearChange();
+      onBulkYearChange();
+    }
+
+    function populateSemestersForYear(yearVal, semSelectEl) {
+      if (!semSelectEl) return;
+      const yr = parseInt(yearVal, 10);
+      if (!yr || isNaN(yr)) {
+        semSelectEl.innerHTML = '<option value="">Select Year First</option>';
+        return;
+      }
+      const oddSem = (yr * 2) - 1;
+      const evenSem = yr * 2;
+      semSelectEl.innerHTML = `
+        <option value="${oddSem}">Semester ${oddSem} (Odd Term)</option>
+        <option value="${evenSem}">Semester ${evenSem} (Even Term)</option>
+      `;
+      semSelectEl.value = String(oddSem);
+    }
+
+    function onAddYearChange() {
+      const yr = document.getElementById('add-year')?.value || 1;
+      const semSelect = document.getElementById('add-sem');
+      populateSemestersForYear(yr, semSelect);
+    }
+
+    function onBulkYearChange() {
+      const yr = document.getElementById('bulk-year')?.value || 1;
+      const semSelect = document.getElementById('bulk-sem');
+      populateSemestersForYear(yr, semSelect);
+    }
+
+    async function loadStudents() {
+      const year = document.getElementById('filter-year').value;
+      const sem = document.getElementById('filter-sem').value;
+
+      let qs = [];
+      if (year) qs.push(`year=${year}`);
+      if (sem) qs.push(`semester=${sem}`);
+      const queryStr = qs.length ? '?' + qs.join('&') : '';
+
+      const tbody = document.getElementById('students-tbody');
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading students...</td></tr>';
+
+      try {
+        const res = await fetchApi(`${API}/students${queryStr}`);
+        if (res.success) {
+          allStudents = res.data || [];
+          updateStats(allStudents);
+          applyFilter();
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--status-absent); padding: 2rem;">Failed to load students: ${err.message}</td></tr>`;
+      }
+    }
+
+    function updateStats(students) {
+      document.getElementById('stat-total').innerText = students.length;
+      document.getElementById('stat-active').innerText = students.filter(s => s.account_status === 'ACTIVE').length;
+      document.getElementById('stat-provisioned').innerText = students.filter(s => s.account_status === 'PROVISIONED').length;
+      document.getElementById('stat-google').innerText = students.filter(s => s.google_linked).length;
+    }
+
+    function applyFilter() {
+      const search = (document.getElementById('search-input').value || '').toLowerCase().trim();
+      const filtered = allStudents.filter(s => {
+        if (!search) return true;
+        return (s.full_name || '').toLowerCase().includes(search) ||
+               (s.official_enrollment_no || '').toLowerCase().includes(search) ||
+               (s.registration_no || '').toLowerCase().includes(search) ||
+               String(s.class_roll_no || '').includes(search);
+      });
+
+      renderTable(filtered);
+    }
+
+    function renderTable(students) {
+      const tbody = document.getElementById('students-tbody');
+      document.getElementById('student-count-badge').innerText = `${students.length} Students`;
+      document.getElementById('table-subtitle').innerText = `Showing ${students.length} matching student records.`;
+
+      if (!students.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+              No students found matching your criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = students.map(s => {
+        const isEnrolled = s.enrollment_status === 'ENROLLED';
+        let enrolBadge = `<span class="badge badge-present">ENROLLED</span>`;
+        if (s.enrollment_status === 'DETAINED') enrolBadge = `<span class="badge badge-late">DETAINED</span>`;
+        if (s.enrollment_status === 'WITHDRAWN') enrolBadge = `<span class="badge badge-absent">WITHDRAWN</span>`;
+
+        let accBadge = `<span class="badge badge-late">PROVISIONED</span>`;
+        if (s.account_status === 'ACTIVE') accBadge = `<span class="badge badge-present">ACTIVE</span>`;
+        else if (s.account_status === 'SUSPENDED') accBadge = `<span class="badge badge-absent">SUSPENDED</span>`;
+        else if (s.account_status === 'ALUMNI') accBadge = `<span class="badge" style="background:var(--bg-surface-secondary); color:var(--text-muted);">ALUMNI</span>`;
+
+        const googleBadge = s.google_linked
+          ? `<span style="color: var(--status-present); font-weight: 700; font-size: 0.8rem;">✓ Linked</span>`
+          : `<span style="color: var(--text-muted); font-size: 0.78rem;">—</span>`;
+
+        return `
+          <tr>
+            <td style="text-align: center;">
+              <span class="badge" style="background:var(--color-primary-light); color:var(--color-primary); font-weight: 800; font-size: 0.85rem; padding: 0.2rem 0.55rem;">
+                ${s.class_roll_no || '—'}
+              </span>
+            </td>
+            <td><span style="font-family: var(--font-family-mono); font-size: 0.8rem; background: var(--bg-surface-secondary); padding: 0.2rem 0.4rem; border-radius: 4px; color: var(--color-primary); font-weight: 700;">${esc(s.registration_no || '—')}</span></td>
+            <td><span style="font-family: var(--font-family-mono); font-weight: 700; color: var(--text-main);">${esc(s.official_enrollment_no)}</span></td>
+            <td style="font-weight: 600; color: var(--text-main);">${esc(s.full_name)}</td>
+            <td>
+              <div>${esc(s.branch_name || s.department_name || '')}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Year ${s.year} • Semester ${s.semester}</div>
+            </td>
+            <td style="text-align: center;">${enrolBadge}</td>
+            <td style="text-align: center;">${accBadge}</td>
+            <td style="text-align: center;">${googleBadge}</td>
+            <td style="text-align: center;">
+              <div style="display: flex; gap: 0.35rem; justify-content: center;">
+                <button class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="openResetStudentModal(${s.id}, '${esc(s.full_name)}', '${esc(s.official_enrollment_no)}')">
+                  🔑 Reset
+                </button>
+                <button class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; color: var(--status-absent);" onclick="openDeleteModal(${s.id}, '${esc(s.full_name)}', '${esc(s.official_enrollment_no)}', ${s.year}, ${s.semester})">
+                  🗑️ Left
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function resetFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('filter-year').value = '';
+      document.getElementById('filter-sem').value = '';
+      loadStudents();
+    }
+
+    // ─── ADD STUDENT MODAL ──────────────────────────────────────
+    function openAddModal() {
+      document.getElementById('add-form').reset();
+      document.getElementById('add-password').value = 'Password@123';
+      const regInput = document.getElementById('add-reg-no');
+      if (regInput) regInput.value = '';
+      document.getElementById('add-error').style.display = 'none';
+      if (departmentData) {
+        updateCohortFilters(departmentData.degree_duration_years || 4, departmentData.academicYears || []);
+      }
+      onAddYearChange();
+      showModal('add-modal');
+    }
+    function closeAddModal() { hideModal('add-modal'); }
+
+    async function submitAddStudent(e) {
+      e.preventDefault();
+      const btn = document.getElementById('add-submit-btn');
+      const errEl = document.getElementById('add-error');
+      btn.disabled = true; btn.textContent = 'Enrolling...'; errEl.style.display = 'none';
+
+      try {
+        const res = await fetchApi(`${API}/students`, {
+          method: 'POST',
+          body: JSON.stringify({
+            official_enrollment_no: document.getElementById('add-enrollment-no').value.trim(),
+            registration_no: document.getElementById('add-reg-no')?.value.trim().toUpperCase() || undefined,
+            full_name: document.getElementById('add-name').value.trim(),
+            email: document.getElementById('add-email').value.trim() || undefined,
+            initial_password: document.getElementById('add-password').value.trim() || undefined,
+            academic_year_id: parseInt(document.getElementById('add-academic-year').value, 10) || undefined,
+            year: parseInt(document.getElementById('add-year').value, 10),
+            semester: parseInt(document.getElementById('add-sem').value, 10),
+            is_lateral_entry: document.getElementById('add-lateral').checked
+          })
+        });
+
+        closeAddModal();
+        await loadStudents();
+        if (res.data) {
+          openCredModal(res.data);
+        } else {
+          showToast(res.message || 'Student enrolled successfully!', 'success');
+        }
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Enroll Student';
+      }
+    }
+
+    // ─── BULK CSV MODAL ─────────────────────────────────────────
+    function openBulkModal() {
+      document.getElementById('bulk-form').reset();
+      document.getElementById('bulk-error').style.display = 'none';
+      if (departmentData) {
+        updateCohortFilters(departmentData.degree_duration_years || 4, departmentData.academicYears || []);
+      }
+      onBulkYearChange();
+      showModal('bulk-modal');
+    }
+    function closeBulkModal() { hideModal('bulk-modal'); }
+
+    async function submitBulkStudents(e) {
+      e.preventDefault();
+      const btn = document.getElementById('bulk-submit-btn');
+      const errEl = document.getElementById('bulk-error');
+      const rawCsv = document.getElementById('bulk-csv-input').value.trim();
+      const academic_year_id = parseInt(document.getElementById('bulk-academic-year').value, 10) || undefined;
+      const year = parseInt(document.getElementById('bulk-year').value, 10);
+      const sem = parseInt(document.getElementById('bulk-sem').value, 10);
+
+      const lines = rawCsv.split('\n').map(l => l.trim()).filter(Boolean);
+      const parsedStudents = [];
+
+      for (const line of lines) {
+        const parts = line.split(',').map(p => p.trim());
+        if (parts.length < 2) continue;
+        if (parts[0].toLowerCase().includes('enrollment') || parts[1].toLowerCase().includes('name') || parts[1].toLowerCase().includes('reg')) continue;
+
+        let enrollNo = parts[0];
+        let regNo = null;
+        let fullName = '';
+        let email = undefined;
+
+        if (parts.length >= 4) {
+          // 4 columns: EnrollmentNo, UBTER_RegNo, FullName, Email
+          regNo = parts[1] || null;
+          fullName = parts[2];
+          email = parts[3] || undefined;
+        } else if (parts.length === 3) {
+          // 3 columns:
+          // If parts[1] looks like a registration number (numeric, 8+ digits)
+          if (/^\d{8,16}$/.test(parts[1])) {
+            regNo = parts[1];
+            fullName = parts[2];
+          } else if (parts[2].includes('@')) {
+            // EnrollmentNo, FullName, Email
+            fullName = parts[1];
+            email = parts[2];
+          } else {
+            // EnrollmentNo, FullName, RegNo
+            fullName = parts[1];
+            regNo = parts[2];
+          }
+        } else {
+          // 2 columns: EnrollmentNo, FullName
+          fullName = parts[1];
+        }
+
+        if (enrollNo && fullName) {
+          parsedStudents.push({
+            official_enrollment_no: enrollNo,
+            registration_no: regNo || undefined,
+            full_name: fullName,
+            email: email || undefined
+          });
+        }
+      }
+
+      if (!parsedStudents.length) {
+        errEl.textContent = 'No valid student records detected. Check format: EnrollmentNo, UBTER_RegNo (optional), Full Name, Email';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Processing...'; errEl.style.display = 'none';
+
+      try {
+        const res = await fetchApi(`${API}/students/bulk`, {
+          method: 'POST',
+          body: JSON.stringify({
+            academic_year_id,
+            year,
+            semester: sem,
+            students: parsedStudents
+          })
+        });
+
+        closeBulkModal();
+        await loadStudents();
+        if (res.data?.students && res.data.students.length) {
+          openBulkResultModal(res.data.students);
+        } else {
+          showToast(res.message || `Successfully enrolled ${res.data?.count || parsedStudents.length} students!`, 'success');
+        }
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Process & Enroll';
+      }
+    }
+
+    // ─── DELETE / LEFT COLLEGE MODAL ────────────────────────────
+    function openDeleteModal(id, name, roll, year, sem) {
+      currentDeleteStudentId = id;
+      document.getElementById('del-name').textContent = name;
+      document.getElementById('del-roll').textContent = roll;
+      document.getElementById('del-error').style.display = 'none';
+      showModal('delete-modal');
+    }
+    function closeDeleteModal() { hideModal('delete-modal'); }
+
+    async function submitDeleteStudent() {
+      if (!currentDeleteStudentId) return;
+      const btn = document.getElementById('del-confirm-btn');
+      const errEl = document.getElementById('del-error');
+      btn.disabled = true; btn.textContent = 'Withdrawing...'; errEl.style.display = 'none';
+
+      try {
+        const res = await fetchApi(`${API}/students/${currentDeleteStudentId}`, {
+          method: 'DELETE'
+        });
+
+        closeDeleteModal();
+        showToast(res.message || 'Student withdrawn and roll numbers re-indexed!', 'success');
+        await loadStudents();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Confirm Withdrawal';
+      }
+    }
+
+    // ─── RE-INDEX ROLL NUMBERS MODAL ────────────────────────────
+    function openReindexModal() {
+      document.getElementById('reindex-error').style.display = 'none';
+      showModal('reindex-modal');
+    }
+    function closeReindexModal() { hideModal('reindex-modal'); }
+
+    async function submitReindexRoll() {
+      const btn = document.getElementById('reindex-submit-btn');
+      const errEl = document.getElementById('reindex-error');
+      const year = parseInt(document.getElementById('reindex-year').value, 10);
+      const sem = parseInt(document.getElementById('reindex-sem').value, 10);
+
+      btn.disabled = true; btn.textContent = 'Re-ordering...'; errEl.style.display = 'none';
+
+      try {
+        const res = await fetchApi(`${API}/students/reindex-roll`, {
+          method: 'POST',
+          body: JSON.stringify({ year, semester: sem })
+        });
+
+        closeReindexModal();
+        showToast(res.message || 'Roll numbers re-indexed alphabetically!', 'success');
+        await loadStudents();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Re-order Alphabetically';
+      }
+    }
+
+    // ─── SEMESTER PROMOTION & DEMOTION MODAL ─────────────────────
+    var currentPromoMode = 'promote';
+    var currentPromoDeptCode = 'IT';
+
+    async function openPromotionModal() {
+      const loading = document.getElementById('promotion-loading');
+      const body = document.getElementById('promotion-body');
+      const errEl = document.getElementById('promotion-error');
+      const codeInput = document.getElementById('promo-confirm-code');
+
+      currentPromoMode = 'promote';
+      if (codeInput) codeInput.value = '';
+
+      updatePromoTabsUI();
+      checkPromoCodeMatch();
+
+      loading.style.display = 'block';
+      body.style.display = 'none';
+      errEl.style.display = 'none';
+      showModal('promotion-modal');
+
+      await loadPromotionPreview(currentPromoMode);
+    }
+
+    function closePromotionModal() { 
+      hideModal('promotion-modal'); 
+    }
+
+    function updatePromoTabsUI() {
+      const tabPromote = document.getElementById('tab-mode-promote');
+      const tabDemote = document.getElementById('tab-mode-demote');
+      if (!tabPromote || !tabDemote) return;
+      if (currentPromoMode === 'promote') {
+        tabPromote.style.background = 'var(--color-primary)';
+        tabPromote.style.color = 'var(--text-inverse, var(--bg-card))';
+        tabDemote.style.background = 'transparent';
+        tabDemote.style.color = 'var(--text-muted)';
+      } else {
+        tabDemote.style.background = 'var(--status-late)';
+        tabDemote.style.color = 'var(--text-inverse, var(--bg-card))';
+        tabPromote.style.background = 'transparent';
+        tabPromote.style.color = 'var(--text-muted)';
+      }
+    }
+
+    async function switchPromoMode(mode) {
+      if (currentPromoMode === mode) return;
+      currentPromoMode = mode;
+      updatePromoTabsUI();
+
+      const loading = document.getElementById('promotion-loading');
+      const body = document.getElementById('promotion-body');
+      const errEl = document.getElementById('promotion-error');
+      
+      loading.style.display = 'block';
+      body.style.display = 'none';
+      errEl.style.display = 'none';
+
+      checkPromoCodeMatch();
+      await loadPromotionPreview(currentPromoMode);
+    }
+
+    async function loadPromotionPreview(action) {
+      const loading = document.getElementById('promotion-loading');
+      const body = document.getElementById('promotion-body');
+      const errEl = document.getElementById('promotion-error');
+
+      try {
+        const res = await fetchApi(`${API}/promotion/preview?action=${action}`);
+        promotionPreviewData = res.data;
+        if (promotionPreviewData?.department_code) {
+          currentPromoDeptCode = promotionPreviewData.department_code;
+          const lbl = document.getElementById('promo-dept-code-label');
+          if (lbl) lbl.innerText = currentPromoDeptCode;
+        }
+        renderPromotionPreview(promotionPreviewData);
+        loading.style.display = 'none';
+        body.style.display = 'block';
+        checkPromoCodeMatch();
+      } catch (err) {
+        loading.innerHTML = `<div style="color: var(--status-absent); padding: 2rem;">Failed to load cohort preview: ${esc(err.message)}</div>`;
+      }
+    }
+
+    function checkPromoCodeMatch() {
+      const codeInput = document.getElementById('promo-confirm-code');
+      const btn = document.getElementById('promo-confirm-btn');
+      if (!btn) return;
+
+      const entered = (codeInput ? codeInput.value : '').trim().toUpperCase();
+      const target = (currentPromoDeptCode || 'IT').trim().toUpperCase();
+
+      if (entered && entered === target) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        if (currentPromoMode === 'demote') {
+          btn.style.background = 'var(--status-late)';
+          btn.style.borderColor = 'var(--status-late)';
+          btn.textContent = 'Execute Cohort Demotion (-1 Sem) →';
+        } else {
+          btn.style.background = 'var(--color-primary)';
+          btn.style.borderColor = 'var(--color-primary)';
+          btn.textContent = 'Execute Semester Promotion (+1 Sem) →';
+        }
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.65';
+        btn.style.cursor = 'not-allowed';
+        btn.style.background = 'var(--bg-surface)';
+        btn.style.borderColor = 'var(--border-color)';
+        btn.textContent = `Enter "${target}" to Enable`;
+      }
+    }
+
+    function renderPromotionPreview(p) {
+      const banner = document.getElementById('promotion-summary-banner');
+      const tbody = document.getElementById('promo-table-body');
+      const targetTh = document.getElementById('promo-target-th');
+      const hint = document.getElementById('promo-mode-hint');
+
+      if (p.action === 'demote') {
+        if (targetTh) targetTh.textContent = 'Demotion Target';
+        banner.style.background = 'var(--status-late-bg)';
+        banner.style.border = '1px solid var(--border-color)';
+        banner.style.color = 'var(--status-late)';
+        banner.innerHTML = `
+          <strong>Cohort Demotion / Rollback:</strong> Reverting cohorts back to their previous academic semester.<br>
+          <span style="font-size: 0.8rem; color: var(--status-late); margin-top: 0.25rem; display: block;">
+            Academic Year: <strong>${esc(p.academic_year_label)}</strong> • Reverting / Demoting: <strong>${p.eligible_count}</strong> students.
+          </span>
+        `;
+        if (hint) hint.innerHTML = '💡 <strong>Exclude from Demotion:</strong> Uncheck any student you wish to keep in their current semester without reverting them.';
+      } else {
+        if (targetTh) targetTh.textContent = 'Promotion Target';
+        banner.style.background = 'var(--color-primary-light, var(--bg-surface))';
+        banner.style.border = '1px solid var(--border-color)';
+        banner.style.color = 'var(--color-primary)';
+        banner.innerHTML = `
+          <strong>Semester Promotion:</strong> Advancing active department cohorts to their next academic semester.<br>
+          <span style="font-size: 0.8rem; color: var(--color-primary); margin-top: 0.25rem; display: block;">
+            Academic Year: <strong>${esc(p.academic_year_label)}</strong> • Advancing: <strong>${p.continuing_count}</strong> students${p.graduating_count > 0 ? ` • Completing Degree / Graduating: <strong>${p.graduating_count}</strong> students` : ''}.
+          </span>
+        `;
+        if (hint) hint.innerHTML = '💡 <strong>Detained / Repeaters:</strong> Uncheck any student who has backlogs or must repeat the semester. Unchecked students remain in current semester as <code>DETAINED</code>.';
+      }
+
+      let allRows = '';
+      (p.cohorts || []).forEach(c => {
+        c.students.forEach(st => {
+          let targetLabel = '';
+          let checkboxHtml = '';
+
+          if (p.action === 'demote') {
+            if (st.can_demote === false) {
+              checkboxHtml = `<input type="checkbox" disabled title="Already in Semester 1">`;
+              targetLabel = `<span class="badge" style="background: var(--bg-surface); color: var(--text-muted); font-weight:600;">Sem 1 Base (Cannot Demote)</span>`;
+            } else if (st.status === 'COMPLETED') {
+              checkboxHtml = `<input type="checkbox" class="promo-student-check" value="${st.student_id}" checked>`;
+              targetLabel = `<span class="badge" style="background: var(--status-late-bg); color: var(--status-late); font-weight:700;">Revert to Yr ${c.target_year} • Sem ${c.target_sem}</span>`;
+            } else if (st.status === 'DETAINED') {
+              checkboxHtml = `<input type="checkbox" class="promo-student-check" value="${st.student_id}" checked>`;
+              targetLabel = `<span class="badge" style="background: var(--color-primary-light, var(--bg-surface)); color: var(--color-primary); font-weight:700;">Restore Active Sem ${c.target_sem}</span>`;
+            } else {
+              checkboxHtml = `<input type="checkbox" class="promo-student-check" value="${st.student_id}" checked>`;
+              targetLabel = `<strong style="color: var(--status-late);">Year ${c.target_year} • Sem ${c.target_sem}</strong>`;
+            }
+          } else {
+            checkboxHtml = `<input type="checkbox" class="promo-student-check" value="${st.student_id}" checked>`;
+            targetLabel = c.is_graduating
+              ? `<span class="badge badge-present" style="background: var(--status-present-bg); color: var(--status-present); font-weight:700;">🎓 GRADUATED / ALUMNI</span>`
+              : `<strong>Year ${c.target_year} • Sem ${c.target_sem}</strong>`;
+          }
+
+          const currentCohortLabel = st.status === 'COMPLETED'
+            ? `<span class="badge" style="background: var(--status-present-bg); color: var(--status-present);">Alumni (Graduated)</span>`
+            : st.status === 'DETAINED'
+            ? `<span class="badge" style="background: var(--status-absent-bg); color: var(--status-absent);">Yr ${c.current_year} • Sem ${c.current_sem} (Detained)</span>`
+            : `Year ${c.current_year} • Sem ${c.current_sem}`;
+
+          allRows += `
+            <tr>
+              <td style="text-align: center;">${checkboxHtml}</td>
+              <td style="font-weight: 600;">${esc(st.full_name)}</td>
+              <td><span style="font-family: var(--font-family-mono); font-weight: 700;">${esc(st.official_enrollment_no)}</span></td>
+              <td>${currentCohortLabel}</td>
+              <td>${targetLabel}</td>
+            </tr>
+          `;
+        });
+      });
+
+      tbody.innerHTML = allRows || `<tr><td colspan="5" style="text-align: center; padding: 2rem;">No students found for this action.</td></tr>`;
+    }
+
+    function toggleAllPromotion(checked) {
+      document.querySelectorAll('.promo-student-check').forEach(cb => {
+        if (!cb.disabled) cb.checked = checked;
+      });
+    }
+
+    async function executePromotion() {
+      const btn = document.getElementById('promo-confirm-btn');
+      const errEl = document.getElementById('promotion-error');
+      const codeInput = document.getElementById('promo-confirm-code');
+      const enteredCode = (codeInput ? codeInput.value : '').trim().toUpperCase();
+
+      if (!enteredCode || enteredCode !== (currentPromoDeptCode || 'IT').trim().toUpperCase()) {
+        errEl.textContent = `Please enter department code "${currentPromoDeptCode}" in the protection box before proceeding.`;
+        errEl.style.display = 'block';
+        return;
+      }
+
+      // Unchecked checkboxes are exceptions
+      const exceptions = [];
+      document.querySelectorAll('.promo-student-check').forEach(cb => {
+        if (!cb.checked && !cb.disabled) {
+          exceptions.push(parseInt(cb.value, 10));
+        }
+      });
+
+      btn.disabled = true;
+      btn.textContent = currentPromoMode === 'demote' ? 'Demoting Cohorts...' : 'Promoting Cohorts...';
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetchApi(`${API}/promotion/execute`, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: currentPromoMode,
+            exceptions,
+            confirm_code: enteredCode
+          })
+        });
+
+        closePromotionModal();
+        showToast(res.message || 'Action successfully executed!', 'success');
+        await init();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        checkPromoCodeMatch();
+      }
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ─── Student Credentials Slip Modal ─────────────────────────
+    var currentCreatedStudent = null;
+
+    function openCredModal(st) {
+      currentCreatedStudent = st;
+      document.getElementById('slip-name').textContent = st.full_name || '';
+      document.getElementById('slip-roll').textContent = st.class_roll_no ? `${st.class_roll_no}` : '—';
+      document.getElementById('slip-enroll').textContent = st.official_enrollment_no || '';
+      document.getElementById('slip-temp').textContent = st.temp_password || 'Password@123';
+      showModal('cred-modal');
+    }
+
+    function closeCredModal() {
+      hideModal('cred-modal');
+      currentCreatedStudent = null;
+    }
+
+    function copyStudentCredentials() {
+      if (!currentCreatedStudent) return;
+      const text = `College Attendance Portal Login\nName: ${currentCreatedStudent.full_name}\nEnrollment No (Login ID): ${currentCreatedStudent.official_enrollment_no}\nTemporary Password: ${currentCreatedStudent.temp_password || 'Password@123'}\nPortal URL: ${window.location.origin}/login/student.html`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Credentials copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Failed to copy. Please manually copy credentials.', 'info');
+      });
+    }
+
+    // ─── Bulk Credentials Modal ─────────────────────────────────
+    var currentBulkStudents = [];
+
+    function openBulkResultModal(students) {
+      currentBulkStudents = students || [];
+      const tbody = document.getElementById('bulk-result-tbody');
+      tbody.innerHTML = currentBulkStudents.map(st => `
+        <tr>
+          <td style="text-align: center; font-weight: 700; color: var(--color-primary);">${st.class_roll_no || '—'}</td>
+          <td style="font-family: var(--font-family-mono); font-weight: 600;">${esc(st.official_enrollment_no)}</td>
+          <td>${esc(st.full_name)}</td>
+          <td style="font-family: var(--font-family-mono); font-weight: 700; color: var(--status-absent);">${esc(st.temp_password || 'Password@123')}</td>
+        </tr>
+      `).join('');
+      showModal('bulk-result-modal');
+    }
+
+    function closeBulkResultModal() {
+      hideModal('bulk-result-modal');
+      currentBulkStudents = [];
+    }
+
+    function copyBulkCredentials() {
+      if (!currentBulkStudents.length) return;
+      const text = currentBulkStudents.map(st =>
+        `${st.official_enrollment_no}, ${st.full_name}, Temp Password: ${st.temp_password || 'Password@123'}`
+      ).join('\n');
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('All student credentials copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Failed to copy. Please manually copy credentials.', 'info');
+      });
+    }
+
+    // ─── Reset Student Password Modal ───────────────────────────
+    var currentResetStudentId = null;
+
+    function openResetStudentModal(id, name, enroll) {
+      currentResetStudentId = id;
+      document.getElementById('reset-student-name').textContent = name;
+      document.getElementById('reset-student-enroll').textContent = enroll;
+      document.getElementById('reset-student-password').value = 'Password@123';
+      document.getElementById('reset-student-err').style.display = 'none';
+      showModal('reset-student-modal');
+    }
+
+    function closeResetStudentModal() {
+      hideModal('reset-student-modal');
+      currentResetStudentId = null;
+    }
+
+    async function submitResetStudentPassword(e) {
+      e.preventDefault();
+      if (!currentResetStudentId) return;
+      const btn = document.getElementById('reset-student-btn');
+      const errEl = document.getElementById('reset-student-err');
+      const newPass = document.getElementById('reset-student-password').value.trim();
+
+      btn.disabled = true;
+      btn.textContent = 'Resetting...';
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetchApi(`${API}/students/${currentResetStudentId}/reset-password`, {
+          method: 'POST',
+          body: JSON.stringify({ new_password: newPass })
+        });
+        closeResetStudentModal();
+        showToast(res.message || 'Password reset successfully!', 'success');
+        if (res.data) {
+          openCredModal(res.data);
+        }
+      } catch (err) {
+        errEl.textContent = err.message || 'Failed to reset password';
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Reset Password';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Portal — College Attendance System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.1rem;
+      margin-top: 1.5rem;
+    }
+    .tile {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 1.6rem 1.4rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      text-decoration: none;
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+      min-height: 150px;
+      justify-content: space-between;
+    }
+    .tile:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-primary);
+    }
+    .tile-icon { font-size: 2.1rem; }
+    .tile-title { font-size: 1.05rem; font-weight: 700; }
+    .tile-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.35; }
+    .tile-badge {
+      align-self: flex-end;
+      background: var(--status-late);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+    }
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--color-primary), hsl(220,90%,45%));
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .welcome-banner h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem; }
+    .welcome-banner p { opacity: 0.92; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">FACULTY</span>
+      <span>Simple Portal</span>
+    </a>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 1100px;">
+    <div class="welcome-banner">
+      <h1>Welcome, <span id="teacher-name">Instructor</span> 👋</h1>
+      <p>Tap a card below. Everything is one or two taps — no forms to hunt for.</p>
+    </div>
+
+    <div class="tile-grid">
+      <!-- Teaching Subject Modules (Shown only when teacher has assigned subjects) -->
+      <a href="/faculty/registers.html" class="tile" id="teaching-registers-tile" style="display: none;">
+        <div>
+          <div class="tile-icon">📖</div>
+          <div class="tile-title" style="margin-top:0.4rem;">Take Attendance & Registers</div>
+          <div class="tile-desc">Subject register books, mark absentees, and 1-click ESP32 day-sync.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/registers.html?tab=assignments" class="tile" id="teaching-assignments-tile" style="display: none;">
+        <div>
+          <div class="tile-icon">📝</div>
+          <div class="tile-title" style="margin-top:0.4rem;">Assignments & Test Marks</div>
+          <div class="tile-desc">Coursework submissions, grading, unit tests, and exam scores.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/reports.html" class="tile" id="teaching-reports-tile" style="display: none;">
+        <div>
+          <div class="tile-icon">📊</div>
+          <div class="tile-title" style="margin-top:0.4rem;">Attendance Reports & Analytics</div>
+          <div class="tile-desc">Attendance trends, low-attendance alerts (&lt; 75%), and ESP32 hardware logs.</div>
+        </div>
+      </a>
+
+      <!-- Informational banner for teachers without subjects -->
+      <div id="no-subjects-banner" class="card" style="display: none; grid-column: 1 / -1; padding: 2rem; background: var(--bg-surface); border: 1px dashed var(--border-color); text-align: center;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📚</div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">No Teaching Subjects Assigned Yet</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 540px; margin: 0 auto; line-height: 1.5;">
+          Your Department HOD has not allocated any course subjects to your schedule yet. Once assigned, your digital attendance registers and coursework grading modules will automatically appear here.
+        </p>
+      </div>
+
+      <!-- HOD Department Administration Modules -->
+      <a href="/faculty/hod-teachers.html" class="tile" id="dept-teachers-tile" style="display: none; border-color: var(--color-primary);">
+        <div>
+          <div class="tile-icon">👨‍🏫</div>
+          <div class="tile-title" style="margin-top:0.4rem; color: var(--color-primary);">My Teachers</div>
+          <div class="tile-desc">Manage department faculty members and assign course subjects.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/hod-subjects.html" class="tile" id="dept-subjects-tile" style="display: none; border-color: var(--color-primary);">
+        <div>
+          <div class="tile-icon">📚</div>
+          <div class="tile-title" style="margin-top:0.4rem; color: var(--color-primary);">Department Subjects</div>
+          <div class="tile-desc">Curriculum catalog, course codes, and semester syllabus subjects.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/hod-students.html" class="tile" id="dept-students-tile" style="display: none; border-color: var(--color-primary);">
+        <div>
+          <div class="tile-icon">👥</div>
+          <div class="tile-title" style="margin-top:0.4rem; color: var(--color-primary);">Department Students</div>
+          <div class="tile-desc">Enroll students, view login credentials, and semester promotion & demotion.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/hod-reports.html" class="tile" id="dept-reports-tile" style="display: none; border-color: var(--color-primary);">
+        <div>
+          <div class="tile-icon">📈</div>
+          <div class="tile-title" style="margin-top:0.4rem; color: var(--color-primary);">Department Reports</div>
+          <div class="tile-desc">ESP32 biometric presence logs, daily trends, and cohort attendance analytics.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/hod-devices.html" class="tile" id="dept-devices-tile" style="display: none; border-color: var(--color-primary);">
+        <div>
+          <div class="tile-icon">📟</div>
+          <div class="tile-title" style="margin-top:0.4rem; color: var(--color-primary);">ESP Terminals</div>
+          <div class="tile-desc">Hardware kiosks registry and biometric presence logs.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/hod-archive.html" class="tile" id="dept-archive-tile" style="display: none; border-color: var(--color-primary);">
+        <div>
+          <div class="tile-icon">🎓</div>
+          <div class="tile-title" style="margin-top:0.4rem; color: var(--color-primary);">Student Archive</div>
+          <div class="tile-desc">Graduated and passout student records, search, and history.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/hod-settings.html" class="tile" id="dept-settings-tile" style="display: none; border-color: var(--color-primary);">
+        <div>
+          <div class="tile-icon">⚙️</div>
+          <div class="tile-title" style="margin-top:0.4rem; color: var(--color-primary);">Department Settings</div>
+          <div class="tile-desc">Degree duration and attendance defaulter policies.</div>
+        </div>
+      </a>
+
+      <!-- Class Teacher Cohort Module -->
+      <a href="/faculty/students.html" class="tile" id="cohort-students-tile" style="display: none;">
+        <div>
+          <div class="tile-icon">👥</div>
+          <div class="tile-title" style="margin-top:0.4rem;">My Students (Cohort)</div>
+          <div class="tile-desc">Class teacher roster and student attendance oversight.</div>
+        </div>
+      </a>
+
+      <!-- Shared Modules -->
+      <a href="/faculty/timetable.html" class="tile" id="timetable-tile">
+        <div>
+          <div class="tile-icon">🗓️</div>
+          <div class="tile-title" style="margin-top:0.4rem;">Timetable</div>
+          <div class="tile-desc">View or add your weekly class schedule.</div>
+        </div>
+      </a>
+
+      <a href="/faculty/leave-approvals.html" class="tile" id="leave-tile">
+        <div>
+          <div class="tile-icon">🧾</div>
+          <div class="tile-title" style="margin-top:0.4rem;">Leave Requests</div>
+          <div class="tile-desc">Approve or reject student leave applications.</div>
+        </div>
+        <span class="tile-badge" id="leave-badge" style="display:none;">0 new</span>
+      </a>
+
+      <a href="/faculty/profile.html" class="tile" id="profile-tile">
+        <div>
+          <div class="tile-icon">👤</div>
+          <div class="tile-title" style="margin-top:0.4rem;">My Profile</div>
+          <div class="tile-desc">Update password and Google account link.</div>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['TEACHER', 'SYSTEM_ADMIN']);
+
+    async function initDashboard() {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      document.getElementById('teacher-name').innerText = (user.full_name || user.username || '').split(' ')[0] || 'Instructor';
+
+      let hasSubjects = Boolean(user.has_assigned_subjects || user.roles?.includes('SYSTEM_ADMIN'));
+      let isHod = Boolean(user.is_hod);
+
+      const regTile = document.getElementById('teaching-registers-tile');
+      const assignTile = document.getElementById('teaching-assignments-tile');
+      const repTile = document.getElementById('teaching-reports-tile');
+      const noSubBanner = document.getElementById('no-subjects-banner');
+
+      function updateTeachingTiles(active) {
+        if (!active) {
+          if (regTile) regTile.style.display = 'none';
+          if (assignTile) assignTile.style.display = 'none';
+          if (repTile) repTile.style.display = 'none';
+          if (!isHod && noSubBanner) noSubBanner.style.display = 'block';
+        } else {
+          if (regTile) regTile.style.display = '';
+          if (assignTile) assignTile.style.display = '';
+          if (repTile) repTile.style.display = '';
+          if (noSubBanner) noSubBanner.style.display = 'none';
+        }
+      }
+
+      // Apply initial state immediately so no UI layout flash occurs
+      updateTeachingTiles(hasSubjects);
+
+      // Verify teaching registers dynamically
+      try {
+        const regsRes = await fetchApi('/faculty/registers');
+        if (regsRes.success && Array.isArray(regsRes.data)) {
+          hasSubjects = regsRes.data.length > 0 || user.roles?.includes('SYSTEM_ADMIN');
+          updateTeachingTiles(hasSubjects);
+          // Update cached user object so nav drawer also reflects fresh state
+          if (user.has_assigned_subjects !== hasSubjects) {
+            user.has_assigned_subjects = hasSubjects;
+            localStorage.setItem('user', JSON.stringify(user));
+          }
+        }
+      } catch (e) {
+        // Fallback to token payload flag
+      }
+
+      // Check HOD dynamically ONLY if user is already an HOD or admin (never trigger 403 for pure teachers)
+      if (isHod || user.roles?.includes('SYSTEM_ADMIN')) {
+        try {
+          const hodRes = await fetch('/api/v1/hod/hierarchy', {
+            headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+          });
+          if (hodRes.ok) {
+            isHod = true;
+          }
+        } catch (e) {}
+      }
+
+      // Class teacher module
+      if (user.is_class_teacher) {
+        const cTile = document.getElementById('cohort-students-tile');
+        if (cTile) cTile.style.display = '';
+        const dTile = document.getElementById('dept-reports-tile');
+        if (dTile) dTile.style.display = '';
+      }
+
+      // HOD administration modules
+      if (isHod) {
+        const hodIds = ['dept-teachers-tile', 'dept-subjects-tile', 'dept-students-tile', 'dept-reports-tile', 'dept-devices-tile', 'dept-archive-tile', 'dept-settings-tile'];
+        hodIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = '';
+        });
+      }
+    }
+
+    initDashboard();
+
+    // Show a small badge if there are pending leave requests
+    fetchApi('/leave?status=PENDING').then(res => {
+      if (res.success && res.data.length > 0) {
+        const badge = document.getElementById('leave-badge');
+        badge.style.display = '';
+        badge.innerText = `${res.data.length} new`;
+      }
+    }).catch(() => {});
+  </script>
+</body>
+</html>

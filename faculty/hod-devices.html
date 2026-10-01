@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 Terminals & Hardware Presence — Department HOD Console</title>
+  <meta name="description" content="Register classroom biometric kiosks, monitor hardware heartbeat telemetry, and inspect real-time physical presence records for your department.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .analysis-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .analysis-board { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 550px) {
+      .analysis-board { grid-template-columns: 1fr; }
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--kpi-accent, var(--color-primary));
+    }
+    .kpi-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .kpi-val {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+      margin-bottom: 0.25rem;
+    }
+    .kpi-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* ESP Pulse Indicator */
+    .esp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+    }
+    .esp-badge-offline {
+      background: var(--status-absent-bg);
+      color: var(--status-absent);
+    }
+    .esp-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--status-present);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+      animation: pulseAnim 2s infinite;
+    }
+    .esp-pulse-offline {
+      background: var(--status-absent);
+      animation: none;
+    }
+    @keyframes pulseAnim {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 1.75rem;
+    }
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      text-align: left;
+    }
+    .custom-table th {
+      background: var(--table-th-bg);
+      padding: 0.85rem 1rem;
+      font-weight: 700;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .custom-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+    .custom-table tr:hover td {
+      background: var(--table-th-bg);
+    }
+
+    @media print {
+      .app-header, .no-print, .btn { display: none !important; }
+      body { background: var(--bg-card) !important; }
+      .kpi-card, .table-container { box-shadow: none !important; border: 1px solid var(--border-color) !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header no-print">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" id="role-badge" style="background: var(--color-primary);">DEPT</span>
+      <span id="dept-header-name">Department Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm">My Registers</a>
+      <div class="hod-nav-section" style="border-top: none; padding: 0; margin: 0; display: flex; gap: 0.5rem; align-items: center;">
+        <span class="hod-nav-label">HOD:</span>
+        <a href="/faculty/hod-teachers.html" class="btn btn-secondary btn-sm">My Teachers</a>
+        <a href="/faculty/hod-subjects.html" class="btn btn-secondary btn-sm">Subjects</a>
+        <a href="/faculty/hod-students.html" class="btn btn-secondary btn-sm">Students</a>
+        <a href="/faculty/hod-archive.html" class="btn btn-secondary btn-sm">Archive</a>
+        <a href="/faculty/hod-reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+        <a href="/faculty/hod-devices.html" class="btn btn-primary btn-sm" style="font-weight: 600;">ESP Terminals</a>
+        <a href="/faculty/hod-settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      </div>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem;">
+    <!-- Page Header -->
+    <div class="page-header no-print" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-title">ESP32 Hardware Terminals &amp; Biometric Presence</h1>
+        <p class="page-subtitle" id="dept-subtitle">Manage classroom biometric kiosk terminals for your department, register new hardware, and monitor real-time physical attendance presence scans.</p>
+      </div>
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="openCreateModal()">+ Register Hardware Terminal</button>
+        <button class="btn btn-secondary" onclick="window.print()" title="Print page document">🖨️ Print</button>
+        <button class="btn btn-secondary" onclick="exportCsv()" title="Download raw ESP logs as CSV">📥 Export Scans CSV</button>
+      </div>
+    </div>
+
+    <!-- 1. ANALYSIS BOARD: 4 KPI CARDS -->
+    <div class="analysis-board" id="kpi-board">
+      <div class="kpi-card" style="--kpi-accent: var(--color-primary);">
+        <div class="kpi-lbl">Total Biometric Scans</div>
+        <div class="kpi-val" id="kpi-scans" style="color: var(--color-primary);">0</div>
+        <div class="kpi-desc">Verified hardware touches</div>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--status-present);">
+        <div class="kpi-lbl">Unique Students Verified</div>
+        <div class="kpi-val" id="kpi-students" style="color: var(--status-present);">0</div>
+        <div class="kpi-desc">Distinct enrolled attendees</div>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--color-primary);">
+        <div class="kpi-lbl">Active Terminals</div>
+        <div class="kpi-val" id="kpi-terminals" style="color: var(--color-primary);">0</div>
+        <div class="kpi-desc">Department ESP32 scanners</div>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--status-late);">
+        <div class="kpi-lbl">Today's Scans</div>
+        <div class="kpi-val" id="kpi-today" style="color: var(--status-late);">0</div>
+        <div class="kpi-desc">Captured in current session</div>
+      </div>
+    </div>
+
+    <!-- 2. DEPARTMENT HARDWARE TERMINALS REGISTRY TABLE -->
+    <div class="table-container">
+      <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; background: var(--bg-surface);">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Department Hardware Kiosks</h3>
+          <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--text-muted);">Biometric optical scanners deployed in your department classrooms and laboratories.</p>
+        </div>
+        <span id="terminal-count-badge" style="background: var(--bg-surface); color: var(--color-primary); font-weight: 700; font-size: 0.8rem; padding: 0.25rem 0.65rem; border-radius: 999px; border: 1px solid var(--border-color);">
+          0 Terminals
+        </span>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">ID</th>
+              <th style="width: 170px;">Device UID</th>
+              <th>Terminal Location / Name</th>
+              <th>Cohort Room Scope</th>
+              <th style="width: 170px;">Last Heartbeat</th>
+              <th style="width: 120px; text-align: center;">Status</th>
+              <th style="width: 120px; text-align: right;" class="no-print">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="devices-tbody">
+            <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading department devices...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. BIOMETRIC ESP32 PRESENCE RECORDS (MOVED HERE FROM ADMIN) -->
+    <div class="table-container">
+      <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; background: var(--bg-surface);">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Biometric ESP32 Presence Records</h3>
+          <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--text-muted);">Verified physical scans from hardware optical terminals cross-referenced with enrolled students.</p>
+        </div>
+        <span id="record-count-badge" style="background: var(--bg-surface); color: var(--color-primary); font-weight: 700; font-size: 0.8rem; padding: 0.25rem 0.65rem; border-radius: 999px; border: 1px solid var(--border-color);">
+          0 Scans
+        </span>
+      </div>
+
+      <!-- Filters Inside Presence Records Card -->
+      <div style="background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 1rem;" class="no-print">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; align-items: flex-end;">
+          <div>
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem;">Academic Year</label>
+            <select id="report-year" class="form-select form-control-sm" onchange="loadReportData()">
+              <option value="">All Years</option>
+              <option value="1">Year 1</option>
+              <option value="2">Year 2</option>
+              <option value="3">Year 3</option>
+              <option value="4">Year 4</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem;">Semester</label>
+            <select id="report-sem" class="form-select form-control-sm" onchange="loadReportData()">
+              <option value="">All Semesters</option>
+              <option value="1">Semester 1</option><option value="2">Semester 2</option>
+              <option value="3">Semester 3</option><option value="4">Semester 4</option>
+              <option value="5">Semester 5</option><option value="6">Semester 6</option>
+              <option value="7">Semester 7</option><option value="8">Semester 8</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem;">Date Filter</label>
+            <select id="report-date-preset" class="form-select form-control-sm" onchange="loadReportData()">
+              <option value="all">All Recorded Scans</option>
+              <option value="today">Today Only</option>
+              <option value="7days">Last 7 Days</option>
+              <option value="30days">Last 30 Days</option>
+            </select>
+          </div>
+          <div>
+            <button class="btn btn-secondary btn-sm" onclick="resetFilters()" style="width: 100%; height: 38px;">Reset</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 0.75rem;">
+          <input type="text" id="report-search" class="form-control form-control-sm" placeholder="Search student by name, enrollment no, or device UID (e.g. ESP32_IT_LAB_01)..." oninput="applySearchFilter()">
+        </div>
+      </div>
+
+      <!-- Scans Table Wrap -->
+      <div id="table-wrap">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading biometric attendance records...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Terminal Modal for HOD -->
+  <div id="device-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Register Hardware Terminal</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;" id="modal-dept-label">Add a biometric kiosk for your department</p>
+        </div>
+        <button onclick="closeModal()" style="font-size: 1.25rem; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <form id="device-form">
+        <div class="form-group">
+          <label class="form-label" for="dev-uid">Hardware Device UID (MAC / Unique ID) *</label>
+          <input type="text" id="dev-uid" class="form-control" placeholder="e.g. ESP32_IT_LAB_01" required style="font-family: 'JetBrains Mono', monospace;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="dev-name">Terminal Location / Room Name *</label>
+          <input type="text" id="dev-name" class="form-control" placeholder="e.g. IT Lab 1 Entrance" required>
+        </div>
+
+        <!-- Target Cohort Years (Multi-Select) -->
+        <div class="form-group" style="margin-bottom: 1.15rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+            <label class="form-label" style="margin-bottom: 0; font-weight: 700;">Target Cohort Year(s) *</label>
+            <button type="button" class="btn btn-sm" id="btn-select-all-years" onclick="toggleAllYears()" style="padding: 0.2rem 0.65rem; font-size: 0.75rem; background: var(--bg-surface); color: var(--color-primary); border: 1px solid var(--border-color); font-weight: 600; border-radius: 6px;">
+              Select All Years
+            </button>
+          </div>
+          <div id="year-checkboxes-wrap" style="display: flex; gap: 0.6rem; flex-wrap: wrap; background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem;">
+            <!-- Year chips rendered dynamically -->
+          </div>
+          <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem; display: block;">
+            Select one or multiple academic years that can use this biometric scanner terminal.
+          </span>
+        </div>
+
+        <!-- Target Semesters (Automatically Derived from Selected Years) -->
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+            <label class="form-label" style="margin-bottom: 0; font-weight: 700; display: flex; align-items: center; gap: 0.45rem;">
+              <span>Target Semesters</span>
+              <span class="badge" style="background: var(--bg-surface); color: var(--color-primary); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid var(--border-color);">
+                ⚡ Auto-Calculated
+              </span>
+            </label>
+          </div>
+          <div id="auto-semesters-preview" style="background: var(--bg-surface); border: 1.5px dashed var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; min-height: 52px; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <!-- Badges auto-populated based on selected year(s) -->
+          </div>
+          <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem; display: block;">
+            Semesters are automatically assigned from your selected year(s) (Year 1 &rarr; Sem 1 &amp; 2, Year 2 &rarr; Sem 3 &amp; 4, etc.).
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="dev-secret">Pre-shared Secret Key *</label>
+          <input type="text" id="dev-secret" class="form-control" placeholder="Device Secret" required style="font-family: 'JetBrains Mono', monospace;">
+          <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">Configured in ESP32 firmware config.h header file.</span>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" id="save-btn" class="btn btn-primary">Register Terminal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireHOD: true });
+
+    let devicesList = [];
+    let allRecords = [];
+    let departmentName = 'Department';
+
+    async function init() {
+      const user = getCurrentUser();
+      if (user && user.hod_department_name) {
+        departmentName = user.hod_department_name;
+        document.getElementById('dept-header-name').innerText = departmentName + ' (HOD)';
+        document.getElementById('dept-subtitle').innerText = `Manage classroom biometric kiosk terminals for ${departmentName}, register new hardware, and monitor real-time physical attendance presence scans.`;
+        document.getElementById('modal-dept-label').innerText = `Add a biometric kiosk for ${departmentName}`;
+      }
+
+      try {
+        const hRes = await fetchApi('/hod/hierarchy');
+        if (hRes.success && hRes.data?.department_degree_duration_years) {
+          deptDurationYears = parseInt(hRes.data.department_degree_duration_years, 10) || 4;
+        }
+      } catch {}
+
+      await Promise.all([
+        loadDevices(),
+        loadReportData()
+      ]);
+    }
+
+    async function loadDevices() {
+      try {
+        const res = await fetchApi('/hod/devices');
+        if (res.success && res.data) {
+          devicesList = res.data;
+          renderDevicesTable();
+        }
+      } catch (err) {
+        console.error('Failed to load devices:', err);
+        document.getElementById('devices-tbody').innerHTML = `
+          <tr><td colspan="7" style="text-align: center; color: var(--status-absent); padding: 2rem;">
+            Failed to load department devices: ${err.message}
+          </td></tr>`;
+      }
+    }
+
+    function renderDevicesTable() {
+      const tbody = document.getElementById('devices-tbody');
+      document.getElementById('terminal-count-badge').innerText = `${devicesList.length} Terminals`;
+
+      if (!devicesList.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📡</div>
+              <div style="font-weight: 700; font-size: 1rem; color: var(--text-main);">No ESP32 Hardware Terminals Registered Yet</div>
+              <div style="font-size: 0.82rem; margin-top: 0.25rem;">Click the "+ Register Hardware Terminal" button above to link your department's first scanner.</div>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = devicesList.map(dev => {
+        const isOnline = dev.is_online;
+        return `
+          <tr>
+            <td style="font-weight: 600; color: var(--text-muted);">#${dev.id}</td>
+            <td>
+              <span class="badge" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; background: var(--bg-surface); color: var(--text-main); font-weight: 700; border: 1px solid var(--border-color);">
+                ${esc(dev.device_uid)}
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: var(--text-main);">${esc(dev.name)}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">${dev.enrolled_count || 0} students enrolled in biometric storage</div>
+            </td>
+            <td>
+              ${(() => {
+                if (dev.cohort_scope_label) {
+                  return `<span class="badge" style="background: var(--bg-surface); color: var(--color-primary); font-weight: 700; font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color);">${esc(dev.cohort_scope_label)}</span>`;
+                }
+                const yrs = dev.assigned_years && dev.assigned_years.length > 0 ? dev.assigned_years : (dev.year ? [dev.year] : []);
+                const sems = dev.assigned_semesters && dev.assigned_semesters.length > 0 ? dev.assigned_semesters : (dev.semester ? [dev.semester] : []);
+                if (yrs.length > 1) {
+                  return `<span class="badge" style="background: var(--bg-surface); color: var(--color-primary); font-weight: 700; font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color);">Years ${yrs.join(', ')} (Sems ${sems.join(', ')})</span>`;
+                } else if (yrs.length === 1) {
+                  return `<span class="badge" style="background: var(--bg-surface); color: var(--text-main); font-weight: 600; font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color);">Year ${yrs[0]} • Sem ${sems.join(', ')}</span>`;
+                }
+                return '<span style="font-size: 0.82rem; color: var(--text-muted);">Campus / Dept Wide</span>';
+              })()}
+            </td>
+            <td>
+              <span style="font-size: 0.8rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
+                ${dev.last_heartbeat_at ? formatTimestamp(dev.last_heartbeat_at) : 'Never'}
+              </span>
+            </td>
+            <td style="text-align: center;">
+              <span class="esp-badge ${isOnline ? '' : 'esp-badge-offline'}">
+                <span class="esp-pulse ${isOnline ? '' : 'esp-pulse-offline'}"></span>
+                ${isOnline ? 'ONLINE' : (dev.is_active ? 'OFFLINE' : 'DISABLED')}
+              </span>
+            </td>
+            <td style="text-align: right;" class="no-print">
+              <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+                <button class="btn btn-secondary btn-sm" onclick="toggleDevice(${dev.id})" title="${dev.is_active ? 'Disable' : 'Enable'} device">
+                  ${dev.is_active ? 'Disable' : 'Enable'}
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="deleteDevice(${dev.id}, '${esc(dev.name)}')" style="color: var(--status-absent);" title="Delete terminal">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadReportData() {
+      const year = document.getElementById('report-year').value;
+      const sem = document.getElementById('report-sem').value;
+      const datePreset = document.getElementById('report-date-preset').value;
+
+      let qs = [];
+      if (year) qs.push(`year=${year}`);
+      if (sem) qs.push(`semester=${sem}`);
+      if (datePreset) qs.push(`date_preset=${datePreset}`);
+
+      const url = `/hod/reports${qs.length ? '?' + qs.join('&') : ''}`;
+
+      try {
+        const res = await fetchApi(url);
+        if (res.success && res.data) {
+          allRecords = res.data.records || [];
+          renderKpis(res.data.kpis || {});
+          applySearchFilter();
+        }
+      } catch (err) {
+        console.error('Failed to load presence records:', err);
+        document.getElementById('table-wrap').innerHTML = `
+          <div style="text-align: center; color: var(--status-absent); padding: 3rem;">
+            Failed to load presence records: ${err.message}
+          </div>`;
+      }
+    }
+
+    function renderKpis(k) {
+      document.getElementById('kpi-scans').textContent = (k.total_scans || 0).toLocaleString();
+      document.getElementById('kpi-students').textContent = (k.unique_students || 0).toLocaleString();
+      document.getElementById('kpi-terminals').textContent = (k.active_terminals || devicesList.filter(d => d.is_active).length || 0).toLocaleString();
+      document.getElementById('kpi-today').textContent = (k.today_scans || 0).toLocaleString();
+    }
+
+    function applySearchFilter() {
+      const q = (document.getElementById('report-search').value || '').toLowerCase().trim();
+      let filtered = allRecords;
+
+      if (q) {
+        filtered = allRecords.filter(r => 
+          (r.student_name || '').toLowerCase().includes(q) ||
+          (r.official_enrollment_no || '').toLowerCase().includes(q) ||
+          (r.device_uid || '').toLowerCase().includes(q) ||
+          (r.device_name || '').toLowerCase().includes(q)
+        );
+      }
+
+      renderPresenceTable(filtered);
+    }
+
+    function renderPresenceTable(records) {
+      const wrap = document.getElementById('table-wrap');
+      document.getElementById('record-count-badge').innerText = `${records.length} Scans`;
+
+      if (!records.length) {
+        wrap.innerHTML = `
+          <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📡</div>
+            <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main);">No ESP32 Biometric Scans Found</div>
+            <div style="font-size: 0.85rem; margin-top: 0.25rem;">No attendance scans match your search or filter criteria for this department.</div>
+          </div>`;
+        return;
+      }
+
+      wrap.innerHTML = `
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 180px;">Scan Timestamp</th>
+              <th>Student Name</th>
+              <th style="width: 140px;">Enrollment No</th>
+              <th style="width: 140px;">Program &amp; Cohort</th>
+              <th style="width: 170px;">Terminal Reader</th>
+              <th style="width: 110px; text-align: center;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${records.map(r => `
+              <tr>
+                <td>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
+                    ${formatTimestamp(r.scan_time)}
+                  </span>
+                </td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-weight: 700; color: var(--text-main); font-size: 0.92rem;">
+                      ${esc(r.student_name)}
+                    </span>
+                    ${r.class_roll_no ? `<span style="font-size: 0.72rem; background: var(--bg-surface); color: var(--text-muted); font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid var(--border-color);">${r.class_roll_no}</span>` : ''}
+                  </div>
+                </td>
+                <td>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--color-primary); background: var(--bg-surface); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; border: 1px solid var(--border-color);">
+                    ${esc(r.official_enrollment_no)}
+                  </span>
+                </td>
+                <td>
+                  <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">
+                    ${esc(r.branch_code || r.branch_name || 'Cohort')}
+                  </span>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">
+                    Year ${r.year || 1} • Sem ${r.semester || 1}
+                  </div>
+                </td>
+                <td>
+                  <div class="esp-badge">
+                    <span class="esp-pulse"></span>
+                    ${esc(r.device_uid || 'ESP32_READER')}
+                  </div>
+                </td>
+                <td style="text-align: center;">
+                  <span style="font-size: 0.75rem; font-weight: 800; color: var(--status-present); background: var(--status-present-bg); padding: 0.2rem 0.6rem; border-radius: 999px;">
+                    VERIFIED
+                  </span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function resetFilters() {
+      document.getElementById('report-year').value = '';
+      document.getElementById('report-sem').value = '';
+      document.getElementById('report-date-preset').value = 'all';
+      document.getElementById('report-search').value = '';
+      loadReportData();
+    }
+
+    let deptDurationYears = 4;
+
+    function renderYearCheckboxes(durationYears = 4) {
+      const wrap = document.getElementById('year-checkboxes-wrap');
+      if (!wrap) return;
+      let html = '';
+      for (let y = 1; y <= durationYears; y++) {
+        html += `
+          <label class="year-select-chip" id="chip-year-${y}" style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; user-select: none; transition: all 0.15s;">
+            <input type="checkbox" name="dev-years" value="${y}" onchange="onYearSelectionChange()" style="cursor: pointer; accent-color: var(--color-primary); width: 16px; height: 16px;">
+            <span>Year ${y}</span>
+          </label>
+        `;
+      }
+      wrap.innerHTML = html;
+      // Default: select Year 1 and Year 2
+      const checkboxes = wrap.querySelectorAll('input[name="dev-years"]');
+      if (checkboxes.length > 0) {
+        checkboxes[0].checked = true;
+        if (checkboxes.length > 1) checkboxes[1].checked = true;
+      }
+      onYearSelectionChange();
+    }
+
+    function onYearSelectionChange() {
+      const checkboxes = document.querySelectorAll('input[name="dev-years"]');
+      const selectedYears = [];
+      checkboxes.forEach(cb => {
+        const chip = document.getElementById(`chip-year-${cb.value}`);
+        if (cb.checked) {
+          selectedYears.push(parseInt(cb.value, 10));
+          if (chip) {
+            chip.style.borderColor = 'var(--color-primary)';
+            chip.style.background = 'var(--bg-surface)';
+            chip.style.color = 'var(--color-primary)';
+          }
+        } else {
+          if (chip) {
+            chip.style.borderColor = 'var(--border-color)';
+            chip.style.background = 'var(--bg-card)';
+            chip.style.color = 'var(--text-main)';
+          }
+        }
+      });
+
+      // Calculate semesters automatically: (Year * 2) - 1 and Year * 2
+      const autoSemesters = [];
+      selectedYears.sort((a, b) => a - b).forEach(y => {
+        autoSemesters.push((y * 2) - 1);
+        autoSemesters.push(y * 2);
+      });
+
+      const preview = document.getElementById('auto-semesters-preview');
+      if (!selectedYears.length) {
+        preview.innerHTML = `
+          <div style="color: var(--status-absent); font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+            <span>⚠️</span> Please select at least one target cohort year above.
+          </div>
+        `;
+      } else {
+        preview.innerHTML = autoSemesters.map(s => `
+          <span class="badge" style="background: var(--color-primary); color: var(--bg-card); padding: 0.3rem 0.65rem; border-radius: 6px; font-weight: 700; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+            <span style="opacity: 0.85;">📚</span> Semester ${s}
+          </span>
+        `).join('');
+      }
+
+      const allBtn = document.getElementById('btn-select-all-years');
+      if (allBtn) {
+        const allChecked = checkboxes.length > 0 && selectedYears.length === checkboxes.length;
+        allBtn.innerText = allChecked ? 'Deselect All' : 'Select All Years';
+      }
+    }
+
+    function toggleAllYears() {
+      const checkboxes = document.querySelectorAll('input[name="dev-years"]');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      checkboxes.forEach(cb => {
+        cb.checked = !allChecked;
+      });
+      onYearSelectionChange();
+    }
+
+    function openCreateModal() {
+      document.getElementById('dev-uid').value = '';
+      document.getElementById('dev-name').value = '';
+      document.getElementById('dev-secret').value = 'secret_' + Math.random().toString(36).slice(2, 8);
+      renderYearCheckboxes(deptDurationYears);
+      document.getElementById('device-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('device-modal').classList.remove('open');
+    }
+
+    document.getElementById('device-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const device_uid = document.getElementById('dev-uid').value.trim();
+      const name = document.getElementById('dev-name').value.trim();
+      const secret_key = document.getElementById('dev-secret').value;
+      const selectedYears = Array.from(document.querySelectorAll('input[name="dev-years"]:checked')).map(cb => parseInt(cb.value, 10));
+
+      if (!selectedYears.length) {
+        showToast('Please select at least one Target Cohort Year.', 'warning');
+        return;
+      }
+
+      const autoSemesters = [];
+      selectedYears.sort((a, b) => a - b).forEach(y => {
+        autoSemesters.push((y * 2) - 1);
+        autoSemesters.push(y * 2);
+      });
+
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/hod/devices', {
+          method: 'POST',
+          body: JSON.stringify({
+            device_uid,
+            name,
+            years: selectedYears,
+            semesters: autoSemesters,
+            year: selectedYears[0],
+            semester: autoSemesters[0],
+            secret_key
+          })
+        });
+        if (res.success) {
+          showToast('Hardware terminal registered successfully!', 'success');
+          closeModal();
+          await loadDevices();
+        }
+      } catch (err) {
+        // Handled by fetchApi toast
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    async function toggleDevice(id) {
+      try {
+        const res = await fetchApi(`/hod/devices/${id}/toggle`, { method: 'PATCH' });
+        if (res.success) {
+          showToast(res.message || 'Device status updated', 'success');
+          await loadDevices();
+        }
+      } catch (err) {
+        // Handled by fetchApi toast
+      }
+    }
+
+    async function deleteDevice(id, name) {
+      if (!confirm(`Are you sure you want to remove the terminal "${name}" from your department?`)) return;
+      try {
+        const res = await fetchApi(`/hod/devices/${id}`, { method: 'DELETE' });
+        if (res.success) {
+          showToast('Device removed', 'success');
+          await loadDevices();
+        }
+      } catch (err) {
+        // Handled by fetchApi toast
+      }
+    }
+
+    function exportCsv() {
+      if (!allRecords.length) {
+        showToast('No attendance scan records available to export.', 'info');
+        return;
+      }
+      const headers = ['Scan ID', 'Event ID', 'Scan Timestamp', 'Student Name', 'Class Roll No', 'Enrollment No', 'Department', 'Cohort Year', 'Cohort Sem', 'Device UID', 'Status'];
+      const rows = allRecords.map(r => [
+        r.scan_id || '',
+        r.event_id || '',
+        r.scan_time || '',
+        `"${(r.student_name || '').replace(/"/g, '""')}"`,
+        r.class_roll_no || '',
+        r.official_enrollment_no || '',
+        `"${(r.department_name || departmentName).replace(/"/g, '""')}"`,
+        r.year || '',
+        r.semester || '',
+        r.device_uid || '',
+        r.status || 'PRESENT'
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `ESP_Presence_Report_${departmentName}_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function formatTimestamp(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts);
+      if (isNaN(d.getTime())) return ts;
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
+             d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    init();
+  </script>
+</body>
+</html>

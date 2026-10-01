@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institutional Audit Trail — Admin Console</title>
+  <meta name="description" content="Immutable institutional audit logs for governance, biometric operations, attendance finalization, and academic activity.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .page-main-container {
+      padding-top: 1.25rem;
+      padding-bottom: 3.5rem;
+    }
+
+    .audit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* KPI Summary Strip */
+    .kpi-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .kpi-board { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .kpi-board { grid-template-columns: 1fr; }
+    }
+
+    .kpi-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .kpi-box:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-box::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--box-accent, var(--color-primary));
+    }
+    .kpi-box-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .kpi-box-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+    .kpi-box-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Filter & Search Bar */
+    .filter-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      align-items: flex-end;
+    }
+
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 170px;
+      flex: 1;
+    }
+    .filter-field label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    /* Audit Table Card */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--table-bg);
+      font-size: 0.85rem;
+    }
+    .audit-table th {
+      background: var(--table-th-bg);
+      color: var(--table-th-color, var(--text-muted));
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .audit-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    .audit-table tr:hover td {
+      background: var(--table-hover-bg, var(--bg-surface));
+    }
+
+    /* Event Badges */
+    .event-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-family: var(--font-family-mono);
+      white-space: nowrap;
+    }
+    .event-approved { background: var(--status-present-bg); color: var(--status-present); }
+    .event-rejected { background: var(--status-absent-bg); color: var(--status-absent); }
+    .event-admin { background: var(--chip-admin-bg); color: var(--chip-admin-color); }
+    .event-biometric { background: var(--chip-classteacher-bg); color: var(--chip-classteacher-color); }
+    .event-academic { background: var(--chip-faculty-bg); color: var(--chip-faculty-color); }
+    .event-attendance { background: var(--status-late-bg); color: var(--status-late); }
+
+    .json-chip {
+      font-family: var(--font-family-mono);
+      font-size: 0.72rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 0.2rem 0.45rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .json-chip:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* Pagination Footer */
+    .pagination-bar {
+      padding: 0.85rem 1.25rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    /* Details Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <!-- Admin Navigation Header -->
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Departments &amp; Branches</a>
+      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/whatsapp-gateway.html" class="btn btn-secondary btn-sm">WhatsApp Gateway</a>
+      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      <a href="/admin/audit-logs.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Audit Logs</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container page-main-container">
+    <!-- Page Header -->
+    <div class="audit-header">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <span class="badge badge-present" style="font-size: 0.72rem;">SECTION 54 COMPLIANT</span>
+          <span style="color: var(--text-muted); font-size: 0.8rem;">Immutable System Audit Trail</span>
+        </div>
+        <h1 class="page-title">Institutional Audit Logs</h1>
+        <p class="page-subtitle">Permanent cryptographic event logs of administrative, biometric, attendance, and coursework transactions.</p>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="btn btn-secondary btn-sm" onclick="exportLogsJson()">📥 Export JSON</button>
+        <button class="btn btn-primary btn-sm" onclick="loadAuditLogs()">🔄 Refresh Feed</button>
+      </div>
+    </div>
+
+    <!-- KPI Summary Strip -->
+    <div class="kpi-board">
+      <div class="kpi-box" style="--box-accent: var(--color-primary);">
+        <div class="kpi-box-lbl">Total Events Recorded</div>
+        <div class="kpi-box-val" id="kpi-total">--</div>
+        <div class="kpi-box-sub">Across institutional history</div>
+      </div>
+      <div class="kpi-box" style="--box-accent: var(--status-present);">
+        <div class="kpi-box-lbl">Governance &amp; Approvals</div>
+        <div class="kpi-box-val" id="kpi-governance">--</div>
+        <div class="kpi-box-sub">Faculty &amp; student approvals</div>
+      </div>
+      <div class="kpi-box" style="--box-accent: var(--status-late);">
+        <div class="kpi-box-lbl">Biometrics &amp; Terminals</div>
+        <div class="kpi-box-val" id="kpi-biometric">--</div>
+        <div class="kpi-box-sub">Slots &amp; hardware touch events</div>
+      </div>
+      <div class="kpi-box" style="--box-accent: var(--chip-faculty-color);">
+        <div class="kpi-box-lbl">Academic &amp; Attendance</div>
+        <div class="kpi-box-val" id="kpi-academic">--</div>
+        <div class="kpi-box-sub">Finalizations, tests &amp; grades</div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="filter-card">
+      <div class="filter-field" style="flex: 2; min-width: 220px;">
+        <label for="filter-search">Keyword Search</label>
+        <input type="text" id="filter-search" class="form-control" placeholder="Search actor, email, role, or details..." onkeydown="if(event.key==='Enter') applyFilters()">
+      </div>
+      <div class="filter-field">
+        <label for="filter-event">Event Type</label>
+        <select id="filter-event" class="form-select" onchange="applyFilters()">
+          <option value="">All Event Types</option>
+          <optgroup label="Governance &amp; Appointments">
+            <option value="FACULTY_APPROVED">FACULTY_APPROVED</option>
+            <option value="FACULTY_REJECTED">FACULTY_REJECTED</option>
+            <option value="HOD_ASSIGNED">HOD_ASSIGNED</option>
+            <option value="HOD_REMOVED">HOD_REMOVED</option>
+            <option value="HOD_REPLACED">HOD_REPLACED</option>
+            <option value="COMMON_MANAGER_ASSIGNED">COMMON_MANAGER_ASSIGNED</option>
+            <option value="STUDENT_APPROVED">STUDENT_APPROVED</option>
+            <option value="STUDENT_REJECTED">STUDENT_REJECTED</option>
+          </optgroup>
+          <optgroup label="Teaching Groups &amp; Classes">
+            <option value="TEACHING_GROUP_CREATED">TEACHING_GROUP_CREATED</option>
+            <option value="TEACHING_GROUP_ARCHIVED">TEACHING_GROUP_ARCHIVED</option>
+          </optgroup>
+          <optgroup label="Hardware &amp; Biometrics">
+            <option value="BIOMETRIC_ENROLLED">BIOMETRIC_ENROLLED</option>
+            <option value="BIOMETRIC_REMOVED">BIOMETRIC_REMOVED</option>
+            <option value="DEVICE_REGISTERED">DEVICE_REGISTERED</option>
+            <option value="DEVICE_DISABLED">DEVICE_DISABLED</option>
+            <option value="ESP_SYNC_EXECUTED">ESP_SYNC_EXECUTED</option>
+          </optgroup>
+          <optgroup label="Attendance &amp; Coursework">
+            <option value="ATTENDANCE_FINALIZED">ATTENDANCE_FINALIZED</option>
+            <option value="ATTENDANCE_CORRECTED">ATTENDANCE_CORRECTED</option>
+            <option value="ASSIGNMENT_GRADED">ASSIGNMENT_GRADED</option>
+            <option value="TEST_MARK_UPDATED">TEST_MARK_UPDATED</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="filter-target">Target Entity</label>
+        <select id="filter-target" class="form-select" onchange="applyFilters()">
+          <option value="">All Target Types</option>
+          <option value="teachers">Teachers</option>
+          <option value="students">Students</option>
+          <option value="teaching_groups">Teaching Groups</option>
+          <option value="devices">Devices</option>
+          <option value="fingerprint_slots">Fingerprint Slots</option>
+          <option value="attendance_sessions">Attendance Sessions</option>
+          <option value="register_attendance">Register Attendance</option>
+          <option value="assignments">Assignments</option>
+          <option value="exams">Exams / Tests</option>
+          <option value="assessment_submissions">Assessment Submissions</option>
+        </select>
+      </div>
+      <div class="filter-field" style="max-width: 160px;">
+        <label for="filter-start-date">From Date</label>
+        <input type="date" id="filter-start-date" class="form-control" onchange="applyFilters()">
+      </div>
+      <div class="filter-field" style="max-width: 160px;">
+        <label for="filter-end-date">To Date</label>
+        <input type="date" id="filter-end-date" class="form-control" onchange="applyFilters()">
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="btn btn-primary" onclick="applyFilters()" style="height: 38px;">Apply</button>
+        <button class="btn btn-secondary" onclick="resetFilters()" style="height: 38px;">Reset</button>
+      </div>
+    </div>
+
+    <!-- Audit Ledger Table -->
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th style="width: 165px;">Timestamp</th>
+              <th>Action / Event</th>
+              <th>Actor</th>
+              <th>Role</th>
+              <th>Target Entity</th>
+              <th>Details Snapshot</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody id="audit-table-body">
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                Loading audit trail records...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination Bar -->
+      <div class="pagination-bar">
+        <div style="font-size: 0.8rem; color: var(--text-muted);" id="pagination-info">
+          Showing 0-0 of 0 entries
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button id="prev-btn" class="btn btn-secondary btn-sm" onclick="changePage(-1)" disabled>&larr; Previous</button>
+          <span id="page-num" style="font-size: 0.8rem; font-weight: 700; padding: 0 0.5rem;">Page 1</span>
+          <button id="next-btn" class="btn btn-secondary btn-sm" onclick="changePage(1)" disabled>Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Details Payload Modal -->
+  <div id="details-modal" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <h3 id="modal-event-title" style="margin: 0; font-size: 1.1rem; font-weight: 700;">Audit Event Details</h3>
+        <button onclick="closeModal()" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.5rem;">✕</button>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.25rem;">TIMESTAMP &amp; ACTOR:</div>
+        <div id="modal-meta-line" style="font-weight: 600; font-size: 0.85rem; color: var(--text-main);"></div>
+      </div>
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.4rem;">JSON PAYLOAD:</div>
+        <pre id="modal-json-content" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; font-family: var(--font-family-mono); font-size: 0.78rem; max-height: 260px; overflow-y: auto; color: var(--text-main); white-space: pre-wrap; word-break: break-all;"></pre>
+      </div>
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    guardRoute({ roles: ['SYSTEM_ADMIN'] });
+
+    let currentOffset = 0;
+    const pageSize = 25;
+    let totalRecords = 0;
+    let cachedRecords = [];
+
+    async function init() {
+      await loadAuditLogs();
+      await loadKpis();
+    }
+
+    function getEventChipClass(eventType) {
+      if (!eventType) return '';
+      const et = eventType.toUpperCase();
+      if (et.includes('APPROVED')) return 'event-approved';
+      if (et.includes('REJECTED') || et.includes('DISABLED') || et.includes('REMOVED')) return 'event-rejected';
+      if (et.includes('HOD') || et.includes('COMMON_MANAGER')) return 'event-admin';
+      if (et.includes('BIOMETRIC') || et.includes('DEVICE') || et.includes('ESP')) return 'event-biometric';
+      if (et.includes('TEACHING_GROUP') || et.includes('ASSIGNMENT') || et.includes('TEST')) return 'event-academic';
+      if (et.includes('ATTENDANCE')) return 'event-attendance';
+      return '';
+    }
+
+    async function loadKpis() {
+      try {
+        const res = await fetchApi('/admin/audit-logs?limit=1000');
+        if (res && res.success && Array.isArray(res.data)) {
+          const rows = res.data;
+          document.getElementById('kpi-total').innerText = res.total || rows.length;
+
+          const govCount = rows.filter(r => /APPROVED|REJECTED|HOD|COMMON_MANAGER/i.test(r.event_type || '')).length;
+          const bioCount = rows.filter(r => /BIOMETRIC|DEVICE|ESP/i.test(r.event_type || '')).length;
+          const acadCount = rows.filter(r => /TEACHING_GROUP|ATTENDANCE|ASSIGNMENT|TEST/i.test(r.event_type || '')).length;
+
+          document.getElementById('kpi-governance').innerText = govCount;
+          document.getElementById('kpi-biometric').innerText = bioCount;
+          document.getElementById('kpi-academic').innerText = acadCount;
+        }
+      } catch (_) {}
+    }
+
+    async function loadAuditLogs() {
+      const search = document.getElementById('filter-search').value.trim();
+      const eventType = document.getElementById('filter-event').value;
+      const targetType = document.getElementById('filter-target').value;
+      const startDate = document.getElementById('filter-start-date').value;
+      const endDate = document.getElementById('filter-end-date').value;
+
+      const params = new URLSearchParams({
+        limit: pageSize,
+        offset: currentOffset
+      });
+
+      if (search) params.append('search', search);
+      if (eventType) params.append('event_type', eventType);
+      if (targetType) params.append('target_type', targetType);
+      if (startDate) params.append('start_date', startDate + ' 00:00:00');
+      if (endDate) params.append('end_date', endDate + ' 23:59:59');
+
+      const tbody = document.getElementById('audit-table-body');
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">Fetching audit records...</td></tr>`;
+
+      try {
+        const res = await fetchApi(`/admin/audit-logs?${params.toString()}`);
+        if (res && res.success) {
+          cachedRecords = res.data || [];
+          totalRecords = res.total !== undefined ? res.total : cachedRecords.length;
+          renderTable(cachedRecords);
+          updatePagination();
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--status-absent);">Failed to load audit trail.</td></tr>`;
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--status-absent);">Error: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function renderTable(rows) {
+      const tbody = document.getElementById('audit-table-body');
+      if (!rows || rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No audit records found matching your filters.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map((r, index) => {
+        const timeStr = r.created_at ? new Date(r.created_at.includes('Z') ? r.created_at : r.created_at.replace(' ', 'T') + 'Z').toLocaleString('en-IN', {
+          year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
+        }) : '--';
+
+        const chipClass = getEventChipClass(r.event_type);
+        const detailsPreview = r.details ? JSON.stringify(r.details) : 'None';
+        const actorName = r.actor_username || r.actor_email || (r.actor_id ? `User #${r.actor_id}` : 'System');
+        const roleName = r.actor_role || (r.actor_id === 1 ? 'SYSTEM_ADMIN' : 'USER');
+        const targetStr = r.target_type ? `${r.target_type}${r.target_id ? ` #${r.target_id}` : ''}` : '--';
+
+        return `
+          <tr>
+            <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); white-space: nowrap;">
+              ${escapeHtml(timeStr)}
+            </td>
+            <td>
+              <span class="event-chip ${chipClass}">${escapeHtml(r.event_type || 'UNKNOWN')}</span>
+            </td>
+            <td style="font-weight: 600;">
+              ${escapeHtml(actorName)}
+            </td>
+            <td>
+              <span class="badge" style="background: var(--bg-surface); font-size: 0.72rem; font-weight: 700;">${escapeHtml(roleName)}</span>
+            </td>
+            <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-main);">
+              ${escapeHtml(targetStr)}
+            </td>
+            <td>
+              ${r.details ? `<span class="json-chip" onclick="openDetailsModal(${index})" title="Click to view full JSON payload">${escapeHtml(detailsPreview)}</span>` : '<span style="color: var(--text-muted); font-size: 0.75rem;">None</span>'}
+            </td>
+            <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted);">
+              ${escapeHtml(r.ip_address || '127.0.0.1')}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updatePagination() {
+      const page = Math.floor(currentOffset / pageSize) + 1;
+      const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
+
+      document.getElementById('page-num').innerText = `Page ${page} of ${totalPages}`;
+      document.getElementById('pagination-info').innerText = `Showing ${totalRecords > 0 ? currentOffset + 1 : 0}–${Math.min(currentOffset + pageSize, totalRecords)} of ${totalRecords} entries`;
+
+      document.getElementById('prev-btn').disabled = currentOffset <= 0;
+      document.getElementById('next-btn').disabled = currentOffset + pageSize >= totalRecords;
+    }
+
+    function changePage(direction) {
+      currentOffset += direction * pageSize;
+      if (currentOffset < 0) currentOffset = 0;
+      loadAuditLogs();
+    }
+
+    function applyFilters() {
+      currentOffset = 0;
+      loadAuditLogs();
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-event').value = '';
+      document.getElementById('filter-target').value = '';
+      document.getElementById('filter-start-date').value = '';
+      document.getElementById('filter-end-date').value = '';
+      currentOffset = 0;
+      loadAuditLogs();
+    }
+
+    function openDetailsModal(index) {
+      const r = cachedRecords[index];
+      if (!r) return;
+
+      document.getElementById('modal-event-title').innerText = `Audit Event: ${r.event_type || 'Unknown'}`;
+      document.getElementById('modal-meta-line').innerText = `${r.created_at} • Actor: ${r.actor_username || r.actor_id || 'System'} (${r.actor_role || 'ADMIN'}) • Target: ${r.target_type || '--'} #${r.target_id || ''}`;
+      document.getElementById('modal-json-content').innerText = r.details ? JSON.stringify(r.details, null, 2) : 'No payload details.';
+      document.getElementById('details-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('details-modal').classList.remove('open');
+    }
+
+    function exportLogsJson() {
+      if (!cachedRecords || cachedRecords.length === 0) {
+        showToast('No audit logs loaded to export.', 'info');
+        return;
+      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cachedRecords, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `institutional_audit_logs_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function escapeHtml(text) {
+      if (text == null) return '';
+      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coursework & Assignments — Faculty Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    /* Compact Register Switcher & Meta Header */
+    .assignment-header-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 0.9rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .assignment-switcher-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+    .assignment-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-grow: 1;
+      max-width: 620px;
+    }
+    .assignment-select {
+      flex: 1;
+      min-width: 260px;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+    .assignment-meta-strip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.65rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .assignment-meta-strip strong {
+      color: var(--text-main);
+    }
+    .meta-bullet {
+      opacity: 0.4;
+      font-size: 0.65rem;
+    }
+
+    /* Workspace Command Bar */
+    .assignment-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Item Card */
+    .item-card {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      padding: 1.25rem 1.4rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s ease;
+    }
+    .item-card:hover { border-color: var(--color-primary); }
+    .item-title { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+    .item-meta { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .expand-panel {
+      display: none;
+      margin-top: 1rem;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 1rem;
+    }
+    .expand-panel.open { display: block; }
+
+    /* Submissions Subtable */
+    table.data-subtable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+    table.data-subtable th {
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.03em;
+      padding: 0.6rem 0.75rem;
+      border-bottom: 2px solid var(--border-color);
+      text-align: left;
+    }
+    table.data-subtable td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      text-align: left;
+    }
+    table.data-subtable tbody tr:hover {
+      background: var(--bg-surface);
+    }
+    table.data-subtable input[type="number"] {
+      width: 75px;
+      padding: 0.25rem 0.45rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-weight: 700;
+      text-align: center;
+    }
+    .file-link {
+      color: var(--color-primary);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .file-link:hover { text-decoration: underline; }
+    .status-tag {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.18rem 0.5rem;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .status-tag.SUBMITTED { background: var(--status-pending-bg); color: var(--status-pending); }
+    .status-tag.LATE { background: var(--status-late-bg); color: var(--status-late); }
+    .status-tag.GRADED { background: var(--status-present-bg); color: var(--status-present); }
+    .status-tag.MISSING { background: var(--status-absent-bg); color: var(--status-absent); }
+
+    /* Modal Styling */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 580px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body {
+      padding: 1.25rem;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+    .modal-footer {
+      padding: 0.85rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">FACULTY</span>
+      <span>Attendance Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" id="top-nav-bar">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm" id="nav-reg">Take Attendance & Registers</a>
+      <a href="/faculty/assignments.html" class="btn btn-primary btn-sm" id="nav-assign">Assignments & Coursework</a>
+      <a href="/faculty/tests.html" class="btn btn-secondary btn-sm" id="nav-marks">Test Marks & Exams</a>
+      <a href="/faculty/evaluation.html" class="btn btn-secondary btn-sm" id="nav-eval">Internal Evaluation</a>
+      <a href="/faculty/reports.html" class="btn btn-secondary btn-sm" id="nav-reports">Analytics & Reports</a>
+      <a href="/faculty/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem; max-width: 1180px;">
+    
+    <!-- PAGE TITLE BANNER -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+      <div>
+        <h1 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <span>📝</span>
+          <span>Coursework & Assignments</span>
+        </h1>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+          Create assignments, track submissions with UBTER registration numbers, and grade coursework
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/faculty/registers.html" class="btn btn-secondary btn-sm" id="btn-quick-matrix">📖 Attendance Matrix</a>
+        <a href="/faculty/tests.html" class="btn btn-secondary btn-sm" id="btn-quick-tests">📊 Class Tests</a>
+        <a href="/faculty/evaluation.html" class="btn btn-secondary btn-sm" id="btn-quick-eval">📈 Evaluation</a>
+      </div>
+    </div>
+
+    <!-- COHORT SWITCHER & HEADER -->
+    <div class="assignment-header-card">
+      <div class="assignment-switcher-strip">
+        <div class="assignment-select-wrap">
+          <label for="assignment-switcher-select" style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">
+            📖 Switch Subject:
+          </label>
+          <select id="assignment-switcher-select" class="assignment-select" onchange="onRegisterSelectChange(this.value)">
+            <option value="">Loading teaching registers...</option>
+          </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+          <span class="badge badge-present" style="font-size: 0.72rem;">COURSEWORK CONSOLE</span>
+          <a href="/faculty/registers.html" id="link-to-register" class="btn btn-secondary btn-sm" title="Open Attendance Register for this subject" style="font-weight: 600;">
+            📖 Attendance Register ↗
+          </a>
+          <a href="/faculty/tests.html" id="link-to-tests" class="btn btn-secondary btn-sm" title="Open Class Tests & Marks for this subject" style="font-weight: 600;">
+            📊 Class Tests &amp; Marks ↗
+          </a>
+        </div>
+      </div>
+      <div class="assignment-meta-strip" id="assignment-meta-strip">
+        <span>SUBJECT: <strong id="meta-subject-name">—</strong></span>
+        <span class="meta-bullet">•</span>
+        <span>CLASS: <strong id="meta-class-name">—</strong></span>
+        <span class="meta-bullet">•</span>
+        <span>SESSION: <strong id="meta-session-name">—</strong></span>
+        <span class="meta-bullet">•</span>
+        <span>ENROLLED: <strong id="meta-cohort-size">0</strong> students</span>
+      </div>
+    </div>
+
+    <!-- WORKSPACE TOOLBAR -->
+    <div class="assignment-toolbar">
+      <div class="toolbar-left">
+        <span style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+          <span>📝</span>
+          <span>Coursework &amp; Assignments</span>
+          <span class="badge badge-late" id="badge-assignments-count" style="font-size: 0.75rem;">0</span>
+        </span>
+      </div>
+      <div class="toolbar-right">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadRegisterAssignments()" title="Refresh coursework list">
+          🔄 Refresh
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openCreateAssignmentModal()" style="font-weight: 700;">
+          + Create Assignment
+        </button>
+      </div>
+    </div>
+
+    <!-- ASSIGNMENTS LIST CONTAINER -->
+    <div id="register-assignments-list">
+      <div class="card" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+        Loading coursework assignments...
+      </div>
+    </div>
+  </main>
+
+  <!-- CREATE ASSIGNMENT MODAL -->
+  <div id="create-assignment-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('create-assignment-modal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">Create Coursework Assignment</h3>
+        <button type="button" onclick="closeModal('create-assignment-modal')" style="background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;">&times;</button>
+      </div>
+      <form id="create-assignment-form" onsubmit="submitRegisterAssignment(event)">
+        <div class="modal-body">
+          <div style="background: var(--bg-surface); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); margin-bottom: 1rem; border: 1px solid var(--border-color); font-size: 0.82rem; color: var(--text-muted);">
+            Target Cohort: <strong id="modal-assign-scope-text" style="color: var(--text-main);">Selected Register</strong>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="assign-title" style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Assignment Title *</label>
+            <input type="text" id="assign-title" class="form-control" placeholder="e.g. Unit 2 ER Diagram Case Study" required style="width: 100%; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div>
+              <label class="form-label" for="assign-due-date" style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Due Date</label>
+              <input type="date" id="assign-due-date" class="form-control" style="width: 100%; padding: 0.45rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);">
+            </div>
+            <div>
+              <label class="form-label" for="assign-max-marks" style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Max Marks</label>
+              <input type="number" id="assign-max-marks" class="form-control" min="1" max="100" value="25" style="width: 100%; padding: 0.45rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-weight: 700;">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="assign-instructions" style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Instructions / Description</label>
+            <textarea id="assign-instructions" class="form-control" rows="3" placeholder="Submission guidelines, formatting instructions, or question details..." style="width: 100%; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit;"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="assign-file" style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Attachment (Optional PDF, DOCX, ZIP)</label>
+            <input type="file" id="assign-file" class="form-control" style="width: 100%; font-size: 0.8rem;">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('create-assignment-modal')">Cancel</button>
+          <button type="submit" id="btn-save-assignment" class="btn btn-primary btn-sm" style="font-weight: 700;">Publish Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRMATION MODAL -->
+  <div id="delete-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('delete-modal')">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 0; color: var(--status-absent);">Confirm Deletion</h3>
+        <button type="button" onclick="closeModal('delete-modal')" style="background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" style="font-size: 0.88rem; color: var(--text-muted);">
+        Are you sure you want to delete this assignment and all student submissions? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('delete-modal')">Cancel</button>
+        <button type="button" id="btn-confirm-delete" class="btn btn-sm" style="background: var(--status-absent); color: var(--text-white); font-weight: 700;" onclick="executeDelete()">Delete Assignment</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireSubjects: true });
+
+    function getToken() {
+      return typeof getAuthToken === 'function' ? getAuthToken() : (localStorage.getItem('access_token') || '');
+    }
+
+    let allRegisters = [];
+    let currentRegisterId = null;
+    let registerData = null;
+    let currentRegisterAssignments = [];
+    let pendingDeleteId = null;
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('open');
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('open');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function getRegisterQueryParams() {
+      if (!registerData) return '';
+      const params = new URLSearchParams();
+      if (registerData.subject_id) params.set('subject_id', registerData.subject_id);
+      if (registerData.department_id) params.set('department_id', registerData.department_id);
+      if (registerData.year) params.set('year', registerData.year);
+      if (registerData.semester) params.set('semester', registerData.semester);
+      if (registerData.branch_id) params.set('branch_id', registerData.branch_id);
+      if (registerData.academic_year_id) params.set('academic_year_id', registerData.academic_year_id);
+      if (currentRegisterId) params.set('register_id', currentRegisterId);
+      return params.toString();
+    }
+
+    async function loadRegistersList() {
+      try {
+        const res = await fetchApi('/faculty/registers');
+        if (res.success) {
+          allRegisters = res.data || [];
+          const selectEl = document.getElementById('assignment-switcher-select');
+          if (!allRegisters.length) {
+            selectEl.innerHTML = '<option value="">No teaching registers assigned</option>';
+            document.getElementById('register-assignments-list').innerHTML = `
+              <div class="card" style="text-align: center; padding: 3rem 2rem; color: var(--text-muted); background: var(--bg-surface); border: 1px dashed var(--border-color);">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📖</div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">No Assigned Registers</h3>
+                <p style="font-size: 0.85rem; max-width: 480px; margin: 0 auto;">No teaching classes or subjects have been assigned to your profile yet.</p>
+              </div>
+            `;
+            return;
+          }
+
+          selectEl.innerHTML = allRegisters.map(r => {
+            const yr = r.year ? `Year ${r.year}` : '';
+            const sem = r.semester ? `Sem ${r.semester}` : '';
+            const sec = r.section ? `Sec ${r.section}` : '';
+            const cohortInfo = [yr, sem, sec].filter(Boolean).join(' • ');
+            const label = `${r.subject_name || r.name} [${r.subject_code || 'SUBJ'}] (${r.type || 'THEORY'} • ${r.department_name || 'Dept'}${cohortInfo ? ' • ' + cohortInfo : ''})`;
+            return `<option value="${r.id}">${escapeHtml(label)}</option>`;
+          }).join('');
+
+          // Read ?id= from URL or default to first register
+          const u = new URL(window.location.href);
+          const requestedId = u.searchParams.get('id');
+          const matched = allRegisters.find(r => String(r.id) === String(requestedId));
+          const targetId = matched ? matched.id : allRegisters[0].id;
+          selectEl.value = targetId;
+          await selectRegister(targetId);
+        }
+      } catch (err) {
+        console.error('Failed to load registers list:', err);
+      }
+    }
+
+    async function onRegisterSelectChange(regId) {
+      if (!regId) return;
+      const u = new URL(window.location.href);
+      u.searchParams.set('id', regId);
+      window.history.replaceState(null, '', u.toString());
+      await selectRegister(regId);
+    }
+
+    async function selectRegister(regId) {
+      currentRegisterId = regId;
+      try {
+        const res = await fetchApi(`/faculty/registers/${regId}`);
+        if (res.success) {
+          registerData = res.data.register;
+          updateHeaderMeta(registerData);
+          updateNavLinks(regId);
+          await loadRegisterAssignments();
+        }
+      } catch (err) {
+        console.error('Error selecting register:', err);
+      }
+    }
+
+    function updateNavLinks(regId) {
+      const regLink = document.getElementById('link-to-register');
+      if (regLink) regLink.href = `/faculty/registers.html?id=${regId}`;
+      const testLink = document.getElementById('link-to-tests');
+      if (testLink) testLink.href = `/faculty/tests.html?id=${regId}`;
+      const quickMatrix = document.getElementById('btn-quick-matrix');
+      if (quickMatrix) quickMatrix.href = `/faculty/registers.html?id=${regId}`;
+      const quickTests = document.getElementById('btn-quick-tests');
+      if (quickTests) quickTests.href = `/faculty/tests.html?id=${regId}`;
+      const quickEval = document.getElementById('btn-quick-eval');
+      if (quickEval) quickEval.href = `/faculty/evaluation.html?id=${regId}`;
+      const navEval = document.getElementById('nav-eval');
+      if (navEval) navEval.href = `/faculty/evaluation.html?id=${regId}`;
+    }
+
+    function updateHeaderMeta(reg) {
+      if (!reg) return;
+      const subEl = document.getElementById('meta-subject-name');
+      if (subEl) subEl.innerText = `${reg.subject_name || reg.name} (${reg.subject_code || '—'})`;
+      const clsEl = document.getElementById('meta-class-name');
+      if (clsEl) clsEl.innerText = `${reg.department_name || 'Dept'} • Year ${reg.year || 1} Sem ${reg.semester || 1}`;
+      const sessEl = document.getElementById('meta-session-name');
+      if (sessEl) sessEl.innerText = reg.academic_year_label || '2026-27 (Winter)';
+      const sizeEl = document.getElementById('meta-cohort-size');
+      if (sizeEl) sizeEl.innerText = reg.enrolled_count || '0';
+      const modalScope = document.getElementById('modal-assign-scope-text');
+      if (modalScope) modalScope.innerText = `${reg.subject_name || reg.name} [${reg.subject_code || ''}] • Year ${reg.year || 1} Sem ${reg.semester || 1}`;
+    }
+
+    async function loadRegisterAssignments() {
+      const container = document.getElementById('register-assignments-list');
+      if (!container) return;
+      if (!registerData) {
+        container.innerHTML = `<div class="card" style="text-align:center; padding:2rem; color:var(--text-muted);">Please select a subject register first.</div>`;
+        return;
+      }
+      container.innerHTML = `<div class="card" style="text-align:center; padding:2.5rem; color:var(--text-muted);">Loading assignments for ${escapeHtml(registerData.subject_name || 'subject')}...</div>`;
+
+      try {
+        const q = getRegisterQueryParams();
+        const res = await fetchApi(`/assignments?${q}`);
+        if (!res.success || !Array.isArray(res.data) || !res.data.length) {
+          container.innerHTML = `
+            <div class="card" style="text-align:center; padding:3rem 2rem; color:var(--text-muted); background:var(--bg-surface); border:1px dashed var(--border-color);">
+              <div style="font-size:2.5rem; margin-bottom:0.5rem;">📝</div>
+              <h3 style="font-size:1.15rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">No Assignments Created Yet</h3>
+              <p style="font-size:0.85rem; max-width:480px; margin:0 auto 1.25rem;">
+                No homework or coursework tasks have been published for <strong>${escapeHtml(registerData.subject_name || 'this subject')}</strong>. Click above to create one.
+              </p>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openCreateAssignmentModal()">+ Create Assignment</button>
+            </div>
+          `;
+          const b = document.getElementById('badge-assignments-count');
+          if (b) b.innerText = '0';
+          return;
+        }
+
+        currentRegisterAssignments = res.data;
+        const b = document.getElementById('badge-assignments-count');
+        if (b) b.innerText = currentRegisterAssignments.length;
+
+        container.innerHTML = currentRegisterAssignments.map(a => {
+          const dtStr = a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN') : 'No due date';
+          const subCount = a.submissions_count || 0;
+          const classSize = a.class_size || (registerData.enrolled_count || 0);
+          return `
+            <div class="item-card assignment-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <div class="item-title">${escapeHtml(a.title)} <span style="font-weight:500; color:var(--text-muted); font-size:0.85rem;">(Max: ${a.max_marks} marks)</span></div>
+                  <div class="item-meta">
+                    ${escapeHtml(a.subject_name || registerData.subject_name || 'Subject')}
+                    • Due: <strong>${dtStr}</strong>
+                  </div>
+                  ${a.description ? `<p style="font-size:0.82rem; color:var(--text-main); margin:0.45rem 0 0 0; line-height:1.4;">${escapeHtml(a.description)}</p>` : ''}
+                  ${a.attachment_path ? `<div style="margin-top:0.35rem;"><a class="file-link" href="${a.attachment_path}" target="_blank">📎 ${escapeHtml(a.original_filename || 'Download Attached File')}</a></div>` : ''}
+                </div>
+                <div style="text-align: right;">
+                  <span class="badge ${subCount > 0 ? 'badge-present' : 'badge-pending'}">
+                    ${subCount} / ${classSize} Submitted
+                  </span>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.85rem; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="assign-toggle-btn-${a.id}" onclick="toggleSubmissions(${a.id})">View Submissions / Grade</button>
+                <button type="button" class="btn btn-sm" style="color: var(--status-absent); border: 1px solid var(--status-absent-bg); background: var(--status-absent-bg); font-weight: 600;" onclick="openDeleteModal('assignment', ${a.id})">Delete</button>
+              </div>
+              <div class="expand-panel" id="assign-panel-${a.id}"></div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `<div class="card" style="color:var(--status-absent); padding:1.5rem;">Failed to load assignments: ${err.message}</div>`;
+      }
+    }
+
+    function openCreateAssignmentModal() {
+      if (!registerData) {
+        showToast('Please select a subject register first', 'error');
+        return;
+      }
+      openModal('create-assignment-modal');
+      setTimeout(() => {
+        const titleInp = document.getElementById('assign-title');
+        if (titleInp) titleInp.focus();
+      }, 100);
+    }
+
+    async function submitRegisterAssignment(e) {
+      e.preventDefault();
+      if (!registerData) {
+        showToast('Please select a subject register first', 'error');
+        return;
+      }
+
+      const saveBtn = document.getElementById('btn-save-assignment');
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = 'Publishing...'; }
+
+      const fd = new FormData();
+      fd.append('title', document.getElementById('assign-title').value.trim());
+      fd.append('description', document.getElementById('assign-instructions').value.trim());
+      fd.append('due_date', document.getElementById('assign-due-date').value || '');
+      fd.append('max_marks', document.getElementById('assign-max-marks').value || 25);
+      fd.append('subject_id', registerData.subject_id);
+      fd.append('department_id', registerData.department_id);
+      if (registerData.branch_id) fd.append('branch_id', registerData.branch_id);
+      fd.append('year', registerData.year || 1);
+      fd.append('semester', registerData.semester || 1);
+      if (registerData.academic_year_id) fd.append('academic_year_id', registerData.academic_year_id);
+
+      const fileInput = document.getElementById('assign-file');
+      if (fileInput && fileInput.files[0]) {
+        fd.append('attachment', fileInput.files[0]);
+      }
+
+      try {
+        const res = await fetchApi('/assignments', {
+          method: 'POST',
+          body: fd
+        });
+        if (res.success) {
+          showToast('Assignment published successfully!', 'success');
+          document.getElementById('create-assignment-form').reset();
+          closeModal('create-assignment-modal');
+          loadRegisterAssignments();
+        } else {
+          showToast(res.error?.message || 'Could not publish assignment', 'error');
+        }
+      } catch (err) {
+        showToast('Failed to publish assignment: ' + err.message, 'error');
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'Publish Assignment'; }
+      }
+    }
+
+    async function toggleSubmissions(id) {
+      const panel = document.getElementById(`assign-panel-${id}`);
+      if (!panel) return;
+      if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        return;
+      }
+      panel.classList.add('open');
+      panel.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">Loading student submissions...</div>';
+
+      try {
+        const res = await fetchApi(`/assignments/${id}/submissions`);
+        if (!res.success) {
+          panel.innerHTML = '<div style="color:var(--status-absent); padding:1rem;">Could not load submissions roster.</div>';
+          return;
+        }
+
+        const roster = res.data.roster || [];
+        if (!roster.length) {
+          panel.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">No enrolled students in this register cohort roster.</div>';
+          return;
+        }
+
+        panel.innerHTML = `
+          <div style="overflow-x: auto; margin-top:0.75rem;">
+            <table class="data-subtable data-table">
+              <thead>
+                <tr>
+                  <th style="width: 65px;">Roll No</th>
+                  <th style="width: 130px;">UBTER Reg No</th>
+                  <th>Student Full Name</th>
+                  <th style="width: 140px;">Uploaded File</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="width: 130px;">Score</th>
+                  <th style="width: 90px; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${roster.map(r => `
+                  <tr>
+                    <td style="font-weight: 700;">${String(r.class_roll_no || '—').replace(/^#/, '')}</td>
+                    <td style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(r.registration_no || r.official_enrollment_no || '—')}</td>
+                    <td style="font-weight: 600;">${escapeHtml(r.full_name)}</td>
+                    <td>
+                      ${r.file_path ? `<a class="file-link" href="${r.file_path}" target="_blank">📥 ${escapeHtml(r.original_filename || 'Download')}</a>` : '<span style="color:var(--text-muted);">None</span>'}
+                    </td>
+                    <td><span class="status-tag ${r.status || 'MISSING'}">${r.status || 'MISSING'}</span></td>
+                    <td>
+                      ${r.submission_id ? `<input type="number" id="marks-${r.submission_id}" value="${r.marks_obtained ?? ''}" placeholder="—" style="width:75px;">` : '<span style="color:var(--text-muted);">—</span>'}
+                    </td>
+                    <td style="text-align: right;">
+                      ${r.submission_id ? `<button type="button" class="btn btn-primary btn-sm" onclick="saveGrade(${r.submission_id})">Grade</button>` : ''}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        panel.innerHTML = '<div style="color:var(--status-absent); padding:1rem;">Error fetching submissions.</div>';
+      }
+    }
+
+    async function saveGrade(submissionId) {
+      const inputEl = document.getElementById(`marks-${submissionId}`);
+      const marksVal = inputEl ? inputEl.value : '';
+      try {
+        const res = await fetchApi(`/assignments/submissions/${submissionId}/grade`, {
+          method: 'PUT',
+          body: JSON.stringify({ marks_obtained: marksVal === '' ? null : Number(marksVal) })
+        });
+        if (res.success) {
+          showToast('Grade saved successfully!', 'success');
+        } else {
+          showToast(res.error?.message || 'Could not save grade', 'error');
+        }
+      } catch (err) {
+        showToast('Failed to save grade', 'error');
+      }
+    }
+
+    function openDeleteModal(type, id) {
+      pendingDeleteId = id;
+      openModal('delete-modal');
+    }
+
+    async function executeDelete() {
+      if (!pendingDeleteId) return;
+      const btn = document.getElementById('btn-confirm-delete');
+      if (btn) { btn.disabled = true; btn.innerText = 'Deleting...'; }
+      try {
+        const res = await fetchApi(`/assignments/${pendingDeleteId}`, { method: 'DELETE' });
+        if (res.success) {
+          showToast('Assignment deleted successfully', 'success');
+          closeModal('delete-modal');
+          loadRegisterAssignments();
+        } else {
+          showToast(res.error?.message || 'Could not delete assignment', 'error');
+        }
+      } catch (err) {
+        showToast('Delete failed: ' + err.message, 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerText = 'Delete Assignment'; }
+        pendingDeleteId = null;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRegistersList();
+    });
+  </script>
+</body>
+</html>

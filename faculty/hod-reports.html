@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Department Attendance Reports — Hardware ESP32 Presence — Faculty Portal</title>
+  <meta name="description" content="View department-wide biometric ESP32 hardware attendance records, scan frequency analytics, and daily presence trends.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .analysis-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .analysis-board { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 550px) {
+      .analysis-board { grid-template-columns: 1fr; }
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--kpi-accent, var(--color-primary));
+    }
+    .kpi-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .kpi-val {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+      margin-bottom: 0.25rem;
+    }
+    .kpi-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 960px) {
+      .chart-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .chart-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0;
+    }
+    .chart-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* SVG / CSS Bar Chart */
+    .bar-chart-container {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      align-items: flex-end;
+      gap: 0.75rem;
+      padding-top: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+    .bar-col {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .bar-col:hover .bar-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-8px);
+    }
+    .bar-fill {
+      width: 70%;
+      max-width: 42px;
+      background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+      border-radius: 6px 6px 0 0;
+      transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+      min-height: 4px;
+    }
+    .bar-col:hover .bar-fill {
+      background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+    }
+    .bar-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      white-space: nowrap;
+    }
+    .bar-tooltip {
+      position: absolute;
+      top: -38px;
+      background: var(--text-main);
+      color: var(--bg-card);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.15s ease;
+      pointer-events: none;
+      z-index: 10;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Distribution Progress Bars */
+    .dist-row {
+      margin-bottom: 1rem;
+    }
+    .dist-row:last-child {
+      margin-bottom: 0;
+    }
+    .dist-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      margin-bottom: 0.35rem;
+    }
+    .dist-bar-bg {
+      background: var(--bg-surface);
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .dist-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--color-primary);
+      transition: width 0.4s ease;
+    }
+
+    /* ESP Pulse Indicator */
+    .esp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+    }
+    .esp-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--status-present);
+      box-shadow: 0 0 0 0 var(--status-present-bg);
+      animation: pulseAnim 2s infinite;
+    }
+    @keyframes pulseAnim {
+      0% { box-shadow: 0 0 0 0 var(--status-present-bg); }
+      70% { box-shadow: 0 0 0 6px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      text-align: left;
+    }
+    .custom-table th {
+      background: var(--bg-surface);
+      padding: 0.85rem 1rem;
+      font-weight: 700;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .custom-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+    .custom-table tr:hover td {
+      background: var(--bg-surface);
+    }
+
+    @media (max-width: 900px) {
+      .chart-columns {
+        grid-template-columns: 1fr !important;
+      }
+      .cohort-side {
+        border-left: none !important;
+        border-top: 1px solid var(--border-color) !important;
+        padding-left: 0 !important;
+        padding-top: 1.5rem !important;
+        margin-top: 1rem !important;
+      }
+    }
+    @media print {
+      .app-header, .no-print, .btn { display: none !important; }
+      body { background: white !important; }
+      .kpi-card, .chart-card, .table-container { box-shadow: none !important; border: 1px solid var(--border-color) !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header no-print">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" id="role-badge" style="background: var(--color-primary);">DEPT</span>
+      <span id="dept-header-name">Department Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm">My Registers</a>
+      <div class="hod-nav-section" style="border-top: none; padding: 0; margin: 0; display: flex; gap: 0.5rem; align-items: center;">
+        <span class="hod-nav-label">HOD:</span>
+        <a href="/faculty/hod-teachers.html" class="btn btn-secondary btn-sm">My Teachers</a>
+        <a href="/faculty/hod-subjects.html" class="btn btn-secondary btn-sm">Subjects</a>
+        <a href="/faculty/hod-students.html" class="btn btn-secondary btn-sm">Students</a>
+        <a href="/faculty/hod-archive.html" class="btn btn-secondary btn-sm">Archive</a>
+        <a href="/faculty/hod-reports.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Dept Reports</a>
+        <a href="/faculty/hod-devices.html" class="btn btn-secondary btn-sm">ESP Terminals</a>
+        <a href="/faculty/hod-settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      </div>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem;">
+    <!-- Page Header -->
+    <div class="page-header no-print" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-title">Department Attendance Reports</h1>
+        <p class="page-subtitle" id="dept-subtitle">Biometric ESP32 hardware terminal logs, presence trends, and verified physical scans.</p>
+      </div>
+      <div style="display: flex; gap: 0.6rem; align-items: center;">
+        <button class="btn btn-secondary" onclick="window.print()" title="Print report document">🖨️ Print</button>
+        <button class="btn btn-primary" onclick="exportCsv()" title="Download raw ESP logs as CSV">📥 Export CSV</button>
+      </div>
+    </div>
+
+    <!-- 1. ANALYSIS BOARD: 4 KPI CARDS -->
+    <div class="analysis-board" id="kpi-board">
+      <div class="kpi-card" style="--kpi-accent: var(--color-primary);">
+        <div class="kpi-lbl">Total Biometric Scans</div>
+        <div class="kpi-val" id="kpi-scans" style="color: var(--color-primary);">0</div>
+        <div class="kpi-desc">Verified hardware touches</div>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--status-present);">
+        <div class="kpi-lbl">Unique Students Scanned</div>
+        <div class="kpi-val" id="kpi-students" style="color: var(--status-present);">0</div>
+        <div class="kpi-desc">Distinct enrolled attendees</div>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--color-primary);">
+        <div class="kpi-lbl">Active Terminals</div>
+        <div class="kpi-val" id="kpi-terminals" style="color: var(--color-primary);">0</div>
+        <div class="kpi-desc">Department ESP32 scanners</div>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--status-late);">
+        <div class="kpi-lbl">Today's Scans</div>
+        <div class="kpi-val" id="kpi-today" style="color: var(--status-late);">0</div>
+        <div class="kpi-desc">Scanned in current session</div>
+      </div>
+    </div>
+
+    <!-- 2. CHART & ANALYTICS SECTION WITH INTEGRATED FILTERS -->
+    <div class="chart-card no-print" style="margin-bottom: 1.5rem;">
+      <div class="chart-header" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h2 class="chart-title" style="font-size: 1.15rem;">Daily Attendance Scan Activity & Telemetry</h2>
+          <p class="chart-subtitle">Biometric hardware touches, daily scan frequency, and cohort distribution</p>
+        </div>
+        <span class="esp-badge"><span class="esp-pulse"></span> LIVE TELEMETRY</span>
+      </div>
+
+      <!-- Filters inside chart section -->
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; align-items: flex-end;">
+          <div>
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem;">Academic Year</label>
+            <select id="filter-year" class="form-select form-control-sm" onchange="loadReports()">
+              <option value="">All Years</option>
+              <option value="1">Year 1</option>
+              <option value="2">Year 2</option>
+              <option value="3">Year 3</option>
+              <option value="4">Year 4</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem;">Semester</label>
+            <select id="filter-sem" class="form-select form-control-sm" onchange="loadReports()">
+              <option value="">All Semesters</option>
+              <option value="1">Semester 1</option><option value="2">Semester 2</option>
+              <option value="3">Semester 3</option><option value="4">Semester 4</option>
+              <option value="5">Semester 5</option><option value="6">Semester 6</option>
+              <option value="7">Semester 7</option><option value="8">Semester 8</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.78rem; font-weight: 700; margin-bottom: 0.25rem;">Date Filter</label>
+            <select id="filter-date-preset" class="form-select form-control-sm" onchange="loadReports()">
+              <option value="all">All Recorded Scans</option>
+              <option value="today">Today Only</option>
+              <option value="7days">Last 7 Days</option>
+              <option value="30days">Last 30 Days</option>
+            </select>
+          </div>
+          <div>
+            <button class="btn btn-secondary btn-sm" onclick="resetFilters()" style="width: 100%; height: 38px;">Reset</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 0.75rem;">
+          <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Search student by name, enrollment no, or device UID (e.g. ESP32_IT_LAB_01)..." oninput="applySearchFilter()">
+        </div>
+      </div>
+
+      <!-- Charts Body: Trend Bar Chart + Cohort Distribution -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;" class="chart-columns">
+        <div>
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em;">
+            Daily Scan Volume Trend
+          </div>
+          <div class="bar-chart-container" id="daily-trend-chart">
+            <div style="margin: auto; color: var(--text-muted); font-size: 0.85rem;">Loading activity trend...</div>
+          </div>
+        </div>
+        <div style="border-left: 1px solid var(--border-color); padding-left: 1.5rem;" class="cohort-side">
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em;">
+            Cohort Distribution
+          </div>
+          <div id="cohort-dist-container" style="display: flex; flex-direction: column; justify-content: center; min-height: 200px;">
+            <div style="margin: auto; color: var(--text-muted); font-size: 0.85rem;">Loading cohort breakdown...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. ATTENDANCE RECORDS FROM ESP TABLE -->
+    <div class="table-container">
+      <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; background: var(--bg-surface);">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Biometric ESP32 Presence Records</h3>
+          <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: var(--text-muted);">Exact hardware scan timestamps, optical reader terminal IDs, and student rosters.</p>
+        </div>
+        <span id="record-count-badge" style="background: var(--color-primary-light); color: var(--color-primary); font-weight: 700; font-size: 0.8rem; padding: 0.25rem 0.65rem; border-radius: 999px;">
+          0 Scans
+        </span>
+      </div>
+
+      <div id="table-wrap">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading department ESP attendance records...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireHOD: true });
+
+    const API = '/api/v1/hod';
+    let departmentData = null;
+    let currentReportData = null;
+    let allRecords = [];
+
+    // Self-healing API client with automatic token refresh
+    async function apiFetch(url, options = {}) {
+      let token = getAuthToken();
+      const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      let res = await fetch(url, { ...options, headers });
+
+      if (res.status === 401) {
+        try {
+          const refreshRes = await fetch('/api/v1/auth/refresh', { method: 'POST' });
+          if (refreshRes.ok) {
+            const refreshData = await refreshRes.json();
+            if (refreshData.success && refreshData.data?.access_token) {
+              localStorage.setItem('auth_token', refreshData.data.access_token);
+              headers['Authorization'] = `Bearer ${refreshData.data.access_token}`;
+              res = await fetch(url, { ...options, headers });
+            }
+          } else {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('current_user');
+            window.location.href = '/index.html?error=session_expired';
+            throw new Error('Session expired. Please log in again.');
+          }
+        } catch (e) {
+          window.location.href = '/index.html?error=session_expired';
+          throw e;
+        }
+      }
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error?.message || `Request failed (${res.status})`);
+      }
+      return data;
+    }
+
+    async function init() {
+      const user = getCurrentUser();
+      if (user) {
+        const isHod = !!user.is_hod;
+        const roleBadge = document.getElementById('role-badge');
+        if (roleBadge) {
+          roleBadge.innerText = isHod ? 'HOD' : 'CLASS TEACHER';
+          roleBadge.style.background = isHod ? 'var(--color-primary)' : 'var(--status-pending)';
+        }
+        if (isHod) {
+          const tLink = document.getElementById('nav-teachers-link');
+          const sLink = document.getElementById('nav-subjects-link');
+          if (tLink) tLink.style.display = '';
+          if (sLink) sLink.style.display = '';
+        }
+      }
+
+      try {
+        const hierRes = await apiFetch(`${API}/hierarchy`);
+        if (hierRes.success && hierRes.data) {
+          departmentData = hierRes.data;
+          document.getElementById('dept-header-name').innerText = departmentData.department_name || 'Department Portal';
+          document.getElementById('dept-subtitle').innerText =
+            `Biometric ESP32 terminal attendance logs, presence trends, and verified physical scans for ${departmentData.department_name || 'Department'}.`;
+        }
+      } catch (err) {
+        console.warn('Hierarchy load warning:', err.message);
+      }
+
+      await loadReports();
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-year').value = '';
+      document.getElementById('filter-sem').value = '';
+      document.getElementById('filter-date-preset').value = 'all';
+      document.getElementById('filter-search').value = '';
+      loadReports();
+    }
+
+    async function loadReports() {
+      const year = document.getElementById('filter-year').value;
+      const sem = document.getElementById('filter-sem').value;
+      const datePreset = document.getElementById('filter-date-preset').value;
+
+      let qs = [];
+      if (year) qs.push(`year=${year}`);
+      if (sem) qs.push(`semester=${sem}`);
+      if (datePreset) qs.push(`date_preset=${datePreset}`);
+
+      const url = `${API}/reports${qs.length ? '?' + qs.join('&') : ''}`;
+
+      try {
+        const res = await apiFetch(url);
+        if (res.success && res.data) {
+          currentReportData = res.data;
+          allRecords = res.data.records || [];
+          renderAnalysisBoard(res.data);
+          applySearchFilter();
+        } else {
+          showEmptyState('No attendance scan records found.');
+        }
+      } catch (err) {
+        document.getElementById('table-wrap').innerHTML = `
+          <div style="text-align: center; color: var(--status-absent); padding: 3rem;">
+            Failed to load department report: ${err.message}
+          </div>`;
+      }
+    }
+
+    function renderAnalysisBoard(data) {
+      const k = data.kpis || {};
+      document.getElementById('kpi-scans').textContent = (k.total_scans || 0).toLocaleString();
+      document.getElementById('kpi-students').textContent = (k.unique_students || 0).toLocaleString();
+      document.getElementById('kpi-terminals').textContent = (k.active_terminals || 0).toLocaleString();
+      document.getElementById('kpi-today').textContent = (k.today_scans || 0).toLocaleString();
+
+      // Render Bar Chart: Daily Trend
+      renderDailyTrendChart(data.daily_trend || []);
+
+      // Render Cohort Breakdown
+      renderCohortDistribution(data.cohort_distribution || []);
+    }
+
+    function renderDailyTrendChart(trend) {
+      const chart = document.getElementById('daily-trend-chart');
+      if (!trend.length) {
+        chart.innerHTML = `<div style="margin: auto; color: var(--text-muted); font-size: 0.85rem;">No historical scans recorded for this selection.</div>`;
+        return;
+      }
+
+      const maxVal = Math.max(...trend.map(t => t.scan_count), 1);
+
+      chart.innerHTML = trend.map(t => {
+        const heightPct = Math.round((t.scan_count / maxVal) * 85) + 5;
+        const dateObj = new Date(t.date + 'T00:00:00');
+        const label = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+        return `
+          <div class="bar-col">
+            <div class="bar-tooltip">
+              ${label}: ${t.scan_count} scans (${t.unique_students} students)
+            </div>
+            <div class="bar-fill" style="height: ${heightPct}%;"></div>
+            <div class="bar-label">${label}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCohortDistribution(dist) {
+      const container = document.getElementById('cohort-dist-container');
+      if (!dist.length) {
+        container.innerHTML = `<div style="margin: auto; color: var(--text-muted); font-size: 0.85rem;">No cohort breakdown available.</div>`;
+        return;
+      }
+
+      const total = dist.reduce((acc, d) => acc + d.scan_count, 0) || 1;
+
+      container.innerHTML = dist.slice(0, 5).map(d => {
+        const pct = Math.round((d.scan_count / total) * 100);
+        return `
+          <div class="dist-row">
+            <div class="dist-header">
+              <span style="font-weight: 700; color: var(--text-main); font-size: 0.8rem;">
+                ${esc(d.branch_code || d.branch_name)} (Y${d.year} S${d.semester})
+              </span>
+              <span style="font-weight: 700; color: var(--color-primary); font-size: 0.8rem;">
+                ${d.scan_count} scans (${pct}%)
+              </span>
+            </div>
+            <div class="dist-bar-bg">
+              <div class="dist-bar-fill" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function applySearchFilter() {
+      const q = document.getElementById('filter-search').value.toLowerCase().trim();
+      let filtered = allRecords;
+
+      if (q) {
+        filtered = allRecords.filter(r => 
+          (r.student_name || '').toLowerCase().includes(q) ||
+          (r.official_enrollment_no || '').toLowerCase().includes(q) ||
+          (r.device_uid || '').toLowerCase().includes(q) ||
+          (r.device_name || '').toLowerCase().includes(q)
+        );
+      }
+
+      renderRecordsTable(filtered);
+    }
+
+    function renderRecordsTable(records) {
+      const wrap = document.getElementById('table-wrap');
+      document.getElementById('record-count-badge').innerText = `${records.length} Scans`;
+
+      if (!records.length) {
+        wrap.innerHTML = `
+          <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📡</div>
+            <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-main);">No ESP32 Biometric Scans Found</div>
+            <div style="font-size: 0.85rem; margin-top: 0.25rem;">No attendance scans match your search or filter criteria.</div>
+          </div>`;
+        return;
+      }
+
+      wrap.innerHTML = `
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 180px;">Scan Timestamp</th>
+              <th>Student Name</th>
+              <th style="width: 140px;">Enrollment No</th>
+              <th style="width: 140px;">Program &amp; Cohort</th>
+              <th style="width: 160px;">Terminal Reader</th>
+              <th style="width: 110px; text-align: center;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${records.map(r => `
+              <tr>
+                <td>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
+                    ${formatTimestamp(r.scan_time)}
+                  </span>
+                </td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-weight: 700; color: var(--text-main); font-size: 0.92rem;">
+                      ${esc(r.student_name)}
+                    </span>
+                    ${r.class_roll_no ? `<span style="font-size: 0.72rem; background: var(--bg-surface); color: var(--text-muted); font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 4px;">${r.class_roll_no}</span>` : ''}
+                  </div>
+                </td>
+                <td>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--color-primary); background: var(--color-primary-light); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">
+                    ${esc(r.official_enrollment_no)}
+                  </span>
+                </td>
+                <td>
+                  <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">
+                    ${esc(r.branch_code || r.branch_name || 'IT')}
+                  </span>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">
+                    Year ${r.year || 3} • Sem ${r.semester || 5}
+                  </div>
+                </td>
+                <td>
+                  <div class="esp-badge">
+                    <span class="esp-pulse"></span>
+                    ${esc(r.device_uid || 'ESP32_READER')}
+                  </div>
+                </td>
+                <td style="text-align: center;">
+                  <span style="font-size: 0.75rem; font-weight: 800; color: var(--status-present); background: var(--status-present-bg); padding: 0.2rem 0.6rem; border-radius: 999px;">
+                    VERIFIED
+                  </span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function formatTimestamp(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts);
+      if (isNaN(d.getTime())) return ts;
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
+             d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function exportCsv() {
+      if (!allRecords.length) {
+        showToast('No attendance scan records available to export.', 'info');
+        return;
+      }
+      const headers = ['Scan ID', 'Event ID', 'Scan Timestamp', 'Student Name', 'Class Roll No', 'Enrollment No', 'Department / Program', 'Year', 'Semester', 'Device UID', 'Status'];
+      const rows = allRecords.map(r => [
+        r.scan_id || '',
+        r.event_id || '',
+        r.scan_time || '',
+        `"${(r.student_name || '').replace(/"/g, '""')}"`,
+        r.class_roll_no || '',
+        r.official_enrollment_no || '',
+        `"${(r.department_name || r.branch_name || '').replace(/"/g, '""')}"`,
+        r.year || '',
+        r.semester || '',
+        r.device_uid || '',
+        r.status || 'PRESENT'
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `ESP_Dept_Attendance_Report_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    init();
+  </script>
+</body>
+</html>

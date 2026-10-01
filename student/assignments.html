@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Assignments — Student Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .assignment-card { border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-card); padding: 1.1rem 1.3rem; margin-bottom: 0.9rem; }
+    .assignment-title { font-weight: 700; font-size: 1.02rem; }
+    .assignment-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .assignment-desc { font-size: 0.88rem; margin-top: 0.5rem; }
+    .status-tag { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .status-tag.SUBMITTED { background: var(--status-pending-bg); color: var(--status-pending); }
+    .status-tag.LATE { background: var(--status-late-bg); color: var(--status-late); }
+    .status-tag.GRADED { background: var(--status-present-bg); color: var(--status-present); }
+    .status-tag.NOT_SUBMITTED { background: var(--status-absent-bg); color: var(--status-absent); }
+    .upload-row { display: flex; gap: 0.6rem; margin-top: 0.75rem; align-items: center; flex-wrap: wrap; }
+    .file-link { color: var(--color-primary); font-weight: 600; text-decoration: none; font-size: 0.85rem; }
+    .feedback-box { margin-top: 0.6rem; font-size: 0.85rem; background: var(--bg-surface); border-radius: var(--radius-sm); padding: 0.6rem; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/student/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-present);">STUDENT</span>
+      <span>Assignments</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/student/attendance.html" class="btn btn-secondary btn-sm">Attendance &amp; Calendar</a>
+      <a href="/student/timetable.html" class="btn btn-secondary btn-sm">Timetable</a>
+      <a href="/student/assignments.html" class="btn btn-primary btn-sm">Assignments</a>
+      <a href="/student/scores.html" class="btn btn-secondary btn-sm">Test Scores</a>
+      <a href="/student/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 900px;">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">My Assignments</h1>
+        <p class="page-subtitle">Upload your work as PPT, DOC, PDF, or similar.</p>
+      </div>
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    <div id="assignment-list">Loading...</div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['STUDENT']);
+
+    async function authedFetch(url, options = {}) {
+      const token = localStorage.getItem('access_token');
+      const headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
+      const res = await fetch(`/api/v1${url}`, { ...options, headers });
+      return res.json();
+    }
+
+    async function loadAssignments() {
+      const res = await fetchApi('/assignments');
+      const list = document.getElementById('assignment-list');
+      if (!res.success || !res.data.length) {
+        list.innerHTML = `<div class="card" style="text-align:center; padding:2rem; color:var(--text-muted);">No assignments yet.</div>`;
+        return;
+      }
+      list.innerHTML = res.data.map(a => {
+        const status = a.my_status || 'NOT_SUBMITTED';
+        return `
+        <div class="assignment-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <div class="assignment-title">${a.title}</div>
+              <div class="assignment-meta">${a.subject_name || ''} · ${a.teacher_name} ${a.due_date ? '· Due ' + new Date(a.due_date).toLocaleDateString('en-IN') : ''}</div>
+            </div>
+            <span class="status-tag ${status}">${status.replace('_',' ')}</span>
+          </div>
+          ${a.description ? `<div class="assignment-desc">${a.description}</div>` : ''}
+          ${a.attachment_path ? `<div style="margin-top:0.5rem;"><a class="file-link" href="${a.attachment_path}" target="_blank">📎 Download question file</a></div>` : ''}
+          <div class="upload-row">
+            <input type="file" id="file-${a.id}">
+            <button class="btn btn-primary btn-sm" onclick="submitAssignment(${a.id})">${a.my_file_path ? 'Replace My Upload' : 'Upload My Work'}</button>
+            ${a.my_file_path ? `<a class="file-link" href="${a.my_file_path}" target="_blank">View my current upload</a>` : ''}
+          </div>
+          ${a.my_status === 'GRADED' ? `
+            <div class="feedback-box">
+              <strong>Marks: ${a.my_marks ?? '—'} / ${a.max_marks}</strong>
+              ${a.my_feedback ? `<div style="margin-top:0.3rem;">${a.my_feedback}</div>` : ''}
+            </div>` : ''}
+        </div>
+      `;
+      }).join('');
+    }
+
+    async function submitAssignment(id) {
+      const fileInput = document.getElementById(`file-${id}`);
+      if (!fileInput.files[0]) { showToast('Choose a file first', 'error'); return; }
+      const fd = new FormData();
+      fd.append('file', fileInput.files[0]);
+      const res = await authedFetch(`/assignments/${id}/submit`, { method: 'POST', body: fd });
+      if (res.success) {
+        showToast('Uploaded!', 'success');
+        loadAssignments();
+      } else {
+        showToast(res.error?.message || 'Upload failed', 'error');
+      }
+    }
+
+    loadAssignments();
+  </script>
+</body>
+</html>

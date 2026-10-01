@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Profile & Academic Credentials — Faculty Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .profile-hero {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      color: #ffffff;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .profile-hero-content {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+    }
+    .profile-avatar-wrap {
+      position: relative;
+      width: 84px;
+      height: 84px;
+      flex-shrink: 0;
+    }
+    .profile-avatar {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: #ffffff;
+      font-size: 2.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      user-select: none;
+    }
+    .profile-beacon {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 3px solid #0f172a;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+    }
+    .profile-meta h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: -0.02em;
+    }
+    .profile-subtitle {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin: 0 0 0.85rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .profile-role-chips {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .role-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .role-chip.hod {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+    .role-chip.class-teacher {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .role-chip.subject {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .role-chip.verified {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* Metric Cards Grid */
+    .profile-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .stat-card-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+    .stat-card-val {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: var(--color-primary);
+      line-height: 1.1;
+    }
+    .stat-card-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Password Input Wrapper with Show/Hide */
+    .password-wrap {
+      position: relative;
+    }
+    .password-wrap input {
+      padding-right: 2.75rem;
+    }
+    .password-toggle-btn {
+      position: absolute;
+      right: 0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #64748b;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .password-toggle-btn:hover {
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">FACULTY</span>
+      <span>Attendance Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm">My Registers</a>
+      <a href="/faculty/students.html" class="btn btn-secondary btn-sm">Students & Provision</a>
+      <a href="/faculty/reports.html" class="btn btn-secondary btn-sm">Reports</a>
+      <a href="/faculty/profile.html" class="btn btn-primary btn-sm">Profile & Google</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 960px;">
+    <!-- HERO PROFILE HEADER -->
+    <div class="profile-hero">
+      <div class="profile-hero-content">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="hero-avatar">AV</div>
+          <div class="profile-beacon" title="Active Faculty Session"></div>
+        </div>
+
+        <div class="profile-meta" style="flex: 1;">
+          <h1 id="hero-name">Prof. Amit Verma</h1>
+          <div class="profile-subtitle">
+            <span id="hero-dept">Department of Information Technology</span>
+            <span>•</span>
+            <span id="hero-empid" style="font-family: var(--font-family-mono); font-weight: 700;">EMP-IT-001</span>
+          </div>
+
+          <div class="profile-role-chips" id="hero-badges">
+            <span class="role-chip verified">✓ Institutional Account</span>
+            <span class="role-chip subject">📖 Subject Faculty</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4-CARD TEACHING METRIC STRIP -->
+    <div class="profile-stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-title">Active Registers</div>
+        <div class="stat-card-val" id="stat-registers">—</div>
+        <div class="stat-card-sub">Teaching subjects assigned</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-title">Students in Scope</div>
+        <div class="stat-card-val" id="stat-students">—</div>
+        <div class="stat-card-sub">Enrolled cohort roster</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-title">Assigned Department</div>
+        <div class="stat-card-val" id="stat-dept" style="font-size: 1.15rem;">—</div>
+        <div class="stat-card-sub" id="stat-dept-code">Academic Unit</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-title">Google 1-Click Status</div>
+        <div class="stat-card-val" id="stat-google" style="font-size: 1.1rem; color: #16a34a;">Checking...</div>
+        <div class="stat-card-sub">Single Sign-On Security</div>
+      </div>
+    </div>
+
+    <!-- GOOGLE 1-CLICK AUTHENTICATION CARD -->
+    <div class="card" style="margin-bottom: 1.75rem; border-left: 5px solid #4285F4;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Google 1-Click Sign-In</h2>
+            <span id="google-status-badge" class="badge badge-late">Checking...</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; max-width: 540px;">
+            Link your institutional Google account to log into the faculty portal with a single click.
+            <strong>Google account email must match your registered institutional Gmail address.</strong>
+          </p>
+        </div>
+
+        <div>
+          <button type="button" id="btn-google-action" class="btn btn-primary btn-sm" onclick="handleGoogleLinkAction()">
+            🔗 Connect Google Account
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEACHING COURSE ALLOCATIONS LEDGER -->
+    <div class="card" style="margin-bottom: 1.75rem; padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0;">📚 Academic Course Allocations</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Official teaching registers and subject responsibility assignments</p>
+        </div>
+        <a href="/faculty/registers.html" class="btn btn-secondary btn-sm" style="font-size: 0.78rem;">Open Digital Registers →</a>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="table" style="font-size: 0.85rem;">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Role / Scope</th>
+              <th>Subject / Course</th>
+              <th>Department / Program</th>
+              <th style="text-align: center; width: 100px;">Term</th>
+              <th style="text-align: center; width: 110px;">Type</th>
+            </tr>
+          </thead>
+          <tbody id="assignments-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading teaching allocations...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EDITABLE INSTRUCTOR DETAILS -->
+    <div class="card" style="margin-bottom: 1.75rem; padding: 2rem;">
+      <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        👤 Instructor Details
+      </h2>
+
+      <form id="profile-form">
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label">Employee ID</label>
+            <input type="text" id="prof-empid" class="form-control" readonly style="background: var(--bg-surface); font-family: var(--font-family-mono); font-weight: 700;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prof-name">Full Name</label>
+            <input type="text" id="prof-name" class="form-control" required style="font-weight: 600;">
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label" for="prof-email">Institutional Gmail (Login ID)</label>
+            <input type="email" id="prof-email" class="form-control" required>
+            <span style="font-size: 0.75rem; color: var(--status-absent); display: block; margin-top: 0.25rem;">
+              ⚠️ Changing this email resets Google 1-click single sign-on connection.
+            </span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prof-phone">Phone Number</label>
+            <input type="tel" id="prof-phone" class="form-control" placeholder="+91 98765 43210">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+          <button type="submit" id="save-prof-btn" class="btn btn-primary" style="font-weight: 700;">Update Profile</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- CHANGE PASSWORD FORM WITH TOGGLE -->
+    <div class="card" style="padding: 2rem;">
+      <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        🔒 Security & Password Management
+      </h2>
+
+      <form id="password-form">
+        <div class="form-group">
+          <label class="form-label" for="pass-current">Current Password</label>
+          <div class="password-wrap">
+            <input type="password" id="pass-current" class="form-control" required placeholder="••••••••">
+            <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('pass-current', this)" aria-label="Toggle password view">👁️</button>
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label" for="pass-new">New Password (min 8 chars)</label>
+            <div class="password-wrap">
+              <input type="password" id="pass-new" class="form-control" required minlength="8" placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('pass-new', this)" aria-label="Toggle password view">👁️</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pass-confirm">Confirm New Password</label>
+            <div class="password-wrap">
+              <input type="password" id="pass-confirm" class="form-control" required minlength="8" placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('pass-confirm', this)" aria-label="Toggle password view">👁️</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+          <button type="submit" id="save-pass-btn" class="btn btn-secondary" style="font-weight: 700;">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['TEACHER', 'SYSTEM_ADMIN']);
+
+    let profileData = null;
+
+    function togglePassVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        inp.type = 'password';
+        btn.innerText = '👁️';
+      }
+    }
+
+    async function loadProfile() {
+      try {
+        const res = await fetchApi('/faculty/profile');
+        if (res.success && res.data) {
+          profileData = res.data;
+
+          // 1. Hero card
+          const fullName = profileData.full_name || 'Faculty Member';
+          document.getElementById('hero-name').innerText = fullName;
+          document.getElementById('hero-empid').innerText = profileData.employee_id || '—';
+          document.getElementById('hero-dept').innerText = profileData.department_name || 'Department of Information Technology';
+
+          // Avatar initials
+          const nameParts = fullName.trim().split(/\s+/);
+          const initials = nameParts.length >= 2 
+            ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+            : fullName.slice(0, 2).toUpperCase();
+          document.getElementById('hero-avatar').innerText = initials;
+
+          // Dynamic badges
+          const badgesContainer = document.getElementById('hero-badges');
+          let badgesHtml = '<span class="role-chip verified">✓ Verified Account</span>';
+          if (profileData.is_hod) {
+            badgesHtml += `<span class="role-chip hod">👑 Head of Department (${profileData.hod_department_name || profileData.department_code || 'Dept'})</span>`;
+          }
+          if (profileData.is_class_teacher) {
+            badgesHtml += `<span class="role-chip class-teacher">📋 Class Teacher</span>`;
+          }
+          badgesHtml += `<span class="role-chip subject">📖 Subject Faculty</span>`;
+          badgesContainer.innerHTML = badgesHtml;
+
+          // 2. Metrics strip
+          document.getElementById('stat-registers').innerText = profileData.active_registers_count || profileData.registers?.length || 0;
+          document.getElementById('stat-students').innerText = profileData.total_students_count || 'Cohort';
+          document.getElementById('stat-dept').innerText = profileData.department_name || 'Faculty';
+          document.getElementById('stat-dept-code').innerText = `Code: ${profileData.department_code || 'CS'}`;
+
+          // Form fields
+          document.getElementById('prof-empid').value = profileData.employee_id || '—';
+          document.getElementById('prof-name').value = fullName;
+          document.getElementById('prof-email').value = profileData.email || profileData.username || '';
+          document.getElementById('prof-phone').value = profileData.phone || '';
+
+          // 3. Google Status
+          const badge = document.getElementById('google-status-badge');
+          const statGoogle = document.getElementById('stat-google');
+          const btn = document.getElementById('btn-google-action');
+          if (profileData.google_linked) {
+            badge.className = 'badge badge-present';
+            badge.innerText = '✓ Connected';
+            statGoogle.innerText = '✓ Connected';
+            statGoogle.style.color = '#16a34a';
+            btn.className = 'btn btn-secondary btn-sm';
+            btn.innerText = 'Re-link Google';
+          } else {
+            badge.className = 'badge badge-absent';
+            badge.innerText = 'Not Connected';
+            statGoogle.innerText = 'Not Linked';
+            statGoogle.style.color = '#dc2626';
+            btn.className = 'btn btn-primary btn-sm';
+            btn.innerText = '🔗 Connect Google Account';
+          }
+
+          // 4. Teaching allocations table
+          const tbody = document.getElementById('assignments-tbody');
+          const assignments = profileData.assignments || [];
+          if (!assignments.length) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No active course teaching allocations found.</td></tr>`;
+          } else {
+            tbody.innerHTML = assignments.map(a => `
+              <tr>
+                <td>
+                  <span class="badge ${a.assignment_type === 'CLASS_TEACHER' ? 'badge-late' : 'badge-present'}" style="font-size: 0.72rem;">
+                    ${a.assignment_type === 'CLASS_TEACHER' ? 'Class Teacher' : 'Subject Faculty'}
+                  </span>
+                </td>
+                <td style="font-weight: 700;">
+                  ${a.subject_name || 'Full Cohort Roster'}
+                  ${a.subject_code ? `<span style="font-family: var(--font-family-mono); font-size: 0.75rem; color: #64748b; margin-left: 4px;">(${a.subject_code})</span>` : ''}
+                </td>
+                <td>${a.department_name || a.branch_name || 'Engineering'}</td>
+                <td style="text-align: center; font-weight: 700;">Year ${a.year} / Sem ${a.semester}</td>
+                <td style="text-align: center;">
+                  <span class="badge" style="background: #f1f5f9; color: #334155; font-size: 0.7rem;">
+                    ${a.session_type_scope || 'THEORY'}
+                  </span>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function handleGoogleLinkAction() {
+      const user = getCurrentUser();
+      try {
+        const res = await fetchApi('/auth/google/url?mode=LINK&user_id=' + (user?.id || ''));
+        if (res.configured && res.data?.url) {
+          window.location.href = res.data.url;
+          return;
+        }
+      } catch {}
+      openProfileGoogleCard();
+    }
+
+    // Listen for OAuth completion
+    window.addEventListener('message', (event) => {
+      if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
+        showToast('Google account linked successfully!', 'success');
+        loadProfile();
+      } else if (event.data?.type === 'GOOGLE_AUTH_ERROR') {
+        showToast(event.data.message || 'Google account linking failed', 'error');
+      }
+    });
+
+    function openProfileGoogleCard() {
+      const modal = document.getElementById('google-signin-modal');
+      const errorBox = document.getElementById('google-card-error');
+      errorBox.style.display = 'none';
+
+      document.getElementById('google-accounts-view').style.display = 'block';
+      document.getElementById('google-input-view').style.display = 'none';
+      document.getElementById('google-loading-view').style.display = 'none';
+      document.getElementById('google-manual-email').value = '';
+
+      const currentEmail = document.getElementById('prof-email').value.trim() || 'faculty@college.edu';
+      const currentName = document.getElementById('prof-name').value.trim() || 'Faculty Member';
+      const initial = currentEmail.charAt(0).toUpperCase();
+
+      const accountList = document.getElementById('google-account-list');
+      accountList.innerHTML = `
+        <li class="google-account-item" onclick="linkProfileGoogleAccount('${currentEmail}')">
+          <div class="google-account-avatar">${initial}</div>
+          <div class="google-account-details">
+            <div class="google-account-name">${currentName}</div>
+            <div class="google-account-email">${currentEmail}</div>
+          </div>
+          <span class="google-signed-in-badge">Matching Profile</span>
+        </li>
+      `;
+
+      modal.style.display = 'flex';
+    }
+
+    function closeGoogleCard() {
+      document.getElementById('google-signin-modal').style.display = 'none';
+    }
+
+    function showGoogleEmailInput() {
+      document.getElementById('google-accounts-view').style.display = 'none';
+      document.getElementById('google-input-view').style.display = 'block';
+      document.getElementById('google-manual-email').focus();
+    }
+
+    function showGoogleAccountList() {
+      document.getElementById('google-input-view').style.display = 'none';
+      document.getElementById('google-accounts-view').style.display = 'block';
+      document.getElementById('google-card-error').style.display = 'none';
+    }
+
+    function submitProfileGoogleEmail() {
+      const email = document.getElementById('google-manual-email').value.trim();
+      if (!email || !email.includes('@')) {
+        const errorBox = document.getElementById('google-card-error');
+        errorBox.innerText = 'Please enter a valid Google email address.';
+        errorBox.style.display = 'block';
+        return;
+      }
+      linkProfileGoogleAccount(email);
+    }
+
+    async function linkProfileGoogleAccount(email) {
+      document.getElementById('google-accounts-view').style.display = 'none';
+      document.getElementById('google-input-view').style.display = 'none';
+      document.getElementById('google-loading-view').style.display = 'block';
+      document.getElementById('google-card-error').style.display = 'none';
+
+      try {
+        const res = await fetchApi('/auth/google/link', {
+          method: 'POST',
+          body: JSON.stringify({ id_token: `google_${email}` })
+        });
+
+        if (res.success) {
+          closeGoogleCard();
+          showToast('Google account linked! You can now sign in with one click.', 'success');
+          loadProfile();
+        }
+      } catch (err) {
+        document.getElementById('google-loading-view').style.display = 'none';
+        document.getElementById('google-accounts-view').style.display = 'block';
+        const errorBox = document.getElementById('google-card-error');
+        errorBox.innerText = err.message || 'Google account linking failed. Google email must match your registered faculty email.';
+        errorBox.style.display = 'block';
+      }
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const full_name = document.getElementById('prof-name').value.trim();
+      const email = document.getElementById('prof-email').value.trim();
+      const phone = document.getElementById('prof-phone').value.trim();
+      const btn = document.getElementById('save-prof-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/faculty/profile', {
+          method: 'PUT',
+          body: JSON.stringify({ full_name, email, phone })
+        });
+        if (res.success) {
+          showToast('Profile updated successfully', 'success');
+          loadProfile();
+        }
+      } catch (err) {
+        // Handled by toast
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById('password-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const current_password = document.getElementById('pass-current').value;
+      const new_password = document.getElementById('pass-new').value;
+      const confirm_password = document.getElementById('pass-confirm').value;
+
+      if (new_password !== confirm_password) {
+        showToast('New passwords do not match', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('save-pass-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/faculty/profile', {
+          method: 'PUT',
+          body: JSON.stringify({ current_password, new_password })
+        });
+        if (res.success) {
+          showToast('Password changed successfully!', 'success');
+          document.getElementById('pass-current').value = '';
+          document.getElementById('pass-new').value = '';
+          document.getElementById('pass-confirm').value = '';
+        }
+      } catch (err) {
+        // Handled by toast
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    loadProfile();
+  </script>
+
+  <!-- OFFICIAL GOOGLE SIGN-IN CARD MODAL -->
+  <div id="google-signin-modal" class="google-modal-overlay" style="display: none;" onclick="if(event.target===this)closeGoogleCard()">
+    <div class="google-card" role="dialog" aria-labelledby="google-modal-title">
+      <button type="button" class="google-card-close" onclick="closeGoogleCard()" aria-label="Close Google link dialog">✕</button>
+      
+      <div class="google-card-header">
+        <div class="google-logo-icon">
+          <svg viewBox="0 0 48 48" width="32" height="32">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+        </div>
+        <h2 id="google-modal-title" class="google-card-title">Connect Google Account</h2>
+        <div id="google-modal-subtitle" class="google-card-subtitle">Choose your Google account to link</div>
+        <div class="google-card-app">to your College Faculty profile</div>
+      </div>
+
+      <div id="google-card-error" class="google-card-alert"></div>
+
+      <div id="google-accounts-view">
+        <ul id="google-account-list" class="google-account-list"></ul>
+
+        <div class="google-use-another" onclick="showGoogleEmailInput()">
+          <span style="font-size: 1.15rem; color: #5f6368;">👤</span>
+          <span>Use another account</span>
+        </div>
+      </div>
+
+      <div id="google-input-view" style="display: none;" class="google-card-input-panel">
+        <div style="font-size: 0.875rem; margin-bottom: 0.5rem; color: #202124; font-weight: 500;">
+          Enter Google account email:
+        </div>
+        <input type="email" id="google-manual-email" class="google-input-field" placeholder="Email or phone">
+        
+        <div class="google-card-actions">
+          <button type="button" class="google-btn-text" onclick="showGoogleAccountList()">Back</button>
+          <button type="button" class="google-btn-blue" onclick="submitProfileGoogleEmail()">Link Account</button>
+        </div>
+      </div>
+
+      <div id="google-loading-view" style="display: none; padding: 2.5rem; text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 0.75rem; display: inline-block;">⏳</div>
+        <div style="font-size: 0.95rem; font-weight: 500; color: #202124;">Connecting Google Account...</div>
+        <div style="font-size: 0.8rem; color: #5f6368; margin-top: 0.25rem;">Verifying email identity with database</div>
+      </div>
+
+      <div class="google-card-footer">
+        Google will confirm your email identity to enable 1-click login for College Attendance System.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

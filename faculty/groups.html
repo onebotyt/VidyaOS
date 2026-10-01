@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teaching Groups — College Attendance & Coursework System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .groups-hero {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-title-wrap h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.35rem;
+    }
+    .hero-title-wrap p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      max-width: 650px;
+      line-height: 1.45;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .segmented-filter {
+      display: inline-flex;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.25rem;
+      gap: 0.25rem;
+    }
+    .segmented-filter button {
+      background: transparent;
+      border: none;
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .segmented-filter button.active {
+      background: var(--bg-card);
+      color: var(--color-primary);
+      box-shadow: var(--shadow-xs);
+    }
+    .search-input-wrap {
+      position: relative;
+      min-width: 260px;
+    }
+    .search-input-wrap input {
+      width: 100%;
+      padding: 0.5rem 0.85rem 0.5rem 2.2rem;
+      font-size: 0.85rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+    }
+    .search-icon-decor {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+    .group-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .group-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-primary);
+    }
+    .group-card.is-archived {
+      opacity: 0.75;
+      border-style: dashed;
+    }
+    .card-banner {
+      padding: 1.1rem 1.25rem 0.9rem;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .badge-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-theory {
+      background: var(--chip-theory-bg);
+      color: var(--chip-theory-color);
+      border: 1px solid var(--chip-theory-border);
+    }
+    .badge-practical {
+      background: var(--chip-practical-bg);
+      color: var(--chip-practical-color);
+      border: 1px solid var(--chip-practical-border);
+    }
+    .badge-sem {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+    .badge-members {
+      background: var(--chip-batch-bg);
+      color: var(--chip-batch-color);
+      border: 1px solid var(--chip-batch-border);
+    }
+    .badge-archived {
+      background: var(--status-absent);
+      color: var(--col-white);
+    }
+    .card-name-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+      margin: 0;
+    }
+    .card-subject-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .card-body {
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      flex: 1;
+    }
+    .invite-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.55rem 0.85rem;
+      font-size: 0.82rem;
+    }
+    .invite-code-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--color-primary);
+    }
+    .copy-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .copy-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .shortcut-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.6rem 0.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.12s ease;
+    }
+    .shortcut-btn:hover {
+      background: var(--bg-card);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-1px);
+    }
+    .card-footer {
+      padding: 0.85rem 1.25rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .stream-open-btn {
+      flex: 1;
+      padding: 0.5rem 0.85rem;
+      background: var(--color-primary);
+      color: var(--col-white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      transition: background 0.15s ease;
+    }
+    .stream-open-btn:hover {
+      filter: brightness(1.08);
+    }
+    .archive-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+    .archive-toggle-btn:hover {
+      border-color: var(--status-absent);
+      color: var(--status-absent);
+    }
+    .empty-state-card {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-lg);
+    }
+    .stream-post-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 0.85rem;
+    }
+    .stream-post-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .stream-post-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .roster-table th {
+      background: var(--bg-surface);
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .roster-table td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body class="page-layout">
+  <!-- Standard Institutional Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="header-left">
+        <a href="/faculty/dashboard.html" class="brand">
+          <span class="brand-icon">🏛️</span>
+          <span class="brand-name">VidyaOS • Institutional Portal</span>
+        </a>
+      </div>
+      <div class="header-right">
+        <div id="user-profile-badge" class="user-badge"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main-container container">
+    <!-- Top Hero Strip -->
+    <section class="groups-hero">
+      <div class="hero-title-wrap">
+        <h1><span>🏫</span> Teaching Groups Hub</h1>
+        <p>
+          Organize your student cohorts by subject and component (Theory / Practical).
+          Each teaching group automatically maintains its own 1:1 official attendance register,
+          Google Classroom-style stream announcements, coursework, and examination marksheet.
+        </p>
+      </div>
+      <div class="hero-actions">
+        <button id="btn-create-group" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:0.45rem;">
+          <span>➕</span> Create Teaching Group
+        </button>
+      </div>
+    </section>
+
+    <!-- Filters & Search Toolbar -->
+    <section class="controls-bar">
+      <div class="segmented-filter">
+        <button id="filter-active" class="active" onclick="setGroupFilter('ACTIVE')">
+          Active Groups (<span id="count-active">0</span>)
+        </button>
+        <button id="filter-archived" onclick="setGroupFilter('ARCHIVED')">
+          Archived Groups (<span id="count-archived">0</span>)
+        </button>
+      </div>
+      <div class="search-input-wrap">
+        <span class="search-icon-decor">🔍</span>
+        <input type="text" id="search-groups" placeholder="Search by name, subject, or code..." oninput="filterGroupsLocally()">
+      </div>
+    </section>
+
+    <!-- Teaching Groups Grid -->
+    <section id="groups-container" class="groups-grid">
+      <!-- Injected via JavaScript -->
+    </section>
+  </main>
+
+  <!-- Modal 1: Create Teaching Group -->
+  <div id="create-group-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+          <span>➕</span> Create New Teaching Group
+        </h3>
+        <button type="button" class="btn-close" onclick="closeModal('create-group-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem;">
+        <form id="create-group-form" onsubmit="submitCreateGroup(event)">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Group Name *
+            </label>
+            <input type="text" id="group-name" required placeholder="e.g. DBMS - Theory (Sem 5)" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">The label visible to you and your students.</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Subject Name * (Free-Text, No Catalog Lock)
+            </label>
+            <input type="text" id="group-subject" required placeholder="e.g. Database Management Systems" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Direct subject title. No complex catalog lookup needed.</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+                Component *
+              </label>
+              <select id="group-component" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+                <option value="THEORY">THEORY</option>
+                <option value="PRACTICAL">PRACTICAL</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+                Semester *
+              </label>
+              <select id="group-semester" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5" selected>Semester 5</option>
+                <option value="6">Semester 6</option>
+                <option value="7">Semester 7</option>
+                <option value="8">Semester 8</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1.25rem;">
+            💡 <strong>Autonomous Setup:</strong> Creating this group instantly issues a 6-digit student invite code and sets up the official attendance register ledger automatically.
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('create-group-modal')">Cancel</button>
+            <button type="submit" id="btn-submit-create-group" class="btn btn-primary">Create Teaching Group</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Classroom Stream & Roster Studio -->
+  <div id="classroom-hub-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 760px; max-height: 90vh;">
+      <div class="modal-header" style="flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h3 id="hub-group-name" style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main);">Group Name</h3>
+          <div id="hub-group-sub" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem;">Subject • Component • Semester</div>
+        </div>
+        <button type="button" class="btn-close" onclick="closeModal('classroom-hub-modal')">✕</button>
+      </div>
+
+      <!-- Hub Tab Header (5-Tab Google Classroom Style) -->
+      <div style="display: flex; border-bottom: 1px solid var(--border-color); background: var(--bg-surface); padding: 0 1.25rem; overflow-x: auto; gap: 0.25rem;">
+        <button id="hub-tab-stream-btn" class="active" onclick="switchHubTab('stream')" style="background:transparent; border:none; border-bottom: 2px solid var(--color-primary); padding: 0.75rem 0.85rem; font-weight: 700; color: var(--color-primary); cursor: pointer; white-space: nowrap;">
+          📢 Stream
+        </button>
+        <button id="hub-tab-classwork-btn" onclick="switchHubTab('classwork')" style="background:transparent; border:none; border-bottom: 2px solid transparent; padding: 0.75rem 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap;">
+          📚 Classwork
+        </button>
+        <button id="hub-tab-tests-btn" onclick="switchHubTab('tests')" style="background:transparent; border:none; border-bottom: 2px solid transparent; padding: 0.75rem 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap;">
+          📝 Tests & Marks
+        </button>
+        <button id="hub-tab-attendance-btn" onclick="switchHubTab('attendance')" style="background:transparent; border:none; border-bottom: 2px solid transparent; padding: 0.75rem 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap;">
+          📊 Attendance
+        </button>
+        <button id="hub-tab-roster-btn" onclick="switchHubTab('roster')" style="background:transparent; border:none; border-bottom: 2px solid transparent; padding: 0.75rem 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap;">
+          👥 Students (<span id="hub-roster-count">0</span>)
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.25rem; overflow-y: auto;">
+        <!-- 1. Stream Section -->
+        <div id="hub-stream-pane">
+          <!-- Post Announcement Box -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+            <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.45rem; color: var(--text-main);">Share an announcement with your class</div>
+            <textarea id="stream-post-input" rows="3" placeholder="Announce an assignment, exam schedule, lecture slide link, or classroom update..." style="width: 100%; padding: 0.65rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main); font-size: 0.88rem; box-sizing: border-box;"></textarea>
+            <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+              <button type="button" id="btn-post-announcement" class="btn btn-primary" onclick="submitAnnouncement()">
+                Post to Classroom
+              </button>
+            </div>
+          </div>
+
+          <!-- Feed -->
+          <div id="stream-feed-container">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- 2. Classwork Section -->
+        <div id="hub-classwork-pane" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <div style="font-size: 1rem; font-weight: 700; color: var(--text-main);">Coursework & Assignments</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Manage student assignments, submissions, and grading for this teaching group.</div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="openCreateGroupAssignmentModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.82rem;">
+              <span>➕</span> Create Assignment
+            </button>
+          </div>
+          <div id="hub-assignments-container">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- 3. Tests & Marks Section -->
+        <div id="hub-tests-pane" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <div style="font-size: 1rem; font-weight: 700; color: var(--text-main);">Class Tests & Assessments</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Schedule unit tests, record student marks, and view group marksheets.</div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="openCreateGroupTestModal()" style="display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.82rem;">
+              <span>➕</span> Schedule Test
+            </button>
+          </div>
+          <div id="hub-tests-container">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- 4. Attendance Section -->
+        <div id="hub-attendance-pane" style="display: none;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">
+                  Official Attendance Register
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
+                  This teaching group maintains an autonomous 1:1 official attendance register.
+                  Finalized teacher records determine official academic attendance percentages.
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="openLinkedRegister()" style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                <span>⚡</span> Open Official Register
+              </button>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-top: 1.25rem;">
+              <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; text-align: center;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Conducted</div>
+                <div id="hub-att-conducted" style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-top: 0.25rem;">0</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Sessions</div>
+              </div>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; text-align: center;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Average %</div>
+                <div id="hub-att-pct" style="font-size: 1.35rem; font-weight: 800; color: var(--status-present); margin-top: 0.25rem;">0%</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Attendance</div>
+              </div>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; text-align: center;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Enrolled</div>
+                <div id="hub-att-students" style="font-size: 1.35rem; font-weight: 800; color: var(--color-primary); margin-top: 0.25rem;">0</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Students</div>
+              </div>
+            </div>
+          </div>
+          <div id="hub-att-recent-sessions">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- 5. Roster Section -->
+        <div id="hub-roster-pane" style="display: none;">
+          <!-- Invite Code Top Callout -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; margin-bottom: 1.25rem;">
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Classroom Invite Code</div>
+              <div id="hub-invite-code" class="invite-code-val" style="font-size: 1.2rem; margin-top: 0.15rem;">CODE</div>
+            </div>
+            <button type="button" class="copy-btn" onclick="copyHubInviteCode()">
+              📋 Copy Invite Link
+            </button>
+          </div>
+
+          <!-- Add Student Box -->
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <input type="text" id="add-student-enrollment" placeholder="Enter student enrollment number (e.g. 2024IT001)" style="flex: 1; padding: 0.55rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main); font-size: 0.85rem;">
+            <button type="button" class="btn btn-secondary" onclick="addStudentByEnrollment()">+ Add Student</button>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="roster-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">Roll</th>
+                  <th>Student Name</th>
+                  <th>Enrollment No</th>
+                  <th>UBTER Reg No</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="hub-roster-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: 2-Step Archive Confirmation -->
+  <div id="archive-group-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 id="archive-modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">
+          📦 Archive Teaching Group
+        </h3>
+        <button type="button" class="btn-close" onclick="closeModal('archive-group-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem;">
+        <!-- Step 1 -->
+        <div id="archive-step-1">
+          <div style="background: var(--bg-surface); border-left: 4px solid var(--status-late); padding: 0.85rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-main); line-height: 1.45;">
+            <strong>Data Preservation Guarantee:</strong><br>
+            Archiving moves this Teaching Group into read-only mode. All recorded attendance sessions, student rosters, assignment submissions, and class test marks remain <strong>100% permanently preserved</strong> and can still be exported or viewed anytime.
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            Students will no longer be able to submit new coursework or mark live attendance for this group. You can restore this group to Active status at any point.
+          </p>
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('archive-group-modal')">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="proceedArchiveStep2()">Proceed to Confirm &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="archive-step-2" style="display: none;">
+          <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 1.25rem;">
+            Are you sure you want to archive <strong id="archive-target-group-name"></strong>?
+          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="btn btn-secondary" onclick="backArchiveStep1()">&larr; Back</button>
+            <button type="button" id="btn-confirm-archive" class="btn" style="background: var(--status-absent); color: var(--col-white);" onclick="executeArchiveGroup()">
+              Confirm & Archive Group
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Create Assignment for Teaching Group -->
+  <div id="create-group-assignment-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+          <span>📚</span> Create Coursework Assignment
+        </h3>
+        <button type="button" class="btn-close" onclick="closeModal('create-group-assignment-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem;">
+        <form id="create-group-assignment-form" onsubmit="submitCreateGroupAssignment(event)">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Assignment Title *
+            </label>
+            <input type="text" id="group-assign-title" required placeholder="e.g. Assignment 1: SQL Normalization & Schema Design" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Instructions / Description
+            </label>
+            <textarea id="group-assign-desc" rows="3" placeholder="Specify instructions, reference materials, or problem statements..." style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);"></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+                Due Date
+              </label>
+              <input type="date" id="group-assign-due" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+            </div>
+            <div class="form-group">
+              <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+                Maximum Marks *
+              </label>
+              <input type="number" id="group-assign-marks" required value="100" min="1" max="100" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('create-group-assignment-modal')">Cancel</button>
+            <button type="submit" id="btn-submit-group-assign" class="btn btn-primary">Publish Assignment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Assignment Submissions & Grading Drawer -->
+  <div id="assignment-submissions-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 800px; max-height: 90vh;">
+      <div class="modal-header">
+        <div>
+          <h3 id="assign-sub-modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">
+            Assignment Submissions
+          </h3>
+          <div id="assign-sub-modal-meta" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">Max Marks: 100</div>
+        </div>
+        <button type="button" class="btn-close" onclick="closeModal('assignment-submissions-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem; overflow-y: auto;">
+        <div style="overflow-x: auto;">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">Roll</th>
+                <th>Student</th>
+                <th>Status</th>
+                <th>File / Link</th>
+                <th style="width: 110px;">Marks</th>
+                <th>Feedback</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="assign-submissions-tbody">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Schedule Test for Teaching Group -->
+  <div id="create-group-test-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+          <span>📝</span> Schedule Class Test
+        </h3>
+        <button type="button" class="btn-close" onclick="closeModal('create-group-test-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem;">
+        <form id="create-group-test-form" onsubmit="submitCreateGroupTest(event)">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Test Name / Evaluation Title *
+            </label>
+            <input type="text" id="group-test-name" required placeholder="e.g. Unit Test 1 (Modules 1 & 2)" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+                Test Date *
+              </label>
+              <input type="date" id="group-test-date" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+            </div>
+            <div class="form-group">
+              <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+                Maximum Marks *
+              </label>
+              <input type="number" id="group-test-marks" required value="20" min="1" max="100" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.65rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('create-group-test-modal')">Cancel</button>
+            <button type="submit" id="btn-submit-group-test" class="btn btn-primary">Schedule Test</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 7: Marksheet Entry Grid for Test -->
+  <div id="exam-scores-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 800px; max-height: 90vh;">
+      <div class="modal-header">
+        <div>
+          <h3 id="exam-scores-modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-main);">
+            Test Marksheet Roster
+          </h3>
+          <div id="exam-scores-modal-meta" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">Max Marks: 20</div>
+        </div>
+        <button type="button" class="btn-close" onclick="closeModal('exam-scores-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem; overflow-y: auto;">
+        <div style="overflow-x: auto;">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">Roll</th>
+                <th>Student</th>
+                <th>Enrollment No</th>
+                <th style="width: 100px;">Marks Obtained</th>
+                <th style="width: 80px; text-align: center;">Absent?</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="exam-scores-tbody">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('exam-scores-modal')">Cancel</button>
+          <button type="button" id="btn-save-exam-scores" class="btn btn-primary" onclick="submitSaveExamScores()">
+            💾 Save All Marks
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/ui.js"></script>
+  <script>
+    // Guard route for Faculty
+    guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN'] });
+
+    let state = {
+      groups: [],
+      currentFilter: 'ACTIVE',
+      searchQuery: '',
+      activeGroupId: null,
+      activeGroupData: null,
+      archiveTargetGroup: null
+    };
+
+    async function init() {
+      document.getElementById('btn-create-group').onclick = () => openModal('create-group-modal');
+      await loadTeachingGroups();
+    }
+
+    async function loadTeachingGroups() {
+      try {
+        const res = await fetchApi('/teaching-groups?status=ALL');
+        if (res.success) {
+          state.groups = res.data || [];
+          updateCounts();
+          renderGroups();
+        } else {
+          showToast(res.error?.message || 'Failed to load teaching groups', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function updateCounts() {
+      const activeCount = state.groups.filter(g => g.status === 'ACTIVE').length;
+      const archivedCount = state.groups.filter(g => g.status === 'ARCHIVED').length;
+      document.getElementById('count-active').innerText = activeCount;
+      document.getElementById('count-archived').innerText = archivedCount;
+    }
+
+    function setGroupFilter(status) {
+      state.currentFilter = status;
+      document.getElementById('filter-active').classList.toggle('active', status === 'ACTIVE');
+      document.getElementById('filter-archived').classList.toggle('active', status === 'ARCHIVED');
+      renderGroups();
+    }
+
+    function filterGroupsLocally() {
+      state.searchQuery = (document.getElementById('search-groups').value || '').trim().toLowerCase();
+      renderGroups();
+    }
+
+    function renderGroups() {
+      const container = document.getElementById('groups-container');
+      const filtered = state.groups.filter(g => {
+        if (g.status !== state.currentFilter) return false;
+        if (!state.searchQuery) return true;
+        const q = state.searchQuery;
+        return (
+          (g.name && g.name.toLowerCase().includes(q)) ||
+          (g.subject_name && g.subject_name.toLowerCase().includes(q)) ||
+          (g.invite_code && g.invite_code.toLowerCase().includes(q))
+        );
+      });
+
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div class="empty-state-card">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🏫</div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">
+              No ${state.currentFilter === 'ACTIVE' ? 'Active' : 'Archived'} Teaching Groups Found
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 480px; margin: 0 auto 1.25rem;">
+              ${state.currentFilter === 'ACTIVE' 
+                ? 'Create your first teaching group to organize student cohorts, stream announcements, and manage attendance registers.'
+                : 'Archived groups will appear here. Archiving guarantees 100% permanent data preservation.'}
+            </p>
+            ${state.currentFilter === 'ACTIVE' ? `<button class="btn btn-primary" onclick="openModal('create-group-modal')">➕ Create Teaching Group</button>` : ''}
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(g => {
+        const isArchived = g.status === 'ARCHIVED';
+        const componentClass = g.component === 'PRACTICAL' ? 'badge-practical' : 'badge-theory';
+        const regParam = g.register_id ? `?id=${g.register_id}` : '';
+
+        return `
+          <div class="group-card ${isArchived ? 'is-archived' : ''}">
+            <div class="card-banner">
+              <div class="card-badges">
+                <span class="badge-pill ${componentClass}">${escapeHtml(g.component)}</span>
+                <span class="badge-pill badge-sem">Sem ${g.semester}</span>
+                <span class="badge-pill badge-members">${g.member_count || 0} Students</span>
+                ${isArchived ? '<span class="badge-pill badge-archived">Archived</span>' : ''}
+              </div>
+              <h2 class="card-name-title">${escapeHtml(g.name)}</h2>
+              <div class="card-subject-sub">📚 ${escapeHtml(g.subject_name)}</div>
+            </div>
+
+            <div class="card-body">
+              <div class="invite-box">
+                <div>
+                  <span style="font-size: 0.74rem; color: var(--text-muted); display: block;">STUDENT INVITE CODE</span>
+                  <span class="invite-code-val">${escapeHtml(g.invite_code)}</span>
+                </div>
+                <button type="button" class="copy-btn" onclick="copyInviteCode('${escapeHtml(g.invite_code)}')">
+                  📋 Copy Code
+                </button>
+              </div>
+
+              <!-- Quick Module Links -->
+              <div class="shortcuts-grid">
+                <a href="/faculty/registers.html${regParam}" class="shortcut-btn" title="Attendance Matrix Ledger">
+                  <span>📖</span> Register
+                </a>
+                <a href="/faculty/assignments.html${regParam}" class="shortcut-btn" title="Coursework & Submissions">
+                  <span>📝</span> Coursework
+                </a>
+                <a href="/faculty/tests.html${regParam}" class="shortcut-btn" title="Class Tests & Marksheet">
+                  <span>📊</span> Class Tests
+                </a>
+                <a href="/faculty/evaluation.html${regParam}" class="shortcut-btn" title="Internal Evaluation Sheet">
+                  <span>📈</span> Evaluation
+                </a>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <button type="button" class="stream-open-btn" onclick="openClassroomHub(${g.id})">
+                <span>💬</span> Classroom Stream & Roster
+              </button>
+              <button type="button" class="archive-toggle-btn" onclick="promptArchiveGroup(${g.id}, '${escapeHtml(g.name).replace(/'/g, "\\'")}', '${g.status}')">
+                ${isArchived ? '↩️ Restore' : '📦'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function submitCreateGroup(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-create-group');
+      btn.disabled = true;
+      btn.innerText = 'Creating...';
+
+      const payload = {
+        name: document.getElementById('group-name').value.trim(),
+        subject_name: document.getElementById('group-subject').value.trim(),
+        component: document.getElementById('group-component').value,
+        semester: parseInt(document.getElementById('group-semester').value, 10)
+      };
+
+      try {
+        const res = await fetchApi('/teaching-groups', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.success) {
+          showToast(`Teaching Group "${payload.name}" created successfully!`, 'success');
+          closeModal('create-group-modal');
+          document.getElementById('create-group-form').reset();
+          await loadTeachingGroups();
+        } else {
+          showToast(res.error?.message || 'Failed to create group', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Create Teaching Group';
+      }
+    }
+
+    async function openClassroomHub(groupId) {
+      state.activeGroupId = groupId;
+      openModal('classroom-hub-modal');
+      switchHubTab('stream');
+
+      try {
+        const res = await fetchApi(`/teaching-groups/${groupId}`);
+        if (res.success && res.data) {
+          state.activeGroupData = res.data;
+          document.getElementById('hub-group-name').innerText = res.data.name;
+          document.getElementById('hub-group-sub').innerText = `${res.data.subject_name} • ${res.data.component} • Semester ${res.data.semester}`;
+          document.getElementById('hub-invite-code').innerText = res.data.invite_code;
+          document.getElementById('hub-roster-count').innerText = (res.data.members || []).length;
+          renderRoster(res.data.members || []);
+        }
+      } catch (err) {
+        showToast('Error loading group details', 'error');
+      }
+
+      await loadStreamFeed(groupId);
+    }
+
+    function switchHubTab(tab) {
+      const tabs = ['stream', 'classwork', 'tests', 'attendance', 'roster'];
+      tabs.forEach(t => {
+        const pane = document.getElementById(`hub-${t}-pane`);
+        const btn = document.getElementById(`hub-tab-${t}-btn`);
+        const isActive = t === tab;
+        if (pane) pane.style.display = isActive ? '' : 'none';
+        if (btn) {
+          btn.style.borderBottomColor = isActive ? 'var(--color-primary)' : 'transparent';
+          btn.style.color = isActive ? 'var(--color-primary)' : 'var(--text-muted)';
+        }
+      });
+
+      if (tab === 'stream') loadStreamFeed(state.activeGroupId);
+      if (tab === 'classwork') loadGroupAssignments(state.activeGroupId);
+      if (tab === 'tests') loadGroupTests(state.activeGroupId);
+      if (tab === 'attendance') loadGroupAttendanceSummary(state.activeGroupId);
+    }
+
+    // ----------------------------------------------------
+    // CLASSWORK: ASSIGNMENTS
+    // ----------------------------------------------------
+    async function loadGroupAssignments(groupId) {
+      const container = document.getElementById('hub-assignments-container');
+      container.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">Loading assignments...</div>';
+      try {
+        const res = await fetchApi(`/assignments?group_id=${groupId}`);
+        if (res.success) {
+          const items = res.data || [];
+          if (!items.length) {
+            container.innerHTML = `
+              <div style="text-align:center; padding:2rem; background:var(--bg-surface); border-radius:var(--radius-md); color:var(--text-muted); font-size:0.85rem;">
+                No coursework assignments published yet for this group.<br>Click <strong>"+ Create Assignment"</strong> above to assign work.
+              </div>
+            `;
+            return;
+          }
+          container.innerHTML = items.map(a => `
+            <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1rem; margin-bottom:0.85rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+              <div style="flex:1; min-width:240px;">
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">
+                  📖 ${escapeHtml(a.title)}
+                </div>
+                ${a.description ? `<div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.4rem; white-space:pre-wrap;">${escapeHtml(a.description)}</div>` : ''}
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; font-size:0.75rem;">
+                  <span class="badge-pill badge-sem">Due: ${a.due_date ? new Date(a.due_date).toLocaleDateString() : 'No Deadline'}</span>
+                  <span class="badge-pill badge-sem">Max Marks: ${a.max_marks || 100}</span>
+                  <span class="badge-pill badge-members">Submissions: ${a.submission_count || 0}</span>
+                </div>
+              </div>
+              <div>
+                <button type="button" class="btn btn-secondary" style="font-size:0.8rem; padding:0.4rem 0.75rem;" onclick="viewGroupSubmissions(${a.id}, '${escapeHtml(a.title).replace(/'/g, "\\'")}', ${a.max_marks || 100})">
+                  📥 Review Submissions
+                </button>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        container.innerHTML = '<div style="color:var(--status-absent);">Failed to load group assignments</div>';
+      }
+    }
+
+    function openCreateGroupAssignmentModal() {
+      document.getElementById('create-group-assignment-form').reset();
+      document.getElementById('group-assign-marks').value = 100;
+      openModal('create-group-assignment-modal');
+    }
+
+    async function submitCreateGroupAssignment(e) {
+      e.preventDefault();
+      const title = document.getElementById('group-assign-title').value.trim();
+      const description = document.getElementById('group-assign-desc').value.trim();
+      const due_date = document.getElementById('group-assign-due').value || null;
+      const max_marks = parseInt(document.getElementById('group-assign-marks').value, 10) || 100;
+
+      const btn = document.getElementById('btn-submit-group-assign');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/assignments', {
+          method: 'POST',
+          body: JSON.stringify({
+            title,
+            description,
+            due_date,
+            max_marks,
+            group_id: state.activeGroupId,
+            department_id: state.activeGroupData?.department_id || 1,
+            year: 1,
+            semester: state.activeGroupData?.semester || 1
+          })
+        });
+        if (res.success) {
+          showToast('Assignment published to class!', 'success');
+          closeModal('create-group-assignment-modal');
+          await loadGroupAssignments(state.activeGroupId);
+        } else {
+          showToast(res.error?.message || 'Failed to create assignment', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function viewGroupSubmissions(assignmentId, title, maxMarks) {
+      document.getElementById('assign-sub-modal-title').innerText = `Submissions: ${title}`;
+      document.getElementById('assign-sub-modal-meta').innerText = `Maximum Marks: ${maxMarks}`;
+      const tbody = document.getElementById('assign-submissions-tbody');
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:var(--text-muted);">Loading roster submissions...</td></tr>';
+      openModal('assignment-submissions-modal');
+
+      try {
+        const res = await fetchApi(`/assignments/${assignmentId}/submissions`);
+        if (res.success) {
+          const roster = res.data.roster || [];
+          if (!roster.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:var(--text-muted);">No students in this group yet.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = roster.map(s => {
+            const isSub = Boolean(s.submission_id);
+            const statusLabel = isSub ? (s.status === 'GRADED' ? 'GRADED' : 'SUBMITTED') : 'PENDING';
+            const statusClass = isSub ? (s.status === 'GRADED' ? 'badge-theory' : 'badge-members') : 'badge-sem';
+            return `
+              <tr>
+                <td style="font-weight:700;">${s.class_roll_no || '—'}</td>
+                <td style="font-weight:600;">${escapeHtml(s.full_name)}<br><small style="color:var(--text-muted);">${escapeHtml(s.official_enrollment_no)}</small></td>
+                <td><span class="badge-pill ${statusClass}">${statusLabel}</span></td>
+                <td>
+                  ${s.file_path ? `<a href="${s.file_path}" target="_blank" style="color:var(--color-primary); font-size:0.8rem; text-decoration:none;">📄 ${escapeHtml(s.original_filename || 'Attachment')}</a>` : '<span style="color:var(--text-muted); font-size:0.8rem;">No file</span>'}
+                </td>
+                <td>
+                  <input type="number" id="sub-marks-${s.submission_id || s.student_id}" value="${s.marks_obtained !== null && s.marks_obtained !== undefined ? s.marks_obtained : ''}" min="0" max="${maxMarks}" placeholder="0-${maxMarks}" style="width:70px; padding:0.35rem; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-main); font-size:0.82rem;">
+                </td>
+                <td>
+                  <input type="text" id="sub-feedback-${s.submission_id || s.student_id}" value="${escapeHtml(s.feedback || '')}" placeholder="Feedback note..." style="width:100%; min-width:110px; padding:0.35rem; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-main); font-size:0.82rem;">
+                </td>
+                <td style="text-align:right;">
+                  ${isSub ? `
+                    <button type="button" class="btn btn-primary" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="submitGradeSubmission(${s.submission_id}, ${maxMarks})">
+                      Save
+                    </button>
+                  ` : '<span style="color:var(--text-muted); font-size:0.75rem;">Unsubmitted</span>'}
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color:var(--status-absent); text-align:center;">Failed to load submissions</td></tr>';
+      }
+    }
+
+    async function submitGradeSubmission(submissionId, maxMarks) {
+      const marksInput = document.getElementById(`sub-marks-${submissionId}`);
+      const feedbackInput = document.getElementById(`sub-feedback-${submissionId}`);
+      const marks_obtained = marksInput && marksInput.value !== '' ? Number(marksInput.value) : null;
+      const feedback = feedbackInput ? feedbackInput.value.trim() : '';
+
+      try {
+        const res = await fetchApi(`/assignments/submissions/${submissionId}/grade`, {
+          method: 'PUT',
+          body: JSON.stringify({ marks_obtained, feedback })
+        });
+        if (res.success) {
+          showToast('Grade saved successfully!', 'success');
+        } else {
+          showToast(res.error?.message || 'Failed to save grade', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ----------------------------------------------------
+    // TESTS & MARKSHEET
+    // ----------------------------------------------------
+    async function loadGroupTests(groupId) {
+      const container = document.getElementById('hub-tests-container');
+      container.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">Loading tests...</div>';
+      try {
+        const res = await fetchApi(`/exams?group_id=${groupId}`);
+        if (res.success) {
+          const items = res.data || [];
+          if (!items.length) {
+            container.innerHTML = `
+              <div style="text-align:center; padding:2rem; background:var(--bg-surface); border-radius:var(--radius-md); color:var(--text-muted); font-size:0.85rem;">
+                No class tests or exams scheduled yet for this group.<br>Click <strong>"+ Schedule Test"</strong> above to add an assessment.
+              </div>
+            `;
+            return;
+          }
+          container.innerHTML = items.map(e => `
+            <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1rem; margin-bottom:0.85rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+              <div style="flex:1; min-width:240px;">
+                <div style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">
+                  📝 ${escapeHtml(e.name)}
+                </div>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; font-size:0.75rem;">
+                  <span class="badge-pill badge-sem">Date: ${e.exam_date || 'TBD'}</span>
+                  <span class="badge-pill badge-sem">Max Marks: ${e.max_marks || 20}</span>
+                  <span class="badge-pill badge-members">Graded: ${e.graded_count || 0}</span>
+                </div>
+              </div>
+              <div>
+                <button type="button" class="btn btn-primary" style="font-size:0.8rem; padding:0.4rem 0.75rem;" onclick="openEnterScoresModal(${e.id}, '${escapeHtml(e.name).replace(/'/g, "\\'")}', ${e.max_marks || 20})">
+                  ✍️ Enter / View Marks
+                </button>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        container.innerHTML = '<div style="color:var(--status-absent);">Failed to load group tests</div>';
+      }
+    }
+
+    function openCreateGroupTestModal() {
+      document.getElementById('create-group-test-form').reset();
+      document.getElementById('group-test-marks').value = 20;
+      document.getElementById('group-test-date').value = new Date().toISOString().slice(0, 10);
+      openModal('create-group-test-modal');
+    }
+
+    async function submitCreateGroupTest(e) {
+      e.preventDefault();
+      const name = document.getElementById('group-test-name').value.trim();
+      const exam_date = document.getElementById('group-test-date').value;
+      const max_marks = parseInt(document.getElementById('group-test-marks').value, 10) || 20;
+
+      const btn = document.getElementById('btn-submit-group-test');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi('/exams', {
+          method: 'POST',
+          body: JSON.stringify({
+            name,
+            exam_date,
+            max_marks,
+            group_id: state.activeGroupId,
+            department_id: state.activeGroupData?.department_id || 1,
+            year: 1,
+            semester: state.activeGroupData?.semester || 1
+          })
+        });
+        if (res.success) {
+          showToast('Class test scheduled successfully!', 'success');
+          closeModal('create-group-test-modal');
+          await loadGroupTests(state.activeGroupId);
+        } else {
+          showToast(res.error?.message || 'Failed to schedule test', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function openEnterScoresModal(examId, name, maxMarks) {
+      state.activeExamId = examId;
+      state.activeExamMaxMarks = maxMarks;
+      document.getElementById('exam-scores-modal-title').innerText = `Marksheet: ${name}`;
+      document.getElementById('exam-scores-modal-meta').innerText = `Maximum Marks: ${maxMarks}`;
+      const tbody = document.getElementById('exam-scores-tbody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">Loading students roster...</td></tr>';
+      openModal('exam-scores-modal');
+
+      try {
+        const res = await fetchApi(`/exams/${examId}/roster`);
+        if (res.success) {
+          const roster = res.data.roster || [];
+          if (!roster.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">No students enrolled in this group yet.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = roster.map(r => `
+            <tr data-student-id="${r.student_id}">
+              <td style="font-weight:700;">${r.class_roll_no || '—'}</td>
+              <td style="font-weight:600;">${escapeHtml(r.full_name)}</td>
+              <td><code>${escapeHtml(r.official_enrollment_no)}</code></td>
+              <td>
+                <input type="number" class="score-input" id="score-val-${r.student_id}" value="${r.marks_obtained !== null && r.marks_obtained !== undefined ? r.marks_obtained : ''}" min="0" max="${maxMarks}" placeholder="0-${maxMarks}" style="width:75px; padding:0.35rem; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-main); font-size:0.82rem;" ${r.is_absent ? 'disabled' : ''}>
+              </td>
+              <td style="text-align:center;">
+                <input type="checkbox" id="absent-check-${r.student_id}" ${r.is_absent ? 'checked' : ''} onchange="toggleAbsentScore(${r.student_id})">
+              </td>
+              <td>
+                <input type="text" id="score-remark-${r.student_id}" value="${escapeHtml(r.remarks || '')}" placeholder="Note..." style="width:100%; min-width:100px; padding:0.35rem; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-main); font-size:0.82rem;">
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" style="color:var(--status-absent); text-align:center;">Failed to load roster</td></tr>';
+      }
+    }
+
+    function toggleAbsentScore(studentId) {
+      const check = document.getElementById(`absent-check-${studentId}`);
+      const val = document.getElementById(`score-val-${studentId}`);
+      if (check && val) {
+        val.disabled = check.checked;
+        if (check.checked) val.value = '';
+      }
+    }
+
+    async function submitSaveExamScores() {
+      const tbody = document.getElementById('exam-scores-tbody');
+      const rows = tbody.querySelectorAll('tr[data-student-id]');
+      const scores = [];
+
+      rows.forEach(r => {
+        const studentId = Number(r.getAttribute('data-student-id'));
+        const check = document.getElementById(`absent-check-${studentId}`);
+        const val = document.getElementById(`score-val-${studentId}`);
+        const rem = document.getElementById(`score-remark-${studentId}`);
+
+        const isAbsent = check ? check.checked : false;
+        const marks_obtained = isAbsent ? null : (val && val.value !== '' ? Number(val.value) : null);
+        const remarks = rem ? rem.value.trim() : '';
+
+        scores.push({
+          student_id: studentId,
+          marks_obtained,
+          is_absent: isAbsent,
+          remarks
+        });
+      });
+
+      const btn = document.getElementById('btn-save-exam-scores');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi(`/exams/${state.activeExamId}/scores`, {
+          method: 'POST',
+          body: JSON.stringify({ scores })
+        });
+        if (res.success) {
+          showToast('Marksheet updated successfully!', 'success');
+          closeModal('exam-scores-modal');
+          await loadGroupTests(state.activeGroupId);
+        } else {
+          showToast(res.error?.message || 'Failed to save scores', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ----------------------------------------------------
+    // ATTENDANCE TAB & SESSIONS
+    // ----------------------------------------------------
+    async function loadGroupAttendanceSummary(groupId) {
+      const container = document.getElementById('hub-att-recent-sessions');
+      container.innerHTML = '<div style="text-align:center; padding:1rem; color:var(--text-muted);">Loading attendance metrics...</div>';
+      try {
+        const res = await fetchApi(`/reports/teaching-groups?group_id=${groupId}`);
+        if (res.success && res.data && res.data.length > 0) {
+          const g = res.data[0];
+          document.getElementById('hub-att-conducted').innerText = g.sessions_conducted || 0;
+          document.getElementById('hub-att-pct').innerText = `${g.average_attendance_percentage || 0}%`;
+          document.getElementById('hub-att-students').innerText = g.student_count || 0;
+        }
+
+        // Fetch recent sessions
+        if (state.activeGroupData?.linked_register_id) {
+          const sRes = await fetchApi(`/attendance/sessions?register_id=${state.activeGroupData.linked_register_id}`);
+          if (sRes.success) {
+            const sessions = sRes.data || [];
+            if (!sessions.length) {
+              container.innerHTML = '<div style="text-align:center; padding:1rem; color:var(--text-muted); font-size:0.85rem;">No attendance sessions held yet for this group register.</div>';
+              return;
+            }
+            container.innerHTML = `
+              <div style="font-size:0.85rem; font-weight:700; color:var(--text-main); margin-bottom:0.5rem;">Recent Attendance Sessions</div>
+              <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                ${sessions.slice(0, 8).map(s => `
+                  <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.6rem 0.85rem; font-size:0.82rem;">
+                    <div>
+                      <strong style="color:var(--text-main);">${escapeHtml(s.label || 'Session')}</strong>
+                      <span style="color:var(--text-muted); margin-left:0.35rem;">(${s.session_date})</span>
+                    </div>
+                    <span class="badge-pill ${s.state === 'FINALIZED' ? 'badge-theory' : 'badge-sem'}">${s.state}</span>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+          }
+        }
+      } catch (err) {
+        container.innerHTML = '<div style="color:var(--status-absent);">Failed to load attendance metrics</div>';
+      }
+    }
+
+    function openLinkedRegister() {
+      if (state.activeGroupData?.linked_register_id) {
+        window.location.href = `/faculty/registers.html?register_id=${state.activeGroupData.linked_register_id}`;
+      } else {
+        window.location.href = '/faculty/registers.html';
+      }
+    }
+
+    async function loadStreamFeed(groupId) {
+      const feed = document.getElementById('stream-feed-container');
+      feed.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">Loading announcements...</div>';
+      try {
+        const res = await fetchApi(`/teaching-groups/${groupId}/stream`);
+        if (res.success) {
+          const posts = res.data || [];
+          if (!posts.length) {
+            feed.innerHTML = `
+              <div style="text-align:center; padding:2rem; background:var(--bg-surface); border-radius:var(--radius-md); color:var(--text-muted); font-size:0.85rem;">
+                No announcements posted yet. Use the box above to post updates to your students!
+              </div>
+            `;
+            return;
+          }
+          feed.innerHTML = posts.map(p => `
+            <div class="stream-post-card">
+              <div class="stream-post-meta">
+                <span style="font-weight:700; color:var(--text-main);">👤 ${escapeHtml(p.author_name || 'Teacher')}</span>
+                <span>${new Date(p.created_at).toLocaleString()}</span>
+              </div>
+              <div class="stream-post-content">${escapeHtml(p.content)}</div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        feed.innerHTML = '<div style="color:var(--status-absent);">Failed to load stream posts</div>';
+      }
+    }
+
+    async function submitAnnouncement() {
+      const input = document.getElementById('stream-post-input');
+      const content = input.value.trim();
+      if (!content) return;
+
+      const btn = document.getElementById('btn-post-announcement');
+      btn.disabled = true;
+
+      try {
+        const res = await fetchApi(`/teaching-groups/${state.activeGroupId}/stream`, {
+          method: 'POST',
+          body: JSON.stringify({ content })
+        });
+        if (res.success) {
+          input.value = '';
+          showToast('Announcement posted to class stream!', 'success');
+          await loadStreamFeed(state.activeGroupId);
+        } else {
+          showToast(res.error?.message || 'Failed to post', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function renderRoster(members) {
+      const tbody = document.getElementById('hub-roster-tbody');
+      if (!members.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center; padding:1.5rem; color:var(--text-muted);">
+              No students enrolled yet. Share your invite code with students or add them using the form above.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      tbody.innerHTML = members.map(m => `
+        <tr>
+          <td style="font-weight:700;">${m.class_roll_no || '—'}</td>
+          <td style="font-weight:600;">${escapeHtml(m.student_name)}</td>
+          <td><code>${escapeHtml(m.official_enrollment_no)}</code></td>
+          <td><code style="font-family:'JetBrains Mono',monospace;">${escapeHtml(m.registration_no || '—')}</code></td>
+          <td style="text-align:right;">
+            <button type="button" class="btn btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem; color:var(--status-absent);" onclick="removeMember(${m.student_id}, '${escapeHtml(m.student_name).replace(/'/g, "\\'")}')">
+              Remove
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function addStudentByEnrollment() {
+      const input = document.getElementById('add-student-enrollment');
+      const val = input.value.trim();
+      if (!val) return;
+
+      try {
+        const res = await fetchApi(`/teaching-groups/${state.activeGroupId}/members`, {
+          method: 'POST',
+          body: JSON.stringify({ official_enrollment_no: val })
+        });
+        if (res.success) {
+          input.value = '';
+          showToast('Student enrolled successfully!', 'success');
+          const groupRes = await fetchApi(`/teaching-groups/${state.activeGroupId}`);
+          if (groupRes.success) {
+            renderRoster(groupRes.data.members || []);
+            document.getElementById('hub-roster-count').innerText = (groupRes.data.members || []).length;
+          }
+          await loadTeachingGroups();
+        } else {
+          showToast(res.error?.message || 'Failed to add student', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function removeMember(studentId, name) {
+      if (!confirm(`Remove ${name} from this teaching group?`)) return;
+      try {
+        const res = await fetchApi(`/teaching-groups/${state.activeGroupId}/members/${studentId}`, {
+          method: 'DELETE'
+        });
+        if (res.success) {
+          showToast(`${name} removed from group`, 'info');
+          const groupRes = await fetchApi(`/teaching-groups/${state.activeGroupId}`);
+          if (groupRes.success) {
+            renderRoster(groupRes.data.members || []);
+            document.getElementById('hub-roster-count').innerText = (groupRes.data.members || []).length;
+          }
+          await loadTeachingGroups();
+        } else {
+          showToast(res.error?.message || 'Failed to remove student', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function promptArchiveGroup(groupId, name, currentStatus) {
+      state.archiveTargetGroup = { id: groupId, name, currentStatus };
+      document.getElementById('archive-target-group-name').innerText = name;
+      document.getElementById('archive-modal-title').innerText = currentStatus === 'ARCHIVED' ? '↩️ Restore Teaching Group' : '📦 Archive Teaching Group';
+      document.getElementById('btn-confirm-archive').innerText = currentStatus === 'ARCHIVED' ? 'Confirm & Restore Group' : 'Confirm & Archive Group';
+      document.getElementById('archive-step-1').style.display = '';
+      document.getElementById('archive-step-2').style.display = 'none';
+      openModal('archive-group-modal');
+    }
+
+    function proceedArchiveStep2() {
+      document.getElementById('archive-step-1').style.display = 'none';
+      document.getElementById('archive-step-2').style.display = '';
+    }
+
+    function backArchiveStep1() {
+      document.getElementById('archive-step-1').style.display = '';
+      document.getElementById('archive-step-2').style.display = 'none';
+    }
+
+    async function executeArchiveGroup() {
+      if (!state.archiveTargetGroup) return;
+      const { id, currentStatus } = state.archiveTargetGroup;
+      const endpoint = currentStatus === 'ARCHIVED' ? `/teaching-groups/${id}/unarchive` : `/teaching-groups/${id}/archive`;
+
+      try {
+        const res = await fetchApi(endpoint, {
+          method: 'POST'
+        });
+        if (res.success) {
+          const actionText = currentStatus === 'ARCHIVED' ? 'restored to active' : 'archived';
+          showToast(`Teaching group ${actionText} successfully!`, 'success');
+          closeModal('archive-group-modal');
+          await loadTeachingGroups();
+        } else {
+          showToast(res.error?.message || 'Failed to update archive status', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function copyInviteCode(code) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast(`Invite code "${code}" copied to clipboard!`, 'info');
+        }).catch(() => fallbackCopy(code));
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function copyHubInviteCode() {
+      const code = document.getElementById('hub-invite-code').innerText;
+      copyInviteCode(code);
+    }
+
+    function fallbackCopy(text) {
+      const input = document.createElement('input');
+      input.value = text;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      showToast(`Copied code "${text}"`, 'info');
+    }
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Dismiss on backdrop click
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-backdrop')) {
+        e.target.style.display = 'none';
+      }
+    });
+
+    // Dismiss on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.style.display = 'none');
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

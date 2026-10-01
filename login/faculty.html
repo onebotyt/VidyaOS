@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty & Admin Portal Login — College Attendance System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: radial-gradient(circle at 50% 20%, #eff6ff 0%, #f8fafc 100%);">
+
+  <div class="card" style="width: 100%; max-width: 440px; padding: 2.25rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+    <div style="text-align: center; margin-bottom: 1.75rem;">
+      <a href="/index.html" class="brand" style="justify-content: center; margin-bottom: 0.75rem;">
+        <span class="brand-badge">UIT</span>
+        <span>Attendance System</span>
+      </a>
+      <h1 class="page-title" style="font-size: 1.35rem; margin-bottom: 0.25rem;">Faculty & Admin Login</h1>
+      <p class="page-subtitle" style="font-size: 0.85rem;">Sign in with your institutional Gmail or Google</p>
+    </div>
+
+    <!-- 1-Click Google Sign In -->
+    <div style="margin-bottom: 1.25rem;">
+      <button type="button" id="google-signin-btn" class="btn-google" onclick="handleGoogleOneClick()">
+        <svg viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span>Sign in with Google</span>
+      </button>
+    </div>
+
+    <div style="display: flex; align-items: center; margin: 1.25rem 0; gap: 0.75rem;">
+      <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">or email login</span>
+      <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+    </div>
+
+    <!-- Standard Login Form (Gmail Address) -->
+    <form id="faculty-login-form">
+      <div class="form-group">
+        <label class="form-label" for="username">Gmail Address</label>
+        <input type="email" id="username" class="form-control" placeholder="e.g. admin@gmail.com, hod@gmail.com, teacher@gmail.com" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <label class="form-label" for="password" style="margin-bottom: 0;">Password</label>
+          <span style="font-size: 0.75rem; color: var(--color-primary); font-weight: 500;">Password: Password@123</span>
+        </div>
+        <div style="position: relative;">
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required style="padding-right: 2.5rem;">
+          <button type="button" id="toggle-pw-btn" onclick="togglePw('password', this)" style="position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.1rem; padding: 0;" title="Show/Hide Password">👁️</button>
+        </div>
+      </div>
+
+      <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%; padding: 0.65rem; margin-top: 0.5rem; font-weight: 600;">
+        Sign In to Portal →
+      </button>
+    </form>
+
+    <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+      <div>
+        <span style="color: var(--text-muted);">New faculty member or HOD?</span>
+        <a href="/login/faculty-register.html" style="color: var(--color-primary); font-weight: 600; margin-left: 0.25rem;">Register here</a>
+      </div>
+      <div>
+        <a href="/login/student.html" style="color: var(--text-muted); font-size: 0.8rem;">Are you a student? Click here</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIRST-TIME TEACHER ACTIVATION POPUP CARD -->
+  <div id="activation-modal" class="activation-modal-overlay" style="display: none;">
+    <div class="activation-card">
+      <div style="text-align: center; margin-bottom: 1.25rem;">
+        <div style="width: 48px; height: 48px; background: var(--color-primary-light); color: var(--color-primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.5rem;">
+          🔑
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 700;">Account Setup Required</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+          Welcome, <span id="act-teacher-name" style="font-weight: 600; color: var(--text-main);">Faculty</span>! You are logging in with temporary credentials.
+        </p>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; font-size: 0.825rem; color: var(--text-muted);">
+        <strong style="color: var(--text-main);">Rule:</strong> Set your permanent password below. You can also link your Google Account matching <span id="act-email-display" style="font-weight: 600; color: var(--color-primary);">your email</span> for 1-click Google login.
+      </div>
+
+      <form id="activation-form">
+        <div class="form-group">
+          <label class="form-label" for="act-new-password">New Permanent Password (min 8 chars)</label>
+          <input type="password" id="act-new-password" class="form-control" minlength="8" required placeholder="••••••••">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="act-confirm-password">Confirm Password</label>
+          <input type="password" id="act-confirm-password" class="form-control" minlength="8" required placeholder="••••••••">
+        </div>
+
+        <!-- Google Link Option in Activation Card -->
+        <div style="margin-top: 1rem; margin-bottom: 1.25rem; padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); text-align: center;">
+          <div style="font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-muted);">Optional: Connect Google Account for 1-click login</div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-link-google-first" onclick="promptGoogleLinkOnActivation()" style="width: 100%;">
+            🔗 Connect Google Account
+          </button>
+          <div id="google-linked-notice" style="display: none; color: var(--status-present); font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem;">
+            ✓ Google Account Connected
+          </div>
+        </div>
+
+        <button type="submit" id="act-submit-btn" class="btn btn-success" style="width: 100%; padding: 0.65rem; font-weight: 600;">
+          Save & Enter Portal →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    function togglePw(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁️';
+      }
+    }
+
+    let currentActivationToken = null;
+    let pendingLinkedGoogleToken = null;
+
+    document.getElementById('faculty-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.innerText = 'Verifying...';
+
+      try {
+        const emailVal = document.getElementById('username').value.trim();
+        const passwordVal = document.getElementById('password').value;
+        const res = await fetchApi('/auth/faculty/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: emailVal,
+            username: emailVal,
+            password: passwordVal
+          })
+        });
+
+        if (res.success) {
+          // Check if teacher needs first-time password change / Google link
+          if (res.data.must_change_password) {
+            currentActivationToken = res.data.activation_token;
+            document.getElementById('act-teacher-name').innerText = res.data.user.full_name || res.data.user.email;
+            document.getElementById('act-email-display').innerText = res.data.user.email;
+            document.getElementById('activation-modal').style.display = 'flex';
+            btn.disabled = false;
+            btn.innerText = 'Sign In to Portal →';
+            return;
+          }
+
+          // Regular successful login
+          setAuthSession(res.data.access_token, res.data.user);
+          try {
+            if (typeof showToast === 'function') {
+              showToast('Login successful! Redirecting...', 'success');
+            }
+          } catch (_) {}
+
+          setTimeout(() => {
+            if (res.data.user.roles && res.data.user.roles.includes('SYSTEM_ADMIN')) {
+              window.location.href = '/admin/dashboard.html';
+            } else {
+              window.location.href = '/faculty/dashboard.html';
+            }
+          }, 400);
+        } else {
+          btn.disabled = false;
+          btn.innerText = 'Sign In to Portal →';
+          const errMsg = res.error?.message || 'Login failed. Please check credentials.';
+          if (typeof showToast === 'function') showToast(errMsg, 'error');
+        }
+      } catch (err) {
+        console.error('Faculty login error:', err);
+        btn.disabled = false;
+        btn.innerText = 'Sign In to Portal →';
+        const errMsg = err?.message || 'Invalid credentials or connection error. Please try again.';
+        if (typeof showToast === 'function') showToast(errMsg, 'error');
+      }
+    });
+
+    // Handle Activation Form Submission
+    document.getElementById('activation-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newPass = document.getElementById('act-new-password').value;
+      const confPass = document.getElementById('act-confirm-password').value;
+
+      if (newPass !== confPass) {
+        showToast('Passwords do not match!', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('act-submit-btn');
+      btn.disabled = true;
+      btn.innerText = 'Activating...';
+
+      try {
+        // Change password using activation token
+        const res = await fetch('/api/v1/auth/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentActivationToken}`
+          },
+          body: JSON.stringify({ new_password: newPass })
+        }).then(r => r.json());
+
+        if (res.success) {
+          setAuthSession(res.data.access_token, res.data.user);
+
+          // If teacher clicked connect Google during activation, link it now
+          if (pendingLinkedGoogleToken) {
+            try {
+              await fetchApi('/auth/google/link', {
+                method: 'POST',
+                body: JSON.stringify({ id_token: pendingLinkedGoogleToken })
+              });
+            } catch (linkErr) {
+              console.warn('Google link deferred:', linkErr);
+            }
+          }
+
+          showToast('Account activated successfully!', 'success');
+          setTimeout(() => {
+            if (res.data.user.roles.includes('SYSTEM_ADMIN')) {
+              window.location.href = '/admin/dashboard.html';
+            } else {
+              window.location.href = '/faculty/dashboard.html';
+            }
+          }, 800);
+        } else {
+          showToast(res.error?.message || 'Activation failed', 'error');
+          btn.disabled = false;
+          btn.innerText = 'Save & Enter Portal →';
+        }
+      } catch (err) {
+        showToast(err.message || 'Activation failed', 'error');
+        btn.disabled = false;
+        btn.innerText = 'Save & Enter Portal →';
+      }
+    });
+
+    // ─────────────────────────────────────────────────────────
+    // OFFICIAL GOOGLE SIGN-IN CARD LOGIC (NO BROWSER PROMPT)
+    // ─────────────────────────────────────────────────────────
+    let googleCardMode = 'LOGIN'; // 'LOGIN' or 'LINK'
+
+    function openGoogleCard(mode = 'LOGIN') {
+      googleCardMode = mode;
+      const modal = document.getElementById('google-signin-modal');
+      const errorBox = document.getElementById('google-card-error');
+      errorBox.style.display = 'none';
+
+      // Reset views
+      document.getElementById('google-accounts-view').style.display = 'block';
+      document.getElementById('google-input-view').style.display = 'none';
+      document.getElementById('google-loading-view').style.display = 'none';
+      document.getElementById('google-manual-email').value = '';
+
+      const titleEl = document.getElementById('google-modal-title');
+      const subtitleEl = document.getElementById('google-modal-subtitle');
+
+      if (mode === 'LINK') {
+        titleEl.innerText = 'Connect Google Account';
+        subtitleEl.innerText = 'Choose your Google account to link';
+      } else {
+        titleEl.innerText = 'Sign in with Google';
+        subtitleEl.innerText = 'Choose an account';
+      }
+
+      // Populate account candidates
+      const accountList = document.getElementById('google-account-list');
+      const currentInputEmail = document.getElementById('username')?.value.trim();
+      const activationEmail = document.getElementById('act-email-display')?.innerText.trim();
+
+      const candidateEmails = new Set();
+      if (activationEmail && activationEmail !== 'your email') candidateEmails.add(activationEmail);
+      if (currentInputEmail && currentInputEmail.includes('@')) candidateEmails.add(currentInputEmail);
+      candidateEmails.add('prof.sharma@college.local');
+      candidateEmails.add('prof.patel@gmail.com');
+
+      accountList.innerHTML = Array.from(candidateEmails).map(email => {
+        const initial = email.charAt(0).toUpperCase();
+        const displayName = email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return `
+          <li class="google-account-item" onclick="selectGoogleAccount('${email}')">
+            <div class="google-account-avatar">${initial}</div>
+            <div class="google-account-details">
+              <div class="google-account-name">${displayName}</div>
+              <div class="google-account-email">${email}</div>
+            </div>
+            <span class="google-signed-in-badge">Signed in</span>
+          </li>
+        `;
+      }).join('');
+
+      modal.style.display = 'flex';
+    }
+
+    function closeGoogleCard() {
+      document.getElementById('google-signin-modal').style.display = 'none';
+    }
+
+    function showGoogleEmailInput() {
+      document.getElementById('google-accounts-view').style.display = 'none';
+      document.getElementById('google-input-view').style.display = 'block';
+      document.getElementById('google-manual-email').focus();
+    }
+
+    function showGoogleAccountList() {
+      document.getElementById('google-input-view').style.display = 'none';
+      document.getElementById('google-accounts-view').style.display = 'block';
+      document.getElementById('google-card-error').style.display = 'none';
+    }
+
+    function submitGoogleEmail() {
+      const email = document.getElementById('google-manual-email').value.trim();
+      if (!email || !email.includes('@')) {
+        showGoogleCardError('Please enter a valid Google email address.');
+        return;
+      }
+      selectGoogleAccount(email);
+    }
+
+    function showGoogleCardError(msg) {
+      const errorBox = document.getElementById('google-card-error');
+      errorBox.innerText = msg;
+      errorBox.style.display = 'block';
+    }
+
+    async function selectGoogleAccount(email) {
+      if (googleCardMode === 'LINK') {
+        pendingLinkedGoogleToken = `google_${email}`;
+        document.getElementById('google-linked-notice').innerText = `✓ Connected with ${email}`;
+        document.getElementById('google-linked-notice').style.display = 'block';
+        document.getElementById('btn-link-google-first').innerText = `✓ Google Linked (${email})`;
+        document.getElementById('btn-link-google-first').disabled = true;
+        closeGoogleCard();
+        showToast(`Google account ${email} selected for linking`, 'success');
+        return;
+      }
+
+      // LOGIN MODE
+      document.getElementById('google-accounts-view').style.display = 'none';
+      document.getElementById('google-input-view').style.display = 'none';
+      document.getElementById('google-loading-view').style.display = 'block';
+      document.getElementById('google-card-error').style.display = 'none';
+
+      try {
+        const res = await fetchApi('/auth/google', {
+          method: 'POST',
+          body: JSON.stringify({ id_token: `google_${email}` })
+        });
+
+        if (res.success) {
+          setAuthSession(res.data.access_token, res.data.user);
+          closeGoogleCard();
+          showToast('Google login verified! Redirecting...', 'success');
+          setTimeout(() => {
+            if (res.data.user.roles.includes('SYSTEM_ADMIN')) {
+              window.location.href = '/admin/dashboard.html';
+            } else {
+              window.location.href = '/faculty/dashboard.html';
+            }
+          }, 600);
+        }
+      } catch (err) {
+        document.getElementById('google-loading-view').style.display = 'none';
+        document.getElementById('google-accounts-view').style.display = 'block';
+        showGoogleCardError(err.message || 'Google account not linked to your profile yet. Please log in with password first, then link Google from your profile page.');
+      }
+    }
+
+    async function handleGoogleOneClick() {
+      await startGoogleAuthFlow('LOGIN');
+    }
+
+    async function promptGoogleLinkOnActivation() {
+      await startGoogleAuthFlow('LINK');
+    }
+
+    async function startGoogleAuthFlow(mode = 'LOGIN') {
+      try {
+        const res = await fetchApi('/auth/google/url?mode=' + mode);
+        if (res.configured && res.data?.url) {
+          // Open REAL official Google Accounts page in SAME TAB (as requested)
+          window.location.href = res.data.url;
+        } else {
+          // Client ID not yet set in .env -> open Google Cloud Console Setup Helper modal
+          openGoogleSetupModal(mode);
+        }
+      } catch (err) {
+        openGoogleSetupModal(mode);
+      }
+    }
+
+    // Listen for authentication message from Google OAuth callback popup
+    window.addEventListener('message', (event) => {
+      if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
+        const { payload } = event.data;
+        if (payload.access_token) {
+          setAuthSession(payload.access_token, payload.user);
+          showToast('Google authentication successful! Redirecting...', 'success');
+          setTimeout(() => {
+            if (payload.user.roles.includes('SYSTEM_ADMIN')) {
+              window.location.href = '/admin/dashboard.html';
+            } else {
+              window.location.href = '/faculty/dashboard.html';
+            }
+          }, 600);
+        } else if (payload.action === 'LINK') {
+          pendingLinkedGoogleToken = `google_${payload.google_email}`;
+          document.getElementById('google-linked-notice').innerText = `✓ Connected with ${payload.google_email}`;
+          document.getElementById('google-linked-notice').style.display = 'block';
+          document.getElementById('btn-link-google-first').innerText = `✓ Google Linked (${payload.google_email})`;
+          document.getElementById('btn-link-google-first').disabled = true;
+          showToast('Google account connected!', 'success');
+        }
+      } else if (event.data?.type === 'GOOGLE_AUTH_ERROR') {
+        showToast(event.data.message || 'Google authentication failed', 'error');
+      }
+    });
+
+    function openGoogleSetupModal(mode = 'LOGIN') {
+      googleCardMode = mode;
+      document.getElementById('google-setup-modal').style.display = 'flex';
+    }
+
+    function closeGoogleSetupModal() {
+      document.getElementById('google-setup-modal').style.display = 'none';
+    }
+
+    async function saveGoogleCredentials() {
+      const clientId = document.getElementById('setup-client-id').value.trim();
+      const clientSecret = document.getElementById('setup-client-secret').value.trim();
+      const feedback = document.getElementById('setup-feedback');
+      feedback.style.display = 'none';
+
+      if (!clientId) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#d93025';
+        feedback.innerText = 'Please enter your Google Client ID from Google Cloud Console.';
+        return;
+      }
+
+      const saveBtn = document.getElementById('save-creds-btn');
+      saveBtn.disabled = true;
+      saveBtn.innerText = 'Saving to .env...';
+
+      try {
+        const res = await fetchApi('/auth/google/save-credentials', {
+          method: 'POST',
+          body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
+        });
+
+        if (res.success) {
+          showToast('Credentials saved! Opening official Google Sign-In...', 'success');
+          closeGoogleSetupModal();
+          // Now launch real Google OAuth!
+          setTimeout(() => startGoogleAuthFlow(googleCardMode), 500);
+        }
+      } catch (err) {
+        feedback.style.display = 'block';
+        feedback.style.color = '#d93025';
+        feedback.innerText = err.message || 'Failed to save credentials.';
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = 'Save & Launch Google Sign-In →';
+      }
+    }
+  </script>
+
+  <!-- GOOGLE CLOUD CONSOLE SETUP MODAL (Shown when GOOGLE_CLIENT_ID not in .env) -->
+  <div id="google-setup-modal" class="google-modal-overlay" style="display: none;" onclick="if(event.target===this)closeGoogleSetupModal()">
+    <div class="google-setup-card" role="dialog">
+      <button type="button" class="google-card-close" onclick="closeGoogleSetupModal()" aria-label="Close setup modal">✕</button>
+      
+      <div style="padding: 1.75rem 1.75rem 1rem 1.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+          <svg viewBox="0 0 48 48" width="28" height="28">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text-main);">Google Cloud Console Setup</h2>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Connect your Google OAuth 2.0 Credentials</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4;">
+          To open Google's official <strong style="color: var(--text-main);">accounts.google.com</strong> login page, an OAuth Client ID from Google Cloud Console is required:
+        </p>
+
+        <div class="google-step-box">
+          <strong>Step 1:</strong> Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--color-primary); font-weight: 600; text-decoration: underline;">Google Cloud Console Credentials ↗</a><br>
+          <strong>Step 2:</strong> Click <strong>+ CREATE CREDENTIALS</strong> → <strong>OAuth client ID</strong> (Application type: <em>Web application</em>)<br>
+          <strong>Step 3:</strong> Configure URIs:
+          <div style="margin-top: 0.35rem;">
+            <div>Authorized JavaScript origin: <span class="google-copy-chip">http://localhost:3000</span></div>
+            <div style="margin-top: 0.25rem;">Authorized redirect URI: <span class="google-copy-chip">http://localhost:3000/api/v1/auth/google/callback</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label class="form-label" style="font-size: 0.8rem;">Paste Google Client ID</label>
+            <input type="text" id="setup-client-id" class="form-control" placeholder="e.g. 799222349882-...apps.googleusercontent.com" style="font-family: var(--font-family-mono); font-size: 0.85rem;">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label class="form-label" style="font-size: 0.8rem;">Google Client Secret (Optional for local testing)</label>
+            <input type="password" id="setup-client-secret" class="form-control" placeholder="e.g. GOCSPX-..." style="font-family: var(--font-family-mono); font-size: 0.85rem;">
+          </div>
+
+          <div id="setup-feedback" style="display: none; font-size: 0.8rem; margin-bottom: 0.75rem;"></div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem;">
+            <button type="button" id="save-creds-btn" class="btn btn-primary" onclick="saveGoogleCredentials()" style="flex: 1;">
+              Save & Launch Google Sign-In →
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="closeGoogleSetupModal(); openGoogleCard(googleCardMode);">
+              Test with Simulated Chooser
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFICIAL GOOGLE SIGN-IN SIMULATED CARD MODAL (Fallback / Demo) -->
+  <div id="google-signin-modal" class="google-modal-overlay" style="display: none;" onclick="if(event.target===this)closeGoogleCard()">
+    <div class="google-card" role="dialog" aria-labelledby="google-modal-title">
+      <button type="button" class="google-card-close" onclick="closeGoogleCard()" aria-label="Close Google sign-in">✕</button>
+      
+      <div class="google-card-header">
+        <div class="google-logo-icon">
+          <svg viewBox="0 0 48 48" width="32" height="32">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+        </div>
+        <h2 id="google-modal-title" class="google-card-title">Sign in with Google</h2>
+        <div id="google-modal-subtitle" class="google-card-subtitle">Choose an account</div>
+        <div class="google-card-app">to continue to College Attendance System</div>
+      </div>
+
+      <!-- Alert Message Box -->
+      <div id="google-card-error" class="google-card-alert"></div>
+
+      <!-- Main Accounts List View -->
+      <div id="google-accounts-view">
+        <ul id="google-account-list" class="google-account-list"></ul>
+
+        <div class="google-use-another" onclick="showGoogleEmailInput()">
+          <span style="font-size: 1.15rem; color: #5f6368;">👤</span>
+          <span>Use another account</span>
+        </div>
+      </div>
+
+      <!-- Email Input View -->
+      <div id="google-input-view" style="display: none;" class="google-card-input-panel">
+        <div style="font-size: 0.875rem; margin-bottom: 0.5rem; color: #202124; font-weight: 500;">
+          Enter your Google account email:
+        </div>
+        <input type="email" id="google-manual-email" class="google-input-field" placeholder="Email or phone">
+        
+        <div class="google-card-actions">
+          <button type="button" class="google-btn-text" onclick="showGoogleAccountList()">Back</button>
+          <button type="button" id="google-submit-manual-btn" class="google-btn-blue" onclick="submitGoogleEmail()">Next</button>
+        </div>
+      </div>
+
+      <!-- Loading View -->
+      <div id="google-loading-view" style="display: none; padding: 2.5rem; text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 0.75rem; display: inline-block;">⏳</div>
+        <div style="font-size: 0.95rem; font-weight: 500; color: #202124;">Connecting to Google...</div>
+        <div style="font-size: 0.8rem; color: #5f6368; margin-top: 0.25rem;">Verifying account credentials</div>
+      </div>
+
+      <div class="google-card-footer">
+        To continue, Google will share your name, email address, language preference, and profile picture with College Attendance System.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

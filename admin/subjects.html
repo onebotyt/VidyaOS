@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institutional Subjects Catalog — Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <header class="app-header">
+    <a href="/admin/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
+      <span>Institutional Administration</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
+      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
+      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
+      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+      <a href="/admin/devices.html" class="btn btn-secondary btn-sm">ESP32 Terminals</a>
+      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
+      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <div class="page-header" style="margin-bottom: 1.5rem;">
+      <div>
+        <h1 class="page-title">Institutional Subjects Catalog</h1>
+        <p class="page-subtitle">Read-only institutional overview of all departmental subjects and curricula</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="/admin/faculty.html" class="btn btn-primary">👨‍🏫 Manage HODs</a>
+        <a href="/admin/reports.html" class="btn btn-secondary">📊 Dept Reports</a>
+      </div>
+    </div>
+
+    <!-- Hierarchy Delegation Banner -->
+    <div style="background: linear-gradient(135deg, #eff6ff, #f0fdf4); border: 1px solid #bfdbfe; border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm); padding: 0.85rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.875rem; color: #1e40af;">
+      <strong>Simplified Hierarchy:</strong> Course subjects are created and maintained directly by <strong>Heads of Department (HODs)</strong> in their departmental portals. This view provides centralized, read-only oversight across all academic departments.
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="card" style="padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: flex-end;">
+        <div>
+          <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Department</label>
+          <select id="filter-dept" class="form-select" onchange="filterSubjects()">
+            <option value="">All Departments</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Year</label>
+          <select id="filter-year" class="form-select" onchange="filterSubjects()">
+            <option value="">All Years</option>
+            <option value="1">Year 1</option>
+            <option value="2">Year 2</option>
+            <option value="3">Year 3</option>
+            <option value="4">Year 4</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Semester</label>
+          <select id="filter-sem" class="form-select" onchange="filterSubjects()">
+            <option value="">All Semesters</option>
+            <option value="1">Sem 1</option><option value="2">Sem 2</option>
+            <option value="3">Sem 3</option><option value="4">Sem 4</option>
+            <option value="5">Sem 5</option><option value="6">Sem 6</option>
+            <option value="7">Sem 7</option><option value="8">Sem 8</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="resetFilters()" style="height: 38px; width: 100%;">Reset Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subjects Table Card -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">ID</th>
+              <th style="width: 120px;">Code</th>
+              <th>Subject Name</th>
+              <th style="width: 200px;">Department / Program</th>
+              <th style="width: 120px; text-align: center;">Cohort</th>
+              <th style="width: 160px;">Curriculum Type</th>
+              <th style="width: 120px; text-align: right;">Managed By</th>
+            </tr>
+          </thead>
+          <tbody id="subjects-table-body">
+            <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading subjects catalog...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['SYSTEM_ADMIN']);
+
+    let subjectsList = [];
+    let departments = [];
+
+    async function init() {
+      try {
+        const [dRes, sRes] = await Promise.all([
+          fetchApi('/admin/departments'),
+          fetchApi('/admin/subjects')
+        ]);
+        if (dRes.success) {
+          departments = dRes.data;
+          const deptSelect = document.getElementById('filter-dept');
+          departments.forEach(d => {
+            deptSelect.innerHTML += `<option value="${d.id}">${d.name} (${d.code})</option>`;
+          });
+        }
+        if (sRes.success) {
+          subjectsList = sRes.data;
+          renderTable(subjectsList);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function filterSubjects() {
+      const deptId = document.getElementById('filter-dept').value;
+      const year = document.getElementById('filter-year').value;
+      const sem = document.getElementById('filter-sem').value;
+
+      let filtered = [...subjectsList];
+      if (deptId) filtered = filtered.filter(s => s.department_id == deptId);
+      if (year) filtered = filtered.filter(s => s.year == year);
+      if (sem) filtered = filtered.filter(s => s.semester == sem);
+
+      renderTable(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-dept').value = '';
+      document.getElementById('filter-year').value = '';
+      document.getElementById('filter-sem').value = '';
+      renderTable(subjectsList);
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById('subjects-table-body');
+      if (!list || !list.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">No subjects found matching filters.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(s => `
+        <tr>
+          <td style="font-weight: 600;">#${s.id}</td>
+          <td><span class="badge badge-pending" style="font-family: var(--font-family-mono); font-size: 0.8rem; font-weight: 700;">${s.code}</span></td>
+          <td style="font-weight: 600; color: var(--text-main);">${s.name}</td>
+          <td>
+            <div style="font-weight: 600; color: #1e293b;">${s.department_name || s.branch_name || '—'}</div>
+            <span class="code-badge" style="font-size: 0.75rem; padding: 0.1rem 0.4rem;">${s.department_code || s.branch_code || ''}</span>
+          </td>
+          <td style="text-align: center;"><span class="badge badge-pending">Y${s.year} S${s.semester}</span></td>
+          <td>
+            ${s.has_practical ? `
+              <span class="badge badge-late" style="font-size: 0.75rem;">Theory + Practical</span>
+            ` : `
+              <span class="badge badge-present" style="font-size: 0.75rem;">Theory Only</span>
+            `}
+          </td>
+          <td style="text-align: right;">
+            <span class="badge" style="background: #f1f5f9; color: #475569; font-size: 0.75rem;">HOD Scope</span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    init();
+  </script>
+</body>
+</html>

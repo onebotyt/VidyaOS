@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard — College Attendance System</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <header class="app-header">
+    <a href="/student/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-present);">STUDENT</span>
+      <span id="header-student-name">Student Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/student/dashboard.html" class="btn btn-primary btn-sm">Dashboard</a>
+      <a href="/student/attendance.html" class="btn btn-secondary btn-sm">Attendance &amp; Calendar</a>
+      <a href="/student/timetable.html" class="btn btn-secondary btn-sm">Timetable</a>
+      <a href="/student/assignments.html" class="btn btn-secondary btn-sm">Assignments</a>
+      <a href="/student/leave.html" class="btn btn-secondary btn-sm">Leave</a>
+      <a href="/student/scores.html" class="btn btn-secondary btn-sm">Test Scores</a>
+      <a href="/student/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container">
+    <!-- Active Classroom Session Alert Banner -->
+    <div id="active-session-banner" class="card" style="display: none; background: var(--color-primary-light); border-color: var(--color-primary); margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="badge" style="background: var(--color-primary); color: white;">● Live Session Active</span>
+            <strong id="active-session-subject" style="font-size: 1.05rem;">Operating Systems (IT402)</strong>
+          </div>
+          <div id="active-session-info" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+            Teacher: Prof. Sharma | Auto-closes in 15 mins
+          </div>
+        </div>
+        <button id="open-self-attendance-btn" class="btn btn-primary" onclick="openSelfAttendanceModal()">
+          Submit Presence (PIN / QR) →
+        </button>
+      </div>
+    </div>
+
+    <!-- Student Identity Header -->
+    <div class="page-header">
+      <div>
+        <h1 id="student-name" class="page-title">Welcome, Student</h1>
+        <p id="student-cohort-info" class="page-subtitle">Loading academic cohort details...</p>
+      </div>
+      <div>
+        <span id="student-roll-badge" class="badge badge-present" style="font-size: 0.85rem; padding: 0.4rem 0.85rem; font-weight: 600;">
+          Roll: -- • UBTER Reg: --
+        </span>
+      </div>
+    </div>
+
+    <!-- Attendance Metrics Grid -->
+    <div class="grid-cols-4" style="margin-bottom: 1.5rem;">
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Attendance Percentage</div>
+        <div id="metric-percentage" style="font-size: 2.2rem; font-weight: 800; color: var(--status-present);">--%</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Threshold: 75%</div>
+      </div>
+
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Attended Sessions</div>
+        <div id="metric-attended" style="font-size: 2.2rem; font-weight: 800; color: var(--text-main);">0</div>
+        <div id="metric-attended-sub" style="font-size: 0.75rem; color: var(--text-muted);">Present: 0 | Late: 0</div>
+      </div>
+
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Absent Sessions</div>
+        <div id="metric-absent" style="font-size: 2.2rem; font-weight: 800; color: var(--status-absent);">0</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Missed classes</div>
+      </div>
+
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Total Conducted</div>
+        <div id="metric-conducted" style="font-size: 2.2rem; font-weight: 800; color: var(--text-main);">0</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Finalized sessions</div>
+      </div>
+    </div>
+
+    <!-- 75% Attendance Predictor Widget -->
+    <div id="predictor-card" class="predictor-box predictor-safe" style="margin-bottom: 1.5rem;">
+      <div id="predictor-icon" style="font-size: 2.5rem;">🛡️</div>
+      <div style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong id="predictor-headline" style="font-size: 1.1rem;">Safe Attendance Zone</strong>
+          <span id="predictor-status-badge" class="badge badge-present">Eligible for Exams</span>
+        </div>
+        <p id="predictor-message" style="font-size: 0.95rem; margin-top: 0.35rem; color: var(--text-main);">
+          Calculating attendance forecast...
+        </p>
+      </div>
+    </div>
+
+    <!-- Subject Breakdown & History Sections -->
+    <div class="grid-cols-2" style="margin-bottom: 2rem;">
+      <!-- Subject-Wise Breakdown -->
+      <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 class="card-title">Subject-Wise Breakdown</h2>
+          <a href="/student/attendance.html" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Open Full Calendar →</a>
+        </div>
+        <div id="subjects-container">
+          <p style="color: var(--text-muted); font-size: 0.875rem;">Loading courses...</p>
+        </div>
+      </div>
+
+      <!-- Recent History Log -->
+      <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 class="card-title">Recent Session History</h2>
+          <a href="/student/attendance.html" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">View Calendar →</a>
+        </div>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted);">Loading history...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Submit Soft Self-Attendance Modal -->
+  <div id="self-attendance-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 class="card-title">Submit Classroom Attendance</h2>
+        <button onclick="closeSelfAttendanceModal()" style="border: none; background: none; font-size: 1.2rem; cursor: pointer;">✕</button>
+      </div>
+
+      <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+        Enter the 6-digit session PIN announced by your professor or scan the live QR code.
+      </p>
+
+      <form id="self-attendance-form">
+        <div class="form-group">
+          <label class="form-label">Submission Method</label>
+          <select id="self-method" class="form-select" onchange="toggleSelfMethod()">
+            <option value="PIN">6-Digit Session PIN</option>
+            <option value="QR">Dynamic QR Code Token</option>
+            <option value="BUTTON">One-Tap Presence Request</option>
+          </select>
+        </div>
+
+        <div id="pin-field" class="form-group">
+          <label class="form-label">Enter 6-Digit PIN</label>
+          <input type="text" id="self-pin" class="form-control" placeholder="e.g. 482109" maxlength="6" style="font-family: var(--font-family-mono); font-size: 1.2rem; letter-spacing: 0.3rem; text-align: center;">
+        </div>
+
+        <div id="qr-field" class="form-group" style="display: none;">
+          <label class="form-label">QR Token Hash</label>
+          <input type="text" id="self-qr" class="form-control" placeholder="Scan or paste QR token">
+        </div>
+
+        <button type="submit" id="submit-self-btn" class="btn btn-success" style="width: 100%; margin-top: 0.5rem;">
+          Submit Presence Claim →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script src="/js/utils.js"></script>
+  <script>
+    guardRoute(['STUDENT']);
+
+    let currentActiveSession = null;
+
+    async function loadStudentDashboard() {
+      try {
+        // 1. Load Profile
+        const profRes = await fetchApi('/students/me');
+        if (profRes.success) {
+          const s = profRes.data;
+          document.getElementById('student-name').innerText = `Welcome, ${s.full_name}`;
+          document.getElementById('header-student-name').innerText = s.full_name;
+          document.getElementById('student-cohort-info').innerText =
+            `${s.department_name || s.branch_name} (${s.branch_code || s.department_code}) • Year ${s.year}, Sem ${s.semester} (${s.academic_year_label})`;
+          const rollTxt = s.class_roll_no ? `${s.class_roll_no}` : '—';
+          const regTxt = s.registration_no || '—';
+          document.getElementById('student-roll-badge').innerHTML = `Roll: <strong>${rollTxt}</strong> • UBTER Reg: <strong>${regTxt}</strong>`;
+        }
+
+        // 2. Load Attendance Stats & Predictor
+        const statsRes = await fetchApi('/students/me/attendance/stats');
+        if (statsRes.success) {
+          const stats = statsRes.data;
+          const pctEl = document.getElementById('metric-percentage');
+          pctEl.innerText = `${stats.current_percentage}%`;
+          pctEl.style.color = stats.current_percentage >= 75 ? 'var(--status-present)' : 'var(--status-absent)';
+
+          document.getElementById('metric-attended').innerText = stats.total_attended;
+          document.getElementById('metric-attended-sub').innerText = `Present: ${stats.present_count} | Late: ${stats.late_count}`;
+          document.getElementById('metric-absent').innerText = stats.total_absent;
+          document.getElementById('metric-conducted').innerText = stats.total_conducted;
+
+          // Render Predictor Card
+          const pCard = document.getElementById('predictor-card');
+          const pIcon = document.getElementById('predictor-icon');
+          const pHead = document.getElementById('predictor-headline');
+          const pBadge = document.getElementById('predictor-status-badge');
+          const pMsg = document.getElementById('predictor-message');
+
+          if (stats.prediction.status === 'SAFE') {
+            pCard.className = 'predictor-box predictor-safe';
+            pIcon.innerText = '🛡️';
+            pHead.innerText = 'Good Standing (Eligible)';
+            pBadge.className = 'badge badge-present';
+            pBadge.innerText = 'Safe Zone';
+          } else {
+            pCard.className = 'predictor-box predictor-deficit';
+            pIcon.innerText = '⚠️';
+            pHead.innerText = 'Attendance Deficit Warning';
+            pBadge.className = 'badge badge-absent';
+            pBadge.innerText = 'Action Required';
+          }
+          pMsg.innerText = stats.prediction.message;
+        }
+
+        // 3. Load Subjects Breakdown
+        const subjRes = await fetchApi('/students/me/attendance/subjects');
+        if (subjRes.success) {
+          const container = document.getElementById('subjects-container');
+          if (subjRes.data.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted);">No enrolled subjects found.</p>';
+          } else {
+            container.innerHTML = subjRes.data.map(sub => `
+              <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.2rem;">
+                  <strong>${sub.subject_code} - ${sub.subject_name}</strong>
+                  <span style="font-weight: 700; color: ${sub.percentage >= 75 ? 'var(--status-present)' : 'var(--status-absent)'};">
+                    ${sub.percentage}% (${sub.attended}/${sub.conducted})
+                  </span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar" style="width: ${sub.percentage}%; background-color: ${sub.percentage >= 75 ? 'var(--status-present)' : 'var(--status-absent)'};"></div>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+
+        // 4. Load History Log
+        const histRes = await fetchApi('/students/me/attendance?limit=8');
+        if (histRes.success) {
+          const tbody = document.getElementById('history-tbody');
+          if (histRes.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No finalized attendance records yet.</td></tr>';
+          } else {
+            tbody.innerHTML = histRes.data.map(h => `
+              <tr>
+                <td>${formatDate(h.start_time)}</td>
+                <td><strong>${h.subject_code}</strong></td>
+                <td><span class="badge badge-${(h.attendance_status || 'absent').toLowerCase()}">${h.attendance_status || 'ABSENT'}</span></td>
+                <td style="font-size: 0.8rem; color: var(--text-muted);">${h.source || 'MANUAL'}</td>
+              </tr>
+            `).join('');
+          }
+        }
+
+        // 5. Check Active Sessions
+        const sessRes = await fetchApi('/attendance/sessions?state=OPEN');
+        if (sessRes.success && sessRes.data.length > 0) {
+          currentActiveSession = sessRes.data[0];
+          document.getElementById('active-session-banner').style.display = 'block';
+          document.getElementById('active-session-subject').innerText = `${currentActiveSession.subject_code} — ${currentActiveSession.subject_name}`;
+          document.getElementById('active-session-info').innerText = `Teacher: ${currentActiveSession.teacher_name} | Session: ${currentActiveSession.session_type}`;
+        }
+      } catch (err) {
+        console.error('Error loading student dashboard', err);
+      }
+    }
+
+    function openSelfAttendanceModal() {
+      document.getElementById('self-attendance-modal').classList.add('open');
+    }
+
+    function closeSelfAttendanceModal() {
+      document.getElementById('self-attendance-modal').classList.remove('open');
+    }
+
+    function toggleSelfMethod() {
+      const method = document.getElementById('self-method').value;
+      document.getElementById('pin-field').style.display = method === 'PIN' ? 'block' : 'none';
+      document.getElementById('qr-field').style.display = method === 'QR' ? 'block' : 'none';
+    }
+
+    document.getElementById('self-attendance-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentActiveSession) return;
+
+      const method = document.getElementById('self-method').value;
+      const btn = document.getElementById('submit-self-btn');
+      btn.disabled = true;
+
+      try {
+        const payload = { method };
+        if (method === 'PIN') payload.pin = document.getElementById('self-pin').value.trim();
+        if (method === 'QR') payload.qr_token = document.getElementById('self-qr').value.trim();
+
+        const res = await fetchApi(`/attendance/sessions/${currentActiveSession.id}/self-attendance`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.success) {
+          showToast('Attendance submitted! Awaiting professor approval.', 'success');
+          closeSelfAttendanceModal();
+          document.getElementById('active-session-banner').style.display = 'none';
+        }
+      } catch (err) {
+        btn.disabled = false;
+      }
+    });
+
+    loadStudentDashboard();
+  </script>
+</body>
+</html>

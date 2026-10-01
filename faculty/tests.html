@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Tests & Examination Marksheets — Faculty Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    /* Compact Register Switcher & Meta Header */
+    .test-header-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 0.9rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .test-switcher-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+    .test-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-grow: 1;
+      max-width: 640px;
+    }
+    .test-select {
+      flex: 1;
+      min-width: 260px;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+    .test-meta-strip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.65rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .test-meta-strip strong {
+      color: var(--text-main);
+    }
+    .meta-bullet {
+      opacity: 0.4;
+      font-weight: 700;
+    }
+
+    /* Workspace Command Bar */
+    .test-command-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+    .test-command-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Exam Cards List */
+    .test-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .item-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .item-card:hover {
+      border-color: var(--color-primary);
+    }
+    .item-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.3rem;
+    }
+    .item-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    /* Expand Panel */
+    .expand-panel {
+      display: none;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border-color);
+    }
+    .expand-panel.open {
+      display: block;
+    }
+
+    /* Marksheet Studio & Spreadsheet Table */
+    .sheet-studio-container {
+      margin-top: 0.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--table-border-strong);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .sheet-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.5rem 0.85rem;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--table-border-strong);
+    }
+    .sheet-toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .excel-sheet-viewport {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--bg-card);
+      padding: 0;
+    }
+    table.excel-table,
+    table.sheet-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-family-sans);
+      font-size: 0.82rem;
+      color: var(--text-main);
+      table-layout: auto;
+      background: var(--bg-card);
+    }
+    table.excel-table th,
+    table.excel-table td,
+    table.sheet-table th,
+    table.sheet-table td {
+      border: 1px solid var(--table-border-strong) !important;
+      padding: 0.35rem 0.5rem;
+      text-align: center;
+      vertical-align: middle;
+      box-sizing: border-box;
+      text-transform: none !important;
+    }
+
+    /* 3 Top Soft Blue Institutional Header Rows */
+    table.excel-table tr.excel-hdr-blue th,
+    table.sheet-table tr.excel-hdr-blue th {
+      background: var(--col-att-group-bg) !important;
+      color: var(--col-att-group-color) !important;
+      font-weight: 800 !important;
+      text-align: center !important;
+      padding: 0.45rem 0.75rem !important;
+      letter-spacing: 0.01em;
+      border: 1px solid var(--table-border-strong) !important;
+      text-transform: none !important;
+    }
+    table.excel-table tr.excel-hdr-blue.row-1 th h3,
+    table.sheet-table tr.excel-hdr-blue.row-1 th h3 {
+      margin: 0;
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: inherit;
+    }
+    table.excel-table tr.excel-hdr-blue.row-2 th,
+    table.sheet-table tr.excel-hdr-blue.row-2 th {
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+    table.excel-table tr.excel-hdr-blue.row-3 th,
+    table.sheet-table tr.excel-hdr-blue.row-3 th {
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    /* Tan Column Headers (Row 4) */
+    table.excel-table tr.excel-hdr-tan th,
+    table.sheet-table tr.excel-hdr-tan th,
+    table.sheet-table thead th.excel-hdr-tan {
+      background: var(--chip-hod-bg) !important;
+      color: var(--chip-hod-color) !important;
+      font-weight: 800 !important;
+      font-size: 0.8rem !important;
+      text-align: center !important;
+      border: 1px solid var(--table-border-strong) !important;
+      padding: 0.45rem 0.5rem !important;
+      text-transform: none !important;
+    }
+
+    /* Subheaders (Row 5) */
+    table.excel-table tr.excel-hdr-sub th,
+    table.sheet-table tr.excel-hdr-sub th,
+    table.sheet-table th.th-secondary {
+      background: var(--bg-surface) !important;
+      color: var(--text-main) !important;
+      font-weight: 700 !important;
+      font-size: 0.76rem !important;
+      border: 1px solid var(--table-border-strong) !important;
+      padding: 0.35rem 0.5rem !important;
+      text-transform: none !important;
+    }
+
+    /* Student Name & Roll Cells */
+    table.excel-table td.cell-student-name,
+    table.sheet-table td.cell-student-name {
+      text-align: left;
+      font-weight: 700;
+      min-width: 170px;
+      padding: 0.35rem 0.6rem;
+    }
+    table.excel-table td.cell-roll,
+    table.sheet-table td.cell-roll {
+      font-family: var(--font-family-mono);
+      font-weight: 700;
+      font-size: 0.8rem;
+      min-width: 80px;
+    }
+    table.excel-table td.excel-cell-sr {
+      font-weight: 700;
+      min-width: 45px;
+    }
+
+    /* Score Input Cells */
+    table.excel-table input.excel-cell-input,
+    table.sheet-table input.excel-cell-input,
+    table.sheet-table input.sheet-cell-input {
+      width: 100% !important;
+      min-width: 44px !important;
+      max-width: 65px !important;
+      padding: 0.25rem 0.15rem !important;
+      border: 1px solid transparent !important;
+      border-radius: 2px !important;
+      background: transparent !important;
+      text-align: center !important;
+      font-size: 0.84rem !important;
+      font-weight: 700 !important;
+      color: var(--text-main) !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    table.excel-table input.excel-cell-input:hover,
+    table.sheet-table input.excel-cell-input:hover,
+    table.sheet-table input.sheet-cell-input:hover {
+      background: var(--bg-surface-secondary) !important;
+      border-color: var(--border-color) !important;
+    }
+    table.excel-table input.excel-cell-input:focus,
+    table.sheet-table input.excel-cell-input:focus,
+    table.sheet-table input.sheet-cell-input:focus {
+      background: var(--bg-card) !important;
+      border-color: var(--color-primary) !important;
+      outline: 2px solid var(--color-primary) !important;
+      outline-offset: -1px !important;
+    }
+
+    /* Absent Styling */
+    table.excel-table tr.is-absent td,
+    table.sheet-table tr.is-absent td {
+      background: var(--status-absent-bg) !important;
+      color: var(--status-absent) !important;
+    }
+    table.excel-table tr.is-absent input.excel-cell-input,
+    table.sheet-table tr.is-absent input.excel-cell-input,
+    table.sheet-table tr.is-absent input.sheet-cell-input {
+      color: var(--status-absent) !important;
+      font-weight: 800 !important;
+      background: transparent !important;
+    }
+    table.excel-table tr.is-absent .excel-cell-total,
+    table.sheet-table tr.is-absent .excel-cell-total {
+      color: var(--status-absent) !important;
+      font-weight: 900 !important;
+    }
+
+    /* Row Attendance Toggle Button */
+    .btn-sheet-att-toggle {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      cursor: pointer;
+      line-height: 1.1;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      opacity: 0.65;
+    }
+    .btn-sheet-att-toggle:hover {
+      opacity: 1;
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--bg-surface-secondary);
+    }
+    .btn-sheet-att-toggle.is-absent {
+      background: var(--status-absent) !important;
+      color: var(--text-white) !important;
+      border-color: var(--status-absent) !important;
+      font-weight: 800 !important;
+      opacity: 1 !important;
+    }
+
+    /* Right Side Panel */
+    table.excel-table td.sheet-side-panel,
+    table.sheet-table td.sheet-side-panel {
+      background: var(--bg-card);
+      text-align: left;
+      vertical-align: top;
+      padding: 0.75rem 1rem;
+      min-width: 500px;
+      border: 1px solid var(--table-border-strong);
+    }
+    .excel-side-content {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: var(--text-main);
+    }
+    .excel-side-sec-title {
+      font-weight: 800;
+      font-size: 0.82rem;
+      margin-bottom: 0.35rem;
+      color: var(--text-main);
+      text-decoration: underline;
+    }
+    .excel-side-instructions {
+      padding-left: 1.25rem;
+      margin: 0 0 0.85rem 0;
+      line-height: 1.45;
+      color: var(--text-main);
+    }
+    .excel-side-instructions li {
+      margin-bottom: 0.2rem;
+    }
+    .excel-side-questions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+      color: var(--text-main);
+    }
+    .sheet-note-red {
+      color: var(--status-absent);
+      font-weight: 800;
+      font-size: 0.82rem;
+      margin-top: 0.85rem;
+      padding: 0.35rem 0;
+      letter-spacing: 0.02em;
+    }
+
+    /* Bottom Summary Row */
+    table.excel-table td.excel-summary-lbl,
+    table.sheet-table td.excel-summary-lbl {
+      text-align: right;
+      font-weight: 800;
+      font-size: 0.84rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-surface);
+    }
+    table.excel-table td.excel-summary-avg,
+    table.sheet-table td.excel-summary-avg {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--color-primary);
+      text-align: center;
+      background: var(--bg-surface);
+    }
+    table.excel-table td.excel-summary-tally-cell,
+    table.sheet-table td.excel-summary-tally-cell {
+      background: var(--bg-surface);
+      padding: 0.3rem 0.6rem;
+      text-align: center;
+    }
+    .excel-tally-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+    .excel-tally-item strong {
+      margin-left: 0.25rem;
+    }
+
+    /* Inline Meta Inputs for Duration & Date */
+    .excel-meta-bar {
+      white-space: nowrap !important;
+    }
+    .excel-meta-inline-wrap {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap !important;
+      flex-wrap: nowrap !important;
+      gap: 0.35rem;
+    }
+    .excel-meta-inline-wrap .meta-sep {
+      opacity: 0.55;
+      font-weight: 700;
+      margin: 0 0.15rem;
+    }
+    .excel-meta-inline-input {
+      background: transparent;
+      border: 1px solid transparent;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-main);
+      padding: 0.1rem 0.25rem;
+      border-radius: var(--radius-sm);
+    }
+    .excel-meta-inline-input:hover {
+      border-color: var(--border-color);
+      background: var(--bg-card);
+    }
+    .excel-meta-inline-input:focus {
+      border-color: var(--color-primary);
+      background: var(--bg-card);
+      outline: none;
+    }
+    .excel-q-max-input {
+      width: 34px;
+      padding: 0 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-align: center;
+      border: 1px dashed var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border-radius: var(--radius-xs);
+      -moz-appearance: textfield;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .excel-q-max-input::-webkit-outer-spin-button,
+    .excel-q-max-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .excel-q-max-input:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-card);
+    }
+    .excel-q-max-input:focus {
+      border-color: var(--color-primary);
+      outline: none;
+      background: var(--bg-card);
+    }
+    .modal-q-item {
+      display: grid;
+      grid-template-columns: 50px 1fr 100px auto;
+      gap: 0.65rem;
+      align-items: center;
+      padding: 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">FACULTY</span>
+      <span>Attendance Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" id="top-nav-bar">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm" id="nav-reg">Take Attendance & Registers</a>
+      <a href="/faculty/assignments.html" class="btn btn-secondary btn-sm" id="nav-assign">Assignments & Coursework</a>
+      <a href="/faculty/tests.html" class="btn btn-primary btn-sm" id="nav-marks">Test Marks & Exams</a>
+      <a href="/faculty/evaluation.html" class="btn btn-secondary btn-sm" id="nav-eval">Internal Evaluation</a>
+      <a href="/faculty/reports.html" class="btn btn-secondary btn-sm" id="nav-reports">Analytics & Reports</a>
+      <a href="/faculty/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem; max-width: 1440px;">
+    
+    <!-- PAGE HEADER -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+      <div>
+        <h1 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <span>📊</span>
+          <span>Class Tests & Marksheets Studio</span>
+        </h1>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+          Unit tests, surprise quizzes, marks rosters, and institutional Excel (.xlsx) spreadsheet evaluations
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/faculty/registers.html" class="btn btn-secondary btn-sm" id="btn-quick-matrix">📖 Attendance Matrix</a>
+        <a href="/faculty/assignments.html" class="btn btn-secondary btn-sm" id="btn-quick-assignments">📝 Assignments</a>
+        <a href="/faculty/evaluation.html" class="btn btn-secondary btn-sm" id="btn-quick-eval">📈 Evaluation</a>
+      </div>
+    </div>
+
+    <!-- COHORT SWITCHER & ACTIVE METADATA CARD -->
+    <div class="test-header-card">
+      <div class="test-switcher-strip">
+        <div class="test-select-wrap">
+          <label for="test-switcher-select" style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">
+            Active Subject Register:
+          </label>
+          <select id="register-switcher-select" class="test-select" onchange="onRegisterChange(this.value)" title="Switch Subject Register"></select>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span class="badge badge-present" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">OFFLINE EXAM MODE</span>
+          <span class="badge badge-primary" id="badge-tests-count" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">0 Tests</span>
+        </div>
+      </div>
+      <div class="test-meta-strip" id="test-meta-strip">
+        <span>Subject: <strong id="meta-subject-name">—</strong></span>
+        <span class="meta-bullet">•</span>
+        <span>Code: <strong id="meta-subject-code">—</strong></span>
+        <span class="meta-bullet">•</span>
+        <span>Department: <strong id="meta-dept-name">—</strong></span>
+        <span class="meta-bullet">•</span>
+        <span>Year / Sem: <strong id="meta-year-sem">—</strong></span>
+        <span class="meta-bullet">•</span>
+        <span>Enrolled Roster: <strong id="meta-student-count">0 Students</strong></span>
+      </div>
+    </div>
+
+    <!-- WORKSPACE COMMAND BAR -->
+    <div class="test-command-bar">
+      <div class="test-command-actions" id="exams-quick-controls">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openInternalEvaluationStudio()" style="font-weight: 700;">
+          📈 Internal Evaluation Sheet
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="exportAllTestsExcel()" style="font-weight: 700; color: var(--status-present);" title="Consolidated Excel download of all scheduled unit tests">
+          📥 Export All Tests
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadRegisterExams()" title="Refresh test list">
+          🔄 Refresh
+        </button>
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openCreateExamModal()" style="font-weight: 700;">
+          + Schedule Class Test
+        </button>
+      </div>
+    </div>
+
+    <!-- SCHEDULED TESTS / MARKSHEETS LIST CONTAINER -->
+    <div id="register-exams-list" class="test-list-container">
+      <div class="card" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+        Loading class tests and marksheets...
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL: SCHEDULE CLASS TEST / EXAM                            -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="create-exam-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('create-exam-modal')">
+    <div class="modal-card" style="max-width: 580px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          📊 Schedule Class Test / Exam
+        </h2>
+        <button type="button" onclick="closeModal('create-exam-modal')" style="font-size: 1.4rem; color: var(--text-muted); cursor: pointer; border: none; background: none; line-height: 1;">&times;</button>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 0.55rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.1rem; font-size: 0.82rem; color: var(--text-muted);">
+        Teaching Register: <strong id="modal-exam-scope-text" style="color: var(--color-primary);">Current Subject</strong>
+      </div>
+
+      <form id="create-exam-form" onsubmit="submitRegisterExam(event)">
+        <div style="margin-bottom: 0.85rem;">
+          <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Test / Exam Title *</label>
+          <input type="text" id="exam-title" placeholder="e.g. Unit Test 1 (Modules 1 & 2)" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Exam Type *</label>
+            <select id="exam-type" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem;">
+              <option value="UNIT_TEST">Unit Test</option>
+              <option value="MID_TERM">Mid Term Examination</option>
+              <option value="PRACTICAL">Practical / Lab Viva</option>
+              <option value="FINAL">Final Semester Exam</option>
+              <option value="OTHER">Class Quiz / Surprise Test</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Exam Date *</label>
+            <input type="date" id="exam-date" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Maximum Marks *</label>
+          <input type="number" id="exam-max-marks" min="1" max="1000" value="25" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem;">
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('create-exam-modal')">Cancel</button>
+          <button type="submit" id="btn-save-exam" class="btn btn-primary" style="font-weight: 700;">Schedule & Create Marksheet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL: MANAGE / ADD EXAM QUESTIONS & MARKS                   -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="exam-questions-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('exam-questions-modal')">
+    <div class="modal-card" style="max-width: 680px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          📝 Manage Questions & Marks
+        </h2>
+        <button type="button" onclick="closeModal('exam-questions-modal')" style="font-size: 1.4rem; color: var(--text-muted); cursor: pointer; border: none; background: none; line-height: 1;">&times;</button>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+        Exam / Test: <strong id="modal-exam-q-test-title" style="color: var(--color-primary);">Unit Test</strong> &bull; Add, edit, or remove questions and assign marks. Marksheet columns and totals synchronize automatically.
+      </div>
+
+      <!-- Grand Total & Auto Distribute -->
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; padding: 0.55rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 0.85rem;">
+        <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <label for="modal-exam-grand-total" style="font-weight: 700; font-size: 0.8rem; color: var(--text-muted);">Grand Total Marks:</label>
+          <input type="number" id="modal-exam-grand-total" min="1" max="500" value="25" style="width:70px; padding: 0.35rem 0.5rem; font-size: 0.85rem; font-weight: 700; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-main);" placeholder="e.g. 25">
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="autoDistributeFromTotal()" title="Auto-distribute grand total across all questions equally" style="font-weight:700; font-size: 0.8rem;">
+          ⚖️ Auto-Distribute Evenly
+        </button>
+        <span style="font-size:0.75rem; color: var(--text-muted);">— or set marks per question manually below</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 50px 1fr 100px auto; gap: 0.65rem; font-weight: 700; font-size: 0.76rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; padding: 0 0.5rem;">
+        <div style="text-align: center;">Q. No.</div>
+        <div>Question Statement (Optional)</div>
+        <div style="text-align: right;">Max Marks</div>
+        <div></div>
+      </div>
+
+      <div id="modal-questions-list" style="max-height: 320px; overflow-y: auto; margin-bottom: 0.65rem; padding-right: 2px;">
+        <!-- Dynamically rendered question rows -->
+      </div>
+
+      <!-- 2-step delete confirmation bar -->
+      <div id="modal-q-delete-confirm-bar" style="display: none; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0.75rem; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); margin-bottom: 0.65rem; flex-wrap: wrap;">
+        <span id="modal-q-delete-confirm-msg" style="font-size: 0.82rem; font-weight: 700; color: var(--status-absent);">Delete this question?</span>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="cancelRemoveModalQuestion()" style="font-size: 0.8rem;">✕ Cancel</button>
+          <button type="button" class="btn btn-sm" onclick="doRemoveModalQuestion()" style="background: var(--status-absent); color: var(--text-white); font-weight: 800; font-size: 0.8rem; border: none; padding: 0.35rem 0.75rem; border-radius: var(--radius-sm);">⚠️ Yes, Delete</button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.85rem; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="addModalQuestionRow()">
+          + Add Another Question
+        </button>
+        <div style="font-size: 0.9rem; font-weight: 800; color: var(--text-main);">
+          Total Maximum Marks: <span id="modal-exam-total-max" style="color: var(--color-primary); font-size: 1.05rem;">20</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('exam-questions-modal')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveExamQuestionsFromModal()" style="font-weight: 700;">Save & Apply Questions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MASTER INTERNAL EVALUATION SPREADSHEET STUDIO MODAL          -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="internal-eval-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('internal-eval-modal')">
+    <div class="modal-card" style="max-width: 96vw; width: 1320px; max-height: 92vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+      
+      <!-- HEADER -->
+      <div style="flex-shrink: 0; padding: 1rem 1.25rem; background: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.45rem;">
+            <span>📈</span>
+            <span>Master Internal Evaluation Spreadsheet</span>
+            <span class="badge badge-present" style="font-size: 0.7rem;">Official Institutional Format</span>
+          </h2>
+          <div id="eval-modal-subtitle" style="font-size: 0.8rem; color: var(--text-muted);">
+            Comprehensive Institutional Evaluation (Unit Tests + Coursework + Attendance + Presentation)
+          </div>
+        </div>
+        <button type="button" onclick="closeModal('internal-eval-modal')" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.25rem 0.5rem;" title="Close">&times;</button>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="sheet-toolbar">
+        <div class="sheet-toolbar-group">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="restoreUnitTestSheet()" title="Switch back and restore Unit Test Sheet" style="font-weight: 700;">
+            📋 Restore Unit Test Sheet
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addInternalEvalColumn()" title="Add custom evaluation column (e.g., Viva, Quiz, Mini-Project)">
+            + Add Assessment Column
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="removeInternalEvalColumn()" title="Remove last custom column">
+            - Remove Column
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addInternalEvalRow()" title="Insert new student row">
+            + Add Student Row
+          </button>
+        </div>
+        <div class="sheet-toolbar-group">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="exportInternalEvalExcel()" title="Export directly to native Microsoft Excel / Google Sheets (.xlsx)" style="font-weight: 700;">
+            📥 Export to Excel (.xlsx)
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="saveInternalEvalGrid()" title="Save current evaluation state" style="font-weight: 700;">
+            💾 Save Evaluation
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL BODY: SPREADSHEET TABLE -->
+      <div id="internal-eval-content" style="flex: 1; overflow: auto; padding: 1rem; background: var(--bg-app);">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">Loading internal evaluation data...</div>
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div style="flex-shrink: 0; padding: 0.75rem 1.25rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted);">
+        <div id="eval-modal-status-text">Ready. All edits calculate live. Native Excel (.xlsx) OpenXML binary export.</div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('internal-eval-modal')">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 2-STEP DELETE CONFIRMATION MODAL                             -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="delete-item-modal" class="modal-backdrop" onclick="if(event.target===this)document.getElementById('delete-item-modal').classList.remove('open')">
+    <div class="modal-card" style="max-width: 420px;">
+
+      <!-- STEP 1: Impact Info -->
+      <div id="del-step-1">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 0;">Confirm Deletion</h2>
+          <button onclick="document.getElementById('delete-item-modal').classList.remove('open')" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+        </div>
+        <div style="background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="font-weight: 700; color: var(--status-absent); font-size: 0.85rem; margin-bottom: 0.35rem;">⚠️ Permanent Action</div>
+          <p id="del-modal-impact" style="font-size: 0.82rem; color: var(--text-main); margin: 0; line-height: 1.5;">This will permanently remove the test.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('delete-item-modal').classList.remove('open')">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="deleteModalNext()">Proceed &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Final Confirmation -->
+      <div id="del-step-2" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--status-absent); margin: 0;">Final Confirmation</h2>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.5;">
+          This action is irreversible. All student examination scores and marksheet records will be permanently deleted.
+        </p>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="deleteModalBack()">&larr; Back</button>
+          <button type="button" id="del-confirm-btn" class="btn" style="background: var(--status-absent); color: var(--text-white); font-weight: 700; border: none;" onclick="confirmDeleteItem()">Confirm Delete</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireSubjects: true });
+
+    function getToken() {
+      return typeof getAuthToken === 'function' ? getAuthToken() : (localStorage.getItem('access_token') || '');
+    }
+
+    let allRegisters = [];
+    let currentRegisterId = null;
+    let registerData = null;
+    let currentRegisterExams = [];
+    window.examStudioState = window.examStudioState || {};
+    window.currentEvalSheetState = null;
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.add('open');
+    }
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        ['create-exam-modal', 'exam-questions-modal', 'internal-eval-modal', 'delete-item-modal'].forEach(id => closeModal(id));
+      }
+    });
+
+    async function loadRegistersList() {
+      try {
+        const res = await fetchApi('/faculty/registers');
+        if (res.success) {
+          allRegisters = res.data || [];
+          if (!allRegisters.length) {
+            document.getElementById('register-exams-list').innerHTML = `
+              <div class="card" style="text-align: center; padding: 3.5rem 2rem; color: var(--text-muted); background: var(--bg-surface); border: 1px dashed var(--border-color);">
+                <div style="font-size: 2.8rem; margin-bottom: 0.75rem;">📚</div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main);">No Teaching Registers Allocated</h3>
+                <p style="font-size: 0.875rem; color: var(--text-muted); max-width: 540px; margin: 0 auto 1.5rem; line-height: 1.5;">
+                  Your Department HOD has not allocated any subject registers to your profile yet. Once assigned, your class tests and marksheets will appear here.
+                </p>
+                <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+              </div>
+            `;
+            return;
+          }
+
+          renderRegisterSwitcher();
+
+          const urlParams = new URLSearchParams(window.location.search);
+          const regParam = urlParams.get('id');
+          let targetId = regParam ? Number(regParam) : null;
+          if (!targetId || !allRegisters.some(r => r.id === targetId)) {
+            targetId = allRegisters[0]?.id;
+          }
+          if (targetId) {
+            await selectRegister(targetId);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load registers:', err);
+      }
+    }
+
+    function renderRegisterSwitcher() {
+      const sel = document.getElementById('register-switcher-select');
+      if (!sel) return;
+      const opts = allRegisters.map(r => {
+        const isSel = r.id === currentRegisterId;
+        const subj = r.subject_name || r.name || 'Subject';
+        const code = r.subject_code ? `[${r.subject_code}]` : '';
+        const cls = `Yr ${r.year || 1} Sem ${r.semester || 1}`;
+        const dept = r.department_code || r.department_name || '';
+        return `<option value="${r.id}" ${isSel ? 'selected' : ''}>${subj} ${code} • ${dept} ${cls}</option>`;
+      }).join('');
+      sel.innerHTML = opts;
+    }
+
+    async function selectRegister(regId) {
+      currentRegisterId = Number(regId);
+      const url = new URL(window.location);
+      url.searchParams.set('id', currentRegisterId);
+      window.history.replaceState({}, '', url);
+
+      renderRegisterSwitcher();
+
+      // Quick links updates
+      const matrixBtn = document.getElementById('btn-quick-matrix');
+      if (matrixBtn) matrixBtn.href = `/faculty/registers.html?id=${currentRegisterId}`;
+      const assignBtn = document.getElementById('btn-quick-assignments');
+      if (assignBtn) assignBtn.href = `/faculty/assignments.html?id=${currentRegisterId}`;
+      const evalBtn = document.getElementById('btn-quick-eval');
+      if (evalBtn) evalBtn.href = `/faculty/evaluation.html?id=${currentRegisterId}`;
+      const navEval = document.getElementById('nav-eval');
+      if (navEval) navEval.href = `/faculty/evaluation.html?id=${currentRegisterId}`;
+
+      try {
+        const res = await fetchApi(`/faculty/registers/${currentRegisterId}`);
+        if (res.success) {
+          registerData = res.data;
+          updateMetaStrip();
+          await loadRegisterExams();
+        }
+      } catch (err) {
+        console.error('Error fetching register details:', err);
+      }
+    }
+
+    function onRegisterChange(newId) {
+      if (newId) selectRegister(newId);
+    }
+
+    function updateMetaStrip() {
+      if (!registerData) return;
+      document.getElementById('meta-subject-name').innerText = registerData.subject_name || registerData.name || '—';
+      document.getElementById('meta-subject-code').innerText = registerData.subject_code || '—';
+      document.getElementById('meta-dept-name').innerText = registerData.department_name || registerData.department_code || '—';
+      document.getElementById('meta-year-sem').innerText = `Year ${registerData.year || 1} • Sem ${registerData.semester || 1}`;
+      const rosterCount = (registerData.students && registerData.students.length) || (registerData.enrolled_count) || 0;
+      document.getElementById('meta-student-count').innerText = `${rosterCount} Students Enrolled`;
+    }
+
+    function getRegisterQueryParams() {
+      if (!registerData) return '';
+      const params = new URLSearchParams();
+      if (registerData.subject_id) params.set('subject_id', registerData.subject_id);
+      if (registerData.department_id) params.set('department_id', registerData.department_id);
+      if (registerData.branch_id) params.set('branch_id', registerData.branch_id);
+      if (registerData.year) params.set('year', registerData.year);
+      if (registerData.semester) params.set('semester', registerData.semester);
+      return params.toString();
+    }
+
+    async function loadRegisterExams() {
+      const container = document.getElementById('register-exams-list');
+      if (!container) return;
+      if (!registerData) {
+        container.innerHTML = `<div class="card" style="text-align:center; padding:2rem; color:var(--text-muted);">Please select a register first.</div>`;
+        return;
+      }
+      container.innerHTML = `<div class="card" style="text-align:center; padding:2.5rem; color:var(--text-muted);">Loading class tests for ${escapeHtml(registerData.subject_name || 'register')}...</div>`;
+
+      try {
+        const q = getRegisterQueryParams();
+        const res = await fetchApi(`/exams?${q}`);
+        if (!res.success || !Array.isArray(res.data) || !res.data.length) {
+          container.innerHTML = `
+            <div class="card" style="text-align:center; padding:3rem 2rem; color:var(--text-muted); background:var(--bg-surface); border:1px dashed var(--border-color);">
+              <div style="font-size:2.5rem; margin-bottom:0.5rem;">📊</div>
+              <h3 style="font-size:1.15rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">No Tests or Marksheets Scheduled Yet</h3>
+              <p style="font-size:0.85rem; max-width:480px; margin:0 auto 1.25rem;">
+                No unit tests, quizzes, or exams scheduled for <strong>${escapeHtml(registerData.subject_name || 'this subject')}</strong>. Click above to schedule one.
+              </p>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openCreateExamModal()">+ Schedule Class Test</button>
+            </div>
+          `;
+          const b = document.getElementById('badge-tests-count');
+          if (b) b.innerText = '0 Tests';
+          return;
+        }
+
+        currentRegisterExams = res.data;
+        const b = document.getElementById('badge-tests-count');
+        if (b) b.innerText = `${currentRegisterExams.length} Test${currentRegisterExams.length === 1 ? '' : 's'}`;
+
+        container.innerHTML = currentRegisterExams.map(ex => {
+          const dtStr = ex.exam_date ? new Date(ex.exam_date).toLocaleDateString('en-IN') : 'Date not set';
+          return `
+            <div class="item-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                  <div class="item-title">${escapeHtml(ex.name)} <span style="font-weight:500; color:var(--text-muted); font-size:0.85rem;">(Max: ${ex.max_marks} marks)</span></div>
+                  <div class="item-meta">
+                    ${escapeHtml(ex.subject_name || registerData.subject_name || 'Subject')}
+                    • Date: <strong>${dtStr}</strong>
+                    • Type: <span class="badge badge-late" style="font-size:0.7rem;">${escapeHtml(ex.type || 'UNIT_TEST')}</span>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <span class="badge ${ex.scores_entered > 0 ? 'badge-present' : 'badge-pending'}">
+                    ${ex.scores_entered || 0} / ${ex.class_size || 0} Marked
+                  </span>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.85rem; gap: 0.5rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <button type="button" class="btn btn-secondary btn-sm" id="exam-toggle-btn-${ex.id}" onclick="toggleMarks(${ex.id})">Edit</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="exportExamStudioExcel(${ex.id})" title="Export Excel (.xlsx)">📥 Export Excel (.xlsx)</button>
+                </div>
+                <button type="button" class="btn btn-sm" style="color: var(--status-absent); border: 1px solid var(--status-absent-bg); background: var(--status-absent-bg); font-weight: 600;" onclick="openDeleteModal('exam', ${ex.id})">Delete</button>
+              </div>
+              <div class="expand-panel" id="exam-panel-${ex.id}"></div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `<div class="card" style="color:var(--status-absent); padding:1.5rem;">Failed to load class tests: ${err.message}</div>`;
+      }
+    }
+
+    function openCreateExamModal() {
+      if (!registerData) {
+        showToast('Please select a register first', 'error');
+        return;
+      }
+      const scopeEl = document.getElementById('modal-exam-scope-text');
+      if (scopeEl) {
+        scopeEl.innerText = `${registerData.subject_name || registerData.name} ${registerData.subject_code ? '[' + registerData.subject_code + ']' : ''} • Year ${registerData.year || 1} Sem ${registerData.semester || 1}`;
+      }
+      const dateInput = document.getElementById('exam-date');
+      if (dateInput && !dateInput.value) {
+        dateInput.value = new Date().toISOString().slice(0, 10);
+      }
+      openModal('create-exam-modal');
+      setTimeout(() => {
+        const titleInp = document.getElementById('exam-title');
+        if (titleInp) titleInp.focus();
+      }, 100);
+    }
+
+    async function submitRegisterExam(e) {
+      e.preventDefault();
+      if (!registerData) {
+        showToast('Please select a register first', 'error');
+        return;
+      }
+
+      const saveBtn = document.getElementById('btn-save-exam');
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = 'Scheduling...'; }
+
+      try {
+        const res = await fetchApi('/exams', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: document.getElementById('exam-title').value.trim(),
+            type: document.getElementById('exam-type').value,
+            exam_date: document.getElementById('exam-date').value || null,
+            max_marks: Number(document.getElementById('exam-max-marks').value) || 25,
+            subject_id: registerData.subject_id,
+            department_id: registerData.department_id,
+            branch_id: registerData.branch_id || null,
+            year: registerData.year || 1,
+            semester: registerData.semester || 1,
+            academic_year_id: registerData.academic_year_id || null
+          })
+        });
+
+        if (res.success) {
+          showToast('Test scheduled successfully!', 'success');
+          document.getElementById('create-exam-form').reset();
+          closeModal('create-exam-modal');
+          loadRegisterExams();
+        } else {
+          showToast(res.error?.message || 'Could not create test', 'error');
+        }
+      } catch (err) {
+        showToast('Failed to create test: ' + err.message, 'error');
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'Schedule & Create Marksheet'; }
+      }
+    }
+
+    function calcTotalMax(questions) {
+      if (!Array.isArray(questions) || !questions.length) return 25;
+      return questions.reduce((sum, q) => sum + (Number(q.max) || 0), 0);
+    }
+
+    async function toggleMarks(examId) {
+      const panel = document.getElementById(`exam-panel-${examId}`);
+      if (!panel) return;
+      const btn = document.getElementById(`exam-toggle-btn-${examId}`);
+      if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        panel.style.display = '';
+        panel.innerHTML = '';
+        if (btn) btn.textContent = 'Edit';
+        return;
+      }
+      panel.classList.add('open');
+      if (btn) btn.textContent = 'Hide Marks';
+      panel.innerHTML = '<div style="text-align:center; padding:1.75rem; color:var(--text-muted);">Loading official examination marksheet...</div>';
+
+      try {
+        const res = await fetchApi(`/exams/${examId}/roster`);
+        if (!res.success) {
+          panel.innerHTML = '<div style="color:var(--status-absent); padding:1rem;">Could not load exam marksheet roster.</div>';
+          return;
+        }
+
+        const exam = res.data.exam || {};
+        const roster = res.data.roster || [];
+        const totalMax = Number(exam.max_marks || 25);
+
+        const defaultQuestions = [
+          { num: 1, label: 'Q1', max: Math.round(totalMax * 0.2) || 4 },
+          { num: 2, label: 'Q2', max: Math.round(totalMax * 0.2) || 4 },
+          { num: 3, label: 'Q3', max: Math.round(totalMax * 0.2) || 4 },
+          { num: 4, label: 'Q4', max: totalMax - (Math.round(totalMax * 0.2) * 3) || 8 }
+        ];
+
+        const defaultInstructions = [
+          'All questions are compulsory.',
+          'Write your Roll Number and Name clearly.',
+          'No electronic gadgets allowed.',
+          'Duration is 50 minutes strictly.',
+          'Check question paper for any discrepancy.',
+          'Neat handwriting is expected.',
+          'Maximum marks are indicated against each question.',
+          'Submit your answer sheet to the invigilator.'
+        ];
+
+        const defaultQuestionsMeta = [
+          { num: 1, text: '', marks: defaultQuestions[0].max },
+          { num: 2, text: '', marks: defaultQuestions[1].max },
+          { num: 3, text: '', marks: defaultQuestions[2].max },
+          { num: 4, text: '', marks: defaultQuestions[3].max }
+        ];
+
+        const formattedRoster = roster.map((r, idx) => {
+          const isAb = Boolean(r.is_absent || r.status === 'ABSENT');
+          let qScores = Array.isArray(r.question_scores) && r.question_scores.length ? r.question_scores : null;
+          if (!qScores) {
+            if (r.marks_obtained !== null && r.marks_obtained !== undefined) {
+              const part = Number(r.marks_obtained) / defaultQuestions.length;
+              qScores = defaultQuestions.map(() => Math.round(part * 10) / 10);
+            } else {
+              qScores = defaultQuestions.map(() => 0);
+            }
+          }
+          const tot = isAb ? 0 : qScores.reduce((sum, v) => sum + (Number(v) || 0), 0);
+          return {
+            student_id: r.student_id,
+            class_roll_no: String(r.class_roll_no || idx + 1).replace(/^#/, ''),
+            registration_no: r.registration_no || null,
+            official_enrollment_no: r.official_enrollment_no || '—',
+            full_name: r.full_name || 'Student ' + (idx + 1),
+            is_absent: isAb,
+            question_scores: qScores,
+            total_marks: Math.round(tot * 10) / 10
+          };
+        });
+
+        window.examStudioState[examId] = {
+          exam,
+          institution_name: (registerData && registerData.institution_name) || 'Uttarakhand Government Institute of Polytechnic, Srinagar Garhwal',
+          session_label: (registerData && registerData.session_label) || 'Internal Evaluation Sheet 2026 Session',
+          duration: '50 Minute',
+          mode: 'OFFLINE',
+          questions: defaultQuestions,
+          instructions: defaultInstructions,
+          questions_meta: defaultQuestionsMeta,
+          roster: formattedRoster
+        };
+
+        renderExamStudio(examId);
+      } catch (err) {
+        console.error(err);
+        panel.innerHTML = `<div style="color:var(--status-absent); padding:1rem;">Error initializing marksheet studio: ${err.message}</div>`;
+      }
+    }
+
+    function renderExamStudio(examId) {
+      const panel = document.getElementById(`exam-panel-${examId}`);
+      const state = window.examStudioState[examId];
+      if (!panel || !state) return;
+
+      const presentStudents = state.roster.filter(s => !s.is_absent);
+      const presentCount = presentStudents.length;
+      const absentCount = state.roster.length - presentCount;
+      const totalCount = state.roster.length;
+      const presentSum = presentStudents.reduce((sum, s) => sum + (Number(s.total_marks) || 0), 0);
+      const presentAvg = presentCount > 0 ? (presentSum / presentCount) : 0;
+      const examMaxMarks = calcTotalMax(state.questions);
+
+      const deptCode = escapeHtml(state.exam.department_code || (registerData && registerData.department_code) || 'IT');
+      const deptName = escapeHtml(state.exam.department_name || (registerData && registerData.department_name) || 'Information Technology');
+      const subName = escapeHtml(state.exam.subject_name || (registerData && registerData.subject_name) || 'Subject');
+      const yr = state.exam.year || (registerData && registerData.year) || 3;
+      const sem = state.exam.semester || (registerData && registerData.semester) || 5;
+      const examNum = (state.exam.name.match(/\d+/) || ['1'])[0];
+      const totalCols = 5 + state.questions.length;
+
+      panel.innerHTML = `
+        <div class="sheet-studio-container">
+          <!-- TOOLBAR (Spreadsheet Controls) -->
+          <div class="sheet-toolbar">
+            <div class="sheet-toolbar-group">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openExamQuestionsModal(${examId})" title="Manage Questions, Marks & Settings">+ Add Question</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="removeExamStudioQuestion(${examId})" title="Remove last question column">- Remove Question</button>
+            </div>
+            <div class="sheet-toolbar-group">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="exportExamStudioExcel(${examId})" title="Download official Excel workbook (.xlsx)" style="font-weight: 700; color: var(--status-present);">
+                📥 Export Excel (.xlsx)
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" onclick="saveExamStudioMarks(${examId})" style="font-weight: 700;">
+                💾 Save Marks
+              </button>
+            </div>
+          </div>
+
+          <!-- SPREADSHEET TABLE -->
+          <div class="excel-sheet-viewport">
+            <table class="excel-table sheet-table data-subtable">
+              <thead>
+                <!-- ROW 1: Institution Header (Soft blue fill) -->
+                <tr class="excel-hdr-blue row-1 sheet-header-banner">
+                  <th colspan="${totalCols}">
+                    <h3>${escapeHtml(state.institution_name)} | ${escapeHtml(state.session_label)}</h3>
+                  </th>
+                </tr>
+                <!-- ROW 2: Department & Subject (Soft blue fill) -->
+                <tr class="excel-hdr-blue row-2">
+                  <th colspan="${totalCols}">
+                    Department (${deptCode}) | Internal Evaluation - ${escapeHtml(state.exam.name)} | Subject : ${subName}
+                  </th>
+                </tr>
+                <!-- ROW 3: Year & Semester (Soft blue fill) -->
+                <tr class="excel-hdr-blue row-3">
+                  <th colspan="${totalCols}">
+                    ${deptName} Year ${yr} | Semester ${sem}
+                  </th>
+                </tr>
+                <!-- ROW 4: Column Headers (Tan fill) -->
+                <tr class="excel-hdr-tan">
+                  <th style="width: 55px;">SR. NO.</th>
+                  <th style="width: 100px;">ROLL NO.</th>
+                  <th style="width: 220px;">STUDENT NAME</th>
+                  <th colspan="${state.questions.length}">${escapeHtml(state.exam.name)} (Total Marks : ${examMaxMarks})</th>
+                  <th style="width: 75px;">Total</th>
+                  <th style="min-width: 380px;">Unit Test Details (Mode : OFFLINE)</th>
+                </tr>
+                <!-- ROW 5: Question Numbers & Metadata Subheader -->
+                <tr class="excel-hdr-sub">
+                  <th></th>
+                  <th></th>
+                  <th style="text-align: right; font-weight: 800; padding-right: 0.6rem;">Question No. &ndash;</th>
+                  ${state.questions.map(q => `
+                    <th style="min-width: 54px; font-weight: 800;">
+                      <span>Q${q.num}</span><br>
+                      <span style="font-size: 0.72rem; font-weight: 600; opacity: 0.85;">( ${q.max} )</span>
+                    </th>
+                  `).join('')}
+                  <th style="font-weight: 800;">(${examMaxMarks})</th>
+                  <th class="excel-meta-bar" style="font-size: 0.74rem; font-weight: 700; padding: 0.35rem 0.6rem; text-align: center;">
+                    UNIT TEST ${examNum} | Maximum Marks : ${examMaxMarks} | Time : ${escapeHtml(state.duration || '50 Minute')} | Date : ${state.exam.exam_date ? state.exam.exam_date.slice(0, 10) : ''}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.roster.map((r, rIdx) => {
+                  const isAb = Boolean(r.is_absent);
+                  return `
+                    <tr class="${isAb ? 'is-absent' : ''}" id="exam-row-${examId}-${r.student_id}">
+                      <td class="excel-cell-sr">${rIdx + 1}</td>
+                      <td class="cell-roll">${escapeHtml(String(r.class_roll_no || rIdx + 1))}</td>
+                      <td class="cell-student-name">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
+                          <div>
+                            <span title="${escapeHtml(r.full_name)}" style="font-weight: 700;">${escapeHtml(r.full_name)}</span>
+                            <div style="font-family: var(--font-family-mono); font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(r.registration_no || r.official_enrollment_no || '')}</div>
+                          </div>
+                          <button type="button" 
+                                  class="btn-sheet-att-toggle ${isAb ? 'is-absent' : ''}" 
+                                  onclick="toggleExamStudentAbsent(${examId}, ${r.student_id})" 
+                                  title="${isAb ? 'Marked Absent. Click to mark Present' : 'Click to mark Absent'}">
+                            ${isAb ? 'AB (Absent)' : 'Present'}
+                          </button>
+                        </div>
+                      </td>
+                      ${state.questions.map((q, qIdx) => {
+                        const qVal = (r.question_scores && r.question_scores[qIdx] !== undefined) ? r.question_scores[qIdx] : 0;
+                        return `
+                          <td>
+                            <input type="number" 
+                                   class="excel-cell-input sheet-cell-input" 
+                                   id="exam-q-${examId}-${r.student_id}-${qIdx}" 
+                                   value="${isAb ? 0 : qVal}" 
+                                   min="0" 
+                                   max="${q.max}" 
+                                   step="0.1" 
+                                   ${isAb ? 'disabled' : ''} 
+                                   oninput="onExamQuestionScoreChange(${examId}, ${r.student_id}, ${qIdx}, this.value)">
+                          </td>
+                        `;
+                      }).join('')}
+                      <td class="excel-cell-total" style="font-weight: 800; font-size: 0.9rem;" id="exam-total-${examId}-${r.student_id}">
+                        ${isAb ? '<span style="color:var(--status-absent);font-weight:800;">0 (AB)</span>' : (r.total_marks ?? 0)}
+                      </td>
+                      ${rIdx === 0 ? `
+                        <td rowspan="${state.roster.length || 1}" class="sheet-side-panel excel-side-panel-cell">
+                          <div class="excel-side-content">
+                            <div class="excel-side-sec-title">Instructions :</div>
+                            <ol class="excel-side-instructions sheet-instructions-box" style="margin: 0.35rem 0 0.75rem 1.25rem; padding: 0; font-size: 0.76rem; line-height: 1.5; color: var(--text-muted);">
+                              ${state.instructions.map((ins, iIdx) => `
+                                <li>
+                                  <span contenteditable="true" 
+                                        title="Click to edit instruction"
+                                        onblur="window.examStudioState[${examId}].instructions[${iIdx}] = this.innerText.trim()">${escapeHtml(ins)}</span>
+                                </li>
+                              `).join('')}
+                            </ol>
+                            <div class="excel-side-sec-title" style="margin-top: 0.85rem;">Questions :</div>
+                            <div class="excel-side-questions sheet-questions-box" style="font-size: 0.76rem; line-height: 1.5; color: var(--text-muted);">
+                              ${state.questions.map((q, idx) => `
+                                <div class="excel-q-item" style="margin-bottom: 0.35rem;">
+                                  <strong>Q${q.num}:</strong> 
+                                  <span contenteditable="true" 
+                                        title="Click to edit question statement"
+                                        onblur="if(window.examStudioState[${examId}].questions_meta && window.examStudioState[${examId}].questions_meta[${idx}]) window.examStudioState[${examId}].questions_meta[${idx}].text = this.innerText.trim()">${(state.questions_meta && state.questions_meta[idx] && state.questions_meta[idx].text) ? escapeHtml(state.questions_meta[idx].text) : '(Question text not set — click "+ Add Question" to edit)'}</span>
+                                  <strong>(${q.max} Marks)</strong>
+                                </div>
+                              `).join('')}
+                            </div>
+                            <div class="sheet-note-red" style="margin-top: 1rem; color: var(--status-absent); font-weight: 700; font-size: 0.78rem;">
+                              NOTE : All marked as RED were absent.
+                            </div>
+                          </div>
+                        </td>
+                      ` : ''}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="${3 + state.questions.length}" class="excel-summary-lbl" style="text-align: right; font-weight: 800;">
+                    Average of the class (Only present students)
+                  </td>
+                  <td class="excel-summary-avg" id="exam-class-avg-${examId}" style="font-weight: 800; text-align: center;">
+                    ${presentAvg.toFixed(1)} / ${examMaxMarks}
+                  </td>
+                  <td class="excel-summary-tally-cell">
+                    <div class="excel-tally-row" style="display: flex; gap: 1rem; justify-content: center; font-size: 0.78rem;">
+                      <span class="excel-tally-item">Present: <strong style="color: var(--status-present);">${presentCount}</strong></span>
+                      <span class="excel-tally-item">Absent: <strong style="color: var(--status-absent); font-weight: 800;">${absentCount}</strong></span>
+                      <span class="excel-tally-item">Total: <strong>${totalCount}</strong></span>
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    async function restoreUnitTestSheet() {
+      const evalModal = document.getElementById('internal-eval-modal');
+      if (evalModal && evalModal.classList.contains('open')) {
+        closeModal('internal-eval-modal');
+      }
+      if (Array.isArray(currentRegisterExams) && currentRegisterExams.length > 0) {
+        const firstExam = currentRegisterExams[0];
+        const panel = document.getElementById(`exam-panel-${firstExam.id}`);
+        if (panel && !panel.classList.contains('open')) {
+          await toggleMarks(firstExam.id);
+        }
+        showToast(`Restored Unit Test Sheet (${firstExam.name})`, 'success');
+        if (panel) {
+          const card = panel.closest('.item-card');
+          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else {
+        showToast('No scheduled unit tests available to restore.', 'info');
+      }
+    }
+
+    async function exportAllTestsExcel() {
+      if (!registerData) { showToast('Please select a register first', 'error'); return; }
+      showToast('Building consolidated All Tests export...', 'info');
+      try {
+        const q = getRegisterQueryParams();
+        const res = await fetchApi(`/exams?${q}`);
+        if (!res.success || !Array.isArray(res.data) || !res.data.length) {
+          showToast('No tests found to export', 'error'); return;
+        }
+        const allExams = res.data;
+        const rosterPromises = allExams.map(ex => fetchApi(`/exams/${ex.id}/roster`));
+        const rosterResults = await Promise.all(rosterPromises);
+
+        const studentMap = {};
+        allExams.forEach((ex, i) => {
+          const rList = rosterResults[i].success ? (rosterResults[i].data.roster || []) : [];
+          rList.forEach(st => {
+            if (!studentMap[st.student_id]) {
+              studentMap[st.student_id] = {
+                student_id: st.student_id,
+                class_roll_no: st.class_roll_no,
+                registration_no: st.registration_no,
+                official_enrollment_no: st.official_enrollment_no,
+                full_name: st.full_name,
+                exam_scores: {}
+              };
+            }
+            studentMap[st.student_id].exam_scores[ex.id] = {
+              marks: st.marks_obtained,
+              is_absent: Boolean(st.is_absent)
+            };
+          });
+        });
+        const roster = Object.values(studentMap).sort((a, b) => (Number(a.class_roll_no) || 0) - (Number(b.class_roll_no) || 0));
+
+        const payload = {
+          institution_name: (registerData && registerData.institution_name) || 'Uttarakhand Government Institute of Polytechnic, Srinagar Garhwal',
+          session_label: (registerData && registerData.session_label) || 'Internal Evaluation Sheet',
+          department_name: registerData.department_name || '',
+          department_code: registerData.department_code || '',
+          subject_name: registerData.subject_name || '',
+          year: registerData.year || 1,
+          semester: registerData.semester || 1,
+          target_avg_max: 20,
+          exams: allExams.map(ex => ({
+            id: ex.id,
+            name: ex.name,
+            exam_date: ex.exam_date,
+            max_marks: ex.max_marks
+          })),
+          roster: roster
+        };
+        const fetchRes = await fetch(`/api/v1/faculty/registers/${currentRegisterId}/export/all-tests-excel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify(payload)
+        });
+        if (!fetchRes.ok) throw new Error('Export failed: ' + fetchRes.statusText);
+        const blob = await fetchRes.blob();
+        downloadBlob(blob, `All_Tests_${(registerData.subject_code || 'Subject').replace(/[^a-zA-Z0-9_-]/g, '_')}.xlsx`);
+        showToast('All Tests exported successfully!', 'success');
+      } catch (err) {
+        showToast('Export failed: ' + err.message, 'error');
+      }
+    }
+
+    function onExamQuestionScoreChange(examId, studentId, qIdx, value) {
+      const state = window.examStudioState[examId];
+      if (!state) return;
+      const student = state.roster.find(s => s.student_id === studentId);
+      if (!student) return;
+
+      const numVal = Math.max(0, parseFloat(value) || 0);
+      const qMax = state.questions[qIdx] ? Number(state.questions[qIdx].max) : 10;
+      student.question_scores[qIdx] = Math.min(numVal, qMax);
+
+      const tot = student.question_scores.reduce((sum, v) => sum + (Number(v) || 0), 0);
+      student.total_marks = Math.round(tot * 10) / 10;
+
+      const totCell = document.getElementById(`exam-total-${examId}-${studentId}`);
+      if (totCell) totCell.innerHTML = student.is_absent ? '<span style="color:var(--status-absent);font-weight:800;">0 (AB)</span>' : student.total_marks;
+
+      const present = state.roster.filter(s => !s.is_absent);
+      const pSum = present.reduce((sum, s) => sum + (Number(s.total_marks) || 0), 0);
+      const pAvg = present.length ? (pSum / present.length) : 0;
+      const examMax = calcTotalMax(state.questions);
+      const avgEl = document.getElementById(`exam-class-avg-${examId}`);
+      if (avgEl) avgEl.innerText = `${pAvg.toFixed(1)} / ${examMax}`;
+    }
+
+    function toggleExamStudentAbsent(examId, studentId) {
+      const state = window.examStudioState[examId];
+      if (!state) return;
+      const student = state.roster.find(s => s.student_id === studentId);
+      if (!student) return;
+      student.is_absent = !student.is_absent;
+      renderExamStudio(examId);
+    }
+
+    let currentExamModalId = null;
+    let modalQuestionsDraft = [];
+
+    function openExamQuestionsModal(examId) {
+      currentExamModalId = examId;
+      const state = window.examStudioState[examId];
+      if (!state) return;
+
+      const titleEl = document.getElementById('modal-exam-q-test-title');
+      if (titleEl) titleEl.innerText = state.exam.name || 'Unit Test';
+
+      const examTotalEl = document.getElementById('modal-exam-grand-total');
+      if (examTotalEl) examTotalEl.value = calcTotalMax(state.questions);
+
+      modalQuestionsDraft = state.questions.map((q, idx) => {
+        const metaText = (state.questions_meta && state.questions_meta[idx] && state.questions_meta[idx].text) ? state.questions_meta[idx].text : '';
+        return { num: q.num || (idx + 1), text: metaText, max: Number(q.max) || 5 };
+      });
+
+      if (!modalQuestionsDraft.length) {
+        modalQuestionsDraft.push({ num: 1, text: '', max: 5 });
+      }
+
+      renderModalQuestions();
+      openModal('exam-questions-modal');
+    }
+
+    function autoDistributeFromTotal() {
+      const totalEl = document.getElementById('modal-exam-grand-total');
+      const total = Math.max(1, parseInt(totalEl ? totalEl.value : 25, 10) || 25);
+      const n = modalQuestionsDraft.length || 1;
+      const perQ = Math.floor(total / n);
+      const remainder = total - (perQ * n);
+      modalQuestionsDraft = modalQuestionsDraft.map((q, i) => ({ ...q, max: perQ + (i === n - 1 ? remainder : 0) }));
+      renderModalQuestions();
+      showToast(`Auto-distributed ${total} marks across ${n} questions`, 'info');
+    }
+
+    function renderModalQuestions() {
+      const container = document.getElementById('modal-questions-list');
+      if (!container) return;
+
+      container.innerHTML = modalQuestionsDraft.map((q, idx) => `
+        <div class="modal-q-item" id="modal-q-row-${idx}">
+          <div style="font-weight: 800; color: var(--color-primary); font-size: 0.88rem; text-align: center;">Q${idx + 1}</div>
+          <div>
+            <input type="text" 
+                   class="form-control modal-q-text" 
+                   style="width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; font-size: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);"
+                   placeholder="Question statement (optional)..." 
+                   value="${escapeHtml(q.text || '')}"
+                   oninput="modalQuestionsDraft[${idx}].text = this.value">
+          </div>
+          <div>
+            <input type="number" 
+                   class="form-control modal-q-max" 
+                   min="1" 
+                   max="200" 
+                   style="width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; font-size: 0.85rem; text-align: right; font-weight: 700; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);"
+                   value="${q.max || 5}"
+                   oninput="modalQuestionsDraft[${idx}].max = Math.max(1, parseInt(this.value, 10) || 1); updateModalTotalMaxMarks()">
+          </div>
+          <div style="text-align: center; display: flex; gap: 0.3rem; align-items: center;">
+            <button type="button" 
+                    class="btn btn-secondary btn-sm" 
+                    style="padding: 0.35rem 0.5rem; color: var(--status-absent); font-size: 0.8rem;" 
+                    onclick="confirmRemoveModalQuestion(${idx})" 
+                    title="Delete Question Q${idx + 1}">🗑</button>
+          </div>
+        </div>
+      `).join('');
+
+      updateModalTotalMaxMarks();
+    }
+
+    let _pendingDeleteQIdx = null;
+    function confirmRemoveModalQuestion(idx) {
+      if (modalQuestionsDraft.length <= 1) { showToast('At least 1 question required', 'error'); return; }
+      _pendingDeleteQIdx = idx;
+      const confirmBar = document.getElementById('modal-q-delete-confirm-bar');
+      if (confirmBar) {
+        confirmBar.style.display = 'flex';
+        const msg = document.getElementById('modal-q-delete-confirm-msg');
+        if (msg) msg.innerText = `Delete Q${idx + 1}? This cannot be undone.`;
+      }
+    }
+    function cancelRemoveModalQuestion() {
+      _pendingDeleteQIdx = null;
+      const confirmBar = document.getElementById('modal-q-delete-confirm-bar');
+      if (confirmBar) confirmBar.style.display = 'none';
+    }
+    function doRemoveModalQuestion() {
+      const idx = _pendingDeleteQIdx;
+      if (idx === null || idx === undefined) return;
+      if (modalQuestionsDraft.length <= 1) { showToast('At least 1 question required', 'error'); return; }
+      modalQuestionsDraft.splice(idx, 1);
+      modalQuestionsDraft.forEach((q, i) => { q.num = i + 1; });
+      _pendingDeleteQIdx = null;
+      const confirmBar = document.getElementById('modal-q-delete-confirm-bar');
+      if (confirmBar) confirmBar.style.display = 'none';
+      renderModalQuestions();
+      showToast(`Deleted question. ${modalQuestionsDraft.length} questions remaining.`, 'info');
+    }
+
+    function addModalQuestionRow() {
+      const nextNum = modalQuestionsDraft.length + 1;
+      modalQuestionsDraft.push({ num: nextNum, text: '', max: 5 });
+      renderModalQuestions();
+    }
+
+    function updateModalTotalMaxMarks() {
+      const total = modalQuestionsDraft.reduce((s, q) => s + (Number(q.max) || 0), 0);
+      const totalEl = document.getElementById('modal-exam-total-max');
+      if (totalEl) totalEl.innerText = total;
+    }
+
+    function saveExamQuestionsFromModal() {
+      if (!currentExamModalId) return;
+      const state = window.examStudioState[currentExamModalId];
+      if (!state) return;
+
+      if (!modalQuestionsDraft.length) {
+        showToast('At least 1 question is required', 'error');
+        return;
+      }
+
+      state.questions = modalQuestionsDraft.map((q, idx) => ({
+        num: idx + 1,
+        label: 'Q' + (idx + 1),
+        max: Number(q.max) || 5
+      }));
+
+      state.questions_meta = modalQuestionsDraft.map((q, idx) => ({
+        num: idx + 1,
+        text: (q.text || '').trim(),
+        marks: Number(q.max) || 5
+      }));
+
+      state.roster.forEach(s => {
+        if (!Array.isArray(s.question_scores)) s.question_scores = [];
+        while (s.question_scores.length < state.questions.length) {
+          s.question_scores.push(0);
+        }
+        if (s.question_scores.length > state.questions.length) {
+          s.question_scores = s.question_scores.slice(0, state.questions.length);
+        }
+        s.question_scores = s.question_scores.map((score, qIdx) => Math.min(Number(score) || 0, state.questions[qIdx].max));
+        const tot = s.is_absent ? 0 : s.question_scores.reduce((sum, v) => sum + (Number(v) || 0), 0);
+        s.total_marks = Math.round(tot * 10) / 10;
+      });
+
+      closeModal('exam-questions-modal');
+      renderExamStudio(currentExamModalId);
+      showToast(`Updated questions & marks successfully! (${state.questions.length} questions, ${calcTotalMax(state.questions)} total marks)`, 'success');
+    }
+
+    function removeExamStudioQuestion(examId) {
+      const state = window.examStudioState[examId];
+      if (!state) return;
+      if (state.questions.length <= 1) {
+        showToast('At least 1 question is required', 'error');
+        return;
+      }
+      state.questions.pop();
+      if (state.questions_meta) state.questions_meta.pop();
+      state.roster.forEach(s => {
+        if (Array.isArray(s.question_scores)) {
+          s.question_scores.pop();
+          const tot = s.question_scores.reduce((sum, v) => sum + (Number(v) || 0), 0);
+          s.total_marks = Math.round(tot * 10) / 10;
+        }
+      });
+      renderExamStudio(examId);
+      showToast('Removed last question column', 'info');
+    }
+
+    async function exportExamStudioExcel(examId) {
+      const state = window.examStudioState[examId];
+      if (!state) return;
+      try {
+        showToast('Generating official Excel workbook (.xlsx)...', 'info');
+        const examMax = calcTotalMax(state.questions);
+        const payload = {
+          institution_name: state.institution_name,
+          session_label: state.session_label,
+          department_name: state.exam.department_name || (registerData && registerData.department_name),
+          department_code: state.exam.department_code || (registerData && registerData.department_code),
+          subject_name: state.exam.subject_name || (registerData && registerData.subject_name),
+          year: state.exam.year || (registerData && registerData.year),
+          semester: state.exam.semester || (registerData && registerData.semester),
+          name: state.exam.name,
+          max_marks: examMax,
+          exam_date: state.exam.exam_date,
+          duration: state.duration,
+          mode: state.mode,
+          questions: state.questions,
+          instructions: state.instructions,
+          questions_meta: state.questions_meta,
+          roster: state.roster.map(r => ({
+            student_id: r.student_id,
+            class_roll_no: r.class_roll_no,
+            registration_no: r.registration_no,
+            official_enrollment_no: r.official_enrollment_no,
+            full_name: r.full_name,
+            is_absent: r.is_absent,
+            question_scores: r.question_scores,
+            marks_obtained: r.is_absent ? 0 : r.total_marks
+          }))
+        };
+
+        const res = await fetch(`/api/v1/exams/${examId}/export/excel`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Failed to generate Excel file');
+        const blob = await res.blob();
+        downloadBlob(blob, `${(state.exam.name || 'Unit_Test').replace(/[^a-zA-Z0-9_-]/g, '_')}_Marksheet.xlsx`);
+        showToast('Excel workbook exported successfully!', 'success');
+      } catch (err) {
+        showToast('Export failed: ' + err.message, 'error');
+      }
+    }
+
+    async function saveExamStudioMarks(examId) {
+      const state = window.examStudioState[examId];
+      if (!state) return;
+      try {
+        const scores = state.roster.map(s => ({
+          student_id: s.student_id,
+          marks_obtained: s.is_absent ? 0 : s.total_marks,
+          is_absent: Boolean(s.is_absent),
+          question_scores: s.question_scores
+        }));
+
+        const res = await fetchApi(`/exams/${examId}/scores`, {
+          method: 'POST',
+          body: JSON.stringify({ scores })
+        });
+
+        if (res.success) {
+          showToast(`Saved marks for ${scores.length} students!`, 'success');
+          loadRegisterExams();
+        } else {
+          showToast(res.error?.message || 'Could not save marks', 'error');
+        }
+      } catch (err) {
+        showToast('Failed to save marks: ' + err.message, 'error');
+      }
+    }
+
+    // ─── MASTER INTERNAL EVALUATION SPREADSHEET STUDIO ───
+    async function openInternalEvaluationStudio() {
+      if (!registerData) {
+        showToast('Please select a register first', 'error');
+        return;
+      }
+      openModal('internal-eval-modal');
+
+      const content = document.getElementById('internal-eval-content');
+      content.innerHTML = '<div style="text-align:center; padding:3rem; color:var(--text-muted);">Loading internal evaluation data...</div>';
+
+      try {
+        const res = await fetchApi(`/faculty/registers/${currentRegisterId}/internal-evaluation`);
+        if (!res.success) {
+          content.innerHTML = `<div class="card" style="color:var(--status-absent); padding:1.5rem;">Failed to load evaluation sheet: ${escapeHtml(res.error?.message || 'Error')}</div>`;
+          return;
+        }
+
+        const d = res.data;
+        const assignList = Array.isArray(d.assignments) && d.assignments.length ? d.assignments : [
+          { id: 1, name: '1' }, { id: 2, name: '2' }, { id: 3, name: '3' }, { id: 4, name: '4' }, { id: 5, name: '5' }
+        ];
+        const examList = Array.isArray(d.exams) && d.exams.length ? d.exams : [
+          { id: 1, name: '1' }, { id: 2, name: '2' }, { id: 3, name: '3' }, { id: 4, name: '4' }
+        ];
+
+        const studentRawList = Array.isArray(d.roster) ? d.roster : (Array.isArray(d.students) ? d.students : []);
+
+        window.currentEvalSheetState = {
+          register: registerData,
+          institution_name: d.institution_name || (registerData && registerData.institution_name) || 'Uttarakhand Government Institute of Polytechnic, Srinagar Garhwal',
+          session_label: d.session_label || (registerData && registerData.session_label) || 'Internal Evaluation Sheet 2026 Session',
+          assignments: assignList,
+          exams: examList,
+          custom_columns: Array.isArray(d.custom_columns) ? d.custom_columns : [],
+          students: studentRawList.map((s, idx) => {
+            const aScores = assignList.map((_, i) => {
+              if (s.assignment_scores && s.assignment_scores[i] !== undefined && s.assignment_scores[i] !== '') {
+                return Number(s.assignment_scores[i]);
+              }
+              return 12;
+            });
+            const eScores = [];
+            const eAb = [];
+            examList.forEach((_, i) => {
+              const ex = s.exam_scores && s.exam_scores[i];
+              if (typeof ex === 'object' && ex !== null) {
+                eScores.push((ex.marks !== '' && ex.marks !== undefined && ex.marks !== null) ? Number(ex.marks) : 0);
+                eAb.push(Boolean(ex.is_absent));
+              } else if (ex !== undefined && ex !== '') {
+                eScores.push(Number(ex));
+                eAb.push(Boolean(s.exam_absent && s.exam_absent[i]));
+              } else {
+                eScores.push(18);
+                eAb.push(false);
+              }
+            });
+            const attSc = s.attendance_score !== undefined ? Number(s.attendance_score) : (s.attendance_percentage !== undefined ? Math.round((s.attendance_percentage / 10) * 10) / 10 : 9);
+            const presSc = s.presentation_score !== undefined ? Number(s.presentation_score) : 4.5;
+            
+            const studentObj = {
+              student_id: s.student_id || (idx + 1),
+              class_roll_no: s.class_roll_no || idx + 1,
+              registration_no: s.registration_no || null,
+              official_enrollment_no: s.official_enrollment_no || '—',
+              full_name: s.full_name || 'Student ' + (idx + 1),
+              assignment_scores: aScores,
+              assignment_avg: 0,
+              exam_scores: eScores,
+              exam_absent: eAb,
+              exam_avg: 0,
+              attendance_score: attSc,
+              presentation_score: presSc,
+              custom_scores: [],
+              grand_total: 0
+            };
+            recalculateEvalRow(studentObj);
+            return studentObj;
+          })
+        };
+
+        renderInternalEvalGrid();
+      } catch (err) {
+        content.innerHTML = `<div class="card" style="color:var(--status-absent); padding:1.5rem;">Error loading evaluation sheet: ${err.message}</div>`;
+      }
+    }
+
+    function recalculateEvalRow(s) {
+      if (!s) return;
+      let aSum = 0;
+      let aValidCount = 0;
+      s.assignment_scores.forEach(v => {
+        if (v !== '' && v !== null && !isNaN(v)) {
+          aSum += Number(v);
+          aValidCount++;
+        }
+      });
+      s.assignment_avg = aValidCount > 0 ? Math.round((aSum / aValidCount) * 10) / 10 : 0;
+
+      let eCount = 0;
+      let eSum = 0;
+      s.exam_scores.forEach((sc, i) => {
+        if (!s.exam_absent[i] && sc !== '' && sc !== null && !isNaN(sc)) {
+          eCount++;
+          eSum += Number(sc);
+        }
+      });
+      s.exam_avg = eCount > 0 ? Math.round((eSum / eCount) * 10) / 10 : 0;
+
+      const cSum = s.custom_scores.reduce((sum, v) => sum + (Number(v) || 0), 0);
+
+      const tot = (Number(s.assignment_avg) || 0) + (Number(s.exam_avg) || 0) + (Number(s.attendance_score) || 0) + (Number(s.presentation_score) || 0) + cSum;
+      s.grand_total = Math.round(tot * 10) / 10;
+    }
+
+    function renderInternalEvalGrid() {
+      const content = document.getElementById('internal-eval-content');
+      const state = window.currentEvalSheetState;
+      if (!content || !state) return;
+
+      const aCount = state.assignments.length;
+      const eCount = state.exams.length;
+      const cCols = state.custom_columns || [];
+
+      const deptCode = escapeHtml((registerData && registerData.department_code) || 'IT');
+      const sem = (registerData && registerData.semester) || 5;
+      const subName = escapeHtml((registerData && registerData.subject_name) || 'Subject');
+
+      content.innerHTML = `
+        <div class="sheet-studio-container" style="margin-top: 0;">
+          <!-- BANNER -->
+          <div class="sheet-header-banner" style="background: var(--bg-card); color: var(--text-main); border-bottom: 2px solid var(--table-border);">
+            <h3 style="font-size: 1.05rem;">${escapeHtml(state.institution_name)}</h3>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 0.2rem; color: var(--text-main);">${escapeHtml(state.session_label)}</div>
+            <div class="sheet-header-meta" style="margin-top: 0.25rem;">
+              Department (${deptCode}) - ${sem} Semester - ${subName}
+            </div>
+          </div>
+
+          <!-- SPREADSHEET TABLE -->
+          <div class="excel-sheet-viewport" style="max-height: 65vh; overflow: auto; border: 1px solid var(--table-border-strong);">
+            <table class="excel-table sheet-table">
+              <thead>
+                <tr>
+                  <th rowspan="2" style="width: 45px;">SRNO</th>
+                  <th rowspan="2" style="width: 120px;">REG NO</th>
+                  <th rowspan="2" style="width: 70px;">ROLL</th>
+                  <th rowspan="2" style="width: 190px; text-align: left;">CNAME</th>
+                  <th colspan="${aCount}">Assignment Marks (15)</th>
+                  <th rowspan="2" style="width: 95px;">Assignment Total Marks (Avg)</th>
+                  <th colspan="${eCount}">Unit Test Marks (20)</th>
+                  <th rowspan="2" style="width: 85px;">UT Total Marks (Avg)</th>
+                  <th rowspan="2" style="width: 90px;">Total Attendance (10)</th>
+                  <th rowspan="2" style="width: 115px;">Problem Solving Skills/<br>Presentation (5)</th>
+                  ${cCols.map(c => `<th rowspan="2" style="width: 95px;">${escapeHtml(c.name)}</th>`).join('')}
+                  <th rowspan="2" style="width: 85px; font-weight: 800;">Total Marks (50)</th>
+                </tr>
+                <tr>
+                  ${state.assignments.map((a, i) => `<th class="th-secondary" style="width: 44px;">${i + 1}</th>`).join('')}
+                  ${state.exams.map((_, i) => `<th class="th-secondary" style="width: 44px;">${i + 1}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${state.students.map((s, idx) => `
+                  <tr>
+                    <td class="excel-cell-sr">${idx + 1}</td>
+                    <td style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(s.registration_no || s.official_enrollment_no)}</td>
+                    <td class="cell-roll">${escapeHtml(String(s.class_roll_no))}</td>
+                    <td class="cell-student-name" style="text-align: left;" title="${escapeHtml(s.full_name)}">
+                      <span style="font-weight: 700; text-transform: uppercase;">${escapeHtml(s.full_name)}</span>
+                    </td>
+                    ${state.assignments.map((_, aIdx) => `
+                      <td>
+                        <input type="number" 
+                               class="excel-cell-input sheet-cell-input" 
+                               value="${s.assignment_scores[aIdx] ?? 0}" 
+                               min="0" 
+                               max="15" 
+                               step="0.5" 
+                               oninput="onEvalAssignmentScoreChange(${s.student_id}, ${aIdx}, this.value)">
+                      </td>
+                    `).join('')}
+                    <td style="font-weight: 700; background: var(--bg-surface-secondary);" id="eval-assign-avg-${s.student_id}">${s.assignment_avg.toFixed(1)}</td>
+                    ${state.exams.map((_, eIdx) => {
+                      const isAb = Boolean(s.exam_absent[eIdx]);
+                      const val = isAb ? 'AB' : (s.exam_scores[eIdx] ?? 0);
+                      return `
+                        <td>
+                          <input type="text" 
+                                 class="excel-cell-input sheet-cell-input" 
+                                 style="${isAb ? 'color: var(--status-absent) !important; font-weight: 800 !important; background: var(--status-absent-bg) !important;' : ''}" 
+                                 value="${val}" 
+                                 title="Type score (0-25) or AB for Absent"
+                                 onchange="onEvalExamScoreChange(${s.student_id}, ${eIdx}, this.value)">
+                        </td>
+                      `;
+                    }).join('')}
+                    <td style="font-weight: 700; background: var(--bg-surface-secondary);" id="eval-exam-avg-${s.student_id}">${s.exam_avg.toFixed(1)}</td>
+                    <td>
+                      <input type="number" 
+                             class="excel-cell-input sheet-cell-input" 
+                             value="${s.attendance_score ?? 10}" 
+                             min="0" 
+                             max="10" 
+                             step="0.5" 
+                             oninput="onEvalAttendanceScoreChange(${s.student_id}, this.value)">
+                    </td>
+                    <td>
+                      <input type="number" 
+                             class="excel-cell-input sheet-cell-input" 
+                             value="${s.presentation_score ?? 5}" 
+                             min="0" 
+                             max="5" 
+                             step="0.5" 
+                             oninput="onEvalPresentationScoreChange(${s.student_id}, this.value)">
+                    </td>
+                    ${cCols.map((c, cIdx) => `
+                      <td>
+                        <input type="number" 
+                               class="excel-cell-input sheet-cell-input" 
+                               value="${s.custom_scores[cIdx] ?? 0}" 
+                               min="0" 
+                               max="${c.max || 10}" 
+                               step="0.5" 
+                               oninput="onEvalCustomScoreChange(${s.student_id}, ${cIdx}, this.value)">
+                      </td>
+                    `).join('')}
+                    <td style="font-weight: 800; font-size: 0.92rem; color: var(--text-main); background: var(--bg-surface-secondary);" id="eval-grand-total-${s.student_id}">
+                      ${s.grand_total}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function onEvalAssignmentScoreChange(studentId, aIdx, val) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+      student.assignment_scores[aIdx] = Math.max(0, parseFloat(val) || 0);
+      recalculateEvalRow(student);
+      const avgEl = document.getElementById(`eval-assign-avg-${studentId}`);
+      if (avgEl) avgEl.innerText = student.assignment_avg.toFixed(1);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    function onEvalExamScoreChange(studentId, eIdx, val) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+
+      const trimmed = String(val).trim().toUpperCase();
+      if (trimmed === 'AB' || trimmed === 'ABSENT' || trimmed === 'A') {
+        student.exam_absent[eIdx] = true;
+        student.exam_scores[eIdx] = 0;
+      } else {
+        student.exam_absent[eIdx] = false;
+        student.exam_scores[eIdx] = Math.max(0, parseFloat(trimmed) || 0);
+      }
+      recalculateEvalRow(student);
+      renderInternalEvalGrid();
+    }
+
+    function onEvalAttendanceScoreChange(studentId, val) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+      student.attendance_score = Math.min(10, Math.max(0, parseFloat(val) || 0));
+      recalculateEvalRow(student);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    function onEvalPresentationScoreChange(studentId, val) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+      student.presentation_score = Math.min(5, Math.max(0, parseFloat(val) || 0));
+      recalculateEvalRow(student);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    function onEvalCustomScoreChange(studentId, cIdx, val) {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const student = state.students.find(s => s.student_id === studentId);
+      if (!student) return;
+      student.custom_scores[cIdx] = Math.max(0, parseFloat(val) || 0);
+      recalculateEvalRow(student);
+      const totEl = document.getElementById(`eval-grand-total-${studentId}`);
+      if (totEl) totEl.innerText = student.grand_total;
+    }
+
+    function addInternalEvalColumn() {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const nextNum = (state.custom_columns || []).length + 1;
+      state.custom_columns.push({
+        id: 'col_' + Date.now(),
+        name: `Viva / Quiz ${nextNum}`,
+        max: 5
+      });
+      state.students.forEach(s => {
+        if (!Array.isArray(s.custom_scores)) s.custom_scores = [];
+        s.custom_scores.push(0);
+        recalculateEvalRow(s);
+      });
+      renderInternalEvalGrid();
+      showToast(`Added assessment column: Viva / Quiz ${nextNum}!`, 'success');
+    }
+
+    function removeInternalEvalColumn() {
+      const state = window.currentEvalSheetState;
+      if (!state || !state.custom_columns.length) {
+        showToast('No custom columns to remove', 'info');
+        return;
+      }
+      state.custom_columns.pop();
+      state.students.forEach(s => {
+        if (Array.isArray(s.custom_scores)) s.custom_scores.pop();
+        recalculateEvalRow(s);
+      });
+      renderInternalEvalGrid();
+      showToast('Removed assessment column', 'info');
+    }
+
+    function addInternalEvalRow() {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      const nextIdx = state.students.length + 1;
+      const newS = {
+        student_id: Date.now(),
+        class_roll_no: nextIdx,
+        official_enrollment_no: 'ENR-NEW-' + nextIdx,
+        full_name: 'Student ' + nextIdx,
+        assignment_scores: state.assignments.map(() => 8),
+        assignment_avg: 0,
+        exam_scores: state.exams.map(() => 18),
+        exam_absent: state.exams.map(() => false),
+        exam_avg: 0,
+        attendance_score: 9,
+        presentation_score: 4,
+        custom_scores: state.custom_columns.map(() => 0),
+        grand_total: 0
+      };
+      recalculateEvalRow(newS);
+      state.students.push(newS);
+      renderInternalEvalGrid();
+      showToast(`Added student row ${nextIdx}`, 'success');
+    }
+
+    async function exportInternalEvalExcel() {
+      const state = window.currentEvalSheetState;
+      if (!state) return;
+      try {
+        showToast('Generating official Internal Evaluation Excel (.xlsx)...', 'info');
+        const payload = {
+          institution_name: state.institution_name,
+          session_label: state.session_label,
+          department_name: (registerData && registerData.department_name) || 'Information Technology',
+          department_code: (registerData && registerData.department_code) || 'IT',
+          subject_name: (registerData && registerData.subject_name) || 'Subject',
+          semester: (registerData && registerData.semester) || 5,
+          assignments: state.assignments,
+          exams: state.exams,
+          custom_columns: state.custom_columns,
+          students: state.students
+        };
+
+        const res = await fetch(`/api/v1/faculty/registers/${currentRegisterId}/export/internal-evaluation-excel`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Export failed');
+        const blob = await res.blob();
+        downloadBlob(blob, `Internal_Evaluation_Sheet_${((registerData && registerData.subject_code) || 'Subject').replace(/[^a-zA-Z0-9_-]/g, '_')}.xlsx`);
+        showToast('Master Evaluation Sheet (.xlsx) downloaded successfully!', 'success');
+      } catch (err) {
+        showToast('Export failed: ' + err.message, 'error');
+      }
+    }
+
+    function saveInternalEvalGrid() {
+      showToast('Internal evaluation spreadsheet synced and saved!', 'success');
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        if (document.body.contains(a)) document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 200);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
+
+    // ─── 2-STEP DELETE MODAL ───
+    let _pendingDelete = { type: null, id: null };
+
+    function openDeleteModal(type, id) {
+      _pendingDelete = { type, id };
+      document.getElementById('del-modal-impact').textContent = 'This will permanently remove the class test and all student marks. This action cannot be reversed.';
+      document.getElementById('del-step-1').style.display = '';
+      document.getElementById('del-step-2').style.display = 'none';
+      document.getElementById('delete-item-modal').classList.add('open');
+    }
+
+    function deleteModalNext() {
+      document.getElementById('del-step-1').style.display = 'none';
+      document.getElementById('del-step-2').style.display = '';
+    }
+
+    function deleteModalBack() {
+      document.getElementById('del-step-1').style.display = '';
+      document.getElementById('del-step-2').style.display = 'none';
+    }
+
+    async function confirmDeleteItem() {
+      const { type, id } = _pendingDelete;
+      if (!type || !id) return;
+      const confirmBtn = document.getElementById('del-confirm-btn');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Deleting...';
+      try {
+        const endpoint = `/exams/${id}`;
+        const res = await fetchApi(endpoint, { method: 'DELETE' });
+        document.getElementById('delete-item-modal').classList.remove('open');
+        if (res.success) {
+          showToast('Class test deleted', 'success');
+          loadRegisterExams();
+        } else {
+          showToast(res.error?.message || 'Failed to delete', 'error');
+        }
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Delete';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRegistersList();
+    });
+  </script>
+</body>
+</html>

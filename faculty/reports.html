@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Reports & Analytics — College Attendance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.25rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease;
+    }
+    .kpi-card:hover { transform: translateY(-2px); }
+    .kpi-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      line-height: 1.1;
+    }
+    .kpi-value.danger { color: var(--status-absent); }
+    .kpi-value.success { color: var(--status-present); }
+    .kpi-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .class-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+    }
+    .class-bar-label {
+      width: 220px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      color: var(--text-main);
+    }
+    .class-bar-track {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      height: 22px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    .class-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary), hsl(220, 85%, 55%));
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .class-bar-fill.low {
+      background: linear-gradient(90deg, var(--status-absent), hsl(0, 80%, 55%));
+    }
+    .class-bar-fill span {
+      font-size: 0.72rem;
+      color: var(--bg-card);
+      font-weight: 800;
+    }
+    .defaulter-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .filter-pills-bar {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .pill-btn {
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      background: var(--bg-card);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .pill-btn:hover {
+      background: var(--bg-surface);
+      color: var(--text-main);
+    }
+    .pill-btn.active {
+      background: var(--color-primary);
+      color: var(--bg-card);
+      border-color: var(--color-primary);
+    }
+    .pill-badge {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: var(--bg-surface);
+      color: var(--text-main);
+    }
+    .pill-btn.active .pill-badge {
+      background: var(--bg-card);
+      color: var(--color-primary);
+    }
+    .badge-critical {
+      background: var(--status-absent-bg);
+      color: var(--status-absent);
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+    .badge-warning {
+      background: var(--status-late-bg);
+      color: var(--status-late);
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+    .badge-healthy {
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+    .trend-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 160px;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .trend-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      position: relative;
+    }
+    .trend-bar {
+      width: 100%;
+      background: var(--color-primary);
+      border-radius: 4px 4px 0 0;
+      transition: height 0.4s ease, background-color 0.2s ease;
+      min-height: 4px;
+      cursor: pointer;
+    }
+    .trend-bar:hover {
+      background: hsl(220, 90%, 50%);
+    }
+    .trend-date {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+      transform: rotate(-35deg);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .search-input {
+      padding: 0.5rem 0.85rem;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      color: var(--text-main);
+      width: 250px;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">FACULTY</span>
+      <span>Attendance Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;" id="top-nav-bar">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm" id="nav-reg">Take Attendance & Registers</a>
+      <a href="/faculty/registers.html?tab=assignments" class="btn btn-secondary btn-sm" id="nav-assign">Assignments & Coursework</a>
+      <a href="/faculty/reports.html" class="btn btn-primary btn-sm" id="nav-reports">Attendance Reports</a>
+      <a href="/faculty/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 1100px;">
+    <div class="page-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-title">Attendance Reports & Analytics</h1>
+        <p class="page-subtitle">Unified insights: semester attendance metrics, low attendance alerts (&lt; 75%), and hardware scan logs</p>
+      </div>
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+      <button id="tab-analytics-btn" class="btn btn-primary btn-sm" onclick="switchTab('analytics')">
+        📊 Attendance Analytics & Trends
+      </button>
+      <button id="tab-defaulters-btn" class="btn btn-secondary btn-sm" onclick="switchTab('defaulters')">
+        ⚠️ Defaulters Report (&lt; 75%)
+      </button>
+      <button id="tab-esp32-btn" class="btn btn-secondary btn-sm" onclick="switchTab('esp32')">
+        📡 ESP32 Hardware Scans Log
+      </button>
+    </div>
+
+    <!-- TAB 1: ATTENDANCE ANALYTICS & TRENDS -->
+    <div id="tab-analytics-panel">
+      <!-- KPI Cards -->
+      <div class="kpi-row" id="kpi-row">
+        <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Overall Attendance</div></div>
+        <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Classes Conducted</div></div>
+        <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Students Below 75%</div></div>
+        <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Active Registers</div></div>
+      </div>
+
+      <!-- Class Attendance Breakdown -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">Attendance % by Subject / Class</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Visual progress towards the mandatory 75% compliance threshold</p>
+          </div>
+          <span class="badge badge-present">Threshold: 75%</span>
+        </div>
+        <div id="class-bars">
+          <div style="text-align:center; padding: 2rem; color: var(--text-muted);">Loading subject attendance metrics...</div>
+        </div>
+      </div>
+
+      <!-- 14-Day Trend Chart -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">14-Day Attendance Trend</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Day-by-day aggregate attendance percentage across all your conducted sessions</p>
+          </div>
+        </div>
+        <div class="trend-container" id="trend-row">
+          <div style="color:var(--text-muted); text-align:center; padding:2rem; width:100%;">Loading 14-day trend...</div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+          <span>Older Sessions</span>
+          <span>Today</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DEFAULTERS & EARLY WARNING CONSOLE -->
+    <div id="tab-defaulters-panel" style="display: none;">
+      <!-- KPI Row -->
+      <div class="defaulter-kpi-row" id="defaulter-kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpi-def-total">—</div>
+          <div class="kpi-label">Analyzed Students</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value danger" id="kpi-def-critical">—</div>
+          <div class="kpi-label">Critical (&lt; 60%)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpi-def-warning" style="color: var(--status-late);">—</div>
+          <div class="kpi-label">Warning (60–74%)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value success" id="kpi-def-healthy">—</div>
+          <div class="kpi-label">Healthy (≥ 75%)</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 1rem 1.25rem; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 700; margin: 0;">Low Attendance Defaulters & Early Warning List</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Students below 75% institutional attendance required for exam eligibility</p>
+          </div>
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="defaulter-search" class="search-input" placeholder="🔍 Search name, roll, enrollment..." oninput="filterDefaulters()">
+            <button class="btn btn-primary btn-sm" id="btn-open-notify-modal" onclick="openNotifyModal()">⚠️ In-App Warnings</button>
+            <button class="btn btn-secondary btn-sm" id="btn-open-parent-modal" onclick="openParentModal()" style="border-color: var(--status-absent); color: var(--status-absent); font-weight: 700;">📱 Escalate to Parents</button>
+            <button class="btn btn-secondary btn-sm" id="btn-open-comm-logs" onclick="openCommLogsModal()">📋 Dispatch History</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportDefaultersCsv()">📥 Export CSV</button>
+          </div>
+        </div>
+
+        <div style="padding: 0.75rem 1.25rem; background: var(--bg-card); border-bottom: 1px solid var(--border-color);">
+          <div class="filter-pills-bar">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Filter:</span>
+            <button class="pill-btn active" id="pill-defaulters" onclick="setDefaulterFilter('defaulters')">
+              ⚠️ All Defaulters (&lt; 75%) <span class="pill-badge" id="pill-count-defaulters">0</span>
+            </button>
+            <button class="pill-btn" id="pill-critical" onclick="setDefaulterFilter('critical')">
+              🚨 Critical (&lt; 60%) <span class="pill-badge" id="pill-count-critical">0</span>
+            </button>
+            <button class="pill-btn" id="pill-warning" onclick="setDefaulterFilter('warning')">
+              ⚡ Warning (60–74%) <span class="pill-badge" id="pill-count-warning">0</span>
+            </button>
+            <button class="pill-btn" id="pill-healthy" onclick="setDefaulterFilter('healthy')">
+              ✅ Healthy (≥ 75%) <span class="pill-badge" id="pill-count-healthy">0</span>
+            </button>
+            <button class="pill-btn" id="pill-all" onclick="setDefaulterFilter('all')">
+              👥 All Students <span class="pill-badge" id="pill-count-all">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="table" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th style="width: 44px; text-align: center;">
+                  <input type="checkbox" id="select-all-defaulters" onchange="toggleSelectAllDefaulters(this.checked)" title="Select all visible students">
+                </th>
+                <th style="width: 65px; text-align: center;">Roll #</th>
+                <th style="width: 130px;">Enrollment No</th>
+                <th>Student Full Name</th>
+                <th>Department / Cohort</th>
+                <th style="width: 120px; text-align: center;">Attended / Conducted</th>
+                <th style="width: 110px; text-align: center;">Attendance %</th>
+                <th style="width: 170px; text-align: right;">Safe Miss / Recovery Target</th>
+                <th style="width: 110px; text-align: center;">Parent Alert</th>
+              </tr>
+            </thead>
+            <tbody id="defaulters-tbody">
+              <tr><td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading defaulters report...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ESP32 SCANS AUDIT -->
+    <div id="tab-esp32-panel" style="display: none;">
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 1rem 1.25rem; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 700; margin: 0;">ESP32 Biometric Hardware Scans Log</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Live audit trail of raw biometric touches received from IoT classroom terminals</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadEsp32Scans()">🔄 Refresh Scans</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="table" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th style="width: 170px;">Scan Timestamp</th>
+                <th>Student Name</th>
+                <th style="width: 140px;">Enrollment No</th>
+                <th style="width: 150px;">Device UID</th>
+                <th>Terminal Location</th>
+                <th style="width: 120px; text-align: right;">Presence Status</th>
+              </tr>
+            </thead>
+            <tbody id="esp32-tbody">
+              <tr><td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading raw ESP32 scans...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: DISPATCH EARLY WARNING NOTIFICATIONS -->
+    <div id="notify-defaulters-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card" style="max-width: 520px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">⚠️ Dispatch Attendance Warnings</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0;">Send official in-app notifications directly to selected student accounts.</p>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeNotifyModal()" style="padding: 0.2rem 0.5rem; font-size: 1rem;">✕</button>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Selected Recipients</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--color-primary);" id="notify-recipients-count">0 students</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Threshold</div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--status-absent);">75% Minimum</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; display: block;">Notification Message Template</label>
+          <textarea id="notify-custom-message" class="form-control" rows="4" style="width: 100%; box-sizing: border-box; font-size: 0.85rem; line-height: 1.4; resize: vertical; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.6rem 0.75rem; background: var(--bg-card); color: var(--text-main);">Institutional Attendance Warning: Your current attendance is below the mandatory 75% threshold. Please attend upcoming lectures and meet your mentor/class teacher immediately to avoid examination debarment.</textarea>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0;">This notice will be recorded in their Notification Hub with a direct link to their attendance register.</p>
+        </div>
+
+        <div id="notify-status-msg" style="display: none; margin-bottom: 1rem; font-size: 0.85rem; font-weight: 600; padding: 0.6rem; border-radius: var(--radius-md);"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeNotifyModal()">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-dispatch" onclick="dispatchDefaulterNotifications()">📤 Dispatch Notices</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: PARENT WHATSAPP / SMS ESCALATION -->
+    <div id="parent-escalation-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card" style="max-width: 580px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">📱 Autonomous Parent Escalation Gateway</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0;">Dispatch official WhatsApp & SMS notifications to registered parent contacts.</p>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeParentModal()" style="padding: 0.2rem 0.5rem; font-size: 1rem;">✕</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Selected Defaulters</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--color-primary);" id="parent-recipients-count">0 students</div>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Phone Available</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--status-present);" id="parent-phone-count">0 contacts</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; display: block;">Escalation Channel</label>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+              <input type="radio" name="parent_channel" value="WHATSAPP" checked onchange="updateParentPreview()">
+              <span>🟢 WhatsApp Direct / Gateway</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+              <input type="radio" name="parent_channel" value="SMS" onchange="updateParentPreview()">
+              <span>📱 SMS Notification</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; display: block;">Notification Template</label>
+          <select id="parent-template-type" class="form-control" style="width: 100%; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.5rem 0.75rem; background: var(--bg-card); color: var(--text-main); font-size: 0.85rem;" onchange="updateParentTemplate(this.value)">
+            <option value="ATTENDANCE_CRITICAL">🚨 Critical Defaulter (&lt; 60%) — Urgent Examination Warning</option>
+            <option value="ATTENDANCE_WARNING">⚡ Early Warning (&lt; 75%) — Attendance Threshold Notice</option>
+            <option value="CUSTOM">✏️ Custom Template</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; display: block;">Message Template Preview</label>
+          <textarea id="parent-message-preview" class="form-control" rows="4" style="width: 100%; box-sizing: border-box; font-size: 0.85rem; line-height: 1.4; resize: vertical; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.6rem 0.75rem; background: var(--bg-card); color: var(--text-main);"></textarea>
+          <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0.35rem 0 0;">Dynamic tokens: {student_name}, {enrollment_no}, {department}, {attendance_pct}, {attended_classes}, {total_classes}, {shortfall_classes}</p>
+        </div>
+
+        <div id="parent-status-msg" style="display: none; margin-bottom: 1rem; font-size: 0.85rem; font-weight: 600; padding: 0.6rem; border-radius: var(--radius-md);"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeParentModal()">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-parent-dispatch" onclick="dispatchParentEscalation()">🚀 Execute Escalation</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: PARENT COMMUNICATION LOGS -->
+    <div id="comm-logs-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-card" style="max-width: 760px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">📋 Parent Communication Dispatch Logs</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0;">Audited history of outbound WhatsApp and SMS escalation notices.</p>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeCommLogsModal()" style="padding: 0.2rem 0.5rem; font-size: 1rem;">✕</button>
+        </div>
+
+        <div class="table-wrapper" style="overflow-y: auto; flex: 1; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-height: 420px;">
+          <table class="table" style="font-size: 0.82rem; margin: 0;">
+            <thead>
+              <tr>
+                <th style="width: 140px;">Dispatched At</th>
+                <th>Student</th>
+                <th style="width: 110px;">Recipient</th>
+                <th style="width: 90px; text-align: center;">Channel</th>
+                <th style="width: 90px; text-align: center;">Status</th>
+                <th style="width: 80px; text-align: right;">Att %</th>
+              </tr>
+            </thead>
+            <tbody id="comm-logs-tbody">
+              <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading logs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeCommLogsModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireSubjects: true });
+
+    let allDefaulters = [];
+
+    async function loadAnalytics() {
+      try {
+        const res = await fetchApi('/reports/analytics');
+        if (!res.success) return;
+        const { classes, trend, defaulter_count } = res.data;
+
+        const user = getCurrentUser();
+        const hasSubjects = Boolean(classes.length > 0 || user?.roles?.includes('SYSTEM_ADMIN') || user?.is_hod);
+        if (!hasSubjects) {
+          ['nav-reg', 'nav-assign', 'nav-reports'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+          });
+
+          document.querySelector('main.container').innerHTML = `
+            <div class="page-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h1 class="page-title">Attendance Reports & Analytics</h1>
+                <p class="page-subtitle">Unified insights and attendance trends</p>
+              </div>
+              <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+            </div>
+            <div class="card" style="text-align: center; padding: 3.5rem 2rem; color: var(--text-muted); background: var(--bg-surface); border: 1px dashed var(--border-color);">
+              <div style="font-size: 2.8rem; margin-bottom: 0.75rem;">📊</div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main);">No Teaching Subjects Allocated Yet</h3>
+              <p style="font-size: 0.875rem; color: var(--text-muted); max-width: 540px; margin: 0 auto 1.5rem; line-height: 1.5;">
+                Your Department HOD has not allocated any course subjects to your profile yet. Once assigned, your class attendance analytics, trend charts, low-attendance alerts, and hardware scan logs will automatically appear here.
+              </p>
+              <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+            </div>
+          `;
+          return;
+        }
+
+        const overall = classes.length
+          ? (classes.reduce((sum, c) => sum + c.attendance_percentage, 0) / classes.length).toFixed(1)
+          : '—';
+        const totalSessions = classes.reduce((sum, c) => sum + c.sessions_conducted, 0);
+
+        document.getElementById('kpi-row').innerHTML = `
+          <div class="kpi-card">
+            <div class="kpi-value ${overall >= 75 ? 'success' : 'danger'}">${overall}${overall !== '—' ? '%' : ''}</div>
+            <div class="kpi-label">Overall Attendance</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value">${totalSessions}</div>
+            <div class="kpi-label">Classes Conducted</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value ${defaulter_count > 0 ? 'danger' : 'success'}">${defaulter_count}</div>
+            <div class="kpi-label">Students Below 75%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value">${classes.length}</div>
+            <div class="kpi-label">Assigned Classes</div>
+          </div>
+        `;
+
+        document.getElementById('class-bars').innerHTML = classes.length ? classes.map(c => `
+          <div class="class-bar-row">
+            <div class="class-bar-label">${c.subject_name}</div>
+            <div class="class-bar-track">
+              <div class="class-bar-fill ${c.attendance_percentage < 75 ? 'low' : ''}" style="width:${Math.max(c.attendance_percentage, 8)}%;">
+                <span>${c.attendance_percentage}%</span>
+              </div>
+            </div>
+          </div>
+        `).join('') : `<div style="color:var(--text-muted); text-align:center; padding:1.5rem;">No finalized class attendance recorded yet.</div>`;
+
+        const maxPct = Math.max(...trend.map(t => t.attendance_percentage), 100);
+        document.getElementById('trend-row').innerHTML = trend.length ? trend.map(t => `
+          <div class="trend-bar-wrap" title="${t.date}: ${t.attendance_percentage}% attendance">
+            <div class="trend-bar" style="height:${Math.max((t.attendance_percentage / maxPct) * 100, 5)}%;"></div>
+            <div class="trend-date">${new Date(t.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>
+          </div>
+        `).join('') : `<div style="color:var(--text-muted); text-align:center; padding:1.5rem; width:100%;">No recent sessions to display.</div>`;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    let allDefaultersData = null;
+    let currentFilter = 'defaulters';
+    let selectedStudentIds = new Set();
+
+    async function loadDefaulters() {
+      try {
+        const res = await fetchApi('/reports/defaulters?threshold=75');
+        const tbody = document.getElementById('defaulters-tbody');
+        if (res.success && res.data) {
+          allDefaultersData = res.data;
+          allDefaulters = res.data.data || [];
+
+          // Update KPI counts
+          document.getElementById('kpi-def-total').textContent = allDefaultersData.total_students || 0;
+          document.getElementById('kpi-def-critical').textContent = allDefaultersData.critical_defaulters || 0;
+          document.getElementById('kpi-def-warning').textContent = allDefaultersData.warning_defaulters || 0;
+          document.getElementById('kpi-def-healthy').textContent = allDefaultersData.healthy_students || 0;
+
+          // Update Filter Pill counts
+          document.getElementById('pill-count-defaulters').textContent = allDefaultersData.total_defaulters || 0;
+          document.getElementById('pill-count-critical').textContent = allDefaultersData.critical_defaulters || 0;
+          document.getElementById('pill-count-warning').textContent = allDefaultersData.warning_defaulters || 0;
+          document.getElementById('pill-count-healthy').textContent = allDefaultersData.healthy_students || 0;
+          document.getElementById('pill-count-all').textContent = allDefaultersData.total_students || 0;
+
+          filterDefaulters();
+        }
+      } catch (err) {
+        console.error('Failed to load defaulters:', err);
+      }
+    }
+
+    function setDefaulterFilter(filter) {
+      currentFilter = filter;
+      ['pill-defaulters', 'pill-critical', 'pill-warning', 'pill-healthy', 'pill-all'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.classList.remove('active');
+      });
+      const activeBtn = document.getElementById(`pill-${filter}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      filterDefaulters();
+    }
+
+    function filterDefaulters() {
+      if (!allDefaulters) return;
+      const q = (document.getElementById('defaulter-search').value || '').toLowerCase().trim();
+
+      let filtered = allDefaulters;
+
+      // Apply category pill filter
+      if (currentFilter === 'defaulters') {
+        filtered = filtered.filter(d => d.status === 'CRITICAL' || d.status === 'WARNING');
+      } else if (currentFilter === 'critical') {
+        filtered = filtered.filter(d => d.status === 'CRITICAL');
+      } else if (currentFilter === 'warning') {
+        filtered = filtered.filter(d => d.status === 'WARNING');
+      } else if (currentFilter === 'healthy') {
+        filtered = filtered.filter(d => d.status === 'HEALTHY');
+      }
+
+      // Apply text search
+      if (q) {
+        filtered = filtered.filter(d =>
+          (d.student_name && d.student_name.toLowerCase().includes(q)) ||
+          (d.official_enrollment_no && d.official_enrollment_no.toLowerCase().includes(q)) ||
+          (d.department_name && d.department_name.toLowerCase().includes(q)) ||
+          (d.group_name && d.group_name.toLowerCase().includes(q)) ||
+          String(d.class_roll_no) === q
+        );
+      }
+
+      renderDefaulters(filtered);
+    }
+
+    function renderDefaulters(data) {
+      const tbody = document.getElementById('defaulters-tbody');
+      if (!data.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--status-present); font-weight: 600;">
+              ✓ No students matching current criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = data.map(d => {
+        const isChecked = selectedStudentIds.has(d.student_id) ? 'checked' : '';
+        let badgeHtml = '';
+        if (d.status === 'CRITICAL') {
+          badgeHtml = `<span class="badge-critical">${d.attendance_percentage}% CRITICAL</span>`;
+        } else if (d.status === 'WARNING') {
+          badgeHtml = `<span class="badge-warning">${d.attendance_percentage}% WARNING</span>`;
+        } else {
+          badgeHtml = `<span class="badge-healthy">${d.attendance_percentage}% HEALTHY</span>`;
+        }
+
+        let targetHtml = '';
+        if (d.status === 'HEALTHY') {
+          targetHtml = `<span style="color: var(--status-present); font-weight: 700;">🟢 Safe to miss: ${d.safe_absences}</span>`;
+        } else {
+          targetHtml = `
+            <div style="color: var(--status-absent); font-weight: 700;">🔴 Must attend: +${d.required_classes}</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">Shortfall: ${d.shortfall} sessions</div>
+          `;
+        }
+
+        return `
+          <tr>
+            <td style="text-align: center;">
+              <input type="checkbox" class="student-select-cb" value="${d.student_id}" ${isChecked} onchange="toggleStudentSelect(${d.student_id}, this.checked)">
+            </td>
+            <td style="text-align: center; font-weight: 700;">${d.class_roll_no || '—'}</td>
+            <td style="font-family: var(--font-family-mono); font-size: 0.8rem;">${d.official_enrollment_no}</td>
+            <td style="font-weight: 600; color: var(--text-main);">${d.student_name}</td>
+            <td style="font-size: 0.8rem; color: var(--text-muted);">${d.group_name || d.department_name || '--'}</td>
+            <td style="text-align: center; font-weight: 700;">${d.attended_sessions} / ${d.conducted_sessions}</td>
+            <td style="text-align: center;">${badgeHtml}</td>
+            <td style="text-align: right;">${targetHtml}</td>
+            <td style="text-align: center;">
+              ${(d.parent_phone || d.student_phone) ? `
+                <button type="button" class="btn btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; background: var(--status-present-bg); color: var(--status-present); border: 1px solid var(--status-present); border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;" onclick="openSingleWhatsApp(${d.student_id})" title="Direct WhatsApp to Parent (${d.parent_phone || d.student_phone})">
+                  💬 WhatsApp
+                </button>
+              ` : `
+                <span style="font-size: 0.72rem; color: var(--text-muted);">No phone</span>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Update Select All Checkbox State
+      const selectAllCb = document.getElementById('select-all-defaulters');
+      if (selectAllCb) {
+        const allVisibleIds = data.map(d => d.student_id);
+        selectAllCb.checked = allVisibleIds.length > 0 && allVisibleIds.every(id => selectedStudentIds.has(id));
+      }
+    }
+
+    function toggleStudentSelect(studentId, isSelected) {
+      if (isSelected) {
+        selectedStudentIds.add(studentId);
+      } else {
+        selectedStudentIds.delete(studentId);
+      }
+      updateSelectCountUI();
+    }
+
+    function toggleSelectAllDefaulters(checked) {
+      const cbs = document.querySelectorAll('.student-select-cb');
+      cbs.forEach(cb => {
+        cb.checked = checked;
+        const id = Number(cb.value);
+        if (checked) selectedStudentIds.add(id);
+        else selectedStudentIds.delete(id);
+      });
+      updateSelectCountUI();
+    }
+
+    function updateSelectCountUI() {
+      const countEl = document.getElementById('notify-recipients-count');
+      if (countEl) countEl.textContent = `${selectedStudentIds.size} student${selectedStudentIds.size === 1 ? '' : 's'}`;
+
+      const parentCountEl = document.getElementById('parent-recipients-count');
+      const parentPhoneEl = document.getElementById('parent-phone-count');
+      if (parentCountEl || parentPhoneEl) {
+        const selectedList = allDefaulters.filter(d => selectedStudentIds.has(d.student_id));
+        const withPhone = selectedList.filter(d => d.parent_phone || d.student_phone);
+        if (parentCountEl) parentCountEl.textContent = `${selectedList.length} student${selectedList.length === 1 ? '' : 's'}`;
+        if (parentPhoneEl) parentPhoneEl.textContent = `${withPhone.length} contact${withPhone.length === 1 ? '' : 's'}`;
+      }
+    }
+
+    function openNotifyModal() {
+      // If no students explicitly checked, auto-select all defaulters
+      if (selectedStudentIds.size === 0 && allDefaulters) {
+        allDefaulters
+          .filter(d => d.status === 'CRITICAL' || d.status === 'WARNING')
+          .forEach(d => selectedStudentIds.add(d.student_id));
+        filterDefaulters();
+      }
+
+      updateSelectCountUI();
+      const modal = document.getElementById('notify-defaulters-modal');
+      const statusMsg = document.getElementById('notify-status-msg');
+      if (statusMsg) statusMsg.style.display = 'none';
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeNotifyModal() {
+      const modal = document.getElementById('notify-defaulters-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function dispatchDefaulterNotifications() {
+      if (selectedStudentIds.size === 0) {
+        showToast('Please select at least one student recipient.', 'warning');
+        return;
+      }
+
+      const msgInput = document.getElementById('notify-custom-message');
+      const customMsg = msgInput ? msgInput.value.trim() : '';
+      const dispatchBtn = document.getElementById('btn-confirm-dispatch');
+      const statusMsg = document.getElementById('notify-status-msg');
+
+      try {
+        if (dispatchBtn) dispatchBtn.disabled = true;
+        if (statusMsg) {
+          statusMsg.style.display = 'block';
+          statusMsg.style.background = 'var(--bg-surface)';
+          statusMsg.style.color = 'var(--text-main)';
+          statusMsg.textContent = '⏳ Dispatching warning notices...';
+        }
+
+        const res = await fetchApi('/reports/defaulters/notify', {
+          method: 'POST',
+          body: JSON.stringify({
+            studentIds: Array.from(selectedStudentIds),
+            threshold: 75,
+            customMessage: customMsg
+          })
+        });
+
+        if (res.success) {
+          if (statusMsg) {
+            statusMsg.style.background = 'var(--status-present-bg)';
+            statusMsg.style.color = 'var(--status-present)';
+            statusMsg.textContent = `✓ Successfully sent early warning notices to ${res.data?.recipients_count || selectedStudentIds.size} students!`;
+          }
+          setTimeout(() => {
+            closeNotifyModal();
+            selectedStudentIds.clear();
+            filterDefaulters();
+          }, 1400);
+        } else {
+          throw new Error(res.error?.message || 'Failed to dispatch notices');
+        }
+      } catch (err) {
+        if (statusMsg) {
+          statusMsg.style.background = 'var(--status-absent-bg)';
+          statusMsg.style.color = 'var(--status-absent)';
+          statusMsg.textContent = `✗ Error: ${err.message}`;
+        }
+      } finally {
+        if (dispatchBtn) dispatchBtn.disabled = false;
+      }
+    }
+
+    /* PARENT ESCALATION SUITE */
+    const PARENT_TEMPLATES = {
+      ATTENDANCE_CRITICAL: "CRITICAL ATTENDANCE ALERT: Dear Parent, your ward {student_name} ({enrollment_no}) in {department} has reached a critical attendance level of {attendance_pct}% ({attended_classes}/{total_classes} classes conducted). Minimum 75% is mandatory for semester examination eligibility. Shortfall: {shortfall_classes} classes. Please contact the Head of Department immediately.",
+      ATTENDANCE_WARNING: "ATTENDANCE EARLY WARNING: Dear Parent, your ward {student_name} ({enrollment_no}) currently has an attendance of {attendance_pct}%, which is below the mandatory 75% institutional threshold. Please advise your ward to attend upcoming lectures regularly.",
+      CUSTOM: "Dear Parent, this is an official institutional attendance notification regarding your ward {student_name} ({enrollment_no}). Current attendance: {attendance_pct}%."
+    };
+
+    function openParentModal() {
+      // If no students explicitly checked, auto-select all defaulters
+      if (selectedStudentIds.size === 0 && allDefaulters) {
+        allDefaulters
+          .filter(d => d.status === 'CRITICAL' || d.status === 'WARNING')
+          .forEach(d => selectedStudentIds.add(d.student_id));
+        filterDefaulters();
+      }
+
+      updateSelectCountUI();
+
+      const tplSelect = document.getElementById('parent-template-type');
+      if (tplSelect) {
+        tplSelect.value = 'ATTENDANCE_CRITICAL';
+        updateParentTemplate('ATTENDANCE_CRITICAL');
+      }
+
+      const modal = document.getElementById('parent-escalation-modal');
+      const statusMsg = document.getElementById('parent-status-msg');
+      if (statusMsg) statusMsg.style.display = 'none';
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeParentModal() {
+      const modal = document.getElementById('parent-escalation-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function updateParentTemplate(type) {
+      const preview = document.getElementById('parent-message-preview');
+      if (preview) {
+        preview.value = PARENT_TEMPLATES[type] || PARENT_TEMPLATES.CUSTOM;
+      }
+    }
+
+    function updateParentPreview() {
+      // Channel preview handler if needed
+    }
+
+    async function dispatchParentEscalation() {
+      if (selectedStudentIds.size === 0) {
+        showToast('Please select at least one student recipient.', 'warning');
+        return;
+      }
+
+      const channelRadio = document.querySelector('input[name="parent_channel"]:checked');
+      const channel = channelRadio ? channelRadio.value : 'WHATSAPP';
+      const templateType = document.getElementById('parent-template-type')?.value || 'ATTENDANCE_CRITICAL';
+      const previewMsg = document.getElementById('parent-message-preview')?.value || '';
+      const dispatchBtn = document.getElementById('btn-confirm-parent-dispatch');
+      const statusMsg = document.getElementById('parent-status-msg');
+
+      try {
+        if (dispatchBtn) dispatchBtn.disabled = true;
+        if (statusMsg) {
+          statusMsg.style.display = 'block';
+          statusMsg.style.background = 'var(--bg-surface)';
+          statusMsg.style.color = 'var(--text-main)';
+          statusMsg.textContent = '⏳ Executing parent escalation...';
+        }
+
+        const res = await fetchApi('/reports/defaulters/escalate-parents', {
+          method: 'POST',
+          body: JSON.stringify({
+            studentIds: Array.from(selectedStudentIds),
+            channel,
+            templateType,
+            customTemplate: previewMsg
+          })
+        });
+
+        if (res.success) {
+          if (statusMsg) {
+            statusMsg.style.background = 'var(--status-present-bg)';
+            statusMsg.style.color = 'var(--status-present)';
+            statusMsg.textContent = `✓ ${res.data.message || 'Parent escalation dispatched successfully!'}`;
+          }
+
+          // If WhatsApp and web links returned, offer to open first link
+          if (channel === 'WHATSAPP' && res.data.dispatches && res.data.dispatches.length > 0) {
+            const firstWithLink = res.data.dispatches.find(d => d.whatsapp_web_url);
+            if (firstWithLink && window.confirm(`Escalation logged for ${res.data.delivered_count} parents! Open WhatsApp Web for ${firstWithLink.student_name} (${firstWithLink.phone}) now?`)) {
+              window.open(firstWithLink.whatsapp_web_url, '_blank');
+            }
+          }
+
+          setTimeout(() => {
+            closeParentModal();
+            selectedStudentIds.clear();
+            filterDefaulters();
+          }, 1500);
+        } else {
+          throw new Error(res.error?.message || 'Failed to dispatch parent escalation');
+        }
+      } catch (err) {
+        if (statusMsg) {
+          statusMsg.style.background = 'var(--status-absent-bg)';
+          statusMsg.style.color = 'var(--status-absent)';
+          statusMsg.textContent = `✗ Error: ${err.message}`;
+        }
+      } finally {
+        if (dispatchBtn) dispatchBtn.disabled = false;
+      }
+    }
+
+    async function openSingleWhatsApp(studentId) {
+      try {
+        const student = allDefaulters.find(d => d.student_id === studentId);
+        if (!student) return;
+        const res = await fetchApi(`/reports/defaulters/generate-whatsapp-link?student_id=${studentId}&template_type=ATTENDANCE_CRITICAL`);
+        if (res.success && res.data.whatsapp_url) {
+          window.open(res.data.whatsapp_url, '_blank');
+        } else {
+          showToast(res.error?.message || 'Unable to generate WhatsApp link. Check parent contact number.', 'error');
+        }
+      } catch (err) {
+        showToast(`Error opening WhatsApp: ${err.message}`, 'error');
+      }
+    }
+
+    async function openCommLogsModal() {
+      const modal = document.getElementById('comm-logs-modal');
+      const tbody = document.getElementById('comm-logs-tbody');
+      if (modal) modal.style.display = 'flex';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading logs...</td></tr>';
+
+      try {
+        const res = await fetchApi('/reports/defaulters/communication-logs?limit=50');
+        if (res.success) {
+          if (!res.data.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">No communication logs recorded yet.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = res.data.map(log => `
+            <tr>
+              <td style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${new Date(log.sent_at).toLocaleString()}</td>
+              <td style="font-weight: 600; color: var(--text-main);">${log.student_name} <span style="font-size: 0.72rem; color: var(--text-muted);">(${log.official_enrollment_no})</span></td>
+              <td style="font-family: var(--font-family-mono); font-size: 0.8rem;">${log.recipient_phone}</td>
+              <td style="text-align: center;"><span class="badge ${log.channel === 'WHATSAPP' ? 'badge-present' : 'badge-pending'}">${log.channel}</span></td>
+              <td style="text-align: center;"><span class="badge badge-present">${log.delivery_status}</span></td>
+              <td style="text-align: right; font-weight: 700; color: ${Number(log.attendance_pct) < 60 ? 'var(--status-absent)' : 'var(--status-late)'};">${log.attendance_pct}%</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--status-absent);">Failed to load logs: ${err.message}</td></tr>`;
+      }
+    }
+
+    function closeCommLogsModal() {
+      const modal = document.getElementById('comm-logs-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function exportDefaultersCsv() {
+      window.location.href = `${API}/reports/defaulters/export?threshold=75`;
+    }
+
+    async function loadEsp32Scans() {
+      try {
+        const res = await fetchApi('/reports/esp32-presence?limit=50');
+        const tbody = document.getElementById('esp32-tbody');
+        if (res.success) {
+          if (!res.data.length) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No biometric scans recorded recently.</td></tr>`;
+            return;
+          }
+
+          tbody.innerHTML = res.data.map(e => `
+            <tr>
+              <td style="font-family: var(--font-family-mono); font-size: 0.8rem; color: var(--text-muted);">${new Date(e.scan_time).toLocaleString()}</td>
+              <td style="font-weight: 600;">${e.full_name}</td>
+              <td style="font-family: var(--font-family-mono); font-size: 0.8rem;">${e.official_enrollment_no}</td>
+              <td><span class="badge badge-pending" style="font-family: var(--font-family-mono);">${e.device_uid}</span></td>
+              <td>${e.device_name || 'Classroom Terminal'}</td>
+              <td style="text-align: right;"><span class="badge badge-present">TOUCH RECORDED</span></td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function switchTab(tab) {
+      document.getElementById('tab-analytics-panel').style.display = tab === 'analytics' ? 'block' : 'none';
+      document.getElementById('tab-defaulters-panel').style.display = tab === 'defaulters' ? 'block' : 'none';
+      document.getElementById('tab-esp32-panel').style.display = tab === 'esp32' ? 'block' : 'none';
+
+      document.getElementById('tab-analytics-btn').className = tab === 'analytics' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+      document.getElementById('tab-defaulters-btn').className = tab === 'defaulters' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+      document.getElementById('tab-esp32-btn').className = tab === 'esp32' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+
+      if (tab === 'analytics') loadAnalytics();
+      if (tab === 'defaulters') loadDefaulters();
+      if (tab === 'esp32') loadEsp32Scans();
+    }
+
+    // Check query params for tab
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTab = urlParams.get('tab') || 'analytics';
+    switchTab(initialTab);
+  </script>
+</body>
+</html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Attendance & Calendar — Student Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    /* Live Class Banner */
+    .live-banner {
+      background: linear-gradient(135deg, var(--col-att-mo-color), var(--color-primary));
+      color: var(--text-white);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      animation: fadeIn 0.3s ease;
+    }
+    .live-pulse {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: var(--status-present);
+      border-radius: 50%;
+      box-shadow: 0 0 0 rgba(52, 211, 153, 0.4);
+      animation: pulseGreen 1.6s infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes pulseGreen {
+      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+
+    /* Overall Standing Card */
+    .standing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      border-left: 6px solid var(--status-present);
+      transition: all 0.2s ease;
+    }
+
+    /* Subjects Grid */
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .subject-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-top: 4px solid var(--color-primary);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .subject-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Progress bar */
+    .pct-track {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      margin: 0.75rem 0;
+      position: relative;
+    }
+    .pct-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .pct-marker-75 {
+      position: absolute;
+      left: 75%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(0,0,0,0.35);
+      z-index: 2;
+    }
+
+    /* Predictor Advice Box */
+    .predictor-note {
+      font-size: 0.825rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+    .predictor-note.safe {
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      border: 1px solid var(--status-present);
+    }
+    .predictor-note.deficit {
+      background: var(--status-absent-bg);
+      color: var(--status-absent);
+      border: 1px solid var(--status-absent);
+    }
+
+    /* Calendar Modal */
+    .calendar-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeIn 0.15s ease;
+    }
+    .calendar-modal-backdrop.open {
+      display: flex;
+    }
+    .calendar-modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      width: 100%;
+      max-width: 620px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+    .calendar-modal-header {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Calendar Controls */
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .calendar-nav-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.45rem 0.85rem;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s ease;
+    }
+    .calendar-nav-btn:hover {
+      background: var(--border-color);
+    }
+    .calendar-select-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .calendar-select {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: var(--radius-md);
+      padding: 0.45rem 0.75rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    /* Legend */
+    .calendar-legend {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.5rem;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.775rem;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .dot-present { background: var(--status-present); }
+    .dot-absent { background: var(--status-absent); }
+    .dot-holiday { background: var(--color-primary); }
+    .dot-none { background: var(--bg-surface); border: 1px solid var(--border-color); }
+
+    /* Calendar Grid */
+    .calendar-body {
+      padding: 1.25rem 1.5rem;
+      overflow-y: auto;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .cal-weekday {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 0.4rem 0;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .cal-weekday.sunday {
+      color: var(--color-primary);
+    }
+    .cal-cell {
+      aspect-ratio: 1;
+      min-height: 48px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      transition: transform 0.1s ease;
+    }
+    .cal-cell.empty {
+      background: transparent;
+      border-color: transparent;
+    }
+    .cal-cell.sunday-holiday {
+      background: var(--col-holiday-bg);
+      border: 1px solid var(--border-color);
+      color: var(--col-holiday-color);
+      font-weight: 700;
+    }
+    .cal-cell.attended-present {
+      background: var(--status-present) !important;
+      border-color: var(--status-present) !important;
+      color: var(--text-white) !important;
+      font-weight: 800;
+      box-shadow: 0 2px 4px rgba(22, 163, 74, 0.35);
+    }
+    .cal-cell.attended-absent {
+      background: var(--status-absent) !important;
+      border-color: var(--status-absent) !important;
+      color: var(--text-white) !important;
+      font-weight: 800;
+      box-shadow: 0 2px 4px rgba(220, 38, 38, 0.35);
+    }
+    .cal-cell.today-ring {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+    }
+    .cal-cell-label {
+      font-size: 0.65rem;
+      margin-top: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Month stats bar */
+    .calendar-modal-footer {
+      padding: 0.85rem 1.5rem;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/student/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--status-present);">STUDENT</span>
+      <span>Attendance Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/student/attendance.html" class="btn btn-primary btn-sm">Attendance &amp; Calendar</a>
+      <a href="/student/timetable.html" class="btn btn-secondary btn-sm">Timetable</a>
+      <a href="/student/assignments.html" class="btn btn-secondary btn-sm">Assignments</a>
+      <a href="/student/scores.html" class="btn btn-secondary btn-sm">Test Scores</a>
+      <a href="/student/profile.html" class="btn btn-secondary btn-sm">Profile</a>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem; max-width: 1060px;">
+    
+    <!-- Active Classroom Live Attendance Banner (Conditional) -->
+    <div id="live-session-banner" class="live-banner" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9; font-weight: 700;">
+            <span class="live-pulse"></span>Live Lecture In Progress
+          </div>
+          <h2 id="live-subject-name" style="font-size: 1.25rem; font-weight: 800; margin: 0.2rem 0;">Subject Name</h2>
+          <div id="live-teacher-name" style="font-size: 0.825rem; opacity: 0.85;">Teacher: Instructor • Theory</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <input type="text" id="live-pin-input" placeholder="6-DIGIT PIN" maxlength="6" style="width: 130px; text-align: center; font-family: var(--font-family-mono); font-weight: 800; font-size: 1.1rem; padding: 0.45rem; border-radius: var(--radius-md); border: none;">
+          <button class="btn btn-secondary" onclick="submitLivePin()" style="background: var(--bg-card); color: var(--status-present); font-weight: 700; border: 1px solid var(--border-color);">Submit PIN</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-title">My Attendance &amp; 75% Predictor</h1>
+        <p class="page-subtitle">Subject-wise compliance, exam eligibility forecasting, and monthly visual attendance calendar</p>
+      </div>
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+        <span id="student-identity-badge" class="badge badge-present" style="font-size: 0.85rem; padding: 0.4rem 0.85rem; font-weight: 600; display: none;"></span>
+        <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Overall Standing / Predictor Banner -->
+    <div id="standing-card" class="standing-card">
+      <div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Institutional Standing</div>
+        <div style="display: flex; align-items: baseline; gap: 0.75rem; margin: 0.25rem 0;">
+          <span id="overall-pct" style="font-size: 2.4rem; font-weight: 800; color: var(--status-present);">--%</span>
+          <span id="standing-badge" class="badge badge-present" style="font-size: 0.85rem; padding: 0.35rem 0.8rem;">Eligible for Exams</span>
+        </div>
+        <p id="overall-msg" style="font-size: 0.9rem; color: var(--text-main); margin: 0; max-width: 600px;">
+          Loading attendance metrics...
+        </p>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Overall Progress</div>
+        <div id="overall-counts" style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-top: 0.2rem;">-- / -- Sessions</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Threshold: 75.0%</div>
+      </div>
+    </div>
+
+    <!-- Enrolled Subjects Section -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+      <h2 style="font-size: 1.15rem; font-weight: 700;">Branch Enrolled Courses &amp; Registers</h2>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Click any course card to open its visual calendar</span>
+    </div>
+
+    <!-- Subjects Grid -->
+    <div id="subjects-grid" class="subjects-grid">
+      <div class="card" style="text-align: center; padding: 3rem; color: var(--text-muted); grid-column: 1 / -1;">
+        Loading course attendance records...
+      </div>
+    </div>
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- INTERACTIVE MONTHLY ATTENDANCE CALENDAR MODAL -->
+  <!-- ================================================================= -->
+  <div id="calendar-modal" class="calendar-modal-backdrop" onclick="if(event.target===this)closeCalendarModal()">
+    <div class="calendar-modal-card">
+      
+      <!-- Modal Header -->
+      <div class="calendar-modal-header">
+        <div>
+          <span id="cal-sub-code" class="badge badge-pending" style="font-family: var(--font-family-mono); font-size: 0.75rem; margin-bottom: 0.25rem;">CS501</span>
+          <h2 id="cal-sub-name" style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-main);">Database Management Systems</h2>
+        </div>
+        <button type="button" onclick="closeCalendarModal()" style="font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Controls: Month & Year Dropdown + Navigation Arrows -->
+      <div class="calendar-controls">
+        <button type="button" class="calendar-nav-btn" onclick="prevMonth()" title="Previous Month" aria-label="Previous Month">◀</button>
+        
+        <div class="calendar-select-group">
+          <select id="cal-month-select" class="calendar-select" onchange="onMonthSelectChange()">
+            <option value="0">January</option>
+            <option value="1">February</option>
+            <option value="2">March</option>
+            <option value="3">April</option>
+            <option value="4">May</option>
+            <option value="5">June</option>
+            <option value="6">July</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">October</option>
+            <option value="10">November</option>
+            <option value="11">December</option>
+          </select>
+
+          <select id="cal-year-select" class="calendar-select" onchange="onYearSelectChange()">
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+
+        <button type="button" class="calendar-nav-btn" onclick="nextMonth()" title="Next Month" aria-label="Next Month">▶</button>
+      </div>
+
+      <!-- Real Calendar Legend -->
+      <div class="calendar-legend">
+        <span class="legend-item"><span class="legend-dot dot-present"></span> Attended (Present)</span>
+        <span class="legend-item"><span class="legend-dot dot-absent"></span> Absent</span>
+        <span class="legend-item"><span class="legend-dot dot-holiday"></span> Sunday / Holiday</span>
+        <span class="legend-item"><span class="legend-dot dot-none"></span> No Class</span>
+      </div>
+
+      <!-- Calendar Body -->
+      <div class="calendar-body">
+        <div class="calendar-grid" id="calendar-grid">
+          <!-- Weekday Headers -->
+          <div class="cal-weekday sunday">Sun</div>
+          <div class="cal-weekday">Mon</div>
+          <div class="cal-weekday">Tue</div>
+          <div class="cal-weekday">Wed</div>
+          <div class="cal-weekday">Thu</div>
+          <div class="cal-weekday">Fri</div>
+          <div class="cal-weekday">Sat</div>
+          <!-- Days populated dynamically by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Modal Footer / Monthly Summary -->
+      <div class="calendar-modal-footer">
+        <div id="cal-month-stats">Sessions: 0 | Attended: 0 | Absent: 0</div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeCalendarModal()">Close Calendar</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute(['STUDENT']);
+
+    // State variables
+    let allSubjects = [];
+    let currentSubjectId = null;
+    let currentSubjectName = '';
+    let currentSubjectCode = '';
+    let subjectAttendanceHistory = {}; // subject_id -> { 'YYYY-MM-DD': 'PRESENT'|'ABSENT' }
+    
+    // Calendar view state (defaulting to September 2026 or current date)
+    let selectedYear = 2026;
+    let selectedMonth = 8; // September (0-indexed: 8 = September)
+
+    // ─── 1. Page Initialization ─────────────────────────────────
+    async function initPage() {
+      // Initialize to current date if 2026 or current year
+      const now = new Date();
+      if (now.getFullYear() >= 2026) {
+        selectedYear = now.getFullYear();
+        selectedMonth = now.getMonth();
+      } else {
+        selectedYear = 2026;
+        selectedMonth = 8; // September 2026
+      }
+      syncDropdowns();
+
+      await Promise.all([
+        checkLiveSession(),
+        loadAttendanceData()
+      ]);
+    }
+
+    // ─── 2. Check Live Session & PIN Submission ─────────────────
+    let activeSession = null;
+    async function checkLiveSession() {
+      try {
+        const res = await fetchApi('/attendance/sessions?state=OPEN');
+        if (res.success && res.data && res.data.length > 0) {
+          activeSession = res.data[0];
+          document.getElementById('live-subject-name').innerText = activeSession.subject_name;
+          document.getElementById('live-teacher-name').innerText = 
+            `Teacher: ${activeSession.teacher_name} • ${activeSession.label || activeSession.session_type}`;
+          document.getElementById('live-session-banner').style.display = 'block';
+        } else {
+          document.getElementById('live-session-banner').style.display = 'none';
+        }
+      } catch (err) {
+        document.getElementById('live-session-banner').style.display = 'none';
+      }
+    }
+
+    async function submitLivePin() {
+      if (!activeSession) return;
+      const pin = document.getElementById('live-pin-input').value.trim();
+      if (!pin || pin.length !== 6) {
+        showToast('Please enter a valid 6-digit session PIN.', 'warning');
+        return;
+      }
+
+      try {
+        const res = await fetchApi(`/attendance/sessions/${activeSession.id}/self-attendance`, {
+          method: 'POST',
+          body: JSON.stringify({ method: 'PIN', pin })
+        });
+        if (res.success) {
+          showToast('✓ Attendance submitted successfully!', 'success');
+          document.getElementById('live-session-banner').style.display = 'none';
+          await loadAttendanceData();
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to submit attendance', 'error');
+      }
+    }
+
+    // ─── 3. Load Student Attendance Data ────────────────────────
+    async function loadAttendanceData() {
+      try {
+        const [statsRes, subsRes, historyRes, profRes] = await Promise.all([
+          fetchApi('/students/me/attendance/stats'),
+          fetchApi('/students/me/attendance/subjects'),
+          fetchApi('/students/me/attendance?limit=500'),
+          fetchApi('/students/me')
+        ]);
+
+        // Student identity
+        if (profRes && profRes.success && profRes.data) {
+          const s = profRes.data;
+          const badge = document.getElementById('student-identity-badge');
+          if (badge) {
+            const rollTxt = s.class_roll_no ? `${s.class_roll_no}` : '—';
+            const regTxt = s.registration_no || '—';
+            badge.innerHTML = `Roll: <strong>${rollTxt}</strong> • UBTER Reg: <strong>${regTxt}</strong>`;
+            badge.style.display = 'inline-flex';
+          }
+        }
+
+        // 1. Overall stats
+        if (statsRes.success) {
+          const stats = statsRes.data;
+          const pct = stats.current_percentage || 0;
+          const isDef = pct < 75.0 && stats.total_conducted > 0;
+          
+          document.getElementById('overall-pct').innerText = `${pct}%`;
+          document.getElementById('overall-counts').innerText = `${stats.total_attended || 0} / ${stats.total_conducted || 0} Sessions`;
+          document.getElementById('overall-msg').innerText = stats.prediction?.message || 'Attendance is within institutional requirements.';
+
+          const card = document.getElementById('standing-card');
+          const badge = document.getElementById('standing-badge');
+          const pctEl = document.getElementById('overall-pct');
+
+          if (isDef) {
+            card.style.borderLeftColor = 'var(--status-absent)';
+            badge.className = 'badge badge-absent';
+            badge.innerText = 'Attendance Deficit (< 75%)';
+            pctEl.style.color = 'var(--status-absent)';
+          } else {
+            card.style.borderLeftColor = 'var(--status-present)';
+            badge.className = 'badge badge-present';
+            badge.innerText = 'Eligible for Exams';
+            pctEl.style.color = 'var(--status-present)';
+          }
+        }
+
+        // 2. Build attendance history lookup by subject and date
+        subjectAttendanceHistory = {};
+        if (historyRes.success && historyRes.data) {
+          historyRes.data.forEach(item => {
+            const dateStr = String(item.start_time).substring(0, 10);
+            const subId = item.subject_id;
+            const subCode = item.subject_code;
+            if (subId) {
+              if (!subjectAttendanceHistory[subId]) subjectAttendanceHistory[subId] = {};
+              subjectAttendanceHistory[subId][dateStr] = item.attendance_status;
+            }
+            if (subCode) {
+              if (!subjectAttendanceHistory[subCode]) subjectAttendanceHistory[subCode] = {};
+              subjectAttendanceHistory[subCode][dateStr] = item.attendance_status;
+            }
+          });
+        }
+
+        // 3. Render Subject Cards
+        if (subsRes.success) {
+          allSubjects = subsRes.data || [];
+          renderSubjectCards(allSubjects);
+          handleDeepLinkScroll();
+        }
+      } catch (err) {
+        console.error('Failed to load attendance data:', err);
+      }
+    }
+
+    function handleDeepLinkScroll() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetId = urlParams.get('subject_id') || urlParams.get('group_id');
+      if (targetId) {
+        const targetEl = document.getElementById(`subject-card-${targetId}`);
+        if (targetEl) {
+          setTimeout(() => {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetEl.style.boxShadow = '0 0 0 3px var(--color-primary)';
+            setTimeout(() => {
+              targetEl.style.transition = 'box-shadow 1s ease';
+              targetEl.style.boxShadow = '';
+            }, 3000);
+          }, 300);
+        }
+      }
+    }
+
+    // ─── 4. Render Subject Cards ────────────────────────────────
+    function renderSubjectCards(subjects) {
+      const container = document.getElementById('subjects-grid');
+      if (!subjects.length) {
+        container.innerHTML = `
+          <div class="card" style="text-align: center; padding: 2.5rem; color: var(--text-muted); grid-column: 1 / -1;">
+            No enrolled courses found for your cohort.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = subjects.map(s => {
+        const isDef = s.percentage < 75.0 && s.conducted > 0;
+        const P = s.attended;
+        const C = s.conducted;
+        const T = 0.75;
+        let recoveryMsg = '';
+
+        if (C === 0) {
+          recoveryMsg = 'No sessions conducted yet.';
+        } else if (!isDef) {
+          const safe = Math.max(0, Math.floor((P - T * C) / T));
+          recoveryMsg = safe > 0 
+            ? `🟢 Good Standing: You can safely miss up to <strong>${safe}</strong> class(es) and remain above 75%.`
+            : '⚠️ Attendance is right on the 75% margin. Do not miss any upcoming sessions.';
+        } else {
+          const needed = Math.max(1, Math.ceil((T * C - P) / (1 - T)));
+          recoveryMsg = `🔴 Deficit Alert: Must attend the next <strong>${needed}</strong> class(es) to recover above 75%.`;
+        }
+
+        return `
+          <div class="subject-card" id="subject-card-${s.subject_id || s.group_id || ''}" style="border-top-color: ${isDef ? 'var(--status-absent)' : 'var(--color-primary)'};">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <div>
+                  <span class="badge badge-pending" style="font-family: var(--font-family-mono); font-size: 0.725rem;">${s.subject_code}</span>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-top: 0.25rem;">${s.subject_name}</h3>
+                </div>
+                <span class="pct-badge ${isDef ? 'pct-defaulter' : 'pct-safe'}" style="font-size: 1.05rem; padding: 0.25rem 0.6rem;">
+                  ${s.percentage}%
+                </span>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="pct-track" title="Attendance: ${s.percentage}% (Threshold: 75%)">
+                <div class="pct-marker-75" title="75% Threshold"></div>
+                <div class="pct-fill" style="width: ${Math.min(100, s.percentage)}%; background: ${isDef ? 'var(--status-absent)' : 'var(--status-present)'};"></div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; font-size: 0.825rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                <div>Attended: <strong style="color: var(--text-main);">${s.attended}</strong> / ${s.conducted}</div>
+                <div>Missed: <strong style="color: var(--status-absent);">${s.absent}</strong></div>
+              </div>
+
+              <div class="predictor-note ${isDef ? 'deficit' : 'safe'}">
+                ${recoveryMsg}
+              </div>
+            </div>
+
+            <div>
+              <button type="button" class="btn btn-primary" style="width: 100%; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;" onclick="openCalendarModal(${s.subject_id || s.group_id || 0}, '${(s.subject_name || '').replace(/'/g, "\\'")}', '${s.subject_code || ''}')">
+                <span>📅 View Attendance Calendar</span>
+                <span>→</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ─── 5. Calendar Modal & Navigation ─────────────────────────
+    function openCalendarModal(subjectId, subjectName, subjectCode) {
+      currentSubjectId = subjectId;
+      currentSubjectName = subjectName;
+      currentSubjectCode = subjectCode;
+
+      document.getElementById('cal-sub-code').innerText = subjectCode;
+      document.getElementById('cal-sub-name').innerText = subjectName;
+
+      // Detect if there's recorded attendance in September 2026 or another month
+      const historyMap = subjectAttendanceHistory[subjectId] || subjectAttendanceHistory[subjectCode] || {};
+      const recordDates = Object.keys(historyMap);
+      if (recordDates.length > 0) {
+        // Find most recent session date to auto-focus that month
+        recordDates.sort();
+        const latest = recordDates[recordDates.length - 1]; // e.g. "2026-09-12"
+        const [y, m] = latest.split('-').map(n => parseInt(n, 10));
+        if (y && m) {
+          selectedYear = y;
+          selectedMonth = m - 1; // 0-indexed
+          syncDropdowns();
+        }
+      }
+
+      renderCalendarGrid();
+      document.getElementById('calendar-modal').classList.add('open');
+    }
+
+    function closeCalendarModal() {
+      document.getElementById('calendar-modal').classList.remove('open');
+    }
+
+    function syncDropdowns() {
+      document.getElementById('cal-month-select').value = selectedMonth;
+      document.getElementById('cal-year-select').value = selectedYear;
+    }
+
+    function onMonthSelectChange() {
+      selectedMonth = parseInt(document.getElementById('cal-month-select').value, 10);
+      renderCalendarGrid();
+    }
+
+    function onYearSelectChange() {
+      selectedYear = parseInt(document.getElementById('cal-year-select').value, 10);
+      renderCalendarGrid();
+    }
+
+    function prevMonth() {
+      selectedMonth--;
+      if (selectedMonth < 0) {
+        selectedMonth = 11;
+        selectedYear--;
+      }
+      syncDropdowns();
+      renderCalendarGrid();
+    }
+
+    function nextMonth() {
+      selectedMonth++;
+      if (selectedMonth > 11) {
+        selectedMonth = 0;
+        selectedYear++;
+      }
+      syncDropdowns();
+      renderCalendarGrid();
+    }
+
+    // ─── 6. Real Calendar Grid Rendering ────────────────────────
+    function renderCalendarGrid() {
+      const grid = document.getElementById('calendar-grid');
+      // Keep weekday headers
+      const weekdayHeaders = `
+        <div class="cal-weekday sunday">Sun</div>
+        <div class="cal-weekday">Mon</div>
+        <div class="cal-weekday">Tue</div>
+        <div class="cal-weekday">Wed</div>
+        <div class="cal-weekday">Thu</div>
+        <div class="cal-weekday">Fri</div>
+        <div class="cal-weekday">Sat</div>
+      `;
+
+      const firstDayIndex = new Date(selectedYear, selectedMonth, 1).getDay(); // 0 for Sun, 1 for Mon...
+      const totalDaysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate(); // 28..31
+
+      // Today's date check
+      const today = new Date();
+      const isCurrentMonthToday = (today.getFullYear() === selectedYear && today.getMonth() === selectedMonth);
+      const todayDate = today.getDate();
+
+      // Attendance records for current subject
+      const records = subjectAttendanceHistory[currentSubjectId] || subjectAttendanceHistory[currentSubjectCode] || {};
+
+      let cellsHtml = '';
+      let monthConducted = 0;
+      let monthAttended = 0;
+      let monthAbsent = 0;
+
+      // 1. Leading empty cells
+      for (let i = 0; i < firstDayIndex; i++) {
+        cellsHtml += `<div class="cal-cell empty"></div>`;
+      }
+
+      // 2. Day cells
+      for (let day = 1; day <= totalDaysInMonth; day++) {
+        const dayOfWeek = (firstDayIndex + day - 1) % 7;
+        const isSunday = (dayOfWeek === 0);
+        
+        // Format YYYY-MM-DD
+        const mStr = String(selectedMonth + 1).padStart(2, '0');
+        const dStr = String(day).padStart(2, '0');
+        const dateKey = `${selectedYear}-${mStr}-${dStr}`;
+
+        const attStatus = records[dateKey]; // 'PRESENT', 'ABSENT', 'LATE', or undefined
+
+        let cellClass = 'cal-cell';
+        let statusBadge = '';
+
+        if (attStatus === 'PRESENT' || attStatus === 'LATE') {
+          cellClass += ' attended-present';
+          statusBadge = '<span class="cal-cell-label">✓ Present</span>';
+          monthConducted++;
+          monthAttended++;
+        } else if (attStatus === 'ABSENT') {
+          cellClass += ' attended-absent';
+          statusBadge = '<span class="cal-cell-label">✕ Absent</span>';
+          monthConducted++;
+          monthAbsent++;
+        } else if (isSunday) {
+          cellClass += ' sunday-holiday';
+          statusBadge = '<span class="cal-cell-label">Holiday</span>';
+        }
+
+        if (isCurrentMonthToday && day === todayDate) {
+          cellClass += ' today-ring';
+        }
+
+        cellsHtml += `
+          <div class="${cellClass}" title="${dateKey}: ${attStatus || (isSunday ? 'Sunday Holiday' : 'No Class')}">
+            <span>${day}</span>
+            ${statusBadge}
+          </div>
+        `;
+      }
+
+      // 3. Trailing empty cells to complete the row
+      const totalRenderedCells = firstDayIndex + totalDaysInMonth;
+      const trailingCells = (7 - (totalRenderedCells % 7)) % 7;
+      for (let i = 0; i < trailingCells; i++) {
+        cellsHtml += `<div class="cal-cell empty"></div>`;
+      }
+
+      grid.innerHTML = weekdayHeaders + cellsHtml;
+
+      // Update Monthly stats bar
+      const monthPct = monthConducted > 0 ? ((monthAttended / monthConducted) * 100).toFixed(1) : '—';
+      document.getElementById('cal-month-stats').innerHTML = `
+        Sessions This Month: <strong>${monthConducted}</strong> &nbsp;|&nbsp; 
+        Attended: <strong style="color: var(--status-present);">${monthAttended}</strong> &nbsp;|&nbsp; 
+        Absent: <strong style="color: var(--status-absent);">${monthAbsent}</strong> &nbsp;|&nbsp; 
+        Monthly Attendance: <strong>${monthPct}%</strong>
+      `;
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeCalendarModal();
+    });
+
+    initPage();
+  </script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Department Policies & Settings | HOD Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    .hod-nav-section { border-top: 1px solid var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem; }
+    .hod-nav-label { font-size: 0.68rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); padding: 0 0.25rem; letter-spacing: 0.05em; }
+
+    .analysis-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+    @media (max-width: 850px) {
+      .analysis-board { grid-template-columns: 1fr; }
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--kpi-accent, var(--color-primary));
+    }
+    .kpi-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .kpi-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.15;
+    }
+    .kpi-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 850px) {
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+
+    .settings-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .settings-panel-header {
+      padding: 1.25rem 1.5rem;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .settings-panel-body {
+      padding: 1.5rem;
+      flex: 1;
+    }
+    .settings-panel-footer {
+      padding: 1rem 1.5rem;
+      background: var(--bg-surface-secondary);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    .term-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.78rem;
+    }
+    .term-odd { background: var(--status-present-bg); color: var(--status-present); }
+    .term-even { background: var(--chip-classteacher-bg); color: var(--chip-classteacher-color); }
+
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      padding: 0.85rem 1.4rem; border-radius: var(--radius-sm);
+      font-size: 0.875rem; font-weight: 600; z-index: 9999;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <a href="/faculty/dashboard.html" class="brand">
+      <span class="brand-badge" style="background: var(--color-primary);">HOD</span>
+      <span id="dept-header-name">Department Portal</span>
+    </a>
+    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+      <a href="/faculty/registers.html" class="btn btn-secondary btn-sm">My Registers</a>
+      <div class="hod-nav-section" style="border-top: none; padding: 0; margin: 0; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <span class="hod-nav-label">HOD:</span>
+        <a href="/faculty/hod-teachers.html" class="btn btn-secondary btn-sm">My Teachers</a>
+        <a href="/faculty/hod-subjects.html" class="btn btn-secondary btn-sm">Subjects</a>
+        <a href="/faculty/hod-students.html" class="btn btn-secondary btn-sm">Students</a>
+        <a href="/faculty/hod-archive.html" class="btn btn-secondary btn-sm">Archive</a>
+        <a href="/faculty/hod-reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
+        <a href="/faculty/hod-devices.html" class="btn btn-secondary btn-sm">ESP Terminals</a>
+        <a href="/faculty/hod-settings.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Settings</a>
+      </div>
+    </nav>
+    <div id="user-nav" class="user-nav"></div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem;">
+    <!-- Page Header -->
+    <div class="page-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-title" style="display: flex; align-items: center; gap: 0.5rem;">
+          <span>⚙️</span> Department Policies &amp; Settings
+        </h1>
+        <p class="page-subtitle" id="page-subtitle">
+          Departmental curriculum specifications, attendance evaluation thresholds, and hardware scanner telemetry rules.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.6rem; align-items: center;">
+        <button class="btn btn-secondary btn-sm" onclick="loadSettings()">🔄 Refresh Settings</button>
+      </div>
+    </div>
+
+    <!-- 1. STATUS OVERVIEW BOARD (3 KPIs) -->
+    <div class="analysis-board">
+      <div class="kpi-card" style="--kpi-accent: var(--color-primary);">
+        <div class="kpi-lbl">Program Curriculum Duration</div>
+        <div class="kpi-val" id="kpi-duration">--</div>
+        <div class="kpi-desc" id="kpi-duration-sub">Loading semesters...</div>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--status-late);">
+        <div class="kpi-lbl">Exam Eligibility Threshold</div>
+        <div class="kpi-val" id="kpi-threshold" style="color: var(--status-late);">75%</div>
+        <div class="kpi-desc">Attendance defaulter cutoff</div>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--color-primary);">
+        <div class="kpi-lbl">Department Resources</div>
+        <div class="kpi-val" id="kpi-resources" style="font-size: 1.4rem;">--</div>
+        <div class="kpi-desc" id="kpi-resources-sub">Teachers • Students • Terminals</div>
+      </div>
+    </div>
+
+    <!-- 2. SETTINGS PANELS GRID -->
+    <div class="settings-grid">
+      <!-- Panel 1: Curriculum & Degree Duration -->
+      <div class="settings-panel">
+        <div class="settings-panel-header">
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Degree Curriculum Controls</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Configure academic program length (up to 4 years)</span>
+          </div>
+          <span class="badge" style="background: var(--chip-faculty-bg); color: var(--chip-faculty-color); font-weight: 700;">Curriculum</span>
+        </div>
+        <div class="settings-panel-body">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700;">Program Degree Duration</label>
+            <select id="setting-duration" class="form-select" onchange="onDurationChange()">
+              <option value="1">1 Year (Semesters 1 to 2)</option>
+              <option value="2">2 Years (Semesters 1 to 4 — Diploma / Master's)</option>
+              <option value="3" selected>3 Years (Semesters 1 to 6 — Polytechnic / Degree)</option>
+              <option value="4">4 Years (Semesters 1 to 8 — B.Tech / BE)</option>
+            </select>
+            <span style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.35rem; display: block;">
+              Defines the total years of study before students are graduated to Alumni Archive during final-year promotions.
+            </span>
+          </div>
+
+          <div id="duration-confirm-box" style="display: none; background: var(--remark-short-bg); border: 1.5px solid var(--remark-short-border); border-radius: var(--radius-sm); padding: 0.85rem; margin-top: 1rem;">
+            <div style="font-weight: 700; color: var(--remark-short-color); font-size: 0.85rem; margin-bottom: 0.35rem;">
+              ⚠️ Security Confirmation Required
+            </div>
+            <p style="font-size: 0.78rem; color: var(--remark-short-color); margin-bottom: 0.65rem;">
+              Changing program duration reconfigures cohort maximum semesters. To confirm, enter your department code (<strong id="confirm-dept-code-label">IT</strong>):
+            </p>
+            <input type="text" id="setting-confirm-code" class="form-control" placeholder="Enter department code" style="text-transform: uppercase; font-family: 'JetBrains Mono', monospace;">
+          </div>
+        </div>
+        <div class="settings-panel-footer">
+          <button type="button" id="save-curriculum-btn" class="btn btn-primary" onclick="saveCurriculumSettings()">
+            Save Curriculum Settings
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel 2: Attendance Defaulter Policy -->
+      <div class="settings-panel">
+        <div class="settings-panel-header">
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Attendance Defaulter Policies</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Threshold cutoffs for examination eligibility &amp; warnings</span>
+          </div>
+          <span class="badge" style="background: var(--chip-hod-bg); color: var(--chip-hod-color); font-weight: 700;">Policies</span>
+        </div>
+        <div class="settings-panel-body">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700;" for="setting-threshold">
+              Examination Eligibility Cutoff (%)
+            </label>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <input type="number" id="setting-threshold" class="form-control" style="max-width: 140px; font-size: 1.15rem; font-weight: 800; color: var(--color-primary);" min="50" max="100" step="1" value="75">
+              <span style="font-weight: 700; color: var(--text-muted); font-size: 1.1rem;">%</span>
+            </div>
+            <span style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.35rem; display: block;">
+              Students with cumulative attendance below this threshold will be flagged as <strong>DEFICIENT / Defaulter</strong> in reports and examination hall-ticket rosters.
+            </span>
+          </div>
+
+          <div style="background: var(--bg-surface-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; margin-top: 1rem;">
+            <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--text-main);">
+              Standard University Threshold Scale:
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.8rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--status-present); font-weight: 600;">🟢 Healthy Turnout (Eligible)</span>
+                <span style="font-weight: 700; color: var(--status-present);">&ge; 75%</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--status-late); font-weight: 600;">🟡 Moderate / Warning Zone</span>
+                <span style="font-weight: 700; color: var(--status-late);">50% – 74%</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--status-absent); font-weight: 600;">🔴 Critical Defaulter (Ineligible)</span>
+                <span style="font-weight: 700; color: var(--status-absent);">&lt; 50%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-panel-footer">
+          <button type="button" id="save-policy-btn" class="btn btn-primary" onclick="savePolicySettings()">
+            Update Attendance Threshold
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel 3: Biometric Hardware & ESP32 Kiosk Preferences -->
+      <div class="settings-panel">
+        <div class="settings-panel-header">
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Biometric Terminal Telemetry</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Hardware kiosk touch logging and presence rules</span>
+          </div>
+          <span class="badge" style="background: var(--chip-classteacher-bg); color: var(--chip-classteacher-color); font-weight: 700;">Hardware</span>
+        </div>
+        <div class="settings-panel-body">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700;">Heartbeat Offline Timeout</label>
+            <input type="text" class="form-control" value="5 Minutes (Automatic Offline Heartbeat)" disabled style="background: var(--bg-surface-secondary);">
+            <span style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.35rem; display: block;">
+              Scanners not pinging within 5 minutes automatically display as OFFLINE in the hardware console.
+            </span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700;">Multi-Year Hardware Scope</label>
+            <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin-top: 0.2rem;">
+              Department terminals can be bound to single cohorts or multi-year lab gates (e.g. Years 1, 2 &amp; 3 simultaneously with automated semester derivation).
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <a href="/faculty/hod-devices.html" class="btn btn-secondary btn-sm" style="font-weight: 600; width: 100%; text-align: center; justify-content: center;">
+              📟 Open Department Hardware Kiosks &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4: Department Governance & HOD Account -->
+      <div class="settings-panel">
+        <div class="settings-panel-header">
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Department Leadership &amp; Account</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Official department leadership and access security</span>
+          </div>
+          <span class="badge" style="background: var(--bg-surface); color: var(--text-main); font-weight: 700;">Governance</span>
+        </div>
+        <div class="settings-panel-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem; margin-bottom: 1.25rem;">
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Department Name</span>
+              <div id="m-dept-name" style="font-weight: 700; color: var(--text-main); margin-top: 0.2rem;">--</div>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Department Code</span>
+              <div id="m-dept-code" style="font-weight: 700; color: var(--text-main); margin-top: 0.2rem;">--</div>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Head of Department</span>
+              <div id="m-hod-name" style="font-weight: 700; color: var(--text-main); margin-top: 0.2rem;">--</div>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Official Email</span>
+              <div id="m-hod-email" style="font-weight: 600; color: var(--text-muted); margin-top: 0.2rem; word-break: break-all;">--</div>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+              Update personal password, Google Workspace Single Sign-On link, and security preferences:
+            </p>
+            <a href="/faculty/profile.html" class="btn btn-secondary btn-sm" style="font-weight: 600; width: 100%; text-align: center; justify-content: center;">
+              👤 My Profile &amp; Google Account Link &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script>
+    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireHOD: true });
+
+    let currentSettings = null;
+
+    async function init() {
+      await loadSettings();
+    }
+
+    async function loadSettings() {
+      try {
+        const res = await fetchApi('/hod/settings');
+        if (res.success && res.data) {
+          currentSettings = res.data;
+          renderSettings(res.data);
+        }
+      } catch (err) {
+        showToast('Failed to load department settings: ' + err.message, 'error');
+      }
+    }
+
+    function renderSettings(d) {
+      document.getElementById('dept-header-name').innerText = d.department_name + ' (HOD)';
+      document.getElementById('page-subtitle').innerText = `Departmental curriculum specifications, attendance evaluation thresholds, and hardware scanner telemetry rules for ${d.department_name}.`;
+
+      // KPIs
+      document.getElementById('kpi-duration').innerText = `${d.degree_duration_years} Years`;
+      document.getElementById('kpi-duration-sub').innerText = `Semesters 1 to ${d.degree_duration_years * 2}`;
+
+      document.getElementById('kpi-threshold').innerText = `${d.defaulter_threshold_percent || 75}%`;
+      document.getElementById('kpi-resources').innerText = `${d.teachers_count || 0} Faculty • ${d.students_count || 0} Students`;
+      document.getElementById('kpi-resources-sub').innerText = `${d.terminals_count || 0} Biometric Terminals Registered`;
+
+      // Form fields
+      document.getElementById('setting-duration').value = String(Math.min(d.degree_duration_years || 3, 4));
+      document.getElementById('setting-threshold').value = d.defaulter_threshold_percent || 75;
+
+      // Governance
+      document.getElementById('m-dept-name').innerText = d.department_name;
+      document.getElementById('m-dept-code').innerText = d.department_code;
+      document.getElementById('confirm-dept-code-label').innerText = d.department_code;
+      document.getElementById('m-hod-name').innerText = d.hod_name;
+      document.getElementById('m-hod-email').innerText = d.hod_email;
+
+      onDurationChange();
+    }
+
+    function onDurationChange() {
+      const selected = parseInt(document.getElementById('setting-duration').value, 10);
+      const original = currentSettings ? currentSettings.degree_duration_years : 3;
+      const confirmBox = document.getElementById('duration-confirm-box');
+      if (selected !== original) {
+        confirmBox.style.display = 'block';
+      } else {
+        confirmBox.style.display = 'none';
+        document.getElementById('setting-confirm-code').value = '';
+      }
+    }
+
+    async function saveCurriculumSettings() {
+      if (!currentSettings) return;
+      const duration = parseInt(document.getElementById('setting-duration').value, 10);
+      const confirmBox = document.getElementById('duration-confirm-box');
+      const btn = document.getElementById('save-curriculum-btn');
+
+      // Check if duration changed and requires confirmation
+      if (duration !== currentSettings.degree_duration_years) {
+        const codeInput = document.getElementById('setting-confirm-code').value.trim().toUpperCase();
+        if (codeInput !== currentSettings.department_code.toUpperCase()) {
+          showToast(`Please enter your exact department code (${currentSettings.department_code}) to confirm changing degree duration.`, 'warning');
+          return;
+        }
+      }
+
+      btn.disabled = true;
+      try {
+        const res = await fetchApi('/hod/settings', {
+          method: 'PUT',
+          body: JSON.stringify({
+            degree_duration_years: duration
+          })
+        });
+        if (res.success) {
+          showToast('Curriculum duration saved successfully!', 'success');
+          await loadSettings();
+        }
+      } catch (err) {
+        // Handled by fetchApi toast
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function savePolicySettings() {
+      const threshold = parseInt(document.getElementById('setting-threshold').value, 10);
+      if (isNaN(threshold) || threshold < 50 || threshold > 100) {
+        showToast('Threshold must be a percentage between 50% and 100%.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('save-policy-btn');
+      btn.disabled = true;
+      try {
+        const res = await fetchApi('/hod/settings', {
+          method: 'PUT',
+          body: JSON.stringify({
+            defaulter_threshold_percent: threshold
+          })
+        });
+        if (res.success) {
+          showToast('Attendance defaulter threshold updated successfully!', 'success');
+          await loadSettings();
+        }
+      } catch (err) {
+        // Handled by fetchApi toast
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
