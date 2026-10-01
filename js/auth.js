@@ -26,6 +26,29 @@ function setAuthSession(token, user) {
   localStorage.setItem('user', JSON.stringify(user));
 }
 
+// Auto-capture token and user if redirected from OAuth callback URL
+if (typeof window !== 'undefined' && window.location && window.location.search) {
+  try {
+    const _urlParams = new URLSearchParams(window.location.search);
+    const _oauthToken = _urlParams.get('token');
+    const _oauthUser = _urlParams.get('user');
+    if (_oauthToken) {
+      localStorage.setItem('access_token', _oauthToken);
+      if (_oauthUser) {
+        try { localStorage.setItem('user', JSON.stringify(JSON.parse(_oauthUser))); }
+        catch (_) { localStorage.setItem('user', _oauthUser); }
+      }
+      _urlParams.delete('token');
+      _urlParams.delete('user');
+      const _newQuery = _urlParams.toString();
+      const _cleanUrl = window.location.pathname + (_newQuery ? '?' + _newQuery : '') + window.location.hash;
+      window.history.replaceState({}, document.title, _cleanUrl);
+    }
+  } catch (_e) {
+    console.warn('OAuth URL param capture warning:', _e);
+  }
+}
+
 // Fallback showToast to guarantee no ReferenceError occurs if ui.js is omitted
 if (typeof window !== 'undefined' && typeof window.showToast !== 'function') {
   window.showToast = function(message, type = 'info', duration = 4000) {

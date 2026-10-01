@@ -405,8 +405,22 @@
       try {
         const res = await fetchApi('/auth/google/url?mode=' + mode);
         if (res.configured && res.data?.url) {
-          // Open REAL official Google Accounts page in SAME TAB (as requested)
-          window.location.href = res.data.url;
+          const width = 500;
+          const height = 650;
+          const left = window.screenX + (window.outerWidth - width) / 2;
+          const top = window.screenY + (window.outerHeight - height) / 2;
+          const popup = window.open(
+            res.data.url,
+            'google_account_chooser',
+            `width=${width},height=${height},left=${left},top=${top},status=0,menubar=0,toolbar=0`
+          );
+
+          if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            window.location.href = res.data.url;
+            return;
+          } else {
+            popup.focus();
+          }
         } else {
           // Client ID not yet set in .env -> open Google Cloud Console Setup Helper modal
           openGoogleSetupModal(mode);
