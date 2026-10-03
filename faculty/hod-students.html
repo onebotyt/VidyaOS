@@ -1147,14 +1147,10 @@
       <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0 0 0.5rem 0;">Approve Student Registration</h2>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Admit <strong id="approve-name"></strong> into active department roster.</p>
       <form id="approve-form" onsubmit="submitApproveRegistration(event)">
-        <div class="form-group" style="margin-bottom: 1rem;">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
           <label class="form-label">Official Enrollment Number <span style="color: var(--status-absent);">*</span></label>
           <input type="text" id="approve-enroll" class="form-control" placeholder="e.g. 2024IT001" style="text-transform: uppercase; font-family: monospace; font-weight: 700;" required>
           <p class="form-hint" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Primary institutional student enrollment identifier.</p>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Class Roll Number <span style="font-size: 0.75rem; color: var(--text-muted);">(Optional &mdash; auto-assigned if empty)</span></label>
-          <input type="number" id="approve-roll" class="form-control" placeholder="Auto-assigned" min="1" max="999">
         </div>
         <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
           <button type="button" class="btn btn-secondary" onclick="closeModal('approve-modal')">Cancel</button>
@@ -2295,13 +2291,13 @@
         tbody.innerHTML = list.map(r => `
           <tr style="border-bottom: 1px solid var(--border-color);">
             <td style="padding: 0.75rem 1rem; font-weight: 600;">${esc(r.full_name)}</td>
-            <td style="padding: 0.75rem 1rem; font-family: monospace;">${esc(r.official_enrollment_no)}</td>
+            <td style="padding: 0.75rem 1rem; font-family: monospace;">${esc(r.official_enrollment_no || r.enrollment_no)}</td>
             <td style="padding: 0.75rem 1rem; font-family: monospace; font-size: 0.85rem;">${esc(r.email)}</td>
             <td style="padding: 0.75rem 1rem; font-size: 0.85rem;">${esc(r.department_name || 'IT')} Y${r.year} S${r.semester}</td>
-            <td style="padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--text-muted);">${new Date(r.created_at || Date.now()).toLocaleDateString()}</td>
+            <td style="padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--text-muted);">${new Date(r.registered_at || r.created_at || Date.now()).toLocaleDateString()}</td>
             <td style="padding: 0.75rem 1rem; text-align: right;">
-              <button class="btn btn-primary btn-sm" onclick="openApproveModal(${r.id}, '${esc(r.full_name)}', '${esc(r.official_enrollment_no)}')">Approve</button>
-              <button class="btn btn-secondary btn-sm" style="color: var(--status-absent);" onclick="openRejectModal(${r.id}, '${esc(r.full_name)}')">Reject</button>
+              <button class="btn btn-primary btn-sm" onclick="openApproveModal(${r.student_id || r.id}, '${esc(r.full_name)}', '${esc(r.official_enrollment_no || r.enrollment_no)}')">Approve</button>
+              <button class="btn btn-secondary btn-sm" style="color: var(--status-absent);" onclick="openRejectModal(${r.student_id || r.id}, '${esc(r.full_name)}')">Reject</button>
             </td>
           </tr>
         `).join('');
@@ -2315,22 +2311,18 @@
       targetRegId = id;
       document.getElementById('approve-name').textContent = name;
       document.getElementById('approve-enroll').value = enrollNo || '';
-      document.getElementById('approve-roll').value = '';
       showModal('approve-modal');
     }
 
     async function submitApproveRegistration(e) {
       e.preventDefault();
       const enrollNo = document.getElementById('approve-enroll').value.trim();
-      const rollVal = document.getElementById('approve-roll').value;
-      const roll = rollVal ? parseInt(rollVal) : undefined;
       try {
         await apiFetch(`/students/registrations/${targetRegId}/adjudicate`, {
           method: 'POST',
           body: JSON.stringify({
             action: 'APPROVE',
-            official_enrollment_no: enrollNo,
-            class_roll_no: roll
+            official_enrollment_no: enrollNo
           })
         });
         showToast('Student registration approved!', 'success');
