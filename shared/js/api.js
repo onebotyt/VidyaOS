@@ -78,7 +78,13 @@ async function apiRequest(endpoint, options = {}) {
   return fetchApi(cleanEndpoint, options);
 }
 
+async function apiFetch(endpoint, options = {}) {
+  const cleanEndpoint = endpoint.startsWith(API_BASE) ? endpoint.slice(API_BASE.length) : endpoint;
+  return fetchApi(cleanEndpoint, options);
+}
+
 if (typeof window !== 'undefined') {
   window.fetchApi = fetchApi;
   window.apiRequest = apiRequest;
+  window.apiFetch = apiFetch;
 }

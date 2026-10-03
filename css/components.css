@@ -2272,3 +2272,302 @@
   font-size: 0.82rem;
 }
 
+/* ─────────────────────────────────────────────────────────
+ * GOOGLE CLASSROOM SUITE COMPONENTS (.gc-navbar, .gc-drawer, etc.)
+ * ───────────────────────────────────────────────────────── */
+.gc-navbar {
+  height: 64px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.04);
+}
+.gc-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.gc-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+.gc-menu-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: var(--text-main);
+  transition: background 0.15s ease;
+}
+.gc-menu-btn:hover {
+  background: var(--bg-surface);
+}
+.gc-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+.gc-brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.gc-brand-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+.gc-brand-sub {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
+  margin-left: 2px;
+}
+.gc-page-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  margin-left: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+}
+.gc-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 20px;
+  background: var(--color-primary);
+  color: var(--text-white);
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.gc-create-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+.gc-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+.gc-icon-btn:hover {
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+.gc-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-white);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.15s ease;
+}
+.gc-user-avatar:hover {
+  filter: brightness(0.95);
+}
+
+/* Apps Launcher Grid Menu */
+.apps-launcher-dropdown {
+  position: absolute;
+  top: 54px;
+  right: 48px;
+  width: 310px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  z-index: 1010;
+  max-height: 460px;
+  overflow-y: auto;
+}
+.apps-launcher-dropdown.open {
+  display: grid;
+}
+.app-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.65rem 0.25rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.app-tile:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+.app-tile-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Profile Popover */
+.user-profile-popover {
+  position: absolute;
+  top: 54px;
+  right: 0;
+  width: 270px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 1010;
+}
+.user-profile-popover.open {
+  display: flex;
+}
+
+/* Slide-out Drawer (.gc-drawer & #app-sidebar) */
+.gc-drawer,
+aside.app-sidebar.gc-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 290px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+}
+.gc-drawer.open,
+.gc-drawer.sidebar-open,
+aside.app-sidebar.gc-drawer.sidebar-open {
+  transform: translateX(0);
+}
+.gc-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: hsl(0 0% 0% / 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  display: none;
+}
+.gc-drawer-backdrop.active,
+.gc-drawer-backdrop.open {
+  display: block;
+}
+.gc-drawer-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.gc-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0;
+}
+.gc-drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 1.25rem;
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 0 999px 999px 0;
+  margin-right: 0.75rem;
+  transition: all 0.15s ease;
+}
+.gc-drawer-link:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+.gc-drawer-link.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.gc-drawer-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.6rem 0;
+}
+.gc-drawer-sec-title {
+  padding: 0.6rem 1.25rem 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.gc-class-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+

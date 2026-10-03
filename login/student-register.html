@@ -482,10 +482,19 @@
     let otpCountdownTimer = null;
     let isCohortRegistrationOpen = false;
     let googleRegistrationData = null;
+    let isWaOtpMandatory = true; // fetched from server on load
 
     // ─── Initialize ──────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', async () => {
-      await loadDepartments();
+      // Fetch WhatsApp mandatory setting and departments concurrently
+      const [, waSettings] = await Promise.allSettled([
+        loadDepartments(),
+        fetchApi('/auth/whatsapp-settings').catch(() => null)
+      ]);
+      if (waSettings?.value?.success && waSettings.value.data) {
+        isWaOtpMandatory = waSettings.value.data.whatsapp_otp_mandatory;
+        applyWaOtpMandatorySetting();
+      }
 
       // Check URL query parameters for Google pre-fill (e.g. redirected from Google OAuth or student.html)
       const urlParams = new URLSearchParams(window.location.search);
@@ -496,6 +505,26 @@
         selectGoogleAccount(qEmail, qName, qSub);
       }
     });
+
+    function applyWaOtpMandatorySetting() {
+      const phoneHint = document.getElementById('phone-hint');
+      const phoneLabel = document.querySelector('label[for="reg-phone"]');
+      const otpSection = document.querySelector('label[for="reg-phone"]')?.closest('.form-group');
+
+      if (!isWaOtpMandatory) {
+        // Show 'Optional' badge on phone label
+        const existingAsterisk = phoneLabel?.querySelector('span[style*="status-absent"]');
+        if (existingAsterisk) existingAsterisk.style.display = 'none';
+        if (phoneHint) phoneHint.innerHTML = '📵 <em>WhatsApp OTP verification is <strong>optional</strong> — you may skip it and submit without verification. Phone verification can be added later.</em>';
+
+        // Update send OTP button label
+        const sendOtpBtn = document.getElementById('btn-send-otp');
+        if (sendOtpBtn) sendOtpBtn.textContent = '💬 Verify WhatsApp (Optional)';
+      } else {
+        if (phoneHint) phoneHint.textContent = '10-digit mobile number registered with WhatsApp for instant OTP code verification.';
+      }
+      updateSubmitButtonState();
+    }
 
     // ─── Official Google OAuth Window & Auto-Fetch ────────────
     async function initiateGoogleSignUp() {
@@ -857,12 +886,14 @@
       if (!isCohortRegistrationOpen) {
         submitBtn.disabled = true;
         submitBtn.textContent = '🚫 Registration Closed';
-      } else if (!verifiedOtpToken) {
+      } else if (isWaOtpMandatory && !verifiedOtpToken) {
         submitBtn.disabled = true;
         submitBtn.textContent = '🔒 Verify OTP to Register';
       } else {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Registration Request →';
+        submitBtn.textContent = verifiedOtpToken
+          ? 'Submit Registration Request →'
+          : '📋 Submit Registration (No Phone Verification)';
       }
     }
 
@@ -1113,12 +1144,18 @@
       if (!full_name) { showToast('Please enter your full name', 'error'); return; }
       if (!official_enrollment_no) { showToast('Please enter your enrollment number', 'error'); return; }
       if (!email || !email.includes('@')) { showToast('Please enter a valid Gmail address', 'error'); return; }
-      if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      // Phone required only if OTP mandatory or if user filled it in
+      if (isWaOtpMandatory && (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone))) {
         showToast('Please enter a valid 10-digit WhatsApp mobile number', 'error');
         document.getElementById('reg-phone')?.focus();
         return;
       }
-      if (!verifiedOtpToken) {
+      if (cleanPhone && (cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone))) {
+        showToast('If entering a phone number, it must be a valid 10-digit Indian mobile number.', 'error');
+        document.getElementById('reg-phone')?.focus();
+        return;
+      }
+      if (isWaOtpMandatory && !verifiedOtpToken) {
         showToast('Please verify your WhatsApp mobile number with OTP before submitting.', 'error');
         handleSendOtp();
         return;
@@ -1221,15 +1258,8 @@
       }
     });
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+    const escapeHtml = typeof esc !== 'undefined' ? esc : (s => s);
+
 
     // ─── Toast Notification ──────────────────────────────────
     function showToast(message, type = 'info', duration = 4000) {

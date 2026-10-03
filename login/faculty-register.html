@@ -306,10 +306,18 @@
     let otpCountdownTimer = null;
     let isGateOpen = false;
     let gateClosedReason = '';
+    let isWaOtpMandatory = true; // fetched from server on load
 
     document.addEventListener('DOMContentLoaded', async () => {
-      await loadRegistrationGates();
-      await loadDepartments();
+      // Load WhatsApp mandatory setting concurrently
+      const [,,waSettings] = await Promise.allSettled([
+        loadRegistrationGates(),
+        loadDepartments(),
+        apiRequest('/api/v1/auth/whatsapp-settings').catch(() => null)
+      ]);
+      if (waSettings?.value?.success && waSettings.value.data) {
+        isWaOtpMandatory = waSettings.value.data.whatsapp_otp_mandatory;
+      }
       updateRoutingDisplay();
     });
 
@@ -500,12 +508,14 @@
       if (!isGateOpen) {
         submitBtn.disabled = true;
         submitBtn.textContent = gateClosedReason ? `${gateClosedReason}` : '🚫 Registration Closed';
-      } else if (!verifiedOtpToken) {
+      } else if (isWaOtpMandatory && !verifiedOtpToken) {
         submitBtn.disabled = true;
         submitBtn.textContent = '🔒 Verify OTP to Register';
       } else {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Registration Request →';
+        submitBtn.textContent = verifiedOtpToken
+          ? 'Submit Registration Request →'
+          : '📋 Submit Registration (No Phone Verification)';
       }
     }
 
@@ -725,13 +735,18 @@
         return;
       }
 
-      if (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone)) {
+      if (isWaOtpMandatory && (!cleanPhone || cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone))) {
         showAlert('Please enter a valid 10-digit WhatsApp mobile number.', 'danger');
         document.getElementById('phone')?.focus();
         return;
       }
+      if (cleanPhone && (cleanPhone.length !== 10 || !/^[6-9]\d{9}$/.test(cleanPhone))) {
+        showAlert('If entering a phone number, it must be a valid 10-digit Indian mobile number.', 'danger');
+        document.getElementById('phone')?.focus();
+        return;
+      }
 
-      if (!verifiedOtpToken) {
+      if (isWaOtpMandatory && !verifiedOtpToken) {
         showAlert('Please verify your WhatsApp mobile number with OTP before submitting.', 'danger');
         handleSendOtp();
         return;
@@ -846,15 +861,8 @@
       }
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+    const escapeHtml = typeof esc !== 'undefined' ? esc : (s => s);
+
   </script>
 </body>
 </html>

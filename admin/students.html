@@ -666,22 +666,13 @@
     }
 
     // ─── Helpers ──────────────────────────────────────────────
-    function esc(str) {
-      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+    
 
     function getCssVar(name) {
       return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     }
 
-    function showToast(msg, type = 'info') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.style.display = 'block';
-      t.style.background = type === 'error' ? 'var(--status-absent)' : type === 'success' ? 'var(--status-present)' : 'var(--color-primary)';
-      t.style.color = 'var(--text-white)';
-      setTimeout(() => { t.style.display = 'none'; }, 4000);
-    }
+    
 
     init();
   </script>

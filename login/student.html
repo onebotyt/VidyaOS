@@ -66,7 +66,7 @@
     <div style="margin-top: 1.5rem;">
       <!-- Pending approval banner (shown after PENDING_APPROVAL response) -->
       <div id="pending-banner" style="display:none; background: var(--bg-surface-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.9rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: var(--color-primary); line-height: 1.5;">
-        ⏳ <strong>Pending Approval</strong> — Your registration is awaiting review by your Class Teacher. You'll be able to log in once they approve your enrollment.
+        ⏳ <strong>Pending Approval</strong> — Your registration is awaiting review by your Department Faculty. You'll be able to log in once they approve your enrollment.
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;">
@@ -280,7 +280,7 @@
             const banner = document.getElementById('pending-banner');
             if (banner) banner.style.display = 'block';
             if (typeof showToast === 'function') {
-              showToast('Your registration is pending approval by your Department Class Teacher.', 'warning');
+              showToast('Your registration is pending approval by your Department Faculty.', 'warning');
             }
           } else if (payload.action === 'NOT_REGISTERED') {
             if (typeof showToast === 'function') {
@@ -411,7 +411,7 @@
         if (errCode === 'PENDING_APPROVAL' || errMsg.includes('PENDING') || errMsg.includes('pending')) {
           closeGoogleCard();
           document.getElementById('pending-banner').style.display = 'block';
-          showToast('Your registration is pending approval by your Class Teacher.', 'warning');
+          showToast('Your registration is pending approval by your Department Faculty.', 'warning');
         } else if (errMsg.includes('No account found') || err.status === 401) {
           showGoogleCardError(`
             No student account found for <strong>${escapeHtml(email)}</strong>.<br>
@@ -425,15 +425,8 @@
       }
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+    const escapeHtml = typeof esc !== 'undefined' ? esc : (s => s);
+
   </script>
 
   <!-- GOOGLE SIGN-IN OFFICIAL / SIMULATED CARD MODAL -->

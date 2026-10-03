@@ -74,10 +74,50 @@ if (typeof window !== 'undefined' && typeof window.showToast !== 'function') {
 
 function getCurrentUser() {
   try {
-    return JSON.parse(localStorage.getItem('user'));
+    const raw = localStorage.getItem('user');
+    if (!raw) return null;
+    const user = JSON.parse(raw);
+    // Sanitize any stale orphaned COMMON_FACULTY_MANAGER role if user is not active manager
+    if (user && !user.is_common_faculty_manager && user.roles && user.roles.includes('COMMON_FACULTY_MANAGER')) {
+      user.roles = user.roles.filter(r => r !== 'COMMON_FACULTY_MANAGER');
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+    return user;
   } catch {
     return null;
   }
+}
+
+async function syncCurrentUser() {
+  const token = getAuthToken();
+  if (!token) return;
+  try {
+    const res = await fetch('/api/v1/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        const stored = getCurrentUser() || {};
+        const rolesChanged = JSON.stringify(stored.roles) !== JSON.stringify(json.data.roles);
+        const cfmChanged = Boolean(stored.is_common_faculty_manager) !== Boolean(json.data.is_common_faculty_manager);
+        const hodChanged = Boolean(stored.is_hod) !== Boolean(json.data.is_hod);
+        
+        localStorage.setItem('user', JSON.stringify({ ...stored, ...json.data }));
+
+        if (rolesChanged || cfmChanged || hodChanged) {
+          const existingSidebar = document.getElementById('app-sidebar');
+          if (existingSidebar) {
+            existingSidebar.remove();
+            renderSidebar();
+          }
+          if (typeof renderHeaderUser === 'function') {
+            renderHeaderUser();
+          }
+        }
+      }
+    }
+  } catch (_) {}
 }
 
 function logout() {
@@ -111,6 +151,9 @@ function guardRoute(options = []) {
     window.location.href = '/index.html';
     return false;
   }
+
+  // Auto-sync session profile in background
+  syncCurrentUser();
 
   const config = Array.isArray(options) ? { roles: options } : (options || {});
   const allowedRoles = config.roles || config.requireRoles || [];
@@ -230,6 +273,12 @@ function guardRoute(options = []) {
     console.error('Error in renderUserNav:', err);
   }
 
+  try {
+    renderClassroomNavbar();
+  } catch (err) {
+    console.error('Error in renderClassroomNavbar:', err);
+  }
+
   return true;
 }
 
@@ -268,13 +317,15 @@ function toggleSidebar() {
   const backdrop = document.getElementById('sidebar-backdrop');
   if (!sidebar) return;
   const isOpen = sidebar.classList.toggle('sidebar-open');
+  sidebar.classList.toggle('open', isOpen);
   document.body.classList.toggle('sidebar-open', isOpen);
   if (backdrop) {
     backdrop.classList.toggle('active', isOpen);
+    backdrop.classList.toggle('open', isOpen);
   }
   _setSidebarState(isOpen);
   // Update toggle button icon
-  const btn = document.getElementById('sidebar-toggle-btn');
+  const btn = document.getElementById('sidebar-toggle-btn') || document.getElementById('btn-menu-toggle');
   if (btn) btn.setAttribute('aria-pressed', isOpen ? 'true' : 'false');
 }
 
@@ -283,29 +334,157 @@ function closeSidebar() {
   const backdrop = document.getElementById('sidebar-backdrop');
   if (!sidebar) return;
   sidebar.classList.remove('sidebar-open');
+  sidebar.classList.remove('open');
   document.body.classList.remove('sidebar-open');
-  if (backdrop) backdrop.classList.remove('active');
+  if (backdrop) {
+    backdrop.classList.remove('active');
+    backdrop.classList.remove('open');
+  }
   _setSidebarState(false);
+}
+
+function toggleAppsLauncher(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const el = document.getElementById('apps-launcher-dropdown');
+  if (!el) return;
+  const isOpen = el.classList.toggle('open');
+  el.style.display = isOpen ? 'grid' : 'none';
+  if (isOpen) {
+    closeUserProfile();
+    closeUserDropdown();
+  }
+}
+
+function closeAppsLauncher() {
+  const el = document.getElementById('apps-launcher-dropdown');
+  if (el) {
+    el.classList.remove('open');
+    el.style.display = 'none';
+  }
+}
+
+function toggleUserProfile(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const el = document.getElementById('user-profile-popover');
+  if (!el) return;
+  const isOpen = el.classList.toggle('open');
+  el.style.display = isOpen ? 'flex' : 'none';
+  if (isOpen) {
+    closeAppsLauncher();
+    closeUserDropdown();
+  }
+}
+
+function closeUserProfile() {
+  const el = document.getElementById('user-profile-popover');
+  if (el) {
+    el.classList.remove('open');
+    el.style.display = 'none';
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.toggleDrawer = toggleSidebar;
+  window.closeDrawer = closeSidebar;
+  window.toggleAppsLauncher = toggleAppsLauncher;
+  window.closeAppsLauncher = closeAppsLauncher;
+  window.toggleUserProfile = toggleUserProfile;
+  window.closeUserProfile = closeUserProfile;
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#apps-launcher-dropdown') && !e.target.closest('[onclick*="toggleAppsLauncher"]')) {
+      closeAppsLauncher();
+    }
+    if (!e.target.closest('#user-profile-popover') && !e.target.closest('#gc-user-avatar') && !e.target.closest('[onclick*="toggleUserProfile"]')) {
+      closeUserProfile();
+    }
+  });
+}
+
+async function _loadDrawerTeachingClasses() {
+  const container = document.getElementById('drawer-classes-list');
+  if (!container) return;
+  const token = getAuthToken();
+  if (!token) return;
+  try {
+    const res = await fetch('/api/v1/teaching-groups?status=ACTIVE', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) return;
+    const json = await res.json();
+    const groups = json?.data || [];
+    if (!groups.length) {
+      container.innerHTML = '<div style="padding:0.4rem 1.25rem; color:var(--text-muted); font-size:0.78rem;">No active classes</div>';
+      return;
+    }
+    const currentUrl = (window.location.pathname + window.location.search).toLowerCase();
+    container.innerHTML = groups.map(g => {
+      const initial = (g.name || 'C').charAt(0).toUpperCase();
+      const href = `/faculty/group-detail.html?id=${g.id}`;
+      const isActive = currentUrl.includes(`id=${g.id}`);
+      const safeName = String(g.name || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      return `
+        <a href="${href}" class="sidebar-item gc-drawer-link ${isActive ? 'active' : ''}" title="${safeName}" style="padding:0.45rem 1.25rem;">
+          <span style="width:24px; height:24px; border-radius:50%; background:var(--color-primary); color:var(--text-white); display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; flex-shrink:0;">${initial}</span>
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${safeName}</span>
+        </a>
+      `;
+    }).join('');
+  } catch (_) {}
+}
+
+function renderClassroomNavbar() {
+  const user = getCurrentUser();
+  if (!user) return;
+  const currentPath = window.location.pathname.toLowerCase();
+  if (!currentPath.includes('/faculty/')) return;
+
+  const displayName = getUserDisplayName(user);
+  const email = user.email || user.username || 'teacher@college.edu';
+  const cleanName = displayName.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
+  const parts = cleanName.split(/\s+/).filter(Boolean);
+  const initial = parts.length > 0 ? parts[0][0].toUpperCase() : 'T';
+
+  const avatarEl = document.getElementById('gc-user-avatar');
+  if (avatarEl) avatarEl.textContent = initial;
+  const popoverAvatar = document.getElementById('popover-avatar');
+  if (popoverAvatar) popoverAvatar.textContent = initial;
+  const popoverName = document.getElementById('popover-user-name');
+  if (popoverName) popoverName.textContent = displayName;
+  const popoverEmail = document.getElementById('popover-user-email');
+  if (popoverEmail) popoverEmail.textContent = email;
+  const launcher = document.getElementById('apps-launcher-dropdown');
+  if (launcher && !launcher.classList.contains('open')) launcher.style.display = 'none';
+  const popover = document.getElementById('user-profile-popover');
+  if (popover && !popover.classList.contains('open')) popover.style.display = 'none';
+
+  _loadDrawerTeachingClasses();
 }
 
 function renderSidebar() {
   const user = getCurrentUser();
-  const header = document.querySelector('.app-header');
+  const header = document.querySelector('.app-header, .gc-navbar');
   if (!header || !user) return;
 
   // 1. Inject toggle button into header left
-  if (!document.getElementById('sidebar-toggle-btn')) {
+  if (!document.getElementById('sidebar-toggle-btn') && !document.getElementById('btn-menu-toggle')) {
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'sidebar-toggle-btn';
-    toggleBtn.className = 'sidebar-toggle-btn';
+    toggleBtn.className = 'sidebar-toggle-btn gc-menu-btn';
     toggleBtn.type = 'button';
     toggleBtn.onclick = toggleSidebar;
     toggleBtn.setAttribute('aria-label', 'Toggle navigation sidebar');
     toggleBtn.setAttribute('aria-pressed', 'false');
     toggleBtn.innerHTML = '☰';
 
-    const brand = header.querySelector('.brand');
-    let leftWrap = header.querySelector('.header-left');
+    const brand = header.querySelector('.brand, .gc-brand-link');
+    let leftWrap = header.querySelector('.header-left, .gc-nav-left');
     if (!leftWrap) {
       leftWrap = document.createElement('div');
       leftWrap.className = 'header-left';
@@ -327,7 +506,22 @@ function renderSidebar() {
 
   const currentPath = window.location.pathname.toLowerCase();
   const currentUrl = (window.location.pathname + window.location.search).toLowerCase();
-  const roleBadge = user.roles ? user.roles[0] : 'USER';
+  let roleBadge = 'USER';
+  if (user.roles?.includes('SYSTEM_ADMIN')) {
+    roleBadge = 'ADMIN';
+  } else if (user.is_hod) {
+    roleBadge = 'HOD';
+  } else if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
+    roleBadge = 'COMMON MGR';
+  } else if (user.is_class_teacher) {
+    roleBadge = 'CLASS TEACHER';
+  } else if (user.roles?.includes('TEACHER')) {
+    roleBadge = 'FACULTY';
+  } else if (user.roles?.includes('STUDENT')) {
+    roleBadge = 'STUDENT';
+  } else if (user.roles && user.roles[0]) {
+    roleBadge = user.roles[0];
+  }
   const displayName = getUserDisplayName(user);
   const email = user.email || user.username || 'System Account';
 
@@ -353,16 +547,16 @@ function renderSidebar() {
     portalLabel = user.is_hod ? `HOD — ${user.hod_department_name || 'Dept'}` : 'Faculty Portal';
 
     const mainItems = [
-      { icon: '📊', label: 'Dashboard', href: '/faculty/dashboard.html' },
+      { icon: '🏠', label: 'Dashboard', href: '/faculty/dashboard.html' },
       { icon: '🏫', label: 'Teaching Groups', href: '/faculty/groups.html' }
     ];
     if (user.has_assigned_subjects) {
       mainItems.push(
-        { icon: '📖', label: 'Registers & Attendance', href: '/faculty/registers.html' },
-        { icon: '📝', label: 'Assignments', href: '/faculty/assignments.html' },
-        { icon: '📊', label: 'Class Tests & Marks', href: '/faculty/tests.html' },
-        { icon: '📈', label: 'Internal Evaluation', href: '/faculty/evaluation.html' },
-        { icon: '📉', label: 'Reports & Analytics', href: '/faculty/reports.html' }
+        { icon: '📖', label: 'Registers & Attendance', href: '/faculty/registers.html', id: 'nav-reg' },
+        { icon: '📝', label: 'Assignments', href: '/faculty/assignments.html', id: 'nav-assign' },
+        { icon: '📊', label: 'Class Tests & Marks', href: '/faculty/tests.html', id: 'nav-marks' },
+        { icon: '📈', label: 'Internal Evaluation', href: '/faculty/evaluation.html', id: 'nav-eval' },
+        { icon: '📉', label: 'Reports & Analytics', href: '/faculty/reports.html', id: 'nav-reports' }
       );
     }
     mainItems.push(
@@ -370,21 +564,26 @@ function renderSidebar() {
       { icon: '🧾', label: 'Leave Requests', href: '/faculty/leave-approvals.html' }
     );
     const isDeptFaculty = Boolean(user.department_id || user.teacher?.department_id || user.is_class_teacher || user.is_hod || (user.roles?.includes('TEACHER') && !user.is_common_faculty_manager));
-    if (isDeptFaculty) {
-      mainItems.push({ icon: '👥', label: 'Department Students', href: '/faculty/students.html', id: 'nav-students-item', hasBadge: true });
+    const isHodUser = Boolean(user.is_hod || currentPath.includes('hod-'));
+    if (isDeptFaculty && !isHodUser) {
+      mainItems.push({ icon: '👥', label: 'Faculty & Students', href: '/faculty/students.html', id: 'nav-students-item', hasBadge: true });
     }
-    if (user.is_common_faculty_manager || user.roles?.includes('COMMON_FACULTY_MANAGER')) {
+    if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
       mainItems.push({ icon: '🌐', label: 'Common Faculty', href: '/faculty/common-teachers.html' });
     }
     navSections.push({ label: 'Faculty', items: mainItems });
 
-    if (user.is_hod || currentPath.includes('hod-')) {
+    navSections.push({
+      label: 'Teaching Classes',
+      customContent: '<div id="drawer-classes-list"><div style="padding:0.4rem 1.25rem;color:var(--text-muted);font-size:0.78rem;">Loading classes...</div></div>',
+      items: []
+    });
+
+    if (isHodUser) {
       navSections.push({
         label: 'HOD Management',
         items: [
-          { icon: '👨‍🏫', label: 'My Teachers', href: '/faculty/hod-teachers.html' },
-          { icon: '📚', label: 'Department Subjects', href: '/faculty/hod-subjects.html' },
-          { icon: '👥', label: 'Dept Students', href: '/faculty/hod-students.html' },
+          { icon: '👥', label: 'Faculty & Students', href: '/faculty/students.html', id: 'nav-students-item', hasBadge: true },
           { icon: '🎓', label: 'Student Archive', href: '/faculty/hod-archive.html' },
           { icon: '📈', label: 'Dept Reports', href: '/faculty/hod-reports.html' },
           { icon: '📡', label: 'ESP Terminals', href: '/faculty/hod-devices.html' },
@@ -392,6 +591,15 @@ function renderSidebar() {
         ]
       });
     }
+
+    navSections.push({
+      label: 'Archive & Safety',
+      items: [
+        { icon: '📦', label: 'Archived Classes', href: '/faculty/dashboard.html?filter=ARCHIVED' },
+        { icon: '🗑️', label: 'Trash Bin (7d Recovery)', href: '/faculty/dashboard.html?trash=1' },
+        { icon: '⚙️', label: 'Settings', href: '/faculty/hod-settings.html' }
+      ]
+    });
   } else if (user.roles?.includes('STUDENT') || currentPath.includes('/student/')) {
     portalLabel = 'Student Portal';
     navSections = [{
@@ -411,20 +619,24 @@ function renderSidebar() {
   // Build link HTML
   function buildLinks(sections) {
     return sections.map(section => {
-      const links = section.items.map(item => {
+      let customHtml = '';
+      if (section.customContent) {
+        customHtml = section.customContent;
+      }
+      const links = (section.items || []).map(item => {
         const hrefLower = item.href.toLowerCase();
         const isActive = (hrefLower.includes('?') ? currentUrl === hrefLower : currentPath === hrefLower)
           || (item.href.endsWith('dashboard.html') && currentPath.endsWith('/'));
         return `
           <a href="${item.href}" ${item.id ? `id="${item.id}"` : ''}
-             class="sidebar-item ${isActive ? 'active' : ''}"
+             class="sidebar-item gc-drawer-link ${isActive ? 'active' : ''}"
              onclick="if(window.innerWidth<=768)closeSidebar()" style="position:relative;">
             <span class="sidebar-item-icon">${item.icon}</span>
             <span>${item.label}</span>
             ${item.hasBadge ? `<span id="${item.id}-badge" style="display:none;position:absolute;right:0.65rem;top:50%;transform:translateY(-50%);background:var(--status-absent);color:white;border-radius:9999px;min-width:18px;height:18px;font-size:0.65rem;font-weight:700;align-items:center;justify-content:center;padding:0 5px;"></span>` : ''}
           </a>`;
       }).join('');
-      return `<div class="sidebar-section-label">${section.label}</div>${links}`;
+      return `<div class="sidebar-section-label gc-drawer-sec-title">${section.label}</div>${customHtml}${links}`;
     }).join('');
   }
 
@@ -439,29 +651,41 @@ function renderSidebar() {
     .map(part => part[0].toUpperCase())
     .join('') || 'U';
 
-  const sidebarHtml = `
-    <aside id="app-sidebar" class="app-sidebar" aria-label="Site Navigation">
-
+  const isFacultyPortal = currentPath.includes('/faculty/');
+  const sidebarHeaderHtml = isFacultyPortal ? `
+      <!-- Executive Profile Card / Drawer Header -->
+      <div class="gc-drawer-header sidebar-user-card" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;border-bottom:1px solid var(--border-color);">
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <a href="/faculty/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;">
+            <div class="gc-brand-icon" style="width:32px;height:32px;font-size:1.1rem;border-radius:8px;background:var(--color-primary-light);color:var(--color-primary);display:flex;align-items:center;justify-content:center;">🎓</div>
+            <div class="gc-brand-title" style="font-size:1.15rem;font-weight:700;color:var(--text-main);">Classroom</div>
+            <span class="gc-brand-sub" style="font-size:0.72rem;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--bg-surface);color:var(--color-primary);border:1px solid var(--border-color);">VidyaOS</span>
+          </a>
+        </div>
+        <button type="button" class="sidebar-close-btn gc-menu-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar" style="width:34px;height:34px;border-radius:50%;border:none;background:transparent;cursor:pointer;font-size:1.1rem;color:var(--text-main);display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+  ` : `
       <!-- Executive Profile Card -->
       <div class="sidebar-user-card">
-        <div class="sidebar-user-top">
-          <span class="sidebar-role-pill">${safeAttr(roleBadge)}</span>
-          <button type="button" class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar">✕</button>
+        <div class="sidebar-user-avatar role-${roleBadge.toLowerCase().replace(/\s+/g, '')}">
+          <span>${userInitials}</span>
         </div>
-        <div class="sidebar-user-profile">
-          <div class="sidebar-avatar">
-            <span>${userInitials}</span>
-            <span class="sidebar-avatar-status" title="Status: Online"></span>
-          </div>
-          <div class="sidebar-user-info">
-            <div class="sidebar-user-name" title="${safeAttr(displayName)}">${displayName}</div>
-            <div class="sidebar-user-email" title="${safeAttr(email)}">${email}</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">${safeAttr(displayName)}</div>
+          <div class="sidebar-user-role-badge">
+            <span class="user-role-chip">${roleBadge}</span>
           </div>
         </div>
+        <button type="button" class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar">✕</button>
       </div>
+  `;
+
+  const sidebarHtml = `
+    <aside id="app-sidebar" class="app-sidebar ${isFacultyPortal ? 'gc-drawer' : ''}" aria-label="Site Navigation">
+      ${sidebarHeaderHtml}
 
       <!-- Scoped Navigation Links -->
-      <div class="sidebar-links">
+      <div class="${isFacultyPortal ? 'gc-drawer-body ' : ''}sidebar-links" style="flex:1;overflow-y:auto;padding:0.5rem 0;">
         ${buildLinks(navSections)}
       </div>
 
@@ -479,20 +703,20 @@ function renderSidebar() {
         </div>
       </div>
     </aside>
-    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeSidebar()"></div>
+    <div id="sidebar-backdrop" class="sidebar-backdrop gc-drawer-backdrop" onclick="closeSidebar()"></div>
   `;
 
   document.body.insertAdjacentHTML('afterbegin', sidebarHtml);
 
-  // Restore sidebar state (open on desktop by default)
+  // Restore sidebar state (open on desktop by default for admin/student, drawer closed by default for faculty)
   const isDesktop = window.innerWidth >= 769;
   const savedOpen = _getSidebarState();
-  const shouldOpen = isDesktop ? (savedOpen !== false) : false;
+  const shouldOpen = isFacultyPortal ? false : (isDesktop ? (savedOpen !== false) : false);
   if (shouldOpen) {
     const sidebar = document.getElementById('app-sidebar');
     if (sidebar) sidebar.classList.add('sidebar-open');
     document.body.classList.add('sidebar-open');
-    const btn = document.getElementById('sidebar-toggle-btn');
+    const btn = document.getElementById('sidebar-toggle-btn') || document.getElementById('btn-menu-toggle');
     if (btn) btn.setAttribute('aria-pressed', 'true');
   }
 
@@ -505,6 +729,9 @@ function renderSidebar() {
   if (user.is_class_teacher || user.department_id || user.teacher?.department_id || user.is_hod) {
     _loadNavPendingBadge();
   }
+
+  // Async: load teaching classes into drawer
+  _loadDrawerTeachingClasses();
 }
 
 // ─────────────────────────────────────────────────────────
@@ -875,7 +1102,7 @@ function renderUserNav() {
       roleChipText = 'HOD';
       roleClass = 'chip-hod';
       avatarRoleClass = 'role-hod';
-    } else if (user.is_common_faculty_manager || user.roles?.includes('COMMON_FACULTY_MANAGER')) {
+    } else if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
       roleChipText = 'Common Mgr';
       roleClass = 'chip-hod';
       avatarRoleClass = 'role-hod';
@@ -1194,7 +1421,12 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Auto-initialize theme on script execution
+// Auto-initialize theme & sync session on script execution
 if (typeof document !== 'undefined') {
   initAppTheme();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { syncCurrentUser(); });
+  } else {
+    syncCurrentUser();
+  }
 }

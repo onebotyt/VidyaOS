@@ -272,6 +272,97 @@
       line-height: 1.45;
       white-space: pre-wrap;
     }
+    .stream-comments-section {
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px dashed var(--border-color);
+    }
+    .stream-comment-item {
+      display: flex;
+      gap: 0.65rem;
+      margin-bottom: 0.65rem;
+      font-size: 0.82rem;
+    }
+    .comment-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    .comment-bubble {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.75rem;
+      flex: 1;
+    }
+    .comment-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+    .comment-author {
+      font-weight: 700;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .comment-role-tag {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .role-instructor {
+      background: var(--chip-faculty-bg);
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+    }
+    .role-student {
+      background: var(--chip-batch-bg);
+      color: var(--chip-batch-color);
+      border: 1px solid var(--chip-batch-border);
+    }
+    .comment-time {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .comment-text {
+      color: var(--text-main);
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+    .comment-input-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+    }
+    .comment-input-row input {
+      flex: 1;
+      padding: 0.45rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.82rem;
+    }
+    .comment-input-row input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      background: var(--bg-card);
+    }
   </style>
 </head>
 <body class="page-layout">
@@ -1100,7 +1191,7 @@
           const authorRole = post.author_role === 'TEACHER' ? 'Instructor' : (post.author_role || 'Student');
 
           return `
-            <div class="stream-post-card">
+            <div class="stream-post-card" id="stream-post-${post.id}">
               <div class="stream-post-meta">
                 <span style="font-weight:700; color:var(--text-main);">
                   ${escapeHtml(post.author_name || 'Member')} 
@@ -1109,11 +1200,112 @@
                 <span>${dateStr}</span>
               </div>
               <div class="stream-post-content">${escapeHtml(post.content)}</div>
+
+              <!-- Google Classroom Comments Section -->
+              <div class="stream-comments-section">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <button type="button" class="btn btn-secondary" style="font-size:0.75rem; padding:0.25rem 0.6rem; border:none; background:var(--bg-surface); color:var(--color-primary); cursor:pointer;" onclick="togglePostComments(${post.id})">
+                    💬 Discussion (<span id="comment-count-${post.id}">${post.comment_count || 0}</span>)
+                  </button>
+                  <span style="font-size:0.72rem; color:var(--text-muted);">Click to view/add comments</span>
+                </div>
+
+                <div id="comments-container-${post.id}" style="display:none; margin-top:0.6rem;">
+                  <div id="comments-list-${post.id}" style="margin-bottom:0.5rem;">
+                    <!-- Injected via loadPostComments -->
+                  </div>
+                </div>
+
+                <div class="comment-input-row">
+                  <input type="text" id="comment-input-${post.id}" placeholder="Add a class comment or question..." onkeydown="if(event.key==='Enter')submitComment(${post.id})">
+                  <button type="button" class="btn btn-primary" style="padding:0.4rem 0.75rem; font-size:0.78rem;" onclick="submitComment(${post.id})">
+                    Post
+                  </button>
+                </div>
+              </div>
             </div>
           `;
         }).join('');
       } catch (err) {
         container.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--status-absent); font-size:0.85rem;">Failed to load stream: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    async function togglePostComments(postId) {
+      const container = document.getElementById(`comments-container-${postId}`);
+      if (!container) return;
+      const isHidden = container.style.display === 'none';
+      container.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) {
+        await loadPostComments(postId);
+      }
+    }
+
+    async function loadPostComments(postId) {
+      const listEl = document.getElementById(`comments-list-${postId}`);
+      if (!listEl) return;
+      listEl.innerHTML = '<div style="font-size:0.75rem; color:var(--text-muted); padding:0.35rem 0;">Loading comments...</div>';
+
+      try {
+        const res = await apiRequest(`/api/v1/teaching-groups/posts/${postId}/comments`);
+        if (res && res.success) {
+          const comments = res.data || [];
+          const countEl = document.getElementById(`comment-count-${postId}`);
+          if (countEl) countEl.innerText = comments.length;
+
+          if (!comments.length) {
+            listEl.innerHTML = '<div style="font-size:0.78rem; color:var(--text-muted); padding:0.4rem 0; font-style:italic;">No comments yet. Start the conversation!</div>';
+            return;
+          }
+
+          listEl.innerHTML = comments.map(c => {
+            const initial = (c.author_name || 'U').charAt(0).toUpperCase();
+            const isTeacher = c.author_role === 'TEACHER';
+            const roleClass = isTeacher ? 'role-instructor' : 'role-student';
+            const roleLabel = isTeacher ? 'Instructor' : (c.author_role || 'Student');
+
+            return `
+              <div class="stream-comment-item">
+                <div class="comment-avatar">${initial}</div>
+                <div class="comment-bubble">
+                  <div class="comment-header">
+                    <span class="comment-author">
+                      ${escapeHtml(c.author_name || 'Member')}
+                      <span class="comment-role-tag ${roleClass}">${roleLabel}</span>
+                    </span>
+                    <span class="comment-time">${new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                  <div class="comment-text">${escapeHtml(c.content)}</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        listEl.innerHTML = '<div style="font-size:0.75rem; color:var(--status-absent);">Failed to load comments</div>';
+      }
+    }
+
+    async function submitComment(postId) {
+      const input = document.getElementById(`comment-input-${postId}`);
+      const content = (input?.value || '').trim();
+      if (!content) return;
+
+      try {
+        const res = await apiRequest(`/api/v1/teaching-groups/posts/${postId}/comments`, {
+          method: 'POST',
+          body: JSON.stringify({ content })
+        });
+        if (res && res.success) {
+          input.value = '';
+          const container = document.getElementById(`comments-container-${postId}`);
+          if (container) container.style.display = 'block';
+          await loadPostComments(postId);
+        } else {
+          showToast(res?.error?.message || 'Failed to post comment', 'error');
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to post comment', 'error');
       }
     }
 
@@ -1147,10 +1339,7 @@
       if (modal) modal.style.display = 'flex';
     }
 
-    function closeModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.style.display = 'none';
-    }
+    
 
     function escapeHtml(str) {
       if (!str) return '';

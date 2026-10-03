@@ -591,9 +591,7 @@
       document.getElementById('details-modal').classList.add('open');
     }
 
-    function closeModal() {
-      document.getElementById('details-modal').classList.remove('open');
-    }
+    
 
     function exportLogsJson() {
       if (!cachedRecords || cachedRecords.length === 0) {
@@ -609,10 +607,8 @@
       downloadAnchor.remove();
     }
 
-    function escapeHtml(text) {
-      if (text == null) return '';
-      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+    const escapeHtml = typeof esc !== 'undefined' ? esc : (s => s);
+
 
     init();
   </script>
