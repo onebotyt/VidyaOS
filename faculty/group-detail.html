@@ -819,15 +819,52 @@
     </div>
   </div>
   <div class="modal-backdrop" id="modal-schedule-test">
-    <div class="modal-card">
-      <div class="modal-header"><h3 class="modal-title">&#128221; Schedule Class Test</h3><button class="modal-close-btn" onclick="closeModal('modal-schedule-test')">&#10005;</button></div>
+    <div class="modal-card" style="max-width:560px">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:.4rem">&#128221; Schedule Class Test</h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-schedule-test')">&#10005;</button>
+      </div>
       <div class="modal-body">
-        <div class="form-field"><label class="form-label">Test Title *</label><input type="text" class="form-input" id="test-title" required placeholder="e.g. Unit Test 1"></div>
-        <div class="form-grid-2">
-          <div class="form-field"><label class="form-label">Test Date *</label><input type="date" class="form-input" id="test-date" required></div>
-          <div class="form-field"><label class="form-label">Maximum Marks *</label><input type="number" class="form-input" id="test-marks" required value="20" min="1" max="200"></div>
+        <div class="form-field">
+          <label class="form-label">Test Title *</label>
+          <input type="text" class="form-input" id="test-title" required placeholder="e.g. Unit Test 1">
         </div>
-        <div class="form-field"><label class="form-label">Description (optional)</label><textarea class="form-textarea" id="test-desc" placeholder="Topics covered&#8230;" style="min-height:70px"></textarea></div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Test Date *</label>
+            <input type="date" class="form-input" id="test-date" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Maximum Marks *</label>
+            <input type="number" class="form-input" id="test-marks" required value="20" min="1" max="500" oninput="updateScheduleTestQPreview()">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Number of Questions *</label>
+            <input type="number" class="form-input" id="test-num-questions" required value="4" min="1" max="50" oninput="updateScheduleTestQPreview()">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Marks Per Question</label>
+            <div id="test-marks-per-q-display" style="padding:.5rem .75rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-weight:700;color:var(--color-primary);font-size:.85rem;min-height:38px;display:flex;align-items:center">
+              5 pts / question
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Breakdown Preview -->
+        <div style="margin-bottom:1rem;padding:.75rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+            <span style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em">Marks Breakdown Preview</span>
+            <span id="test-q-summary-badge" style="font-size:.75rem;font-weight:700;color:var(--color-primary)">4 questions • 20 marks total</span>
+          </div>
+          <div id="test-schedule-q-chips" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Description (optional)</label>
+          <textarea class="form-textarea" id="test-desc" placeholder="Topics covered&#8230;" style="min-height:65px"></textarea>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('modal-schedule-test')">Cancel</button>
@@ -1231,18 +1268,27 @@
       } catch {}
       S.cachedTestScores = scores;
 
-      // Initialize questions breakdown
+      // Initialize questions breakdown: Check saved student submissions questions OR test definition questions
+      let initialQuestions = null;
       const firstSavedQuestions = Object.values(scores).find(s => Array.isArray(s.questions) && s.questions.length > 0)?.questions;
       if (firstSavedQuestions && firstSavedQuestions.length > 0) {
-        S.currentTestQuestions = firstSavedQuestions.map((q, idx) => ({
+        initialQuestions = firstSavedQuestions;
+      } else if (test.questions) {
+        try {
+          initialQuestions = typeof test.questions === 'string' ? JSON.parse(test.questions) : test.questions;
+        } catch {}
+      }
+
+      if (Array.isArray(initialQuestions) && initialQuestions.length > 0) {
+        S.currentTestQuestions = initialQuestions.map((q, idx) => ({
           num: idx + 1,
           label: q.label || ('Q' + (idx + 1)),
-          max: Number(q.max) || 5
+          max: Number(q.max) || Math.round(((Number(test.max_marks) || 20) / initialQuestions.length) * 10) / 10
         }));
       } else {
         const firstQScore = Object.values(scores).find(s => Array.isArray(s.question_scores) && s.question_scores.length > 0)?.question_scores;
-        const qCount = firstQScore ? firstQScore.length : (test.max_marks >= 25 ? 5 : (test.max_marks >= 20 ? 4 : (test.max_marks >= 10 ? 2 : 1)));
-        const marksPerQ = Math.max(1, Math.round((test.max_marks / qCount) * 10) / 10);
+        const qCount = firstQScore ? firstQScore.length : (Number(test.num_questions) || (test.max_marks >= 25 ? 5 : (test.max_marks >= 20 ? 4 : (test.max_marks >= 10 ? 2 : 1))));
+        const marksPerQ = Math.max(1, Math.round(((Number(test.max_marks) || 20) / qCount) * 10) / 10);
         S.currentTestQuestions = [];
         for (let i = 1; i <= qCount; i++) {
           S.currentTestQuestions.push({ num: i, label: 'Q' + i, max: marksPerQ });
@@ -1440,9 +1486,101 @@
       if(!title||!marks){toast('Title and marks are required');return;}
       try{await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/assignments',{method:'POST',body:JSON.stringify({title,description:desc,due_date:due||null,max_marks:marks})});toast('Assignment published!');closeModal('modal-create-assignment');ById('assign-title').value='';ById('assign-desc').value='';ById('assign-due').value='';await loadAssignments();}catch(e){toast(e.message);}
     }
-    async function submitScheduleTest(){const name=ById('test-title').value.trim(),date=ById('test-date').value,marks=parseInt(ById('test-marks').value),desc=ById('test-desc').value.trim();
-      if(!name||!date||!marks){toast('Title, date and marks are required');return;}
-      try{await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/tests',{method:'POST',body:JSON.stringify({name,test_date:date,max_marks:marks,description:desc||null})});toast('Test scheduled!');closeModal('modal-schedule-test');ById('test-title').value='';ById('test-date').value='';ById('test-marks').value='20';await loadTests();switchTab('marks');}catch(e){toast(e.message);}
+    S.scheduleTestQuestions = [];
+
+    function updateScheduleTestQPreview(){
+      const marksInp = ById('test-marks');
+      const numQInp = ById('test-num-questions');
+      const totalMarks = marksInp ? (parseFloat(marksInp.value) || 20) : 20;
+      const numQ = numQInp ? Math.max(1, Math.min(50, parseInt(numQInp.value, 10) || 4)) : 4;
+      const perQ = Math.round((totalMarks / numQ) * 10) / 10;
+
+      S.scheduleTestQuestions = Array.from({ length: numQ }, (_, i) => ({
+        num: i + 1,
+        label: 'Q' + (i + 1),
+        max: perQ
+      }));
+
+      const dispEl = ById('test-marks-per-q-display');
+      if (dispEl) dispEl.textContent = perQ + ' pts / question';
+
+      const sumBadge = ById('test-q-summary-badge');
+      if (sumBadge) sumBadge.textContent = numQ + ' questions • ' + totalMarks + ' marks total';
+
+      renderScheduleQChips();
+    }
+
+    function renderScheduleQChips(){
+      const container = ById('test-schedule-q-chips');
+      if (!container) return;
+      container.innerHTML = S.scheduleTestQuestions.map((q, idx) => `
+        <span class="q-chip" style="display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .45rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm)">
+          <span style="font-weight:700;color:var(--text-main);font-size:.8rem">${esc(q.label)}</span>
+          <input type="number" min="0.5" max="500" step="0.5" value="${q.max}" style="width:46px;padding:.12rem .2rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--color-primary);font-weight:700;font-size:.8rem;text-align:center" onchange="updateScheduleQChip(${idx}, this.value)" title="Marks for ${esc(q.label)}">
+          <span style="font-size:.7rem;color:var(--text-muted);font-weight:600">pts</span>
+        </span>
+      `).join('');
+    }
+
+    function updateScheduleQChip(idx, val){
+      const q = S.scheduleTestQuestions[idx];
+      if (!q) return;
+      const num = parseFloat(val);
+      if (isNaN(num) || num <= 0) {
+        toast('Please enter a valid positive number');
+        renderScheduleQChips();
+        return;
+      }
+      q.max = Math.round(num * 10) / 10;
+      const newTotal = S.scheduleTestQuestions.reduce((sum, item) => sum + (Number(item.max) || 0), 0);
+      const roundedTotal = Math.round(newTotal * 10) / 10;
+      if (ById('test-marks')) ById('test-marks').value = roundedTotal;
+      const sumBadge = ById('test-q-summary-badge');
+      if (sumBadge) sumBadge.textContent = S.scheduleTestQuestions.length + ' questions • ' + roundedTotal + ' marks total';
+    }
+
+    async function submitScheduleTest(){
+      const name = ById('test-title').value.trim();
+      const date = ById('test-date').value;
+      const marks = parseFloat(ById('test-marks').value);
+      const numQ = parseInt(ById('test-num-questions')?.value, 10) || (S.scheduleTestQuestions?.length || 4);
+      const desc = ById('test-desc').value.trim();
+      if (!name || !date || !marks) {
+        toast('Title, date and marks are required');
+        return;
+      }
+
+      const questions = (S.scheduleTestQuestions && S.scheduleTestQuestions.length > 0)
+        ? S.scheduleTestQuestions
+        : Array.from({ length: numQ }, (_, i) => ({
+            num: i + 1,
+            label: 'Q' + (i + 1),
+            max: Math.round((marks / numQ) * 10) / 10
+          }));
+
+      try {
+        await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests', {
+          method: 'POST',
+          body: JSON.stringify({
+            name,
+            test_date: date,
+            max_marks: marks,
+            num_questions: numQ,
+            questions,
+            description: desc || null
+          })
+        });
+        toast('Test scheduled with ' + questions.length + ' questions!');
+        closeModal('modal-schedule-test');
+        ById('test-title').value = '';
+        ById('test-date').value = '';
+        ById('test-marks').value = '20';
+        if (ById('test-num-questions')) ById('test-num-questions').value = '4';
+        await loadTests();
+        switchTab('marks');
+      } catch (e) {
+        toast(e.message || 'Failed to schedule test');
+      }
     }
     function requestDeleteWork(type, id){
       const isAssign = type === 'assignment';
@@ -1513,7 +1651,10 @@
     async function loadAttStat(rid){try{const r=await apiFetch('/api/v1/attendance/registers/'+rid+'/summary');const pct=r.data?.avg_attendance_pct??null;ById('stat-attendance').textContent=pct!=null?parseFloat(pct).toFixed(1)+'%':'--';}catch{}}
     function openLinkedRegister(){const rid=S.group?.register_id;if(rid)location.href='/faculty/registers.html?register='+rid+'&group='+S.groupId;else toast('No linked register found');}
     function openCreateAssignmentModal(){openModal('modal-create-assignment');}
-    function openScheduleTestModal(){openModal('modal-schedule-test');}
+    function openScheduleTestModal(){
+      updateScheduleTestQPreview();
+      openModal('modal-schedule-test');
+    }
     function openArchiveModal(){openModal('modal-archive');}
     function openEditGroupModal(){
       if(!S.group) return;
