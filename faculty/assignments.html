@@ -569,17 +569,17 @@
           <div class="app-tile-icon">🧾</div>
           <span>Leaves</span>
         </a>
-        <a href="/faculty/hod-teachers.html" class="app-tile">
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">🏛️</div>
           <span>HOD Hub</span>
         </a>
-        <a href="/faculty/hod-devices.html" class="app-tile">
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">📡</div>
           <span>ESP Devices</span>
         </a>
-        <a href="/admin/whatsapp-gateway.html" class="app-tile">
-          <div class="app-tile-icon">📱</div>
-          <span>WhatsApp</span>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon">🎓</div>
+          <span>Archive</span>
         </a>
       </div>
 
@@ -756,7 +756,7 @@
   <script src="/js/ui.js?v=20261003"></script>
   <script src="/js/auth.js?v=20261003"></script>
   <script>
-    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireSubjects: true });
+    guardRoute({ roles: ['TEACHER'], requireSubjects: true });
 
     function getToken() {
       return typeof getAuthToken === 'function' ? getAuthToken() : (localStorage.getItem('access_token') || '');
@@ -873,7 +873,7 @@
       const clsEl = document.getElementById('meta-class-name');
       if (clsEl) clsEl.innerText = `${reg.department_name || 'Dept'} • Year ${reg.year || 1} Sem ${reg.semester || 1}`;
       const sessEl = document.getElementById('meta-session-name');
-      if (sessEl) sessEl.innerText = reg.academic_year_label || '2026-27 (Winter)';
+      if (sessEl) sessEl.innerText = reg.academic_year_label || '2026-27 (Odd Semester)';
       const sizeEl = document.getElementById('meta-cohort-size');
       if (sizeEl) sizeEl.innerText = reg.enrolled_count || '0';
       const modalScope = document.getElementById('modal-assign-scope-text');

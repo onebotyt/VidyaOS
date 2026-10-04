@@ -432,17 +432,17 @@
           <div class="app-tile-icon">🧾</div>
           <span>Leaves</span>
         </a>
-        <a href="/faculty/hod-teachers.html" class="app-tile">
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">🏛️</div>
           <span>HOD Hub</span>
         </a>
-        <a href="/faculty/hod-devices.html" class="app-tile">
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">📡</div>
           <span>ESP Devices</span>
         </a>
-        <a href="/admin/whatsapp-gateway.html" class="app-tile">
-          <div class="app-tile-icon">📱</div>
-          <span>WhatsApp</span>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon">🎓</div>
+          <span>Archive</span>
         </a>
       </div>
 
@@ -629,8 +629,9 @@
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 0.75rem; color: var(--text-muted);">Ready for future Certificate & Transcript issuance</span>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Ready for future Certificate &amp; Transcript issuance</span>
         <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-modal-dossier" onclick="openStudentDossierFromArchive()">📜 Full Dossier &amp; Vault</button>
           <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Print Transcript</button>
           <button class="btn btn-primary btn-sm" onclick="closeDetailsModal()">Done</button>
         </div>
@@ -642,7 +643,7 @@
   <script src="/js/ui.js?v=20261003"></script>
   <script src="/js/auth.js?v=20261003"></script>
   <script>
-    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireHOD: true });
+    guardRoute({ roles: ['TEACHER'], requireHOD: true });
 
     let currentArchive = [];
     let searchTimer = null;
@@ -776,18 +777,26 @@
               </span>
             </td>
             <td style="text-align: right;">
-              <button class="btn btn-secondary btn-sm" onclick="viewDetails(${idx})">
-                📄 Details
-              </button>
+              <div style="display: inline-flex; gap: 0.35rem; align-items: center;">
+                <button class="btn btn-secondary btn-sm" onclick="openStudentDossier(${s.id})" title="View Complete Multi-Semester Academic Dossier &amp; Vault" style="font-weight: 600; font-size: 0.78rem; padding: 0.25rem 0.55rem;">
+                  📜 Dossier
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="viewDetails(${idx})" style="font-size: 0.78rem; padding: 0.25rem 0.55rem;">
+                  📄 Details
+                </button>
+              </div>
             </td>
           </tr>
         `;
       }).join('');
     }
 
+    let selectedArchiveStudentId = null;
+
     function viewDetails(idx) {
       const s = currentArchive[idx];
       if (!s) return;
+      selectedArchiveStudentId = s.id;
 
       document.getElementById('m-name').textContent = s.full_name;
       document.getElementById('m-email').textContent = s.email || 'No email registered';
@@ -805,6 +814,13 @@
       document.getElementById('m-attended').textContent = s.attended_sessions;
 
       document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function openStudentDossierFromArchive() {
+      if (selectedArchiveStudentId) {
+        closeDetailsModal();
+        openStudentDossier(selectedArchiveStudentId);
+      }
     }
 
     function closeDetailsModal() {

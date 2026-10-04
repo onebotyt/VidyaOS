@@ -1194,17 +1194,17 @@
           <div class="app-tile-icon">🧾</div>
           <span>Leaves</span>
         </a>
-        <a href="/faculty/hod-teachers.html" class="app-tile">
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">🏛️</div>
           <span>HOD Hub</span>
         </a>
-        <a href="/faculty/hod-devices.html" class="app-tile">
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">📡</div>
           <span>ESP Devices</span>
         </a>
-        <a href="/admin/whatsapp-gateway.html" class="app-tile">
-          <div class="app-tile-icon">📱</div>
-          <span>WhatsApp</span>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon">🎓</div>
+          <span>Archive</span>
         </a>
       </div>
 
@@ -1261,7 +1261,7 @@
   <script src="/js/ui.js?v=20261003"></script>
   <script src="/js/auth.js?v=20261003"></script>
   <script>
-    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireSubjects: true });
+    guardRoute({ roles: ['TEACHER'], requireSubjects: true });
 
     function getToken() {
       return typeof getAuthToken === 'function' ? getAuthToken() : (localStorage.getItem('access_token') || '');
@@ -1398,7 +1398,7 @@
         window.currentEvalSheetState = {
           register: registerData,
           institution_name: d.institution_name || (registerData && registerData.institution_name) || 'Uttarakhand Government Institute of Polytechnic, Srinagar Garhwal',
-          session_label: d.session_label || (registerData && registerData.session_label) || 'Internal Evaluation Sheet 2026-27 (Winter)',
+          session_label: d.session_label || (registerData && registerData.session_label) || 'Internal Evaluation Sheet 2026-27 (Odd Semester)',
           dept_semester_text: d.dept_semester_text || `Department (${deptCode}) - ${sem} Semester`,
           scheme: {
             // assign_avg_max / exam_avg_max = target weight of the AVERAGE in final marks

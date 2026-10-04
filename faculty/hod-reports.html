@@ -628,17 +628,17 @@
           <div class="app-tile-icon">🧾</div>
           <span>Leaves</span>
         </a>
-        <a href="/faculty/hod-teachers.html" class="app-tile">
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">🏛️</div>
           <span>HOD Hub</span>
         </a>
-        <a href="/faculty/hod-devices.html" class="app-tile">
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">📡</div>
           <span>ESP Devices</span>
         </a>
-        <a href="/admin/whatsapp-gateway.html" class="app-tile">
-          <div class="app-tile-icon">📱</div>
-          <span>WhatsApp</span>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon">🎓</div>
+          <span>Archive</span>
         </a>
       </div>
 
@@ -669,6 +669,7 @@
     <a href="/faculty/tests.html" id="nav-marks">Test Marks &amp; Exams</a>
     <a href="/faculty/evaluation.html" id="nav-eval">Internal Evaluation</a>
     <a href="/faculty/reports.html" id="nav-reports">Analytics &amp; Reports</a>
+    <a href="/faculty/hod-archive.html">Archive</a>
     <a href="/faculty/profile.html">Profile</a>
   </nav>
 
@@ -680,6 +681,7 @@
         <p class="page-subtitle" id="dept-subtitle">Biometric ESP32 hardware terminal logs, presence trends, and verified physical scans.</p>
       </div>
       <div style="display: flex; gap: 0.6rem; align-items: center;">
+        <a href="/faculty/hod-archive.html" class="btn btn-secondary" title="View alumni &amp; student archive">🎓 Alumni Archive</a>
         <button class="btn btn-secondary" onclick="window.print()" title="Print report document">🖨️ Print</button>
         <button class="btn btn-primary" onclick="exportCsv()" title="Download raw ESP logs as CSV">📥 Export CSV</button>
       </div>
@@ -804,7 +806,7 @@
   <script src="/js/ui.js?v=20261003"></script>
   <script src="/js/auth.js?v=20261003"></script>
   <script>
-    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireHOD: true });
+    guardRoute({ roles: ['TEACHER'], requireHOD: true });
 
     const API = '/api/v1/hod';
     let departmentData = null;

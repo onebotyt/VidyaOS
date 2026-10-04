@@ -1509,14 +1509,13 @@
   right: 0;
   bottom: 0;
   background: rgba(10, 15, 30, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   z-index: 499;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.26s ease;
 }
 .sidebar-backdrop.active {
+  display: block;
   opacity: 1;
   pointer-events: auto;
 }
@@ -1637,15 +1636,18 @@
     display: none !important;
   }
 
-  body.sidebar-open main,
-  body.sidebar-open .page-main-container {
+  body.sidebar-open:not(:has(.gc-navbar)) main,
+  body.sidebar-open:not(:has(.gc-navbar)) .page-main-container {
     margin-left: 270px;
     width: calc(100% - 270px);
     transition: margin-left 0.26s cubic-bezier(0.16, 1, 0.3, 1), width 0.26s cubic-bezier(0.16, 1, 0.3, 1);
   }
   body:not(.sidebar-open) main,
   body:not(.sidebar-open) .container,
-  body:not(.sidebar-open) .page-main-container {
+  body:not(.sidebar-open) .page-main-container,
+  body.sidebar-open:has(.gc-navbar) main,
+  body.sidebar-open:has(.gc-navbar) .container,
+  body.sidebar-open:has(.gc-navbar) .page-main-container {
     margin-left: auto !important;
     margin-right: auto !important;
     width: 100% !important;
@@ -1653,6 +1655,12 @@
   }
   .sidebar-backdrop {
     display: none !important;
+  }
+  .sidebar-backdrop.gc-drawer-backdrop.active,
+  .sidebar-backdrop.gc-drawer-backdrop.open,
+  .gc-drawer-backdrop.active,
+  .gc-drawer-backdrop.open {
+    display: block !important;
   }
 }
 
@@ -2571,19 +2579,22 @@ aside.app-sidebar.gc-drawer {
 }
 .gc-drawer.open,
 .gc-drawer.sidebar-open,
-aside.app-sidebar.gc-drawer.sidebar-open {
+aside.app-sidebar.gc-drawer.sidebar-open,
+aside.app-sidebar.gc-drawer.open {
   transform: translateX(0);
 }
-.gc-drawer-backdrop {
+.gc-drawer-backdrop,
+.sidebar-backdrop.gc-drawer-backdrop {
   position: fixed;
   inset: 0;
   background: hsl(0 0% 0% / 0.45);
-  backdrop-filter: blur(2px);
   z-index: 999;
   display: none;
 }
 .gc-drawer-backdrop.active,
-.gc-drawer-backdrop.open {
+.gc-drawer-backdrop.open,
+.sidebar-backdrop.gc-drawer-backdrop.active,
+.sidebar-backdrop.gc-drawer-backdrop.open {
   display: block;
 }
 .gc-drawer-header {

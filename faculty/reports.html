@@ -568,17 +568,17 @@
           <div class="app-tile-icon">🧾</div>
           <span>Leaves</span>
         </a>
-        <a href="/faculty/hod-teachers.html" class="app-tile">
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">🏛️</div>
           <span>HOD Hub</span>
         </a>
-        <a href="/faculty/hod-devices.html" class="app-tile">
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">📡</div>
           <span>ESP Devices</span>
         </a>
-        <a href="/admin/whatsapp-gateway.html" class="app-tile">
-          <div class="app-tile-icon">📱</div>
-          <span>WhatsApp</span>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon">🎓</div>
+          <span>Archive</span>
         </a>
       </div>
 
@@ -827,13 +827,13 @@
       </div>
     </div>
 
-    <!-- MODAL: PARENT WHATSAPP / SMS ESCALATION -->
+    <!-- MODAL: PARENT NOTIFICATION / SMS ESCALATION -->
     <div id="parent-escalation-modal" class="modal-backdrop" style="display: none;">
       <div class="modal-card" style="max-width: 580px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
           <div>
-            <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">📱 Autonomous Parent Escalation Gateway</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0;">Dispatch official WhatsApp & SMS notifications to registered parent contacts.</p>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">📩 Autonomous Parent Escalation Gateway</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0;">Dispatch official SMS &amp; institutional notifications to registered parent contacts.</p>
           </div>
           <button type="button" class="btn btn-secondary btn-sm" onclick="closeParentModal()" style="padding: 0.2rem 0.5rem; font-size: 1rem;">✕</button>
         </div>
@@ -853,12 +853,12 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; display: block;">Escalation Channel</label>
           <div style="display: flex; gap: 1rem; align-items: center;">
             <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
-              <input type="radio" name="parent_channel" value="WHATSAPP" checked onchange="updateParentPreview()">
-              <span>🟢 WhatsApp Direct / Gateway</span>
+              <input type="radio" name="parent_channel" value="SMS" checked onchange="updateParentPreview()">
+              <span>📱 Official SMS Gateway</span>
             </label>
             <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
-              <input type="radio" name="parent_channel" value="SMS" onchange="updateParentPreview()">
-              <span>📱 SMS Notification</span>
+              <input type="radio" name="parent_channel" value="PORTAL" onchange="updateParentPreview()">
+              <span>🏛️ Parent Portal Notice</span>
             </label>
           </div>
         </div>
@@ -893,7 +893,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">📋 Parent Communication Dispatch Logs</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0;">Audited history of outbound WhatsApp and SMS escalation notices.</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0;">Audited history of outbound SMS and institutional escalation notices.</p>
           </div>
           <button type="button" class="btn btn-secondary btn-sm" onclick="closeCommLogsModal()" style="padding: 0.2rem 0.5rem; font-size: 1rem;">✕</button>
         </div>
@@ -927,7 +927,7 @@
   <script src="/js/ui.js?v=20261003"></script>
   <script src="/js/auth.js?v=20261003"></script>
   <script>
-    guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireSubjects: true });
+    guardRoute({ roles: ['TEACHER'], requireSubjects: true });
 
     let allDefaulters = [];
 
@@ -938,7 +938,7 @@
         const { classes, trend, defaulter_count } = res.data;
 
         const user = getCurrentUser();
-        const hasSubjects = Boolean(classes.length > 0 || user?.roles?.includes('SYSTEM_ADMIN') || user?.is_hod);
+        const hasSubjects = Boolean(classes.length > 0 || user?.is_hod);
         if (!hasSubjects) {
           ['nav-reg', 'nav-assign', 'nav-reports'].forEach(id => {
             const el = document.getElementById(id);
@@ -1135,8 +1135,8 @@
             <td style="text-align: right;">${targetHtml}</td>
             <td style="text-align: center;">
               ${(d.parent_phone || d.student_phone) ? `
-                <button type="button" class="btn btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; background: var(--status-present-bg); color: var(--status-present); border: 1px solid var(--status-present); border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;" onclick="openSingleWhatsApp(${d.student_id})" title="Direct WhatsApp to Parent (${d.parent_phone || d.student_phone})">
-                  💬 WhatsApp
+                <button type="button" class="btn btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem; background: var(--status-present-bg); color: var(--status-present); border: 1px solid var(--status-present); border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;" onclick="openSingleEscalation(${d.student_id})" title="Dispatch Escalation to Parent (${d.parent_phone || d.student_phone})">
+                  📩 Notify Parent
                 </button>
               ` : `
                 <span style="font-size: 0.72rem; color: var(--text-muted);">No phone</span>
@@ -1316,7 +1316,7 @@
       }
 
       const channelRadio = document.querySelector('input[name="parent_channel"]:checked');
-      const channel = channelRadio ? channelRadio.value : 'WHATSAPP';
+      const channel = channelRadio ? channelRadio.value : 'SMS';
       const templateType = document.getElementById('parent-template-type')?.value || 'ATTENDANCE_CRITICAL';
       const previewMsg = document.getElementById('parent-message-preview')?.value || '';
       const dispatchBtn = document.getElementById('btn-confirm-parent-dispatch');
@@ -1348,14 +1348,6 @@
             statusMsg.textContent = `✓ ${res.data.message || 'Parent escalation dispatched successfully!'}`;
           }
 
-          // If WhatsApp and web links returned, offer to open first link
-          if (channel === 'WHATSAPP' && res.data.dispatches && res.data.dispatches.length > 0) {
-            const firstWithLink = res.data.dispatches.find(d => d.whatsapp_web_url);
-            if (firstWithLink && window.confirm(`Escalation logged for ${res.data.delivered_count} parents! Open WhatsApp Web for ${firstWithLink.student_name} (${firstWithLink.phone}) now?`)) {
-              window.open(firstWithLink.whatsapp_web_url, '_blank');
-            }
-          }
-
           setTimeout(() => {
             closeParentModal();
             selectedStudentIds.clear();
@@ -1375,18 +1367,25 @@
       }
     }
 
-    async function openSingleWhatsApp(studentId) {
+    async function openSingleEscalation(studentId) {
       try {
         const student = allDefaulters.find(d => d.student_id === studentId);
         if (!student) return;
-        const res = await fetchApi(`/reports/defaulters/generate-whatsapp-link?student_id=${studentId}&template_type=ATTENDANCE_CRITICAL`);
-        if (res.success && res.data.whatsapp_url) {
-          window.open(res.data.whatsapp_url, '_blank');
+        const res = await fetchApi('/reports/defaulters/escalate-parents', {
+          method: 'POST',
+          body: JSON.stringify({
+            student_ids: [studentId],
+            channel: 'SMS',
+            template_type: 'ATTENDANCE_CRITICAL'
+          })
+        });
+        if (res.success) {
+          showToast(`Escalation notification dispatched to parent of ${student.student_name}!`, 'success');
         } else {
-          showToast(res.error?.message || 'Unable to generate WhatsApp link. Check parent contact number.', 'error');
+          showToast(res.error?.message || 'Unable to dispatch notice.', 'error');
         }
       } catch (err) {
-        showToast(`Error opening WhatsApp: ${err.message}`, 'error');
+        showToast(`Error dispatching notice: ${err.message}`, 'error');
       }
     }
 
@@ -1408,7 +1407,7 @@
               <td style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${new Date(log.sent_at).toLocaleString()}</td>
               <td style="font-weight: 600; color: var(--text-main);">${log.student_name} <span style="font-size: 0.72rem; color: var(--text-muted);">(${log.official_enrollment_no})</span></td>
               <td style="font-family: var(--font-family-mono); font-size: 0.8rem;">${log.recipient_phone}</td>
-              <td style="text-align: center;"><span class="badge ${log.channel === 'WHATSAPP' ? 'badge-present' : 'badge-pending'}">${log.channel}</span></td>
+              <td style="text-align: center;"><span class="badge ${log.channel === 'SMS' ? 'badge-present' : 'badge-pending'}">${log.channel}</span></td>
               <td style="text-align: center;"><span class="badge badge-present">${log.delivery_status}</span></td>
               <td style="text-align: right; font-weight: 700; color: ${Number(log.attendance_pct) < 60 ? 'var(--status-absent)' : 'var(--status-late)'};">${log.attendance_pct}%</td>
             </tr>

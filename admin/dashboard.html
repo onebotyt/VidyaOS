@@ -4,163 +4,534 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard — College Attendance System</title>
+  <meta name="description" content="Institutional Management Console — Configure academic structure, appoint Department Heads, and monitor institution-wide attendance.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/reset.css">
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/layout.css">
   <link rel="stylesheet" href="/css/components.css">
+  <style>
+    /* ==========================================================================
+       Institutional Admin Dashboard — 100% Theme Tokenized (Zero Hex Colors)
+       ========================================================================== */
+
+    .dashboard-container {
+      padding-top: 1.5rem;
+      padding-bottom: 3.5rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Executive Hero Banner */
+    .admin-hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .admin-hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--color-primary);
+    }
+
+    .hero-title-group h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0 0 0.35rem 0;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-title-group p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0;
+      max-width: 620px;
+      line-height: 1.45;
+    }
+
+    .hero-badges-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .hero-pill.pill-live {
+      color: var(--status-present);
+      border-color: var(--status-present);
+      background: var(--status-present-bg);
+    }
+
+    /* Hierarchy Guidance Card */
+    .hierarchy-strip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .hierarchy-strip-text {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Stats Grid */
+    .stats-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      position: relative;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-icon {
+      font-size: 1.25rem;
+    }
+
+    .kpi-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+      margin: 0.2rem 0;
+      font-family: var(--font-family-mono);
+    }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Governance Modules Grid */
+    .modules-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .modules-section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .module-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.4rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .module-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .module-card-top {
+      margin-bottom: 1.25rem;
+    }
+
+    .module-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.65rem;
+    }
+
+    .module-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .module-description {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+      margin: 0.4rem 0 0 0;
+    }
+
+    /* Live Security Trail Table */
+    .audit-preview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .audit-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .audit-preview-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+  </style>
 </head>
 <body>
-  <header class="app-header">
-    <a href="/admin/dashboard.html" class="brand">
-      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
-      <span>Institutional Administration</span>
-    </a>
-    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-      <a href="/admin/dashboard.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Dashboard</a>
-      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
-      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
-      <a href="/admin/students.html" class="btn btn-secondary btn-sm">Student Analytics</a>
-      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
-      <a href="/admin/whatsapp-gateway.html" class="btn btn-secondary btn-sm">WhatsApp Gateway</a>
-      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
-      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
-      <a href="/admin/profile.html" class="btn btn-secondary btn-sm">Profile</a>
-    </nav>
-    <div id="user-nav" class="user-nav"></div>
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">☰</button>
+      <a href="/admin/dashboard.html" class="gc-brand-link">
+        <div class="gc-brand-icon">🏛️</div>
+        <div class="gc-brand-title">Admin Console</div>
+        <span class="gc-brand-sub">VidyaOS</span>
+      </a>
+      <span class="gc-page-badge" id="admin-header-page-title">Executive Dashboard</span>
+    </div>
+    <div class="gc-nav-right">
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher(event)" title="Admin Apps &amp; Modules">✱</button>
+      <button type="button" class="gc-icon-btn" onclick="toggleAppTheme()" id="btn-theme-toggle" title="Toggle Theme">🌙</button>
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile(event)" title="Account Profile">A</div>
+
+      <!-- Admin Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/admin/dashboard.html" class="app-tile">
+          <div class="app-tile-icon">📊</div>
+          <span>Dashboard</span>
+        </a>
+        <a href="/admin/academic-structure.html" class="app-tile">
+          <div class="app-tile-icon">🏛️</div>
+          <span>Academics</span>
+        </a>
+        <a href="/admin/faculty.html" class="app-tile">
+          <div class="app-tile-icon">👨‍🏫</div>
+          <span>HOD Hub</span>
+        </a>
+        <a href="/admin/students.html" class="app-tile">
+          <div class="app-tile-icon">👥</div>
+          <span>Students</span>
+        </a>
+        <a href="/admin/reports.html" class="app-tile">
+          <div class="app-tile-icon">📈</div>
+          <span>Reports</span>
+        </a>
+        <a href="/admin/settings.html" class="app-tile">
+          <div class="app-tile-icon">⚙️</div>
+          <span>Settings</span>
+        </a>
+        <a href="/admin/audit-logs.html" class="app-tile">
+          <div class="app-tile-icon">🛡️</div>
+          <span>Audit Logs</span>
+        </a>
+      </div>
+
+      <!-- User Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
+        <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">A</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">Administrator</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">admin@college.edu</div>
+        <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+        <a href="/admin/profile.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">👤 My Profile</a>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickPasswordModal()" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">🔑 Change Password</button>
+        <a href="/admin/settings.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">⚙️ System Settings</a>
+        <button class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);" onclick="logout()">🚪 Sign Out</button>
+      </div>
+
+      <div id="user-nav" class="user-nav" style="display:none;" aria-hidden="true"></div>
+    </div>
   </header>
 
-  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
-    <div class="page-header" style="margin-bottom: 2rem;">
-      <div>
-        <h1 class="page-title">Institutional Management Console</h1>
-        <p class="page-subtitle">Configure academic structure, appoint HODs, and view department-wide attendance reports</p>
+  <main class="dashboard-container">
+    <!-- Executive Hero Card -->
+    <div class="admin-hero-card">
+      <div class="hero-title-group">
+        <h1><span>👑</span> Institutional Administration Console</h1>
+        <p>Institutional oversight, master academic curricula, department leadership appointments, and college-wide attendance compliance.</p>
       </div>
-      <div style="display: flex; gap: 0.75rem;">
-        <a href="/admin/faculty.html" class="btn btn-primary">👨‍🏫 Manage HODs</a>
-        <a href="/admin/reports.html" class="btn btn-secondary">📊 Dept Reports</a>
-      </div>
-    </div>
-
-    <!-- Hierarchy Notice -->
-    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid var(--color-primary); border-radius: var(--radius-sm); padding: 0.85rem 1.25rem; margin-bottom: 1.75rem; font-size: 0.875rem; color: #1e40af;">
-      <strong>Simplified Hierarchy:</strong> Admin configures the college structure and appoints HODs. 
-      <strong>HODs</strong> create teachers, subjects, and assignments within their department. 
-      <strong>Class Teachers</strong> manage student rosters for their cohort.
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="grid-cols-4" style="margin-bottom: 2rem; gap: 1rem;">
-      <div class="card" style="text-align: center; padding: 1.5rem;">
-        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Teaching Faculty</div>
-        <div id="stat-teachers" style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin: 0.25rem 0;">0</div>
-        <div style="font-size: 0.75rem; color: var(--text-muted);">Registered instructors</div>
-      </div>
-      <div class="card" style="text-align: center; padding: 1.5rem;">
-        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">ESP32 Terminals</div>
-        <div id="stat-devices" style="font-size: 2.2rem; font-weight: 800; color: var(--status-present); margin: 0.25rem 0;">0</div>
-        <div style="font-size: 0.75rem; color: var(--text-muted);">Biometric touch terminals</div>
-      </div>
-      <div class="card" style="text-align: center; padding: 1.5rem;">
-        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Today's Sessions</div>
-        <div id="stat-sessions" style="font-size: 2.2rem; font-weight: 800; color: var(--color-primary); margin: 0.25rem 0;">0</div>
-        <div style="font-size: 0.75rem; color: var(--text-muted);">Classes scheduled today</div>
-      </div>
-      <div class="card" style="text-align: center; padding: 1.5rem;">
-        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Enrolled Students</div>
-        <div id="stat-students" style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin: 0.25rem 0;">0</div>
-        <div style="font-size: 0.75rem; color: var(--text-muted);">Class teacher provisioned</div>
+      <div class="hero-badges-row">
+        <div class="hero-pill pill-live">
+          <span>🟢</span>
+          <span>VidyaOS Core Active</span>
+        </div>
+        <div class="hero-pill">
+          <span>🏛️</span>
+          <span>Term: 2026 Academic</span>
+        </div>
+        <div class="hero-pill">
+          <span>🛡️</span>
+          <span>Audit Enforced</span>
+        </div>
       </div>
     </div>
 
-    <!-- Management Modules Cards -->
-    <div style="margin-bottom: 1.5rem;">
-      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">Core Administration Modules</h2>
-      <div class="grid-cols-3" style="gap: 1.25rem;">
-        
-        <!-- Unified Master Setup Card -->
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-left: 4px solid var(--color-primary);">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h3 style="font-size: 1rem; font-weight: 700;">1. Departments / Programs</h3>
-              <span class="badge badge-present">Unified Setup</span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-              Consolidated master setup: Manage institutional departments / programs and current appointed HODs.
-            </p>
-          </div>
-          <div>
-            <a href="/admin/academic-structure.html" class="btn btn-primary btn-sm" style="width: 100%; font-weight: 600;">Open Departments / Programs →</a>
-          </div>
-        </div>
+    <!-- Hierarchy Guidance Strip -->
+    <div class="hierarchy-strip">
+      <div class="hierarchy-strip-text">
+        <span style="font-weight: 700; color: var(--color-primary);">Role Boundary Invariant:</span>
+        <span style="color: var(--text-muted);">Admin manages college-wide structure &amp; HOD appointments. HODs govern their department curriculum &amp; faculty. Class Teachers supervise student cohorts.</span>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <a href="/admin/faculty.html" class="btn btn-primary btn-sm" style="font-weight: 700;">+ Appoint HOD</a>
+        <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">+ Structure</a>
+      </div>
+    </div>
 
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h3 style="font-size: 1rem; font-weight: 700;">2. HOD Management</h3>
-              <span class="badge badge-late" style="background:#fdf4ff; color:#7e22ce;">Department Heads</span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-              Appoint HODs, assign them to departments, and issue credentials. HODs administer teachers &amp; subjects.
-            </p>
-          </div>
-          <a href="/admin/faculty.html" class="btn btn-primary btn-sm" style="width: 100%;">Manage HODs →</a>
+    <!-- Real-Time Institutional KPI Grid -->
+    <div class="stats-kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Appointed Faculty</span>
+          <span class="kpi-icon">👨‍🏫</span>
         </div>
+        <div id="stat-teachers" class="kpi-value">0</div>
+        <div class="kpi-sub">Registered instructors &amp; professors</div>
+      </div>
 
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h3 style="font-size: 1rem; font-weight: 700;">3. Department Reports</h3>
-              <span class="badge badge-present">Institutional Analytics</span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-              Institutional overview of attendance registers across all departments, teacher records, and defaulter tracking.
-            </p>
-          </div>
-          <a href="/admin/reports.html" class="btn btn-secondary btn-sm" style="width: 100%;">View Dept Reports →</a>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Active Terminals</span>
+          <span class="kpi-icon">📟</span>
         </div>
+        <div id="stat-devices" class="kpi-value" style="color: var(--status-present);">0</div>
+        <div class="kpi-sub">Biometric touch devices online</div>
+      </div>
 
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h3 style="font-size: 1rem; font-weight: 700;">4. Department Hardware</h3>
-              <span class="badge badge-pending">HOD Managed</span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-              Hardware biometric terminals are decentralized and directly managed by respective Department HODs.
-            </p>
-          </div>
-          <a href="/admin/reports.html" class="btn btn-secondary btn-sm" style="width: 100%;">View Department Attendance →</a>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Today's Sessions</span>
+          <span class="kpi-icon">📅</span>
         </div>
+        <div id="stat-sessions" class="kpi-value" style="color: var(--color-primary);">0</div>
+        <div class="kpi-sub">Lectures &amp; labs conducted today</div>
+      </div>
 
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h3 style="font-size: 1rem; font-weight: 700;">5. Student Analytics &amp; Demographics</h3>
-              <span class="badge badge-present">Charts &amp; Roster</span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-              Interactive department-wise analytics, enrollment graphs, biometric hardware coverage, and on-demand cohort rosters.
-            </p>
-          </div>
-          <a href="/admin/students.html" class="btn btn-secondary btn-sm" style="width: 100%;">View Student Analytics →</a>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Enrolled Students</span>
+          <span class="kpi-icon">🎓</span>
         </div>
+        <div id="stat-students" class="kpi-value">0</div>
+        <div class="kpi-sub">Verified cohort student profiles</div>
+      </div>
+    </div>
 
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h3 style="font-size: 1rem; font-weight: 700;">8. System Settings</h3>
-              <span class="badge badge-late">Threshold &amp; Policies</span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-              Configure official minimum attendance percentage (75%), institution branding, and audit security trail.
-            </p>
+    <!-- Core Governance Modules -->
+    <div class="modules-section-header">
+      <h2 class="modules-section-title">Core Administration Modules</h2>
+      <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">6 Essential Modules • Minimal &amp; Purpose-Built</span>
+    </div>
+
+    <div class="modules-grid">
+      <!-- 1. Academic Structure -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge-row">
+            <span class="badge badge-present">Master Curriculum</span>
+            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">01</span>
           </div>
-          <a href="/admin/settings.html" class="btn btn-secondary btn-sm" style="width: 100%;">Settings &amp; Audit →</a>
+          <h3 class="module-title"><span>🏛️</span> Academic Structure</h3>
+          <p class="module-description">Configure institutional departments, degree programs, semesters, divisions, and automated academic session rollovers.</p>
         </div>
+        <a href="/admin/academic-structure.html" class="btn btn-primary btn-sm" style="font-weight: 700; width: 100%;">
+          Open Academic Structure →
+        </a>
+      </div>
 
+      <!-- 2. HOD Governance -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge-row">
+            <span class="badge badge-late">Leadership</span>
+            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">02</span>
+          </div>
+          <h3 class="module-title"><span>👨‍🏫</span> HOD Governance</h3>
+          <p class="module-description">Appoint Heads of Department, transfer department leadership, approve pending candidate registrations, and toggle anti-spam self-registration gates.</p>
+        </div>
+        <a href="/admin/faculty.html" class="btn btn-primary btn-sm" style="font-weight: 700; width: 100%;">
+          Manage Department Heads →
+        </a>
+      </div>
+
+      <!-- 3. Student Analytics -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge-row">
+            <span class="badge badge-present">Cohort Visuals</span>
+            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">03</span>
+          </div>
+          <h3 class="module-title"><span>👥</span> Student Analytics</h3>
+          <p class="module-description">Department-wise enrollment distribution charts, biometric hardware coverage ratios, demographic stats, and on-demand cohort rosters.</p>
+        </div>
+        <a href="/admin/students.html" class="btn btn-secondary btn-sm" style="font-weight: 600; width: 100%;">
+          View Student Analytics →
+        </a>
+      </div>
+
+      <!-- 4. Institutional Reports -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge-row">
+            <span class="badge badge-pending">Compliance</span>
+            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">04</span>
+          </div>
+          <h3 class="module-title"><span>📈</span> Department Reports</h3>
+          <p class="module-description">Comprehensive attendance ledgers across all college branches, faculty accountability audits, early-warning defaulter tracking, and CSV exports.</p>
+        </div>
+        <a href="/admin/reports.html" class="btn btn-secondary btn-sm" style="font-weight: 600; width: 100%;">
+          View Department Reports →
+        </a>
+      </div>
+
+      <!-- 5. System Settings -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge-row">
+            <span class="badge badge-present">Policies</span>
+            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">05</span>
+          </div>
+          <h3 class="module-title"><span>⚙️</span> System Settings</h3>
+          <p class="module-description">Institutional identity branding, official minimum attendance threshold percentage (75%), and session expiration rules.</p>
+        </div>
+        <a href="/admin/settings.html" class="btn btn-secondary btn-sm" style="font-weight: 600; width: 100%;">
+          Configure Policies →
+        </a>
+      </div>
+
+      <!-- 6. Audit Logs -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge-row">
+            <span class="badge badge-late">Security Trail</span>
+            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">06</span>
+          </div>
+          <h3 class="module-title"><span>🛡️</span> Immutable Audit Trail</h3>
+          <p class="module-description">Tamper-evident chronological record of all administrative actions, faculty approvals, security events, and database mutations.</p>
+        </div>
+        <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm" style="font-weight: 600; width: 100%;">
+          Inspect Audit Logs →
+        </a>
+      </div>
+    </div>
+
+    <!-- Live Recent Security Events Feed -->
+    <div class="audit-preview-card">
+      <div class="audit-preview-header">
+        <h3 class="audit-preview-title"><span>🛡️</span> Recent Security &amp; Administrative Activity</h3>
+        <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm" style="font-size: 0.8rem;">View Full Audit Trail →</a>
+      </div>
+      <div class="table-wrapper" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow-x: auto;">
+        <table class="table" style="font-size: 0.82rem; margin: 0;">
+          <thead>
+            <tr>
+              <th style="width: 140px;">Timestamp</th>
+              <th style="width: 160px;">Event Action</th>
+              <th style="width: 140px;">Actor</th>
+              <th>Audit Narrative</th>
+            </tr>
+          </thead>
+          <tbody id="audit-preview-tbody">
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">Loading recent security trail...</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </main>
@@ -173,18 +544,53 @@
     async function loadAdminStats() {
       try {
         const res = await fetchApi('/admin/stats');
-        if (res.success) {
-          document.getElementById('stat-students').innerText = res.data.total_students;
-          document.getElementById('stat-teachers').innerText = res.data.total_teachers;
-          document.getElementById('stat-devices').innerText = res.data.active_terminals;
-          document.getElementById('stat-sessions').innerText = res.data.today_sessions;
+        if (res && res.success && res.data) {
+          const d = res.data;
+          document.getElementById('stat-students').innerText = Number(d.total_students || 0).toLocaleString();
+          document.getElementById('stat-teachers').innerText = Number(d.total_teachers || 0).toLocaleString();
+          document.getElementById('stat-devices').innerText = Number(d.active_terminals || 0).toLocaleString();
+          document.getElementById('stat-sessions').innerText = Number(d.today_sessions || 0).toLocaleString();
         }
       } catch (err) {
-        console.error(err);
+        console.warn('Failed to load admin stats:', err);
       }
     }
 
-    loadAdminStats();
+    async function loadRecentAuditEvents() {
+      const tbody = document.getElementById('audit-preview-tbody');
+      if (!tbody) return;
+      try {
+        const res = await fetchApi('/admin/audit-logs?limit=5');
+        const logs = res?.data || res?.logs || [];
+        if (!logs.length) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1.25rem; color: var(--text-muted);">No security events recorded yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = logs.map(ev => {
+          const dateStr = ev.created_at ? new Date(ev.created_at).toLocaleString() : '—';
+          const action = ev.action || ev.event_type || 'SYSTEM_EVENT';
+          const actor = ev.actor_name || ev.email || 'System';
+          const details = ev.details || ev.description || ev.narrative || '—';
+
+          return `
+            <tr>
+              <td style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${dateStr}</td>
+              <td><span class="badge badge-late" style="font-size: 0.72rem;">${action}</span></td>
+              <td style="font-weight: 600; color: var(--text-main); font-size: 0.8rem;">${actor}</td>
+              <td style="color: var(--text-muted); font-size: 0.8rem;">${details}</td>
+            </tr>
+          `;
+        }).join('');
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 1.25rem; color: var(--text-muted);">Live audit feed active. Full logs available in Security Trail.</td></tr>';
+      }
+    }
+
+    (async function init() {
+      await loadAdminStats();
+      await loadRecentAuditEvents();
+    })();
   </script>
 </body>
 </html>

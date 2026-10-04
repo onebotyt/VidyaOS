@@ -432,33 +432,6 @@
       box-shadow: var(--shadow-md);
     }
 
-    .demo-credentials-strip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.45rem 1rem;
-      border-radius: 9999px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .demo-credentials-strip:hover {
-      background: var(--bg-card);
-      border-color: var(--color-primary);
-      color: var(--text-main);
-    }
-    .demo-credentials-strip code {
-      font-family: var(--font-mono);
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      padding: 0.1rem 0.4rem;
-      border-radius: 4px;
-      font-weight: 700;
-      color: var(--color-primary);
-    }
 
     /* ── Live Interactive OS Window (Hero Bento Feature) ── */
     .os-preview-window {
@@ -1038,60 +1011,6 @@
       margin: 0 0.2rem;
     }
 
-    /* ── Demo Modal ── */
-    .demo-modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 120;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      animation: modalFade 0.2s ease;
-    }
-    @keyframes modalFade {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    .demo-modal-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 520px;
-      padding: 2rem;
-      box-shadow: var(--shadow-lg);
-      position: relative;
-    }
-    .modal-close-btn {
-      position: absolute;
-      top: 1.25rem; right: 1.25rem;
-      background: none;
-      border: none;
-      font-size: 1.35rem;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-    .demo-account-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      margin-bottom: 0.65rem;
-      font-size: 0.84rem;
-    }
-    .demo-role-badge {
-      font-weight: 700;
-      font-size: 0.74rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-    }
 
     /* ── Footer ── */
     .site-footer {
@@ -1172,7 +1091,6 @@
         <li class="nav-link-item"><a href="#matrix-preview">Live Matrix</a></li>
         <li class="nav-link-item"><a href="#portals">Role Portals</a></li>
         <li class="nav-link-item"><a href="#capabilities">Architecture</a></li>
-        <li class="nav-link-item"><a href="javascript:void(0)" onclick="openDemoModal()">Demo Accounts</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -1237,14 +1155,6 @@
         <a href="/login/register.html" class="btn-hero-register">
           <span>Self-Registration Gateway</span>
         </a>
-      </div>
-
-      <div class="demo-credentials-strip" onclick="openDemoModal()" title="Click to view all demo account logins">
-        <span>🔑 Fast Demo Access:</span>
-        <code>admin / Admin@123</code>
-        <span>·</span>
-        <code>prof.sharma@college.edu</code>
-        <span>· Click for all roles →</span>
       </div>
     </section>
 
@@ -1512,8 +1422,8 @@
               <span>Sign In as Admin</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </a>
-            <a href="javascript:void(0)" onclick="openDemoModal()" class="link-portal-sub">
-              View Administrator Credentials →
+            <a href="/login/index.html" class="link-portal-sub">
+              Access Administration Console &rarr;
             </a>
           </div>
         </div>
@@ -1605,12 +1515,6 @@
       <span class="dock-tooltip">Register</span>
     </a>
 
-    <button type="button" class="dock-btn" onclick="openDemoModal()" aria-label="Demo Credentials">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
-      </svg>
-      <span class="dock-tooltip">Demo Logins</span>
-    </button>
 
     <div class="dock-divider-line" aria-hidden="true"></div>
 
@@ -1622,68 +1526,6 @@
     </button>
   </nav>
 
-  <!-- Demo Accounts Modal -->
-  <div class="demo-modal-overlay" id="demo-modal" role="dialog" aria-modal="true" aria-labelledby="demo-modal-title">
-    <div class="demo-modal-card">
-      <button type="button" class="modal-close-btn" onclick="closeDemoModal()" aria-label="Close modal">&times;</button>
-      <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
-        <span style="font-size:1.3rem;">🔑</span>
-        <h3 id="demo-modal-title" style="font-family:var(--font-display); font-size:1.25rem; font-weight:800; color:var(--text-main);">Demo Accounts</h3>
-      </div>
-      <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:1.5rem;">
-        Instant institutional credentials pre-configured for verification and system evaluation.
-      </p>
-
-      <div class="demo-account-row">
-        <div>
-          <span class="demo-role-badge tag-adm">System Admin</span>
-          <div style="font-weight:700; margin-top:0.25rem;">admin</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.75rem; color:var(--text-muted);">Password</div>
-          <code style="font-family:var(--font-mono); font-weight:700; color:var(--color-primary);">Admin@123</code>
-        </div>
-      </div>
-
-      <div class="demo-account-row">
-        <div>
-          <span class="demo-role-badge tag-fac">Department HOD</span>
-          <div style="font-weight:700; margin-top:0.25rem;">hod.it@college.edu</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.75rem; color:var(--text-muted);">Password</div>
-          <code style="font-family:var(--font-mono); font-weight:700; color:var(--color-primary);">Password@123</code>
-        </div>
-      </div>
-
-      <div class="demo-account-row">
-        <div>
-          <span class="demo-role-badge tag-fac">Faculty Member</span>
-          <div style="font-weight:700; margin-top:0.25rem;">prof.sharma@college.edu</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.75rem; color:var(--text-muted);">Password</div>
-          <code style="font-family:var(--font-mono); font-weight:700; color:var(--color-primary);">Password@123</code>
-        </div>
-      </div>
-
-      <div class="demo-account-row">
-        <div>
-          <span class="demo-role-badge tag-stu">Student</span>
-          <div style="font-weight:700; margin-top:0.25rem;">student.it01@college.edu</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.75rem; color:var(--text-muted);">Password</div>
-          <code style="font-family:var(--font-mono); font-weight:700; color:var(--color-primary);">Password@123</code>
-        </div>
-      </div>
-
-      <a href="/login/index.html" class="btn-hero-launch" style="width:100%; justify-content:center; margin-top:1rem; padding:0.75rem;">
-        <span>Open Sign In Portal</span>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-      </a>
-    </div>
-  </div>
 
   <!-- Footer -->
   <footer class="site-footer">
@@ -1693,7 +1535,6 @@
         <a href="/login/register.html">Registration Portal</a>
         <a href="#matrix-preview">Live Matrix</a>
         <a href="#capabilities">System Architecture</a>
-        <a href="javascript:void(0)" onclick="openDemoModal()">Demo Credentials</a>
       </div>
       <p>&copy; 2026 VidyaOS &middot; Institutional Campus &amp; Academic Operating System &middot; All rights reserved.</p>
       <div class="footer-credits">
@@ -1772,21 +1613,6 @@
       }, 1000);
     })();
 
-    // ── Demo Accounts Modal ───────────────────────────────────
-    function openDemoModal() {
-      const modal = document.getElementById('demo-modal');
-      if (modal) modal.style.display = 'flex';
-    }
-    function closeDemoModal() {
-      const modal = document.getElementById('demo-modal');
-      if (modal) modal.style.display = 'none';
-    }
-    document.getElementById('demo-modal')?.addEventListener('click', (e) => {
-      if (e.target.id === 'demo-modal') closeDemoModal();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeDemoModal();
-    });
   </script>
 </body>
 </html>

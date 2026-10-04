@@ -25,12 +25,24 @@ function showToast(message, type = 'info', duration = 4000) {
     }
     container = document.createElement('div');
     container.id = 'toast-container';
+    container.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:0.5rem;z-index:99999;max-width:380px;pointer-events:none;';
     document.body.appendChild(container);
+  } else if (!container.style.position) {
+    container.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:0.5rem;z-index:99999;max-width:380px;pointer-events:none;';
   }
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  toast.style.animation = 'fadeIn 0.2s ease-out';
+  toast.style.cssText = 'pointer-events:auto;background:var(--bg-card);color:var(--text-main);border:1px solid var(--border-color);box-shadow:var(--shadow-md);padding:0.75rem 1.15rem;border-radius:var(--radius-md);font-size:0.875rem;font-weight:500;line-height:1.4;display:flex;align-items:center;gap:0.6rem;animation:fadeIn 0.2s ease-out;';
+  if (type === 'error') {
+    toast.style.borderLeft = '4px solid var(--status-absent)';
+  } else if (type === 'success') {
+    toast.style.borderLeft = '4px solid var(--status-present)';
+  } else if (type === 'warning') {
+    toast.style.borderLeft = '4px solid var(--status-late)';
+  } else {
+    toast.style.borderLeft = '4px solid var(--color-primary)';
+  }
   toast.textContent = message;
 
   container.appendChild(toast);
@@ -175,3 +187,328 @@ function clampScore(val, min = 0, max = 100) {
   if (isNaN(num)) return min;
   return Math.min(Math.max(num, min), max);
 }
+
+/**
+ * Universal Student Multi-Semester Academic Dossier & Vault Viewer
+ * Opens an interactive modal displaying student master details, cumulative metrics,
+ * and a semester-by-semester breakdown of attendance, submitted coursework files, and test scores.
+ * @param {number|string} studentId
+ */
+async function openStudentDossier(studentId) {
+  let modal = document.getElementById('student-dossier-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'student-dossier-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,0.65);z-index:99990;display:flex;align-items:center;justify-content:center;padding:1rem;';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.onclick = (e) => {
+      if (e.target === modal) closeStudentDossier();
+    };
+    document.body.appendChild(modal);
+  }
+
+  modal.style.display = 'flex';
+  modal.innerHTML = `
+    <div style="background:var(--bg-card);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-lg);max-width:880px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-lg);">
+      <div style="padding:2.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);gap:0.75rem;">
+        <span style="font-size:2rem;">⏳</span>
+        <span style="font-weight:600;">Loading Student Academic Dossier &amp; Vault...</span>
+      </div>
+    </div>
+  `;
+
+  try {
+    const token = (typeof getToken === 'function' ? getToken() : (localStorage.getItem('access_token') || ''));
+    const res = await fetch(`/api/v1/students/${studentId}/academic-dossier`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    const body = await res.json();
+    if (!res.ok || !body.success) {
+      throw new Error(body?.error?.message || 'Failed to retrieve academic dossier.');
+    }
+    const { student, summary, semesters } = body.data;
+    renderStudentDossierContent(modal, student, summary, semesters);
+  } catch (err) {
+    modal.innerHTML = `
+      <div style="background:var(--bg-card);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-lg);max-width:520px;width:100%;padding:1.75rem;text-align:center;box-shadow:var(--shadow-lg);">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">⚠️</div>
+        <h3 style="margin:0 0 0.5rem 0;color:var(--status-absent);">Unable to Open Dossier</h3>
+        <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:1.25rem;">${esc(err.message)}</p>
+        <button type="button" class="btn btn-secondary" onclick="closeStudentDossier()">Close</button>
+      </div>
+    `;
+  }
+}
+
+function closeStudentDossier() {
+  const modal = document.getElementById('student-dossier-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function renderStudentDossierContent(modal, student, summary, semesters) {
+  const initial = (student.full_name || 'S').charAt(0).toUpperCase();
+  const isAlumni = student.enrollment_status === 'COMPLETED' || student.enrollment_status === 'GRADUATED' || student.user_status === 'ALUMNI';
+  const statusColor = isAlumni ? 'var(--color-primary)' : 'var(--status-present)';
+  const statusBg = isAlumni ? 'var(--chip-hod-bg)' : 'var(--status-present-bg)';
+  const statusText = isAlumni ? 'PASSOUT / ALUMNI' : 'ACTIVE';
+
+  let currentSemIndex = 0;
+
+  function renderInner(selectedSemIdx) {
+    currentSemIndex = selectedSemIdx;
+    const curSem = (semesters && semesters[selectedSemIdx]) || (semesters && semesters[0]) || { semester: 1, attendance: { by_subject: [] }, assignments: [], exams: [] };
+
+    // Semester Selector Pills
+    const semPillsHtml = (semesters && semesters.length) ? semesters.map((s, idx) => `
+      <button type="button" class="btn btn-sm" onclick="window._switchDossierSem(${idx})" style="
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        border: 1px solid var(--border-color);
+        background: ${idx === currentSemIndex ? 'var(--color-primary)' : 'var(--bg-surface)'};
+        color: ${idx === currentSemIndex ? 'var(--text-white)' : 'var(--text-main)'};
+        cursor: pointer;
+        transition: all 0.15s ease;
+      ">
+        Semester ${s.semester}
+      </button>
+    `).join('') : '<span style="font-size:0.8rem;color:var(--text-muted);">No recorded terms</span>';
+
+    // Attendance breakdown
+    const attPct = curSem.attendance?.percentage || 0;
+    const attHeld = curSem.attendance?.total_held || 0;
+    const attPres = curSem.attendance?.total_present || 0;
+    const attSubjects = curSem.attendance?.by_subject || [];
+
+    const attRowsHtml = attSubjects.length ? attSubjects.map(sub => `
+      <tr style="border-bottom: 1px solid var(--border-color);">
+        <td style="padding: 0.55rem 0.75rem; font-family: var(--font-family-mono); font-weight: 700; color: var(--color-primary); font-size: 0.82rem;">${esc(sub.subject_code)}</td>
+        <td style="padding: 0.55rem 0.75rem; font-weight: 600; font-size: 0.85rem; color: var(--text-main);">${esc(sub.subject_name)}</td>
+        <td style="padding: 0.55rem 0.75rem; font-size: 0.82rem; text-align: center;">${sub.attended} / ${sub.held}</td>
+        <td style="padding: 0.55rem 0.75rem; text-align: right;">
+          <span class="badge" style="
+            font-weight: 700; font-size: 0.78rem;
+            background: ${sub.percentage >= 75 ? 'var(--status-present-bg)' : 'var(--status-absent-bg)'};
+            color: ${sub.percentage >= 75 ? 'var(--status-present)' : 'var(--status-absent)'};
+          ">${sub.percentage}%</span>
+        </td>
+      </tr>
+    `).join('') : `
+      <tr>
+        <td colspan="4" style="text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem;">
+          No subject attendance sessions recorded for Semester ${curSem.semester}.
+        </td>
+      </tr>
+    `;
+
+    // Assignments Vault
+    const assignments = curSem.assignments || [];
+    const assignmentsHtml = assignments.length ? assignments.map(a => {
+      const fileBtn = a.file_path ? `
+        <a href="${esc(a.file_path)}" target="_blank" download class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.6rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;" title="Download submitted project / assignment">
+          <span>📄</span><span>Download File</span>
+        </a>
+      ` : '<span style="color: var(--text-muted); font-size: 0.75rem;">Text / Online entry</span>';
+
+      const marksDisplay = a.marks_obtained != null ? `<span style="font-weight: 700; color: var(--color-primary);">${a.marks_obtained}</span> / ${a.max_marks || 100}` : '<span style="color: var(--status-late);">Pending Grade</span>';
+
+      return `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 0.65rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; flex-wrap: wrap;">
+            <div>
+              <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">${esc(a.title)}</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem;">
+                ${esc(a.subject_name || 'Subject')} • <span class="badge" style="background: var(--bg-surface-secondary); font-size: 0.7rem; padding: 0.1rem 0.4rem;">${esc(a.component || 'THEORY')}</span>
+                ${a.submitted_at ? ` • Submitted: ${new Date(a.submitted_at).toLocaleDateString()}` : ''}
+              </div>
+            </div>
+            <div style="text-align: right; display: flex; align-items: center; gap: 0.75rem;">
+              <div style="font-size: 0.82rem;">Score: ${marksDisplay}</div>
+              ${fileBtn}
+            </div>
+          </div>
+          ${a.feedback ? `<div style="margin-top: 0.5rem; font-size: 0.78rem; background: var(--bg-card); padding: 0.4rem 0.65rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary); color: var(--text-main);"><strong>Teacher Feedback:</strong> ${esc(a.feedback)}</div>` : ''}
+        </div>
+      `;
+    }).join('') : `
+      <div style="text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+        No submitted coursework or project uploads for Semester ${curSem.semester}.
+      </div>
+    `;
+
+    // Exams & Class Tests
+    const exams = curSem.exams || [];
+    const examsHtml = exams.length ? exams.map(e => {
+      const marksDisp = e.marks_obtained != null ? `<span style="font-weight: 700; color: var(--color-primary);">${e.marks_obtained}</span> / ${e.max_marks}` : '—';
+      const pctDisp = e.percentage != null ? `${e.percentage}%` : '—';
+      const statusPill = e.result_status === 'PASS' 
+        ? `<span class="badge" style="background: var(--status-present-bg); color: var(--status-present); font-weight: 700; font-size: 0.75rem;">PASS</span>`
+        : (e.result_status === 'FAIL' 
+            ? `<span class="badge" style="background: var(--status-absent-bg); color: var(--status-absent); font-weight: 700; font-size: 0.75rem;">FAIL</span>`
+            : `<span class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.75rem;">—</span>`);
+
+      return `
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 0.55rem 0.75rem; font-weight: 600; font-size: 0.85rem; color: var(--text-main);">${esc(e.test_title)}</td>
+          <td style="padding: 0.55rem 0.75rem; font-size: 0.82rem; color: var(--text-muted);">${esc(e.subject_name || '—')}</td>
+          <td style="padding: 0.55rem 0.75rem; font-size: 0.82rem; text-align: center;">${marksDisp}</td>
+          <td style="padding: 0.55rem 0.75rem; font-size: 0.82rem; text-align: center; font-weight: 600;">${pctDisp}</td>
+          <td style="padding: 0.55rem 0.75rem; text-align: right;">${statusPill}</td>
+        </tr>
+      `;
+    }).join('') : `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem;">
+          No class tests or examination records for Semester ${curSem.semester}.
+        </td>
+      </tr>
+    `;
+
+    modal.innerHTML = `
+      <div style="background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: var(--radius-lg); max-width: 880px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-lg);">
+        <!-- Modal Header -->
+        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.85rem;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: var(--shadow-sm);">
+              ${esc(initial)}
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">${esc(student.full_name)}</h2>
+                <span class="badge" style="background: ${statusBg}; color: ${statusColor}; font-weight: 700; font-size: 0.75rem;">${statusText}</span>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <span>Enrollment: <strong style="font-family: var(--font-family-mono); color: var(--text-main);">${esc(student.official_enrollment_no)}</strong></span>
+                <span>Roll: <strong style="color: var(--color-primary);">${student.class_roll_no || '—'}</strong></span>
+                <span>${esc(student.department_name || 'Department')}</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="closeStudentDossier()" style="background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; padding: 0.25rem 0.5rem; line-height: 1;" title="Close Dossier">&times;</button>
+        </div>
+
+        <!-- Scrollable Modal Body -->
+        <div style="padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1;">
+          <!-- Summary Metric Cards -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.85rem; margin-bottom: 1.5rem;">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Recorded Semesters</div>
+              <div style="font-size: 1.4rem; font-weight: 800; color: var(--color-primary); margin-top: 0.2rem;">${summary.total_semesters_recorded}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">Terms with activity</div>
+            </div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Overall Attendance</div>
+              <div style="font-size: 1.4rem; font-weight: 800; color: ${summary.overall_attendance_percentage >= 75 ? 'var(--status-present)' : 'var(--status-absent)'}; margin-top: 0.2rem;">
+                ${summary.overall_attendance_percentage}%
+              </div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">${summary.overall_attendance_present} / ${summary.overall_attendance_held} attended</div>
+            </div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Assignments Vault</div>
+              <div style="font-size: 1.4rem; font-weight: 800; color: var(--color-primary); margin-top: 0.2rem;">${summary.total_assignments_submitted}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">Submitted files &amp; work</div>
+            </div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Class Tests &amp; Exams</div>
+              <div style="font-size: 1.4rem; font-weight: 800; color: var(--color-primary); margin-top: 0.2rem;">${summary.total_exams_recorded}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">Evaluation records</div>
+            </div>
+          </div>
+
+          <!-- Multi-Semester Navigation Pills -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Select Semester:</span>
+            ${semPillsHtml}
+          </div>
+
+          <!-- SECTION 1: ATTENDANCE -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+              <h3 style="font-size: 0.95rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+                <span>📅</span><span>Semester ${curSem.semester} Attendance Ledger</span>
+              </h3>
+              <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">
+                Term Attendance: <span style="font-weight: 700; color: ${attPct >= 75 ? 'var(--status-present)' : 'var(--status-absent)'};">${attPct}%</span> (${attPres}/${attHeld} classes)
+              </div>
+            </div>
+            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                  <tr style="background: var(--table-th-bg); border-bottom: 1px solid var(--border-color); text-align: left;">
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase;">Code</th>
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase;">Subject Name</th>
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase; text-align: center;">Attended / Held</th>
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase; text-align: right;">Rate</th>
+                  </tr>
+                </thead>
+                <tbody>${attRowsHtml}</tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SECTION 2: COURSEWORK & SUBMISSIONS VAULT -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <h3 style="font-size: 0.95rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+                <span>📂</span><span>Coursework &amp; Projects Vault (Semester ${curSem.semester})</span>
+              </h3>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">${assignments.length} submission(s)</span>
+            </div>
+            ${assignmentsHtml}
+          </div>
+
+          <!-- SECTION 3: CLASS TESTS & EXAMS -->
+          <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <h3 style="font-size: 0.95rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+                <span>📝</span><span>Class Tests &amp; Marks (Semester ${curSem.semester})</span>
+              </h3>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">${exams.length} test(s)</span>
+            </div>
+            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                  <tr style="background: var(--table-th-bg); border-bottom: 1px solid var(--border-color); text-align: left;">
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase;">Exam / Test Title</th>
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase;">Subject</th>
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase; text-align: center;">Score</th>
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase; text-align: center;">%</th>
+                    <th style="padding: 0.55rem 0.75rem; font-size: 0.75rem; text-transform: uppercase; text-align: right;">Result</th>
+                  </tr>
+                </thead>
+                <tbody>${examsHtml}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="padding: 0.85rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
+          <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+            <span>🛡️</span><span>Student Data Sovereignty: Academic records belong to the student and are permanently preserved.</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeStudentDossier()">Close</button>
+        </div>
+      </div>
+    `;
+  }
+
+  window._switchDossierSem = (semIdx) => {
+    renderInner(semIdx);
+  };
+
+  renderInner(0);
+}
+
+if (typeof window !== 'undefined') {
+  window.openStudentDossier = openStudentDossier;
+  window.closeStudentDossier = closeStudentDossier;
+}
+

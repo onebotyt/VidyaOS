@@ -21,3 +21,15 @@ api-explorer.html
 api_explorer.html
 js/api-catalog-data.js
 shared/js/api-catalog-data.js
+
+# Test & verification artifacts (Local development only, NEVER push to GitHub)
+tests/
+test/
+*.test.js
+*.spec.js
+test-*.js
+test-*.png
+evaluation_*.png
+scratch/
+browser/
+

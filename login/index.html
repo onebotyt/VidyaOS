@@ -566,6 +566,54 @@
     [data-theme="dark"] .role-tab.active { background: var(--bg-card); }
     [data-theme="dark"] .btn-google { background: var(--bg-card); border-color: var(--border-color); color: var(--text-main); }
     [data-theme="dark"] .modal-card { border-color: var(--border-color); }
+
+    /* ── TOAST NOTIFICATIONS ── */
+    #toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 99999;
+      max-width: 380px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+      padding: 0.75rem 1.15rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 500;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      animation: slideInToast 0.25s ease;
+    }
+
+    .toast-error {
+      border-left: 4px solid var(--status-absent);
+    }
+    .toast-success {
+      border-left: 4px solid var(--status-present);
+    }
+    .toast-warning {
+      border-left: 4px solid var(--status-late);
+    }
+    .toast-info {
+      border-left: 4px solid var(--color-primary);
+    }
+
+    @keyframes slideInToast {
+      from { transform: translateX(100%); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -852,6 +900,7 @@
       const deviceId = getVidyaDeviceId();
       const res = await fetchApi('/auth/login', {
         method: 'POST',
+        suppressToast: true,
         body: JSON.stringify({
           email: id, phone: id, credential: id,
           identifier: id, username: id, enrollment_no: id,
@@ -877,7 +926,6 @@
       resetSubmitBtn();
       if (err?.code === 'ACCOUNT_ALREADY_ACTIVE') {
         document.getElementById('conflict-banner').style.display = 'block';
-        try { if (typeof showToast === 'function') showToast('Account active on another device.', 'warning'); } catch(_) {}
         return;
       }
       if (err?.code === 'PENDING_APPROVAL') {
@@ -889,7 +937,6 @@
           }
           pb.style.display = 'block';
         }
-        try { if (typeof showToast === 'function') showToast(err.message || 'Registration is pending approval.', 'warning'); } catch(_) {}
         return;
       }
       if (err?.code === 'REGISTRATION_REJECTED' || (err?.code === 'FORBIDDEN' && err?.message && err.message.toLowerCase().includes('reject'))) {
@@ -901,7 +948,6 @@
           if (link) link.style.display = 'inline-flex';
           sb.style.display = 'block';
         }
-        try { if (typeof showToast === 'function') showToast(err.message, 'error'); } catch(_) {}
         return;
       }
       if (err?.code === 'FORBIDDEN') {
@@ -911,7 +957,6 @@
           document.getElementById('status-alert-body').textContent = err.message || 'Account access has been restricted. Please contact your department administration.';
           sb.style.display = 'block';
         }
-        try { if (typeof showToast === 'function') showToast(err.message, 'error'); } catch(_) {}
         return;
       }
       try {
@@ -931,6 +976,7 @@
     try {
       const res = await fetchApi('/auth/login', {
         method: 'POST',
+        suppressToast: true,
         body: JSON.stringify({
           email: id, phone: id, credential: id,
           identifier: id, username: id, enrollment_no: id,

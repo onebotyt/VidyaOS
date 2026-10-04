@@ -60,7 +60,7 @@ async function fetchApi(endpoint, options = {}) {
 
     return data;
   } catch (err) {
-    if (typeof showToast === 'function') {
+    if (!options.suppressToast && typeof showToast === 'function') {
       showToast(err.message || 'Network request failed', 'error');
     }
     throw err;

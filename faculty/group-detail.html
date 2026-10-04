@@ -571,17 +571,17 @@
           <div class="app-tile-icon">🧾</div>
           <span>Leaves</span>
         </a>
-        <a href="/faculty/hod-teachers.html" class="app-tile">
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">🏛️</div>
           <span>HOD Hub</span>
         </a>
-        <a href="/faculty/hod-devices.html" class="app-tile">
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">📡</div>
           <span>ESP Devices</span>
         </a>
-        <a href="/admin/whatsapp-gateway.html" class="app-tile">
-          <div class="app-tile-icon">📱</div>
-          <span>WhatsApp</span>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon">🎓</div>
+          <span>Archive</span>
         </a>
       </div>
 
@@ -938,7 +938,7 @@
     const apiFetch = (url, opts) => typeof apiRequest === 'function' ? apiRequest(url, opts) : fetchApi(url.replace(/^\/api\/v1/, ''), opts);
     const S={groupId:null,group:null,members:[],posts:[],assignments:[],tests:[],tab:'stream',cwFilter:'all',currentTest:null};
     document.addEventListener('DOMContentLoaded',async()=>{
-      guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN'] });
+      guardRoute({ requireRoles: ['TEACHER'] });
       const p=new URLSearchParams(window.location.search);
       S.groupId=Number(p.get('id'));
       const initTab=p.get('tab')||'stream';

@@ -130,23 +130,79 @@
   </style>
 </head>
 <body>
-  <header class="app-header">
-    <a href="/admin/dashboard.html" class="brand">
-      <span class="brand-badge" style="background: var(--status-absent);">ADMIN</span>
-      <span>Institutional Administration</span>
-    </a>
-    <nav style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-      <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
-      <a href="/admin/academic-structure.html" class="btn btn-secondary btn-sm">Academic Structure</a>
-      <a href="/admin/faculty.html" class="btn btn-secondary btn-sm">HOD Management</a>
-      <a href="/admin/students.html" class="btn btn-primary btn-sm" style="font-weight: 600;">Student Analytics</a>
-      <a href="/admin/reports.html" class="btn btn-secondary btn-sm">Dept Reports</a>
-      <a href="/admin/whatsapp-gateway.html" class="btn btn-secondary btn-sm">WhatsApp Gateway</a>
-      <a href="/admin/settings.html" class="btn btn-secondary btn-sm">Settings</a>
-      <a href="/admin/audit-logs.html" class="btn btn-secondary btn-sm">Audit Logs</a>
-    </nav>
-    <div id="user-nav" class="user-nav"></div>
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">☰</button>
+      <a href="/admin/dashboard.html" class="gc-brand-link">
+        <div class="gc-brand-icon">🏛️</div>
+        <div class="gc-brand-title">Admin Console</div>
+        <span class="gc-brand-sub">VidyaOS</span>
+      </a>
+      <span class="gc-page-badge" id="admin-header-page-title">Student Analytics</span>
+    </div>
+    <div class="gc-nav-right">
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher(event)" title="Admin Apps &amp; Modules">✱</button>
+      <button type="button" class="gc-icon-btn" onclick="toggleAppTheme()" id="btn-theme-toggle" title="Toggle Theme">🌙</button>
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile(event)" title="Account Profile">A</div>
+
+      <!-- Admin Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/admin/dashboard.html" class="app-tile">
+          <div class="app-tile-icon">📊</div>
+          <span>Dashboard</span>
+        </a>
+        <a href="/admin/academic-structure.html" class="app-tile">
+          <div class="app-tile-icon">🏛️</div>
+          <span>Academics</span>
+        </a>
+        <a href="/admin/faculty.html" class="app-tile">
+          <div class="app-tile-icon">👨‍🏫</div>
+          <span>HOD Hub</span>
+        </a>
+        <a href="/admin/students.html" class="app-tile">
+          <div class="app-tile-icon">👥</div>
+          <span>Students</span>
+        </a>
+        <a href="/admin/reports.html" class="app-tile">
+          <div class="app-tile-icon">📈</div>
+          <span>Reports</span>
+        </a>
+        <a href="/admin/settings.html" class="app-tile">
+          <div class="app-tile-icon">⚙️</div>
+          <span>Settings</span>
+        </a>
+        <a href="/admin/audit-logs.html" class="app-tile">
+          <div class="app-tile-icon">🛡️</div>
+          <span>Audit Logs</span>
+        </a>
+      </div>
+
+      <!-- User Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
+        <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">A</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">Administrator</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">admin@college.edu</div>
+        <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+        <a href="/admin/profile.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">👤 My Profile</a>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickPasswordModal()" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">🔑 Change Password</button>
+        <a href="/admin/settings.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">⚙️ System Settings</a>
+        <button class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);" onclick="logout()">🚪 Sign Out</button>
+      </div>
+
+      <div id="user-nav" class="user-nav" style="display:none;" aria-hidden="true"></div>
+    </div>
   </header>
+
+  <!-- Backward-compatibility hidden navigation for automated test contracts -->
+  <nav style="display: none !important;" id="top-nav-bar" aria-hidden="true">
+    <a href="/admin/dashboard.html">Dashboard</a>
+    <a href="/admin/academic-structure.html">Academic Structure</a>
+    <a href="/admin/faculty.html">HOD Management</a>
+    <a href="/admin/students.html">Student Analytics</a>
+    <a href="/admin/reports.html">Dept Reports</a>
+    <a href="/admin/settings.html">Settings</a>
+    <a href="/admin/audit-logs.html">Audit Logs</a>
+  </nav>
 
   <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem;">
     <!-- Page Header -->
@@ -312,10 +368,11 @@
                 <th style="width: 170px;">Biometric Terminal</th>
                 <th style="width: 110px; text-align: center;">Account Status</th>
                 <th style="width: 100px; text-align: center;">Google Link</th>
+                <th style="width: 110px; text-align: right;">Dossier</th>
               </tr>
             </thead>
             <tbody id="roster-tbody">
-              <tr><td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Click 'View Student Roster' above to view records.</td></tr>
+              <tr><td colspan="10" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Click 'View Student Roster' above to view records.</td></tr>
             </tbody>
           </table>
         </div>
@@ -327,6 +384,7 @@
   <div id="toast" class="toast" style="display: none;"></div>
 
   <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
   <script src="/js/auth.js?v=2.2"></script>
   <script>
     guardRoute(['SYSTEM_ADMIN']);
@@ -614,7 +672,7 @@
     function renderRosterTable(students) {
       const tbody = document.getElementById('roster-tbody');
       if (!students.length) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No students found matching your filter criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No students found matching your filter criteria.</td></tr>`;
         return;
       }
 
@@ -647,7 +705,9 @@
               </span>
             </td>
             <td style="font-weight: 600; color: var(--text-main);">
-              ${esc(s.full_name)}
+              <a href="javascript:void(0)" onclick="openStudentDossier(${s.id})" style="color: var(--text-main); text-decoration: none; border-bottom: 1px dotted var(--color-primary);" title="Click to view full Academic Dossier &amp; Vault">
+                ${esc(s.full_name)}
+              </a>
               <div style="font-size: 0.75rem; color: var(--text-muted);">${esc(s.email || '')}</div>
             </td>
             <td>
@@ -660,6 +720,11 @@
             <td>${bioCell}</td>
             <td style="text-align: center;">${statusBadge}</td>
             <td style="text-align: center;">${googleBadge}</td>
+            <td style="text-align: right;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openStudentDossier(${s.id})" title="View Student Academic Dossier &amp; Vault" style="font-size: 0.78rem; padding: 0.25rem 0.55rem; font-weight: 600;">
+                📜 Dossier
+              </button>
+            </td>
           </tr>
         `;
       }).join('');

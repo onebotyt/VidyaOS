@@ -389,8 +389,8 @@ function _setSidebarState(open) {
 }
 
 function toggleSidebar() {
-  const sidebar = document.getElementById('app-sidebar');
-  const backdrop = document.getElementById('sidebar-backdrop');
+  const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer');
+  const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop');
   if (!sidebar) return;
   const isOpen = sidebar.classList.toggle('sidebar-open');
   sidebar.classList.toggle('open', isOpen);
@@ -406,8 +406,8 @@ function toggleSidebar() {
 }
 
 function closeSidebar() {
-  const sidebar = document.getElementById('app-sidebar');
-  const backdrop = document.getElementById('sidebar-backdrop');
+  const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer');
+  const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop');
   if (!sidebar) return;
   sidebar.classList.remove('sidebar-open');
   sidebar.classList.remove('open');
@@ -418,6 +418,12 @@ function closeSidebar() {
   }
   _setSidebarState(false);
 }
+
+// Global aliases to ensure all faculty pages work with either function name
+window.toggleSidebar = toggleSidebar;
+window.closeSidebar = closeSidebar;
+window.toggleDrawer = toggleSidebar;
+window.closeDrawer = closeSidebar;
 
 function toggleAppsLauncher(event) {
   if (event) {
@@ -519,13 +525,15 @@ function renderClassroomNavbar() {
   const user = getCurrentUser();
   if (!user) return;
   const currentPath = window.location.pathname.toLowerCase();
-  if (!currentPath.includes('/faculty/')) return;
+  const isFaculty = currentPath.includes('/faculty/');
+  const isAdmin = currentPath.includes('/admin/');
+  if (!isFaculty && !isAdmin) return;
 
   const displayName = getUserDisplayName(user);
-  const email = user.email || user.username || 'teacher@college.edu';
+  const email = user.email || user.username || (isAdmin ? 'admin@college.edu' : 'teacher@college.edu');
   const cleanName = displayName.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
   const parts = cleanName.split(/\s+/).filter(Boolean);
-  const initial = parts.length > 0 ? parts[0][0].toUpperCase() : 'T';
+  const initial = parts.length > 0 ? parts[0][0].toUpperCase() : (isAdmin ? 'A' : 'T');
 
   const avatarEl = document.getElementById('gc-user-avatar');
   if (avatarEl) avatarEl.textContent = initial;
@@ -536,11 +544,22 @@ function renderClassroomNavbar() {
   const popoverEmail = document.getElementById('popover-user-email');
   if (popoverEmail) popoverEmail.textContent = email;
   const launcher = document.getElementById('apps-launcher-dropdown');
-  if (launcher && !launcher.classList.contains('open')) launcher.style.display = 'none';
+  if (launcher) {
+    if (!launcher.classList?.contains?.('open')) launcher.style.display = 'none';
+    // Role-based visibility for HOD tiles
+    const isHod = Boolean(user.is_hod);
+    if (typeof launcher.querySelectorAll === 'function') {
+      launcher.querySelectorAll('.hod-only-tile, a[href*="hod-"]').forEach(tile => {
+        tile.style.display = isHod ? 'flex' : 'none';
+      });
+    }
+  }
   const popover = document.getElementById('user-profile-popover');
-  if (popover && !popover.classList.contains('open')) popover.style.display = 'none';
+  if (popover && !popover.classList?.contains?.('open')) popover.style.display = 'none';
 
-  _loadDrawerTeachingClasses();
+  if (isFaculty) {
+    _loadDrawerTeachingClasses();
+  }
 }
 
 function renderSidebar() {
@@ -612,7 +631,6 @@ function renderSidebar() {
         { icon: '📊', label: 'Dashboard', href: '/admin/dashboard.html' },
         { icon: '🏛️', label: 'Academic Structure', href: '/admin/academic-structure.html' },
         { icon: '👨‍🏫', label: 'HOD Management', href: '/admin/faculty.html' },
-        { icon: '📱', label: 'WhatsApp Gateway', href: '/admin/whatsapp-gateway.html' },
         { icon: '👥', label: 'Student Analytics', href: '/admin/students.html' },
         { icon: '📈', label: 'Department Reports', href: '/admin/reports.html' },
         { icon: '⚙️', label: 'System Settings', href: '/admin/settings.html' },
@@ -622,38 +640,42 @@ function renderSidebar() {
   } else if (user.roles?.includes('TEACHER') || currentPath.includes('/faculty/')) {
     portalLabel = user.is_hod ? `HOD — ${user.hod_department_name || 'Dept'}` : 'Faculty Portal';
 
-    const mainItems = [
-      { icon: '🏠', label: 'Dashboard', href: '/faculty/dashboard.html' },
-      { icon: '🏫', label: 'Teaching Groups', href: '/faculty/groups.html' }
-    ];
-    if (user.has_assigned_subjects) {
-      mainItems.push(
-        { icon: '📖', label: 'Registers & Attendance', href: '/faculty/registers.html', id: 'nav-reg' },
-        { icon: '📝', label: 'Assignments', href: '/faculty/assignments.html', id: 'nav-assign' },
-        { icon: '📊', label: 'Class Tests & Marks', href: '/faculty/tests.html', id: 'nav-marks' },
-        { icon: '📈', label: 'Internal Evaluation', href: '/faculty/evaluation.html', id: 'nav-eval' },
-        { icon: '📉', label: 'Reports & Analytics', href: '/faculty/reports.html', id: 'nav-reports' }
-      );
-    }
-    mainItems.push(
-      { icon: '🗓️', label: 'Timetable', href: '/faculty/timetable.html' },
-      { icon: '🧾', label: 'Leave Requests', href: '/faculty/leave-approvals.html' }
-    );
     const isDeptFaculty = Boolean(user.department_id || user.teacher?.department_id || user.is_class_teacher || user.is_hod || (user.roles?.includes('TEACHER') && !user.is_common_faculty_manager));
     const isHodUser = Boolean(user.is_hod || currentPath.includes('hod-'));
-    if (isDeptFaculty && !isHodUser) {
-      mainItems.push({ icon: '👥', label: 'Faculty & Students', href: '/faculty/students.html', id: 'nav-students-item', hasBadge: true });
-    }
-    if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
-      mainItems.push({ icon: '🌐', label: 'Common Faculty', href: '/faculty/common-teachers.html' });
-    }
-    navSections.push({ label: 'Faculty', items: mainItems });
 
+    // Top Level: Google Classroom Style
+    navSections.push({
+      label: '',
+      items: [
+        { icon: '🏠', label: 'Classes', href: '/faculty/dashboard.html' },
+        { icon: '📅', label: 'Calendar & Timetable', href: '/faculty/timetable.html' }
+      ]
+    });
+
+    // Teaching Classes List
     navSections.push({
       label: 'Teaching Classes',
       customContent: '<div id="drawer-classes-list"><div style="padding:0.4rem 1.25rem;color:var(--text-muted);font-size:0.78rem;">Loading classes...</div></div>',
       items: []
     });
+
+    // Academic Tools
+    const academicTools = [
+      { icon: '📖', label: 'Attendance Registers', href: '/faculty/registers.html', id: 'nav-reg' },
+      { icon: '📝', label: 'Coursework & Assignments', href: '/faculty/assignments.html', id: 'nav-assign' },
+      { icon: '📊', label: 'Marks & Tests', href: '/faculty/tests.html', id: 'nav-marks' },
+      { icon: '📈', label: 'Internal Evaluation', href: '/faculty/evaluation.html', id: 'nav-eval' },
+      { icon: '📉', label: 'Reports & Analytics', href: '/faculty/reports.html', id: 'nav-reports' },
+      { icon: '🧾', label: 'Leave Requests', href: '/faculty/leave-approvals.html' }
+    ];
+
+    if (isDeptFaculty && !isHodUser) {
+      academicTools.push({ icon: '👥', label: 'Faculty & Students', href: '/faculty/students.html', id: 'nav-students-item', hasBadge: true });
+    }
+    if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
+      academicTools.push({ icon: '🌐', label: 'Common Faculty', href: '/faculty/common-teachers.html' });
+    }
+    navSections.push({ label: 'Academic Tools', items: academicTools });
 
     if (isHodUser) {
       navSections.push({
@@ -694,7 +716,7 @@ function renderSidebar() {
 
   // Build link HTML
   function buildLinks(sections) {
-    return sections.map(section => {
+    return sections.map((section, idx) => {
       let customHtml = '';
       if (section.customContent) {
         customHtml = section.customContent;
@@ -702,17 +724,19 @@ function renderSidebar() {
       const links = (section.items || []).map(item => {
         const hrefLower = item.href.toLowerCase();
         const isActive = (hrefLower.includes('?') ? currentUrl === hrefLower : currentPath === hrefLower)
-          || (item.href.endsWith('dashboard.html') && currentPath.endsWith('/'));
+          || (item.href.endsWith('dashboard.html') && (currentPath.endsWith('/') || currentPath.includes('dashboard.html') || currentPath.includes('groups.html')));
         return `
           <a href="${item.href}" ${item.id ? `id="${item.id}"` : ''}
              class="sidebar-item gc-drawer-link ${isActive ? 'active' : ''}"
              onclick="if(window.innerWidth<=768)closeSidebar()" style="position:relative;">
-            <span class="sidebar-item-icon">${item.icon}</span>
+            <span class="sidebar-item-icon" style="font-size:1.15rem;">${item.icon}</span>
             <span>${item.label}</span>
             ${item.hasBadge ? `<span id="${item.id}-badge" style="display:none;position:absolute;right:0.65rem;top:50%;transform:translateY(-50%);background:var(--status-absent);color:white;border-radius:9999px;min-width:18px;height:18px;font-size:0.65rem;font-weight:700;align-items:center;justify-content:center;padding:0 5px;"></span>` : ''}
           </a>`;
       }).join('');
-      return `<div class="sidebar-section-label gc-drawer-sec-title">${section.label}</div>${customHtml}${links}`;
+      const dividerHtml = isDrawerPortal && idx > 0 ? '<div class="gc-drawer-divider"></div>' : '';
+      const labelHtml = section.label ? `<div class="sidebar-section-label gc-drawer-sec-title">${section.label}</div>` : '';
+      return `${dividerHtml}${labelHtml}${customHtml}${links}`;
     }).join('');
   }
 
@@ -728,7 +752,12 @@ function renderSidebar() {
     .join('') || 'U';
 
   const isFacultyPortal = currentPath.includes('/faculty/');
-  const sidebarHeaderHtml = isFacultyPortal ? `
+  const isAdminPortal = currentPath.includes('/admin/');
+  const isDrawerPortal = isFacultyPortal || isAdminPortal;
+
+  let sidebarHeaderHtml = '';
+  if (isFacultyPortal) {
+    sidebarHeaderHtml = `
       <!-- Brand Header / Drawer Header -->
       <div class="gc-drawer-header sidebar-user-card" style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;border-bottom:1px solid var(--border-color);gap:0.65rem;">
         <a href="/faculty/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;flex:1;min-width:0;">
@@ -740,7 +769,23 @@ function renderSidebar() {
         </a>
         <button type="button" class="sidebar-close-btn gc-menu-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar">✕</button>
       </div>
-  ` : `
+    `;
+  } else if (isAdminPortal) {
+    sidebarHeaderHtml = `
+      <!-- Admin Drawer Header -->
+      <div class="gc-drawer-header sidebar-user-card" style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;border-bottom:1px solid var(--border-color);gap:0.65rem;">
+        <a href="/admin/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;flex:1;min-width:0;">
+          <div style="width:34px;height:34px;font-size:1.1rem;border-radius:9px;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-hover));color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(37,99,235,0.22);">🏛️</div>
+          <div style="display:flex;flex-direction:column;line-height:1.1;">
+            <span style="font-size:0.9rem;font-weight:800;color:var(--text-main);letter-spacing:-0.01em;">Admin Console</span>
+            <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.06em;color:var(--color-primary);text-transform:uppercase;">VidyaOS</span>
+          </div>
+        </a>
+        <button type="button" class="sidebar-close-btn gc-menu-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar">✕</button>
+      </div>
+    `;
+  } else {
+    sidebarHeaderHtml = `
       <!-- Executive Profile Card -->
       <div class="sidebar-user-card">
         <div class="sidebar-avatar" style="background:linear-gradient(135deg,var(--color-primary),var(--color-primary-hover));">
@@ -755,14 +800,15 @@ function renderSidebar() {
         </div>
         <button type="button" class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar">✕</button>
       </div>
-  `;
+    `;
+  }
 
   const sidebarHtml = `
-    <aside id="app-sidebar" class="app-sidebar ${isFacultyPortal ? 'gc-drawer' : ''}" aria-label="Site Navigation">
+    <aside id="app-sidebar" class="app-sidebar ${isDrawerPortal ? 'gc-drawer' : ''}" aria-label="Site Navigation">
       ${sidebarHeaderHtml}
 
       <!-- Scoped Navigation Links -->
-      <div class="${isFacultyPortal ? 'gc-drawer-body ' : ''}sidebar-links">
+      <div class="${isDrawerPortal ? 'gc-drawer-body ' : ''}sidebar-links">
         ${buildLinks(navSections)}
       </div>
 
@@ -785,16 +831,18 @@ function renderSidebar() {
 
   document.body.insertAdjacentHTML('afterbegin', sidebarHtml);
 
-  // Restore sidebar state (open on desktop by default for admin/student, drawer closed by default for faculty)
+  // Restore sidebar state (drawer closed by default for faculty and admin, open on desktop by default for student)
   const isDesktop = window.innerWidth >= 769;
   const savedOpen = _getSidebarState();
-  const shouldOpen = isFacultyPortal ? false : (isDesktop ? (savedOpen !== false) : false);
+  const shouldOpen = isDrawerPortal ? false : (isDesktop ? (savedOpen !== false) : false);
   if (shouldOpen) {
     const sidebar = document.getElementById('app-sidebar');
     if (sidebar) sidebar.classList.add('sidebar-open');
     document.body.classList.add('sidebar-open');
     const btn = document.getElementById('sidebar-toggle-btn') || document.getElementById('btn-menu-toggle');
     if (btn) btn.setAttribute('aria-pressed', 'true');
+  } else if (isDrawerPortal) {
+    document.body.classList.remove('sidebar-open');
   }
 
   // Close on Escape key

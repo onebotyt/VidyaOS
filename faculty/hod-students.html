@@ -430,17 +430,17 @@
           <div class="app-tile-icon">🧾</div>
           <span>Leaves</span>
         </a>
-        <a href="/faculty/hod-teachers.html" class="app-tile">
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">🏛️</div>
           <span>HOD Hub</span>
         </a>
-        <a href="/faculty/hod-devices.html" class="app-tile">
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">📡</div>
           <span>ESP Devices</span>
         </a>
-        <a href="/admin/whatsapp-gateway.html" class="app-tile">
-          <div class="app-tile-icon">📱</div>
-          <span>WhatsApp</span>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon">🎓</div>
+          <span>Archive</span>
         </a>
       </div>
 
@@ -492,8 +492,6 @@
         <button type="button" class="btn btn-primary btn-sm" id="btn-add-teacher" onclick="openCreateModal()" style="display: none; font-weight: 600;">+ Add Teacher</button>
         
         <!-- Student Action Buttons -->
-        <button type="button" class="btn btn-secondary btn-sm" id="btn-reindex-roll" onclick="openReindexModal()" style="display: none; font-weight: 600;">🔤 Re-order Roll #</button>
-        <button type="button" class="btn btn-secondary btn-sm" id="btn-bulk-csv" onclick="openBulkModal()" style="display: none; font-weight: 600;">📁 Bulk CSV</button>
         <button type="button" class="btn btn-primary btn-sm" id="btn-add-student" onclick="openAddModal()" style="display: none; font-weight: 600;">+ Add Student</button>
         <button type="button" class="btn btn-primary btn-sm" id="btn-promotion" onclick="openPromotionModal()" style="display: none; font-weight: 700;">🔄 Semester Promotion &amp; Demotion</button>
         <a href="/faculty/hod-archive.html" class="btn btn-secondary btn-sm" id="btn-archive-link" style="display: none; font-weight: 600;">🎓 Alumni Archive</a>
@@ -527,41 +525,57 @@
     </div>
 
     <!-- Dedicated Registration Control Hub -->
-    <div class="card" id="registration-control-hub" style="padding: 1.1rem 1.25rem; margin-bottom: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div class="card" id="registration-control-hub" style="margin-bottom: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;">
+      <div style="padding: 1.15rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
         <div>
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span style="font-size: 1.25rem;">🚪</span>
-            <h2 class="card-title" style="font-size: 1rem; margin: 0;">Self-Registration Gateways (Open / Close)</h2>
+            <h2 class="card-title" style="font-size: 1.05rem; font-weight: 700; margin: 0;">Self-Registration Gateways (Open / Close)</h2>
           </div>
-          <p class="card-subtitle" style="margin-top: 0.25rem; font-size: 0.8rem; color: var(--text-muted);">
-            Control whether prospective teachers and students can register on the public portal. After opening, applicants can submit self-registration into your review queue.
+          <p class="card-subtitle" style="margin: 0.25rem 0 0 0; font-size: 0.82rem; color: var(--text-muted);">
+            Control whether prospective teachers and students can register on the public portal. After opening, applicants submit registrations to your review queue.
           </p>
         </div>
+      </div>
 
-        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-          <!-- Teacher Registration Gateway -->
-          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.85rem; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-            <div style="display: flex; flex-direction: column;">
-              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Teacher Portal</span>
-              <span id="quick-teacher-reg-badge" class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.78rem; font-weight: 700; padding: 0.15rem 0.5rem;">Checking...</span>
+      <div style="padding: 1.25rem 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+        <!-- Teacher Registration Gateway Tile -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+              👨‍🏫
             </div>
-            <button type="button" id="quick-teacher-reg-toggle-btn" class="btn btn-secondary btn-sm" onclick="toggleFacultyRegistration()" style="font-weight: 600; font-size: 0.78rem; height: 32px;">
-              Toggle Teacher Reg
-            </button>
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main);">Faculty Gateway</div>
+              <div style="margin-top: 0.2rem;">
+                <span id="quick-teacher-reg-badge" class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;">Checking...</span>
+              </div>
+            </div>
           </div>
+          <button type="button" id="quick-teacher-reg-toggle-btn" class="btn btn-secondary btn-sm" onclick="toggleFacultyRegistration()" style="font-weight: 700; font-size: 0.8rem; padding: 0.4rem 0.9rem; border-radius: 20px; white-space: nowrap;">
+            Toggle Teacher Reg
+          </button>
+        </div>
 
-          <!-- Student Registration Gateway -->
-          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.85rem; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-            <div style="display: flex; flex-direction: column;">
-              <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Student Portal</span>
-              <span id="quick-student-reg-badge" class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.78rem; font-weight: 700; padding: 0.15rem 0.5rem;">Checking...</span>
+        <!-- Student Registration Gateway Tile -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+              🎓
             </div>
-            <button type="button" id="quick-student-reg-toggle-btn" class="btn btn-secondary btn-sm" onclick="toggleCohortRegistration()" style="font-weight: 600; font-size: 0.78rem; height: 32px;" title="Toggle registration for the currently selected cohort">
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main);">Student Gateway</div>
+              <div style="margin-top: 0.2rem;">
+                <span id="quick-student-reg-badge" class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;">Checking...</span>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" id="quick-student-reg-toggle-btn" class="btn btn-secondary btn-sm" onclick="toggleCohortRegistration()" style="font-weight: 700; font-size: 0.8rem; padding: 0.4rem 0.85rem; border-radius: 20px; white-space: nowrap;" title="Toggle registration for the currently selected cohort">
               Toggle Cohort Reg
             </button>
-            <button type="button" id="quick-dept-student-reg-toggle-btn" class="btn btn-secondary btn-sm" onclick="toggleDepartmentStudentRegistration()" style="font-weight: 600; font-size: 0.78rem; height: 32px;" title="Toggle registration across all department cohorts at once">
-              Toggle All Semesters
+            <button type="button" id="quick-dept-student-reg-toggle-btn" class="btn btn-secondary btn-sm" onclick="toggleDepartmentStudentRegistration()" style="font-weight: 700; font-size: 0.8rem; padding: 0.4rem 0.85rem; border-radius: 20px; white-space: nowrap;" title="Toggle registration across all department cohorts at once">
+              All Semesters
             </button>
           </div>
         </div>
@@ -1186,7 +1200,7 @@
   <script>
     // Enforce role-based access for department faculty and HODs
     if (typeof guardRoute === 'function') {
-      guardRoute({ roles: ['TEACHER', 'SYSTEM_ADMIN'], requireDepartmentFaculty: true });
+      guardRoute({ roles: ['TEACHER'], requireDepartmentFaculty: true });
     }
     
     // Transparent apiFetch fallback
@@ -1326,7 +1340,7 @@
     (async function init() {
       try {
         currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-        isHod = Boolean(currentUser && (currentUser.is_hod || currentUser.roles?.includes('SYSTEM_ADMIN')));
+        isHod = Boolean(currentUser && (currentUser.is_hod));
 
         if (isHod) {
           const hodBadge = document.getElementById('hod-badge');

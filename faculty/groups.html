@@ -1622,17 +1622,17 @@
           <div class="app-tile-icon">🧾</div>
           <span>Leaves</span>
         </a>
-        <a href="/faculty/hod-teachers.html" class="app-tile">
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">🏛️</div>
           <span>HOD Hub</span>
         </a>
-        <a href="/faculty/hod-devices.html" class="app-tile">
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
           <div class="app-tile-icon">📡</div>
           <span>ESP Devices</span>
         </a>
-        <a href="/admin/whatsapp-gateway.html" class="app-tile">
-          <div class="app-tile-icon">📱</div>
-          <span>WhatsApp</span>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon">🎓</div>
+          <span>Archive</span>
         </a>
       </div>
 
@@ -1648,87 +1648,7 @@
     </div>
   </header>
 
-  <!-- Google Classroom Sidebar Drawer -->
-  <div class="gc-drawer-backdrop" id="classroom-drawer-backdrop" onclick="closeDrawer()"></div>
-  <aside class="gc-drawer" id="classroom-drawer">
-    <div class="gc-drawer-header">
-      <button type="button" class="gc-menu-btn" onclick="closeDrawer()">✕</button>
-      <a href="/faculty/groups.html" class="gc-brand-link">
-        <div class="gc-brand-icon" style="width:32px;height:32px;font-size:1.1rem;">🎓</div>
-        <div class="gc-brand-title" style="font-size:1.15rem;">Classroom</div>
-      </a>
-    </div>
-    <div class="gc-drawer-body">
-      <a href="/faculty/dashboard.html" class="gc-drawer-link active">
-        <span style="font-size:1.2rem;">🏠</span> Classes
-      </a>
-      <a href="/faculty/timetable.html" class="gc-drawer-link">
-        <span style="font-size:1.2rem;">📅</span> Calendar &amp; Timetable
-      </a>
-      
-      <div class="gc-drawer-divider"></div>
-      <div class="gc-drawer-sec-title">Teaching Classes</div>
-      <div id="drawer-classes-list">
-        <!-- Injected via JS -->
-      </div>
 
-      <div class="gc-drawer-divider"></div>
-      <div class="gc-drawer-sec-title">Academic Tools</div>
-      <a href="/faculty/registers.html" class="gc-drawer-link">
-        <span style="font-size:1.15rem;">📖</span> Attendance Registers
-      </a>
-      <a href="/faculty/assignments.html" class="gc-drawer-link">
-        <span style="font-size:1.15rem;">📝</span> Coursework &amp; Assignments
-      </a>
-      <a href="/faculty/tests.html" class="gc-drawer-link">
-        <span style="font-size:1.15rem;">📊</span> Marks &amp; Tests
-      </a>
-      <a href="/faculty/evaluation.html" class="gc-drawer-link">
-        <span style="font-size:1.15rem;">📈</span> Internal Evaluation
-      </a>
-      <a href="/faculty/reports.html" class="gc-drawer-link">
-        <span style="font-size:1.15rem;">📉</span> Reports &amp; Analytics
-      </a>
-      <a href="/faculty/leave-approvals.html" class="gc-drawer-link">
-        <span style="font-size:1.15rem;">🧾</span> Leave Requests
-      </a>
-      <a href="/faculty/students.html" class="gc-drawer-link">
-        <span style="font-size:1.15rem;">👥</span> Faculty &amp; Students
-      </a>
-
-      <div class="gc-drawer-divider" id="drawer-hod-divider"></div>
-      <div class="gc-drawer-sec-title" id="drawer-hod-title">HOD Management</div>
-      <div id="drawer-hod-items">
-        <a href="/faculty/students.html" class="gc-drawer-link">
-          <span style="font-size:1.15rem;">👥</span> Faculty &amp; Student Directory
-        </a>
-        <a href="/faculty/hod-archive.html" class="gc-drawer-link">
-          <span style="font-size:1.15rem;">🎓</span> Student Archive
-        </a>
-        <a href="/faculty/hod-reports.html" class="gc-drawer-link">
-          <span style="font-size:1.15rem;">📈</span> Department Reports
-        </a>
-        <a href="/faculty/hod-devices.html" class="gc-drawer-link">
-          <span style="font-size:1.15rem;">📡</span> ESP Terminals
-        </a>
-        <a href="/faculty/hod-settings.html" class="gc-drawer-link">
-          <span style="font-size:1.15rem;">⚙️</span> Department Settings
-        </a>
-      </div>
-
-      <div class="gc-drawer-divider"></div>
-      <div class="gc-drawer-sec-title">Archive &amp; Safety</div>
-      <a href="javascript:void(0)" class="gc-drawer-link" onclick="setGroupFilter('ARCHIVED');closeDrawer();">
-        <span style="font-size:1.15rem;">📦</span> Archived Classes
-      </a>
-      <a href="javascript:void(0)" class="gc-drawer-link" onclick="openTrashBinModal();closeDrawer();">
-        <span style="font-size:1.15rem;">🗑️</span> Trash Bin (7d Recovery)
-      </a>
-      <a href="/faculty/hod-settings.html" class="gc-drawer-link">
-        <span style="font-size:1.15rem;">⚙️</span> Settings
-      </a>
-    </div>
-  </aside>
 
   <main class="page-main-container container" style="max-width:1380px;padding-top:1.5rem;">
     <!-- HOD Role View Switcher (Only rendered for HODs) -->
@@ -2014,45 +1934,6 @@
         <button type="button" class="btn-close" onclick="closeModal('create-group-modal')">✕</button>
       </div>
       <div class="modal-body" style="padding: 1.25rem;">
-        <form id="create-group-form" onsubmit="submitCreateGroup(event)">
-          <!-- Enrollment Mode Selection -->
-          <div class="form-group" style="margin-bottom: 1rem;">
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main);">
-              Student Enrollment Mode *
-            </label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-              <label id="mode-card-invite" class="enroll-mode-card active" onclick="setEnrollmentMode('INVITE_CODE')">
-                <input type="radio" name="enrollment_mode" value="INVITE_CODE" checked style="display:none;">
-                <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem;">
-                  <span>🎟️</span> 1. Invite Code
-                </div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.35;">
-                  Students join themselves with a 6-digit code or share link
-                </div>
-              </label>
-              <label id="mode-card-cohort" class="enroll-mode-card" onclick="setEnrollmentMode('COHORT')">
-                <input type="radio" name="enrollment_mode" value="COHORT" style="display:none;">
-                <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem;">
-                  <span>⚡</span> 2. Cohort Auto-Enroll
-                </div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.35;">
-                  Auto-enrolls department students for this semester
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <!-- Department Picker (For common faculty or cohort enrollment) -->
-          <div id="create-dept-field" class="form-group" style="margin-bottom: 1rem; display: none;">
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
-              Department Cohort *
-            </label>
-            <select id="group-department" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
-              <!-- Populated via JS -->
-            </select>
-            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Select student department cohort to enroll.</div>
-          </div>
-
           <div class="form-group" style="margin-bottom: 1rem;">
             <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
               Group Name *
@@ -2069,7 +1950,7 @@
             <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Direct subject title. No complex catalog lookup needed.</div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
             <div class="form-group">
               <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
                 Component *
@@ -2095,15 +1976,73 @@
             </div>
           </div>
 
-          <div id="create-mode-explainer" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1.25rem;">
-            💡 <strong>Option 1 (Invite Code):</strong> Creating this group issues a 6-digit student invite code and sets up the official attendance register ledger automatically.
-          </div>
-
           <div style="display: flex; justify-content: flex-end; gap: 0.65rem;">
             <button type="button" class="btn btn-secondary" onclick="closeModal('create-group-modal')">Cancel</button>
             <button type="submit" id="btn-submit-create-group" class="btn btn-primary">Create Teaching Group</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Post-Create Enroll Department Students Prompt -->
+  <div id="enroll-dept-students-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 650px; max-height: 90vh;">
+      <div class="modal-header">
+        <div>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+            <span>👥</span> Enroll Department Students
+          </h3>
+          <div id="enroll-modal-subtitle" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.4;">
+            Do you want to enroll department students into your new class?
+          </div>
+        </div>
+        <button type="button" class="btn-close" onclick="closeEnrollDeptModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem; overflow-y: auto;">
+        <!-- Search Bar -->
+        <div style="margin-bottom: 0.85rem;">
+          <input type="text" id="search-enroll-dept-input" placeholder="Search by name, roll, or enrollment no..." oninput="filterEnrollDeptStudents()" style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main); font-size: 0.85rem;">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">
+            Available Department Students: <span id="enroll-dept-count">0</span>
+          </div>
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--color-primary); cursor: pointer; display: flex; align-items: center; gap: 0.35rem;">
+            <input type="checkbox" id="enroll-dept-select-all" checked onchange="toggleEnrollDeptSelectAll(this.checked)">
+            <span>Select All</span>
+          </label>
+        </div>
+
+        <div style="max-height: 280px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card);">
+          <table class="checklist-table">
+            <thead>
+              <tr>
+                <th style="width: 40px; text-align: center;"></th>
+                <th style="width: 60px;">Roll</th>
+                <th>Student Name</th>
+                <th>Enrollment No</th>
+              </tr>
+            </thead>
+            <tbody id="enroll-dept-tbody">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="enroll-dept-empty-notice" style="display: none; padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+          No students found in your department for this semester. Students can join anytime using the 6-digit invitation code.
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeEnrollDeptModal()">
+            Skip (Invite Code Only)
+          </button>
+          <button type="button" id="btn-confirm-enroll-dept" class="btn btn-primary" onclick="submitEnrollDeptStudents()">
+            + Enroll Selected (<span id="enroll-dept-selected-tally">0</span>)
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -2849,7 +2788,7 @@
   <script src="/js/ui.js?v=20261003"></script>
   <script>
     // Guard route for Faculty
-    guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN'] });
+    guardRoute({ requireRoles: ['TEACHER'] });
 
     let state = {
       groups: [],
@@ -2862,7 +2801,8 @@
       currentUser: null,
       userDepartmentId: null,
       isCommonFaculty: false,
-      createEnrollmentMode: 'INVITE_CODE',
+      pendingNewGroup: null,
+      pendingDeptStudents: [],
       unenrolledStudents: [],
       promoteMembers: []
     };
@@ -3155,16 +3095,7 @@
     }
 
     function populateDepartmentDropdowns() {
-      const createDeptSel = document.getElementById('group-department');
       const noticeDeptSel = document.getElementById('notice-department');
-
-      if (createDeptSel) {
-        createDeptSel.innerHTML = state.departments.map(d => `
-          <option value="${d.id}" ${state.userDepartmentId === d.id ? 'selected' : ''}>
-            ${escapeHtml(d.name)} (${escapeHtml(d.code)})
-          </option>
-        `).join('');
-      }
 
       if (noticeDeptSel) {
         noticeDeptSel.innerHTML = '<option value="ALL">🌐 All Departments</option>' + state.departments.map(d => `
@@ -3189,28 +3120,7 @@
       if (badge) badge.innerText = `Year ${yr}`;
     }
 
-    function setEnrollmentMode(mode) {
-      state.createEnrollmentMode = mode;
-      const cardInvite = document.getElementById('mode-card-invite');
-      const cardCohort = document.getElementById('mode-card-cohort');
-      const deptField = document.getElementById('create-dept-field');
-      const explainer = document.getElementById('create-mode-explainer');
 
-      if (cardInvite) cardInvite.classList.toggle('active', mode === 'INVITE_CODE');
-      if (cardCohort) cardCohort.classList.toggle('active', mode === 'COHORT');
-
-      if (mode === 'COHORT') {
-        if (deptField) deptField.style.display = 'block';
-        if (explainer) {
-          explainer.innerHTML = `⚡ <strong>Option 2 (Cohort Auto-Enroll):</strong> Students belonging to the chosen semester &amp; department will be automatically enrolled on group creation. You can review and adjust the roster anytime.`;
-        }
-      } else {
-        if (deptField) deptField.style.display = 'none';
-        if (explainer) {
-          explainer.innerHTML = `💡 <strong>Option 1 (Invite Code):</strong> Issues a 6-digit student invite code and sets up the official attendance register ledger automatically.`;
-        }
-      }
-    }
 
     async function loadTeachingGroups() {
       try {
@@ -3521,17 +3431,25 @@
     }
 
     function toggleDrawer() {
-      const drawer = document.getElementById('classroom-drawer');
-      const backdrop = document.getElementById('classroom-drawer-backdrop');
-      if (drawer) drawer.classList.toggle('open');
-      if (backdrop) backdrop.classList.toggle('open');
+      if (typeof toggleSidebar === 'function') {
+        toggleSidebar();
+      } else {
+        const drawer = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer');
+        const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop');
+        if (drawer) drawer.classList.toggle('open');
+        if (backdrop) backdrop.classList.toggle('open');
+      }
     }
 
     function closeDrawer() {
-      const drawer = document.getElementById('classroom-drawer');
-      const backdrop = document.getElementById('classroom-drawer-backdrop');
-      if (drawer) drawer.classList.remove('open');
-      if (backdrop) backdrop.classList.remove('open');
+      if (typeof closeSidebar === 'function') {
+        closeSidebar();
+      } else {
+        const drawer = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer');
+        const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop');
+        if (drawer) drawer.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('open');
+      }
     }
 
     function toggleAppsLauncher() {
@@ -3692,21 +3610,8 @@
       }
     }
 
-    async function permanentDeleteGroup(groupId, name) {
-      if (!confirm(`Permanently delete "${name}"? This cannot be undone.`)) return;
-      try {
-        const res = await fetchApi(`/teaching-groups/${groupId}/permanent`, { method: 'DELETE' });
-        if (res.success) {
-          showToast(`Class "${name}" permanently purged`, 'info');
-          await openTrashBinModal();
-          await loadDashboardOverview();
-        } else {
-          showToast(res.error?.message || 'Failed to purge class', 'error');
-        }
-      } catch (err) {
-        showToast(err.message, 'error');
-      }
-    }
+    // permanentDeleteGroup removed — groups may only be soft-archived or restored from trash.
+    // They auto-expire after 7 days. No hard purge option is available to faculty.
 
     // Edit Class Settings Functions
     function openEditGroupModal(groupId) {
@@ -3769,18 +3674,14 @@
       }
 
       const semVal = parseInt(document.getElementById('group-semester').value, 10);
-      let deptVal = document.getElementById('group-department')?.value || state.userDepartmentId || null;
-      if (!deptVal && state.departments && state.departments.length > 0) {
-        deptVal = state.departments[0].id;
-      }
+      const compVal = document.getElementById('group-component').value;
 
       const payload = {
         name: nameVal,
         subject_name: subjectVal,
-        component: document.getElementById('group-component').value,
+        component: compVal,
         semester: semVal,
-        enrollment_mode: state.createEnrollmentMode || 'INVITE_CODE',
-        department_id: deptVal ? Number(deptVal) : null
+        enrollment_mode: 'INVITE_CODE'
       };
 
       try {
@@ -3789,18 +3690,14 @@
           body: JSON.stringify(payload)
         });
 
-        if (res.success) {
-          const autoCount = res.data?.auto_enrolled_count || 0;
-          const msg = autoCount > 0 
-            ? `Teaching Group "${payload.name}" created with ${autoCount} students auto-enrolled!` 
-            : `Teaching Group "${payload.name}" created successfully!`;
-          showToast(msg, 'success');
+        if (res.success && res.data) {
           closeModal('create-group-modal');
           document.getElementById('create-group-form').reset();
-          setEnrollmentMode('INVITE_CODE');
           updateDerivedYear();
           await loadTeachingGroups();
-          await loadDashboardOverview();
+
+          // Launch the enrollment confirmation pop-up
+          openEnrollDeptModal(res.data);
         } else {
           showToast(res.error?.message || 'Failed to create group', 'error');
         }
@@ -3810,6 +3707,149 @@
         btn.disabled = false;
         btn.innerText = 'Create Teaching Group';
       }
+    }
+
+    // ----------------------------------------------------
+    // POST-CREATE ENROLL DEPARTMENT STUDENTS MODAL
+    // ----------------------------------------------------
+    async function openEnrollDeptModal(group) {
+      state.pendingNewGroup = group;
+      state.pendingDeptStudents = [];
+
+      const subtitle = document.getElementById('enroll-modal-subtitle');
+      if (subtitle) {
+        subtitle.innerHTML = `Teaching Group <strong>${escapeHtml(group.name)}</strong> created! Do you want to enroll your department students (Semester ${group.semester})? Or skip to let them join with invite code <strong style="font-family:var(--font-mono); color:var(--color-primary);">${escapeHtml(group.invite_code)}</strong>.`;
+      }
+
+      const tbody = document.getElementById('enroll-dept-tbody');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:1.5rem; color:var(--text-muted);">Finding department students...</td></tr>';
+      }
+      const searchInput = document.getElementById('search-enroll-dept-input');
+      if (searchInput) searchInput.value = '';
+      const emptyNotice = document.getElementById('enroll-dept-empty-notice');
+      if (emptyNotice) emptyNotice.style.display = 'none';
+
+      openModal('enroll-dept-students-modal');
+
+      try {
+        const res = await fetchApi(`/teaching-groups/${group.id}/unenrolled-students`);
+        if (res.success && Array.isArray(res.data)) {
+          state.pendingDeptStudents = res.data;
+          renderEnrollDeptStudents(true);
+        } else {
+          if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:1.5rem; color:var(--status-absent);">Failed to load students</td></tr>';
+        }
+      } catch (err) {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:1.5rem; color:var(--status-absent);">${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function renderEnrollDeptStudents(selectAll = false) {
+      const tbody = document.getElementById('enroll-dept-tbody');
+      const emptyNotice = document.getElementById('enroll-dept-empty-notice');
+      const tableWrapper = tbody?.closest('div');
+      const q = (document.getElementById('search-enroll-dept-input')?.value || '').trim().toLowerCase();
+
+      const filtered = state.pendingDeptStudents.filter(s => {
+        if (!q) return true;
+        const name = (s.full_name || '').toLowerCase();
+        const eno = (s.official_enrollment_no || '').toLowerCase();
+        const roll = String(s.class_roll_no || '');
+        return name.includes(q) || eno.includes(q) || roll.includes(q);
+      });
+
+      const countEl = document.getElementById('enroll-dept-count');
+      if (countEl) countEl.innerText = filtered.length;
+
+      if (!filtered.length) {
+        if (tbody) tbody.innerHTML = '';
+        if (emptyNotice) emptyNotice.style.display = 'block';
+        if (tableWrapper) tableWrapper.style.display = 'none';
+        updateEnrollDeptTally();
+        return;
+      }
+
+      if (emptyNotice) emptyNotice.style.display = 'none';
+      if (tableWrapper) tableWrapper.style.display = 'block';
+
+      tbody.innerHTML = filtered.map(s => `
+        <tr>
+          <td style="text-align:center;">
+            <input type="checkbox" class="enroll-dept-student-chk" value="${s.student_id}" ${selectAll ? 'checked' : ''} onchange="updateEnrollDeptTally()">
+          </td>
+          <td style="font-weight:700;">${s.class_roll_no || '—'}</td>
+          <td style="font-weight:600;">${escapeHtml(s.full_name)}</td>
+          <td><code>${escapeHtml(s.official_enrollment_no)}</code></td>
+        </tr>
+      `).join('');
+
+      const selAll = document.getElementById('enroll-dept-select-all');
+      if (selAll) selAll.checked = selectAll;
+      updateEnrollDeptTally();
+    }
+
+    function filterEnrollDeptStudents() {
+      renderEnrollDeptStudents(false);
+    }
+
+    function toggleEnrollDeptSelectAll(checked) {
+      document.querySelectorAll('.enroll-dept-student-chk').forEach(c => c.checked = checked);
+      updateEnrollDeptTally();
+    }
+
+    function updateEnrollDeptTally() {
+      const chks = document.querySelectorAll('.enroll-dept-student-chk');
+      const checked = Array.from(chks).filter(c => c.checked);
+      const tallyEl = document.getElementById('enroll-dept-selected-tally');
+      if (tallyEl) tallyEl.innerText = checked.length;
+
+      const selAll = document.getElementById('enroll-dept-select-all');
+      if (selAll && chks.length > 0) {
+        selAll.checked = checked.length === chks.length;
+      }
+
+      const btn = document.getElementById('btn-confirm-enroll-dept');
+      if (btn) btn.disabled = checked.length === 0;
+    }
+
+    async function submitEnrollDeptStudents() {
+      if (!state.pendingNewGroup) return;
+      const checked = Array.from(document.querySelectorAll('.enroll-dept-student-chk:checked')).map(c => Number(c.value));
+      if (!checked.length) return;
+
+      const btn = document.getElementById('btn-confirm-enroll-dept');
+      btn.disabled = true;
+      btn.innerText = 'Enrolling...';
+
+      try {
+        const res = await fetchApi(`/teaching-groups/${state.pendingNewGroup.id}/members`, {
+          method: 'POST',
+          body: JSON.stringify({ student_ids: checked })
+        });
+
+        if (res.success) {
+          showToast(`Successfully enrolled ${checked.length} student(s) into "${state.pendingNewGroup.name}"!`, 'success');
+          closeModal('enroll-dept-students-modal');
+          state.pendingNewGroup = null;
+          await loadTeachingGroups();
+        } else {
+          showToast(res.error?.message || 'Failed to enroll students', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = `+ Enroll Selected (${checked.length})`;
+      }
+    }
+
+    function closeEnrollDeptModal() {
+      if (state.pendingNewGroup) {
+        showToast(`Teaching group "${state.pendingNewGroup.name}" ready! Invite code: ${state.pendingNewGroup.invite_code}`, 'info');
+      }
+      closeModal('enroll-dept-students-modal');
+      state.pendingNewGroup = null;
     }
 
     async function openClassroomHub(groupId) {
