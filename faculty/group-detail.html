@@ -935,7 +935,7 @@
   <script src="/js/auth.js?v=20261003"></script>
   <script src="/js/ui.js?v=20261003"></script>
   <script>
-    const apiFetch = (url, opts) => typeof apiRequest === 'function' ? apiRequest(url, opts) : fetchApi(url.replace(/^\/api\/v1/, ''), opts);
+    var apiFetch = window.apiFetch || ((url, opts) => typeof apiRequest === 'function' ? apiRequest(url, opts) : fetchApi(url.replace(/^\/api\/v1/, ''), opts));
     const S={groupId:null,group:null,members:[],posts:[],assignments:[],tests:[],tab:'stream',cwFilter:'all',currentTest:null};
     document.addEventListener('DOMContentLoaded',async()=>{
       guardRoute({ requireRoles: ['TEACHER'] });
