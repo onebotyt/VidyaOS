@@ -929,6 +929,61 @@
         </div>
       </div>
     </div>
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 2-STEP DELETE & REMOVE CONFIRMATION MODAL (ZERO NATIVE ALERTS) -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="modal-backdrop" id="modal-confirm-delete" style="display:none" onclick="if(event.target===this)closeModal('modal-confirm-delete')">
+    <div class="modal-card" style="max-width:480px">
+      <!-- STEP 1: Impact Review & Safety Safeguard -->
+      <div id="del-step-1">
+        <div class="modal-header">
+          <h3 class="modal-title" style="margin:0;font-size:1.05rem;font-weight:700;color:var(--text-main);display:flex;align-items:center;gap:.5rem">
+            <span style="font-size:1.2rem">⚠️</span> <span id="del-modal-title">Confirm Action</span>
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="closeModal('modal-confirm-delete')">&#10005;</button>
+        </div>
+        <div class="modal-body" style="padding:1.25rem">
+          <div style="background:var(--status-absent-bg);border:1px solid var(--status-absent);border-radius:var(--radius-md);padding:1rem;margin-bottom:1rem">
+            <div style="font-weight:700;color:var(--status-absent);font-size:.85rem;margin-bottom:.35rem;display:flex;align-items:center;gap:.35rem">
+              <span>🛑</span> Action Safeguard (Step 1 of 2)
+            </div>
+            <p id="del-modal-desc" style="font-size:.86rem;color:var(--text-main);margin:0;line-height:1.5">
+              Are you sure you want to proceed?
+            </p>
+          </div>
+          <div style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:.85rem 1rem;font-size:.82rem;color:var(--text-muted);line-height:1.45">
+            <strong style="color:var(--text-main)">🛡️ Institutional Data Sovereignty:</strong> Historical attendance logs, class marks, and past submissions remain safe and permanently preserved in the college database.
+          </div>
+        </div>
+        <div class="modal-footer" style="padding:1rem 1.25rem">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-confirm-delete')">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="proceedDeleteStep2()">Proceed to Step 2 &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Final Verification & Confirmation -->
+      <div id="del-step-2" style="display:none">
+        <div class="modal-header">
+          <h3 class="modal-title" style="margin:0;font-size:1.05rem;font-weight:800;color:var(--status-absent);display:flex;align-items:center;gap:.5rem">
+            <span>⚠️</span> Final Confirmation (Step 2 of 2)
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="closeModal('modal-confirm-delete')">&#10005;</button>
+        </div>
+        <div class="modal-body" style="padding:1.25rem">
+          <p id="del-modal-step2-text" style="font-size:.88rem;color:var(--text-main);line-height:1.5;margin:0 0 1rem 0">
+            Please confirm your action below to complete removal.
+          </p>
+          <label style="display:flex;align-items:flex-start;gap:.65rem;background:var(--bg-surface);padding:.85rem 1rem;border-radius:var(--radius-md);border:1px solid var(--border-color);cursor:pointer;font-size:.84rem;color:var(--text-main);user-select:none">
+            <input type="checkbox" id="del-confirm-checkbox" onchange="document.getElementById('btn-final-delete-confirm').disabled=!this.checked" style="margin-top:2px;width:16px;height:16px;accent-color:var(--status-absent)">
+            <span id="del-checkbox-label">I understand and confirm this action.</span>
+          </label>
+        </div>
+        <div class="modal-footer" style="padding:1rem 1.25rem;display:flex;justify-content:space-between">
+          <button type="button" class="btn btn-secondary" onclick="backDeleteStep1()">&larr; Back</button>
+          <button type="button" id="btn-final-delete-confirm" class="btn" style="background:var(--status-absent);color:var(--text-white);font-weight:700;border:none" disabled onclick="executeConfirmedDelete()">Confirm &amp; Remove</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="/js/api.js?v=20261003"></script>
@@ -1033,11 +1088,41 @@
     async function addStudentByEnroll(){const inp=ById('add-enroll-input'),eno=inp.value.trim();if(!eno){toast('Enter an enrollment number');return;}
       try{await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/members',{method:'POST',body:JSON.stringify({official_enrollment_no:eno})});inp.value='';toast('Student added!');await loadMembers();}catch(e){toast(e.message||'Student not found');}
     }
-    async function removeStudent(sid){
+    let _pendingDelete = null;
+
+    function requestRemoveStudent(sid){
       const member = S.members.find(m => m.student_id === sid);
-      const name = member ? member.full_name : 'student';
-      if(!confirm('Remove '+name+' from this group?'))return;
-      try{await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/members/'+sid,{method:'DELETE'});toast(name+' removed');await loadMembers();}catch(e){toast(e.message);}
+      const name = member ? member.full_name : 'Student';
+      const roll = member ? (member.class_roll_no ? ('Roll #' + member.class_roll_no) : '') : '';
+      const enroll = member ? (member.official_enrollment_no || member.enrollment_no || '') : '';
+      const detailStr = [roll, enroll].filter(Boolean).join(' • ');
+
+      _pendingDelete = {
+        action: 'remove_student',
+        id: sid,
+        name: name,
+        execute: async () => {
+          await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/members/' + sid, { method: 'DELETE' });
+          toast(name + ' removed from group');
+          await loadMembers();
+        }
+      };
+
+      ById('del-modal-title').textContent = 'Remove Student from Group';
+      ById('del-modal-desc').innerHTML = 'Remove <strong>' + esc(name) + '</strong>' + (detailStr ? ' (' + esc(detailStr) + ')' : '') + ' from <strong>' + esc(S.group?.name || 'this group') + '</strong>?';
+      ById('del-modal-step2-text').innerHTML = 'You are about to remove <strong>' + esc(name) + '</strong> from this teaching group. The student will lose access to the classroom stream, assignments, and test rosters.';
+      ById('del-checkbox-label').innerHTML = 'Yes, remove <strong>' + esc(name) + '</strong> from this teaching group';
+      ById('btn-final-delete-confirm').textContent = 'Confirm & Remove';
+
+      ById('del-step-1').style.display = '';
+      ById('del-step-2').style.display = 'none';
+      ById('del-confirm-checkbox').checked = false;
+      ById('btn-final-delete-confirm').disabled = true;
+      openModal('modal-confirm-delete');
+    }
+
+    function removeStudent(sid){
+      requestRemoveStudent(sid);
     }
     async function loadAssignments(){
       try{const r=await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/assignments');S.assignments=r.data||[];}catch{S.assignments=[];}
@@ -1111,8 +1196,67 @@
       if(!name||!date||!marks){toast('Title, date and marks are required');return;}
       try{await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/tests',{method:'POST',body:JSON.stringify({name,test_date:date,max_marks:marks,description:desc||null})});toast('Test scheduled!');closeModal('modal-schedule-test');ById('test-title').value='';ById('test-date').value='';ById('test-marks').value='20';await loadTests();switchTab('marks');}catch(e){toast(e.message);}
     }
-    async function delWork(type,id){if(!confirm('Delete this '+type+'?'))return;
-      try{const ep=type==='assignment'?'/api/v1/teaching-groups/'+S.groupId+'/assignments/'+id:'/api/v1/teaching-groups/'+S.groupId+'/tests/'+id;await apiFetch(ep,{method:'DELETE'});toast('Deleted');if(type==='assignment')await loadAssignments();else await loadTests();}catch(e){toast(e.message);}
+    function requestDeleteWork(type, id){
+      const isAssign = type === 'assignment';
+      const label = isAssign ? 'Assignment' : 'Class Test';
+      const item = isAssign ? S.assignments.find(a => a.id === id) : S.tests.find(t => t.id === id);
+      const title = item ? (item.title || item.name) : label;
+
+      _pendingDelete = {
+        action: 'delete_work',
+        type: type,
+        id: id,
+        name: title,
+        execute: async () => {
+          const ep = isAssign ? '/api/v1/teaching-groups/' + S.groupId + '/assignments/' + id : '/api/v1/teaching-groups/' + S.groupId + '/tests/' + id;
+          await apiFetch(ep, { method: 'DELETE' });
+          toast(label + ' deleted');
+          if (isAssign) await loadAssignments(); else await loadTests();
+        }
+      };
+
+      ById('del-modal-title').textContent = 'Delete ' + label;
+      ById('del-modal-desc').innerHTML = 'Permanently delete <strong>' + esc(title) + '</strong> from this teaching group?';
+      ById('del-modal-step2-text').innerHTML = 'You are about to delete <strong>' + esc(title) + '</strong>. Any submissions and recorded scores will be unlinked.';
+      ById('del-checkbox-label').innerHTML = 'Yes, permanently delete <strong>' + esc(title) + '</strong>';
+      ById('btn-final-delete-confirm').textContent = 'Confirm & Delete';
+
+      ById('del-step-1').style.display = '';
+      ById('del-step-2').style.display = 'none';
+      ById('del-confirm-checkbox').checked = false;
+      ById('btn-final-delete-confirm').disabled = true;
+      openModal('modal-confirm-delete');
+    }
+
+    function delWork(type, id){
+      requestDeleteWork(type, id);
+    }
+
+    function proceedDeleteStep2(){
+      ById('del-step-1').style.display = 'none';
+      ById('del-step-2').style.display = '';
+    }
+
+    function backDeleteStep1(){
+      ById('del-step-1').style.display = '';
+      ById('del-step-2').style.display = 'none';
+    }
+
+    async function executeConfirmedDelete(){
+      if (!_pendingDelete || typeof _pendingDelete.execute !== 'function') return;
+      const btn = ById('btn-final-delete-confirm');
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+      try {
+        await _pendingDelete.execute();
+        closeModal('modal-confirm-delete');
+      } catch (err) {
+        toast(err.message || 'Action failed');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Confirm & Remove';
+        _pendingDelete = null;
+      }
     }
     function populateSidebarStats(){const g=S.group;
       ById('stat-assignments').textContent=g.assignment_count??'--';ById('stat-register-id').textContent=g.register_id?'#'+g.register_id:'--';
@@ -1254,7 +1398,7 @@
     async function executeArchive(){try{await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/archive',{method:'POST'});toast('Group archived!');closeModal('modal-archive');setTimeout(()=>location.href='/faculty/groups.html',1500);}catch(e){toast(e.message);}}
     function openModal(id){const el=ById(id);el.classList.add('open');el.style.display='flex';}
     function closeModal(id){const el=ById(id);el.classList.remove('open');el.style.display='none';}
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')['modal-create-assignment','modal-schedule-test','modal-enter-marks','modal-archive','modal-edit-group','modal-add-unenrolled'].forEach(closeModal);});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')['modal-create-assignment','modal-schedule-test','modal-enter-marks','modal-archive','modal-edit-group','modal-add-unenrolled','modal-confirm-delete'].forEach(closeModal);});
     document.querySelectorAll('.modal-backdrop').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m){m.classList.remove('open');m.style.display='none';}});});
     function renderUserAvatar(){const u=getCurrentUser();if(u&&ById('compose-av-initials'))ById('compose-av-initials').textContent=initials(u.full_name||u.username||'T');}
     function ById(id){return document.getElementById(id);}

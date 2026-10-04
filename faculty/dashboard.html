@@ -2706,6 +2706,59 @@
     </div>
   </div>
 
+  <!-- Modal: 2-Step Remove Member from Group -->
+  <div id="modal-confirm-remove-member" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 460px;">
+      <!-- Step 1 of 2 -->
+      <div id="remove-member-step-1">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+            <span>⚠️</span> Remove Student (Step 1 of 2)
+          </h3>
+          <button type="button" class="btn-close" onclick="closeModal('modal-confirm-remove-member')">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.25rem;">
+          <div style="background: var(--status-absent-bg); border: 1px solid var(--status-absent); padding: 0.85rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.5; color: var(--text-main);">
+            <strong style="color: var(--status-absent);">Action Safeguard:</strong><br>
+            Are you sure you want to remove <strong id="remove-member-step1-name" style="color: var(--color-primary);"></strong> from this teaching group?
+          </div>
+          <div style="background: var(--bg-surface); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+            <strong>🛡️ Data Sovereignty:</strong> Past attendance marks, submissions, and historical logs remain fully preserved in the college system.
+          </div>
+        </div>
+        <div class="modal-footer" style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-confirm-remove-member')">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="proceedRemoveMemberStep2()">Proceed to Step 2 ➔</button>
+        </div>
+      </div>
+
+      <!-- Step 2 of 2 -->
+      <div id="remove-member-step-2" style="display: none;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--status-absent); display: flex; align-items: center; gap: 0.5rem;">
+            <span>⚠️</span> Final Confirmation (Step 2 of 2)
+          </h3>
+          <button type="button" class="btn-close" onclick="closeModal('modal-confirm-remove-member')">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.25rem;">
+          <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.75rem; line-height: 1.5;">
+            Please confirm removing <strong id="remove-member-step2-name" style="color: var(--color-primary);"></strong>. The student will lose access to active assignments and live check-ins.
+          </p>
+          <label style="display: flex; align-items: flex-start; gap: 0.65rem; background: var(--bg-surface); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer; font-size: 0.84rem; color: var(--text-main); user-select: none;">
+            <input type="checkbox" id="remove-member-checkbox" onchange="document.getElementById('btn-confirm-remove-member').disabled=!this.checked" style="margin-top: 2px; width: 16px; height: 16px; accent-color: var(--status-absent);">
+            <span>I confirm removing this student from this group.</span>
+          </label>
+        </div>
+        <div class="modal-footer" style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+          <button type="button" class="btn btn-secondary" onclick="backRemoveMemberStep1()">← Back</button>
+          <button type="button" id="btn-confirm-remove-member" class="btn" style="background: var(--status-absent); color: var(--text-white); font-weight: 700; border: none;" disabled onclick="executeConfirmedRemoveMember()">
+            Confirm &amp; Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: 7-Day Trash Bin & Recovery -->
   <div id="modal-trash-bin" class="modal-backdrop" style="display: none;">
     <div class="modal-card" style="max-width: 720px;">
@@ -4832,12 +4885,40 @@
       }
     }
 
-    async function removeMember(studentId, name) {
-      if (!confirm(`Remove ${name} from this teaching group?`)) return;
+    let _pendingMemberRemove = null;
+
+    function openRemoveMemberModal(studentId, name) {
+      _pendingMemberRemove = { studentId, name };
+      document.getElementById('remove-member-step1-name').textContent = name;
+      document.getElementById('remove-member-step2-name').textContent = name;
+      document.getElementById('remove-member-step-1').style.display = '';
+      document.getElementById('remove-member-step-2').style.display = 'none';
+      document.getElementById('remove-member-checkbox').checked = false;
+      document.getElementById('btn-confirm-remove-member').disabled = true;
+      openModal('modal-confirm-remove-member');
+    }
+
+    function proceedRemoveMemberStep2() {
+      document.getElementById('remove-member-step-1').style.display = 'none';
+      document.getElementById('remove-member-step-2').style.display = '';
+    }
+
+    function backRemoveMemberStep1() {
+      document.getElementById('remove-member-step-1').style.display = '';
+      document.getElementById('remove-member-step-2').style.display = 'none';
+    }
+
+    async function executeConfirmedRemoveMember() {
+      if (!_pendingMemberRemove) return;
+      const { studentId, name } = _pendingMemberRemove;
+      const btn = document.getElementById('btn-confirm-remove-member');
+      btn.disabled = true;
+      btn.textContent = 'Removing...';
       try {
         const res = await fetchApi(`/teaching-groups/${state.activeGroupId}/members/${studentId}`, {
           method: 'DELETE'
         });
+        closeModal('modal-confirm-remove-member');
         if (res.success) {
           showToast(`${name} removed from group`, 'info');
           const groupRes = await fetchApi(`/teaching-groups/${state.activeGroupId}`);
@@ -4851,7 +4932,15 @@
         }
       } catch (err) {
         showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Confirm & Remove';
+        _pendingMemberRemove = null;
       }
+    }
+
+    function removeMember(studentId, name) {
+      openRemoveMemberModal(studentId, name);
     }
 
     function promptArchiveGroup(groupId, name, currentStatus) {
