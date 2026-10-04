@@ -183,8 +183,11 @@
     .marks-table td{padding:.65rem 1rem;border-bottom:1px solid var(--border-color);color:var(--text-main)}
     .marks-table tr:last-child td{border-bottom:none}
     .marks-table tr:hover td{background:var(--bg-surface)}
-    .marks-input-cell{width:80px;padding:.35rem .5rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text-main);font-size:.85rem;text-align:center}
-    .marks-input-cell:focus{outline:none;border-color:var(--color-primary);background:var(--bg-card)}
+    .marks-input-cell{width:70px;padding:.35rem .5rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-main);font-size:.85rem;text-align:center;font-weight:600}
+    .marks-input-cell:focus{outline:none;border-color:var(--color-primary);background:var(--bg-surface)}
+    .q-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:999px;font-size:.8rem;font-weight:700;color:var(--text-main)}
+    .q-chip-max{font-size:.74rem;color:var(--color-primary);font-weight:800}
+    .auto-total-badge{display:inline-block;font-weight:800;font-size:.92rem;color:var(--color-primary);min-width:48px;padding:.25rem .5rem;border-radius:var(--radius-sm);background:var(--bg-surface);border:1px solid var(--border-color);text-align:center}
     .empty-state{text-align:center;padding:3.5rem 1.5rem;background:var(--bg-card);border:1px dashed var(--border-color);border-radius:var(--radius-lg)}
     .empty-icon{font-size:3rem;margin-bottom:.75rem;opacity:.6}
     .empty-title{font-size:1rem;font-weight:700;color:var(--text-main);margin-bottom:.35rem}
@@ -833,10 +836,53 @@
     </div>
   </div>
   <div class="modal-backdrop" id="modal-enter-marks">
-    <div class="modal-card" style="max-width:860px">
-      <div class="modal-header"><div><h3 class="modal-title" id="marks-modal-title">Enter Marks</h3><div id="marks-modal-meta" style="font-size:.8rem;color:var(--text-muted);margin-top:.15rem"></div></div><button class="modal-close-btn" onclick="closeModal('modal-enter-marks')">&#10005;</button></div>
-      <div class="modal-body" style="padding:0"><div style="overflow-x:auto"><table class="marks-table"><thead><tr><th style="width:50px">Roll</th><th>Student Name</th><th>Enrollment No.</th><th style="width:120px">Marks</th><th style="width:80px;text-align:center">Absent?</th><th>Remarks</th></tr></thead><tbody id="marks-entry-tbody"></tbody></table></div></div>
-      <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-enter-marks')">Cancel</button><button class="btn btn-primary" onclick="saveMarksEntry()">&#128190; Save Marks</button></div>
+    <div class="modal-card" style="max-width:960px">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="marks-modal-title" style="display:flex;align-items:center;gap:.4rem">📊 Enter Marks</h3>
+          <div id="marks-modal-meta" style="font-size:.8rem;color:var(--text-muted);margin-top:.15rem"></div>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('modal-enter-marks')">&#10005;</button>
+      </div>
+
+      <!-- Question-by-Question Configuration Bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;background:var(--bg-surface);border-bottom:1px solid var(--border-color);gap:1rem;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+          <span style="font-size:.82rem;font-weight:700;color:var(--text-main)">Questions:</span>
+          <div id="modal-q-chips-container" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addModalQuestion()" style="font-size:.78rem;padding:.3rem .65rem">+ Add Question</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="removeModalQuestion()" style="font-size:.78rem;padding:.3rem .65rem" id="btn-remove-q">− Remove Question</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="autoDistributeQuestionMarks()" style="font-size:.78rem;padding:.3rem .65rem" title="Auto-distribute maximum marks equally across all questions">⚖️ Distribute</button>
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding:0">
+        <div style="overflow-x:auto;max-height:55vh">
+          <table class="marks-table" id="marks-entry-table">
+            <thead>
+              <tr id="marks-table-header-row">
+                <th style="width:50px">Roll</th>
+                <th style="min-width:140px">Student Name</th>
+                <th style="min-width:110px">Enrollment No.</th>
+                <!-- Dynamic question headers will be injected here -->
+                <th style="width:90px;text-align:center;background:var(--bg-surface);font-weight:800;color:var(--color-primary)">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody id="marks-entry-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:.82rem;color:var(--text-muted)">
+          Total Maximum Marks: <strong id="marks-footer-max" style="color:var(--color-primary);font-size:.95rem">20</strong> • Sum calculates automatically
+        </div>
+        <div style="display:flex;gap:.65rem">
+          <button class="btn btn-secondary" onclick="closeModal('modal-enter-marks')">Cancel</button>
+          <button class="btn btn-primary" id="btn-save-marks-entry" onclick="saveMarksEntry()">💾 Save Marks</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="modal-backdrop" id="modal-archive">
@@ -1171,22 +1217,224 @@
       }).join('');
     }
     function filterMarksTable(q){document.querySelectorAll('#marks-tests-tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});}
-    async function openMarksModal(test){S.currentTest=test;
-      ById('marks-modal-title').textContent='&#128202; '+(test.name||test.title);
-      ById('marks-modal-meta').textContent='Max Marks: '+(test.max_marks||'--')+' • Date: '+(test.test_date?new Date(test.test_date).toLocaleDateString():'--');
-      let scores={};
-      try{const sr=await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/tests/'+test.id+'/scores');(sr.data||[]).forEach(s=>{scores[s.student_id]=s;});}catch{}
-      const tbody=ById('marks-entry-tbody');
-      if(!S.members.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No students enrolled.</td></tr>';}
-      else{tbody.innerHTML=S.members.map(m=>{const ex=scores[m.student_id];const mv=ex?.marks_obtained??'';const ab=ex?.is_absent?'checked':'';const rm=ex?.remarks||'';
-        return '<tr><td style="font-weight:700;color:var(--text-muted)">'+(m.class_roll_no||'--')+'</td><td style="font-weight:600">'+esc(m.full_name)+'</td><td style="font-size:.8rem;color:var(--text-muted)">'+esc(m.official_enrollment_no||m.enrollment_no||'--')+'</td><td><input type="number" class="marks-input-cell" id="mi-'+m.student_id+'" value="'+mv+'" min="0" max="'+(test.max_marks||100)+'" placeholder="--" '+(ab?'disabled':'')+'></td><td style="text-align:center"><input type="checkbox" id="ab-'+m.student_id+'" '+ab+' onchange="toggleAbsent('+m.student_id+')"></td><td><input type="text" style="width:100%;padding:.3rem .5rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text-main);font-size:.8rem" id="rm-'+m.student_id+'" value="'+esc(rm)+'" placeholder="Optional remark"></td></tr>';
-      }).join('');}
+    S.currentTestQuestions = [];
+    S.cachedTestScores = {};
+
+    async function openMarksModal(test){
+      S.currentTest = test;
+      ById('marks-modal-title').innerHTML = '📊 ' + esc(test.name || test.title);
+      ById('marks-modal-meta').textContent = 'Max Marks: ' + (test.max_marks || '--') + ' • Date: ' + (test.test_date ? new Date(test.test_date).toLocaleDateString() : '--');
+      let scores = {};
+      try {
+        const sr = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + test.id + '/scores');
+        (sr.data || []).forEach(s => { scores[s.student_id] = s; });
+      } catch {}
+      S.cachedTestScores = scores;
+
+      // Initialize questions breakdown
+      const firstSavedQuestions = Object.values(scores).find(s => Array.isArray(s.questions) && s.questions.length > 0)?.questions;
+      if (firstSavedQuestions && firstSavedQuestions.length > 0) {
+        S.currentTestQuestions = firstSavedQuestions.map((q, idx) => ({
+          num: idx + 1,
+          label: q.label || ('Q' + (idx + 1)),
+          max: Number(q.max) || 5
+        }));
+      } else {
+        const firstQScore = Object.values(scores).find(s => Array.isArray(s.question_scores) && s.question_scores.length > 0)?.question_scores;
+        const qCount = firstQScore ? firstQScore.length : (test.max_marks >= 25 ? 5 : (test.max_marks >= 20 ? 4 : (test.max_marks >= 10 ? 2 : 1)));
+        const marksPerQ = Math.max(1, Math.round((test.max_marks / qCount) * 10) / 10);
+        S.currentTestQuestions = [];
+        for (let i = 1; i <= qCount; i++) {
+          S.currentTestQuestions.push({ num: i, label: 'Q' + i, max: marksPerQ });
+        }
+      }
+
+      renderQuestionChips();
+      renderMarksEntryTable(false);
       openModal('modal-enter-marks');
     }
-    function toggleAbsent(sid){const cb=ById('ab-'+sid),inp=ById('mi-'+sid);inp.disabled=cb.checked;if(cb.checked)inp.value='';}
-    async function saveMarksEntry(){const test=S.currentTest;if(!test)return;
-      const entries=S.members.map(m=>({student_id:m.student_id,marks_obtained:ById('ab-'+m.student_id)?.checked?null:parseFloat(ById('mi-'+m.student_id)?.value),is_absent:ById('ab-'+m.student_id)?.checked?1:0,remarks:ById('rm-'+m.student_id)?.value?.trim()||null}));
-      try{await apiFetch('/api/v1/teaching-groups/'+S.groupId+'/tests/'+test.id+'/scores',{method:'POST',body:JSON.stringify({scores:entries})});toast('Marks saved!');closeModal('modal-enter-marks');await loadTests();}catch(e){toast(e.message);}
+
+    function renderQuestionChips(){
+      const c = ById('modal-q-chips-container');
+      if (!c) return;
+      c.innerHTML = S.currentTestQuestions.map((q, idx) => `
+        <span class="q-chip" style="display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .5rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm)">
+          <span style="font-weight:700;color:var(--text-main);font-size:.82rem">${esc(q.label)}</span>
+          <input type="number" min="0.5" max="500" step="0.5" value="${q.max}" style="width:48px;padding:.15rem .25rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--color-primary);font-weight:700;font-size:.82rem;text-align:center" onchange="updateQuestionMax(${idx}, this.value)" title="Max marks for ${esc(q.label)}">
+          <span style="font-size:.72rem;color:var(--text-muted);font-weight:600">pts</span>
+        </span>
+      `).join('');
+      const totalMax = S.currentTestQuestions.reduce((sum, q) => sum + (Number(q.max) || 0), 0);
+      if (ById('marks-footer-max')) ById('marks-footer-max').textContent = totalMax;
+      if (ById('btn-remove-q')) ById('btn-remove-q').disabled = S.currentTestQuestions.length <= 1;
+    }
+
+    function updateQuestionMax(idx, val){
+      const q = S.currentTestQuestions[idx];
+      if (!q) return;
+      const num = parseFloat(val);
+      if (isNaN(num) || num <= 0) {
+        toast('Please enter a valid positive number');
+        renderQuestionChips();
+        return;
+      }
+      q.max = Math.round(num * 10) / 10;
+      const totalMax = S.currentTestQuestions.reduce((sum, item) => sum + (Number(item.max) || 0), 0);
+      if (ById('marks-footer-max')) ById('marks-footer-max').textContent = totalMax;
+      renderMarksEntryTable(true);
+    }
+
+    function addModalQuestion(){
+      const nextNum = S.currentTestQuestions.length + 1;
+      S.currentTestQuestions.push({ num: nextNum, label: 'Q' + nextNum, max: 5 });
+      renderQuestionChips();
+      renderMarksEntryTable(true);
+    }
+
+    function removeModalQuestion(){
+      if (S.currentTestQuestions.length <= 1) return;
+      S.currentTestQuestions.pop();
+      renderQuestionChips();
+      renderMarksEntryTable(true);
+    }
+
+    function autoDistributeQuestionMarks(){
+      const total = Number(S.currentTest?.max_marks) || 20;
+      const count = S.currentTestQuestions.length || 1;
+      const perQ = Math.round((total / count) * 10) / 10;
+      S.currentTestQuestions.forEach(q => { q.max = perQ; });
+      renderQuestionChips();
+      renderMarksEntryTable(true);
+      toast('Marks distributed evenly (' + perQ + 'm per question)');
+    }
+
+    function renderMarksEntryTable(preserveInputs = false){
+      const headerRow = ById('marks-table-header-row');
+      const tbody = ById('marks-entry-tbody');
+      if (!headerRow || !tbody) return;
+
+      const totalMax = S.currentTestQuestions.reduce((sum, q) => sum + (Number(q.max) || 0), 0);
+
+      // Save input values before regenerating DOM if preserving
+      const savedInputValues = {};
+      if (preserveInputs) {
+        document.querySelectorAll('.q-score-input').forEach(inp => {
+          const sid = inp.getAttribute('data-student');
+          const q = inp.getAttribute('data-q');
+          if (!savedInputValues[sid]) savedInputValues[sid] = {};
+          savedInputValues[sid][q] = inp.value;
+        });
+      }
+
+      // Rebuild header
+      let thHtml = '<th style="width:50px">Roll</th>' +
+        '<th style="min-width:140px">Student Name</th>' +
+        '<th style="min-width:110px">Enrollment No.</th>';
+      S.currentTestQuestions.forEach((q, idx) => {
+        thHtml += '<th style="width:75px;text-align:center">' + esc(q.label) + ' <span style="font-size:.72rem;color:var(--text-muted);display:block;font-weight:normal">max ' + q.max + '</span></th>';
+      });
+      thHtml += '<th style="width:90px;text-align:center;background:var(--bg-surface);font-weight:800;color:var(--color-primary)">TOTAL <span style="font-size:.72rem;display:block;font-weight:normal">/' + totalMax + '</span></th>';
+      headerRow.innerHTML = thHtml;
+
+      // Rebuild body
+      if (!S.members.length) {
+        tbody.innerHTML = '<tr><td colspan="' + (S.currentTestQuestions.length + 4) + '" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No students enrolled.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = S.members.map(m => {
+        const ex = S.cachedTestScores[m.student_id];
+        let qTds = '';
+        S.currentTestQuestions.forEach((q, qIdx) => {
+          let val = '';
+          if (preserveInputs && savedInputValues[m.student_id]?.[qIdx] !== undefined) {
+            val = savedInputValues[m.student_id][qIdx];
+          } else if (Array.isArray(ex?.question_scores) && ex.question_scores[qIdx] !== undefined && ex.question_scores[qIdx] !== null) {
+            val = ex.question_scores[qIdx];
+          } else if (!preserveInputs && ex?.marks_obtained != null && S.currentTestQuestions.length === 1 && qIdx === 0) {
+            val = ex.marks_obtained;
+          }
+          qTds += '<td style="text-align:center"><input type="number" class="marks-input-cell q-score-input" id="q-' + m.student_id + '-' + qIdx + '" data-student="' + m.student_id + '" data-q="' + qIdx + '" min="0" max="' + q.max + '" step="0.5" value="' + val + '" placeholder="0" oninput="recalcStudentTotal(' + m.student_id + ')" style="width:65px"></td>';
+        });
+
+        return '<tr>' +
+          '<td style="font-weight:700;color:var(--text-muted)">' + (m.class_roll_no || '--') + '</td>' +
+          '<td style="font-weight:600">' + esc(m.full_name) + '</td>' +
+          '<td style="font-size:.8rem;color:var(--text-muted)">' + esc(m.official_enrollment_no || m.enrollment_no || '--') + '</td>' +
+          qTds +
+          '<td style="text-align:center;background:var(--bg-surface)"><span id="tot-' + m.student_id + '" class="auto-total-badge">--</span></td>' +
+          '</tr>';
+      }).join('');
+
+      // Recalculate totals for all students
+      S.members.forEach(m => recalcStudentTotal(m.student_id));
+    }
+
+    function recalcStudentTotal(sid){
+      let sum = 0;
+      let hasAny = false;
+      document.querySelectorAll(`.q-score-input[data-student="${sid}"]`).forEach(inp => {
+        const v = parseFloat(inp.value);
+        if (!isNaN(v)) {
+          sum += v;
+          hasAny = true;
+        }
+      });
+      const totEl = ById('tot-' + sid);
+      if (totEl) {
+        const rounded = Math.round(sum * 10) / 10;
+        totEl.textContent = hasAny ? rounded : '--';
+        const totalMax = S.currentTestQuestions.reduce((s, q) => s + (Number(q.max) || 0), 0);
+        if (hasAny && sum > totalMax) {
+          totEl.style.color = 'var(--status-absent)';
+          totEl.style.borderColor = 'var(--status-absent)';
+          totEl.title = 'Total exceeds maximum marks (' + totalMax + ')';
+        } else {
+          totEl.style.color = 'var(--color-primary)';
+          totEl.style.borderColor = 'var(--border-color)';
+          totEl.title = '';
+        }
+      }
+    }
+
+    async function saveMarksEntry(){
+      const test = S.currentTest;
+      if (!test) return;
+      const btn = ById('btn-save-marks-entry');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      const entries = S.members.map(m => {
+        const qInputs = document.querySelectorAll(`.q-score-input[data-student="${m.student_id}"]`);
+        const qScores = Array.from(qInputs).map(inp => {
+          const v = parseFloat(inp.value);
+          return isNaN(v) ? null : v;
+        });
+        const hasAny = qScores.some(v => v !== null);
+        const total = hasAny ? qScores.reduce((sum, v) => sum + (v || 0), 0) : null;
+        return {
+          student_id: m.student_id,
+          marks_obtained: total !== null ? (Math.round(total * 10) / 10) : null,
+          is_absent: false,
+          question_scores: qScores,
+          questions: S.currentTestQuestions
+        };
+      });
+
+      try {
+        await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + test.id + '/scores', {
+          method: 'POST',
+          body: JSON.stringify({ scores: entries })
+        });
+        toast('Marks saved successfully!');
+        closeModal('modal-enter-marks');
+        await loadTests();
+      } catch (e) {
+        toast(e.message || 'Failed to save marks');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Save Marks';
+      }
     }
     async function submitCreateAssignment(){const title=ById('assign-title').value.trim(),desc=ById('assign-desc').value.trim(),due=ById('assign-due').value,marks=parseInt(ById('assign-marks').value);
       if(!title||!marks){toast('Title and marks are required');return;}
