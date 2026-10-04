@@ -607,6 +607,27 @@
           </div>
         </div>
 
+        <!-- Admin Gateway WhatsApp Number Card -->
+        <div class="console-card">
+          <div class="console-card-header">
+            <h3 class="console-card-title" style="font-size: 0.95rem;">
+              <span>📞</span>
+              <span>Admin Gateway WhatsApp Number</span>
+            </h3>
+          </div>
+          <div class="console-card-body" id="gateway-phone-card" style="padding: 1.15rem 1.5rem;">
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.45;">
+              The official Admin WhatsApp number linked in this gateway. When students or faculty open WhatsApp during registration, their chat opens directly with this admin number.
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
+              <span style="font-weight: 700; color: var(--text-muted); font-size: 0.88rem;">+91</span>
+              <input type="tel" id="input-gateway-phone" class="form-control" placeholder="7453046125" maxlength="10" style="font-family: var(--font-family-mono); font-weight: 600; width: 160px;" />
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-save-gateway-phone" onclick="saveGatewayPhone()" style="font-weight: 700;">Save Number</button>
+            </div>
+            <div id="gateway-phone-status-note" style="font-size: 0.75rem; color: var(--status-present); font-weight: 600;"></div>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -744,9 +765,43 @@
         if (res.success && res.data) {
           waBotState = res.data;
           renderWhatsAppBotUI(waBotState);
+
+          if (res.data?.gateway_phone) {
+            const inp = document.getElementById('input-gateway-phone');
+            const note = document.getElementById('gateway-phone-status-note');
+            const clean = res.data.gateway_phone.replace(/^91/, '');
+            if (inp && (!inp.value || inp.value === '7453046125')) inp.value = clean;
+            if (note) note.textContent = `✓ Active Gateway Number: +91 ${clean}`;
+          }
         }
       } catch (err) {
         console.warn('Could not load WhatsApp Bot status:', err);
+      }
+    }
+
+    async function saveGatewayPhone() {
+      const inp = document.getElementById('input-gateway-phone');
+      const btn = document.getElementById('btn-save-gateway-phone');
+      const note = document.getElementById('gateway-phone-status-note');
+      const val = inp?.value.trim() || '';
+      if (!val || val.length !== 10) {
+        showToast('Please enter a valid 10-digit Indian mobile number', 'error');
+        return;
+      }
+      if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+      try {
+        const res = await apiFetch(`${API}/admin/whatsapp/gateway-phone`, {
+          method: 'POST',
+          body: JSON.stringify({ phone: val })
+        });
+        if (res.success) {
+          showToast(res.message || 'Admin Gateway phone number saved.', 'success');
+          if (note) note.textContent = `✓ Linked Gateway Number: +${res.data?.gateway_phone}`;
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to save gateway phone.', 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Save Number'; }
       }
     }
 
@@ -895,6 +950,7 @@
               </ol>
               <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                 <button type="button" class="btn btn-secondary btn-sm" onclick="disconnectWhatsAppBot()">✕ Cancel / Reset</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="initWhatsAppBot(true)">🔄 Regenerate Fresh QR</button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="loadWhatsAppBotStatus()">🔄 Refresh Status</button>
               </div>
             </div>
@@ -916,7 +972,10 @@
             <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⏳</div>
             <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.35rem;">Starting Headless WhatsApp Engine...</div>
             <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Launching Chromium and generating secure pairing QR code. This takes ~10-15 seconds.</div>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="disconnectWhatsAppBot()">✕ Cancel</button>
+            <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="disconnectWhatsAppBot()">✕ Cancel</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="initWhatsAppBot(true)" title="Clear lockfile/cache and force a brand-new browser session">🔄 Force Fresh Start</button>
+            </div>
           </div>
         `;
       } else {
@@ -930,7 +989,20 @@
         if (kpiPush) kpiPush.textContent = 'Awaiting activation';
         if (kpiEngine) kpiEngine.textContent = 'Offline';
 
+        const lastErrorHtml = state.last_error ? `
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); padding: 0.75rem 1rem; color: var(--status-absent); font-size: 0.82rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+            <div>
+              <span style="font-weight: 700; margin-right: 0.35rem;">⚠️ Notice:</span>
+              <span>${state.last_error}</span>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="initWhatsAppBot(true)" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; white-space: nowrap;">
+              🔄 Reset &amp; Generate Fresh QR
+            </button>
+          </div>
+        ` : '';
+
         content.innerHTML = `
+          ${lastErrorHtml}
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
             <div>
               <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.35rem;">
@@ -940,9 +1012,12 @@
                 Student &amp; faculty registration OTPs currently fallback to dynamic QR cards &amp; direct chat links. Link your institutional phone once to activate 100% automated direct delivery with zero subscription fees.
               </div>
             </div>
-            <div>
-              <button type="button" class="btn btn-primary" id="btn-init-wa-bot" onclick="initWhatsAppBot()" style="font-weight: 700; padding: 0.65rem 1.25rem;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary" id="btn-init-wa-bot" onclick="initWhatsAppBot(false)" style="font-weight: 700; padding: 0.65rem 1.25rem;">
                 🚀 Link Bot (Generate QR)
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-fresh-wa-bot" onclick="initWhatsAppBot(true)" style="font-weight: 600; padding: 0.65rem 1rem;" title="Wipe previous logged-out session cache and generate a clean pairing QR code">
+                🔄 Fresh QR (Clear Cache)
               </button>
             </div>
           </div>
@@ -950,14 +1025,21 @@
       }
     }
 
-    async function initWhatsAppBot() {
+    async function initWhatsAppBot(clearSession = false) {
       const btn = document.getElementById('btn-init-wa-bot');
+      const freshBtn = document.getElementById('btn-fresh-wa-bot');
       if (btn) {
         btn.disabled = true;
         btn.textContent = 'Starting Engine...';
       }
+      if (freshBtn) {
+        freshBtn.disabled = true;
+      }
       try {
-        const res = await apiFetch(`${API}/admin/whatsapp/initialize`, { method: 'POST' });
+        const res = await apiFetch(`${API}/admin/whatsapp/initialize`, {
+          method: 'POST',
+          body: JSON.stringify({ clear_session: clearSession })
+        });
         showToast(res.message || 'WhatsApp Bot initializing. Preparing QR code...', 'info');
         await loadWhatsAppBotStatus();
       } catch (err) {
@@ -965,6 +1047,9 @@
         if (btn) {
           btn.disabled = false;
           btn.textContent = '🚀 Link Bot (Generate QR)';
+        }
+        if (freshBtn) {
+          freshBtn.disabled = false;
         }
       }
     }

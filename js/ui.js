@@ -125,3 +125,53 @@ function formatPercentage(num, threshold = 75) {
     className: val >= threshold ? 'text-success' : 'text-danger'
   };
 }
+
+/**
+ * Safe HTML string escape alias (compatible with esc)
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+  return esc(str);
+}
+
+/**
+ * Calculate total maximum marks from an array of question objects
+ * @param {Array<{max: number|string}>} questions
+ * @param {number} [defaultVal=25]
+ * @returns {number}
+ */
+function calcTotalMax(questions, defaultVal = 25) {
+  if (!Array.isArray(questions) || !questions.length) return defaultVal;
+  return questions.reduce((sum, q) => sum + (Number(q.max) || 0), 0);
+}
+
+/**
+ * Distribute total marks evenly across question drafts
+ * @param {Array<{max: number|string}>} questionsDraft
+ * @param {number} totalMarks
+ * @returns {Array<{max: number}>}
+ */
+function distributeQuestionMarks(questionsDraft, totalMarks) {
+  const total = Math.max(1, parseInt(totalMarks, 10) || 25);
+  const n = (questionsDraft && questionsDraft.length) ? questionsDraft.length : 1;
+  const perItem = Math.floor(total / n);
+  const remainder = total - (perItem * n);
+  return questionsDraft.map((q, i) => ({
+    ...q,
+    max: perItem + (i === n - 1 ? remainder : 0)
+  }));
+}
+
+/**
+ * Clamp a numerical score within [min, max]
+ * @param {number|string} val
+ * @param {number} [min=0]
+ * @param {number} [max=100]
+ * @returns {number}
+ */
+function clampScore(val, min = 0, max = 100) {
+  const num = parseFloat(val);
+  if (isNaN(num)) return min;
+  return Math.min(Math.max(num, min), max);
+}

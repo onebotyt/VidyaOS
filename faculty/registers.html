@@ -4661,12 +4661,9 @@
     function autoDistributeFromTotal() {
       const totalEl = document.getElementById('modal-exam-grand-total');
       const total = Math.max(1, parseInt(totalEl ? totalEl.value : 25, 10) || 25);
-      const n = modalQuestionsDraft.length || 1;
-      const perQ = Math.floor(total / n);
-      const remainder = total - (perQ * n);
-      modalQuestionsDraft = modalQuestionsDraft.map((q, i) => ({ ...q, max: perQ + (i === n - 1 ? remainder : 0) }));
+      modalQuestionsDraft = distributeQuestionMarks(modalQuestionsDraft, total);
       renderModalQuestions();
-      showToast(`Auto-distributed ${total} marks across ${n} questions`, 'info');
+      showToast(`Auto-distributed ${total} marks across ${modalQuestionsDraft.length} questions`, 'info');
     }
 
     function renderModalQuestions() {

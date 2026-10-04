@@ -18,6 +18,11 @@ async function fetchApi(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const deviceId = typeof getDeviceId === 'function' ? getDeviceId() : (typeof localStorage !== 'undefined' ? localStorage.getItem('vidyaos_device_id') : null);
+  if (deviceId) {
+    headers['X-Device-Id'] = deviceId;
+  }
+
   const config = {
     ...options,
     headers
@@ -28,18 +33,26 @@ async function fetchApi(endpoint, options = {}) {
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      if (response.status === 401 && !endpoint.includes('/auth/')) {
-        // Attempt token refresh
-        const refreshed = await attemptTokenRefresh();
-        if (refreshed) {
-          // Retry original request once
-          headers['Authorization'] = `Bearer ${localStorage.getItem('access_token')}`;
-          const retryRes = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
-          return await retryRes.json();
-        } else {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('user');
-          window.location.href = '/index.html';
+      if (response.status === 401) {
+        if (data?.error?.code === 'SESSION_REVOKED') {
+          if (typeof handleSessionRevocation === 'function') {
+            handleSessionRevocation();
+            return;
+          }
+        }
+        if (!endpoint.includes('/auth/')) {
+          // Attempt token refresh
+          const refreshed = await attemptTokenRefresh();
+          if (refreshed) {
+            // Retry original request once
+            headers['Authorization'] = `Bearer ${localStorage.getItem('access_token')}`;
+            const retryRes = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+            return await retryRes.json();
+          } else {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+          }
         }
       }
       throw data.error || { message: `Request failed with status ${response.status}` };

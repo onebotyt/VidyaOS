@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — VidyaOS Campus Management</title>
+  <meta name="description" content="Sign in to VidyaOS — Institutional Campus & Academic Management System for students, faculty, HODs and administrators.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      background: var(--bg-app, #f0f4ff);
+      overflow-x: hidden;
+      color: var(--text-main, #0f172a);
+    }
+
+    /* ── LAYOUT ── */
+    .login-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* ── LEFT BRAND PANEL ── */
+    .brand-panel {
+      position: relative;
+      background: #1a1250;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem 2.5rem;
+      text-align: center;
+    }
+
+    .brand-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 55% at 20% 25%, rgba(99,102,241,0.45) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 55% at 80% 80%, rgba(139,92,246,0.38) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 50% -15%, rgba(79,70,229,0.32) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      animation: float 10s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .orb-1 { width: 320px; height: 320px; background: rgba(99,102,241,0.22); top: -100px; left: -80px; }
+    .orb-2 { width: 220px; height: 220px; background: rgba(139,92,246,0.2); bottom: 60px; right: -50px; animation-delay: -4s; }
+    .orb-3 { width: 160px; height: 160px; background: rgba(167,139,250,0.18); top: 55%; left: 55%; animation-delay: -7s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(18px, -18px) scale(1.04); }
+      66%       { transform: translate(-14px, 14px) scale(0.97); }
+    }
+
+    .brand-content { position: relative; z-index: 2; width: 100%; max-width: 340px; }
+
+    .brand-logo {
+      width: 76px; height: 76px;
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(12px);
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      transition: transform 0.3s ease;
+    }
+    .brand-logo:hover { transform: scale(1.05); }
+
+    .brand-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.035em;
+      margin-bottom: 0.4rem;
+      line-height: 1;
+    }
+    .brand-name span {
+      background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-tagline {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.6);
+      font-weight: 400;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+
+    .feature-list { display: flex; flex-direction: column; gap: 0.7rem; }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      transition: background 0.2s;
+    }
+    .feature-item:hover { background: rgba(255,255,255,0.09); }
+
+    .feat-icon {
+      width: 38px; height: 38px;
+      background: rgba(99,102,241,0.3);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+    .feat-text h4 { font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.95); margin-bottom: 0.1rem; }
+    .feat-text p  { font-size: 0.7rem; color: rgba(255,255,255,0.48); line-height: 1.35; }
+
+    .brand-footer {
+      position: relative; z-index: 2;
+      margin-top: 2.5rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── RIGHT FORM PANEL ── */
+    .form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 2rem;
+      background: var(--bg-app, #f8fafc);
+      overflow-y: auto;
+    }
+
+    .form-card { width: 100%; max-width: 428px; }
+
+    /* Mobile logo */
+    .mobile-brand {
+      display: none;
+      align-items: center;
+      gap: 0.625rem;
+      margin-bottom: 1.75rem;
+    }
+    .mobile-brand-icon {
+      width: 42px; height: 42px;
+      background: #4f46e5;
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .mobile-brand-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.15rem; font-weight: 800;
+      color: var(--text-main, #0f172a);
+      letter-spacing: -0.02em;
+    }
+
+    .form-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.7rem; font-weight: 800;
+      color: var(--text-main, #0f172a);
+      letter-spacing: -0.035em;
+      margin-bottom: 0.35rem;
+    }
+    .form-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted, #64748b);
+      margin-bottom: 1.75rem;
+      line-height: 1.5;
+    }
+
+    /* Role tabs */
+    .role-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.35rem;
+      background: var(--bg-surface, #f1f5f9);
+      border-radius: 11px;
+      padding: 0.3rem;
+      margin-bottom: 1.5rem;
+    }
+    .role-tab {
+      padding: 0.5rem 0.25rem;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      font-size: 0.775rem; font-weight: 600;
+      color: var(--text-muted, #64748b);
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.3rem;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+    .role-tab.active {
+      background: var(--bg-card, #fff);
+      color: #4f46e5;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    }
+    .role-tab:hover:not(.active) {
+      color: var(--text-main, #0f172a);
+      background: rgba(255,255,255,0.6);
+    }
+
+    /* Google button */
+    .btn-google {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.75rem;
+      padding: 0.72rem 1rem;
+      border-radius: 10px;
+      border: 1.5px solid var(--border-color, #e2e8f0);
+      background: var(--bg-card, #fff);
+      color: var(--text-main, #0f172a);
+      font-size: 0.875rem; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-google:hover {
+      background: var(--bg-surface, #f8fafc);
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* Divider */
+    .divider {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin: 1.2rem 0;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border-color, #e2e8f0); }
+    .divider-text {
+      font-size: 0.7rem;
+      color: var(--text-muted, #94a3b8);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Input fields */
+    .field-group { margin-bottom: 1rem; }
+    .field-label {
+      display: block;
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--text-main, #0f172a);
+      margin-bottom: 0.4rem;
+    }
+    .field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+    .field-row .field-label { margin-bottom: 0; }
+
+    .field-wrap { position: relative; }
+    .field-input {
+      width: 100%;
+      padding: 0.72rem 0.9rem;
+      border-radius: 10px;
+      border: 1.5px solid var(--border-color, #e2e8f0);
+      background: var(--bg-card, #fff);
+      color: var(--text-main, #0f172a);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    .field-input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.13);
+    }
+    .field-input::placeholder { color: var(--text-muted, #94a3b8); font-size: 0.845rem; }
+    .field-input.has-addon { padding-right: 2.8rem; }
+
+    .pw-toggle {
+      position: absolute; right: 0.75rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted, #94a3b8);
+      font-size: 1rem; padding: 0.25rem;
+      transition: color 0.15s;
+    }
+    .pw-toggle:hover { color: var(--text-main, #475569); }
+
+    .forgot-link {
+      font-size: 0.775rem; color: #4f46e5; font-weight: 600;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .forgot-link:hover { color: #4338ca; text-decoration: underline; }
+
+    /* Banners */
+    .conflict-banner {
+      display: none;
+      border-radius: 10px;
+      border: 1.5px solid #fca5a5;
+      background: #fef2f2;
+      padding: 0.875rem 1rem;
+      margin-bottom: 1rem;
+    }
+    [data-theme="dark"] .conflict-banner {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.3);
+    }
+    .conflict-title {
+      font-size: 0.82rem; font-weight: 700; color: #dc2626;
+      margin-bottom: 0.35rem;
+    }
+    [data-theme="dark"] .conflict-title { color: #f87171; }
+    .conflict-body {
+      font-size: 0.775rem; color: #7f1d1d;
+      margin-bottom: 0.625rem; line-height: 1.45;
+    }
+    [data-theme="dark"] .conflict-body { color: #fca5a5; }
+    .btn-force {
+      width: 100%; padding: 0.5rem 0.875rem;
+      border-radius: 8px; border: none;
+      background: #dc2626; color: #fff;
+      font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: background 0.15s;
+    }
+    .btn-force:hover:not(:disabled) { background: #b91c1c; }
+    .btn-force:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .pending-banner {
+      display: none;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--remark-short-border);
+      background: var(--remark-short-bg);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      animation: bannerSlideDown 0.25s ease-out;
+    }
+    @keyframes bannerSlideDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    [data-theme="dark"] .pending-banner {
+      background: var(--status-late-bg);
+      border-color: var(--status-late);
+    }
+    .pending-banner-head {
+      display: flex; align-items: center; gap: 0.65rem;
+      margin-bottom: 0.5rem;
+    }
+    .pending-banner-icon {
+      width: 36px; height: 36px;
+      background: var(--chip-hod-bg);
+      border: 1px solid var(--remark-short-border);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+      color: var(--status-late);
+    }
+    .pending-banner-title {
+      font-size: 0.9rem; font-weight: 700;
+      color: var(--chip-hod-color);
+      letter-spacing: -0.01em;
+    }
+    .pending-banner-body {
+      font-size: 0.8rem;
+      color: var(--text-main);
+      line-height: 1.55;
+      margin-bottom: 0.75rem;
+      opacity: 0.92;
+    }
+    .pending-banner-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--color-primary);
+      text-decoration: none;
+      padding: 0.3rem 0.65rem;
+      border-radius: var(--radius-sm);
+      background: var(--color-primary-light);
+      border: 1px solid var(--border-color);
+      transition: all 0.15s ease;
+    }
+    .pending-banner-link:hover {
+      background: var(--color-primary);
+      color: var(--text-white);
+      border-color: var(--color-primary);
+    }
+
+    .status-alert-banner {
+      display: none;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--status-absent);
+      background: var(--status-absent-bg);
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      animation: bannerSlideDown 0.25s ease-out;
+    }
+    .status-alert-head {
+      display: flex; align-items: center; gap: 0.65rem;
+      margin-bottom: 0.45rem;
+    }
+    .status-alert-icon {
+      width: 36px; height: 36px;
+      background: var(--chip-admin-bg);
+      border: 1px solid var(--status-absent);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+      color: var(--status-absent);
+    }
+    .status-alert-title {
+      font-size: 0.9rem; font-weight: 700;
+      color: var(--status-absent);
+      letter-spacing: -0.01em;
+    }
+    .status-alert-body {
+      font-size: 0.8rem;
+      color: var(--text-main);
+      line-height: 1.55;
+      margin-bottom: 0.75rem;
+      opacity: 0.92;
+    }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%; padding: 0.8rem 1rem;
+      border-radius: 10px; border: none;
+      background: #4f46e5; color: #fff;
+      font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      margin-top: 1.25rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: #4338ca;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(79,70,229,0.38);
+    }
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Bottom links */
+    .form-links {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-color, #e2e8f0);
+      display: flex; flex-direction: column; gap: 0.6rem;
+      text-align: center;
+    }
+    .link-row { font-size: 0.825rem; color: var(--text-muted, #64748b); }
+    .link-row a {
+      color: #4f46e5; font-weight: 600; text-decoration: none;
+      transition: color 0.15s;
+    }
+    .link-row a:hover { color: #4338ca; text-decoration: underline; }
+
+    /* ── ACTIVATION MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-card {
+      background: var(--bg-card, #fff);
+      border-radius: 18px;
+      padding: 2rem 1.75rem;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 24px 72px rgba(0,0,0,0.22);
+      border: 1px solid var(--border-color, #e2e8f0);
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-icon {
+      width: 54px; height: 54px;
+      background: #ede9fe;
+      border-radius: 15px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 1rem;
+    }
+    [data-theme="dark"] .modal-icon { background: rgba(99,102,241,0.2); }
+    .modal-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.2rem; font-weight: 800;
+      color: var(--text-main, #0f172a);
+      text-align: center; letter-spacing: -0.025em;
+      margin-bottom: 0.3rem;
+    }
+    .modal-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted, #64748b);
+      text-align: center; margin-bottom: 1.5rem; line-height: 1.55;
+    }
+    .modal-note {
+      background: var(--bg-surface, #f8fafc);
+      border-radius: 8px;
+      padding: 0.65rem 0.875rem;
+      font-size: 0.78rem; color: var(--text-muted, #64748b);
+      margin-bottom: 1.25rem; line-height: 1.4;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .brand-panel { padding: 2.5rem 2rem; }
+      .brand-name { font-size: 1.75rem; }
+    }
+
+    @media (max-width: 768px) {
+      .login-container { grid-template-columns: 1fr; }
+      .brand-panel { display: none; }
+      .form-panel {
+        padding: 1.75rem 1.25rem;
+        min-height: 100vh;
+        align-items: flex-start;
+        padding-top: 2.25rem;
+      }
+      .mobile-brand { display: flex; }
+      .form-card { max-width: 100%; }
+    }
+
+    @media (max-width: 400px) {
+      .form-panel { padding: 1.25rem 0.875rem; }
+      .role-tab { font-size: 0.7rem; }
+    }
+
+    /* ── DARK MODE ── */
+    [data-theme="dark"] .brand-panel { background: #0d0b2e; }
+    [data-theme="dark"] .field-input {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+    [data-theme="dark"] .role-tabs { background: var(--bg-surface); }
+    [data-theme="dark"] .role-tab.active { background: var(--bg-card); }
+    [data-theme="dark"] .btn-google { background: var(--bg-card); border-color: var(--border-color); color: var(--text-main); }
+    [data-theme="dark"] .modal-card { border-color: var(--border-color); }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+
+  <!-- ══ LEFT: BRAND PANEL ══ -->
+  <div class="brand-panel">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="brand-content">
+      <div class="brand-logo">🎓</div>
+      <div class="brand-name">Vidya<span>OS</span></div>
+      <div class="brand-tagline">
+        Institutional Campus & Academic<br>Operating System
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feat-icon">📊</div>
+          <div class="feat-text">
+            <h4>Smart Attendance Registers</h4>
+            <p>Day-by-day matrix with ESP32 biometric integration & live roll call</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feat-icon">🎓</div>
+          <div class="feat-text">
+            <h4>Google Classroom Dashboard</h4>
+            <p>Teaching groups, coursework, class tests & marksheets in one place</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feat-icon">🛡️</div>
+          <div class="feat-text">
+            <h4>Secure Role-Based Access</h4>
+            <p>Admin, HOD, Faculty & Student portals with granular RBAC</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-footer">© 2026 VidyaOS · All rights reserved</div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT: FORM PANEL ══ -->
+  <div class="form-panel">
+    <div class="form-card">
+
+      <!-- Mobile brand (desktop: hidden) -->
+      <div class="mobile-brand">
+        <div class="mobile-brand-icon">🎓</div>
+        <div class="mobile-brand-name">VidyaOS</div>
+      </div>
+
+      <div class="form-title">Welcome back</div>
+      <div class="form-subtitle">Sign in with your institutional credentials</div>
+
+      <!-- Google sign-in -->
+      <button type="button" id="google-signin-btn" class="btn-google" onclick="handleGoogleSignIn()">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span id="google-btn-text">Continue with Google</span>
+      </button>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">or sign in with credentials</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" autocomplete="on" novalidate>
+
+        <div class="field-group">
+          <label class="field-label" for="identifier" id="id-label">Gmail / Username / Enrollment No.</label>
+          <input
+            type="text"
+            id="identifier"
+            name="identifier"
+            class="field-input"
+            placeholder="e.g. student@gmail.com, prof.sharma, or 2024IT001"
+            autocomplete="username"
+            required
+            autofocus
+          >
+        </div>
+
+        <div class="field-group">
+          <div class="field-row">
+            <label class="field-label" for="password">Password</label>
+            <a href="#" class="forgot-link" id="forgot-link" onclick="handleForgotPassword(); return false;">Forgot password?</a>
+          </div>
+          <div class="field-wrap">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="field-input has-addon"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            >
+            <button type="button" class="pw-toggle" id="pw-toggle-btn" onclick="togglePw()" title="Show / hide password" aria-label="Toggle password visibility">👁️</button>
+          </div>
+        </div>
+
+        <!-- Session conflict banner -->
+        <div class="conflict-banner" id="conflict-banner" role="alert">
+          <div class="conflict-title">⚠️ Account Active on Another Device</div>
+          <div class="conflict-body">This account is currently signed in on another device. Only one active session is allowed at a time.</div>
+          <button type="button" class="btn-force" id="force-login-btn" onclick="submitForceLogin()">
+            Disconnect Other Device &amp; Sign In Here
+          </button>
+        </div>
+
+        <!-- Pending approval card -->
+        <div class="pending-banner" id="pending-banner" role="alert">
+          <div class="pending-banner-head">
+            <div class="pending-banner-icon">⏳</div>
+            <div class="pending-banner-title">Registration Pending Approval</div>
+          </div>
+          <div class="pending-banner-body" id="pending-banner-text">
+            Your registration request is under review by your Department Faculty or Administrator. You'll be able to sign in as soon as your account is approved.
+          </div>
+          <a href="/login/register.html" class="pending-banner-link">Check registration status or re-submit →</a>
+        </div>
+
+        <!-- Rejection / Account Status Alert Card -->
+        <div class="status-alert-banner" id="status-alert-banner" role="alert">
+          <div class="status-alert-head">
+            <div class="status-alert-icon" id="status-alert-icon">⚠️</div>
+            <div class="status-alert-title" id="status-alert-title">Account Notice</div>
+          </div>
+          <div class="status-alert-body" id="status-alert-body"></div>
+          <a href="/login/register.html" class="pending-banner-link" id="status-alert-link" style="display: none;">Submit New Registration →</a>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn-submit">
+          <span id="submit-text">Sign In →</span>
+        </button>
+      </form>
+
+      <!-- Bottom links -->
+      <div class="form-links">
+        <div class="link-row" id="reg-student-row">
+          New to VidyaOS? <a href="/login/register.html" id="reg-student-link">Create an account / Register here &rarr;</a>
+        </div>
+        <div class="link-row" id="reg-faculty-row" style="font-size: 0.78rem;">
+          <a href="/login/register.html?role=faculty" id="reg-faculty-link" style="color: var(--text-muted); font-weight: normal;">Faculty &amp; HOD Application Form &rarr;</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ FIRST-TIME ACTIVATION MODAL ══ -->
+<div class="modal-overlay" id="activation-modal" role="dialog" aria-modal="true" aria-labelledby="act-title">
+  <div class="modal-card">
+    <div class="modal-icon">🔑</div>
+    <div class="modal-title" id="act-title">Account Setup Required</div>
+    <div class="modal-sub">
+      Welcome, <strong id="act-name">Faculty</strong>! You're using a temporary password.<br>
+      Please set your permanent password to continue.
+    </div>
+    <div class="modal-note">
+      <strong>Note:</strong> You're logging in from <span id="act-email" style="font-weight:600;color:var(--text-main);">your account</span>. Choose a strong, unique password.
+    </div>
+
+    <form id="activation-form" novalidate>
+      <div class="field-group">
+        <label class="field-label" for="act-new-pw">New Password <span style="color:var(--text-muted);font-weight:400;">(min. 8 characters)</span></label>
+        <input type="password" id="act-new-pw" class="field-input" minlength="8" required placeholder="Create a strong password">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="act-confirm-pw">Confirm Password</label>
+        <input type="password" id="act-confirm-pw" class="field-input" minlength="8" required placeholder="Re-enter your password">
+      </div>
+      <button type="submit" id="act-submit-btn" class="btn-submit" style="margin-top:0.75rem;">
+        <span id="act-submit-text">Save & Enter Portal →</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="/js/ui.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/auth.js?v=2.3"></script>
+<script>
+  /* ── Redirect if already logged in ── */
+  (function checkExistingSession() {
+    const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token') || sessionStorage.getItem('authToken');
+    if (!token) return;
+    try {
+      const u = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('auth_user') || 'null');
+      if (!u) return;
+      const roles = u.roles || [];
+      if (roles.includes('SYSTEM_ADMIN'))  { window.location.replace('/admin/dashboard.html');     return; }
+      if (roles.includes('STUDENT'))       { window.location.replace('/student/attendance.html');   return; }
+      window.location.replace('/faculty/dashboard.html');
+    } catch (_) {}
+  })();
+
+  /* ── Dark mode ── */
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+
+  /* ── State ── */
+  let currentActivationToken = null;
+
+  /* ── Role compatibility (Unified single login for all roles) ── */
+  function setRole(role) {
+    hideBanners();
+  }
+
+  function hideBanners() {
+    const cb = document.getElementById('conflict-banner');
+    const pb = document.getElementById('pending-banner');
+    const sb = document.getElementById('status-alert-banner');
+    if (cb) cb.style.display = 'none';
+    if (pb) pb.style.display = 'none';
+    if (sb) sb.style.display = 'none';
+  }
+
+  /* ── Password toggle ── */
+  function togglePw() {
+    const inp = document.getElementById('password');
+    const btn = document.getElementById('pw-toggle-btn');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁️' : '🙈';
+  }
+
+  /* ── Device ID ── */
+  function getVidyaDeviceId() {
+    if (typeof getDeviceId === 'function') return getDeviceId();
+    let id = localStorage.getItem('vidyaos_device_id');
+    if (!id) {
+      id = 'dev_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now();
+      localStorage.setItem('vidyaos_device_id', id);
+    }
+    return id;
+  }
+
+  /* ── Post-login redirect ── */
+  function redirectAfterLogin(user) {
+    const roles = user.roles || [];
+    if (roles.includes('SYSTEM_ADMIN'))  { window.location.href = '/admin/dashboard.html';   return; }
+    if (roles.includes('STUDENT'))       { window.location.href = '/student/attendance.html'; return; }
+    window.location.href = '/faculty/dashboard.html';
+  }
+
+  /* ── Form reset helper ── */
+  function resetSubmitBtn() {
+    const btn  = document.getElementById('submit-btn');
+    const text = document.getElementById('submit-text');
+    if (btn)  btn.disabled = false;
+    if (text) text.textContent = 'Sign In →';
+  }
+
+  /* ── Input events: hide banners ── */
+  document.getElementById('identifier').addEventListener('input', hideBanners);
+  document.getElementById('password').addEventListener('input', hideBanners);
+
+  /* ── Main login submit ── */
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('identifier').value.trim();
+    const pw = document.getElementById('password').value;
+    if (!id || !pw) return;
+
+    const btn  = document.getElementById('submit-btn');
+    const text = document.getElementById('submit-text');
+    btn.disabled = true;
+    text.textContent = 'Verifying...';
+    hideBanners();
+
+    try {
+      const deviceId = getVidyaDeviceId();
+      const res = await fetchApi('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: id, phone: id, credential: id,
+          identifier: id, username: id, enrollment_no: id,
+          password: pw,
+          device_id: deviceId
+        })
+      });
+
+      if (res.success) {
+        if (res.data.must_change_password) {
+          currentActivationToken = res.data.activation_token;
+          document.getElementById('act-name').textContent  = res.data.user?.full_name || res.data.user?.email || 'Faculty';
+          document.getElementById('act-email').textContent = res.data.user?.email || 'your account';
+          document.getElementById('activation-modal').style.display = 'flex';
+          resetSubmitBtn();
+          return;
+        }
+        setAuthSession(res.data.access_token, res.data.user);
+        try { if (typeof showToast === 'function') showToast('Login successful! Redirecting…', 'success'); } catch(_) {}
+        setTimeout(() => redirectAfterLogin(res.data.user), 350);
+      }
+    } catch (err) {
+      resetSubmitBtn();
+      if (err?.code === 'ACCOUNT_ALREADY_ACTIVE') {
+        document.getElementById('conflict-banner').style.display = 'block';
+        try { if (typeof showToast === 'function') showToast('Account active on another device.', 'warning'); } catch(_) {}
+        return;
+      }
+      if (err?.code === 'PENDING_APPROVAL') {
+        const pb = document.getElementById('pending-banner');
+        if (pb) {
+          const bodyEl = document.getElementById('pending-banner-text');
+          if (bodyEl && err.message) {
+            bodyEl.textContent = err.message + " You will be able to sign in as soon as your account is approved.";
+          }
+          pb.style.display = 'block';
+        }
+        try { if (typeof showToast === 'function') showToast(err.message || 'Registration is pending approval.', 'warning'); } catch(_) {}
+        return;
+      }
+      if (err?.code === 'REGISTRATION_REJECTED' || (err?.code === 'FORBIDDEN' && err?.message && err.message.toLowerCase().includes('reject'))) {
+        const sb = document.getElementById('status-alert-banner');
+        if (sb) {
+          document.getElementById('status-alert-title').textContent = 'Registration Rejected';
+          document.getElementById('status-alert-body').textContent = err.message || 'Your registration request was rejected by institutional administration.';
+          const link = document.getElementById('status-alert-link');
+          if (link) link.style.display = 'inline-flex';
+          sb.style.display = 'block';
+        }
+        try { if (typeof showToast === 'function') showToast(err.message, 'error'); } catch(_) {}
+        return;
+      }
+      if (err?.code === 'FORBIDDEN') {
+        const sb = document.getElementById('status-alert-banner');
+        if (sb) {
+          document.getElementById('status-alert-title').textContent = 'Access Restricted';
+          document.getElementById('status-alert-body').textContent = err.message || 'Account access has been restricted. Please contact your department administration.';
+          sb.style.display = 'block';
+        }
+        try { if (typeof showToast === 'function') showToast(err.message, 'error'); } catch(_) {}
+        return;
+      }
+      try {
+        if (typeof showToast === 'function') showToast(err?.message || 'Invalid credentials. Please try again.', 'error');
+      } catch(_) {}
+    }
+  });
+
+  /* ── Force login (session takeover) ── */
+  async function submitForceLogin() {
+    const id  = document.getElementById('identifier').value.trim();
+    const pw  = document.getElementById('password').value;
+    const btn = document.getElementById('force-login-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Disconnecting…';
+
+    try {
+      const res = await fetchApi('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: id, phone: id, credential: id,
+          identifier: id, username: id, enrollment_no: id,
+          password: pw,
+          device_id: getVidyaDeviceId(),
+          force_logout: true
+        })
+      });
+      if (res.success) {
+        setAuthSession(res.data.access_token, res.data.user);
+        try { if (typeof showToast === 'function') showToast('Previous session disconnected. Signing in…', 'success'); } catch(_) {}
+        setTimeout(() => redirectAfterLogin(res.data.user), 350);
+      }
+    } catch (err) {
+      try { if (typeof showToast === 'function') showToast(err?.message || 'Force login failed.', 'error'); } catch(_) {}
+      btn.disabled    = false;
+      btn.textContent = 'Disconnect Other Device & Sign In Here';
+    }
+  }
+
+  /* ── Activation modal submit ── */
+  document.getElementById('activation-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const newPw  = document.getElementById('act-new-pw').value;
+    const confPw = document.getElementById('act-confirm-pw').value;
+
+    if (newPw !== confPw) {
+      try { if (typeof showToast === 'function') showToast('Passwords do not match!', 'error'); } catch(_) {}
+      return;
+    }
+
+    const btn  = document.getElementById('act-submit-btn');
+    const text = document.getElementById('act-submit-text');
+    btn.disabled      = true;
+    text.textContent  = 'Activating…';
+
+    try {
+      const r = await fetch('/api/v1/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentActivationToken}`
+        },
+        body: JSON.stringify({ new_password: newPw })
+      }).then(x => x.json());
+
+      if (r.success) {
+        setAuthSession(r.data.access_token, r.data.user);
+        try { if (typeof showToast === 'function') showToast('Account activated! Welcome to VidyaOS.', 'success'); } catch(_) {}
+        setTimeout(() => redirectAfterLogin(r.data.user), 600);
+      } else {
+        throw { message: r.error?.message || 'Activation failed' };
+      }
+    } catch (err) {
+      try { if (typeof showToast === 'function') showToast(err?.message || 'Activation failed', 'error'); } catch(_) {}
+      btn.disabled     = false;
+      text.textContent = 'Save & Enter Portal →';
+    }
+  });
+
+  /* ── Google OAuth ── */
+  async function handleGoogleSignIn() {
+    const btn = document.getElementById('google-signin-btn');
+    const txt = document.getElementById('google-btn-text');
+    btn.disabled = true;
+    txt.textContent = 'Connecting…';
+    try {
+      const res = await fetchApi('/auth/google/url?mode=LOGIN');
+      if (res.configured && res.data?.url) {
+        const w = 500, h = 650;
+        const l = window.screenX + (window.outerWidth  - w) / 2;
+        const t = window.screenY + (window.outerHeight - h) / 2;
+        const popup = window.open(res.data.url, 'vidyaos_google_login', `width=${w},height=${h},left=${l},top=${t},status=0,menubar=0,toolbar=0`);
+        if (popup) popup.focus(); else window.location.href = res.data.url;
+      } else {
+        try { if (typeof showToast === 'function') showToast('Google OAuth not configured. Please use email login.', 'info'); } catch(_) {}
+      }
+    } catch (_) {
+      try { if (typeof showToast === 'function') showToast('Google sign-in unavailable. Please use email login.', 'info'); } catch(_) {}
+    } finally {
+      btn.disabled    = false;
+      txt.textContent = 'Continue with Google';
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
+      const { payload } = event.data;
+      if (payload?.access_token) {
+        setAuthSession(payload.access_token, payload.user);
+        try { if (typeof showToast === 'function') showToast('Google login successful!', 'success'); } catch(_) {}
+        setTimeout(() => redirectAfterLogin(payload.user), 400);
+      }
+    } else if (event.data?.type === 'GOOGLE_AUTH_ERROR') {
+      try { if (typeof showToast === 'function') showToast(event.data.message || 'Google authentication failed', 'error'); } catch(_) {}
+    }
+  });
+
+  /* ── Forgot password ── */
+  function handleForgotPassword() {
+    try {
+      if (typeof showToast === 'function') showToast('To reset your password, contact your HOD or System Administrator.', 'info');
+    } catch(_) {}
+  }
+
+  /* ── Check URL parameters for pending status or messages ── */
+  (function handleUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('pending') === '1' || params.get('google_pending') === '1' || params.get('status') === 'pending') {
+      const pb = document.getElementById('pending-banner');
+      if (pb) {
+        const email = params.get('email');
+        if (email) {
+          const bodyEl = document.getElementById('pending-banner-text');
+          if (bodyEl) {
+            bodyEl.textContent = `The registration request for "${email}" is currently under review by Department Faculty. You will be able to sign in once approved.`;
+          }
+        }
+        pb.style.display = 'block';
+      }
+    }
+    const msg = params.get('message');
+    if (msg) {
+      try { if (typeof showToast === 'function') showToast(decodeURIComponent(msg), 'info'); } catch(_) {}
+    }
+    const errMsg = params.get('error');
+    if (errMsg) {
+      try { if (typeof showToast === 'function') showToast(decodeURIComponent(errMsg), 'error'); } catch(_) {}
+    }
+  })();
+</script>
+</body>
+</html>

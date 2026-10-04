@@ -21,6 +21,22 @@ if (typeof window !== 'undefined') {
   window.getAccessToken = getAccessToken;
 }
 
+function getDeviceId() {
+  try {
+    let deviceId = localStorage.getItem('vidyaos_device_id');
+    if (!deviceId) {
+      deviceId = 'dev_' + Math.random().toString(36).substring(2, 12) + '_' + Date.now().toString(36);
+      localStorage.setItem('vidyaos_device_id', deviceId);
+    }
+    return deviceId;
+  } catch (_) {
+    return 'dev_fallback_' + Date.now();
+  }
+}
+if (typeof window !== 'undefined') {
+  window.getDeviceId = getDeviceId;
+}
+
 function setAuthSession(token, user) {
   localStorage.setItem('access_token', token);
   localStorage.setItem('user', JSON.stringify(user));
@@ -93,8 +109,18 @@ async function syncCurrentUser() {
   if (!token) return;
   try {
     const res = await fetch('/api/v1/auth/me', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'X-Device-Id': getDeviceId()
+      }
     });
+    if (res.status === 401) {
+      const errJson = await res.json().catch(() => ({}));
+      if (errJson?.error?.code === 'SESSION_REVOKED') {
+        handleSessionRevocation();
+        return;
+      }
+    }
     if (res.ok) {
       const json = await res.json();
       if (json.success && json.data) {
@@ -120,13 +146,62 @@ async function syncCurrentUser() {
   } catch (_) {}
 }
 
+function handleSessionRevocation() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('user');
+  alert('Your session has ended because this account was logged into from another PC/device or signed out.');
+  window.location.href = '/index.html';
+}
+
+let _heartbeatTimer = null;
+function startSessionHeartbeat() {
+  if (_heartbeatTimer || typeof window === 'undefined') return;
+  const token = getAuthToken();
+  if (!token) return;
+
+  _heartbeatTimer = setInterval(async () => {
+    const curToken = getAuthToken();
+    if (!curToken) {
+      clearInterval(_heartbeatTimer);
+      _heartbeatTimer = null;
+      return;
+    }
+    try {
+      const res = await fetch('/api/v1/auth/heartbeat', {
+        headers: {
+          'Authorization': `Bearer ${curToken}`,
+          'X-Device-Id': getDeviceId()
+        }
+      });
+      if (res.status === 401) {
+        const data = await res.json().catch(() => ({}));
+        if (data?.error?.code === 'SESSION_REVOKED') {
+          clearInterval(_heartbeatTimer);
+          _heartbeatTimer = null;
+          handleSessionRevocation();
+        }
+      }
+    } catch (_) {}
+  }, 120000);
+}
+
 function logout() {
   const token = getAuthToken();
+  const deviceId = getDeviceId();
   if (token) {
     fetch('/api/v1/auth/logout', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'X-Device-Id': deviceId
+      },
+      body: JSON.stringify({ device_id: deviceId })
     }).catch(() => {});
+  }
+  if (_heartbeatTimer) {
+    clearInterval(_heartbeatTimer);
+    _heartbeatTimer = null;
   }
   localStorage.removeItem('access_token');
   localStorage.removeItem('user');
@@ -152,8 +227,9 @@ function guardRoute(options = []) {
     return false;
   }
 
-  // Auto-sync session profile in background
+  // Auto-sync session profile in background & start session heartbeat
   syncCurrentUser();
+  startSessionHeartbeat();
 
   const config = Array.isArray(options) ? { roles: options } : (options || {});
   const allowedRoles = config.roles || config.requireRoles || [];
@@ -481,7 +557,7 @@ function renderSidebar() {
     toggleBtn.onclick = toggleSidebar;
     toggleBtn.setAttribute('aria-label', 'Toggle navigation sidebar');
     toggleBtn.setAttribute('aria-pressed', 'false');
-    toggleBtn.innerHTML = '☰';
+    toggleBtn.innerHTML = '<span>☰</span>';
 
     const brand = header.querySelector('.brand, .gc-brand-link');
     let leftWrap = header.querySelector('.header-left, .gc-nav-left');
@@ -653,22 +729,23 @@ function renderSidebar() {
 
   const isFacultyPortal = currentPath.includes('/faculty/');
   const sidebarHeaderHtml = isFacultyPortal ? `
-      <!-- Executive Profile Card / Drawer Header -->
-      <div class="gc-drawer-header sidebar-user-card" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;border-bottom:1px solid var(--border-color);">
-        <div style="display:flex;align-items:center;gap:0.6rem;">
-          <a href="/faculty/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;">
-            <div class="gc-brand-icon" style="width:32px;height:32px;font-size:1.1rem;border-radius:8px;background:var(--color-primary-light);color:var(--color-primary);display:flex;align-items:center;justify-content:center;">🎓</div>
-            <div class="gc-brand-title" style="font-size:1.15rem;font-weight:700;color:var(--text-main);">Classroom</div>
-            <span class="gc-brand-sub" style="font-size:0.72rem;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--bg-surface);color:var(--color-primary);border:1px solid var(--border-color);">VidyaOS</span>
-          </a>
-        </div>
-        <button type="button" class="sidebar-close-btn gc-menu-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar" style="width:34px;height:34px;border-radius:50%;border:none;background:transparent;cursor:pointer;font-size:1.1rem;color:var(--text-main);display:flex;align-items:center;justify-content:center;">✕</button>
+      <!-- Brand Header / Drawer Header -->
+      <div class="gc-drawer-header sidebar-user-card" style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;border-bottom:1px solid var(--border-color);gap:0.65rem;">
+        <a href="/faculty/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;flex:1;min-width:0;">
+          <div style="width:34px;height:34px;font-size:1.1rem;border-radius:9px;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-hover));color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(37,99,235,0.22);">🎓</div>
+          <div style="display:flex;flex-direction:column;line-height:1.1;">
+            <span style="font-size:0.9rem;font-weight:800;color:var(--text-main);letter-spacing:-0.01em;">Classroom</span>
+            <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.06em;color:var(--color-primary);text-transform:uppercase;">VidyaOS</span>
+          </div>
+        </a>
+        <button type="button" class="sidebar-close-btn gc-menu-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar">✕</button>
       </div>
   ` : `
       <!-- Executive Profile Card -->
       <div class="sidebar-user-card">
-        <div class="sidebar-user-avatar role-${roleBadge.toLowerCase().replace(/\s+/g, '')}">
+        <div class="sidebar-avatar" style="background:linear-gradient(135deg,var(--color-primary),var(--color-primary-hover));">
           <span>${userInitials}</span>
+          <div class="sidebar-avatar-status"></div>
         </div>
         <div class="sidebar-user-info">
           <div class="sidebar-user-name">${safeAttr(displayName)}</div>
@@ -685,7 +762,7 @@ function renderSidebar() {
       ${sidebarHeaderHtml}
 
       <!-- Scoped Navigation Links -->
-      <div class="${isFacultyPortal ? 'gc-drawer-body ' : ''}sidebar-links" style="flex:1;overflow-y:auto;padding:0.5rem 0;">
+      <div class="${isFacultyPortal ? 'gc-drawer-body ' : ''}sidebar-links">
         ${buildLinks(navSections)}
       </div>
 
