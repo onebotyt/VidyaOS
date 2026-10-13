@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Drive &amp; Media Vault — VidyaOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261008">
+  <link rel="stylesheet" href="/css/variables.css?v=20261008">
+  <link rel="stylesheet" href="/css/layout.css?v=20261008">
+  <link rel="stylesheet" href="/css/components.css?v=20261008">
+  <link rel="stylesheet" href="/css/classroom-nav.css?v=20261008">
+  <link rel="stylesheet" href="/faculty/media/media.css?v=20261008">
+</head>
+<body class="page-layout">
+  <!-- Google Classroom Navbar with Global Omnisearch -->
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <button type="button" class="gc-menu-btn" id="btn-menu-toggle" onclick="toggleDrawer()" title="Main Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <a href="/faculty/dashboard.html" class="gc-brand-link">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+        </div>
+        <div class="gc-brand-title">Classroom</div>
+        <span class="gc-brand-sub">VidyaOS</span>
+      </a>
+    </div>
+
+    <!-- Center Global Omnisearch Bar -->
+    <div class="gc-nav-center">
+      <button type="button" class="gc-search-trigger-btn" id="global-search-trigger" onclick="openOmnisearch()" title="Search anything across VidyaOS (Ctrl + K)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span class="gc-search-placeholder">Search media, documents, students, or registers...</span>
+        <kbd class="gc-search-kbd">Ctrl K</kbd>
+      </button>
+    </div>
+
+    <div class="gc-nav-right">
+      <button type="button" class="btn btn-primary btn-sm gc-quick-upload-btn" onclick="openUploadModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        <span>Upload File</span>
+      </button>
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher()" title="Academic Apps &amp; Modules">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      </button>
+      <button type="button" class="gc-icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Toggle Theme">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile()" title="Account Profile">T</div>
+
+      <!-- Google Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/faculty/dashboard.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+          <span>Classes</span>
+        </a>
+        <a href="/faculty/media.html" class="app-tile active">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></div>
+          <span>Faculty Drive</span>
+        </a>
+        <a href="/faculty/registers.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+          <span>Registers</span>
+        </a>
+        <a href="/faculty/assignments.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg></div>
+          <span>Coursework</span>
+        </a>
+        <a href="/faculty/tests.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></div>
+          <span>Class Tests</span>
+        </a>
+        <a href="/faculty/students.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+          <span>Students</span>
+        </a>
+        <a href="/faculty/reports.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
+          <span>Reports</span>
+        </a>
+      </div>
+
+      <!-- User Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
+        <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">T</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">Faculty Member</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">teacher@college.edu</div>
+        <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+        <button class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);display:flex;align-items:center;justify-content:center;gap:0.35rem;" onclick="logout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide-Out Left Navigation Drawer -->
+  <aside class="gc-drawer" id="gc-drawer">
+    <div class="gc-drawer-header">
+      <div class="gc-brand-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></div>
+      <span class="gc-drawer-title">VidyaOS Classroom</span>
+    </div>
+    <nav class="gc-drawer-nav">
+      <a href="/faculty/dashboard.html" class="gc-drawer-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Classes Hub</span>
+      </a>
+      <a href="/faculty/media.html" class="gc-drawer-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+        <span>Faculty Drive &amp; Vault</span>
+      </a>
+      <a href="/faculty/registers.html" class="gc-drawer-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Attendance Registers</span>
+      </a>
+      <a href="/faculty/assignments.html" class="gc-drawer-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        <span>Coursework &amp; Assignments</span>
+      </a>
+      <a href="/faculty/tests.html" class="gc-drawer-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <span>Class Tests &amp; Marksheets</span>
+      </a>
+      <a href="/faculty/students.html" class="gc-drawer-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span>Department Students</span>
+      </a>
+      <a href="/faculty/reports.html" class="gc-drawer-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        <span>Reports &amp; Analytics</span>
+      </a>
+    </nav>
+  </aside>
+  <div class="gc-drawer-backdrop" id="gc-drawer-backdrop" onclick="toggleDrawer()"></div>
+
+  <!-- Main Faculty Drive Page Container -->
+  <main class="page-main-container container" style="max-width:1380px;padding-top:1.5rem;padding-bottom:3rem;">
+    <!-- Page Header Banner -->
+    <div class="drive-header-card">
+      <div class="drive-header-text">
+        <div class="drive-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          <span>FACULTY DRIVE &amp; RECORDS VAULT</span>
+        </div>
+        <h1 class="drive-title">Teacher Records &amp; Media Hub</h1>
+        <p class="drive-subtitle">Organize and quickly access instructional videos, lecture notes, question papers, syllabus files, and student records.</p>
+      </div>
+      <div class="drive-header-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadMediaAssets()" title="Reload Asset List">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span>Refresh</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="openUploadModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <span>Upload File</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 1-Click Simple Category Chips -->
+    <div class="drive-category-chips">
+      <button type="button" class="chip-btn active" data-category="ALL" onclick="selectCategory('ALL')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+        <span>All Files</span>
+        <span class="chip-count" id="count-all">0</span>
+      </button>
+      <button type="button" class="chip-btn" data-category="DOCUMENT" onclick="selectCategory('DOCUMENT')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        <span>Documents &amp; Slides</span>
+        <span class="chip-count" id="count-doc">0</span>
+      </button>
+      <button type="button" class="chip-btn" data-category="VIDEO" onclick="selectCategory('VIDEO')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+        <span>Videos &amp; Demos</span>
+        <span class="chip-count" id="count-video">0</span>
+      </button>
+      <button type="button" class="chip-btn" data-category="IMAGE" onclick="selectCategory('IMAGE')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+        <span>Images &amp; Whiteboards</span>
+        <span class="chip-count" id="count-image">0</span>
+      </button>
+      <button type="button" class="chip-btn" data-category="STUDENT_DOC" onclick="selectCategory('STUDENT_DOC')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+        <span>Student Documents</span>
+        <span class="chip-count" id="count-student">0</span>
+      </button>
+    </div>
+
+    <!-- Filter & Controls Toolbar -->
+    <div class="drive-toolbar-card">
+      <div class="toolbar-left">
+        <div class="toolbar-search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="drive-search-input" class="toolbar-search-input" placeholder="Search by title, tag, or topic..." oninput="debounceFilter()">
+        </div>
+        <div class="toolbar-subject-wrap">
+          <select id="drive-subject-select" class="form-select toolbar-select" onchange="onSubjectFilterChange()">
+            <option value="">All Courses &amp; Subjects</option>
+          </select>
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <div class="drive-stats-badge" id="drive-stats-badge">
+          0 files • 0 MB
+        </div>
+        <div class="view-toggle-group">
+          <button type="button" class="view-toggle-btn active" id="btn-view-grid" onclick="setViewMode('grid')" title="Grid View">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          </button>
+          <button type="button" class="view-toggle-btn" id="btn-view-list" onclick="setViewMode('list')" title="List View">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Media Assets Content Grid / List View -->
+    <div id="media-content-area">
+      <div class="media-grid" id="media-grid">
+        <div class="drive-loading-state">
+          <div class="drive-spinner"></div>
+          <p>Loading your faculty files...</p>
+        </div>
+      </div>
+      <div class="media-table-wrap" id="media-table-wrap" style="display:none;">
+        <table class="table media-table" id="media-table">
+          <thead>
+            <tr>
+              <th style="width: 44px;"></th>
+              <th>Name &amp; Details</th>
+              <th>Course / Subject</th>
+              <th>Category</th>
+              <th>Size</th>
+              <th>Uploaded</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="media-table-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== UPLOAD MODAL ==================== -->
+  <div id="upload-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header-simple">
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <div class="modal-icon-bubble">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </div>
+          <div>
+            <h2 style="font-size:1.15rem;font-weight:700;margin:0;color:var(--text-main);">Upload to Faculty Drive</h2>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin:0.15rem 0 0 0;">Add instructional videos, lecture notes, or student records.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-simple" onclick="closeUploadModal()">&times;</button>
+      </div>
+
+      <form id="upload-form" onsubmit="handleUploadSubmit(event)">
+        <!-- Drag & Drop Zone -->
+        <div class="upload-dropzone" id="upload-dropzone" onclick="document.getElementById('file-input').click()">
+          <input type="file" id="file-input" style="display:none;" onchange="onFileSelected(this)">
+          <div class="dropzone-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </div>
+          <div class="dropzone-title" id="dropzone-title">Click to select a file or drag &amp; drop here</div>
+          <div class="dropzone-hint">Supports PDF, PPT, Word, Excel, MP4/WebM Videos, and Images (Up to 100 MB)</div>
+          <div class="dropzone-selected-file" id="dropzone-selected-file" style="display:none;"></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-top:1rem;">
+          <div style="grid-column: 1 / -1;">
+            <label class="form-label" style="font-size:0.8rem;font-weight:600;">Asset Title</label>
+            <input type="text" id="upload-title" class="form-control" placeholder="e.g. Unit 2 Normalization Slides">
+          </div>
+          <div>
+            <label class="form-label" style="font-size:0.8rem;font-weight:600;">Category</label>
+            <select id="upload-category" class="form-select">
+              <option value="LECTURE_NOTES">Lecture Notes &amp; Slides</option>
+              <option value="LAB_DEMO">Lab Video / Demonstration</option>
+              <option value="QUESTION_PAPER">Question Paper &amp; Solutions</option>
+              <option value="STUDENT_DOC">Student Record / Answer Sheet</option>
+              <option value="SYLLABUS">Syllabus &amp; Regulations</option>
+              <option value="GENERAL">General Academic Asset</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size:0.8rem;font-weight:600;">Course / Subject</label>
+            <select id="upload-subject" class="form-select">
+              <option value="">-- General / Departmental --</option>
+            </select>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label class="form-label" style="font-size:0.8rem;font-weight:600;">Tags (Comma-separated)</label>
+            <input type="text" id="upload-tags" class="form-control" placeholder="e.g. unit2, midterm, lab5">
+          </div>
+        </div>
+
+        <div style="margin-top:0.9rem;display:flex;align-items:center;gap:0.5rem;">
+          <input type="checkbox" id="upload-public" style="width:16px;height:16px;accent-color:var(--color-primary);">
+          <label for="upload-public" style="font-size:0.82rem;font-weight:500;color:var(--text-main);cursor:pointer;">
+            Share with enrolled students in Classroom Stream
+          </label>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="upload-progress-wrap" style="display:none;margin-top:1rem;">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="upload-progress-fill" style="width:0%;"></div>
+          </div>
+          <div style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-top:0.35rem;" id="upload-progress-text">Uploading...</div>
+        </div>
+
+        <div class="modal-footer-simple" style="margin-top:1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-upload">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span>Upload File</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== PREVIEW MODAL ==================== -->
+  <div id="preview-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card preview-modal-card">
+      <div class="modal-header-simple preview-header">
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:1rem;">
+          <h2 id="preview-title" style="font-size:1.05rem;font-weight:700;margin:0;color:var(--text-main);">File Preview</h2>
+          <span id="preview-meta" style="font-size:0.78rem;color:var(--text-muted);">Details</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+          <a id="preview-download-btn" href="#" download class="btn btn-secondary btn-sm" title="Download File">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Download</span>
+          </a>
+          <button type="button" class="btn-close-simple" onclick="closePreviewModal()">&times;</button>
+        </div>
+      </div>
+      <div class="preview-body" id="preview-body"></div>
+    </div>
+  </div>
+
+  <!-- ==================== GLOBAL OMNISEARCH MODAL (Ctrl + K) ==================== -->
+  <div id="omnisearch-modal" class="omnisearch-backdrop" style="display:none;" onclick="handleOmnisearchBackdrop(event)">
+    <div class="omnisearch-card" onclick="event.stopPropagation()">
+      <div class="omnisearch-input-wrap">
+        <svg class="omnisearch-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="omnisearch-input" class="omnisearch-input" placeholder="Type to search media, documents, students, or registers..." autocomplete="off" oninput="debounceOmnisearch(this.value)">
+        <span class="omnisearch-esc-badge" onclick="closeOmnisearch()">ESC</span>
+      </div>
+
+      <div class="omnisearch-results" id="omnisearch-results">
+        <div class="omnisearch-hints">
+          <div style="font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:0.4rem;">QUICK SUGGESTIONS</div>
+          <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/media.html?action=upload')">
+            <span class="omni-item-icon">📤</span>
+            <div class="omni-item-text">
+              <span class="omni-title">Upload New Media / Document</span>
+              <span class="omni-sub">Add lecture recording, notes, or student records to drive</span>
+            </div>
+          </div>
+          <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/registers.html')">
+            <span class="omni-item-icon">📅</span>
+            <div class="omni-item-text">
+              <span class="omni-title">Open Attendance Registers</span>
+              <span class="omni-sub">Ledger view, daily sessions, and PIN roll call studio</span>
+            </div>
+          </div>
+          <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/students.html')">
+            <span class="omni-item-icon">👥</span>
+            <div class="omni-item-text">
+              <span class="omni-title">Department Students Directory</span>
+              <span class="omni-sub">View roster, student dossiers, and self-registration</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="omnisearch-footer">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+        <span><kbd>ENTER</kbd> to select</span>
+        <span><kbd>ESC</kbd> to dismiss</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared/js/api.js?v=20261008"></script>
+  <script src="/shared/js/auth.js?v=20261008"></script>
+  <script src="/shared/js/ui.js?v=20261008"></script>
+  <script src="/faculty/media/media.js?v=20261008"></script>
+</body>
+</html>

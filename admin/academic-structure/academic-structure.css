@@ -1,0 +1,597 @@
+/* ══════════════════════════════════════════════════════════════
+   PAGE STYLES: ACADEMIC-STRUCTURE
+   frontend/admin/academic-structure/academic-structure.css
+══════════════════════════════════════════════════════════════ */
+
+/* ==========================================================================
+       Academic Departments & Catalog - Minimal & Responsive Layout
+       ========================================================================== */
+
+    .page-main-container {
+      padding-top: 1.25rem;
+      padding-bottom: 3rem;
+    }
+
+    /* Page Header */
+    .academic-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .academic-header-title-wrap {
+      flex: 1;
+      min-width: 240px;
+    }
+    .academic-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Minimal High-Density Telemetry Ribbon */
+    .structure-telemetry-strip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--color-primary);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s ease;
+    }
+    .structure-telemetry-strip:hover {
+      box-shadow: var(--shadow-md);
+    }
+    .telemetry-session-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+      flex: 1;
+    }
+    .telemetry-session-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .telemetry-session-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+    .telemetry-session-headline {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .telemetry-session-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+    .telemetry-session-dates {
+      font-size: 0.75rem;
+      font-family: var(--font-family-mono);
+      color: var(--text-muted);
+    }
+    .telemetry-session-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-sm);
+      background: var(--status-present-bg);
+      color: var(--status-present);
+      border: 1px solid currentColor;
+      letter-spacing: 0.03em;
+    }
+    .telemetry-rollover-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .telemetry-kpi-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-shrink: 0;
+    }
+    .telemetry-kpi-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.65rem;
+    }
+    .telemetry-kpi-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .telemetry-kpi-value {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: var(--font-family-mono);
+    }
+
+    /* Catalog Card & Minimal Toolbar */
+    .catalog-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .catalog-card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: var(--bg-surface-secondary);
+    }
+    .catalog-title-wrap {
+      flex: 1;
+      min-width: 220px;
+    }
+    .catalog-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--text-main);
+    }
+    .catalog-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 0.2rem 0 0 0;
+    }
+    .catalog-toolbar {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+    .search-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
+    .search-input-wrap input {
+      padding-left: 2.1rem;
+      height: 38px;
+      width: 240px;
+      font-size: 0.875rem;
+      transition: width 0.2s ease, border-color 0.2s ease;
+    }
+    .search-input-icon {
+      position: absolute;
+      left: 0.7rem;
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 0.85rem;
+    }
+
+    /* Responsive Buttons */
+    .btn-add-dept {
+      height: 38px;
+      padding: 0 0.95rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+    .btn-text-short {
+      display: none;
+    }
+    .btn-text-full {
+      display: inline;
+    }
+
+    /* Danger Soft Button */
+    .btn-danger-soft {
+      background: var(--status-absent-bg);
+      color: var(--status-absent);
+      border: 1px solid var(--status-absent);
+      padding: 0.25rem 0.55rem;
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .btn-danger-soft:hover {
+      background: var(--status-absent);
+      color: var(--text-white);
+    }
+
+    .btn-danger {
+      background: var(--status-absent);
+      color: var(--text-white);
+      border: 1px solid var(--status-absent);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+    }
+    .btn-danger:hover {
+      filter: brightness(0.92);
+    }
+    .btn-danger:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Table Scroll & Responsive Mobile Card View */
+    .table-scroll-wrapper {
+      width: 100%;
+    }
+    .table-scroll-hint {
+      display: none;
+    }
+
+    .academic-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--table-bg);
+    }
+    .academic-table th {
+      background: var(--table-th-bg);
+      color: var(--text-muted);
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1.15rem;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+    }
+    .academic-table td {
+      padding: 0.9rem 1.15rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.875rem;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    .academic-table tbody tr {
+      transition: background-color 0.15s ease;
+    }
+    .academic-table tbody tr:hover {
+      background-color: var(--table-hover-bg);
+    }
+
+    /* Display Utility Classes */
+    .d-mobile-only {
+      display: none !important;
+    }
+    .d-desktop-only {
+      display: table-cell !important;
+    }
+
+    /* Code Badge */
+    .code-badge {
+      font-family: var(--font-family-mono);
+      font-weight: 700;
+      font-size: 0.88rem;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      padding: 0.25rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid currentColor;
+      display: inline-block;
+      letter-spacing: 0.04em;
+    }
+
+    .row-actions-group {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.4rem;
+    }
+
+    .badge-core-lock {
+      background: var(--bg-surface-secondary);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.25rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+    }
+
+    .catalog-count-badge {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 0.72rem;
+    }
+
+    /* Modal Backdrop & Card */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    .modal-backdrop.open,
+    .modal-backdrop[style*="display: flex"] {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 460px;
+      padding: 1.4rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideIn {
+      from { transform: translateY(10px) scale(0.97); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* ==========================================================================
+       Responsive Media Queries for Mobile & Tablets
+       ========================================================================== */
+
+    /* Small Tablet & Mobile (<= 768px): Native Minimal Cards & Zero Duplicates */
+    @media (max-width: 768px) {
+      .page-main-container {
+        padding-top: 0.65rem !important;
+        padding-bottom: 2rem !important;
+      }
+      .academic-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        margin-bottom: 0.65rem !important;
+      }
+      .page-title {
+        font-size: 1.25rem !important;
+      }
+      .page-subtitle {
+        display: none !important;
+      }
+      .academic-header-actions {
+        display: none !important;
+      }
+
+      /* Compact Minimal Telemetry Strip on Mobile */
+      .structure-telemetry-strip {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.55rem !important;
+        padding: 0.6rem 0.75rem !important;
+        margin-bottom: 0.65rem !important;
+      }
+      .telemetry-session-cell {
+        gap: 0.5rem !important;
+      }
+      .telemetry-session-icon {
+        width: 30px !important;
+        height: 30px !important;
+      }
+      .telemetry-session-icon svg {
+        width: 15px !important;
+        height: 15px !important;
+      }
+      .telemetry-session-headline {
+        gap: 0.35rem !important;
+      }
+      .telemetry-session-title {
+        font-size: 0.9rem !important;
+      }
+      .telemetry-session-dates {
+        display: none !important;
+      }
+      .telemetry-session-badge {
+        display: none !important;
+      }
+      .telemetry-rollover-desc {
+        font-size: 0.7rem !important;
+      }
+      .telemetry-kpi-group {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.45rem !important;
+        width: 100% !important;
+      }
+      .telemetry-kpi-pill {
+        justify-content: space-between !important;
+        padding: 0.3rem 0.55rem !important;
+      }
+      .telemetry-kpi-label {
+        font-size: 0.68rem !important;
+      }
+      .telemetry-kpi-value {
+        font-size: 0.88rem !important;
+      }
+
+      /* Catalog Card & Toolbar on Mobile */
+      .catalog-card-header {
+        padding: 0.65rem 0.75rem !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.45rem !important;
+      }
+      .catalog-title {
+        font-size: 0.95rem !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+      }
+      .catalog-toolbar {
+        width: 100% !important;
+      }
+      .search-input-wrap input {
+        width: 100% !important;
+        height: 35px !important;
+        font-size: 0.82rem !important;
+        padding-left: 1.85rem !important;
+      }
+      .search-input-icon {
+        left: 0.55rem !important;
+      }
+
+      /* CRITICAL: Strict Display Overrides (Guarantees Desktop Cells Never Render on Mobile) */
+      .academic-table tbody td.d-desktop-only,
+      .academic-table th.d-desktop-only,
+      .academic-table td.d-desktop-only,
+      .d-desktop-only {
+        display: none !important;
+      }
+      .d-mobile-only {
+        display: inline-flex !important;
+      }
+
+      /* Native Mobile Cards (Zero Horizontal Scroll, Zero Duplication) */
+      .table-scroll-wrapper {
+        overflow-x: hidden !important;
+        padding: 0 !important;
+      }
+      .academic-table {
+        display: block !important;
+        min-width: 100% !important;
+        width: 100% !important;
+        border-collapse: separate !important;
+      }
+      .academic-table thead {
+        display: none !important;
+      }
+      .academic-table tbody {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        padding: 0.55rem !important;
+      }
+      .academic-table tbody tr {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.45rem !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-md) !important;
+        padding: 0.65rem 0.75rem !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+      }
+      .academic-table tbody td {
+        display: block !important;
+        padding: 0 !important;
+        border: none !important;
+      }
+      .academic-table tbody td.d-desktop-only {
+        display: none !important;
+      }
+
+      /* Mobile Card Header Row */
+      .academic-table tbody td.td-mobile-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+      }
+
+      /* Mobile Card HOD & Program Meta */
+      .academic-table tbody td.td-mobile-hod {
+        background: var(--bg-surface-secondary) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-sm) !important;
+        padding: 0.35rem 0.55rem !important;
+        font-size: 0.78rem !important;
+      }
+
+      /* Mobile Card Actions */
+      .academic-table tbody td.td-mobile-actions {
+        margin-top: 0.15rem !important;
+        padding-top: 0.4rem !important;
+        border-top: 1px dashed var(--border-color) !important;
+      }
+      .row-actions-group {
+        display: flex !important;
+        justify-content: stretch !important;
+        gap: 0.45rem !important;
+        width: 100% !important;
+      }
+      .row-actions-group .btn,
+      .row-actions-group .btn-danger-soft,
+      .row-actions-group .badge-core-lock {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 0.32rem 0.5rem !important;
+        font-size: 0.8rem !important;
+      }
+
+      .modal-card {
+        padding: 1.15rem !important;
+        max-width: min(440px, 94vw) !important;
+      }
+    }
+
+    /* Small Mobile (<= 540px) */
+    @media (max-width: 540px) {
+      .structure-telemetry-strip {
+        padding: 0.5rem 0.65rem !important;
+      }
+      .telemetry-kpi-pill {
+        padding: 0.25rem 0.45rem !important;
+      }
+    }
+

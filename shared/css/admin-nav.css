@@ -1,0 +1,611 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS INSTITUTIONAL ADMIN NAVIGATION SYSTEM (admin-nav.css)
+ * Consolidated Top Navbar, Side Drawer, and Mobile Bottom Nav
+ * 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * ══════════════════════════════════════════════════════════════
+ */
+
+/* ── 1. Top Navigation Bar (.gc-navbar) ── */
+.gc-navbar {
+  height: 64px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-xs, var(--shadow-sm));
+  box-sizing: border-box;
+}
+
+.gc-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.gc-menu-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.gc-menu-btn:hover {
+  background: var(--bg-surface);
+}
+
+.gc-brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+
+.gc-brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, hsl(142 70% 35%) 0%, hsl(160 75% 42%) 100%);
+  color: var(--text-white, hsl(0 0% 100%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.gc-brand-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
+.gc-brand-title {
+  font-size: 1.24rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.gc-brand-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-left: 0.2rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.gc-page-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light, var(--bg-surface));
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  margin-left: 0.5rem;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+
+.gc-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gc-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  border: 1px solid transparent;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.gc-create-btn:hover {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.gc-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.gc-icon-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+.gc-icon-btn:hover {
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.gc-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.15s ease;
+  flex-shrink: 0;
+}
+
+.gc-user-avatar:hover {
+  filter: brightness(0.95);
+}
+
+/* ── 2. Apps Launcher & User Profile Popovers ── */
+.apps-launcher-dropdown {
+  position: absolute;
+  top: 54px;
+  right: 48px;
+  width: 310px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  z-index: 1010;
+  max-height: 460px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.apps-launcher-dropdown.open {
+  display: grid !important;
+}
+
+.app-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.65rem 0.25rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-tile:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+
+.app-tile-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-tile-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
+.user-profile-popover {
+  position: absolute;
+  top: 54px;
+  right: 0;
+  width: 270px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 1010;
+  box-sizing: border-box;
+}
+
+.user-profile-popover.open {
+  display: flex !important;
+}
+
+/* ── 3. Slide-Out Drawer Side Navigation (.gc-drawer / #app-sidebar) ── */
+.gc-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: hsl(0 0% 0% / 0.45);
+  z-index: 9990;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.gc-drawer-backdrop.open,
+.gc-drawer-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+  display: block;
+}
+
+.gc-drawer,
+aside.app-sidebar.gc-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100vh;
+  height: 100dvh;
+  width: 290px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  z-index: 9995;
+  transform: translateX(-100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  box-sizing: border-box;
+}
+
+.gc-drawer.open,
+.gc-drawer.sidebar-open,
+aside.app-sidebar.gc-drawer.sidebar-open,
+aside.app-sidebar.gc-drawer.open {
+  transform: translateX(0);
+}
+
+.gc-drawer-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box;
+}
+
+.gc-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0;
+}
+
+.gc-drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 1.25rem;
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 0 999px 999px 0;
+  margin-right: 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.gc-drawer-link:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+
+.gc-drawer-link.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.gc-drawer-link svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
+.gc-drawer-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.6rem 0;
+}
+
+.gc-drawer-sec-title {
+  padding: 0.6rem 1.25rem 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.gc-drawer-footer {
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  box-sizing: border-box;
+}
+
+.gc-drawer-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.gc-drawer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--status-present);
+}
+
+.gc-drawer-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: transparent;
+  color: var(--status-absent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+}
+
+.gc-drawer-logout-btn:hover {
+  background: var(--status-absent-bg);
+}
+
+/* ── 4. Mobile Bottom Navigation Bar (.mobile-bottom-nav) ── */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(58px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  z-index: 500;
+  box-shadow: 0 -2px 10px hsl(0 0% 0% / 0.05);
+}
+
+.mobile-bottom-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 58px;
+  width: 100%;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  flex: 1;
+  height: 100%;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.68rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.mobile-nav-item:hover {
+  color: var(--color-primary);
+}
+
+.mobile-nav-item.active {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.mobile-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.mobile-nav-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+
+/* ── 5. Responsive Breakpoints & Collision Elimination (<= 768px & <= 420px) ── */
+@media (max-width: 768px) {
+  .gc-navbar {
+    height: 58px;
+    padding: 0 0.75rem;
+  }
+
+  .gc-nav-left {
+    gap: 0.5rem;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .gc-menu-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+
+  .gc-brand-link {
+    gap: 0.5rem;
+    min-width: 0;
+    max-width: calc(100% - 44px);
+    flex-shrink: 1;
+  }
+
+  .gc-brand-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+  }
+
+  .gc-brand-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .gc-brand-title {
+    font-size: 1.05rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Eliminate header text collision by suppressing secondary labels on mobile */
+  .gc-brand-sub {
+    display: none !important;
+  }
+
+  .gc-page-badge {
+    display: none !important;
+  }
+
+  .gc-create-btn {
+    display: none !important;
+  }
+
+  .gc-nav-right {
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .gc-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .gc-icon-btn svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .gc-user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.82rem;
+  }
+
+  /* Popovers */
+  .apps-launcher-dropdown {
+    right: 0.5rem;
+    top: 52px;
+    width: min(300px, calc(100vw - 1rem));
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .user-profile-popover {
+    right: 0.5rem;
+    top: 52px;
+    width: min(280px, calc(100vw - 1rem));
+    padding: 1rem;
+  }
+
+  /* Show mobile bottom nav */
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  /* Clear mobile bottom navigation across all admin page containers */
+  body {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .dashboard-container,
+  .admin-container,
+  .structure-container,
+  .reports-container,
+  .settings-container,
+  .faculty-container,
+  .students-container {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  /* On compact screens, hide the 9-dot apps button in navbar (available in drawer menu) */
+  .gc-navbar .gc-nav-right button[onclick*="toggleAppsLauncher"],
+  .gc-navbar .gc-nav-right .gc-icon-btn:first-child {
+    display: none !important;
+  }
+}

@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Take Attendance & Digital Registers — Faculty Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261003">
+  <link rel="stylesheet" href="/css/variables.css?v=20261003">
+  <link rel="stylesheet" href="/css/layout.css?v=20261003">
+  <link rel="stylesheet" href="/css/components.css?v=20261003">
+  <link rel="stylesheet" href="/css/classroom-nav.css?v=20261003">
+  
+  <link rel="stylesheet" href="/components/modal/modal.css?v=20261003">
+  <link rel="stylesheet" href="/faculty/registers/registers.css?v=20261003">
+</head>
+<body>
+  <!-- Google Classroom Universal Top Menu Bar -->
+    
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <a href="/faculty/dashboard.html" class="gc-brand-link">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+        </div>
+        <div class="gc-brand-title">Classroom</div>
+        <span class="gc-brand-sub">VidyaOS</span>
+      </a>
+      <span class="gc-page-badge" id="dept-header-name">Attendance Registers</span>
+    </div>
+    <div class="gc-nav-right">
+      <a href="/faculty/dashboard.html" class="gc-create-btn">
+        <span style="font-size:1.1rem;line-height:1">&#43;</span> Classes Hub
+      </a>
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher(event)" title="Academic Apps &amp; Modules">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="4" r="1.5"></circle><circle cx="12" cy="4" r="1.5"></circle><circle cx="20" cy="4" r="1.5"></circle><circle cx="4" cy="12" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="20" cy="12" r="1.5"></circle><circle cx="4" cy="20" r="1.5"></circle><circle cx="12" cy="20" r="1.5"></circle><circle cx="20" cy="20" r="1.5"></circle></svg>
+      </button>
+      <button type="button" class="gc-icon-btn" onclick="toggleAppTheme()" id="btn-theme-toggle" title="Toggle Theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile(event)" title="Account Profile">T</div>
+
+      <!-- Google Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/faculty/dashboard.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+          <span>Classes</span>
+        </a>
+        <a href="/faculty/media.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></div>
+          <span>Faculty Drive</span>
+        </a>
+        <a href="/faculty/registers.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+          <span>Registers</span>
+        </a>
+        <a href="/faculty/assignments.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14h6"></path><path d="M9 10h6"></path><path d="M9 18h4"></path></svg></div>
+          <span>Coursework</span>
+        </a>
+        <a href="/faculty/tests.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+          <span>Marksheets</span>
+        </a>
+        <a href="/faculty/evaluation.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+          <span>Evaluation</span>
+        </a>
+        <a href="/faculty/reports.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
+          <span>Reports</span>
+        </a>
+        <a href="/faculty/students.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+          <span>Students</span>
+        </a>
+        <a href="/faculty/timetable.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+          <span>Timetable</span>
+        </a>
+        <a href="/faculty/leave-approvals.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M12 18v-6"></path><path d="m9 15 3 3 3-3"></path></svg></div>
+          <span>Leaves</span>
+        </a>
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></div>
+          <span>HOD Hub</span>
+        </a>
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path><circle cx="12" cy="12" r="2"></circle><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"></path></svg></div>
+          <span>ESP Devices</span>
+        </a>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></div>
+          <span>Archive</span>
+        </a>
+      </div>
+
+      <!-- User Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
+        <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">T</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">Faculty Member</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">teacher@college.edu</div>
+        <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+        <a href="/faculty/profile.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          My Profile
+        </a>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickPasswordModal()" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-1.5 1.5L14 9l-2-2-4 4 2 2-4 4-2-2-2 2 4 4 6-6 1-1 4-4 2-2z"></path><circle cx="7.5" cy="16.5" r="1.5"></circle></svg>
+          Change Password
+        </button>
+        <a href="/faculty/hod-settings.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Account Settings
+        </a>
+        <button class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);display:flex;align-items:center;justify-content:center;gap:0.4rem;" onclick="logout()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Sign Out
+        </button>
+      </div>
+
+      <div id="user-nav" class="user-nav" style="display:none;" aria-hidden="true"></div>
+      <span id="brand-role-badge" style="display:none;" aria-hidden="true"></span>
+      <span id="role-badge" style="display:none;" aria-hidden="true"></span>
+      <span id="user-profile-badge" style="display:none;" aria-hidden="true"></span>
+    </div>
+  </header>
+
+  <!-- Backward-compatibility hidden navigation for automated test contracts -->
+  <nav style="display: none !important;" id="top-nav-bar" aria-hidden="true">
+    <a href="/faculty/dashboard.html">Dashboard</a>
+    <a href="/faculty/registers.html" id="nav-reg">Take Attendance &amp; Registers</a>
+    <a href="/faculty/assignments.html" id="nav-assign">Assignments &amp; Coursework</a>
+    <a href="/faculty/tests.html" id="nav-marks">Test Marks &amp; Exams</a>
+    <a href="/faculty/evaluation.html" id="nav-eval">Internal Evaluation</a>
+    <a href="/faculty/reports.html" id="nav-reports">Analytics &amp; Reports</a>
+    <a href="/faculty/profile.html">Profile</a>
+  </nav>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem; max-width: 1440px;">
+    
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- VIEW 1: SUBJECT REGISTER CARDS GRID (TEACHER ASSIGNMENTS) -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- Hidden Legacy Cards View for compatibility -->
+    <div id="view-cards-container" style="display: none !important;" aria-hidden="true">
+      <div id="registers-grid"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- DIRECT SUBJECT DIGITAL REGISTER & ATTENDANCE VIEW           -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <div id="view-register-container" style="display: block;">
+      <!-- AUTHENTIC COMPACT REGISTER HEADER WITH SWITCHER & RESPONSIVE META -->
+      <div class="physical-register-header">
+        <!-- ROW 1: SWITCHER + ACTIONS + REGISTER STATUS BADGES -->
+        <div class="reg-header-top-row no-print">
+          <div class="reg-switcher-group">
+            <label for="register-switcher-select" class="reg-switcher-label">
+              <span style="display:inline-flex;align-items:center;gap:0.35rem;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> Switch:</span>
+            </label>
+            <select id="register-switcher-select" class="form-select reg-switcher-select" onchange="openRegister(Number(this.value))"
+                    style="font-weight: 700; font-size: 0.8rem; padding: 0.32rem 0.85rem 0.32rem 0.6rem; border-radius: 6px; border: 1.5px solid var(--color-primary); background: var(--bg-card); color: var(--text-main); box-shadow: var(--shadow-sm); cursor: pointer;">
+              <option value="">Loading assigned registers...</option>
+            </select>
+            <button type="button" class="btn btn-secondary btn-xs reg-new-btn" onclick="openCreatePersonalModal()" title="Create personal teaching register">
+              + New Register
+            </button>
+          </div>
+
+          <div class="reg-badges-group">
+            <span class="reg-type-pill">LECTURE REGISTER</span>
+            <span id="reg-badge-official" class="badge badge-present">Official Register</span>
+            <span id="reg-badge-scope" class="badge badge-late">THEORY</span>
+          </div>
+        </div>
+
+        <!-- ROW 2: STREAMLINED INLINE META STRIP (Compact & Responsive) -->
+        <div class="reg-meta-strip">
+          <div class="reg-meta-pill">
+            <span class="reg-meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></span>
+            <span class="reg-meta-label">Subject:</span>
+            <span class="reg-meta-value" id="reg-meta-subject">Loading Subject...</span>
+          </div>
+          <span class="reg-meta-dot">•</span>
+          <div class="reg-meta-pill">
+            <span class="reg-meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></span>
+            <span class="reg-meta-label">Class:</span>
+            <span class="reg-meta-value" id="reg-meta-class">Loading Class...</span>
+          </div>
+          <span class="reg-meta-dot">•</span>
+          <div class="reg-meta-pill">
+            <span class="reg-meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+            <span class="reg-meta-label">Session:</span>
+            <span class="reg-meta-value" id="reg-meta-section">Loading Session...</span>
+          </div>
+          <span class="reg-meta-dot">•</span>
+          <div class="reg-meta-pill">
+            <span class="reg-meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14h6"></path><path d="M9 10h6"></path><path d="M9 18h4"></path></svg></span>
+            <span class="reg-meta-label">Type:</span>
+            <span class="reg-meta-value" id="reg-meta-paper">THEORY</span>
+          </div>
+        </div>
+        <div id="print-month-banner" style="display:none; text-align:center; font-weight:800; font-size:1.1rem; margin-top:0.4rem;">
+          MONTH: <span id="print-month-text"></span>
+        </div>
+      </div>
+
+      <!-- ═══ CONSOLIDATED REGISTER WORKSPACE COMMAND BAR ═══ -->
+      <div class="register-workspace-bar no-print">
+        <!-- TABS ON LEFT -->
+        <div class="register-main-tabs" role="tablist">
+          <button type="button" class="register-tab-btn active" id="tab-btn-matrix" onclick="switchRegisterTab('matrix')" role="tab" aria-selected="true" style="display:inline-flex;align-items:center;gap:0.45rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Attendance Matrix</span>
+          </button>
+          <button type="button" class="register-tab-btn" id="tab-btn-assignments" onclick="switchRegisterTab('assignments')" role="tab" aria-selected="false" style="display:inline-flex;align-items:center;gap:0.45rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14h6"></path><path d="M9 10h6"></path><path d="M9 18h4"></path></svg>
+            <span>Coursework & Assignments</span>
+            <span class="tab-badge" id="badge-assignments-count">0</span>
+          </button>
+          <button type="button" class="register-tab-btn" id="tab-btn-exams" onclick="switchRegisterTab('exams')" role="tab" aria-selected="false" style="display:inline-flex;align-items:center;gap:0.45rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span>Class Tests & Marks</span>
+            <span class="tab-badge" id="badge-exams-count">0</span>
+          </button>
+        </div>
+
+        <!-- ACTIONS ON RIGHT (Contextual to active tab) -->
+        <div class="workspace-bar-actions">
+          <!-- MATRIX TAB CONTROLS (Month Picker & Print) -->
+          <div id="matrix-quick-controls" style="display: inline-flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <div class="month-nav-pill">
+              <button type="button" class="month-nav-arrow" onclick="navigateMonth(-1)" title="Previous Month" aria-label="Previous Month">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              
+              <div style="position: relative; display: inline-flex; align-items: center;">
+                <button type="button" class="month-nav-display" id="btn-month-picker" onclick="openMonthPicker()" title="Click to choose month from calendar" style="background: var(--bg-surface); color: var(--text-main); display:inline-flex; align-items:center; gap:0.35rem;">
+                  <span id="current-month-display">September 2026</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.7;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <input type="month" id="hidden-month-picker" 
+                       style="position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; opacity: 0; pointer-events: none; border: none; padding: 0; margin: 0;" 
+                       tabindex="-1"
+                       aria-hidden="true"
+                       onchange="changeRegisterMonth(this.value)">
+              </div>
+
+              <button type="button" class="month-nav-arrow" onclick="navigateMonth(1)" title="Next Month" aria-label="Next Month">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+              <button type="button" class="month-nav-today" onclick="jumpToCurrentMonth()" title="Jump to current month">Today</button>
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openInternalEvaluationStudio()" title="Master Internal Evaluation Spreadsheet (UT + Assignments + Attendance + Presentation)" style="display:inline-flex;align-items:center;gap:0.35rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+              <span>Internal Evaluation Sheet</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm print-action-btn" onclick="window.print()" title="Print physical inspection format" style="display:inline-flex;align-items:center;gap:0.35rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>Print</span>
+            </button>
+          </div>
+
+          <!-- ASSIGNMENTS TAB CONTROLS -->
+          <div id="assignments-quick-controls" style="display: none; align-items: center; gap: 0.5rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openInternalEvaluationStudio()" title="Master Internal Evaluation Spreadsheet" style="display:inline-flex;align-items:center;gap:0.35rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+              <span>Internal Evaluation Sheet</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadRegisterAssignments()" title="Refresh coursework list" style="display:inline-flex;align-items:center;gap:0.35rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Refresh</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openCreateAssignmentModal()" style="font-weight: 700;">
+              + Create Assignment
+            </button>
+          </div>
+
+          <!-- EXAMS TAB CONTROLS -->
+          <div id="exams-quick-controls" style="display: none; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openInternalEvaluationStudio()" title="Master Internal Evaluation Sheet (UT + Assignments + Attendance + Presentation)" style="font-weight: 700; display:inline-flex;align-items:center;gap:0.35rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+              <span>Internal Evaluation Sheet</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadRegisterExams()" title="Refresh test list" style="display:inline-flex;align-items:center;gap:0.35rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Refresh</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openCreateExamModal()" style="font-weight: 700;">
+              + Schedule Class Test
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TAB PANEL 1: ATTENDANCE MATRIX ═══ -->
+      <div id="tab-panel-matrix">
+
+      <!-- ─── MINIMIZED ACTION BAR: ESP32 STATUS & DAY-SYNC ─── -->
+      <div class="esp-toolbar no-print">
+        <div style="display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap;">
+          <span style="font-size: 0.82rem; font-weight: 800; color: var(--text-main); display: inline-flex; align-items: center; gap: 0.35rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>ESP32 Sync</span>
+          </span>
+          <span id="esp-status-badge">
+            <span class="badge badge-pending" style="font-size: 0.68rem; padding: 0.15rem 0.45rem;">Checking...</span>
+          </span>
+          <span title="Syncs selected date's RFID/biometric scans into this register with instant confirmation preview" style="cursor: help; font-size: 0.75rem; color: var(--text-muted); opacity: 0.85;">ⓘ</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.3rem;">
+            <label for="sync-date" style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted);">Date:</label>
+            <input type="date" id="sync-date" class="form-control" onchange="checkEspStatus()" style="padding: 0.22rem 0.45rem; font-size: 0.8rem; height: 30px; width: 135px; border-radius: var(--radius-sm);">
+          </div>
+          <button id="btn-esp-sync" class="btn btn-primary btn-sm" onclick="triggerEspDaySync()" style="font-weight: 700; font-size: 0.78rem; padding: 0.25rem 0.65rem; height: 30px; display: inline-flex; align-items: center; gap: 0.35rem;" title="Fetch ESP scans and preview attendance">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Sync ESP Scans</span>
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="openQuickMarkModal()" style="font-size: 0.78rem; padding: 0.25rem 0.6rem; height: 30px; display:inline-flex; align-items:center; gap:0.35rem;" title="Conduct manual roll call, QR attendance, or 6-digit PIN">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            <span>Roll Call (Manual, QR & PIN)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 1: PHYSICAL REGISTER GRID MATRIX -->
+      <div id="subview-grid-container">
+        <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem; border: 1px solid var(--border-color); background: var(--bg-card);">
+          <div style="padding: 0.75rem 1.25rem; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;" class="no-print">
+            <div style="font-size: 0.82rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+              <span style="display:inline-flex;align-items:center;gap:0.4rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                Class Roll Sheet Matrix
+              </span>
+              <span style="font-weight: 500; color: var(--text-muted); font-size: 0.75rem;">(Click any cell to toggle: Present → Absent → Late → Clear)</span>
+            </div>
+            <div style="display: flex; gap: 0.85rem; font-size: 0.75rem; align-items: center;">
+              <div><span class="pen-mark p" style="font-size: 0.85rem;">P</span> Present</div>
+              <div><span class="pen-mark a" style="font-size: 0.85rem;">A</span> Absent</div>
+              <div><span class="pen-mark l" style="font-size: 0.85rem;">L</span> Late</div>
+              <div><span class="badge-transferred">T</span> Transferred</div>
+              <div><span class="pct-badge pct-defaulter" style="font-size: 0.7rem;">&lt; 75%</span> Defaulter</div>
+            </div>
+          </div>
+
+          <div class="register-matrix-wrapper" id="matrix-scroll-wrapper">
+            <table class="register-table" id="register-matrix-table">
+              <thead id="matrix-head">
+                <tr><th>Loading register headers...</th></tr>
+              </thead>
+              <tbody id="matrix-body">
+                <tr><td style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading student attendance sheet...</td></tr>
+              </tbody>
+              <tfoot id="matrix-foot">
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- ACADEMIC EVENTS & REGISTER FOOTER LEDGER (Matches Image 1 & 2 bottom area) -->
+        <div class="academic-events-ledger">
+          <div class="academic-events-grid">
+            <div>
+              <div style="font-weight: 800; font-size: 0.88rem; margin-bottom: 0.6rem; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.05em; display:flex; align-items:center; gap:0.4rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>Academic Events & Milestones for this Month</span>
+              </div>
+              <div id="academic-events-list">
+                <div style="color: var(--text-muted); font-size: 0.8rem;">No class tests or assignments recorded for this month yet.</div>
+              </div>
+              <div style="margin-top: 0.6rem; display: flex; gap: 0.4rem; flex-wrap: wrap;" class="no-print">
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;" onclick="switchRegisterTab('assignments')">
+                  + Coursework & Assignments
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;" onclick="switchRegisterTab('exams')">
+                  + Class Tests & Marks
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-weight: 800; font-size: 0.88rem; margin-bottom: 0.6rem; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.05em; display:flex; align-items:center; gap:0.4rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Register Legend & Guidelines</span>
+              </div>
+              <div style="font-size: 0.78rem; line-height: 1.6; color: var(--text-muted);">
+                <div>• <strong style="color:var(--status-present);">P</strong> = Present in Lecture / Lab (Emerald Ink)</div>
+                <div>• <strong style="color:var(--status-absent);">A</strong> = Absent from Lecture (Vibrant Red Ink)</div>
+                <div>• <strong style="color:var(--status-late);">L</strong> = Late Arrival Attendance (Amber Ink)</div>
+                <div>• <span class="badge-transferred" style="width:16px;height:16px;font-size:0.6rem;">T</span> = Student Transferred / Detained / Dropped</div>
+                <div>• Statutory Minimum Attendance Rule: <strong>75.0%</strong> required for exam eligibility.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRINT-ONLY SIGNATURE BLOCK -->
+          <div class="print-signature-block">
+            <div style="text-align: center;">
+              <div style="border-top: 1px solid black; width: 180px; margin-bottom: 4px;"></div>
+              <div>Teacher Signature</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="border-top: 1px solid black; width: 180px; margin-bottom: 4px;"></div>
+              <div>Head of Department (HOD)</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="border-top: 1px solid black; width: 180px; margin-bottom: 4px;"></div>
+              <div>Principal / Director</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 2: SESSIONS TIMELINE LIST -->
+      <div id="subview-sessions-container" style="display: none;">
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-wrapper">
+            <table class="table" style="font-size: 0.85rem;">
+              <thead>
+                <tr>
+                  <th style="width: 120px;">Class Date</th>
+                  <th>Class Label</th>
+                  <th style="width: 100px;">Type</th>
+                  <th style="width: 100px;">State</th>
+                  <th style="width: 110px; text-align: center;">Roster Size</th>
+                  <th style="width: 200px; text-align: right;">Session Controls</th>
+                </tr>
+              </thead>
+              <tbody id="sessions-table-body">
+                <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading sessions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      </div><!-- End #tab-panel-matrix -->
+
+      <!-- ═══ TAB PANEL 2: COURSEWORK & ASSIGNMENTS ═══ -->
+      <div id="tab-panel-assignments" style="display: none;" class="no-print" role="tabpanel">
+        <!-- Hidden scope badge kept for JS compatibility -->
+        <span id="assign-scope-badge" style="display:none;"></span>
+
+        <!-- ASSIGNMENTS LIST CONTAINER -->
+        <div id="register-assignments-list">
+          <div class="card" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+            Loading assignments for this register...
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TAB PANEL 3: CLASS TESTS & MARKS ═══ -->
+      <div id="tab-panel-exams" style="display: none;" class="no-print" role="tabpanel">
+        <!-- Hidden scope badge kept for JS compatibility -->
+        <span id="exam-scope-badge" style="display:none;"></span>
+
+        <!-- EXAMS LIST CONTAINER -->
+        <div id="register-exams-list">
+          <div class="card" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+            Loading exams and test marksheets for this register...
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL 1: ESP32 SCANS CONFIRMATION MODAL WITH CHECKBOXES    -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="esp-confirm-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Confirm ESP32 Attendance</span>
+        </h2>
+        <button onclick="closeModal('esp-confirm-modal')" style="font-size: 1.4rem; color: var(--text-muted); cursor: pointer; border: none; background: none;">&times;</button>
+      </div>
+
+      <p id="esp-confirm-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        The following students scanned on the ESP32 terminal for this date. Check/uncheck students, then click <strong>Confirm & Add to Register</strong>.
+      </p>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; background: var(--bg-surface); padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+        <label style="font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+          <input type="checkbox" id="esp-select-all" onchange="toggleAllEspCheckboxes(this.checked)" checked>
+          Select All (<span id="esp-scanned-count">0</span> scanned)
+        </label>
+        <span id="esp-device-tag" class="badge badge-present" style="font-size: 0.75rem;">Terminal: ESP32</span>
+      </div>
+
+      <div style="max-height: 320px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+        <table class="sync-table">
+          <thead>
+            <tr>
+              <th style="width: 45px; text-align: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></th>
+              <th style="width: 55px;">Roll</th>
+              <th style="width: 130px;">UBTER Reg No</th>
+              <th>Student Full Name</th>
+              <th style="width: 110px;">Enrollment No</th>
+              <th style="width: 95px; text-align: right;">Scan Time</th>
+            </tr>
+          </thead>
+          <tbody id="esp-scans-tbody">
+            <tr><td colspan="6" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">Fetching scans...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('esp-confirm-modal')">Cancel</button>
+        <button type="button" id="btn-confirm-save-esp" class="btn btn-primary" onclick="submitEspConfirmation()" style="display:inline-flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Confirm & Add to Register</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL 2: ADD CLASS FOR DATE MODAL                           -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="add-session-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 700;">Add Class Record for Date</h2>
+        <button onclick="closeModal('add-session-modal')" style="font-size: 1.25rem; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <form id="add-session-form" onsubmit="createManualSession(event)">
+        <div class="form-group">
+          <label class="form-label">Session Calendar Date</label>
+          <input type="date" id="sess-date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Class / Lecture Label</label>
+          <input type="text" id="sess-label" class="form-control" placeholder="e.g. Lecture 5: B-Tree Indexes" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Period / Lecture Slot</label>
+          <select id="sess-period" class="form-select">
+            <option value="1">Period 1</option>
+            <option value="2">Period 2</option>
+            <option value="3">Period 3</option>
+            <option value="4">Period 4</option>
+            <option value="5">Period 5</option>
+            <option value="6">Period 6</option>
+            <option value="7">Period 7</option>
+            <option value="8">Period 8</option>
+            <option value="9">Double Period / Lab Block</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Session Type</label>
+          <select id="sess-type" class="form-select">
+            <option value="THEORY">Theory Lecture</option>
+            <option value="PRACTICAL">Practical Lab</option>
+            <option value="TUTORIAL">Tutorial</option>
+            <option value="EXTRA">Extra Class</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('add-session-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Class Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL 3: CREATE PERSONAL REGISTER                           -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="personal-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 700;">Create Personal Register</h2>
+        <button onclick="closeModal('personal-modal')" style="font-size: 1.25rem; color: var(--text-muted);">&times;</button>
+      </div>
+      <form id="personal-form" onsubmit="createPersonalRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Register Title</label>
+          <input type="text" id="p-reg-name" class="form-control" placeholder="e.g. Competitive Coding Batch 2026" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Scope</label>
+          <select id="p-reg-scope" class="form-select">
+            <option value="THEORY">Theory / Meeting</option>
+            <option value="PRACTICAL">Lab / Hands-on</option>
+            <option value="ALL">Mixed Sessions</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('personal-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Register</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL 4: CLASS ROLL CALL & ATTENDANCE STUDIO (MANUAL, QR, PIN)-->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="manual-roll-modal" class="modal-backdrop" onclick="if(event.target===this)closeRollCallModal()">
+    <div class="modal-card">
+      <!-- FIXED MODAL HEADER (Never scrolls) -->
+      <div class="rollcall-modal-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.45rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M3 15h18"></path><path d="M9 3v18"></path><path d="M15 3v18"></path></svg>
+              <span>Class Roll Call & Live Attendance</span>
+            </h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0; display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+              <span id="rc-modal-subject" style="font-weight: 700; color: var(--color-primary);">Subject</span> • 
+              Date: <span id="rc-modal-date" style="font-weight: 700; color: var(--text-main);">Today</span> •
+              <span style="font-weight: 600;">Period:</span>
+              <select id="rc-modal-period" class="form-select" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; width: auto; display: inline-block; height: auto;" onchange="onRollCallPeriodChange()">
+                <option value="1">Period 1</option>
+                <option value="2">Period 2</option>
+                <option value="3">Period 3</option>
+                <option value="4">Period 4</option>
+                <option value="5">Period 5</option>
+                <option value="6">Period 6</option>
+                <option value="7">Period 7</option>
+                <option value="8">Period 8</option>
+                <option value="9">Double Period / Lab Block</option>
+              </select>
+            </p>
+          </div>
+          <button onclick="closeRollCallModal()" style="font-size: 1.4rem; color: var(--text-muted); line-height: 1; padding: 0.2rem; background: none; border: none; cursor: pointer;" title="Close">&times;</button>
+        </div>
+
+        <!-- Roll Call Mode Switcher Tabs (Fixed inside header) -->
+        <div class="rollcall-mode-tabs" style="margin-bottom: 0;">
+          <button type="button" class="rollcall-tab-btn active" id="rc-tab-btn-live" onclick="switchRollCallMode('live')" style="display:inline-flex;align-items:center;gap:0.4rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Dynamic QR & 6-Digit PIN</span>
+          </button>
+          <button type="button" class="rollcall-tab-btn" id="rc-tab-btn-manual" onclick="switchRollCallMode('manual')" style="display:inline-flex;align-items:center;gap:0.4rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            <span>Manual Roll Call</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE CONTENT BODY (Only this scrolls) -->
+      <div class="rollcall-modal-body">
+        <!-- ─── SUB-VIEW 1: LIVE QR & PIN ATTENDANCE (TOGETHER) ─── -->
+        <div id="rc-view-live">
+          <!-- STATE A: PRE-GENERATION (Live session not started yet) -->
+          <div id="rc-live-starter-banner" style="display: none; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2.2rem 1.5rem; text-align: center; margin-bottom: 0.5rem;">
+            <div style="margin-bottom: 0.75rem; color: var(--color-primary); display: flex; justify-content: center;">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path><circle cx="12" cy="12" r="2"></circle><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"></path></svg>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.4rem 0;">
+              Launch Live Attendance Session
+            </h3>
+            <p style="font-size: 0.84rem; color: var(--text-muted); max-width: 480px; margin: 0 auto 1.25rem auto; line-height: 1.5;">
+              Generate an active dynamic QR Code and a 6-Digit PIN simultaneously. Students can scan with their camera or enter the PIN on their student portal to record attendance in real-time.
+            </p>
+            <button type="button" id="btn-generate-live-session" class="btn btn-primary" onclick="startLiveAttendanceSession()" style="font-weight: 700; padding: 0.65rem 1.5rem; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>Generate QR & PIN to Begin</span>
+            </button>
+          </div>
+
+          <!-- STATE B: ACTIVE LIVE SESSION CONTROLS & GRIDS -->
+          <div id="rc-live-active-container">
+            <!-- 2-Column Grid: Dynamic QR & PIN on Left, Live Log on Right -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem; margin-bottom: 0.5rem;">
+              <!-- LEFT CARD: DYNAMIC QR CODE & SESSION PIN -->
+              <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                    <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                      <span>Dynamic QR & Session PIN</span>
+                    </div>
+                  </div>
+                  <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0 0 0.65rem 0;">
+                    Students scan QR via camera or enter 6-digit PIN on portal
+                  </p>
+                  <div class="qr-frame-box" style="margin: 0 auto 0.65rem auto; width: fit-content; text-align: center;">
+                    <div id="rc-qr-code-wrapper" style="width: 170px; height: 170px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: white; border-radius: var(--radius-md); padding: 6px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                      <img id="rc-qr-code-img" src="" alt="Dynamic Attendance QR Code" style="width: 100%; height: 100%; display: block; object-fit: contain;">
+                    </div>
+                    <div style="margin-top: 0.35rem;">
+                      <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-full); padding: 0.15rem 0.6rem; display: inline-flex; align-items: center; gap: 0.35rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span>Valid for:</span> <strong id="rc-expiry-timer" style="color: var(--color-primary); font-family: var(--font-family-mono); font-size: 0.85rem;">15:00</strong>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.35rem;">
+                    <!-- PIN line: PIN is the 6-digit human version of the session token -->
+                    <code id="rc-qr-pin-display" style="font-size: 0.82rem; font-weight: 800; letter-spacing: 2px; background: var(--bg-card); padding: 0.25rem 0.65rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); color: var(--color-primary); font-family: var(--font-family-mono);" title="6-Digit Session PIN">PIN: —</code>
+                    <button type="button" class="btn btn-secondary btn-xs" onclick="copyPinCode()" style="font-size: 0.74rem; padding: 0.25rem 0.55rem; display:inline-flex; align-items:center; gap:0.25rem;" title="Copy 6-Digit PIN">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      <span>Copy</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-xs" id="btn-refresh-live-session" onclick="regenerateLiveAttendanceSession()" style="font-size: 0.74rem; padding: 0.25rem 0.55rem; display:inline-flex; align-items:center; gap:0.25rem;" title="Refresh both QR Code and 6-Digit PIN">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                      <span>Refresh</span>
+                    </button>
+                  </div>
+                  <!-- Hidden elements for script and test compatibility -->
+                  <span id="rc-qr-token-display" style="display: none;" aria-hidden="true"></span>
+                </div>
+                <!-- Hidden container for compatibility with scripts/tests checking pin-digits-container -->
+                <div id="pin-digits-container" style="display: none;" aria-hidden="true"></div>
+              </div>
+
+              <!-- RIGHT CARD: LIVE STUDENT ATTENDANCE LOG -->
+              <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column; height: 100%;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                    <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M3 15h18"></path><path d="M9 3v18"></path><path d="M15 3v18"></path></svg>
+                      <span>Live Check-In Log</span>
+                    </div>
+                    <span class="badge badge-present" style="font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.6rem;">
+                      <span id="rc-claim-count">0</span> Checked In
+                    </span>
+                  </div>
+                  <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0 0 0.75rem 0;">
+                    <span id="rc-claims-status">Listening for QR scans & PIN entries...</span>
+                  </p>
+
+                  <!-- Live Stream Roster Container -->
+                  <div id="rc-claims-roster" style="flex: 1; min-height: 220px; max-height: 250px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <div style="height: 100%; min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-align: center; gap: 0.4rem; padding: 1rem;">
+                      <div style="color: var(--text-muted); opacity: 0.7; margin-bottom: 0.2rem;">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path><circle cx="12" cy="12" r="2"></circle><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"></path></svg>
+                      </div>
+                      <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-main);">No check-ins yet</div>
+                      <div style="font-size: 0.74rem;">Students scanning the QR code or entering the PIN will appear here live in real-time.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 0.65rem; display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+                    <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--status-present);"></span>
+                    Real-time sync active
+                  </span>
+                  <button type="button" class="btn btn-secondary btn-xs" onclick="startClaimsPolling(currentRollCallSession?.id)" style="font-size: 0.7rem; padding: 0.15rem 0.45rem; display:inline-flex; align-items:center; gap:0.25rem;" title="Refresh check-in feed">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    <span>Refresh Feed</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── SUB-VIEW 2: MANUAL ROLL CALL (ROSTER GRID) ─── -->
+        <div id="rc-view-manual" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">
+              Tap cards to toggle: <strong style="color:var(--status-present);">Green = Present</strong>, <strong style="color:var(--status-absent);">Red = Absent</strong>.
+            </p>
+            <div style="display: flex; gap: 0.4rem;">
+              <button type="button" class="btn btn-secondary btn-xs" onclick="markAllManual(false)" style="font-size: 0.75rem; padding: 0.2rem 0.55rem;">Mark All Present</button>
+              <button type="button" class="btn btn-secondary btn-xs" onclick="markAllManual(true)" style="font-size: 0.75rem; padding: 0.2rem 0.55rem;">Mark All Absent</button>
+            </div>
+          </div>
+
+          <div id="quick-roster-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.55rem; max-height: 360px; overflow-y: auto; padding: 0.25rem;">
+          </div>
+        </div>
+      </div>
+
+      <!-- FIXED MODAL FOOTER (Never scrolls) -->
+      <div class="rollcall-modal-footer">
+        <!-- Live View Footer Controls -->
+        <div id="rc-footer-live" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeRollCallModal()">Close</button>
+          <button type="button" id="btn-save-claims-rc" class="btn btn-primary btn-sm" onclick="finalizeClaimsAttendance('LIVE')" style="display:inline-flex;align-items:center;gap:0.4rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Confirm & Save Check-Ins to Register</span>
+          </button>
+        </div>
+        <!-- Manual View Footer Controls -->
+        <div id="rc-footer-manual" style="display: none; justify-content: space-between; align-items: center; width: 100%;">
+          <div style="font-size: 0.84rem; color: var(--text-main);">
+            <strong id="q-present-count" style="color: var(--status-present);">0</strong> Present • 
+            <strong id="q-absent-count" style="color: var(--status-absent);">0</strong> Absent • 
+            <span id="q-total-count" style="color: var(--text-muted);">0</span> Total
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeRollCallModal()">Cancel</button>
+            <button type="button" id="btn-save-manual-rc" class="btn btn-primary btn-sm" onclick="submitManualAttendance()">Save Attendance to Register</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL 5: CREATE NEW ASSIGNMENT / COURSEWORK MODAL            -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="create-assignment-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('create-assignment-modal')">
+    <div class="modal-card" style="max-width: 620px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14h6"></path><path d="M9 10h6"></path><path d="M9 18h4"></path></svg>
+          <span>Create New Coursework / Assignment</span>
+        </h2>
+        <button type="button" onclick="closeModal('create-assignment-modal')" style="font-size: 1.4rem; color: var(--text-muted); cursor: pointer; border: none; background: none; line-height: 1;">&times;</button>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 0.55rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.1rem; font-size: 0.82rem; color: var(--text-muted);">
+        Teaching Register: <strong id="modal-assign-scope-text" style="color: var(--color-primary);">Current Subject</strong>
+      </div>
+
+      <form id="create-assignment-form" onsubmit="submitRegisterAssignment(event)" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Assignment No *</label>
+            <select id="assign-num-select" onchange="onRegisterAssignNumChange(this.value)" style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem;">
+              <option value="1" selected>Assignment 1 (A1)</option>
+              <option value="2">Assignment 2 (A2)</option>
+              <option value="3">Assignment 3 (A3)</option>
+              <option value="4">Assignment 4 (A4)</option>
+              <option value="5">Assignment 5 (A5)</option>
+              <option value="6">Assignment 6 (A6)</option>
+              <option value="7">Assignment 7 (A7)</option>
+              <option value="8">Assignment 8 (A8)</option>
+              <option value="CUSTOM">Custom No</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Assignment Title *</label>
+            <input type="text" id="assign-title" value="Assignment 1" placeholder="e.g. Lab Exercise 3: SQL Triggers & Procedures" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Due Date & Time *</label>
+            <input type="datetime-local" id="assign-due-date" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem;">
+          </div>
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Total Marks / Points *</label>
+            <input type="number" id="assign-total-marks" min="1" max="500" value="20" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 0.85rem;">
+          <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Instructions & Description (optional)</label>
+          <textarea id="assign-desc" rows="3" placeholder="Provide problem statement, formatting guidelines, or instructions for students..." style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem; resize: vertical;"></textarea>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Question Paper / Attachment (Optional PDF, DOC, ZIP, Image - Max 10MB)</label>
+          <input type="file" id="assign-file" style="width: 100%; box-sizing: border-box; font-size: 0.8rem; padding: 0.45rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-main); font-family: inherit;">
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('create-assignment-modal')">Cancel</button>
+          <button type="submit" id="btn-save-assignment" class="btn btn-primary" style="font-weight: 700;">Publish Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL 6: SCHEDULE CLASS TEST / EXAM MODAL                   -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="create-exam-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('create-exam-modal')">
+    <div class="modal-card" style="max-width: 580px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span>Schedule Class Test / Exam</span>
+        </h2>
+        <button type="button" onclick="closeModal('create-exam-modal')" style="font-size: 1.4rem; color: var(--text-muted); cursor: pointer; border: none; background: none; line-height: 1;">&times;</button>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 0.55rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.1rem; font-size: 0.82rem; color: var(--text-muted);">
+        Teaching Register: <strong id="modal-exam-scope-text" style="color: var(--color-primary);">Current Subject</strong>
+      </div>
+
+      <form id="create-exam-form" onsubmit="submitRegisterExam(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Test Type &amp; Number *</label>
+            <div style="display:flex;gap:0.4rem;">
+              <select id="exam-unit-type" onchange="onRegisterExamTypeOrNumChange()" style="flex:1; box-sizing: border-box; padding: 0.6rem 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem;">
+                <option value="UT" selected>Unit Test (UT)</option>
+                <option value="CT">Class Test (CT)</option>
+                <option value="MT">Mid-Term Exam (MT)</option>
+                <option value="FINAL">Final Semester Exam</option>
+                <option value="CUSTOM">Custom / Other</option>
+              </select>
+              <input type="number" id="exam-number-input" min="1" max="99" value="1" placeholder="No." oninput="onRegisterExamTypeOrNumChange()" style="width: 75px; box-sizing: border-box; padding: 0.6rem 0.4rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem; text-align: center; font-weight: 700;">
+              <input type="hidden" id="exam-unit-no" value="UT1">
+            </div>
+          </div>
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Test / Exam Title *</label>
+            <input type="text" id="exam-title" value="Unit Test 1" placeholder="e.g. Unit Test 1 (Modules 1 & 2)" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Exam Type *</label>
+            <select id="exam-type" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem;">
+              <option value="UNIT_TEST">Unit Test</option>
+              <option value="MID_TERM">Mid Term Examination</option>
+              <option value="PRACTICAL">Practical / Lab Viva</option>
+              <option value="FINAL">Final Semester Exam</option>
+              <option value="OTHER">Class Quiz / Surprise Test</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Exam Date *</label>
+            <input type="date" id="exam-date" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.85rem;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="font-weight: 700; font-size: 0.82rem; margin-bottom: 0.35rem; display: block; color: var(--text-main);">Maximum Marks *</label>
+          <input type="number" id="exam-max-marks" min="1" max="1000" value="25" required style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem;">
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('create-exam-modal')">Cancel</button>
+          <button type="submit" id="btn-save-exam" class="btn btn-primary" style="font-weight: 700;">Schedule & Create Marksheet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MODAL 7: MANAGE / ADD EXAM QUESTIONS & MARKS MODAL          -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="exam-questions-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('exam-questions-modal')">
+    <div class="modal-card" style="max-width: 680px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14h6"></path><path d="M9 10h6"></path><path d="M9 18h4"></path></svg>
+          <span>Manage Questions & Marks</span>
+        </h2>
+        <button type="button" onclick="closeModal('exam-questions-modal')" style="font-size: 1.4rem; color: var(--text-muted); cursor: pointer; border: none; background: none; line-height: 1;">&times;</button>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1rem; font-size: 0.82rem; color: var(--text-muted);">
+        Exam / Test: <strong id="modal-exam-q-test-title" style="color: var(--color-primary);">Unit Test</strong> &bull; Add, edit, or remove questions and assign marks. Marksheet columns and totals synchronize automatically.
+      </div>
+
+      <!-- Grand Total & Auto Distribute -->
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; padding: 0.55rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 0.85rem;">
+        <div class="ut-settings-field">
+          <label for="modal-exam-grand-total" style="font-weight: 700; font-size: 0.8rem; color: var(--text-muted);">Grand Total Marks:</label>
+          <input type="number" id="modal-exam-grand-total" class="ut-settings-input" min="1" max="500" value="25" style="width:70px;" placeholder="e.g. 25">
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="autoDistributeFromTotal()" title="Auto-distribute grand total across all questions equally" style="font-weight:700; font-size: 0.8rem; display:inline-flex; align-items:center; gap:0.35rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10"></path><path d="M12 3v18"></path><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path></svg>
+          <span>Auto-Distribute Evenly</span>
+        </button>
+        <span style="font-size:0.75rem; color: var(--text-muted);">— or set marks per question manually below</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 50px 1fr 100px auto; gap: 0.65rem; font-weight: 700; font-size: 0.76rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; padding: 0 0.5rem;">
+        <div style="text-align: center;">Q. No.</div>
+        <div>Question Statement (Optional)</div>
+        <div style="text-align: right;">Max Marks</div>
+        <div></div>
+      </div>
+
+      <div id="modal-questions-list" style="max-height: 320px; overflow-y: auto; margin-bottom: 0.65rem; padding-right: 2px;">
+        <!-- Dynamically rendered question rows -->
+      </div>
+
+      <!-- 2-step delete confirmation bar (hidden by default) -->
+      <div id="modal-q-delete-confirm-bar" style="display: none; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0.75rem; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); margin-bottom: 0.65rem; flex-wrap: wrap;">
+        <span id="modal-q-delete-confirm-msg" style="font-size: 0.82rem; font-weight: 700; color: var(--status-absent);">Delete this question?</span>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="cancelRemoveModalQuestion()" style="font-size: 0.8rem; display:inline-flex; align-items:center; gap:0.25rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <span>Cancel</span>
+          </button>
+          <button type="button" class="btn btn-sm" onclick="doRemoveModalQuestion()" style="background: var(--status-absent); color: var(--color-on-danger, white); font-weight: 800; font-size: 0.8rem; border: none; padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); display:inline-flex; align-items:center; gap:0.25rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Yes, Delete</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.85rem; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="addModalQuestionRow()">
+          + Add Another Question
+        </button>
+        <div style="font-size: 0.9rem; font-weight: 800; color: var(--text-main);">
+          Total Maximum Marks: <span id="modal-exam-total-max" style="color: var(--color-primary); font-size: 1.05rem;">20</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('exam-questions-modal')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveExamQuestionsFromModal()" style="font-weight: 700;">Save & Apply Questions</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js?v=20261003"></script>
+  <script src="/js/ui.js?v=20261003"></script>
+  <script src="/js/auth.js?v=20261003"></script>
+
+  <!-- Floating Remark / Student Status Popover -->
+  <div id="remark-action-popover" class="remark-popover" style="display: none;">
+    <div class="remark-popover-header">
+      <div id="popover-student-name" class="remark-popover-title">Student Status</div>
+      <button type="button" class="remark-popover-close" onclick="closeRemarkMenu()" title="Close">&times;</button>
+    </div>
+    <div class="remark-popover-options">
+      <button type="button" class="remark-opt-btn" onclick="applyStudentStatus('ENROLLED')">
+        <span class="opt-dot dot-enrolled"></span>
+        <div class="opt-desc">
+          <strong>Active / Enrolled</strong>
+          <small>Regular attendance tracking</small>
+        </div>
+        <span class="opt-check" id="check-ENROLLED"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      </button>
+      <button type="button" class="remark-opt-btn" onclick="applyStudentStatus('TRANSFERRED')">
+        <span class="opt-dot dot-transferred"></span>
+        <div class="opt-desc">
+          <strong>Transferred</strong>
+          <small>Mark as transferred out</small>
+        </div>
+        <span class="opt-check" id="check-TRANSFERRED"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      </button>
+      <button type="button" class="remark-opt-btn" onclick="applyStudentStatus('DROPPED')">
+        <span class="opt-dot dot-dropped"></span>
+        <div class="opt-desc">
+          <strong>Dropped</strong>
+          <small>Removed from active cohort</small>
+        </div>
+        <span class="opt-check" id="check-DROPPED"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- MASTER INTERNAL EVALUATION SPREADSHEET STUDIO MODAL (Image 2) -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="internal-eval-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('internal-eval-modal')">
+    <div class="modal-card" style="max-width: 96vw; width: 1320px; max-height: 92vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+      
+      <!-- HEADER -->
+      <div style="flex-shrink: 0; padding: 1rem 1.25rem; background: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.45rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span>Master Internal Evaluation Spreadsheet</span>
+            <span class="badge badge-present" style="font-size: 0.7rem;">Official Institutional Format</span>
+          </h2>
+          <div id="eval-modal-subtitle" style="font-size: 0.8rem; color: var(--text-muted);">
+            Comprehensive Institutional Evaluation (Unit Tests + Coursework + Attendance + Presentation)
+          </div>
+        </div>
+        <button type="button" onclick="closeModal('internal-eval-modal')" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.25rem 0.5rem;" title="Close">&times;</button>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="sheet-toolbar">
+        <div class="sheet-toolbar-group">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="restoreUnitTestSheet()" title="Switch back and restore Unit Test Sheet" style="font-weight: 700; display:inline-flex; align-items:center; gap:0.35rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            <span>Restore Unit Test Sheet</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addInternalEvalColumn()" title="Add custom evaluation column (e.g., Viva, Quiz, Mini-Project)">
+            + Add Assessment Column
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="removeInternalEvalColumn()" title="Remove last custom column">
+            - Remove Column
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addInternalEvalRow()" title="Insert new student row">
+            + Add Student Row
+          </button>
+        </div>
+        <div class="sheet-toolbar-group">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="exportInternalEvalExcel()" title="Export directly to native Microsoft Excel / Google Sheets (.xlsx)" style="font-weight: 700; display:inline-flex; align-items:center; gap:0.35rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Export to Excel (.xlsx)</span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="saveInternalEvalGrid()" title="Save current evaluation state" style="font-weight: 700; display:inline-flex; align-items:center; gap:0.35rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            <span>Save Evaluation</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL BODY: SPREADSHEET TABLE -->
+      <div id="internal-eval-content" style="flex: 1; overflow: auto; padding: 1rem; background: var(--bg-app);">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">Loading internal evaluation data...</div>
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div style="flex-shrink: 0; padding: 0.75rem 1.25rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted);">
+        <div id="eval-modal-status-text">Ready. All edits calculate live. Native Excel (.xlsx) OpenXML binary export.</div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('internal-eval-modal')">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 2-STEP DELETE CONFIRMATION MODAL (Assignment / Class Test)  -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div id="delete-item-modal" class="modal-backdrop" onclick="if(event.target===this)document.getElementById('delete-item-modal').classList.remove('open')">
+    <div class="modal-card" style="max-width: 420px;">
+
+      <!-- STEP 1: Impact Info -->
+      <div id="del-step-1">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 0;">Confirm Deletion</h2>
+          <button onclick="document.getElementById('delete-item-modal').classList.remove('open')" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+        </div>
+        <div style="background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: var(--status-absent); font-size: 0.85rem; margin-bottom: 0.35rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Permanent Action</span>
+          </div>
+          <p id="del-modal-impact" style="font-size: 0.82rem; color: var(--text-main); margin: 0; line-height: 1.5;">This will permanently remove the item.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('delete-item-modal').classList.remove('open')">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="deleteModalNext()">Proceed &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Final Confirmation -->
+      <div id="del-step-2" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--status-absent); margin: 0;">Final Confirmation</h2>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.5;">
+          This action is irreversible. All associated data will be permanently removed.
+        </p>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="deleteModalBack()">&larr; Back</button>
+          <button type="button" id="del-confirm-btn" class="btn" style="background: var(--status-absent); color: var(--bg-card); font-weight: 700; border: none;" onclick="confirmDeleteItem()">Confirm Delete</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="/components/modal/modal.js?v=20261003"></script>
+  <script src="/faculty/registers/registers.js?v=20261003"></script>
+</body>
+</html>

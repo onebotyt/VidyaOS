@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teaching Group Classroom - VidyaOS</title>
+  <meta name="description" content="Google Classroom-style teaching group workspace for faculty.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261003">
+  <link rel="stylesheet" href="/css/variables.css?v=20261003">
+  <link rel="stylesheet" href="/css/layout.css?v=20261003">
+  <link rel="stylesheet" href="/css/components.css?v=20261003">
+  <link rel="stylesheet" href="/css/classroom-nav.css?v=20261003">
+  
+  <link rel="stylesheet" href="/components/modal/modal.css?v=20261003">
+  <link rel="stylesheet" href="/faculty/group-detail/group-detail.css?v=20261011_v3">
+  <script>
+    function openSheetStudio(sheetName) {
+      const gid = (window.S && window.S.groupId) || new URLSearchParams(location.search).get('id') || 1;
+      let url = '/faculty/sheets.html?id=' + encodeURIComponent(gid);
+      if (sheetName) url += '&sheet=' + encodeURIComponent(sheetName);
+      window.location.href = url;
+    }
+    function openLinkedRegister() {
+      const rid = (window.S && window.S.group && window.S.group.register_id);
+      const gid = (window.S && window.S.groupId) || new URLSearchParams(location.search).get('id');
+      if (rid) {
+        window.location.href = '/faculty/registers.html?register=' + encodeURIComponent(rid) + (gid ? '&group=' + encodeURIComponent(gid) : '');
+      } else if (gid) {
+        window.location.href = '/faculty/registers.html?group=' + encodeURIComponent(gid);
+      } else {
+        window.location.href = '/faculty/registers.html';
+      }
+    }
+  </script>
+</head>
+<body class="classroom-page">
+    <!-- Google Classroom Universal Top Menu Bar -->
+    
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <!-- Mobile Center Class Title (Screenshot 2) -->
+      <span class="mobile-header-center-title" id="mobile-nav-class-title">Classroom</span>
+      <a href="/faculty/dashboard.html" class="gc-brand-link" title="Classroom Dashboard">
+        <div class="gc-brand-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+        <div class="gc-brand-title">Classroom</div>
+        <span class="gc-brand-sub">VidyaOS</span>
+      </a>
+      <div class="gc-desktop-divider" aria-hidden="true"></div>
+      <div class="gc-desktop-class-info" id="gc-desktop-class-info">
+        <a href="javascript:void(0)" onclick="switchTab('stream')" class="gc-nav-class-title" id="navbar-class-name">Loading…</a>
+        <span class="gc-nav-class-sub" id="navbar-class-sub"></span>
+      </div>
+      <span class="gc-page-badge" id="dept-header-name" style="display:none;" aria-hidden="true">Classroom Workspace</span>
+      <a href="/faculty/groups.html" class="gc-create-btn back-btn" style="display:none;" aria-hidden="true">&larr; Back to Classes</a>
+    </div>
+
+    <!-- Centered Google Classroom Tabs (Desktop PC View) -->
+    <nav class="gc-nav-center-tabs" id="gc-nav-center-tabs" aria-label="Classroom Navigation">
+      <button type="button" class="gc-nav-tab active" id="tab-btn-stream" onclick="switchTab('stream')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Stream</span>
+      </button>
+      <button type="button" class="gc-nav-tab" id="tab-btn-classwork" onclick="switchTab('classwork')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Classwork</span>
+        <span class="tab-badge" id="tab-cw-count">0</span>
+      </button>
+      <button type="button" class="gc-nav-tab" id="tab-btn-people" onclick="switchTab('people')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>People</span>
+        <span class="tab-badge" id="tab-people-count">0</span>
+      </button>
+      <button type="button" class="gc-nav-tab" id="tab-btn-marks" onclick="switchTab('marks')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Marks</span>
+        <span class="tab-badge" id="tab-marks-count">0</span>
+      </button>
+    </nav>
+    <div class="gc-nav-right">
+      <!-- Mobile Header Right Actions: Theme Toggle + Avatar -->
+      <div class="mobile-header-actions" id="mobile-header-actions">
+        <button type="button" class="mobile-icon-btn" id="btn-theme-toggle-mobile" onclick="toggleAppTheme()" title="Toggle Theme" aria-label="Toggle theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <div class="gc-user-avatar mobile-avatar" id="gc-user-avatar-mobile" onclick="toggleUserProfile(event)" title="Account Profile">T</div>
+      </div>
+
+      <!-- Desktop Classroom Settings Gear & Dropdown -->
+      <div class="gc-desktop-settings-wrap" id="gc-desktop-settings-wrap">
+        <button type="button" class="gc-icon-btn gc-desktop-settings-btn" id="btn-desktop-class-settings" onclick="toggleDesktopClassSettings(event)" title="Class Settings &amp; Modules" aria-label="Class settings">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <div class="desktop-class-settings-dropdown" id="desktop-class-settings-dropdown" style="display:none;">
+          <button type="button" class="settings-menu-item" onclick="openEditGroupModal();closeDesktopClassSettings();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span>Edit Class Details</span>
+          </button>
+          <button type="button" class="settings-menu-item" onclick="openSheetStudio();closeDesktopClassSettings();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+            <span>Unified Sheets Studio</span>
+          </button>
+          <button type="button" class="settings-menu-item" onclick="openLinkedRegister();closeDesktopClassSettings();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Attendance Register</span>
+          </button>
+          <button type="button" class="settings-menu-item" onclick="openPromoteModal();closeDesktopClassSettings();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <span>Promote Cohort</span>
+          </button>
+          <button type="button" class="settings-menu-item" onclick="openClassInfoModal();closeDesktopClassSettings();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>About This Class</span>
+          </button>
+        </div>
+      </div>
+
+      <a href="/faculty/dashboard.html" class="gc-create-btn">
+        <span style="font-size:1.1rem;line-height:1">&#43;</span> Classes Hub
+      </a>
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher(event)" title="Academic Apps &amp; Modules">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="4" r="1.5"/><circle cx="12" cy="4" r="1.5"/><circle cx="20" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="20" cy="12" r="1.5"/><circle cx="4" cy="20" r="1.5"/><circle cx="12" cy="20" r="1.5"/><circle cx="20" cy="20" r="1.5"/></svg>
+      </button>
+      <button type="button" class="gc-icon-btn" onclick="toggleAppTheme()" id="btn-theme-toggle" title="Toggle Theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile(event)" title="Account Profile">T</div>
+
+      <!-- Google Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown">
+        <a href="/faculty/dashboard.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <span>Classes</span>
+        </a>
+        <a href="/faculty/registers.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <span>Registers</span>
+        </a>
+        <a href="/faculty/assignments.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6"/><path d="M9 10h6"/><path d="M9 18h4"/></svg></div>
+          <span>Coursework</span>
+        </a>
+        <a href="/faculty/tests.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <span>Marksheets</span>
+        </a>
+        <a href="/faculty/evaluation.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+          <span>Evaluation</span>
+        </a>
+        <a href="/faculty/reports.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <span>Reports</span>
+        </a>
+        <a href="/faculty/students.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <span>Students</span>
+        </a>
+        <a href="/faculty/timetable.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <span>Timetable</span>
+        </a>
+        <a href="/faculty/leave-approvals.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg></div>
+          <span>Leaves</span>
+        </a>
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/></svg></div>
+          <span>HOD Hub</span>
+        </a>
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg></div>
+          <span>ESP Devices</span>
+        </a>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+          <span>Archive</span>
+        </a>
+      </div>
+
+      <!-- User Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover">
+        <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">T</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">Faculty Member</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">teacher@college.edu</div>
+        <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+        <a href="/faculty/profile.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>My Profile</span>
+        </a>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickPasswordModal()" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-1.5 1.5L14 9l-2-2-4 4 2 2-4 4-2-2-2 2 4 4 6-6 1-1 4-4 2-2z"/><circle cx="7.5" cy="16.5" r="1.5"/></svg>
+          <span>Change Password</span>
+        </button>
+        <a href="/faculty/hod-settings.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Account Settings</span>
+        </a>
+        <button class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);display:flex;align-items:center;justify-content:center;gap:0.4rem;" onclick="logout()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+      <div id="user-nav" class="user-nav" style="display:none;" aria-hidden="true"></div>
+      <span id="brand-role-badge" style="display:none;" aria-hidden="true"></span>
+      <span id="role-badge" style="display:none;" aria-hidden="true"></span>
+      <span id="user-profile-badge" style="display:none;" aria-hidden="true"></span>
+    </div>
+  </header>
+
+  <!-- Backward-compatibility hidden navigation for automated test contracts -->
+  <nav style="display: none !important;" id="top-nav-bar" aria-hidden="true">
+    <a href="/faculty/dashboard.html">Dashboard</a>
+    <a href="/faculty/registers.html" id="nav-reg">Take Attendance &amp; Registers</a>
+    <a href="/faculty/assignments.html" id="nav-assign">Assignments &amp; Coursework</a>
+    <a href="/faculty/tests.html" id="nav-marks">Test Marks &amp; Exams</a>
+    <a href="/faculty/evaluation.html" id="nav-eval">Internal Evaluation</a>
+    <a href="/faculty/reports.html" id="nav-reports">Analytics &amp; Reports</a>
+    <a href="/faculty/profile.html">Profile</a>
+  </nav>
+  <div class="classroom-banner" id="classroom-banner">
+    <div class="classroom-banner-bg"></div>
+    <div class="banner-decor">
+      <!-- Google Classroom Academic Theme Illustration (Desktop & Mobile) -->
+      <div class="banner-illustration" aria-hidden="true">
+        <svg class="banner-illustration-svg" viewBox="0 0 280 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Tilted Yellow Academic Notebook / Folder -->
+          <polygon points="120,20 230,35 190,175 80,158" fill="var(--color-warning, hsl(45, 95%, 52%))" />
+          <polygon points="108,28 120,20 80,158 68,165" fill="hsl(38, 92%, 40%)" opacity="0.9" />
+          <rect x="135" y="48" width="55" height="38" rx="4" fill="hsl(45, 95%, 68%)" opacity="0.65" />
+          <rect x="140" y="96" width="42" height="32" rx="4" fill="hsl(45, 95%, 65%)" opacity="0.5" />
+          <line x1="88" y1="160" x2="188" y2="173" stroke="hsl(45, 95%, 75%)" stroke-width="3" />
+          <!-- Headphone Arch & Wire -->
+          <path d="M75 135 C60 95, 82 45, 140 38 C175 35, 202 58, 215 95" stroke="var(--color-primary-light, hsl(215, 85%, 48%))" stroke-width="7" stroke-linecap="round" fill="none" />
+          <path d="M78 135 C65 100, 85 50, 140 43" stroke="hsl(215, 90%, 65%)" stroke-width="3.5" stroke-linecap="round" fill="none" />
+          <!-- Headphone Earpieces -->
+          <rect x="56" y="120" width="22" height="34" rx="9" fill="hsl(220, 85%, 32%)" />
+          <rect x="60" y="124" width="14" height="26" rx="6" fill="hsl(220, 90%, 20%)" />
+          <rect x="206" y="85" width="22" height="34" rx="9" fill="hsl(220, 85%, 32%)" />
+          <rect x="210" y="89" width="14" height="26" rx="6" fill="hsl(220, 90%, 20%)" />
+          <!-- Audio Cable curving downward -->
+          <path d="M67 154 C67 195, 120 180, 130 220" stroke="var(--color-primary-light, hsl(215, 80%, 45%))" stroke-width="3.5" stroke-linecap="round" fill="none" />
+        </svg>
+      </div>
+    </div>
+    <div class="banner-float-icon" id="banner-icon" style="display:none;" aria-hidden="true">
+      <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" opacity="0.25"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    </div>
+    <div class="banner-actions">
+      <button type="button" class="banner-action-btn" id="btn-edit-group" onclick="openEditGroupModal()" title="Customize class details">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>Customize</span>
+      </button>
+      <button type="button" class="banner-action-btn" onclick="openSheetStudio()" title="Open Unified Sheets Studio">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+        <span>Sheets Studio</span>
+      </button>
+      <button type="button" class="banner-action-btn primary" onclick="openLinkedRegister()" title="Take Attendance Register">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Register</span>
+      </button>
+      <button type="button" class="banner-action-btn" onclick="openPromoteModal()" style="display:none;" id="btn-banner-promote">
+        <span>Promote Cohort</span>
+      </button>
+    </div>
+    <div class="classroom-banner-content">
+      <div class="banner-breadcrumb" style="display:none;" aria-hidden="true"><a href="/faculty/groups.html">Teaching Groups</a><span>&#8250;</span><span id="banner-dept-name">Loading&#8230;</span></div>
+      <h1 class="banner-group-name" id="banner-group-name">Loading&#8230;</h1>
+      <div class="banner-subtitle" id="banner-subtitle">5th Semester</div>
+      <div class="banner-code-pill" id="banner-code-pill" onclick="copyClassInviteCode()" title="Click to copy class invite code">
+        <span class="banner-code-label">Class code:</span>
+        <span class="banner-code-value" id="banner-code-display">&#8212;&#8212;</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </div>
+      <div class="banner-subject-line" id="banner-subject-line" style="display:none;" aria-hidden="true">
+        <span id="banner-subject-name">Subject</span>
+        <span class="banner-chip" id="banner-component-chip">THEORY</span>
+        <span class="banner-chip" id="banner-sem-chip">Sem 5</span>
+        <span class="banner-chip" id="banner-year-chip">Year 3</span>
+        <span class="banner-chip" id="banner-ay-chip">AY 2025-26</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Stream Quick Action Pills (Screenshot 2) -->
+  <div class="mobile-stream-actions" id="mobile-stream-actions">
+    <button type="button" class="stream-pill-btn primary mobile-new-announcement-btn" id="btn-mobile-new-announcement" onclick="openNewAnnouncementModal()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"></path>
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+      </svg>
+      <span>New announcement</span>
+    </button>
+  </div>
+  <!-- Dedicated Sheets & Marksheet Studio Action Bar (Accessible via gear menu & apps launcher) -->
+  <div class="classroom-sheets-bar" id="classroom-sheets-bar" style="display:none !important;" aria-hidden="true">
+    <div class="sheets-bar-inner">
+      <div class="sheets-bar-left">
+        <span class="sheets-bar-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </span>
+        <div class="sheets-bar-titles">
+          <div class="sheets-bar-title">
+            <span>Spreadsheet Studio</span>
+            <span class="sheets-bar-badge">All-In-One Workspace</span>
+          </div>
+          <div class="sheets-bar-sub">Unified multi-sheet console with instant tab switching between Marksheets, Coursework &amp; Evaluation</div>
+        </div>
+      </div>
+      <div class="sheets-bar-actions">
+        <button type="button" class="sheets-bar-btn" onclick="openSheetStudio('tests')" title="Open Class Test Marksheet &amp; Questions in unified multi-sheet console">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+          <span>Open Mark's Excel Sheet</span>
+        </button>
+        <button type="button" class="sheets-bar-btn" onclick="openSheetStudio('assignments')" title="Open Assignment &amp; Practical Marksheet in unified multi-sheet console">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Open Assignment Excel Sheet</span>
+        </button>
+        <button type="button" class="sheets-bar-btn" onclick="openSheetStudio('evaluation')" title="Open Master Internal Evaluation Sheet (Formula &amp; Grading) in unified multi-sheet console">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          <span>Open Evaluation Sheet</span>
+        </button>
+        <button type="button" class="sheets-bar-btn" onclick="openSheetStudio('attendance')" title="Open Monthly Attendance Ledger Matrix in unified multi-sheet console">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Open Attendance Sheet</span>
+        </button>
+        <button type="button" class="sheets-bar-btn primary" onclick="openSheetStudio()" title="Launch Unified All-in-One Multi-Sheet Workspace">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+          <span>Unified Studio</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <main class="classroom-body">
+    <div id="tab-stream" class="tab-pane">
+      <div class="stream-layout">
+        <div>
+          <div class="compose-box">
+            <div class="compose-header">
+              <div class="compose-avatar" id="compose-av-initials">GD</div>
+              <textarea id="stream-compose-text" class="compose-textarea" placeholder="Announce something to your class&#8230;" rows="2" oninput="autoResizeTA(this);updateComposeState()"></textarea>
+            </div>
+            <input type="file" id="compose-stream-file" style="display:none;" onchange="handleComposeStreamFileSelect(this)">
+            <div id="compose-attachment-preview" class="announcement-attachment-preview" style="display:none;padding:0 1.25rem 0.5rem;">
+              <div class="attachment-preview-card">
+                <span class="file-ext-badge" id="compose-preview-badge">DOC</span>
+                <div class="attachment-preview-meta">
+                  <span class="attachment-preview-name" id="compose-preview-name">filename.pdf</span>
+                  <span class="attachment-preview-size" id="compose-preview-size">0 KB</span>
+                </div>
+                <button type="button" class="attachment-remove-btn" onclick="clearComposeStreamFile()" title="Remove file" aria-label="Remove attachment">&#10005;</button>
+              </div>
+            </div>
+            <div class="compose-toolbar" id="compose-toolbar" style="display:none">
+              <div class="compose-tools">
+                <button class="compose-tool-btn" onclick="showToast('Video coming soon')" title="Attach Video">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                </button>
+                <button class="compose-tool-btn" onclick="ById('compose-stream-file').click()" title="Attach Document or File">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                </button>
+                <button class="compose-tool-btn" onclick="showToast('Link insertion coming soon')" title="Insert Link">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </button>
+              </div>
+              <div style="display:flex;align-items:center;gap:.5rem">
+                <button class="compose-cancel" onclick="clearCompose()">Cancel</button>
+                <button class="compose-post-btn" id="btn-post-ann" onclick="postAnnouncement()" disabled>Post</button>
+              </div>
+            </div>
+          </div>
+          <div id="stream-feed">
+            <div class="shimmer" style="height:100px;margin-bottom:1rem"></div>
+            <div class="shimmer" style="height:80px;margin-bottom:1rem"></div>
+          </div>
+        </div>
+        <aside class="stream-sidebar">
+          <div class="sidebar-card">
+            <div class="sidebar-card-hdr">Class Invite Code</div>
+            <div class="sidebar-card-body">
+              <div class="invite-code-display" id="sidebar-invite-code" onclick="copyInviteCode()" title="Click to copy">&#8212;&#8212;</div>
+              <div class="copy-hint">Click code to copy</div>
+              <button class="btn btn-secondary" style="width:100%;margin-top:.75rem;font-size:.8rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;" onclick="copyInviteCode()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span>Copy Invite Link</span>
+              </button>
+            </div>
+          </div>
+          <div class="sidebar-card">
+            <div class="sidebar-card-hdr">Group Overview</div>
+            <div class="sidebar-card-body" style="padding:.75rem 1rem">
+              <div class="stat-row"><span class="stat-label">Students Enrolled</span><span class="stat-value accent" id="stat-enrolled">&#8212;</span></div>
+              <div class="stat-row"><span class="stat-label">Assignments</span><span class="stat-value" id="stat-assignments">&#8212;</span></div>
+              <div class="stat-row"><span class="stat-label">Tests Scheduled</span><span class="stat-value" id="stat-tests">&#8212;</span></div>
+              <div class="stat-row"><span class="stat-label">Avg. Attendance</span><span class="stat-value success" id="stat-attendance">&#8212;</span></div>
+              <div class="stat-row"><span class="stat-label">Register ID</span><span class="stat-value" id="stat-register-id">&#8212;</span></div>
+            </div>
+          </div>
+          <div class="sidebar-card">
+            <div class="sidebar-card-hdr">Quick Actions</div>
+            <div class="sidebar-card-body" style="padding:.5rem .75rem">
+              <div class="quick-action-list">
+                <button class="qa-item" onclick="switchTab('classwork');setTimeout(openCreateAssignmentModal,100)">
+                  <span class="qa-icon" style="display:inline-flex;align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </span>
+                  <span>Create Assignment</span>
+                </button>
+                <button class="qa-item" onclick="switchTab('classwork');setTimeout(openScheduleTestModal,100)">
+                  <span class="qa-icon" style="display:inline-flex;align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  </span>
+                  <span>Schedule Class Test</span>
+                </button>
+                <button class="qa-item" onclick="openSheetStudio('evaluation')">
+                  <span class="qa-icon" style="display:inline-flex;align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+                  </span>
+                  <span>Sheets Studio (All Sheets)</span>
+                </button>
+                <button class="qa-item" onclick="openLinkedRegister()">
+                  <span class="qa-icon" style="display:inline-flex;align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                  </span>
+                  <span>Open Attendance Register</span>
+                </button>
+                <button class="qa-item" onclick="switchTab('people');setTimeout(()=>document.getElementById('add-enroll-input').focus(),100)">
+                  <span class="qa-icon" style="display:inline-flex;align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                  </span>
+                  <span>Add Student</span>
+                </button>
+                <button class="qa-item" onclick="openPromoteModal()">
+                  <span class="qa-icon" style="display:inline-flex;align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                  </span>
+                  <span>Promote Cohort</span>
+                </button>
+                <button class="qa-item" onclick="openArchiveModal()" style="color:var(--status-absent)">
+                  <span class="qa-icon" style="display:inline-flex;align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                  </span>
+                  <span>Archive Group</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           ANNOUNCEMENT DETAIL & CLASS COMMENTS VIEW (Screenshot 3)
+           ══════════════════════════════════════════════════════════════ -->
+      <div class="announcement-detail-view" id="announcement-detail-view" style="display:none;">
+        <div class="detail-header-bar">
+          <button type="button" class="detail-back-btn" onclick="closeAnnouncementDetail()" title="Back to Stream" aria-label="Back">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+          <div class="detail-header-spacer"></div>
+          <button type="button" class="detail-overflow-btn" onclick="toggleDetailOverflow(event)" title="Options" aria-label="Options">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1.5"></circle>
+              <circle cx="12" cy="5" r="1.5"></circle>
+              <circle cx="12" cy="19" r="1.5"></circle>
+            </svg>
+          </button>
+        </div>
+
+        <div class="detail-content-wrap">
+          <!-- Announcement Post Card -->
+          <div class="detail-post-card" id="detail-post-card">
+            <!-- Dynamically populated in openAnnouncementDetail -->
+          </div>
+
+          <!-- Class Comments Section (Screenshot 3) -->
+          <div class="detail-comments-container">
+            <h2 class="detail-comments-heading">Class comments</h2>
+            <div class="detail-comments-list" id="detail-comments-list">
+              <div class="detail-no-comments">No comments</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Bottom Capsule Comment Input Bar (Screenshot 3) -->
+        <div class="detail-bottom-composer">
+          <div class="detail-composer-pill">
+            <input type="text" id="detail-comment-input" class="detail-comment-input" placeholder="Add class comment" onkeydown="if(event.key==='Enter')submitDetailComment()">
+            <button type="button" class="detail-send-btn" id="btn-detail-send" onclick="submitDetailComment()" title="Send comment" aria-label="Send">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="tab-classwork" class="tab-pane" style="display:none">
+      <div class="classwork-layout">
+        <!-- Mobile Classwork Filter Bar (Opens Filter Modal instead of horizontal scrolling) -->
+        <div class="cw-mobile-filter-bar" id="cw-mobile-filter-bar">
+          <button type="button" class="cw-mobile-filter-btn" id="btn-cw-filter-modal" onclick="openWorkFilterModal()">
+            <div class="cw-mobile-filter-btn-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              <span>Filter: <strong id="cw-mobile-filter-label">All Work</strong></span>
+            </div>
+            <div class="cw-mobile-filter-btn-right">
+              <span class="cw-filter-count-chip" id="cw-mobile-filter-count">0</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        <div class="cw-categories">
+          <div class="cw-cat-hdr">Filter</div>
+          <div class="cw-cat-item active" id="cwcat-all" onclick="filterCW('all')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            <span>All Work</span>
+          </div>
+          <div class="cw-cat-item" id="cwcat-assignments" onclick="filterCW('assignments')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Assignments</span>
+          </div>
+          <div class="cw-cat-item" id="cwcat-practicals" onclick="filterCW('practicals')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/><line x1="6.5" y1="15" x2="17.5" y2="15"/></svg>
+            <span>Lab Practical</span>
+          </div>
+          <div class="cw-cat-item" id="cwcat-finaldocs" onclick="filterCW('finaldocs')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Final Documents</span>
+          </div>
+          <div class="cw-cat-item" id="cwcat-tests" onclick="filterCW('tests')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            <span>Class Tests</span>
+          </div>
+          <div class="cw-cat-item" id="cwcat-materials" onclick="filterCW('materials')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+            <span>Materials</span>
+          </div>
+        </div>
+        <div class="cw-main">
+          <div class="cw-toolbar">
+            <div style="font-size:.9rem;font-weight:700;color:var(--text-main)" id="cw-section-title">All Classwork</div>
+            <div class="cw-dd-wrap" id="cw-dd-wrap">
+              <button class="cw-create-btn" onclick="toggleCWDrop()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Create</span>
+              </button>
+              <div class="cw-dd-menu" id="cw-dd-menu" style="display:none">
+                <div class="cw-dd-item" onclick="openCreateAssignmentModal();closeCWDrop()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                  <span>Assignment</span>
+                </div>
+                <div class="cw-dd-item" id="cw-dd-practical-item" onclick="openCreatePracticalModal();closeCWDrop()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/><line x1="6.5" y1="15" x2="17.5" y2="15"/></svg>
+                  <span>Lab Practical</span>
+                </div>
+                <div class="cw-dd-item" onclick="openFinalDocsModal();closeCWDrop()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  <span>Final Documents Request</span>
+                </div>
+                <div class="cw-dd-item" onclick="openScheduleTestModal();closeCWDrop()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                  <span>Class Test</span>
+                </div>
+                <div class="cw-dd-item" onclick="showToast('Material coming soon');closeCWDrop()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+                  <span>Material</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="classwork-list">
+            <div class="shimmer" style="height:88px;margin-bottom:1rem"></div>
+            <div class="shimmer" style="height:88px;margin-bottom:1rem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="tab-people" class="tab-pane" style="display:none">
+      <div class="people-layout">
+        <div class="invite-section">
+          <div class="invite-info">
+            <h3>Class Invite Code</h3>
+            <p>Share this 6-digit code with students to join this teaching group, or share the direct invite link.</p>
+          </div>
+          <div class="invite-copy-area">
+            <div class="invite-code-big" id="people-invite-code">&#8212;&#8212;</div>
+            <button class="btn btn-primary" style="font-size:.8rem;display:inline-flex;align-items:center;gap:0.4rem;" onclick="copyInviteCode()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy Invite Link</span>
+            </button>
+          </div>
+        </div>
+        <div class="add-student-bar">
+          <span style="font-size:.88rem;font-weight:700;color:var(--text-main);white-space:nowrap">Add Student:</span>
+          <input type="text" id="add-enroll-input" class="add-student-input" placeholder="Enter Enrollment No. (e.g. 2024IT011)">
+          <button class="btn btn-primary" style="font-size:.83rem;white-space:nowrap" onclick="addStudentByEnroll()">+ Add</button>
+          <button class="btn btn-secondary" style="font-size:.83rem;white-space:nowrap;display:inline-flex;align-items:center;gap:0.4rem;" onclick="openAddUnenrolledModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Add from Cohort</span>
+          </button>
+        </div>
+        <div>
+          <div class="people-sec-hdr"><span class="people-sec-title">Teacher</span></div>
+          <div class="people-list" id="teacher-list"><div class="shimmer" style="height:60px"></div></div>
+        </div>
+        <div>
+          <div class="people-sec-hdr">
+            <span class="people-sec-title">Students</span>
+            <span class="people-sec-count" id="students-count-label">0 students</span>
+          </div>
+          <div class="people-list" id="students-list">
+            <div class="shimmer" style="height:60px;margin-bottom:.5rem"></div>
+            <div class="shimmer" style="height:60px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="tab-marks" class="tab-pane" style="display:none">
+      <div class="marks-layout">
+        <div class="kpi-strip">
+          <div class="kpi-card"><div class="kpi-label">Tests Conducted</div><div class="kpi-value blue" id="kpi-tests">0</div><div class="kpi-sub">scheduled exams</div></div>
+          <div class="kpi-card"><div class="kpi-label">Students</div><div class="kpi-value" id="kpi-students">0</div><div class="kpi-sub">enrolled in group</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg. Score</div><div class="kpi-value green" id="kpi-avg-score">&#8212;</div><div class="kpi-sub">across all tests</div></div>
+          <div class="kpi-card"><div class="kpi-label">Pending Grading</div><div class="kpi-value" id="kpi-pending">&#8212;</div><div class="kpi-sub">to grade</div></div>
+        </div>
+        <div class="marks-hdr-bar">
+          <div>
+            <div style="font-size:1rem;font-weight:800;color:var(--text-main)">Marksheets &amp; Test Results</div>
+            <div style="font-size:.8rem;color:var(--text-muted)">Select a class test to enter or review student marks.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+            <button class="btn btn-secondary" onclick="openSheetStudio('tests')" style="display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem" title="Open full-page multi-sheet studio">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+              <span>Open in Sheets Studio</span>
+            </button>
+            <button class="btn btn-primary" onclick="openScheduleTestModal()" style="display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>Schedule New Test</span>
+            </button>
+          </div>
+        </div>
+        <div class="marks-table-wrap">
+          <div class="marks-table-toolbar">
+            <span style="font-size:.95rem;font-weight:700;color:var(--text-main)">Class Test Schedule</span>
+            <input type="text" placeholder="Search tests&#8230;" style="padding:.4rem .75rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-main);font-size:.82rem;width:200px" oninput="filterMarksTable(this.value)">
+          </div>
+          <div style="overflow-x:auto">
+            <table class="marks-table" id="marks-tests-table">
+              <thead><tr><th>#</th><th>Test Name</th><th>Date</th><th>Max Marks</th><th>Graded</th><th>Avg Score</th><th>Pass %</th><th style="text-align:right">Actions</th></tr></thead>
+              <tbody id="marks-tests-tbody"><tr><td colspan="8" style="text-align:center;padding:2rem"><div class="shimmer" style="height:20px;width:300px;margin:0 auto"></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="gd-toast"></div>
+  <div class="modal-backdrop" id="modal-create-assignment">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.45rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>Create Assignment</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-create-assignment')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Assignment No *</label>
+            <select class="form-select" id="assign-num" onchange="onAssignNumChange(this.value)">
+              <option value="1" selected>Assignment 1 (A1)</option>
+              <option value="2">Assignment 2 (A2)</option>
+              <option value="3">Assignment 3 (A3)</option>
+              <option value="4">Assignment 4 (A4)</option>
+              <option value="5">Assignment 5 (A5)</option>
+              <option value="6">Assignment 6 (A6)</option>
+              <option value="7">Assignment 7 (A7)</option>
+              <option value="8">Assignment 8 (A8)</option>
+              <option value="CUSTOM">Custom / Other</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Assignment Title *</label>
+            <input type="text" class="form-input" id="assign-title" required placeholder="e.g. Assignment 1: SQL Normalization">
+          </div>
+        </div>
+        <div class="form-field"><label class="form-label">Instructions</label><textarea class="form-textarea" id="assign-desc" placeholder="Detailed instructions&#8230;"></textarea></div>
+        <div class="form-grid-2">
+          <div class="form-field"><label class="form-label">Due Date</label><input type="date" class="form-input" id="assign-due"></div>
+          <div class="form-field"><label class="form-label">Maximum Marks *</label><input type="number" class="form-input" id="assign-marks" required value="100" min="1" max="200"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-create-assignment')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCreateAssignment()" style="display:inline-flex;align-items:center;gap:0.4rem">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span>Publish</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE PRACTICAL WORK MODAL -->
+  <div class="modal-backdrop" id="modal-create-practical">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.45rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.65 18.23A2 2 0 0 0 6.38 21h11.24a2 2 0 0 0 1.73-2.77L14 9.31V2"/></svg>
+          <span>Practical Work / Lab Experiment</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-create-practical')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label class="form-label">Practical / Lab Title *</label>
+          <input type="text" class="form-input" id="practical-title" required placeholder="e.g. Lab Experiment 1: SQL Join Operations & Indexing">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Lab Instructions & Announcement *</label>
+          <textarea class="form-textarea" id="practical-desc" rows="4" placeholder="Enter practical guidelines, experiment problem statement, execution steps, viva questions..."></textarea>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Lab Due Date</label>
+            <input type="date" class="form-input" id="practical-due">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Maximum Marks</label>
+            <input type="number" class="form-input" id="practical-marks" value="25" min="1" max="100">
+          </div>
+        </div>
+        <div class="form-field" style="margin-top: 0.5rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; color: var(--text-main);">
+            <input type="checkbox" id="practical-post-stream" checked>
+            <span style="display:inline-flex;align-items:center;gap:0.4rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+              <span>Automatically post announcement to classroom stream</span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-create-practical')">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-practical" onclick="submitCreatePractical()" style="display:inline-flex;align-items:center;gap:0.4rem">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.65 18.23A2 2 0 0 0 6.38 21h11.24a2 2 0 0 0 1.73-2.77L14 9.31V2"/></svg>
+          <span>Publish Practical Work</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE FINAL DOCUMENTS REQUEST MODAL -->
+  <div class="modal-backdrop" id="modal-create-finaldocs">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.5rem">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>Final Documents Request</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-create-finaldocs')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label class="form-label">Request Title *</label>
+          <input type="text" class="form-input" id="finaldocs-title" required value="Semester-End Final Academic Documents Submission">
+        </div>
+        <div class="form-field">
+          <label class="form-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Required Documents Checklist</span>
+            <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal">Students upload each item individually</span>
+          </label>
+          <div style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.75rem">
+            <div id="finaldocs-req-items" style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:0.6rem"></div>
+            <div style="display:flex;gap:0.5rem;align-items:center">
+              <input type="text" id="finaldocs-new-req-input" class="form-input" placeholder="Type document name (e.g. Viva Voce Report)..." style="font-size:0.84rem;padding:0.5rem 0.75rem" onkeydown="if(event.key==='Enter'){event.preventDefault();addFinalDocRequirement();}">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addFinalDocRequirement()" style="white-space:nowrap;display:inline-flex;align-items:center;gap:0.35rem">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Add</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Submission Guidelines &amp; Instructions</label>
+          <textarea class="form-textarea" id="finaldocs-desc" rows="3" placeholder="e.g. Ensure all documents are merged in order, legible PDF format with roll number clearly watermarked on page 1."></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Final Deadline (Optional)</label>
+          <input type="date" class="form-input" id="finaldocs-due">
+        </div>
+        <div class="form-field" style="margin-top: 0.5rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; color: var(--text-main);">
+            <input type="checkbox" id="finaldocs-post-stream" checked>
+            <span style="display:inline-flex;align-items:center;gap:0.4rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+              <span>Automatically post notice to classroom stream</span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-create-finaldocs')">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-finaldocs" onclick="submitCreateFinalDocs()" style="display:inline-flex;align-items:center;gap:0.4rem">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>Request Final Documents</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT CLASSWORK ITEM MODAL -->
+  <div class="modal-backdrop" id="modal-edit-classwork">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.5rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span id="edit-work-modal-heading">Edit Classwork</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-edit-classwork')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-work-id">
+        <input type="hidden" id="edit-work-type">
+
+        <div class="form-field">
+          <label class="form-label">Title *</label>
+          <input type="text" class="form-input" id="edit-work-title" required>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Description / Instructions</label>
+          <textarea class="form-textarea" id="edit-work-desc" rows="3"></textarea>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label" id="edit-work-date-label">Due Date (Optional)</label>
+            <input type="date" class="form-input" id="edit-work-due">
+          </div>
+          <div class="form-field" id="edit-work-marks-wrap">
+            <label class="form-label">Maximum Marks</label>
+            <input type="number" class="form-input" id="edit-work-marks" min="0" max="500">
+          </div>
+        </div>
+
+        <!-- Dynamic Requirements List for Final Documents in Edit Modal -->
+        <div class="form-field" id="edit-work-req-container" style="display:none">
+          <label class="form-label" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Required Documents Checklist</span>
+            <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal">Edit or add document requirements</span>
+          </label>
+          <div style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.75rem">
+            <div id="edit-finaldocs-req-items" style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:0.6rem"></div>
+            <div style="display:flex;gap:0.5rem;align-items:center">
+              <input type="text" id="edit-finaldocs-new-req-input" class="form-input" placeholder="Type document name..." style="font-size:0.84rem;padding:0.5rem 0.75rem" onkeydown="if(event.key==='Enter'){event.preventDefault();addEditFinalDocRequirement();}">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addEditFinalDocRequirement()" style="white-space:nowrap;display:inline-flex;align-items:center;gap:0.35rem">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Add</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-edit-classwork')">Cancel</button>
+        <button class="btn btn-primary" id="btn-save-edit-work" onclick="submitEditWork()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIRECT 1-STEP DELETE CONFIRMATION MODAL -->
+  <div class="modal-backdrop" id="modal-delete-work-direct">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.5rem;color:var(--status-absent)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--status-absent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Delete <span id="del-work-type-label">Classwork</span></span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-delete-work-direct')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.95rem;color:var(--text-main);line-height:1.5;margin:0.25rem 0 0.75rem 0;">
+          Are you sure you want to delete <strong id="del-work-title" style="color:var(--text-main)">this item</strong>?
+        </p>
+        <label style="display:flex;align-items:center;gap:0.6rem;padding:0.65rem 0.85rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);cursor:pointer;font-size:0.85rem;color:var(--text-main);user-select:none;">
+          <input type="checkbox" id="del-work-delete-files" checked style="width:16px;height:16px;accent-color:var(--status-absent);cursor:pointer;">
+          <span style="font-weight:500;">Delete related files and student submission records</span>
+        </label>
+      </div>
+      <div class="modal-footer" style="margin-top:0.75rem;display:flex;justify-content:flex-end;gap:0.6rem;">
+        <button class="btn btn-secondary" onclick="closeModal('modal-delete-work-direct')">Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-delete-work" onclick="confirmDirectDeleteWork()" style="background:var(--status-absent);border-color:var(--status-absent);color:var(--text-white);font-weight:700;">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="modal-schedule-test">
+    <div class="modal-card" style="max-width:560px">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:.45rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Schedule Class Test</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-schedule-test')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Test Type &amp; Number *</label>
+            <div style="display:flex;gap:0.4rem;">
+              <select class="form-select" id="test-unit-type" onchange="onTestTypeOrNumChange()" style="flex:1;">
+                <option value="UT" selected>Unit Test (UT)</option>
+                <option value="CT">Class Test (CT)</option>
+                <option value="MT">Mid-Term Exam (MT)</option>
+                <option value="PB">Pre-Board Exam (PB)</option>
+                <option value="CUSTOM">Custom / Other</option>
+              </select>
+              <input type="number" class="form-input" id="test-number-input" min="1" max="99" value="1" placeholder="No." oninput="onTestTypeOrNumChange()" style="width:75px;text-align:center;font-weight:700;">
+              <input type="hidden" id="test-unit-no" value="UT1">
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Test Title *</label>
+            <input type="text" class="form-input" id="test-title" required value="Unit Test 1" placeholder="e.g. Unit Test 1: SQL Basics">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Test Date *</label>
+            <input type="date" class="form-input" id="test-date" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Maximum Marks *</label>
+            <input type="number" class="form-input" id="test-marks" required value="20" min="1" max="500" oninput="updateScheduleTestQPreview()">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label class="form-label">Number of Questions *</label>
+            <input type="number" class="form-input" id="test-num-questions" required value="4" min="1" max="50" oninput="updateScheduleTestQPreview()">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Marks Per Question</label>
+            <div id="test-marks-per-q-display" style="padding:.5rem .75rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-weight:700;color:var(--color-primary);font-size:.85rem;min-height:38px;display:flex;align-items:center">
+              5 pts / question
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Breakdown Preview -->
+        <div style="margin-bottom:1rem;padding:.75rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+            <span style="font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em">Marks Breakdown Preview</span>
+            <span id="test-q-summary-badge" style="font-size:.75rem;font-weight:700;color:var(--color-primary)">4 questions • 20 marks total</span>
+          </div>
+          <div id="test-schedule-q-chips" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Description (optional)</label>
+          <textarea class="form-textarea" id="test-desc" placeholder="Topics covered&#8230;" style="min-height:65px"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-schedule-test')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitScheduleTest()" style="display:inline-flex;align-items:center;gap:0.4rem">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Schedule Test</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="modal-enter-marks">
+    <div class="modal-card" style="max-width:1100px;width:95vw">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="marks-modal-title" style="display:flex;align-items:center;gap:.45rem">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            <span>Enter Marks</span>
+          </h3>
+          <div id="marks-modal-meta" style="font-size:.8rem;color:var(--text-muted);margin-top:.15rem"></div>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('modal-enter-marks')">&#10005;</button>
+      </div>
+
+      <!-- Minimalist Toolbar: Add/Remove Question, Columns Filter, Excel / Normal Table View Mode & Multi-Format Export -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 1.25rem;background:var(--bg-surface);border-bottom:1px solid var(--border-color);gap:.75rem;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:.35rem;flex-wrap:wrap">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addModalQuestion()" style="font-size:.74rem;padding:.2rem .55rem;font-weight:600" title="Add another question column">+ Add Question</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="removeModalQuestion()" style="font-size:.74rem;padding:.2rem .55rem;font-weight:600" id="btn-remove-q" title="Remove last question column">− Remove Question</button>
+          
+          <!-- Columns Visibility Filter Dropdown (hide SR, Enrollment, Reg by default to save space) -->
+          <div style="position:relative;display:inline-block" id="marks-col-filter-wrapper">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-marks-col-filter" onclick="toggleMarksColFilterMenu(event)" style="font-size:.74rem;padding:.2rem .55rem;font-weight:600;display:inline-flex;align-items:center;gap:0.35rem" title="Filter columns: Show/Hide SR. NO., Enrollment No., Registration No.">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg>
+              <span>Columns</span>
+              <span id="marks-col-filter-count" class="badge badge-primary" style="font-size:0.68rem;padding:0.1rem 0.35rem;display:none">0</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div id="marks-col-filter-dropdown" class="dropdown-menu" style="display:none;position:absolute;left:0;top:100%;margin-top:0.3rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:100;min-width:185px;padding:0.4rem 0">
+              <div style="padding:0.25rem 0.75rem 0.35rem;font-size:0.72rem;font-weight:700;color:var(--text-muted);border-bottom:1px solid var(--border-color)">COLUMN VISIBILITY</div>
+              <label style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;cursor:pointer;font-size:0.78rem;color:var(--text-main);user-select:none" class="dropdown-item">
+                <input type="checkbox" id="chk-show-sr" onchange="toggleMarksColumn('srNo', this.checked)">
+                <span>Show SR. NO.</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;cursor:pointer;font-size:0.78rem;color:var(--text-main);user-select:none" class="dropdown-item">
+                <input type="checkbox" id="chk-show-enroll" onchange="toggleMarksColumn('enrollmentNo', this.checked)">
+                <span>Show Enrollment No.</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;cursor:pointer;font-size:0.78rem;color:var(--text-main);user-select:none" class="dropdown-item">
+                <input type="checkbox" id="chk-show-reg" onchange="toggleMarksColumn('registrationNo', this.checked)">
+                <span>Show Registration No.</span>
+              </label>
+              <div style="padding:0.3rem 0.75rem;font-size:0.7rem;color:var(--text-muted);border-top:1px solid var(--border-color);background:var(--bg-surface)">
+                * SR. NO. is always included when exporting
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+          <div class="view-mode-toggle">
+            <button type="button" id="btn-view-excel" class="view-mode-btn" onclick="setMarksModalView('excel')" title="Excel Ledger format matching Attendance Register" style="display:inline-flex;align-items:center;gap:0.35rem">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+              <span>Excel Sheet</span>
+            </button>
+            <button type="button" id="btn-view-table" class="view-mode-btn" onclick="setMarksModalView('table')" title="Compact normal list table" style="display:inline-flex;align-items:center;gap:0.35rem">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Normal Table</span>
+            </button>
+          </div>
+          <button type="button" id="btn-set-default-view" class="btn btn-secondary btn-sm" onclick="saveCurrentViewAsDefault()" style="font-size:.74rem;padding:.2rem .55rem;display:inline-flex;align-items:center;gap:0.35rem" title="Save this view as your preferred default">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Set as Default</span>
+          </button>
+
+          <!-- Export Dropdown (Excel, PDF, Word DOC) -->
+          <div style="position:relative;display:inline-block" id="marks-export-wrapper">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-marks-export" onclick="toggleMarksExportMenu(event)" style="font-size:.74rem;padding:.2rem .6rem;font-weight:700;display:inline-flex;align-items:center;gap:0.35rem;color:var(--status-present)" title="Export marksheet in multiple formats">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Export</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div id="marks-export-dropdown" class="dropdown-menu" style="display:none;position:absolute;right:0;top:100%;margin-top:0.3rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:100;min-width:190px;padding:0.4rem 0">
+              <button type="button" onclick="exportGroupTestMarks('excel')" style="width:100%;text-align:left;display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.75rem;background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--text-main);font-family:inherit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--status-present)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Excel Spreadsheet (.xlsx)</span>
+              </button>
+              <button type="button" onclick="exportGroupTestMarks('pdf')" style="width:100%;text-align:left;display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.75rem;background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--text-main);font-family:inherit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--status-absent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>
+                <span>PDF Document (.pdf)</span>
+              </button>
+              <button type="button" onclick="exportGroupTestMarks('doc')" style="width:100%;text-align:left;display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.75rem;background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--text-main);font-family:inherit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Word Document (.doc)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding:0">
+        <div class="marks-scroll-container" id="marks-table-viewport">
+          <table class="marks-table" id="marks-entry-table">
+            <thead id="marks-entry-thead">
+              <tr id="marks-table-header-row"></tr>
+            </thead>
+            <tbody id="marks-entry-tbody"></tbody>
+            <tfoot id="marks-entry-tfoot"></tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:.82rem;color:var(--text-muted)">
+          Total Maximum Marks: <strong id="marks-footer-max" style="color:var(--color-primary);font-size:.95rem">20</strong> • Sum calculates automatically
+        </div>
+        <div style="display:flex;gap:.65rem">
+          <button class="btn btn-secondary" onclick="closeModal('modal-enter-marks')">Cancel</button>
+          <button class="btn btn-primary" id="btn-save-marks-entry" onclick="saveMarksEntry()" style="display:inline-flex;align-items:center;gap:0.4rem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Save Marks</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="modal-archive">
+    <div class="modal-card" style="max-width:460px">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.45rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+          <span>Archive Teaching Group</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-archive')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--status-late-bg);border-left:4px solid var(--status-late);padding:.85rem;border-radius:var(--radius-sm);margin-bottom:1rem;font-size:.85rem;line-height:1.5;color:var(--text-main)"><strong>Data Preservation Guarantee:</strong> All attendance, submissions, marks remain permanently in read-only mode.</div>
+        <p style="font-size:.9rem;color:var(--text-main);font-weight:600;margin-top:1rem">Archive <span id="archive-group-name-confirm" style="color:var(--color-primary)"></span>?</p>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-archive')">Cancel</button><button class="btn" style="background:var(--status-absent);color:var(--text-white)" onclick="executeArchive()">Confirm &amp; Archive</button></div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Class Settings -->
+  <div class="modal-backdrop" id="modal-edit-group" style="display:none">
+    <div class="modal-card" style="max-width:500px">
+      <div class="modal-header">
+        <h3 class="modal-title" style="margin:0;font-size:1.1rem;font-weight:700;color:var(--text-main);display:flex;align-items:center;gap:.5rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Edit Class Settings</span>
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-edit-group')">&#10005;</button>
+      </div>
+      <div class="modal-body" style="padding:1.25rem">
+        <form id="edit-group-form" onsubmit="submitEditGroup(event)">
+          <input type="hidden" id="edit-group-id">
+          <div style="margin-bottom:1rem">
+            <label style="display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem;color:var(--text-main)">Class Name *</label>
+            <input type="text" id="edit-group-name" required style="width:100%;padding:.6rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-main);box-sizing:border-box">
+          </div>
+          <div style="margin-bottom:1rem">
+            <label style="display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem;color:var(--text-main)">Subject Name *</label>
+            <input type="text" id="edit-group-subject" required style="width:100%;padding:.6rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-main);box-sizing:border-box">
+          </div>
+          <div style="margin-bottom:1.25rem">
+            <label style="display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem;color:var(--text-main)">Academic Component *</label>
+            <select id="edit-group-component" style="width:100%;padding:.6rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-main);box-sizing:border-box">
+              <option value="THEORY">THEORY (Lecture Register)</option>
+              <option value="PRACTICAL">PRACTICAL (Lab Work)</option>
+            </select>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:.75rem">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit-group')">Cancel</button>
+            <button type="submit" id="btn-save-edit-group" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Unenrolled Students from Cohort -->
+  <div class="modal-backdrop" id="modal-add-unenrolled" style="display:none">
+    <div class="modal-card" style="max-width:650px;max-height:90vh">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" style="margin:0;font-size:1.1rem;font-weight:700;color:var(--text-main);display:flex;align-items:center;gap:.5rem">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Add Students from Cohort</span>
+          </h3>
+          <div style="font-size:.8rem;color:var(--text-muted);margin-top:.15rem">Only students not yet enrolled in this group are shown.</div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-add-unenrolled')">&#10005;</button>
+      </div>
+      <div class="modal-body" style="padding:1.25rem;overflow-y:auto">
+        <div style="margin-bottom:1rem">
+          <input type="text" id="search-unenrolled-input" placeholder="Search by name, roll, or enrollment no..." oninput="filterUnenrolledStudents()" style="width:100%;padding:.55rem .85rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-main);font-size:.85rem;box-sizing:border-box">
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+          <div style="font-size:.8rem;font-weight:700;color:var(--text-muted)">Available Students: <span id="unenrolled-count">0</span></div>
+          <label style="font-size:.8rem;font-weight:600;color:var(--color-primary);cursor:pointer;display:flex;align-items:center;gap:.35rem">
+            <input type="checkbox" id="unenrolled-select-all" onchange="toggleUnenrolledSelectAll(this.checked)">
+            <span>Select All</span>
+          </label>
+        </div>
+        <div style="max-height:280px;overflow-y:auto;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card)">
+          <table class="marks-table" style="margin:0">
+            <thead>
+              <tr>
+                <th style="width:40px;text-align:center"></th>
+                <th style="width:50px">Roll</th>
+                <th>Student Name</th>
+                <th>Enrollment No</th>
+                <th style="text-align:right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="unenrolled-checklist-tbody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add-unenrolled')">Cancel</button>
+          <button type="button" id="btn-batch-enroll-unenrolled" class="btn btn-primary" onclick="submitBatchEnrollUnenrolled()" disabled>+ Enroll Selected (<span id="unenrolled-selected-tally">0</span>)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- 2-STEP DELETE & REMOVE CONFIRMATION MODAL (ZERO NATIVE ALERTS) -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="modal-backdrop" id="modal-confirm-delete" style="display:none" onclick="if(event.target===this)closeModal('modal-confirm-delete')">
+    <div class="modal-card" style="max-width:480px">
+      <!-- STEP 1: Impact Review & Safety Safeguard -->
+      <div id="del-step-1">
+        <div class="modal-header">
+          <h3 class="modal-title" style="margin:0;font-size:1.05rem;font-weight:700;color:var(--text-main);display:flex;align-items:center;gap:.5rem">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span id="del-modal-title">Confirm Action</span>
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="closeModal('modal-confirm-delete')">&#10005;</button>
+        </div>
+        <div class="modal-body" style="padding:1.25rem">
+          <div style="background:var(--status-absent-bg);border:1px solid var(--status-absent);border-radius:var(--radius-md);padding:1rem;margin-bottom:1rem">
+            <div style="font-weight:700;color:var(--status-absent);font-size:.85rem;margin-bottom:.35rem;display:flex;align-items:center;gap:.35rem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              <span>Action Safeguard (Step 1 of 2)</span>
+            </div>
+            <p id="del-modal-desc" style="font-size:.86rem;color:var(--text-main);margin:0;line-height:1.5">
+              Are you sure you want to proceed?
+            </p>
+          </div>
+          <div style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:.85rem 1rem;font-size:.82rem;color:var(--text-muted);line-height:1.45">
+            <strong style="color:var(--text-main);display:inline-flex;align-items:center;gap:0.35rem">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Institutional Data Sovereignty:</span>
+            </strong> Historical attendance logs, class marks, and past submissions remain safe and permanently preserved in the college database.
+          </div>
+        </div>
+        <div class="modal-footer" style="padding:1rem 1.25rem">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-confirm-delete')">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="proceedDeleteStep2()">Proceed to Step 2 &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Final Verification & Confirmation -->
+      <div id="del-step-2" style="display:none">
+        <div class="modal-header">
+          <h3 class="modal-title" style="margin:0;font-size:1.05rem;font-weight:800;color:var(--status-absent);display:flex;align-items:center;gap:.5rem">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Final Confirmation (Step 2 of 2)</span>
+          </h3>
+          <button type="button" class="modal-close-btn" onclick="closeModal('modal-confirm-delete')">&#10005;</button>
+        </div>
+        <div class="modal-body" style="padding:1.25rem">
+          <p id="del-modal-step2-text" style="font-size:.88rem;color:var(--text-main);line-height:1.5;margin:0 0 1rem 0">
+            Please confirm your action below to complete removal.
+          </p>
+          <label style="display:flex;align-items:flex-start;gap:.65rem;background:var(--bg-surface);padding:.85rem 1rem;border-radius:var(--radius-md);border:1px solid var(--border-color);cursor:pointer;font-size:.84rem;color:var(--text-main);user-select:none">
+            <input type="checkbox" id="del-confirm-checkbox" onchange="document.getElementById('btn-final-delete-confirm').disabled=!this.checked" style="margin-top:2px;width:16px;height:16px;accent-color:var(--status-absent)">
+            <span id="del-checkbox-label">I understand and confirm this action.</span>
+          </label>
+        </div>
+        <div class="modal-footer" style="padding:1rem 1.25rem;display:flex;justify-content:space-between">
+          <button type="button" class="btn btn-secondary" onclick="backDeleteStep1()">&larr; Back</button>
+          <button type="button" id="btn-final-delete-confirm" class="btn" style="background:var(--status-absent);color:var(--text-white);font-weight:700;border:none" disabled onclick="executeConfirmedDelete()">Confirm &amp; Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FILTER CLASSWORK (Mobile Bottom Sheet) -->
+  <div class="modal-backdrop" id="modal-work-filter" onclick="if(event.target===this)closeModal('modal-work-filter')">
+    <div class="modal-card modal-bottom-sheet" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.5rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          <span>Filter Classwork</span>
+        </h3>
+      </div>
+      <div class="modal-body" style="padding: 0.5rem 0.75rem;">
+        <div class="cw-filter-modal-list" id="cw-filter-modal-list">
+          <!-- Dynamically populated in openWorkFilterModal -->
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.65rem 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-work-filter')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CLASS INFO (Google Classroom Style 'i' button, Screenshots 1 & 2) -->
+  <div class="modal-backdrop" id="modal-class-info" onclick="if(event.target===this)closeModal('modal-class-info')">
+    <div class="modal-card modal-bottom-sheet" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.55rem">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>About this class</span>
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-class-info')">&#10005;</button>
+      </div>
+      <div class="modal-body" style="padding: 0.85rem 1.15rem;">
+        <div class="class-info-card-list">
+          <div class="class-info-item">
+            <div class="class-info-label">Class Name</div>
+            <div class="class-info-value" id="info-modal-name">—</div>
+          </div>
+          <div class="class-info-item">
+            <div class="class-info-label">Subject</div>
+            <div class="class-info-value" id="info-modal-subject">—</div>
+          </div>
+          <div class="class-info-item">
+            <div class="class-info-label">Department</div>
+            <div class="class-info-value" id="info-modal-dept">—</div>
+          </div>
+          <div class="class-info-item">
+            <div class="class-info-label">Semester &amp; Component</div>
+            <div class="class-info-value" id="info-modal-sem">—</div>
+          </div>
+          <div class="class-info-item">
+            <div class="class-info-label">Teacher</div>
+            <div class="class-info-value" id="info-modal-teacher">—</div>
+          </div>
+          <div class="class-info-item" style="border-bottom:none;">
+            <div class="class-info-label">Class Invite Code</div>
+            <div class="class-info-code-row">
+              <span class="class-info-code" id="info-modal-code">——</span>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="copyInviteCode()">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.65rem 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-class-info')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NEW ANNOUNCEMENT (Google Classroom Style, Screenshot 2) -->
+  <div class="modal-backdrop" id="modal-new-announcement" onclick="if(event.target===this)closeModal('modal-new-announcement')">
+    <div class="modal-card modal-bottom-sheet" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.55rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          <span>Share with your class</span>
+        </h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-new-announcement')">&#10005;</button>
+      </div>
+      <div class="modal-body" style="padding: 1rem 1.15rem;">
+        <div class="form-field">
+          <textarea id="modal-announcement-text" class="form-textarea" rows="4" placeholder="Announce something to your class..." style="font-size:0.92rem;min-height:90px;"></textarea>
+        </div>
+        <input type="file" id="modal-announcement-file" style="display:none;" onchange="handleModalAnnouncementFileSelect(this)">
+        <div class="announcement-attachment-actions" style="margin-top:0.75rem;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-modal-attach-file" onclick="ById('modal-announcement-file').click()" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.82rem;font-weight:600;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            <span>Attach Document or File</span>
+          </button>
+          <div id="modal-attachment-preview" class="announcement-attachment-preview" style="display:none;margin-top:0.6rem;">
+            <div class="attachment-preview-card">
+              <span class="file-ext-badge" id="modal-preview-badge">DOC</span>
+              <div class="attachment-preview-meta">
+                <span class="attachment-preview-name" id="modal-preview-name">filename.pdf</span>
+                <span class="attachment-preview-size" id="modal-preview-size">0 KB</span>
+              </div>
+              <button type="button" class="attachment-remove-btn" onclick="clearModalAnnouncementFile()" title="Remove file" aria-label="Remove attachment">&#10005;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.75rem 1.15rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-new-announcement')">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-modal-announcement" onclick="submitModalAnnouncement()">Post</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js?v=20261003"></script>
+  <script src="/js/auth.js?v=20261003"></script>
+  <script src="/js/ui.js?v=20261003"></script>
+
+  <!-- Classwork Mobile Floating Action Button (Screenshot 2) -->
+  <button type="button" class="classwork-mobile-fab" id="classwork-mobile-fab" onclick="toggleCwFabMenu()" title="Add Classwork" aria-label="Add Classwork" style="display:none;">
+    <svg id="cw-fab-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  </button>
+
+  <div class="cw-mobile-fab-menu" id="cw-mobile-fab-menu" style="display:none;">
+    <button type="button" class="cw-fab-menu-item" onclick="openCreateAssignmentModal();toggleCwFabMenu(false)">
+      <span>Assignment</span>
+      <span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:var(--text-white);align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </span>
+    </button>
+    <button type="button" class="cw-fab-menu-item" onclick="openScheduleTestModal();toggleCwFabMenu(false)">
+      <span>Class Test</span>
+      <span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:var(--text-white);align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+      </span>
+    </button>
+    <button type="button" class="cw-fab-menu-item" id="cw-fab-practical-item" onclick="openCreatePracticalModal();toggleCwFabMenu(false)">
+      <span>Lab Practical</span>
+      <span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:var(--text-white);align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/></svg>
+      </span>
+    </button>
+    <button type="button" class="cw-fab-menu-item" onclick="openFinalDocsModal();toggleCwFabMenu(false)">
+      <span>Final Documents</span>
+      <span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:var(--text-white);align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      </span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       CLASSROOM MOBILE BOTTOM NAVIGATION BAR (Google Classroom Style)
+       ══════════════════════════════════════════════════════════════ -->
+  <nav class="classroom-mobile-bottom-nav" id="classroom-mobile-bottom-nav" aria-label="Classroom Navigation">
+    <button type="button" class="classroom-mobile-nav-btn active" id="mobile-tab-btn-stream" onclick="switchTab('stream')">
+      <div class="classroom-mobile-nav-pill">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
+      <span class="classroom-mobile-nav-label">Stream</span>
+    </button>
+
+    <button type="button" class="classroom-mobile-nav-btn" id="mobile-tab-btn-classwork" onclick="switchTab('classwork')">
+      <div class="classroom-mobile-nav-pill">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+          <line x1="9" y1="12" x2="15" y2="12"></line>
+          <line x1="9" y1="16" x2="15" y2="16"></line>
+        </svg>
+      </div>
+      <span class="classroom-mobile-nav-label">Classwork</span>
+    </button>
+
+    <button type="button" class="classroom-mobile-nav-btn" id="mobile-tab-btn-people" onclick="switchTab('people')">
+      <div class="classroom-mobile-nav-pill">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <span class="classroom-mobile-nav-label">People</span>
+    </button>
+
+    <button type="button" class="classroom-mobile-nav-btn" id="mobile-tab-btn-register" onclick="openLinkedRegister()" title="Attendance Register">
+      <div class="classroom-mobile-nav-pill">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <span class="classroom-mobile-nav-label">Register</span>
+    </button>
+
+    <button type="button" class="classroom-mobile-nav-btn" id="mobile-tab-btn-sheets" onclick="openSheetStudio()" title="Sheets Studio">
+      <div class="classroom-mobile-nav-pill">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <line x1="3" y1="9" x2="21" y2="9"></line>
+          <line x1="3" y1="15" x2="21" y2="15"></line>
+          <line x1="9" y1="3" x2="9" y2="21"></line>
+          <line x1="15" y1="3" x2="15" y2="21"></line>
+        </svg>
+      </div>
+      <span class="classroom-mobile-nav-label">Sheets</span>
+    </button>
+  </nav>
+  <script src="/components/modal/modal.js?v=20261003"></script>
+  <script src="/faculty/group-detail/group-detail.js?v=20261011_v3"></script>
+</body>
+</html>

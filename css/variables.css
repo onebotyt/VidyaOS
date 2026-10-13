@@ -1,0 +1,246 @@
+/**
+ * Attendance System - CSS Custom Properties & Design Tokens
+ * Location: /shared/css/variables.css
+ */
+
+:root {
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', monospace;
+
+  /* Brand Palette */
+  --color-primary: hsl(220, 90%, 56%);
+  --color-primary-hover: hsl(220, 90%, 48%);
+  --color-primary-light: hsl(220, 90%, 96%);
+
+  /* Attendance Status Palette (Strict Invariant) */
+  --status-present: hsl(142, 71%, 45%);
+  --status-present-bg: hsl(142, 71%, 95%);
+  --status-absent: hsl(0, 84%, 60%);
+  --status-absent-bg: hsl(0, 84%, 96%);
+  --status-late: hsl(38, 92%, 50%);
+  --status-late-bg: hsl(38, 92%, 95%);
+  --status-pending: hsl(215, 80%, 55%);
+  --status-pending-bg: hsl(215, 80%, 96%);
+
+  /* Neutral Shades */
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-surface: #f1f5f9;
+  --bg-surface-secondary: #f8fafc;
+  --bg-surface-hover: #e2e8f0;
+  --bg-card-hover: #ffffff;
+  --bg-header-book: linear-gradient(135deg, #ffffff 60%, #f0f9ff 100%);
+  --bg-header-glow: radial-gradient(ellipse at top right, rgba(37,99,235,0.06) 0%, transparent 70%);
+
+  --border-color: #e2e8f0;
+  --border-focus: #94a3b8;
+
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-white: #ffffff;
+
+  /* Spacing & Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Table & Ledger Tokens */
+  --table-bg: #ffffff;
+  --table-border: #cbd5e1;
+  --table-border-subtle: #e2e8f0;
+  --table-border-strong: #475569;
+  --table-th-bg: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  --table-th-color: #1e293b;
+  --table-sticky-bg: #ffffff;
+  --table-sticky-th-bg: #f1f5f9;
+  --table-stripe-bg: #f8fafc;
+  --table-stripe-sticky-bg: #fafbfc;
+  --table-hover-bg: #eff6ff;
+
+  /* Summary Matrix Columns (Attended vs Absent) */
+  --col-att-group-bg: #e0f2fe;
+  --col-att-group-color: #0369a1;
+  --col-abs-group-bg: #fee2e2;
+  --col-abs-group-color: #b91c1c;
+
+  --col-att-mo-bg: #f0fdf4;
+  --col-att-mo-color: #166534;
+  --col-att-pr-bg: #f8fafc;
+  --col-att-pr-color: #475569;
+  --col-att-tt-bg: #dcfce7;
+  --col-att-tt-color: #15803d;
+
+  --col-abs-mo-bg: #fef2f2;
+  --col-abs-mo-color: #991b1b;
+  --col-abs-pr-bg: #f8fafc;
+  --col-abs-pr-color: #475569;
+  --col-abs-tt-bg: #fee2e2;
+  --col-abs-tt-color: #b91c1c;
+
+  /* Holiday & Calendar Tokens */
+  --col-holiday-bg: #fef2f2;
+  --col-holiday-color: #dc2626;
+
+  /* Role Badge Chips */
+  --chip-admin-bg: #fee2e2;
+  --chip-admin-color: #991b1b;
+  --chip-hod-bg: #fef3c7;
+  --chip-hod-color: #92400e;
+  --chip-classteacher-bg: #dbeafe;
+  --chip-classteacher-color: #1e40af;
+  --chip-faculty-bg: #ede9fe;
+  --chip-faculty-color: #6b21a8;
+  --chip-student-bg: #dcfce7;
+  --chip-student-color: #166534;
+
+  /* Remarks Tokens */
+  --remark-badge-bg: #ffffff;
+  --remark-badge-border: #e2e8f0;
+  --remark-regular-bg: #ecfdf5;
+  --remark-regular-color: #065f46;
+  --remark-regular-border: #a7f3d0;
+  --remark-regular-dot: #10b981;
+  --remark-short-bg: #fffbeb;
+  --remark-short-color: #92400e;
+  --remark-short-border: #fde68a;
+  --remark-short-dot: #f59e0b;
+  --remark-defaulter-bg: #fef2f2;
+  --remark-defaulter-color: #991b1b;
+  --remark-defaulter-border: #fecaca;
+  --remark-defaulter-dot: #ef4444;
+  --remark-dropped-bg: #f1f5f9;
+  --remark-dropped-color: #475569;
+  --remark-dropped-border: #cbd5e1;
+  --remark-dropped-dot: #64748b;
+  --remark-transferred-bg: #faf5ff;
+  --remark-transferred-color: #6b21a8;
+  --remark-transferred-border: #e9d5ff;
+  --remark-transferred-dot: #a855f7;
+
+  --remark-popover-bg: #ffffff;
+  --remark-popover-border: #cbd5e1;
+  --remark-popover-header: #1e293b;
+  --remark-popover-hover: #f1f5f9;
+}
+
+[data-theme='dark'] {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --status-present: #22c55e;
+  --status-absent: #ef4444;
+  --status-late: #f59e0b;
+
+  --bg-app: #0b0f19;
+  --bg-card: #111827;
+  --bg-surface: #1f2937;
+  --bg-surface-secondary: #1e293b;
+  --bg-surface-hover: #374151;
+  --bg-card-hover: #1f2937;
+  --bg-header-book: linear-gradient(135deg, #1e293b 60%, #0f172a 100%);
+  --bg-header-glow: radial-gradient(ellipse at top right, rgba(59,130,246,0.12) 0%, transparent 70%);
+
+  --border-color: #374151;
+  --border-focus: #60a5fa;
+
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --color-primary-light: rgba(59, 130, 246, 0.15);
+  --status-present-bg: rgba(34, 197, 94, 0.15);
+  --status-absent-bg: rgba(239, 68, 68, 0.15);
+  --status-late-bg: rgba(245, 158, 11, 0.15);
+
+  /* Table & Ledger Dark Tokens */
+  --table-bg: #111827;
+  --table-border: #374151;
+  --table-border-subtle: #1f2937;
+  --table-border-strong: #64748b;
+  --table-th-bg: linear-gradient(180deg, #1e293b 0%, #111827 100%);
+  --table-th-color: #f9fafb;
+  --table-sticky-bg: #111827;
+  --table-sticky-th-bg: #1e293b;
+  --table-stripe-bg: #151e2e;
+  --table-stripe-sticky-bg: #172033;
+  --table-hover-bg: #1e293b;
+
+  /* Summary Matrix Columns Dark */
+  --col-att-group-bg: rgba(14, 165, 233, 0.2);
+  --col-att-group-color: #38bdf8;
+  --col-abs-group-bg: rgba(239, 68, 68, 0.2);
+  --col-abs-group-color: #f87171;
+
+  --col-att-mo-bg: rgba(34, 197, 94, 0.12);
+  --col-att-mo-color: #4ade80;
+  --col-att-pr-bg: #151e2e;
+  --col-att-pr-color: #9ca3af;
+  --col-att-tt-bg: rgba(34, 197, 94, 0.22);
+  --col-att-tt-color: #86efac;
+
+  --col-abs-mo-bg: rgba(239, 68, 68, 0.12);
+  --col-abs-mo-color: #f87171;
+  --col-abs-pr-bg: #151e2e;
+  --col-abs-pr-color: #9ca3af;
+  --col-abs-tt-bg: rgba(239, 68, 68, 0.22);
+  --col-abs-tt-color: #fca5a5;
+
+  /* Holiday & Calendar Tokens Dark */
+  --col-holiday-bg: rgba(239, 68, 68, 0.12);
+  --col-holiday-color: #f87171;
+
+  /* Role Badge Chips Dark */
+  --chip-admin-bg: rgba(239, 68, 68, 0.22);
+  --chip-admin-color: #fca5a5;
+  --chip-hod-bg: rgba(245, 158, 11, 0.22);
+  --chip-hod-color: #fcd34d;
+  --chip-classteacher-bg: rgba(59, 130, 246, 0.22);
+  --chip-classteacher-color: #93c5fd;
+  --chip-faculty-bg: rgba(168, 85, 247, 0.22);
+  --chip-faculty-color: #d8b4fe;
+  --chip-student-bg: rgba(34, 197, 94, 0.22);
+  --chip-student-color: #86efac;
+
+  /* Remarks Tokens Dark */
+  --remark-badge-bg: #1f2937;
+  --remark-badge-border: #374151;
+  --remark-regular-bg: rgba(16, 185, 129, 0.2);
+  --remark-regular-color: #6ee7b7;
+  --remark-regular-border: rgba(16, 185, 129, 0.4);
+  --remark-regular-dot: #34d399;
+  --remark-short-bg: rgba(245, 158, 11, 0.2);
+  --remark-short-color: #fde68a;
+  --remark-short-border: rgba(245, 158, 11, 0.4);
+  --remark-short-dot: #fbbf24;
+  --remark-defaulter-bg: rgba(239, 68, 68, 0.2);
+  --remark-defaulter-color: #fca5a5;
+  --remark-defaulter-border: rgba(239, 68, 68, 0.4);
+  --remark-defaulter-dot: #f87171;
+  --remark-dropped-bg: #1f2937;
+  --remark-dropped-color: #9ca3af;
+  --remark-dropped-border: #374151;
+  --remark-dropped-dot: #9ca3af;
+  --remark-transferred-bg: rgba(168, 85, 247, 0.2);
+  --remark-transferred-color: #d8b4fe;
+  --remark-transferred-border: rgba(168, 85, 247, 0.4);
+  --remark-transferred-dot: #c084fc;
+
+  --remark-popover-bg: #1f2937;
+  --remark-popover-border: #374151;
+  --remark-popover-header: #f9fafb;
+  --remark-popover-hover: #374151;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}

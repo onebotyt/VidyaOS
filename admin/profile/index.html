@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Profile &amp; Security — Admin Console</title>
+  <meta name="description" content="Administrator profile credentials, security password management, and governance authority metrics.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/admin-nav.css">
+  
+  <link rel="stylesheet" href="/components/modal/modal.css?v=20261003">
+  <link rel="stylesheet" href="/admin/profile/profile.css?v=20261003">
+</head>
+<body>
+    <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- 1. ADMIN TOP NAVIGATION HEADER                                 -->
+  <!-- Fixed institutional top bar with drawer hamburger, brand logo, -->
+  <!-- apps launcher grid modal, theme toggle, and profile popover.  -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <!-- Toggle Button: Opens/Closes the slide-out navigation drawer -->
+      <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <!-- Brand Logo and System Title -->
+      <a href="/admin/dashboard.html" class="gc-brand-link">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+        </div>
+        <div class="gc-brand-title">Admin Console</div>
+        <span class="gc-brand-sub">VidyaOS</span>
+      </a>
+
+      <!-- Current Page Badge -->
+      <span class="gc-page-badge" id="admin-header-page-title">Executive Profile</span>
+    </div>
+
+    <div class="gc-nav-right">
+      <!-- Apps Launcher Button (Opens Quick Module Grid) -->
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher(event)" title="Admin Apps &amp; Modules">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
+      </button>
+
+      <!-- Dark/Light Theme Mode Toggle -->
+      <button type="button" class="gc-icon-btn" onclick="toggleAppTheme()" id="btn-theme-toggle" title="Toggle Theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <!-- Administrator Avatar Button -->
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile(event)" title="Account Profile">SA</div>
+
+      <!-- Quick Apps Launcher Dropdown Grid -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/admin/dashboard.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg></div>
+          <span>Dashboard</span>
+        </a>
+        <a href="/admin/academic-structure.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></div>
+          <span>Academics</span>
+        </a>
+        <a href="/admin/faculty.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></div>
+          <span>HOD Hub</span>
+        </a>
+        <a href="/admin/reports.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+          <span>Reports</span>
+        </a>
+        <a href="/admin/settings.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
+          <span>Settings</span>
+        </a>
+        <a href="/admin/audit-logs.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+          <span>Audit Logs</span>
+        </a>
+      </div>
+
+      <!-- Administrator Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
+        <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">SA</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">Administrator</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">admin@college.edu</div>
+        <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+        <a href="/admin/profile.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>My Profile
+        </a>
+        <a href="/admin/settings.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>System Settings
+        </a>
+        <button type="button" class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);justify-content:center;" onclick="logout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- 2. ADMIN SIDE DRAWER NAVIGATION (#app-sidebar)                 -->
+  <!-- Slide-out institutional navigation drawer for desktop/mobile.  -->
+  <!-- Contains primary links to all 7 administrative core modules.   -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <aside id="app-sidebar" class="app-sidebar gc-drawer" aria-label="Admin Navigation">
+    <div class="gc-drawer-header">
+      <a href="/admin/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;flex:1;min-width:0;">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+        </div>
+        <div style="display:flex;flex-direction:column;line-height:1.1;">
+          <span style="font-size:0.92rem;font-weight:800;color:var(--text-main);letter-spacing:-0.01em;">Admin Console</span>
+          <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.06em;color:var(--color-primary);text-transform:uppercase;">VidyaOS</span>
+        </div>
+      </a>
+      <button type="button" class="gc-menu-btn" onclick="window.closeSidebar()" aria-label="Close menu" title="Close menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <!-- Navigation links for administrative modules -->
+    <div class="gc-drawer-body">
+      <div class="gc-drawer-sec-title">Administrative Modules</div>
+      <a href="/admin/dashboard.html" class="gc-drawer-link" onclick="if(window.innerWidth&lt;=768)window.closeSidebar()">
+        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg></span>
+        <span>Dashboard</span>
+      </a>
+      <a href="/admin/academic-structure.html" class="gc-drawer-link" onclick="if(window.innerWidth&lt;=768)window.closeSidebar()">
+        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></span>
+        <span>Academic Structure</span>
+      </a>
+      <a href="/admin/faculty.html" class="gc-drawer-link" onclick="if(window.innerWidth&lt;=768)window.closeSidebar()">
+        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></span>
+        <span>HOD Management</span>
+      </a>
+      <a href="/admin/reports.html" class="gc-drawer-link" onclick="if(window.innerWidth&lt;=768)window.closeSidebar()">
+        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></span>
+        <span>Reports &amp; Analytics</span>
+      </a>
+      <a href="/admin/settings.html" class="gc-drawer-link" onclick="if(window.innerWidth&lt;=768)window.closeSidebar()">
+        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>
+        <span>System Settings</span>
+      </a>
+      <a href="/admin/audit-logs.html" class="gc-drawer-link" onclick="if(window.innerWidth&lt;=768)window.closeSidebar()">
+        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
+        <span>Audit Logs</span>
+      </a>
+    </div>
+
+    <!-- Drawer Footer: System Status and Logout -->
+    <div class="gc-drawer-footer">
+      <div class="gc-drawer-status-pill">
+        <span class="gc-drawer-dot"></span>
+        <span>VidyaOS &bull; Admin</span>
+      </div>
+      <button type="button" class="gc-drawer-logout-btn" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Drawer Backdrop Overlay: Click outside to dismiss drawer -->
+  <div id="sidebar-backdrop" class="gc-drawer-backdrop sidebar-backdrop" onclick="window.closeSidebar()"></div>
+
+  <!-- Backward-compatibility hidden navigation for automated test contracts -->
+  <nav style="display: none !important;" id="top-nav-bar" aria-hidden="true">
+    <a href="/admin/dashboard.html">Dashboard</a>
+    <a href="/admin/academic-structure.html">Academic Structure</a>
+    <a href="/admin/faculty.html">HOD Management</a>
+    <a href="/admin/reports.html">Reports &amp; Analytics</a>
+    <a href="/admin/settings.html">Settings</a>
+    <a href="/admin/audit-logs.html">Audit Logs</a>
+  </nav>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem; max-width: 920px;">
+    <!-- HERO ADMINISTRATOR BANNER -->
+    <div class="admin-hero">
+      <div class="admin-hero-content">
+        <div class="admin-avatar-wrap">
+          <div class="admin-avatar" id="hero-avatar">SA</div>
+          <div class="admin-beacon" title="Super Administrator Session Active"></div>
+        </div>
+
+        <div class="admin-meta" style="flex: 1;">
+          <h1 id="hero-name">System Administrator</h1>
+          <div class="admin-subtitle">
+            <span id="hero-institution">VidyaOS Institutional Campus</span>
+            <span>•</span>
+            <span id="hero-email" style="font-family: var(--font-family-mono); font-weight: 700; color: var(--color-primary);">admin@college.edu</span>
+          </div>
+
+          <div class="admin-badges">
+            <span class="admin-chip super"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Institutional Superuser</span>
+            <span class="admin-chip verified">Full Master Authority</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GOVERNANCE METRICS STRIP -->
+    <div class="gov-grid">
+      <div class="gov-card">
+        <div class="gov-card-title">Departments</div>
+        <div class="gov-card-val" id="stat-dept">—</div>
+        <div class="gov-card-sub">Academic programs</div>
+      </div>
+
+      <div class="gov-card">
+        <div class="gov-card-title">Faculty Members</div>
+        <div class="gov-card-val" id="stat-teachers">—</div>
+        <div class="gov-card-sub">HODs &amp; teaching staff</div>
+      </div>
+
+      <div class="gov-card">
+        <div class="gov-card-title">Students Enrolled</div>
+        <div class="gov-card-val" id="stat-students">—</div>
+        <div class="gov-card-sub">Total student body</div>
+      </div>
+
+      <div class="gov-card">
+        <div class="gov-card-title">Active Registers</div>
+        <div class="gov-card-val" id="stat-registers">—</div>
+        <div class="gov-card-sub">Digital lecture books</div>
+      </div>
+
+      <div class="gov-card">
+        <div class="gov-card-title">ESP32 Terminals</div>
+        <div class="gov-card-val" id="stat-devices" style="color: var(--status-present);">—</div>
+        <div class="gov-card-sub">Biometric hardware units</div>
+      </div>
+    </div>
+
+    <div class="grid-cols-2" style="gap: 1.5rem; align-items: start;">
+      <!-- Editable Admin Details -->
+      <div class="card" style="padding: 1.75rem;">
+        <h2 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1.25rem; color: var(--text-main);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Administrator Identity
+        </h2>
+
+        <form id="admin-profile-form">
+          <div class="form-group">
+            <label class="form-label" for="admin-username">Admin Username</label>
+            <input type="text" id="admin-username" class="form-control" required style="font-family: var(--font-family-mono); font-weight: 700;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-email">Institutional Admin Email</label>
+            <input type="email" id="admin-email" class="form-control" required>
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+              Primary contact for institutional audit and system alerts.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role Classification</label>
+            <input type="text" class="form-control" value="SYSTEM_ADMIN (Root System Master Authority)" disabled style="background: var(--bg-surface); color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+            <button type="submit" id="save-admin-btn" class="btn btn-primary" style="font-weight: 700;">
+              Update Admin Profile
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Password & Security Form -->
+      <div class="card" style="padding: 1.75rem;">
+        <h2 style="font-size: 1.1rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1.25rem; color: var(--text-main);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Master Password Management
+        </h2>
+
+        <form id="admin-pass-form">
+          <div class="form-group">
+            <label class="form-label" for="admin-current-pass">Current Master Password</label>
+            <div class="password-wrap">
+              <input type="password" id="admin-current-pass" class="form-control" required placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-current-pass', this)" aria-label="Toggle password view" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-new-pass">New Password (min 8 chars)</label>
+            <div class="password-wrap">
+              <input type="password" id="admin-new-pass" class="form-control" required minlength="8" placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-new-pass', this)" aria-label="Toggle password view" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="admin-confirm-pass">Confirm New Password</label>
+            <div class="password-wrap">
+              <input type="password" id="admin-confirm-pass" class="form-control" required minlength="8" placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-confirm-pass', this)" aria-label="Toggle password view" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+            <button type="submit" id="save-pass-btn" class="btn btn-secondary" style="font-weight: 700;">
+              Change Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- 3. ADMIN MOBILE BOTTOM NAVIGATION (.mobile-bottom-nav)         -->
+  <!-- Fixed bottom navigation bar for mobile / compact screens.      -->
+  <!-- Provides single-tap access to primary views + drawer toggle.  -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <nav class="mobile-bottom-nav" aria-label="Admin Mobile Navigation">
+    <div class="mobile-bottom-nav-inner">
+      <a href="/admin/dashboard.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
+        <span class="mobile-nav-label">Home</span>
+      </a>
+      <a href="/admin/academic-structure.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></span>
+        <span class="mobile-nav-label">Structure</span>
+      </a>
+      <a href="/admin/faculty.html" class="mobile-nav-item">
+        <span class="mobile-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></span>
+        <span class="mobile-nav-label">Faculty</span>
+      </a>
+      <button type="button" class="mobile-nav-item" onclick="window.toggleSidebar()" aria-label="Open Navigation Menu">
+        <span class="mobile-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></span>
+        <span class="mobile-nav-label">Menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js?v=2.2"></script>
+  <script src="/js/admin-nav.js"></script>
+  <script src="/js/ui.js"></script>
+  
+  <script src="/components/modal/modal.js?v=20261003"></script>
+  <script src="/admin/profile/profile.js?v=20261003"></script>
+</body>
+</html>

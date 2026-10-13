@@ -1,0 +1,18 @@
+/* ══════════════════════════════════════════════════════════════
+   PAGE STYLES: ASSIGNMENTS
+   frontend/student/assignments/assignments.css
+══════════════════════════════════════════════════════════════ */
+
+.assignment-card { border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-card); padding: 1.1rem 1.3rem; margin-bottom: 0.9rem; }
+    .assignment-title { font-weight: 700; font-size: 1.02rem; }
+    .assignment-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .assignment-desc { font-size: 0.88rem; margin-top: 0.5rem; }
+    .status-tag { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .status-tag.SUBMITTED { background: var(--status-pending-bg); color: var(--status-pending); }
+    .status-tag.LATE { background: var(--status-late-bg); color: var(--status-late); }
+    .status-tag.GRADED { background: var(--status-present-bg); color: var(--status-present); }
+    .status-tag.NOT_SUBMITTED { background: var(--status-absent-bg); color: var(--status-absent); }
+    .upload-row { display: flex; gap: 0.6rem; margin-top: 0.75rem; align-items: center; flex-wrap: wrap; }
+    .file-link { color: var(--color-primary); font-weight: 600; text-decoration: none; font-size: 0.85rem; }
+    .feedback-box { margin-top: 0.6rem; font-size: 0.85rem; background: var(--bg-surface); border-radius: var(--radius-sm); padding: 0.6rem; }
+

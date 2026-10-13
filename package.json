@@ -1,0 +1,17 @@
+{
+  "name": "vidyaos-frontend",
+  "version": "1.0.0",
+  "description": "VidyaOS Institutional Campus Operating System - Modern Frontend Client",
+  "scripts": {
+    "start": "node ../backend/server.js",
+    "dev": "node --watch ../backend/server.js"
+  },
+  "keywords": [
+    "vidyaos",
+    "attendance",
+    "campus-os",
+    "frontend"
+  ],
+  "author": "VidyaOS Core Team",
+  "license": "ISC"
+}

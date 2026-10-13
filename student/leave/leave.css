@@ -1,0 +1,18 @@
+/* ══════════════════════════════════════════════════════════════
+   PAGE STYLES: LEAVE
+   frontend/student/leave/leave.css
+══════════════════════════════════════════════════════════════ */
+
+form.add-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
+    form.add-form label { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display:block; margin-bottom: 0.25rem; }
+    form.add-form input, form.add-form textarea {
+      width: 100%; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-family: inherit;
+    }
+    .full-row { grid-column: 1 / -1; }
+    .leave-card { border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-card); padding: 1rem 1.2rem; margin-bottom: 0.8rem; }
+    .leave-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .status-pill { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .status-pill.PENDING { background: var(--status-pending-bg); color: var(--status-pending); }
+    .status-pill.APPROVED { background: var(--status-present-bg); color: var(--status-present); }
+    .status-pill.REJECTED { background: var(--status-absent-bg); color: var(--status-absent); }
+
