@@ -152,9 +152,6 @@
       await loadDashboardOverview();
       updateDashboardMode();
 
-      // Initialize view mode (Minimal vs Detailed Cards)
-      applyClassesViewMode(getClassesViewMode());
-
       // Deep-linking URL query params
       const urlParams = new URLSearchParams(window.location.search);
       const action = urlParams.get('action');
@@ -570,35 +567,6 @@
       'hsl(270, 70%, 45%)',
       'hsl(185, 80%, 35%)'
     ];
-
-    // Minimal vs Detailed Cards View Controller
-    function getClassesViewMode() {
-      const saved = localStorage.getItem('faculty_classes_view_mode');
-      if (saved) return saved;
-      return window.innerWidth <= 768 ? 'minimal' : 'cards';
-    }
-
-    function setClassesViewMode(mode) {
-      localStorage.setItem('faculty_classes_view_mode', mode);
-      applyClassesViewMode(mode);
-    }
-
-    function applyClassesViewMode(mode) {
-      const container = document.getElementById('groups-container');
-      const btnMin = document.getElementById('btn-view-minimal');
-      const btnCards = document.getElementById('btn-view-cards');
-      if (container) {
-        if (mode === 'minimal') {
-          container.classList.add('view-minimal');
-        } else {
-          container.classList.remove('view-minimal');
-        }
-      }
-      if (btnMin) btnMin.classList.toggle('active', mode === 'minimal');
-      if (btnCards) btnCards.classList.toggle('active', mode !== 'minimal');
-    }
-
-    window.setClassesViewMode = setClassesViewMode;
 
     function renderGroups() {
       const container = document.getElementById('groups-container');
