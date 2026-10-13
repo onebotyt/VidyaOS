@@ -3,6 +3,11 @@
  * Location: /shared/css/layout.css
  */
 
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 .app-header {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
