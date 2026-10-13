@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course File Preparation (NBA/NAAC) — VidyaOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261008">
+  <link rel="stylesheet" href="/css/variables.css?v=20261008">
+  <link rel="stylesheet" href="/css/layout.css?v=20261008">
+  <link rel="stylesheet" href="/css/components.css?v=20261008">
+  <link rel="stylesheet" href="/css/classroom-nav.css?v=20261008">
+  <link rel="stylesheet" href="/components/modal/modal.css?v=20261008">
+  <link rel="stylesheet" href="/faculty/course-file/course-file.css?v=20261008">
+</head>
+
+<body class="page-layout">
+  <!-- Classroom Header Navigation -->
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <a href="/faculty/dashboard.html" class="cf-back-btn" title="Back to Classroom Dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back to Classes</span>
+      </a>
+      <div class="gc-brand-divider"></div>
+      <div class="gc-brand-link">
+        <div class="gc-brand-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg></div>
+        <div>
+          <div class="gc-brand-title">Course File Dossier</div>
+          <span class="gc-brand-sub">NBA&amp; Audit Portfolio</span>
+        </div>
+      </div>
+    </div>
+    <div class="gc-nav-right">
+      <div class="cf-class-selector-wrap">
+        <label for="select-class-switch" class="cf-selector-label">Active Class:</label>
+        <select id="select-class-switch" class="form-control cf-select-class" onchange="onSwitchClass(this.value)">
+          <option value="">Loading classes...</option>
+        </select>
+      </div>
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher()" title="Academic Apps"><svg width="18"
+          height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg></button>
+      <button type="button" class="gc-icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Toggle Theme"><svg
+          width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg></button>
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile()" title="Account Profile">T</div>
+
+      <!-- Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/faculty/dashboard.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg></div>
+          <span>Classes</span>
+        </a>
+        <a href="/faculty/registers.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg></div>
+          <span>Registers</span>
+        </a>
+        <a href="/faculty/registers.html?tab=assignments" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg></div>
+          <span>Classwork</span>
+        </a>
+        <a href="/faculty/students.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+            </svg></div>
+          <span>Students</span>
+        </a>
+        <a href="/faculty/reports.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg></div>
+          <span>Reports</span>
+        </a>
+      </div>
+
+      <!-- User Profile Dropdown -->
+      <div class="gc-profile-dropdown" id="gc-profile-dropdown" style="display:none;">
+        <div class="gc-profile-header">
+          <div class="gc-profile-avatar" id="dropdown-avatar">T</div>
+          <div class="gc-profile-info">
+            <div class="gc-profile-name" id="dropdown-user-name">Faculty Member</div>
+            <div class="gc-profile-email" id="dropdown-user-email">faculty@college.edu</div>
+            <div class="gc-profile-role" id="dropdown-user-role">Teacher</div>
+          </div>
+        </div>
+        <div class="gc-profile-divider"></div>
+        <button type="button" class="gc-profile-item danger" onclick="handleLogout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="cf-main-container">
+    <!-- Course Header Hero Card -->
+    <section class="cf-hero-card" id="cf-hero-card">
+      <div class="cf-hero-body">
+        <div class="cf-hero-details">
+          <div class="cf-badge-row">
+            <span class="badge badge-sem" id="cf-hero-sem">Semester --</span>
+            <span class="badge" style="background:var(--bg-card);border:1px solid var(--border-color);"
+              id="cf-hero-component">THEORY</span>
+            <span class="badge" style="background:var(--bg-card);border:1px solid var(--border-color);"
+              id="cf-hero-ay">AY 2026-27</span>
+            <span class="badge" id="cf-hero-status-badge">IN PROGRESS</span>
+          </div>
+          <h1 class="cf-hero-title" id="cf-hero-title">Loading Subject Course File...</h1>
+          <div class="cf-hero-meta">
+            <span id="cf-hero-code" class="cf-code-tag">--</span>
+            <span class="cf-meta-dot">•</span>
+            <span id="cf-hero-dept">Department</span>
+            <span class="cf-meta-dot">•</span>
+            <span id="cf-hero-teacher">Faculty In-Charge</span>
+          </div>
+        </div>
+
+        <!-- Compliance Gauge Meter -->
+        <div class="cf-hero-meter-card">
+          <div class="cf-meter-header">
+            <div>
+              <span class="cf-meter-label">Audit Readiness</span>
+              <div class="cf-meter-score" id="cf-meter-score">0 / 18</div>
+            </div>
+            <div class="cf-meter-pct" id="cf-meter-pct">0%</div>
+          </div>
+          <div class="cf-meter-track">
+            <div class="cf-meter-bar" id="cf-meter-bar" style="width: 0%;"></div>
+          </div>
+          <div class="cf-meter-caption" id="cf-meter-caption">Documentation In Progress</div>
+        </div>
+      </div>
+
+      <!-- Quick Action Toolbar -->
+      <div class="cf-hero-actions">
+        <div class="cf-actions-left">
+          <button type="button" class="btn btn-primary" onclick="printDossierIndex()"
+            title="Print complete institutional NBA/NAAC index and cover sheet">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>Print Dossier Index</span>
+          </button>
+          <a href="#" id="btn-quick-rollcall" class="btn btn-outline" title="Launch attendance roll call">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>Take Attendance</span>
+          </a>
+          <a href="#" id="btn-quick-register" class="btn btn-outline" title="Open 31-day attendance matrix register">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg>
+            <span>Register</span>
+          </a>
+          <a href="#" id="btn-quick-classwork" class="btn btn-outline" title="Coursework &amp; assignments">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Classwork</span>
+          </a>
+        </div>
+        <div class="cf-actions-right" id="cf-hod-audit-trigger" style="display:none;">
+          <button type="button" class="btn btn-outline" onclick="openHodAuditModal()"
+            title="HOD Quality &amp; Compliance Audit Verification">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>HOD Audit Verification</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOD Remarks Banner (if audited or revision requested) -->
+    <div class="cf-remarks-banner" id="cf-remarks-banner" style="display:none;">
+      <div class="cf-remarks-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <div class="cf-remarks-content">
+        <strong id="cf-remarks-title">Department HOD Review Remarks</strong>
+        <p id="cf-remarks-text">No remarks posted.</p>
+        <div class="cf-remarks-meta" id="cf-remarks-meta">Audited by Dept Head</div>
+      </div>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <section class="cf-filter-section">
+      <div class="cf-tab-pills" role="tablist">
+        <button type="button" class="cf-tab-pill active" onclick="setCategoryFilter('all', this)" role="tab"
+          aria-selected="true">
+          <span>All 18 Documents</span>
+          <span class="cf-tab-count" id="count-cat-all">18</span>
+        </button>
+        <button type="button" class="cf-tab-pill" onclick="setCategoryFilter('curriculum', this)" role="tab"
+          aria-selected="false">
+          <span>Curriculum &amp; Syllabus</span>
+          <span class="cf-tab-count" id="count-cat-curriculum">7</span>
+        </button>
+        <button type="button" class="cf-tab-pill" onclick="setCategoryFilter('students', this)" role="tab"
+          aria-selected="false">
+          <span>Students &amp; Diagnostics</span>
+          <span class="cf-tab-count" id="count-cat-students">4</span>
+        </button>
+        <button type="button" class="cf-tab-pill" onclick="setCategoryFilter('assessment', this)" role="tab"
+          aria-selected="false">
+          <span>Assessments &amp; Schedules</span>
+          <span class="cf-tab-count" id="count-cat-assessment">5</span>
+        </button>
+        <button type="button" class="cf-tab-pill" onclick="setCategoryFilter('review', this)" role="tab"
+          aria-selected="false">
+          <span>Review &amp; Attainment</span>
+          <span class="cf-tab-count" id="count-cat-review">2</span>
+        </button>
+      </div>
+
+      <div class="cf-search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="cf-search-input" placeholder="Search course file document or keyword..."
+          oninput="onSearchDocuments(this.value)">
+      </div>
+    </section>
+
+    <!-- 18 Artifact Cards Grid -->
+    <section class="cf-grid-section" id="cf-cards-grid">
+      <!-- Injected via JavaScript -->
+    </section>
+  </main>
+
+  <!-- Hidden File Input for Direct Uploads -->
+  <input type="file" id="cf-hidden-file-input" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx"
+    onchange="handleDirectFileSelect(event)">
+
+  <!-- Modal 1: Upload / Replace Document Modal -->
+  <div class="modal" id="modal-upload-doc" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-upload-doc')"></div>
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="upload-modal-title">Upload Course File Document</h3>
+          <p class="modal-subtitle" id="upload-modal-subtitle">PDF / Document File</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-upload-doc')">&times;</button>
+      </div>
+      <form id="form-upload-doc" onsubmit="submitDocumentUpload(event)">
+        <input type="hidden" id="upload-item-key">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Document Title</label>
+            <input type="text" id="upload-doc-title" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Select PDF Document</label>
+            <div class="cf-drop-zone" id="cf-drop-zone" onclick="document.getElementById('upload-file-field').click()">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-bottom:0.5rem;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">Click to Browse or Drag &amp; Drop
+                PDF</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">Supported formats: PDF, DOC,
+                DOCX, XLS (Max 20 MB)</div>
+              <div id="upload-selected-file-name"
+                style="margin-top:0.75rem;font-size:0.82rem;font-weight:700;color:var(--status-present);display:none;">
+              </div>
+            </div>
+            <input type="file" id="upload-file-field" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx"
+              onchange="onModalFileSelected(this)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes / Revision Remarks (Optional)</label>
+            <textarea id="upload-doc-notes" class="form-control" rows="2"
+              placeholder="e.g. Approved in Department Curriculum Meeting on 12/08/2026..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-upload-doc')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-upload">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>Upload Document</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: PDF Document Viewer Modal -->
+  <div class="modal" id="modal-pdf-preview" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-pdf-preview')"></div>
+    <div class="modal-dialog modal-xl" style="max-width: 950px; height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="preview-modal-title">Document Preview</h3>
+          <p class="modal-subtitle" id="preview-modal-subtitle">Course File Artifact</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <a href="#" id="btn-preview-download" class="btn btn-sm btn-outline" target="_blank" download>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download</span>
+          </a>
+          <button type="button" class="modal-close" onclick="closeModal('modal-pdf-preview')">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" style="flex: 1; padding: 0; overflow: hidden; position: relative;">
+        <iframe id="pdf-preview-frame" style="width: 100%; height: 100%; border: none; background: var(--bg-surface);"
+          src="about:blank"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Live Student Roster View (Item #7) -->
+  <div class="modal" id="modal-student-roster" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-student-roster')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Official Enrolled Student Roster (Item #7)</h3>
+          <p class="modal-subtitle">Auto-Synchronized from VidyaOS Department Database</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="printStudentRoster()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>Print Student List</span>
+          </button>
+          <button type="button" class="modal-close" onclick="closeModal('modal-student-roster')">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="cf-roster-summary-bar">
+          <span id="roster-count-badge" class="badge badge-sem">10 Students Enrolled</span>
+          <span style="font-size:0.8rem;color:var(--text-muted);">Includes verified official registration roll and live
+            subject attendance.</span>
+        </div>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+          <table class="data-table" id="table-students-roster">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Roll No</th>
+                <th style="width: 130px;">Enrollment No</th>
+                <th>Student Full Name</th>
+                <th>Email Address</th>
+                <th style="width: 90px; text-align: center;">Attended</th>
+                <th style="width: 100px; text-align: center;">Attendance %</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-students-roster">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline"
+          onclick="openDirectUploadModal('student_list', 'Student List Signed PDF')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Upload Signed / Certified PDF Roster (Optional)</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="closeModal('modal-student-roster')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Live Classwork Schedule View (Item #14) -->
+  <div class="modal" id="modal-assignment-schedule" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-assignment-schedule')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Assignment &amp; Tutorial Schedule (Item #14)</h3>
+          <p class="modal-subtitle">Auto-Synchronized from Subject Classwork Records</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="printAssignmentSchedule()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>Print Schedule</span>
+          </button>
+          <button type="button" class="modal-close" onclick="closeModal('modal-assignment-schedule')">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="cf-roster-summary-bar">
+          <span id="schedule-count-badge" class="badge badge-sem">7 Assignments Issued</span>
+          <span style="font-size:0.8rem;color:var(--text-muted);">Pulled directly from Classwork coursework
+            repository.</span>
+        </div>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+          <table class="data-table" id="table-assignments-schedule">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Assignment Title</th>
+                <th style="width: 110px;">Issue Date</th>
+                <th style="width: 110px;">Due Date</th>
+                <th style="width: 90px; text-align: center;">Max Marks</th>
+                <th style="width: 100px; text-align: center;">Submissions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-assignments-schedule">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline"
+          onclick="openDirectUploadModal('assignment_schedule', 'Assignment Schedule Signed PDF')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Upload Signed Tutorial Schedule PDF (Optional)</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="closeModal('modal-assignment-schedule')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Internal Assessment Plan Evaluation Sheet (Item #12) -->
+  <div class="modal" id="modal-evaluation-scheme" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-evaluation-scheme')"></div>
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Internal Assessment Plan (Item #12)</h3>
+          <p class="modal-subtitle">Continuous Evaluation Weightage Breakdown</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-evaluation-scheme')">&times;</button>
+      </div>
+      <form id="form-evaluation-scheme" onsubmit="saveEvaluationScheme(event)">
+        <div class="modal-body">
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+            Configure the internal continuous assessment weightages. These criteria form the official evaluation rubric
+            submitted to the University/Board.
+          </p>
+          <div class="form-group">
+            <label class="form-label">Mid-Semester / Sessional Tests Weightage (Marks)</label>
+            <input type="number" id="eval-midsem" class="form-control" value="20" min="0" max="100"
+              oninput="recalcEvalTotal()" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Continuous Classwork &amp; Assignments (Marks)</label>
+            <input type="number" id="eval-assignments" class="form-control" value="10" min="0" max="100"
+              oninput="recalcEvalTotal()" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Laboratory Work / Practical Performance (Marks)</label>
+            <input type="number" id="eval-lab" class="form-control" value="15" min="0" max="100"
+              oninput="recalcEvalTotal()" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Attendance Regularity &amp; Discipline (Marks)</label>
+            <input type="number" id="eval-attendance" class="form-control" value="5" min="0" max="100"
+              oninput="recalcEvalTotal()" required>
+          </div>
+          <div class="cf-eval-total-box">
+            <span>Total Internal Assessment Marks:</span>
+            <strong id="eval-total-display">50 Marks</strong>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline"
+            onclick="openDirectUploadModal('internal_assessment_plan', 'Internal Assessment Plan PDF')">Upload Signed
+            PDF</button>
+          <button type="submit" class="btn btn-primary">Save Evaluation Plan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 6: Course Outcomes & CO-PO Mapping Matrix (Item #3 & #4) -->
+  <div class="modal" id="modal-copo-matrix" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-copo-matrix')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Course Outcomes &amp; CO-PO Mapping (Items #3 &amp; #4)</h3>
+          <p class="modal-subtitle">NBA / OBE Outcome Based Education Framework</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-copo-matrix')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;color:var(--text-main);">Course Outcomes (CO1
+          - CO6)</h4>
+        <div id="co-list-inputs" style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem;">
+          <!-- Injected via JS -->
+        </div>
+
+        <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.5rem;color:var(--text-main);">CO-PO Correlation
+          Matrix</h4>
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">Scale: 1 = Low (Slight), 2 = Medium
+          (Moderate), 3 = High (Substantial), Blank = No Correlation</p>
+        <div class="table-responsive" style="max-height: 260px; overflow: auto;">
+          <table class="data-table" id="table-copo-matrix" style="font-size:0.78rem;">
+            <thead>
+              <tr>
+                <th style="min-width: 50px;">CO</th>
+                <th>PO1</th>
+                <th>PO2</th>
+                <th>PO3</th>
+                <th>PO4</th>
+                <th>PO5</th>
+                <th>PO6</th>
+                <th>PO7</th>
+                <th>PO8</th>
+                <th>PO9</th>
+                <th>PO10</th>
+                <th>PO11</th>
+                <th>PO12</th>
+                <th>PSO1</th>
+                <th>PSO2</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-copo-matrix">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline"
+          onclick="openDirectUploadModal('copo_matrix', 'CO-PO Matrix PDF')">Upload CO-PO PDF</button>
+        <button type="button" class="btn btn-primary" onclick="saveCopoData()">Save Outcomes &amp; Matrix</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 7: Advanced & Slow Learners View (Item #9 & #10) -->
+  <div class="modal" id="modal-learners-view" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-learners-view')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="learners-modal-title">Student Diagnostic Roster</h3>
+          <p class="modal-subtitle" id="learners-modal-subtitle">Learning Diagnostic Categorization</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-learners-view')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Roll No</th>
+                <th style="width: 130px;">Enrollment No</th>
+                <th>Full Name</th>
+                <th style="width: 110px; text-align: center;">Attendance</th>
+                <th>Diagnostic Status &amp; Mentoring Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-learners-roster">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="btn-learners-upload-pdf">Upload Formal PDF Report</button>
+        <button type="button" class="btn btn-primary" onclick="closeModal('modal-learners-view')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 8: HOD Audit Verification Modal -->
+  <div class="modal" id="modal-hod-audit" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-hod-audit')"></div>
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">HOD Quality &amp; Compliance Audit</h3>
+          <p class="modal-subtitle">Official Course File Verification Sign-off</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-hod-audit')">&times;</button>
+      </div>
+      <form id="form-hod-audit" onsubmit="submitHodAudit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Audit Decision</label>
+            <select id="audit-decision-status" class="form-control" required>
+              <option value="APPROVED">✓ APPROVE — Course File Complete &amp; Verified</option>
+              <option value="REVISION_REQUESTED">⚠️ REVISION REQUESTED — Missing Required Documents</option>
+              <option value="AUDITED">📋 AUDITED — In Review</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Audit Remarks / Feedback for Faculty Member</label>
+            <textarea id="audit-remarks-text" class="form-control" rows="4"
+              placeholder="Enter specific observations, missing items, or praise for NBA/NAAC compliance..."
+              required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-hod-audit')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Audit Sign-Off</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Print Template Container (Hidden on Screen, Shown during Print) -->
+  <div id="print-dossier-template" class="print-only"></div>
+
+  <!-- Scripts -->
+  <script src="/js/auth.js?v=20261008"></script>
+  <script src="/js/api.js?v=20261008"></script>
+  <script src="/faculty/course-file/course-file.js?v=20261008"></script>
+</body>
+
+</html>

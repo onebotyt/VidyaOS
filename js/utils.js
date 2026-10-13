@@ -4,12 +4,11 @@
  */
 
 /**
- * Calculates 75% threshold forecast client-side for interactive widgets
+ * Calculates attendance compliance status client-side for interactive widgets
  */
 function calculateAttendanceForecast(conducted, attended, threshold = 75) {
   const C = Number(conducted) || 0;
   const P = Number(attended) || 0;
-  const T = threshold / 100;
 
   if (C === 0) {
     return {
@@ -24,24 +23,20 @@ function calculateAttendanceForecast(conducted, attended, threshold = 75) {
   const pct = Number(((P / C) * 100).toFixed(2));
 
   if (pct >= threshold) {
-    const X = Math.max(0, Math.floor((P - T * C) / T));
     return {
       percentage: pct,
       status: 'SAFE',
-      safeAbsences: X,
+      safeAbsences: 0,
       recoveryClasses: 0,
-      message: X > 0
-        ? `You can safely miss up to ${X} consecutive class(es) without falling below ${threshold}%.`
-        : `You are on the ${threshold}% margin.`
+      message: `Attendance satisfies institutional requirements (≥ ${threshold}%).`
     };
   } else {
-    const Y = Math.max(1, Math.ceil((T * C - P) / (1 - T)));
     return {
       percentage: pct,
       status: 'DEFICIT',
       safeAbsences: 0,
-      recoveryClasses: Y,
-      message: `You must attend the next ${Y} consecutive class(es) to reach ${threshold}%.`
+      recoveryClasses: 0,
+      message: `Attendance is below statutory requirement (${threshold}%).`
     };
   }
 }

@@ -1,0 +1,294 @@
+/* ══════════════════════════════════════════════════════════════
+   PAGE STYLES: DASHBOARD
+   frontend/admin/dashboard/dashboard.css
+   100% Theme Tokenized (Zero Hardcoded Hex Colors)
+   Fully Optimized for Desktop, Tablet, and Mobile Screens
+══════════════════════════════════════════════════════════════ */
+
+.dashboard-container {
+  padding-top: 1.5rem;
+  padding-bottom: 3.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ── 1. Real-Time Institutional KPI Grid (Always 1 Single Row of 3 Cards) ── */
+.stats-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.4rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+  gap: 0.35rem;
+}
+
+.kpi-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-label-short,
+.kpi-sub-short {
+  display: none;
+}
+
+.kpi-label-full,
+.kpi-sub-full {
+  display: inline;
+}
+
+.kpi-icon {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+  margin: 0.2rem 0;
+  font-family: var(--font-family-mono);
+}
+
+.kpi-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 2. Governance Modules Grid ── */
+.modules-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.15rem;
+}
+
+.modules-section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.modules-section-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.module-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.4rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  box-sizing: border-box;
+}
+
+.module-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.module-card-top {
+  margin-bottom: 1.25rem;
+}
+
+.module-badge-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.module-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.module-description {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  margin: 0.4rem 0 0 0;
+}
+
+.module-card .btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 3. Responsive Screen Adaptations ── */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding-top: 1rem;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .stats-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .kpi-card {
+    padding: 0.85rem 0.75rem;
+  }
+
+  .kpi-label {
+    font-size: 0.68rem;
+  }
+
+  .kpi-value {
+    font-size: 1.6rem;
+  }
+
+  .kpi-sub {
+    font-size: 0.68rem;
+  }
+
+  .modules-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .module-card {
+    padding: 1.15rem;
+  }
+
+  .module-title {
+    font-size: 1rem;
+  }
+
+  .module-description {
+    font-size: 0.82rem;
+  }
+
+  .module-card .btn {
+    min-height: 42px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .stats-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.45rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .kpi-card {
+    padding: 0.7rem 0.45rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .kpi-label {
+    font-size: 0.64rem;
+    letter-spacing: 0;
+  }
+
+  .kpi-label-short,
+  .kpi-sub-short {
+    display: inline;
+  }
+
+  .kpi-label-full,
+  .kpi-sub-full {
+    display: none;
+  }
+
+  .kpi-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .kpi-value {
+    font-size: 1.35rem;
+    margin: 0.1rem 0;
+  }
+
+  .kpi-sub {
+    font-size: 0.58rem;
+  }
+
+  .modules-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .modules-section-title {
+    font-size: 1.05rem;
+  }
+
+  .modules-section-sub {
+    font-size: 0.74rem;
+  }
+}

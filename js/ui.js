@@ -17,6 +17,10 @@ function showToast(message, type = 'info', duration = 4000) {
     if (legacyToast) {
       legacyToast.textContent = message;
       legacyToast.style.display = 'block';
+      legacyToast.style.position = 'fixed';
+      legacyToast.style.bottom = 'calc(64px + 1.25rem + env(safe-area-inset-bottom, 0px))';
+      legacyToast.style.right = '1.5rem';
+      legacyToast.style.zIndex = '99999';
       legacyToast.style.background = type === 'error' ? 'var(--status-absent)' : (type === 'success' ? 'var(--status-present)' : (type === 'warning' ? 'var(--status-late)' : 'var(--color-primary)'));
       legacyToast.style.color = 'var(--text-white)';
       clearTimeout(legacyToast._timeout);
@@ -25,10 +29,10 @@ function showToast(message, type = 'info', duration = 4000) {
     }
     container = document.createElement('div');
     container.id = 'toast-container';
-    container.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:0.5rem;z-index:99999;max-width:380px;pointer-events:none;';
+    container.style.cssText = 'position:fixed;bottom:calc(64px + 1.25rem + env(safe-area-inset-bottom, 0px));right:1.5rem;display:flex;flex-direction:column;gap:0.6rem;z-index:99999;max-width:400px;pointer-events:none;';
     document.body.appendChild(container);
   } else if (!container.style.position) {
-    container.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:0.5rem;z-index:99999;max-width:380px;pointer-events:none;';
+    container.style.cssText = 'position:fixed;bottom:calc(64px + 1.25rem + env(safe-area-inset-bottom, 0px));right:1.5rem;display:flex;flex-direction:column;gap:0.6rem;z-index:99999;max-width:400px;pointer-events:none;';
   }
 
   const toast = document.createElement('div');
@@ -212,7 +216,7 @@ async function openStudentDossier(studentId) {
   modal.innerHTML = `
     <div style="background:var(--bg-card);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-lg);max-width:880px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-lg);">
       <div style="padding:2.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);gap:0.75rem;">
-        <span style="font-size:2rem;">⏳</span>
+        <span style="display:inline-flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
         <span style="font-weight:600;">Loading Student Academic Dossier &amp; Vault...</span>
       </div>
     </div>
@@ -235,7 +239,7 @@ async function openStudentDossier(studentId) {
   } catch (err) {
     modal.innerHTML = `
       <div style="background:var(--bg-card);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-lg);max-width:520px;width:100%;padding:1.75rem;text-align:center;box-shadow:var(--shadow-lg);">
-        <div style="font-size:2.5rem;margin-bottom:0.75rem;">⚠️</div>
+        <div style="display:flex;justify-content:center;margin-bottom:0.75rem;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--status-absent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
         <h3 style="margin:0 0 0.5rem 0;color:var(--status-absent);">Unable to Open Dossier</h3>
         <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:1.25rem;">${esc(err.message)}</p>
         <button type="button" class="btn btn-secondary" onclick="closeStudentDossier()">Close</button>
@@ -313,7 +317,7 @@ function renderStudentDossierContent(modal, student, summary, semesters) {
     const assignmentsHtml = assignments.length ? assignments.map(a => {
       const fileBtn = a.file_path ? `
         <a href="${esc(a.file_path)}" target="_blank" download class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.2rem 0.6rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;" title="Download submitted project / assignment">
-          <span>📄</span><span>Download File</span>
+          <span style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span><span>Download File</span>
         </a>
       ` : '<span style="color: var(--text-muted); font-size: 0.75rem;">Text / Online entry</span>';
 
@@ -432,7 +436,7 @@ function renderStudentDossierContent(modal, student, summary, semesters) {
           <div style="margin-bottom: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
               <h3 style="font-size: 0.95rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
-                <span>📅</span><span>Semester ${curSem.semester} Attendance Ledger</span>
+                <span style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span><span>Semester ${curSem.semester} Attendance Ledger</span>
               </h3>
               <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">
                 Term Attendance: <span style="font-weight: 700; color: ${attPct >= 75 ? 'var(--status-present)' : 'var(--status-absent)'};">${attPct}%</span> (${attPres}/${attHeld} classes)
@@ -457,7 +461,7 @@ function renderStudentDossierContent(modal, student, summary, semesters) {
           <div style="margin-bottom: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
               <h3 style="font-size: 0.95rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
-                <span>📂</span><span>Coursework &amp; Projects Vault (Semester ${curSem.semester})</span>
+                <span style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span>Coursework &amp; Projects Vault (Semester ${curSem.semester})</span>
               </h3>
               <span style="font-size: 0.8rem; color: var(--text-muted);">${assignments.length} submission(s)</span>
             </div>
@@ -468,7 +472,7 @@ function renderStudentDossierContent(modal, student, summary, semesters) {
           <div style="margin-bottom: 1rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
               <h3 style="font-size: 0.95rem; font-weight: 700; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
-                <span>📝</span><span>Class Tests &amp; Marks (Semester ${curSem.semester})</span>
+                <span style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span><span>Class Tests &amp; Marks (Semester ${curSem.semester})</span>
               </h3>
               <span style="font-size: 0.8rem; color: var(--text-muted);">${exams.length} test(s)</span>
             </div>
@@ -492,7 +496,7 @@ function renderStudentDossierContent(modal, student, summary, semesters) {
         <!-- Modal Footer -->
         <div style="padding: 0.85rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
           <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
-            <span>🛡️</span><span>Student Data Sovereignty: Academic records belong to the student and are permanently preserved.</span>
+            <span style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span><span>Student Data Sovereignty: Academic records belong to the student and are permanently preserved.</span>
           </div>
           <button type="button" class="btn btn-secondary btn-sm" onclick="closeStudentDossier()">Close</button>
         </div>
@@ -510,5 +514,113 @@ function renderStudentDossierContent(modal, student, summary, semesters) {
 if (typeof window !== 'undefined') {
   window.openStudentDossier = openStudentDossier;
   window.closeStudentDossier = closeStudentDossier;
+  window.esc = esc;
+  window.escapeHtml = escapeHtml;
 }
+
+// ─────────────────────────────────────────────────────────
+// UNIVERSAL GOOGLE CLASSROOM NAVIGATION CONTROLLER
+// ─────────────────────────────────────────────────────────
+function toggleDrawer(forceState) {
+  const drawer = document.getElementById('gc-drawer');
+  const backdrop = document.getElementById('gc-drawer-backdrop');
+  if (!drawer) return;
+  const isOpen = forceState !== undefined ? forceState : !drawer.classList.contains('open');
+  if (isOpen) {
+    drawer.classList.add('open');
+    if (backdrop) backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  } else {
+    drawer.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+function toggleAppsLauncher(forceState) {
+  const menu = document.getElementById('apps-launcher-dropdown');
+  if (!menu) return;
+  if (typeof toggleUserProfile === 'function') toggleUserProfile(false);
+  const isOpen = forceState !== undefined ? forceState : (menu.style.display === 'none' || !menu.style.display);
+  menu.style.display = isOpen ? 'grid' : 'none';
+}
+
+function toggleUserProfile(forceState) {
+  const pop = document.getElementById('user-profile-popover');
+  if (!pop) return;
+  if (forceState !== false) {
+    const appsMenu = document.getElementById('apps-launcher-dropdown');
+    if (appsMenu) appsMenu.style.display = 'none';
+  }
+  const isOpen = forceState !== undefined ? forceState : (pop.style.display === 'none' || !pop.style.display);
+  pop.style.display = isOpen ? 'flex' : 'none';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('theme', next); } catch {}
+}
+
+if (typeof window !== 'undefined') {
+  window.toggleDrawer = toggleDrawer;
+  window.toggleAppsLauncher = toggleAppsLauncher;
+  window.toggleUserProfile = toggleUserProfile;
+  window.toggleTheme = toggleTheme;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    try {
+      const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+      if (user) {
+        const avatarEl = document.getElementById('gc-user-avatar');
+        const popAvatarEl = document.getElementById('popover-avatar');
+        const popNameEl = document.getElementById('popover-user-name');
+        const popEmailEl = document.getElementById('popover-user-email');
+        const name = user.full_name || user.name || user.username || 'User';
+        const clean = name.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
+        const parts = clean.split(/\s+/).filter(Boolean);
+        const initials = parts.length >= 2 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : clean.slice(0, 2).toUpperCase();
+        if (avatarEl && (!avatarEl.innerText || avatarEl.innerText.length <= 1)) avatarEl.innerText = initials || 'U';
+        if (popAvatarEl && (!popAvatarEl.innerText || popAvatarEl.innerText.length <= 1)) popAvatarEl.innerText = initials || 'U';
+        if (popNameEl && popNameEl.innerText.includes('Member')) popNameEl.innerText = name;
+        if (popEmailEl && popEmailEl.innerText.includes('@')) popEmailEl.innerText = user.email || `${user.username}@college.edu`;
+      }
+    } catch {}
+
+    document.addEventListener('click', (e) => {
+      const appsDropdown = document.getElementById('apps-launcher-dropdown');
+      const appsTrigger = e.target.closest('[onclick*="toggleAppsLauncher"]');
+      if (appsDropdown && appsDropdown.style.display !== 'none' && !appsDropdown.contains(e.target) && !appsTrigger) {
+        appsDropdown.style.display = 'none';
+      }
+      const profilePopover = document.getElementById('user-profile-popover');
+      const profileTrigger = e.target.closest('#gc-user-avatar');
+      if (profilePopover && profilePopover.style.display !== 'none' && !profilePopover.contains(e.target) && !profileTrigger) {
+        profilePopover.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        if (typeof window.openOmnisearch === 'function') {
+          e.preventDefault();
+          window.openOmnisearch();
+        } else if (window.location.pathname.startsWith('/faculty/')) {
+          e.preventDefault();
+          window.location.href = '/faculty/media.html';
+        }
+      }
+      if (e.key === 'Escape') {
+        if (typeof window.closeOmnisearch === 'function') {
+          window.closeOmnisearch();
+        }
+        toggleDrawer(false);
+        toggleAppsLauncher(false);
+        toggleUserProfile(false);
+      }
+    });
+  });
+}
+
 

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — VidyaOS Campus Management</title>
+  <meta name="description" content="Register for VidyaOS institutional portal as a student or faculty member. Secure institutional registration.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  
+  <link rel="stylesheet" href="/components/modal/modal.css?v=20261003">
+  <link rel="stylesheet" href="/login/register/register.css?v=20261003">
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<div class="top-bar">
+  <a href="/index.html" class="brand-mark">
+    <div class="brand-icon" style="display:flex;align-items:center;justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></div>
+    <span class="brand-wordmark">Vidya<span>OS</span></span>
+  </a>
+  <div class="bar-actions">
+    <a href="/login/index.html" class="btn-ghost">Sign In</a>
+    <button class="btn-theme" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle dark mode" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+  </div>
+</div>
+
+<!-- ── MAIN CARD ── -->
+<div class="reg-card" id="main-card">
+
+  <!-- ── CARD HEADER ── -->
+  <div class="card-header">
+    <div class="header-badge">Institutional Onboarding</div>
+    <h1 class="header-title" id="page-heading">Create your account</h1>
+    <p class="header-sub" id="page-subheading">Select your role and fill in your details below</p>
+  </div>
+
+  <!-- ── ROLE SWITCHER ── -->
+  <div class="role-switcher" role="tablist" aria-label="Select registration role">
+    <button type="button" class="rs-btn active" id="tab-student" onclick="switchRole('student')" role="tab" aria-selected="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg> Student
+    </button>
+    <button type="button" class="rs-btn" id="tab-faculty" onclick="switchRole('faculty')" role="tab" aria-selected="false">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Faculty &amp; HOD
+    </button>
+  </div>
+
+  <!-- ── GLOBAL ALERT ── -->
+  <div id="alert-banner" class="alert" role="alert"></div>
+
+  <!-- ══ FORM CONTAINER ══ -->
+  <div id="form-container">
+
+    <!-- ═══════════════════════════════════════════
+         STUDENT REGISTRATION
+         ═══════════════════════════════════════════ -->
+    <div id="student-section" class="tab-section active">
+      <form id="student-form" novalidate onsubmit="handleStudentSubmit(event)">
+
+        <p class="section-label">Academic Details</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="lbl" for="stu-dept">Branch / Department <span class="req">*</span></label>
+            <div class="inp-wrap">
+              <select id="stu-dept" class="inp" required onchange="handleStudentDeptChange()">
+                <option value="">— Loading branches…</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl" for="stu-sem">Current Semester <span class="req">*</span></label>
+            <div class="inp-wrap">
+              <select id="stu-sem" class="inp" required disabled onchange="handleStudentSemChange()">
+                <option value="">— Select branch first —</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Routing Banner -->
+        <div class="callout" id="stu-routing-banner">
+          <span class="callout-icon" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg></span>
+          <div class="callout-text">
+            <strong id="stu-routing-target">Department Verification</strong>
+            <span id="stu-routing-desc">Select your branch and semester. Requests are verified by Department Faculty.</span>
+          </div>
+        </div>
+
+        <p class="section-label">Personal Information</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="lbl" for="stu-name">Full Name <span class="req">*</span></label>
+            <input type="text" id="stu-name" class="inp" placeholder="e.g. Aarav Sharma" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label class="lbl" for="stu-enroll">Enrollment No. <span class="req">*</span></label>
+            <input type="text" id="stu-enroll" class="inp mono" placeholder="e.g. 2024IT001" required autocomplete="off" style="text-transform:uppercase;">
+            <p class="inp-hint">Issued by university / college.</p>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="lbl" for="stu-ubter">UBTER Reg. No. <span class="opt">(optional)</span></label>
+            <input type="text" id="stu-ubter" class="inp mono" placeholder="e.g. R230104001" autocomplete="off" style="text-transform:uppercase;">
+          </div>
+          <div class="field">
+            <label class="lbl" for="stu-email">Gmail Address <span class="req">*</span></label>
+            <input type="email" id="stu-email" class="inp" placeholder="student@gmail.com" required autocomplete="email">
+            <p class="inp-hint">Used for sign-in &amp; alerts.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="stu-phone">Mobile Number <span class="opt">(optional)</span></label>
+          <div class="phone-row">
+            <span class="phone-cc">+91</span>
+            <input type="tel" id="stu-phone" class="inp" placeholder="10-digit mobile" maxlength="10" pattern="[6-9][0-9]{9}" autocomplete="tel" style="flex:1;">
+          </div>
+          <p class="inp-hint">Used for attendance alerts and institutional notifications.</p>
+        </div>
+
+        <p class="section-label">Set Password</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="lbl" for="stu-password">Password <span class="req">*</span></label>
+            <div class="pw-field">
+              <input type="password" id="stu-password" class="inp" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password" oninput="checkStrength('stu')" style="padding-right:2.2rem;">
+              <button type="button" class="pw-eye" onclick="togglePwVisibility('stu-password', this)" aria-label="Toggle password" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+            </div>
+            <div id="stu-pw-bar" class="pw-bar"></div>
+            <div id="stu-pw-label" class="pw-lbl"></div>
+          </div>
+          <div class="field">
+            <label class="lbl" for="stu-confirm">Confirm Password <span class="req">*</span></label>
+            <div class="pw-field">
+              <input type="password" id="stu-confirm" class="inp" placeholder="Re-enter password" required minlength="8" autocomplete="new-password" style="padding-right:2.2rem;">
+              <button type="button" class="pw-eye" onclick="togglePwVisibility('stu-confirm', this)" aria-label="Toggle confirm" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="stu-submit-btn" class="btn-submit">
+          Submit Registration <span class="arrow">→</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         FACULTY & HOD REGISTRATION
+         ═══════════════════════════════════════════ -->
+    <div id="faculty-section" class="tab-section">
+      <form id="faculty-form" novalidate onsubmit="handleFacultySubmit(event)">
+
+        <p class="section-label">Account Role</p>
+        <div class="type-grid">
+          <button type="button" id="fac-btn-role-teacher" class="type-card active" onclick="setFacultyType('FACULTY')">
+            <div class="type-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Faculty Member</div>
+            <div class="type-card-sub">Department or Common Faculty</div>
+          </button>
+          <button type="button" id="fac-btn-role-hod" class="type-card" onclick="setFacultyType('HOD')">
+            <div class="type-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg> Head of Department</div>
+            <div class="type-card-sub">Department Leadership</div>
+          </button>
+        </div>
+
+        <!-- Routing Callout -->
+        <div class="callout" id="fac-routing-banner">
+          <span class="callout-icon" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
+          <div class="callout-text">
+            <strong id="fac-routing-target">Department HOD Review</strong>
+            <span id="fac-routing-desc">Your registration will be submitted to the Head of Department for authorization.</span>
+          </div>
+        </div>
+
+        <p class="section-label">Personal Information</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="lbl" for="fac-name">Full Name <span class="req">*</span></label>
+            <input type="text" id="fac-name" class="inp" placeholder="e.g. Dr. Ramesh Joshi" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label class="lbl" for="fac-email">Institutional Gmail <span class="req">*</span></label>
+            <input type="email" id="fac-email" class="inp" placeholder="ramesh.joshi@gmail.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="fac-dept">Department / Affiliation <span class="req">*</span></label>
+          <div class="inp-wrap">
+            <select id="fac-dept" class="inp" required onchange="handleFacultyDeptChange()">
+              <option value="">— Loading departments…</option>
+            </select>
+          </div>
+          <p id="fac-dept-hint" class="inp-hint">Select your institutional department or Common Faculty.</p>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="fac-phone">Mobile Number <span class="opt">(optional)</span></label>
+          <div class="phone-row">
+            <span class="phone-cc">+91</span>
+            <input type="tel" id="fac-phone" class="inp" placeholder="10-digit mobile" maxlength="10" pattern="[6-9][0-9]{9}" autocomplete="tel" style="flex:1;">
+          </div>
+          <p class="inp-hint">Used for institutional communications and notifications.</p>
+        </div>
+
+        <p class="section-label">Credentials</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="lbl" for="fac-empid">Employee ID <span class="opt">(optional)</span></label>
+            <input type="text" id="fac-empid" class="inp mono" placeholder="e.g. FAC-2026-042" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="lbl" for="fac-password">Create Password <span class="req">*</span></label>
+            <div class="pw-field">
+              <input type="password" id="fac-password" class="inp" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password" style="padding-right:2.2rem;">
+              <button type="button" class="pw-eye" onclick="togglePwVisibility('fac-password', this)" aria-label="Toggle password" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="fac-submit-btn" class="btn-submit">
+          Submit Application <span class="arrow">→</span>
+        </button>
+      </form>
+    </div>
+
+  </div><!-- /#form-container -->
+
+  <!-- ═══════════════════════════════════════════
+       SUCCESS VIEW
+       ═══════════════════════════════════════════ -->
+  <div id="success-view" class="success-view">
+    <div class="success-ring" style="display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+    <h2 class="success-title">Registration Submitted!</h2>
+    <p class="success-msg" id="success-message">
+      Your account request has been received and routed for administrative authorization.
+    </p>
+    <div class="summary-grid" id="success-summary"></div>
+    <div class="what-next">
+      <strong>What happens next?</strong> Your departmental administrator will verify your credentials and approve your account. Once authorized, you can sign in through the unified login portal.
+    </div>
+    <a href="/login/index.html" class="btn-goto">Go to Sign In →</a>
+  </div>
+
+  <!-- ── FOOTER LINKS ── -->
+  <div class="footer-links">
+    <div>Already registered? <a href="/login/index.html">Sign In →</a></div>
+    <div style="font-size:0.75rem;">
+      Standalone forms:
+      <a href="/login/student-register.html">Student</a>
+      <span class="sep">&nbsp;·&nbsp;</span>
+      <a href="/login/faculty-register.html">Faculty</a>
+    </div>
+  </div>
+
+</div><!-- /.reg-card -->
+
+<script src="/js/ui.js"></script>
+<script src="/js/api.js"></script>
+
+  <script src="/components/modal/modal.js?v=20261003"></script>
+  <script src="/login/register/register.js?v=20261003"></script>
+</body>
+</html>

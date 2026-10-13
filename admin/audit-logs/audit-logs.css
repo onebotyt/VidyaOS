@@ -1,0 +1,224 @@
+/* ══════════════════════════════════════════════════════════════
+   PAGE STYLES: AUDIT-LOGS
+   frontend/admin/audit-logs/audit-logs.css
+══════════════════════════════════════════════════════════════ */
+
+.page-main-container {
+      padding-top: 1.25rem;
+      padding-bottom: 3.5rem;
+    }
+
+    .audit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* KPI Summary Strip */
+    .kpi-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .kpi-board { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .kpi-board { grid-template-columns: 1fr; }
+    }
+
+    .kpi-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .kpi-box:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-box::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--box-accent, var(--color-primary));
+    }
+    .kpi-box-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .kpi-box-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+    .kpi-box-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Filter & Search Bar */
+    .filter-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      align-items: flex-end;
+    }
+
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 170px;
+      flex: 1;
+    }
+    .filter-field label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    /* Audit Table Card */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--table-bg);
+      font-size: 0.85rem;
+    }
+    .audit-table th {
+      background: var(--table-th-bg);
+      color: var(--table-th-color, var(--text-muted));
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .audit-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    .audit-table tr:hover td {
+      background: var(--table-hover-bg, var(--bg-surface));
+    }
+
+    /* Event Badges */
+    .event-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-family: var(--font-family-mono);
+      white-space: nowrap;
+    }
+    .event-approved { background: var(--status-present-bg); color: var(--status-present); }
+    .event-rejected { background: var(--status-absent-bg); color: var(--status-absent); }
+    .event-admin { background: var(--chip-admin-bg); color: var(--chip-admin-color); }
+    .event-biometric { background: var(--chip-classteacher-bg); color: var(--chip-classteacher-color); }
+    .event-academic { background: var(--chip-faculty-bg); color: var(--chip-faculty-color); }
+    .event-attendance { background: var(--status-late-bg); color: var(--status-late); }
+
+    .json-chip {
+      font-family: var(--font-family-mono);
+      font-size: 0.72rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 0.2rem 0.45rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .json-chip:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* Pagination Footer */
+    .pagination-bar {
+      padding: 0.85rem 1.25rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    /* Details Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+

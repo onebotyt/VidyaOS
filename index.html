@@ -303,6 +303,56 @@
       box-shadow: 0 8px 20px -2px rgba(79, 70, 229, 0.45);
     }
 
+    @media (max-width: 640px) {
+      .nav-container {
+        padding: 0.6rem 1rem;
+        gap: 0.5rem;
+      }
+      .brand-group {
+        gap: 0.6rem;
+      }
+      .brand-emblem {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+      }
+      .brand-emblem svg {
+        width: 19px;
+        height: 19px;
+      }
+      .brand-name {
+        font-size: 1.15rem;
+      }
+      .brand-tagline {
+        display: none;
+      }
+      .nav-actions {
+        gap: 0.45rem;
+      }
+      .theme-toggle {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+      }
+      .theme-toggle svg {
+        width: 16px;
+        height: 16px;
+      }
+      .btn-nav-ghost {
+        display: none !important;
+      }
+      .btn-nav-cta {
+        padding: 0.42rem 0.85rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        gap: 0.35rem;
+      }
+      .btn-nav-cta svg {
+        width: 13px;
+        height: 13px;
+      }
+    }
+
     /* ── Main Layout ── */
     .page-main {
       position: relative;
@@ -362,9 +412,6 @@
       color: var(--text-main);
       margin-bottom: 1.35rem;
     }
-    @media (max-width: 768px) {
-      .hero-headline { font-size: 2.35rem; }
-    }
     .hero-headline .gradient-text {
       background: linear-gradient(135deg, var(--color-primary) 0%, hsl(265, 85%, 62%) 50%, hsl(210, 95%, 55%) 100%);
       -webkit-background-clip: text;
@@ -379,9 +426,6 @@
       max-width: 720px;
       margin: 0 auto 2.5rem;
       font-weight: 400;
-    }
-    @media (max-width: 768px) {
-      .hero-description { font-size: 0.98rem; }
     }
 
     .hero-cta-row {
@@ -430,6 +474,78 @@
       color: var(--color-primary);
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
+    }
+
+    .badge-text-short {
+      display: none;
+    }
+    .badge-text-full {
+      display: inline;
+    }
+
+    @media (max-width: 768px) {
+      .page-main {
+        padding: 1.75rem 1rem 5.5rem;
+      }
+      .hero-wrap {
+        margin-bottom: 2rem;
+      }
+      .hero-headline {
+        font-size: 2.15rem;
+        line-height: 1.15;
+      }
+      .hero-description {
+        font-size: 0.92rem;
+        line-height: 1.5;
+        margin-bottom: 1.75rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-main {
+        padding: 1.25rem 1rem 5.5rem;
+      }
+      .hero-wrap {
+        margin-bottom: 1.85rem;
+      }
+      .hero-badge-pill {
+        font-size: 0.72rem;
+        padding: 0.25rem 0.65rem;
+        margin-bottom: 0.75rem;
+        max-width: 100%;
+      }
+      .badge-text-full {
+        display: none;
+      }
+      .badge-text-short {
+        display: inline;
+      }
+      .hero-headline {
+        font-size: 1.8rem;
+        line-height: 1.16;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.65rem;
+      }
+      .hero-description {
+        font-size: 0.85rem;
+        line-height: 1.45;
+        margin-bottom: 1.25rem;
+        padding: 0;
+      }
+      .hero-cta-row {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.55rem;
+        margin-bottom: 1.25rem;
+      }
+      .btn-hero-launch,
+      .btn-hero-register {
+        width: 100%;
+        justify-content: center;
+        padding: 0.72rem 1.15rem;
+        font-size: 0.9rem;
+        border-radius: 10px;
+      }
     }
 
 
@@ -639,6 +755,75 @@
       border-radius: 9999px;
     }
 
+    @media (max-width: 640px) {
+      .os-preview-window {
+        margin: 0 auto 2.75rem;
+        border-radius: 14px;
+      }
+      .window-header {
+        padding: 0.55rem 0.85rem;
+        gap: 0.5rem;
+      }
+      .window-title {
+        font-size: 0.72rem;
+        min-width: 0;
+        flex: 1;
+      }
+      .window-title-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+      }
+      .pill-live {
+        font-size: 0.65rem;
+        padding: 0.18rem 0.45rem;
+        white-space: nowrap;
+      }
+      .window-body {
+        padding: 0.75rem;
+        gap: 0.75rem;
+      }
+      .studio-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+        padding: 0.75rem;
+      }
+      .studio-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+      }
+      .subject-chip {
+        font-size: 0.76rem;
+      }
+      .esp-status-chip {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.5rem;
+      }
+      .live-pin-card {
+        width: 100%;
+        justify-content: space-between;
+        padding: 0.45rem 0.75rem;
+      }
+      .pin-digits {
+        white-space: nowrap;
+        font-size: 0.98rem;
+      }
+      .pin-label {
+        font-size: 0.68rem;
+      }
+      .pin-timer {
+        font-size: 0.7rem;
+      }
+      .preview-table th,
+      .preview-table td {
+        padding: 0.55rem 0.65rem;
+        font-size: 0.76rem;
+      }
+    }
+
     /* ── Metrics Bento Bar ── */
     .metrics-bento {
       display: grid;
@@ -649,8 +834,35 @@
     @media (max-width: 960px) {
       .metrics-bento { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 520px) {
-      .metrics-bento { grid-template-columns: 1fr; }
+    @media (max-width: 640px) {
+      .metrics-bento {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.65rem;
+        margin-bottom: 3rem;
+      }
+      .metric-card {
+        padding: 0.95rem 0.85rem;
+        border-radius: 12px;
+      }
+      .metric-number {
+        font-size: 1.55rem;
+      }
+      .metric-unit {
+        font-size: 1.05rem;
+      }
+      .metric-title {
+        font-size: 0.78rem;
+        margin-bottom: 0.2rem;
+        line-height: 1.25;
+      }
+      .metric-desc {
+        font-size: 0.68rem;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
     }
     .metric-card {
       background: var(--bg-card);
@@ -739,6 +951,78 @@
     }
     @media (max-width: 960px) {
       .gateways-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .section-header {
+        margin-bottom: 1.75rem;
+      }
+      .section-tag {
+        font-size: 0.72rem;
+        margin-bottom: 0.4rem;
+      }
+      .section-title {
+        font-size: 1.65rem;
+        margin-bottom: 0.5rem;
+      }
+      .section-subtitle {
+        font-size: 0.84rem;
+        line-height: 1.45;
+      }
+      .gateways-grid {
+        gap: 1rem;
+        margin-bottom: 3.25rem;
+      }
+      .portal-card {
+        padding: 1.35rem 1.15rem;
+        border-radius: 16px;
+      }
+      .portal-card-top {
+        margin-bottom: 1.1rem;
+      }
+      .portal-badge-bar {
+        margin-bottom: 0.75rem;
+      }
+      .portal-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+      }
+      .portal-icon-box svg {
+        width: 20px;
+        height: 20px;
+      }
+      .portal-role-tag {
+        font-size: 0.68rem;
+        padding: 0.2rem 0.55rem;
+      }
+      .portal-title {
+        font-size: 1.18rem;
+        margin-bottom: 0.35rem;
+      }
+      .portal-desc {
+        font-size: 0.82rem;
+        line-height: 1.45;
+        margin-bottom: 1rem;
+      }
+      .portal-feature-list {
+        gap: 0.45rem;
+        padding-top: 0.75rem;
+        margin-bottom: 1.15rem;
+      }
+      .portal-feature-list li {
+        font-size: 0.78rem;
+        line-height: 1.35;
+      }
+      .portal-actions {
+        gap: 0.5rem;
+      }
+      .btn-portal-enter {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.86rem;
+      }
+      .link-portal-sub {
+        font-size: 0.75rem;
+      }
     }
     .portal-card {
       background: var(--bg-card);
@@ -899,6 +1183,34 @@
     @media (max-width: 960px) {
       .features-bento-grid { grid-template-columns: 1fr; }
     }
+    @media (max-width: 640px) {
+      .features-bento-grid {
+        gap: 0.85rem;
+        margin-bottom: 3.5rem;
+      }
+      .feat-card {
+        padding: 1.15rem;
+        border-radius: 14px;
+      }
+      .feat-icon-bubble {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+      }
+      .feat-icon-bubble svg {
+        width: 19px;
+        height: 19px;
+      }
+      .feat-heading {
+        font-size: 1.02rem;
+        margin-bottom: 0.3rem;
+      }
+      .feat-text {
+        font-size: 0.8rem;
+        line-height: 1.45;
+      }
+    }
     .feat-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -1011,6 +1323,28 @@
       margin: 0 0.2rem;
     }
 
+    @media (max-width: 640px) {
+      .floating-island-dock {
+        bottom: 0.85rem;
+        padding: 0.3rem 0.5rem;
+        gap: 0.35rem;
+      }
+      .dock-btn {
+        width: 38px;
+        height: 38px;
+      }
+      .dock-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .dock-btn .dock-tooltip {
+        display: none !important;
+      }
+      .dock-divider-line {
+        height: 20px;
+        margin: 0 0.1rem;
+      }
+    }
 
     /* ── Footer ── */
     .site-footer {
@@ -1021,6 +1355,24 @@
       font-size: 0.84rem;
       position: relative;
       z-index: 1;
+    }
+    @media (max-width: 640px) {
+      .site-footer {
+        padding: 2.25rem 1rem 5.5rem;
+      }
+      .footer-inner {
+        gap: 1rem;
+      }
+      .footer-nav {
+        gap: 0.85rem;
+        font-size: 0.78rem;
+      }
+      .footer-credits {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.35rem;
+        font-size: 0.72rem;
+      }
     }
     .footer-inner {
       max-width: 1240px;
@@ -1131,8 +1483,9 @@
     <!-- Hero Header -->
     <section class="hero-wrap">
       <div class="hero-badge-pill">
-        <span class="badge-spark">⚡</span>
-        <span>VidyaOS 2026 Academic Release · Zero-Latency Institutional Core</span>
+        <span class="badge-spark" style="display:inline-flex;align-items:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
+        <span class="badge-text-full">VidyaOS 2026 Academic Release · Zero-Latency Core</span>
+        <span class="badge-text-short">VidyaOS 2026 · Institutional Core</span>
       </div>
 
       <h1 class="hero-headline">
@@ -1167,12 +1520,12 @@
           <span class="dot dot-max"></span>
         </div>
         <div class="window-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="3" y1="9" x2="21" y2="9"></line>
             <line x1="9" y1="21" x2="9" y2="9"></line>
           </svg>
-          vidyaos/registers/matrix · IT-502 Data Structures &amp; Algorithms
+          <span class="window-title-text">vidyaos/registers/matrix · IT-502 Data Structures &amp; Algorithms</span>
         </div>
         <div class="window-pills">
           <span class="pill-live">● Live Studio Active</span>
@@ -1199,7 +1552,7 @@
           <div class="live-pin-card">
             <span class="pin-label">Roll Call PIN:</span>
             <span class="pin-digits" id="live-ticker-pin">482 109</span>
-            <span class="pin-timer" id="live-ticker-timer">⏳ 04:32</span>
+            <span class="pin-timer" id="live-ticker-timer" style="display:inline-flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> 04:32</span>
           </div>
         </div>
 
@@ -1233,7 +1586,7 @@
                 <td><span class="status-cell cell-p">P</span></td>
                 <td><span class="status-cell cell-p">P</span></td>
                 <td><strong>94.2%</strong></td>
-                <td><span class="badge-regular">✓ Regular</span></td>
+                <td><span class="badge-regular" style="display:inline-flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Regular</span></td>
               </tr>
               <tr>
                 <td><strong>02</strong></td>
@@ -1246,7 +1599,7 @@
                 <td><span class="status-cell cell-p">P</span></td>
                 <td><span class="status-cell cell-p">P</span></td>
                 <td><strong>91.4%</strong></td>
-                <td><span class="badge-regular">✓ Regular</span></td>
+                <td><span class="badge-regular" style="display:inline-flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Regular</span></td>
               </tr>
               <tr>
                 <td><strong>03</strong></td>
@@ -1259,7 +1612,7 @@
                 <td><span class="status-cell cell-a">A</span></td>
                 <td><span class="status-cell cell-p">P</span></td>
                 <td><strong style="color:var(--status-absent);">73.8%</strong></td>
-                <td><span class="badge-risk">⚠ At Risk (75%)</span></td>
+                <td><span class="badge-risk" style="display:inline-flex;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> At Risk (75%)</span></td>
               </tr>
               <tr>
                 <td><strong>04</strong></td>
@@ -1272,7 +1625,7 @@
                 <td><span class="status-cell cell-p">P</span></td>
                 <td><span class="status-cell cell-p">P</span></td>
                 <td><strong>98.0%</strong></td>
-                <td><span class="badge-regular">✓ Regular</span></td>
+                <td><span class="badge-regular" style="display:inline-flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Regular</span></td>
               </tr>
             </tbody>
           </table>
@@ -1306,7 +1659,7 @@
           <span class="metric-unit">%</span>
         </div>
         <div class="metric-title">Defaulter Radar Engine</div>
-        <p class="metric-desc">Predictive threshold intelligence alerting students before examination bar requirements.</p>
+        <p class="metric-desc">Institutional threshold intelligence alerting students of examination bar compliance.</p>
       </div>
 
       <div class="metric-card">
@@ -1342,12 +1695,12 @@
             </div>
             <h3 class="portal-title">Student Gateway</h3>
             <p class="portal-desc">
-              Monitor subject-wise attendance, track the 75% threshold predictor, submit PIN check-ins, and inspect coursework scorecards.
+              Monitor subject-wise attendance, track institutional 75% compliance, submit PIN check-ins, and inspect coursework scorecards.
             </p>
             <ul class="portal-feature-list">
-              <li><span class="feat-check">✓</span> Live attendance threshold calculator</li>
-              <li><span class="feat-check">✓</span> Classroom Dynamic 6-digit PIN check-in</li>
-              <li><span class="feat-check">✓</span> Coursework &amp; Continuous Marks report</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Live attendance threshold calculator</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Classroom Dynamic 6-digit PIN check-in</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Coursework &amp; Continuous Marks report</li>
             </ul>
           </div>
           <div class="portal-actions">
@@ -1380,9 +1733,9 @@
               Take roll call via dual studio, maintain Day 1-31 matrices, sync ESP32 scanners, grade assignments, and approve student admissions.
             </p>
             <ul class="portal-feature-list">
-              <li><span class="feat-check">✓</span> Consolidated registers matrix &amp; live studio</li>
-              <li><span class="feat-check">✓</span> Google Classroom assignments &amp; CIA marks</li>
-              <li><span class="feat-check">✓</span> 1-Click Excel reports &amp; HOD roster approvals</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Consolidated registers matrix &amp; live studio</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Google Classroom assignments &amp; CIA marks</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> 1-Click Excel reports &amp; HOD roster approvals</li>
             </ul>
           </div>
           <div class="portal-actions">
@@ -1412,9 +1765,9 @@
               Manage departmental topology, configure semester calendars, supervise biometric terminals, and enforce institutional RBAC security.
             </p>
             <ul class="portal-feature-list">
-              <li><span class="feat-check">✓</span> Department hierarchy &amp; faculty mapping</li>
-              <li><span class="feat-check">✓</span> Strict Role-Based Access Control (RBAC)</li>
-              <li><span class="feat-check">✓</span> Hardware terminal provisioning &amp; audit trails</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Department hierarchy &amp; faculty mapping</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Strict Role-Based Access Control (RBAC)</li>
+              <li><span class="feat-check" style="display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Hardware terminal provisioning &amp; audit trails</li>
             </ul>
           </div>
           <div class="portal-actions">
@@ -1609,7 +1962,7 @@
         }
         const m = Math.floor(remaining / 60);
         const s = remaining % 60;
-        timerEl.textContent = `⏳ ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        timerEl.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
       }, 1000);
     })();
 

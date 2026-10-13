@@ -1,0 +1,13 @@
+/* ══════════════════════════════════════════════════════════════
+   PAGE STYLES: TIMETABLE
+   frontend/student/timetable/timetable.css
+══════════════════════════════════════════════════════════════ */
+
+.day-col { min-width: 200px; }
+    .week-grid { display: flex; gap: 0.8rem; overflow-x: auto; padding-bottom: 0.5rem; margin-top: 1rem; }
+    .day-header { font-weight: 800; font-size: 0.85rem; text-align: center; padding: 0.5rem; background: var(--bg-surface); border-radius: var(--radius-sm); margin-bottom: 0.6rem; }
+    .slot-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.6rem; font-size: 0.82rem; }
+    .slot-time { font-weight: 700; color: var(--color-primary); }
+    .slot-subject { font-weight: 700; margin-top: 0.15rem; }
+    .slot-meta { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem; }
+

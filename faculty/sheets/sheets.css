@@ -1,0 +1,2173 @@
+/* ══════════════════════════════════════════════════════════════
+   PAGE STYLES: SHEETS
+   frontend/faculty/sheets/sheets.css
+══════════════════════════════════════════════════════════════ */
+
+/* Full-viewport Spreadsheet App Layout (Zero Window Scrolling) */
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-family: var(--font-family-sans);
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Studio Full-Screen Canvas: Hide global institutional footer & mobile bottom nav */
+    .app-footer,
+    .mobile-bottom-nav {
+      display: none !important;
+    }
+
+    /* Universal GC Top Nav */
+    .gc-navbar {
+      flex-shrink: 0;
+      z-index: 1000;
+    }
+
+    /* Studio Main Layout Container */
+    .sheets-studio-layout {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 0.2rem 0.45rem 0.2rem 0.45rem;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       4-BAR STUDIO HIERARCHY & CONTROLS
+       ══════════════════════════════════════════════════════════════ */
+    
+    /* Common Studio Bar Container */
+    .studio-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.35rem;
+      padding: 0.22rem 0.55rem;
+      box-sizing: border-box;
+      z-index: 30;
+    }
+    .studio-bar-left,
+    .studio-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: nowrap;
+    }
+
+    /* BAR 1: Minimal Back + Class Switcher with Code + Export + Edit/Save Toggle */
+    .studio-bar-1,
+    .sheets-top-command-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      min-height: 35px;
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-icon-minimal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+    .btn-icon-minimal:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .group-selector-select {
+      padding: 0.22rem 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+      max-width: 280px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .group-selector-select:focus {
+      border-color: var(--color-primary);
+    }
+    .btn-edit-save-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .btn-edit-save-toggle:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .btn-edit-save-toggle.is-editing {
+      background: var(--color-primary);
+      color: var(--text-white);
+      border-color: var(--color-primary);
+    }
+
+    /* BAR 2: Sheet Selector + Sub-Sheet Dropdown + Edit Student Modal Trigger */
+    .studio-bar-2 {
+      background: var(--bg-card);
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      min-height: 38px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+      z-index: 25;
+    }
+    .studio-bar-2::-webkit-scrollbar {
+      display: none;
+    }
+    .bar-tools-badge {
+      display: none !important;
+    }
+    .sheet-select-dropdown,
+    .subsheet-select-dropdown {
+      padding: 0.22rem 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+      flex-shrink: 0;
+      max-width: 175px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .sheet-select-dropdown:focus,
+    .subsheet-select-dropdown:focus {
+      border-color: var(--color-primary);
+    }
+    .subsheet-selector-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+    .subsheet-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 0.18rem 0.45rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+    .subsheet-calendar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+
+    /* Responsive Button Text Helpers */
+    .btn-text-short {
+      display: none;
+    }
+
+    /* Segmented Sheet View Mode Switcher (Dynamic vs Overview) */
+    .sheet-mode-segmented {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-surface-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .btn-mode-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.16rem 0.45rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: all 0.15s ease;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .btn-mode-toggle:hover {
+      color: var(--text-main);
+    }
+    .btn-mode-toggle.active {
+      background: var(--color-primary);
+      color: var(--text-white);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Dynamic Student Cell (Name on Line 1, Enrollment on Line 2) */
+    .dyn-student-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      line-height: 1.15;
+      text-align: left;
+    }
+    .dyn-student-name {
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.8rem;
+    }
+    .dyn-student-enroll {
+      display: none;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-family: var(--font-family-mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #sheets-viewport.sheet-mode-dynamic .dyn-student-enroll {
+      display: block !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DYNAMIC SHEET MODE (MOBILE STICKY ROLL + NAME & HORIZONTAL SCROLL)
+       ══════════════════════════════════════════════════════════════ */
+    #sheets-viewport.sheet-mode-dynamic {
+      overscroll-behavior-x: contain !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic .sheet-scale-wrapper {
+      transform: none !important;
+      width: max-content !important;
+      min-width: 100% !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic table.excel-table,
+    #sheets-viewport.sheet-mode-dynamic table.sheet-table,
+    #sheets-viewport.sheet-mode-dynamic table.studio-sheet-table {
+      width: max-content !important;
+      min-width: 100% !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      margin-right: 0 !important;
+    }
+    /* Hide redundant columns in Dynamic Mode */
+    #sheets-viewport.sheet-mode-dynamic .col-sr,
+    #sheets-viewport.sheet-mode-dynamic .col-reg,
+    #sheets-viewport.sheet-mode-dynamic .col-side-panel,
+    #sheets-viewport.sheet-mode-dynamic thead th.col-enroll,
+    #sheets-viewport.sheet-mode-dynamic tbody td.col-enroll,
+    #sheets-viewport.sheet-mode-dynamic thead th.excel-cell-sr,
+    #sheets-viewport.sheet-mode-dynamic tbody td.excel-cell-sr {
+      display: none !important;
+    }
+    /* Sticky Roll No column (left: 0) */
+    #sheets-viewport.sheet-mode-dynamic th.col-roll,
+    #sheets-viewport.sheet-mode-dynamic td.col-roll,
+    #sheets-viewport.sheet-mode-dynamic td.cell-roll {
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 8 !important;
+      background: var(--bg-card) !important;
+      min-width: 44px !important;
+      max-width: 50px !important;
+      text-align: center !important;
+      border-right: 1px solid var(--border-color) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic thead th.col-roll {
+      z-index: 12 !important;
+      background: var(--chip-hod-bg) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic thead tr.excel-hdr-numbers th.col-roll {
+      z-index: 12 !important;
+      background: var(--bg-surface-secondary) !important;
+    }
+    /* Sticky Name column (left: 44px) */
+    #sheets-viewport.sheet-mode-dynamic th.col-name,
+    #sheets-viewport.sheet-mode-dynamic td.col-name,
+    #sheets-viewport.sheet-mode-dynamic td.cell-student-name {
+      position: sticky !important;
+      left: 44px !important;
+      z-index: 8 !important;
+      background: var(--bg-card) !important;
+      min-width: 135px !important;
+      max-width: 170px !important;
+      text-align: left !important;
+      border-right: 2px solid var(--border-color) !important;
+      box-shadow: 2px 0 6px var(--shadow-sm) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic thead th.col-name {
+      z-index: 12 !important;
+      background: var(--chip-hod-bg) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic thead tr.excel-hdr-numbers th.col-name {
+      z-index: 12 !important;
+      background: var(--bg-surface-secondary) !important;
+    }
+    /* Top Blue Header rows sticky anchor */
+    #sheets-viewport.sheet-mode-dynamic tr.excel-hdr-blue th {
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 6 !important;
+      text-align: left !important;
+      padding-left: 0.75rem !important;
+    }
+    /* Temporary pulse when jumping to a column */
+    @keyframes columnPulseHighlight {
+      0% { outline: 2px solid var(--color-primary); background: var(--color-primary-light) !important; }
+      50% { outline: 2px solid var(--color-primary); background: var(--chip-hod-bg) !important; }
+      100% { outline: none; }
+    }
+    .focus-column-pulse {
+      animation: columnPulseHighlight 1.8s ease-out !important;
+    }
+
+    /* BAR 3: Search & Filters Toolbar */
+    .studio-bar-3,
+    .eval-filter-toolbar {
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      min-height: 34px;
+      z-index: 40;
+      position: relative;
+    }
+
+    /* Floating Action Button (FAB) */
+    .floating-tools-fab {
+      position: fixed;
+      right: 18px;
+      bottom: 70px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--text-white);
+      border: none;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1050;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .floating-tools-fab:hover {
+      transform: scale(1.06);
+      background: var(--color-primary-hover);
+    }
+
+    /* Floating Bottom Bar Drawer */
+    .floating-bottom-drawer {
+      position: fixed;
+      bottom: 56px;
+      left: 0;
+      right: 0;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      z-index: 1040;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      animation: slideUpDrawer 0.18s ease-out;
+      box-sizing: border-box;
+    }
+    @keyframes slideUpDrawer {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .drawer-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0.2rem 0.4rem;
+      border-radius: var(--radius-sm);
+    }
+    .drawer-close-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-surface);
+    }
+    .drawer-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .drawer-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .drawer-sec-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+    .drawer-ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    /* BAR 4: Main Bottom Menu Bar */
+    .studio-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 1000;
+      box-shadow: var(--shadow-md);
+      box-sizing: border-box;
+    }
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      transition: color 0.15s ease;
+    }
+    .bottom-nav-item:hover,
+    .bottom-nav-item.active {
+      color: var(--color-primary);
+    }
+    .bottom-profile-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--text-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+
+    /* Android-Style Profile Drawer */
+    .android-profile-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--text-main);
+      opacity: 0.5;
+      z-index: 1190;
+    }
+    .android-profile-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 85vh;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      z-index: 1200;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      padding: 0.75rem 1.25rem 2rem 1.25rem;
+      animation: slideUpDrawer 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
+    }
+    .drawer-handle-pill {
+      width: 36px;
+      height: 4px;
+      border-radius: var(--radius-pill);
+      background: var(--border-color);
+      margin: 0 auto 0.85rem auto;
+      cursor: pointer;
+    }
+    .profile-drawer-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+    .profile-drawer-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--text-white);
+      font-size: 1.1rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .profile-drawer-info {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .profile-quick-links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-top: 0.75rem;
+    }
+    .quick-link-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      font-family: inherit;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      box-sizing: border-box;
+    }
+    .quick-link-item:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--border-color);
+    }
+    .quick-link-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    .quick-link-text {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .quick-link-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .quick-link-subtitle {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .quick-link-arrow {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .quick-link-logout {
+      margin-top: 0.5rem;
+      background: var(--status-absent-bg);
+      border-color: var(--status-absent);
+    }
+    .quick-link-logout:hover {
+      background: var(--status-absent-bg);
+    }
+
+    .back-classroom-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.22rem 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.74rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+    .back-classroom-link:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .save-indicator-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-pill);
+      background: var(--bg-surface);
+    }
+    .save-indicator-badge.saving {
+      color: var(--color-primary);
+    }
+    .save-indicator-badge.saved {
+      color: var(--status-present);
+    }
+
+    .sheets-top-left,
+    .sheets-top-right {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    /* Screen Size & Zoom Controls Widget */
+    .screen-fit-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      background: var(--bg-surface);
+      padding: 0.15rem 0.3rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+    }
+    .screen-ctrl-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.18rem 0.4rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-main);
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+    .screen-ctrl-btn:hover {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--color-primary);
+    }
+    .screen-ctrl-btn#btn-autofit.active {
+      background: var(--color-primary);
+      color: var(--text-white);
+      border-color: var(--color-primary);
+    }
+    .zoom-level-indicator {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-main);
+      min-width: 38px;
+      text-align: center;
+      user-select: none;
+    }
+
+    /* Density Selector */
+    .density-select {
+      padding: 0.2rem 0.4rem;
+      font-size: 0.74rem;
+      font-weight: 700;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* Institutional Multi-Sheet Switcher Bar */
+    .sheet-tabs-container {
+      flex-shrink: 0;
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 0.25rem;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 2px solid var(--border-color);
+      padding: 0.15rem 0.4rem 0 0.4rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      z-index: 25;
+    }
+    .sheet-tabs-container::-webkit-scrollbar {
+      display: none;
+    }
+    .sheet-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      white-space: nowrap;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .sheet-tab-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-surface-hover);
+    }
+    .sheet-tab-btn.active {
+      color: var(--color-primary);
+      background: var(--bg-card);
+      border-color: var(--border-color);
+      border-top: 2px solid var(--color-primary);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: -2px;
+      padding-bottom: calc(0.35rem + 2px);
+      z-index: 26;
+    }
+    .sheet-tab-badge {
+      font-size: 0.66rem;
+      font-weight: 800;
+      padding: 0.08rem 0.35rem;
+      border-radius: 999px;
+      background: var(--bg-surface);
+      color: inherit;
+      border: 1px solid var(--border-color);
+    }
+    .sheet-tab-btn.active .sheet-tab-badge {
+      background: var(--color-primary);
+      color: var(--text-white);
+      border-color: var(--color-primary);
+    }
+
+    /* Sub-Toolbar for Active Sheet */
+    .sheet-subtoolbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.35rem;
+      padding: 0.2rem 0.55rem;
+      min-height: 32px;
+      background: var(--bg-card);
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 20;
+    }
+    .sheet-subtoolbar-left,
+    .sheet-subtoolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* Filter & Search Bar Strip */
+    .eval-filter-toolbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.2rem 0.55rem;
+      min-height: 32px;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      gap: 0.35rem;
+      z-index: 40;
+      position: relative;
+    }
+    .eval-search-input-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      position: relative;
+    }
+    .eval-search-input {
+      padding: 0.22rem 0.55rem 0.22rem 1.6rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.76rem;
+      width: 200px;
+    }
+    .eval-search-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    .eval-search-icon {
+      position: absolute;
+      left: 0.45rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .eval-filter-select {
+      padding: 0.22rem 0.45rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Sheet Content / Grid Viewport Area */
+    .sheets-viewport-wrap {
+      flex: 1 1 0;
+      min-height: 0;
+      position: relative;
+      overflow: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      box-shadow: var(--shadow-sm);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Scale & Zoom Wrapper */
+    .sheet-scale-wrapper {
+      transform-origin: top left;
+      transition: transform 0.12s ease-out;
+      width: 100%;
+    }
+
+    .sheet-pane {
+      display: none;
+      width: 100%;
+      min-width: max-content;
+      box-sizing: border-box;
+      padding: 0;
+    }
+    .sheet-pane.active {
+      display: block;
+    }
+
+    /* Master Excel Replica Table Styling */
+    table.excel-table,
+    table.sheet-table,
+    table.studio-sheet-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-family-sans);
+      font-size: 0.82rem;
+      color: var(--text-main);
+      background: var(--bg-card);
+      table-layout: auto;
+    }
+    table.excel-table th,
+    table.excel-table td,
+    table.sheet-table th,
+    table.sheet-table td,
+    table.studio-sheet-table th,
+    table.studio-sheet-table td {
+      border: 1px solid var(--table-border-strong) !important;
+      padding: 0.22rem 0.35rem;
+      text-align: center;
+      vertical-align: middle;
+      box-sizing: border-box;
+      line-height: 1.2;
+      text-transform: none !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DEDICATED NON-SCROLLING INSTITUTIONAL HEADER BANNER (WRAPPED & PINNED)
+       ══════════════════════════════════════════════════════════════ */
+    .sheet-institutional-banner {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      background: var(--col-att-group-bg);
+      color: var(--col-att-group-color);
+      border: 1px solid var(--table-border-strong);
+      border-bottom: 2px solid var(--color-primary);
+      text-align: center;
+      z-index: 20;
+      margin-bottom: 0.2rem;
+      position: relative;
+    }
+    .sheet-institutional-banner .banner-row {
+      padding: 0.16rem 0.5rem;
+      line-height: 1.25;
+      white-space: normal !important;
+      word-break: break-word !important;
+      overflow-wrap: break-word !important;
+      text-wrap: balance;
+      box-sizing: border-box;
+    }
+    .sheet-institutional-banner .banner-row.row-1 {
+      font-size: 0.82rem;
+      font-weight: 800;
+      border-bottom: 1px solid var(--table-border-subtle);
+      background: var(--col-att-group-bg);
+      color: var(--col-att-group-color);
+    }
+    .sheet-institutional-banner .banner-row.row-1 h3 {
+      margin: 0;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: inherit;
+      display: inline;
+    }
+    .sheet-institutional-banner .banner-row.row-2 {
+      font-size: 0.74rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--table-border-subtle);
+    }
+    .sheet-institutional-banner .banner-row.row-3 {
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .banner-editable-inst,
+    .banner-editable-cohort {
+      outline: none;
+      border: 1px dashed transparent;
+      padding: 0.1rem 0.35rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+      user-select: text;
+    }
+    .banner-editable-inst.banner-is-editable,
+    .banner-editable-cohort.banner-is-editable {
+      border: 1px dashed var(--color-primary) !important;
+      background: var(--bg-card) !important;
+      color: var(--text-main) !important;
+      cursor: text !important;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    }
+    .banner-edit-indicator {
+      display: inline-flex;
+      align-items: center;
+      color: var(--color-primary);
+      cursor: pointer;
+    }
+
+    /* In-table institutional blue rows are hidden so table columns & rows scroll freely below banner */
+    table.excel-table tr.excel-hdr-blue,
+    table.sheet-table tr.excel-hdr-blue,
+    table.studio-sheet-table tr.excel-hdr-blue {
+      display: none !important;
+    }
+
+    /* 3 Top Soft Blue Institutional Header Rows */
+    table.excel-table tr.excel-hdr-blue th,
+    table.sheet-table tr.excel-hdr-blue th,
+    table.studio-sheet-table tr.excel-hdr-blue th {
+      background: var(--col-att-group-bg) !important;
+      color: var(--col-att-group-color) !important;
+      font-weight: 800 !important;
+      text-align: center !important;
+      padding: 0.2rem 0.45rem !important;
+      letter-spacing: 0.01em;
+      border: 1px solid var(--table-border-strong) !important;
+      text-transform: none !important;
+    }
+    table.excel-table tr.excel-hdr-blue.row-1 th h3,
+    table.sheet-table tr.excel-hdr-blue.row-1 th h3,
+    table.studio-sheet-table tr.excel-hdr-blue.row-1 th h3 {
+      margin: 0;
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: inherit;
+    }
+    table.excel-table tr.excel-hdr-blue.row-2 th,
+    table.sheet-table tr.excel-hdr-blue.row-2 th {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.14rem 0.35rem !important;
+    }
+    table.excel-table tr.excel-hdr-blue.row-3 th,
+    table.sheet-table tr.excel-hdr-blue.row-3 th {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.14rem 0.35rem !important;
+    }
+
+    /* Tan / Cream Column Headers (Row 4) */
+    table.excel-table tr.excel-hdr-tan th,
+    table.sheet-table tr.excel-hdr-tan th,
+    table.studio-sheet-table tr.excel-hdr-tan th,
+    table.sheet-table thead th.excel-hdr-tan {
+      background: var(--chip-hod-bg) !important;
+      color: var(--chip-hod-color) !important;
+      font-weight: 800 !important;
+      font-size: 0.75rem !important;
+      text-align: center !important;
+      border: 1px solid var(--table-border-strong) !important;
+      padding: 0.25rem 0.35rem !important;
+      text-transform: none !important;
+    }
+
+    /* Subheaders (Row 5) */
+    table.excel-table tr.excel-hdr-sub th,
+    table.sheet-table tr.excel-hdr-sub th,
+    table.studio-sheet-table tr.excel-hdr-sub th,
+    table.sheet-table th.th-secondary {
+      background: var(--bg-surface) !important;
+      color: var(--text-main) !important;
+      font-weight: 700 !important;
+      font-size: 0.72rem !important;
+      border: 1px solid var(--table-border-strong) !important;
+      padding: 0.2rem 0.35rem !important;
+      text-transform: none !important;
+    }
+
+    /* Dedicated Numbers / Maximum Marks Row (Row 6 directly below subheaders) */
+    table.excel-table tr.excel-hdr-numbers th,
+    table.sheet-table tr.excel-hdr-numbers th,
+    table.studio-sheet-table tr.excel-hdr-numbers th {
+      background: var(--bg-surface-secondary) !important;
+      color: var(--text-main) !important;
+      font-weight: 700 !important;
+      font-size: 0.76rem !important;
+      border: 1px solid var(--table-border-strong) !important;
+      padding: 0.2rem 0.25rem !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    table.excel-table tr.excel-hdr-numbers th.hdr-num-label,
+    table.sheet-table tr.excel-hdr-numbers th.hdr-num-label {
+      font-family: var(--font-family-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      background: var(--chip-faculty-bg) !important;
+      font-weight: 800 !important;
+      padding: 0.22rem 0.45rem !important;
+    }
+    .excel-hdr-num-input {
+      width: 100% !important;
+      min-width: 40px !important;
+      max-width: 58px !important;
+      padding: 0.16rem 0.2rem !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: var(--radius-sm) !important;
+      background: var(--bg-card) !important;
+      text-align: center !important;
+      font-size: 0.78rem !important;
+      font-weight: 800 !important;
+      color: var(--color-primary) !important;
+      box-sizing: border-box !important;
+      outline: none !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .excel-hdr-num-input:hover {
+      border-color: var(--color-primary) !important;
+    }
+    .excel-hdr-num-input:focus {
+      border-color: var(--color-primary) !important;
+      box-shadow: 0 0 0 2px var(--color-primary-light) !important;
+    }
+    .excel-hdr-num-badge {
+      display: inline-block;
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 0.76rem;
+      background: var(--chip-faculty-bg);
+      color: var(--color-primary);
+      border: 1px solid var(--border-color);
+    }
+    #sheets-viewport.hide-col-custom .col-custom { display: none !important; }
+
+    /* Student Name, Roll & SR Cells */
+    table.excel-table td.cell-student-name,
+    table.sheet-table td.cell-student-name,
+    table.studio-sheet-table td.cell-student-name {
+      text-align: left;
+      font-weight: 700;
+      min-width: 170px;
+      padding: 0.35rem 0.6rem;
+      white-space: nowrap;
+    }
+    table.excel-table td.cell-roll,
+    table.sheet-table td.cell-roll,
+    table.studio-sheet-table td.cell-roll {
+      font-family: var(--font-family-mono);
+      font-weight: 700;
+      font-size: 0.82rem;
+      min-width: 75px;
+      color: var(--color-primary);
+    }
+    table.excel-table td.excel-cell-sr,
+    table.sheet-table td.excel-cell-sr,
+    table.studio-sheet-table td.excel-cell-sr {
+      font-weight: 700;
+      min-width: 44px;
+      color: var(--text-muted);
+    }
+    table.excel-table td.excel-cell-total,
+    table.sheet-table td.excel-cell-total,
+    table.studio-sheet-table td.excel-cell-total {
+      font-weight: 800;
+      background: var(--bg-surface);
+    }
+
+    /* Input Cells */
+    table.excel-table input.excel-cell-input,
+    table.sheet-table input.excel-cell-input,
+    table.studio-sheet-table input.sheet-cell-input {
+      width: 100% !important;
+      min-width: 44px !important;
+      max-width: 65px !important;
+      padding: 0.22rem 0.15rem !important;
+      border: 1px solid transparent !important;
+      border-radius: var(--radius-sm) !important;
+      background: transparent !important;
+      text-align: center !important;
+      font-size: 0.84rem !important;
+      font-weight: 700 !important;
+      color: var(--text-main) !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    table.excel-table input.excel-cell-input:not(.is-editable),
+    table.sheet-table input.excel-cell-input:not(.is-editable),
+    table.studio-sheet-table input.sheet-cell-input:not(.is-editable) {
+      border: 1px solid transparent !important;
+      background: transparent !important;
+      cursor: default !important;
+      box-shadow: none !important;
+    }
+    table.excel-table input.excel-cell-input.is-editable,
+    table.sheet-table input.excel-cell-input.is-editable,
+    table.studio-sheet-table input.sheet-cell-input.is-editable {
+      border: 1px solid var(--border-color) !important;
+      background: var(--bg-surface) !important;
+      cursor: text !important;
+    }
+    table.excel-table input.excel-cell-input.is-editable:hover,
+    table.sheet-table input.excel-cell-input.is-editable:hover,
+    table.studio-sheet-table input.sheet-cell-input.is-editable:hover {
+      background: var(--bg-surface-secondary) !important;
+      border-color: var(--color-primary) !important;
+    }
+    table.excel-table input.excel-cell-input.is-editable:focus,
+    table.sheet-table input.excel-cell-input.is-editable:focus,
+    table.studio-sheet-table input.sheet-cell-input.is-editable:focus {
+      background: var(--bg-card) !important;
+      border-color: var(--color-primary) !important;
+      outline: 2px solid var(--color-primary) !important;
+      outline-offset: -1px !important;
+    }
+
+    /* Absent Styling (Row Red Flag) */
+    table.excel-table tr.is-absent td,
+    table.sheet-table tr.is-absent td {
+      background: var(--status-absent-bg) !important;
+      color: var(--status-absent) !important;
+    }
+    table.excel-table tr.is-absent input.excel-cell-input,
+    table.sheet-table tr.is-absent input.sheet-cell-input {
+      color: var(--status-absent) !important;
+      font-weight: 800 !important;
+      background: transparent !important;
+    }
+
+    /* Row Attendance Toggle Button */
+    .btn-sheet-att-toggle {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      cursor: pointer;
+      line-height: 1.1;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      opacity: 0.65;
+    }
+    .btn-sheet-att-toggle:hover {
+      opacity: 1;
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--bg-surface-secondary);
+    }
+    .btn-sheet-att-toggle.is-absent {
+      background: var(--status-absent) !important;
+      color: var(--text-white) !important;
+      border-color: var(--status-absent) !important;
+      font-weight: 800 !important;
+      opacity: 1 !important;
+    }
+
+    /* Right Side Panel (Scanned from tests.html) */
+    table.excel-table td.sheet-side-panel,
+    table.sheet-table td.sheet-side-panel {
+      background: var(--bg-card);
+      text-align: left;
+      vertical-align: top;
+      padding: 0.75rem 1rem;
+      min-width: 480px;
+      max-width: 540px;
+      border: 1px solid var(--table-border-strong) !important;
+    }
+    .excel-side-content {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: var(--text-main);
+    }
+    .excel-side-sec-title {
+      font-weight: 800;
+      font-size: 0.82rem;
+      margin-bottom: 0.35rem;
+      color: var(--text-main);
+      text-decoration: underline;
+    }
+    .excel-side-instructions {
+      padding-left: 1.25rem;
+      margin: 0 0 0.85rem 0;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+    .excel-side-instructions li {
+      margin-bottom: 0.2rem;
+    }
+    .excel-side-questions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+      color: var(--text-muted);
+    }
+    .sheet-note-red {
+      color: var(--status-absent);
+      font-weight: 800;
+      font-size: 0.8rem;
+      margin-top: 0.85rem;
+      padding: 0.35rem 0;
+      letter-spacing: 0.02em;
+    }
+    .sheet-signature-block {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px dashed var(--border-color);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .signature-item {
+      text-align: center;
+      flex: 1;
+    }
+    .signature-line {
+      border-bottom: 1px solid var(--text-muted);
+      height: 28px;
+      margin-bottom: 0.3rem;
+    }
+
+    /* Bottom Summary Footer Row */
+    table.excel-table td.excel-summary-lbl,
+    table.sheet-table td.excel-summary-lbl {
+      text-align: right;
+      font-weight: 800;
+      font-size: 0.84rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-surface);
+    }
+    table.excel-table td.excel-summary-avg,
+    table.sheet-table td.excel-summary-avg {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--color-primary);
+      text-align: center;
+      background: var(--bg-surface);
+    }
+    table.excel-table td.excel-summary-tally-cell,
+    table.sheet-table td.excel-summary-tally-cell {
+      background: var(--bg-surface);
+      padding: 0.3rem 0.6rem;
+      text-align: center;
+    }
+
+    /* Bottom Status Bar - Permanently Hidden per User Request */
+    .sheets-bottom-status-bar {
+      display: none !important;
+    }
+
+    /* Attendance Ledger Day Cells */
+    .att-cell-p {
+      color: var(--status-present) !important;
+      font-weight: 800;
+    }
+    .att-cell-a {
+      color: var(--status-absent) !important;
+      font-weight: 800;
+      background: var(--status-absent-bg);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       DENSITY MODES
+       ══════════════════════════════════════════════════════════════ */
+    .density-compact table.excel-table th,
+    .density-compact table.excel-table td {
+      padding: 0.16rem 0.28rem !important;
+      font-size: 0.73rem !important;
+    }
+    .density-compact table.excel-table input.sheet-cell-input,
+    .density-compact table.excel-table input.excel-cell-input {
+      min-width: 32px !important;
+      max-width: 48px !important;
+      font-size: 0.74rem !important;
+      padding: 0.1rem !important;
+    }
+    .density-compact table.excel-table td.cell-student-name {
+      min-width: 140px !important;
+      padding: 0.18rem 0.4rem !important;
+    }
+    .density-comfortable table.excel-table th,
+    .density-comfortable table.excel-table td {
+      padding: 0.5rem 0.75rem !important;
+      font-size: 0.88rem !important;
+    }
+    .density-comfortable table.excel-table input.sheet-cell-input,
+    .density-comfortable table.excel-table input.excel-cell-input {
+      min-width: 50px !important;
+      max-width: 75px !important;
+      font-size: 0.9rem !important;
+      padding: 0.3rem 0.25rem !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       COLUMN HIDING FILTER RULES
+       ══════════════════════════════════════════════════════════════ */
+    #sheets-viewport.hide-col-roll .col-roll { display: none !important; }
+    #sheets-viewport.hide-col-enroll .col-enroll { display: none !important; }
+    #sheets-viewport.hide-col-reg .col-reg { display: none !important; }
+    #sheets-viewport.hide-col-name .col-name { display: none !important; }
+    #sheets-viewport.hide-col-assign .col-assign { display: none !important; }
+    #sheets-viewport.hide-col-assign-avg .col-assign-avg { display: none !important; }
+    #sheets-viewport.hide-col-test .col-test { display: none !important; }
+    #sheets-viewport.hide-col-test-avg .col-test-avg { display: none !important; }
+    #sheets-viewport.hide-col-att-held .col-att-held { display: none !important; }
+    #sheets-viewport.hide-col-att-pct .col-att-pct { display: none !important; }
+    #sheets-viewport.hide-col-pres .col-pres { display: none !important; }
+    #sheets-viewport.hide-col-side-panel .col-side-panel { display: none !important; }
+
+    /* Modal Backdrop & Dialog Container */
+    .studio-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg-card);
+      opacity: 0.96;
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .studio-modal-backdrop.open {
+      display: flex;
+    }
+    .studio-modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+      animation: modalFadeIn 0.18s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .studio-modal-header {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface);
+    }
+    .studio-modal-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .studio-modal-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    .studio-modal-footer {
+      padding: 0.75rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      background: var(--bg-surface);
+    }
+    .form-group-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .form-group-item label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .form-input-field {
+      width: 100%;
+      padding: 0.45rem 0.65rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.84rem;
+      font-weight: 600;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .form-input-field:focus {
+      border-color: var(--color-primary);
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        overflow: visible !important;
+        background: var(--bg-card) !important;
+      }
+      .gc-navbar,
+      .sheets-top-command-bar,
+      .sheet-tabs-container,
+      .sheet-subtoolbar,
+      .eval-filter-toolbar,
+      .sheets-bottom-status-bar,
+      .btn-sheet-att-toggle,
+      .studio-modal-backdrop {
+        display: none !important;
+      }
+      .sheets-studio-layout,
+      .sheets-viewport-wrap {
+        overflow: visible !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .sheet-scale-wrapper {
+        transform: none !important;
+        width: 100% !important;
+      }
+      .sheet-pane.active {
+        display: block !important;
+      }
+      table.excel-table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        page-break-inside: auto;
+      }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       RESPONSIVE DESIGN FOR TABLETS & SMALL SCREENS (iPhone, Mobile)
+       ══════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      /* Universal Navigation Bar */
+      .gc-navbar {
+        min-height: 38px !important;
+        height: 38px !important;
+        padding: 0.15rem 0.4rem !important;
+      }
+      .gc-brand-text {
+        font-size: 0.84rem !important;
+      }
+      .gc-navbar .badge,
+      .gc-nav-right a.btn {
+        display: none !important;
+      }
+      #gc-user-avatar {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.72rem !important;
+      }
+
+      /* Sheets Studio Main Layout */
+      .sheets-studio-layout {
+        padding: 0.1rem 0.2rem !important;
+      }
+
+      /* Responsive Button Text Helpers on Mobile */
+      .btn-text-full {
+        display: none !important;
+      }
+      .btn-text-short {
+        display: inline !important;
+      }
+
+      /* BAR 1 */
+      .studio-bar-1,
+      .sheets-top-command-bar {
+        padding: 0.15rem 0.35rem !important;
+        gap: 0.25rem !important;
+        min-height: 34px !important;
+      }
+      .group-selector-select {
+        max-width: calc(100vw - 165px) !important;
+        min-width: 85px !important;
+        font-size: 0.72rem !important;
+        padding: 0.18rem 0.3rem !important;
+      }
+      .btn-edit-save-toggle {
+        padding: 0.18rem 0.42rem !important;
+        font-size: 0.72rem !important;
+        white-space: nowrap !important;
+      }
+
+      /* BAR 2 */
+      .studio-bar-2 {
+        padding: 0.15rem 0.35rem !important;
+        gap: 0.25rem !important;
+        min-height: 34px !important;
+      }
+      .sheet-select-dropdown,
+      .subsheet-select-dropdown {
+        font-size: 0.72rem !important;
+        padding: 0.18rem 0.35rem !important;
+        max-width: 125px !important;
+      }
+
+      /* BAR 3 */
+      .studio-bar-3,
+      .eval-filter-toolbar {
+        padding: 0.15rem 0.35rem !important;
+        gap: 0.25rem !important;
+        min-height: 32px !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        scrollbar-width: none !important;
+      }
+      .studio-bar-3::-webkit-scrollbar,
+      .eval-filter-toolbar::-webkit-scrollbar {
+        display: none !important;
+      }
+      .eval-search-input-wrap {
+        flex: 1 1 auto;
+        min-width: 50px;
+      }
+      .eval-search-input {
+        width: 100% !important;
+        min-width: 50px !important;
+        font-size: 0.72rem !important;
+        padding: 0.18rem 0.35rem 0.18rem 1.3rem !important;
+      }
+      .eval-filter-select {
+        max-width: 80px !important;
+        font-size: 0.7rem !important;
+        padding: 0.18rem 0.25rem !important;
+      }
+      #sheet-column-focus-select {
+        max-width: 105px !important;
+        font-size: 0.7rem !important;
+        padding: 0.18rem 0.25rem !important;
+      }
+      .sheet-mode-segmented {
+        padding: 1px !important;
+      }
+      .btn-mode-toggle {
+        padding: 0.14rem 0.32rem !important;
+        font-size: 0.68rem !important;
+      }
+      #btn-col-filter-toggle {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        padding: 0.18rem 0.4rem !important;
+        font-size: 0.7rem !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+      }
+      #btn-col-filter-toggle svg {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        flex-shrink: 0 !important;
+      }
+      #btn-col-filter-toggle .filter-btn-label,
+      #sheet-visible-tally {
+        display: none !important;
+      }
+      #btn-col-filter-toggle .filter-btn-label-mobile {
+        display: inline !important;
+        font-size: 0.7rem !important;
+        font-weight: 700 !important;
+      }
+      #col-filter-dropdown-menu {
+        position: fixed !important;
+        top: 108px !important;
+        left: 10px !important;
+        right: 10px !important;
+        width: auto !important;
+        max-width: calc(100vw - 20px) !important;
+        min-width: 0 !important;
+        max-height: 75vh !important;
+        overflow-y: auto !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-sm) !important;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
+        z-index: 1050 !important;
+        padding: 0.75rem 0.9rem !important;
+      }
+      .floating-bottom-drawer .btn-text-full {
+        display: inline !important;
+      }
+      .floating-bottom-drawer .btn-text-short {
+        display: none !important;
+      }
+
+      .sheet-tabs-container {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+      }
+      .sheet-subtoolbar {
+        flex-wrap: nowrap !important;
+      }
+
+      /* Hide bulky desktop-only controls on small screens */
+      .desktop-only-btn,
+      .density-select,
+      .sheets-top-right > button[onclick*="toggleFullscreen"],
+      .sheets-top-right > button[onclick*="reloadCurrentSheetData"],
+      .sheets-top-right > button[onclick*="window.print"] {
+        display: none !important;
+      }
+
+      /* Floating Action Button (FAB) */
+      .floating-tools-fab {
+        right: 14px !important;
+        bottom: 66px !important;
+        width: 40px !important;
+        height: 40px !important;
+      }
+
+      /* BAR 4: Main Bottom Menu Bar */
+      .studio-bottom-nav {
+        height: 52px !important;
+      }
+      .bottom-nav-item {
+        font-size: 0.65rem !important;
+        padding: 0.15rem 0.35rem !important;
+      }
+      .bottom-profile-avatar {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 0.64rem !important;
+      }
+
+      /* Bar 1 & Bar 2 Small Screen Compact Refinements */
+      .studio-bar-1 .group-selector-select {
+        max-width: 135px !important;
+        font-size: 0.74rem !important;
+        padding: 0.18rem 0.3rem !important;
+      }
+      .studio-bar-1 .sheets-top-right {
+        gap: 0.25rem !important;
+      }
+      .studio-bar-1 .btn-sm {
+        padding: 0.18rem 0.35rem !important;
+        font-size: 0.72rem !important;
+      }
+      .studio-bar-2 .sheet-select-dropdown {
+        max-width: 125px !important;
+        font-size: 0.74rem !important;
+        padding: 0.18rem 0.3rem !important;
+      }
+      .studio-bar-2 .subsheet-select-dropdown {
+        max-width: 110px !important;
+        font-size: 0.72rem !important;
+        padding: 0.18rem 0.25rem !important;
+      }
+      .studio-bar-2 .subsheet-badge {
+        max-width: 110px !important;
+        font-size: 0.68rem !important;
+        padding: 0.14rem 0.3rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      .studio-bar-2 #btn-edit-student-row {
+        padding: 0.18rem 0.35rem !important;
+        font-size: 0.72rem !important;
+      }
+      .sheet-institutional-banner .banner-row.row-1 {
+        font-size: 0.78rem !important;
+        padding: 0.14rem 0.35rem !important;
+      }
+      .sheet-institutional-banner .banner-row.row-1 h3 {
+        font-size: 0.78rem !important;
+      }
+      .sheet-institutional-banner .banner-row.row-2 {
+        font-size: 0.72rem !important;
+        padding: 0.12rem 0.35rem !important;
+      }
+      .sheet-institutional-banner .banner-row.row-3 {
+        font-size: 0.70rem !important;
+        padding: 0.12rem 0.35rem !important;
+      }
+
+      /* Table Viewport Area Height Guard */
+      .sheets-viewport-wrap {
+        margin-bottom: 54px !important;
+      }
+    }
+
+    /* Remove bottom status bar completely */
+    .sheets-bottom-status-bar {
+      display: none !important;
+    }
+
+    /* Floating Action Button (FAB) Dragging */
+    .floating-tools-fab.fab-is-dragging {
+      cursor: grabbing !important;
+      transform: scale(1.15) !important;
+      box-shadow: 0 10px 28px hsl(0 0% 0% / 0.45) !important;
+      transition: none !important;
+      outline: 2px solid var(--color-primary-light);
+      z-index: 9999 !important;
+    }
+
+    /* Column Focus and Dynamic View Mode: Only on Small Screens */
+    @media (min-width: 769px) {
+      #sheet-column-focus-select,
+      #sheet-mode-segmented {
+        display: none !important;
+      }
+    }
+    @media (max-width: 768px) {
+      #sheet-column-focus-select {
+        display: inline-block !important;
+      }
+      #sheet-mode-segmented {
+        display: inline-flex !important;
+      }
+    }
+
+    /* ========================================================
+       FLIPKART-STYLE 2-PANE FILTER, SORT & VISIBILITY MODAL
+       ======================================================== */
+    .filter-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: hsl(0 0% 0% / 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 9998;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: filterModalFadeIn 0.18s ease-out;
+    }
+    .filter-modal-backdrop.open {
+      display: flex !important;
+    }
+    @keyframes filterModalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .filter-modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 94vw;
+      max-width: 640px;
+      height: 520px;
+      max-height: 84vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-xl), 0 20px 50px hsl(0 0% 0% / 0.35);
+      overflow: hidden;
+      animation: filterModalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes filterModalScaleIn {
+      from { transform: scale(0.96) translateY(8px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .filter-modal-header {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .filter-modal-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0;
+    }
+    .filter-btn-clear {
+      background: none;
+      border: none;
+      color: var(--color-primary);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s ease;
+    }
+    .filter-btn-clear:hover {
+      background: var(--color-primary-light);
+    }
+    .filter-modal-body {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .filter-sidebar {
+      width: 165px;
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .filter-sidebar-tab {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.85rem 1rem;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .filter-sidebar-tab:hover {
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+    .filter-sidebar-tab.active {
+      background: var(--bg-card);
+      color: var(--color-primary);
+      font-weight: 800;
+    }
+    .filter-sidebar-tab.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--color-primary);
+      border-radius: 0 4px 4px 0;
+    }
+    .filter-tab-content-area {
+      flex: 1;
+      padding: 1.15rem 1.25rem;
+      overflow-y: auto;
+      background: var(--bg-card);
+    }
+    .filter-tab-pane {
+      display: none;
+    }
+    .filter-tab-pane.active {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      animation: filterTabFadeIn 0.15s ease;
+    }
+    @keyframes filterTabFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .filter-option-row {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.12s ease;
+      user-select: none;
+    }
+    .filter-option-row:hover {
+      background: var(--bg-surface);
+    }
+    .filter-option-row input[type="radio"],
+    .filter-option-row input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: var(--color-primary);
+      width: 16px;
+      height: 16px;
+    }
+    .filter-option-label {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      flex: 1;
+    }
+    .filter-modal-footer {
+      padding: 0.85rem 1.25rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    /* Master Internal Evaluation Theme Compliant Classes & Input States */
+    .excel-hdr-blue {
+      background-color: var(--table-th-bg);
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+    .excel-hdr-tan {
+      background-color: var(--table-th-bg);
+      color: var(--text-main);
+      font-weight: 700;
+    }
+    .excel-hdr-sub {
+      background-color: var(--bg-surface);
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .is-absent {
+      background-color: var(--status-absent-bg);
+      color: var(--status-absent);
+      font-weight: 800;
+    }
+
+    /* Master Evaluation Cell Inputs (View Mode: Clean numbers, Edit Mode: Visible boxes) */
+    table.excel-table input.excel-cell-input,
+    table.sheet-table input.excel-cell-input,
+    table.excel-table input.sheet-cell-input,
+    table.sheet-table input.sheet-cell-input {
+      width: 100% !important;
+      padding: 0.2rem !important;
+      border: 1px solid transparent !important;
+      border-radius: var(--radius-sm, 3px) !important;
+      background: transparent !important;
+      text-align: center !important;
+      font-size: 0.82rem !important;
+      font-weight: 700 !important;
+      color: var(--text-main) !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      height: 1.75rem !important;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    table.excel-table input.excel-cell-input[readonly],
+    table.sheet-table input.excel-cell-input[readonly],
+    table.excel-table input.sheet-cell-input[readonly],
+    table.sheet-table input.sheet-cell-input[readonly] {
+      background: transparent !important;
+      border-color: transparent !important;
+      cursor: default;
+      pointer-events: none;
+    }
+    table.excel-table input.excel-cell-input.is-editable,
+    table.sheet-table input.excel-cell-input.is-editable,
+    table.excel-table input.sheet-cell-input.is-editable,
+    table.sheet-table input.sheet-cell-input.is-editable {
+      background: var(--bg-surface) !important;
+      border: 1px solid var(--border-color) !important;
+      cursor: text;
+      pointer-events: auto;
+    }
+    table.excel-table input.excel-cell-input.is-editable:focus,
+    table.sheet-table input.excel-cell-input.is-editable:focus,
+    table.excel-table input.sheet-cell-input.is-editable:focus,
+    table.sheet-table input.sheet-cell-input.is-editable:focus {
+      background: var(--bg-card) !important;
+      border-color: var(--color-primary) !important;
+      outline: 2px solid var(--color-primary) !important;
+      outline-offset: -1px !important;
+    }
+
+    /* Dedicated Numbers Row (Live Editable Max Marks & Scheme Weightages) */
+    table.excel-table tr.excel-hdr-numbers th,
+    table.sheet-table tr.excel-hdr-numbers th {
+      background: var(--bg-surface-secondary) !important;
+      color: var(--text-muted) !important;
+      font-size: 0.76rem !important;
+      font-weight: 700 !important;
+      padding: 0.22rem 0.35rem !important;
+      border-right: 1px solid var(--table-border-strong) !important;
+      border-bottom: 1px solid var(--table-border-strong) !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    table.excel-table tr.excel-hdr-numbers th.hdr-num-label,
+    table.sheet-table tr.excel-hdr-numbers th.hdr-num-label {
+      font-size: 0.74rem !important;
+      font-weight: 800 !important;
+      color: var(--text-muted) !important;
+      letter-spacing: 0.3px;
+    }
+    input.excel-hdr-num-input {
+      width: 44px !important;
+      max-width: 100% !important;
+      padding: 0.15rem 0.25rem !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: var(--radius-sm, 3px) !important;
+      background: var(--bg-surface) !important;
+      color: var(--color-primary) !important;
+      font-weight: 800 !important;
+      font-size: 0.78rem !important;
+      text-align: center !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      height: 1.6rem !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    input.excel-hdr-num-input:focus {
+      border-color: var(--color-primary) !important;
+      box-shadow: 0 0 0 2px var(--color-primary-subtle) !important;
+      background: var(--bg-card) !important;
+    }
+    span.excel-hdr-num-badge {
+      display: inline-block;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      background: var(--color-primary-subtle);
+      padding: 0.18rem 0.45rem;
+      border-radius: var(--radius-sm, 3px);
+      border: 1px solid var(--border-color);
+    }
+
+    /* PC Screen Toolbar - Tools placed directly on toolbar for desktop, hiding floating button */
+    .pc-screen-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: nowrap;
+    }
+
+    @media (max-width: 899px) {
+      .pc-screen-toolbar {
+        display: none !important;
+      }
+      .floating-tools-fab {
+        display: flex !important;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .pc-screen-toolbar {
+        display: flex !important;
+      }
+      .floating-tools-fab {
+        display: none !important;
+      }
+      .floating-bottom-drawer {
+        display: none !important;
+      }
+    }
+
+
+
