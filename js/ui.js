@@ -74,13 +74,14 @@ function esc(str) {
 
 /**
  * Modal opener
- * @param {string} modalId
+ * @param {string|HTMLElement} idOrEl
  */
-function openModal(modalId) {
-  const modal = document.getElementById(modalId);
+function openModal(idOrEl) {
+  const modal = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
   if (modal) {
     modal.classList.add('open');
     modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
     // Trap focus / autofocus first input
     const firstInput = modal.querySelector('input:not([disabled]), select:not([disabled]), button:not([disabled])');
     if (firstInput) setTimeout(() => firstInput.focus(), 50);
@@ -89,14 +90,32 @@ function openModal(modalId) {
 
 /**
  * Modal closer
- * @param {string} modalId
+ * @param {string|HTMLElement} [idOrEl]
  */
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
+function closeModal(idOrEl) {
+  const modal = idOrEl ? (typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl) : document.querySelector('.modal-backdrop.open, .modal.open');
   if (modal) {
     modal.classList.remove('open');
     modal.style.display = 'none';
+    if (!document.querySelector('.modal-backdrop.open, .modal.open')) {
+      document.body.classList.remove('modal-open');
+    }
   }
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const openModals = document.querySelectorAll('.modal-backdrop.open, .modal.open');
+      openModals.forEach((m) => closeModal(m));
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.classList && e.target.classList.contains('modal-backdrop')) {
+      closeModal(e.target);
+    }
+  });
 }
 
 /**
