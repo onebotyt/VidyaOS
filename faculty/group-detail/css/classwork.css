@@ -1402,6 +1402,256 @@ table.sheet-table .excel-cell-total {
 }
 
 /* ============================================================
+   Minimal Mobile Marks Entry Modal Design (Milestone 249)
+   ============================================================ */
+
+.marks-modal-header-minimal {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.75rem 1rem !important;
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.modal-back-btn {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-main) !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  margin-right: 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+}
+
+.modal-back-btn:hover {
+  background: var(--bg-surface) !important;
+}
+
+.marks-modal-hdr-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.marks-modal-hdr-info .modal-title {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+  margin: 0 !important;
+  line-height: 1.25 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.marks-modal-sub-meta {
+  font-size: 0.76rem !important;
+  color: var(--text-muted) !important;
+  margin-top: 2px !important;
+}
+
+.marks-modal-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+  letter-spacing: 0.5px;
+}
+
+.mobile-text {
+  display: none;
+}
+
+.desktop-text {
+  display: inline;
+}
+
+.btn-tool-minimal {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--text-main) !important;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  padding: 0.25rem 0.5rem !important;
+  cursor: pointer;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.3rem !important;
+  border-radius: var(--radius-xs) !important;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-tool-minimal:hover,
+.btn-tool-minimal:active {
+  background: var(--bg-surface) !important;
+}
+
+.cell-roll-minimal {
+  font-family: var(--font-family-mono, monospace) !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  color: var(--text-muted) !important;
+  text-align: center !important;
+}
+
+.cell-name-minimal .student-name-text {
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  color: var(--text-main) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell-att-minimal {
+  width: 28px !important;
+  text-align: center !important;
+  padding: 0.2rem 0.15rem !important;
+}
+
+.minimal-att-dot {
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  border: none !important;
+  cursor: pointer;
+  display: inline-block !important;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  line-height: 1;
+}
+
+.minimal-att-dot.is-present {
+  background-color: var(--status-present) !important;
+  box-shadow: 0 0 0 3px var(--status-present-bg) !important;
+}
+
+.minimal-att-dot.is-absent {
+  background-color: var(--status-absent) !important;
+  box-shadow: 0 0 0 3px var(--status-absent-bg) !important;
+}
+
+.minimal-att-dot:active {
+  transform: scale(1.35);
+}
+
+.minimal-q-input {
+  border: none !important;
+  border-bottom: 1.5px solid var(--border-color) !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  text-align: center !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  color: var(--text-main) !important;
+  width: 36px !important;
+  height: 28px !important;
+  padding: 0 0 2px 0 !important;
+  margin: 0 auto !important;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.minimal-q-input:focus {
+  border-bottom: 2px solid var(--color-primary) !important;
+  background: var(--bg-surface) !important;
+}
+
+.minimal-total-text {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text-muted) !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  padding: 0 !important;
+  text-align: right !important;
+  display: inline-block !important;
+}
+
+.marks-modal-footer-minimal {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.65rem 1rem calc(0.65rem + env(safe-area-inset-bottom, 0px)) !important;
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border-color) !important;
+}
+
+.marks-footer-max-text {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.marks-footer-max-text strong {
+  font-weight: 700;
+  color: var(--text-main);
+  margin-left: 2px;
+}
+
+.marks-footer-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.btn-modal-cancel {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-main) !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+  padding: 0.45rem 0.75rem !important;
+  transition: opacity 0.15s ease;
+}
+
+.btn-modal-cancel:hover {
+  opacity: 0.7;
+}
+
+.btn-modal-save-dark {
+  background: var(--text-main) !important;
+  color: var(--bg-card) !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.5rem 1.15rem !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  box-shadow: 0 1px 3px hsl(0 0% 0% / 0.15);
+}
+
+.btn-modal-save-dark:hover {
+  opacity: 0.9;
+}
+
+@media (min-width: 769px) {
+  .modal-back-btn {
+    display: none !important;
+  }
+
+  .desktop-close-btn {
+    display: inline-flex !important;
+  }
+}
+
+/* ============================================================
    Mobile Screen Optimizations for Tabular Marks Entry (< 768px)
    ============================================================ */
 
@@ -1447,6 +1697,24 @@ table.sheet-table .excel-cell-total {
     display: inline-flex !important;
   }
 
+  .mobile-text {
+    display: inline !important;
+  }
+
+  .desktop-text {
+    display: none !important;
+  }
+
+  .desktop-close-btn,
+  .desktop-only-toggle,
+  .desktop-only-toolbar-right {
+    display: none !important;
+  }
+
+  .modal-back-btn {
+    display: inline-flex !important;
+  }
+
   /* Full screen modal dialog on phone to maximize table visibility */
   #modal-enter-marks .modal-card {
     width: 100vw !important;
@@ -1460,12 +1728,12 @@ table.sheet-table .excel-cell-total {
   }
 
   #modal-enter-marks .modal-header {
-    padding: 0.45rem 0.75rem !important;
+    padding: 0.55rem 0.85rem !important;
     flex-shrink: 0 !important;
   }
 
   #modal-enter-marks .modal-title {
-    font-size: 0.92rem !important;
+    font-size: 0.96rem !important;
   }
 
   #modal-enter-marks #marks-modal-meta {
@@ -1473,22 +1741,26 @@ table.sheet-table .excel-cell-total {
     margin-top: 1px !important;
   }
 
-  /* Compact Toolbar: fits cleanly in small screens */
+  /* Compact Toolbar: fits cleanly in small screens in one flat row */
   .marks-modal-toolbar {
-    padding: 0.3rem 0.5rem !important;
+    padding: 0.35rem 0.6rem !important;
     gap: 0.3rem !important;
   }
 
-  .marks-toolbar-left,
-  .marks-toolbar-right {
+  .marks-toolbar-left {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     gap: 0.2rem !important;
   }
 
   .marks-modal-toolbar .btn,
-  .marks-modal-toolbar .view-mode-btn {
-    font-size: 0.7rem !important;
-    padding: 0.18rem 0.4rem !important;
-    height: 26px !important;
+  .marks-modal-toolbar .view-mode-btn,
+  .btn-tool-minimal {
+    font-size: 0.72rem !important;
+    padding: 0.2rem 0.35rem !important;
+    height: 28px !important;
   }
 
   .marks-modal-toolbar svg {
@@ -1529,12 +1801,12 @@ table.sheet-table .excel-cell-total {
   }
 
   .marks-table th {
-    padding: 0.3rem 0.2rem !important;
+    padding: 0.35rem 0.2rem !important;
     font-size: 0.7rem !important;
   }
 
   .marks-table td {
-    padding: 0.22rem 0.2rem !important;
+    padding: 0.25rem 0.2rem !important;
     font-size: 0.74rem !important;
   }
 
@@ -1581,13 +1853,8 @@ table.sheet-table .excel-cell-total {
   }
 
   .student-name-text {
-    font-size: 0.74rem !important;
-    max-width: 78px !important;
-  }
-
-  .btn-sheet-att-toggle {
-    font-size: 0.62rem !important;
-    padding: 0.1rem 0.22rem !important;
+    font-size: 0.76rem !important;
+    max-width: 82px !important;
   }
 
   .marks-table .col-q,
@@ -1609,29 +1876,28 @@ table.sheet-table .excel-cell-total {
   }
 
   .marks-input-cell.q-score-input,
-  .sheet-cell-input.q-score-input {
-    width: 40px !important;
-    min-width: 38px !important;
+  .sheet-cell-input.q-score-input,
+  .minimal-q-input {
+    width: 38px !important;
+    min-width: 36px !important;
     max-width: 44px !important;
     height: 28px !important;
-    padding: 0.1rem 0.1rem !important;
-    font-size: 0.8rem !important;
-    border-radius: var(--radius-xs) !important;
+    padding: 0 0 2px 0 !important;
+    font-size: 0.86rem !important;
   }
 
   .marks-table .col-total,
   .marks-table .cell-total {
-    width: 46px !important;
-    min-width: 40px !important;
-    max-width: 50px !important;
-    text-align: center !important;
-    padding: 0.2rem 0.15rem !important;
+    width: 52px !important;
+    min-width: 46px !important;
+    max-width: 58px !important;
+    text-align: right !important;
+    padding: 0.2rem 0.5rem 0.2rem 0.15rem !important;
   }
 
-  .auto-total-badge {
-    min-width: 36px !important;
-    padding: 0.12rem 0.2rem !important;
-    font-size: 0.76rem !important;
+  .auto-total-badge,
+  .minimal-total-text {
+    font-size: 0.78rem !important;
   }
 
   /* Compact Excel table on mobile */
@@ -1659,19 +1925,20 @@ table.sheet-table .excel-cell-total {
   /* Modal Footer: Compact and pinned clearly above mobile dock */
   #modal-enter-marks .modal-footer {
     flex-shrink: 0 !important;
-    padding: 0.45rem 0.75rem calc(0.45rem + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 0.6rem 0.85rem calc(0.6rem + env(safe-area-inset-bottom, 0px)) !important;
     background: var(--bg-card) !important;
     border-top: 1px solid var(--border-color) !important;
   }
 
-  #modal-enter-marks .footer-meta-text {
-    font-size: 0.72rem !important;
+  #modal-enter-marks .btn-modal-cancel {
+    font-size: 0.82rem !important;
+    padding: 0.35rem 0.55rem !important;
   }
 
-  #modal-enter-marks .modal-footer .btn {
-    padding: 0.35rem 0.65rem !important;
-    font-size: 0.78rem !important;
-    height: 32px !important;
+  #modal-enter-marks .btn-modal-save-dark {
+    font-size: 0.82rem !important;
+    padding: 0.4rem 0.85rem !important;
+    height: 34px !important;
   }
 }
 
