@@ -1638,32 +1638,40 @@
     </div>
   </div>
   <div class="modal-backdrop" id="modal-enter-marks">
-    <div class="modal-card" style="max-width:1100px;width:95vw">
-      <div class="modal-header">
-        <div>
-          <h3 class="modal-title" id="marks-modal-title" style="display:flex;align-items:center;gap:.45rem">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
-            <span>Enter Marks</span>
-          </h3>
-          <div id="marks-modal-meta" style="font-size:.8rem;color:var(--text-muted);margin-top:.15rem"></div>
+    <div class="modal-card marks-entry-modal-card" style="max-width:1100px;width:95vw">
+      <div class="modal-header marks-modal-header-minimal">
+        <button type="button" class="modal-back-btn" onclick="closeModal('modal-enter-marks')" title="Back" aria-label="Back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+        <div class="marks-modal-hdr-info">
+          <h3 class="modal-title" id="marks-modal-title">Enter Marks</h3>
+          <div id="marks-modal-meta" class="marks-modal-sub-meta"></div>
         </div>
-        <button class="modal-close-btn" onclick="closeModal('modal-enter-marks')">&#10005;</button>
+        <div class="marks-modal-avatar" id="marks-modal-user-avatar">DS</div>
+        <button class="modal-close-btn desktop-close-btn" onclick="closeModal('modal-enter-marks')">&#10005;</button>
       </div>
 
       <!-- Clean Toolbar: Add/Remove Question, Columns Filter, Table / Excel View Mode & Multi-Format Export -->
       <div class="marks-modal-toolbar">
         <div class="marks-toolbar-left">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="openEditQuestionsModal()" style="font-size:.74rem;padding:.2rem .55rem;font-weight:700;display:inline-flex;align-items:center;gap:0.35rem" id="btn-modal-edit-q" title="Edit questions, max marks &amp; topics">
+          <button type="button" class="btn btn-secondary btn-sm btn-tool-minimal" onclick="openEditQuestionsModal()" id="btn-modal-edit-q" title="Edit questions, max marks &amp; topics">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            <span class="btn-edit-q-text">Edit Questions</span>
+            <span class="btn-edit-q-text"><span class="desktop-text">Edit Questions</span><span class="mobile-text">Edit</span></span>
           </button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="addModalQuestion()" style="font-size:.74rem;padding:.2rem .55rem;font-weight:600" title="Add another question column">+ Add Q</button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="removeModalQuestion()" style="font-size:.74rem;padding:.2rem .55rem;font-weight:600" id="btn-remove-q" title="Remove last question column">&minus; Remove Q</button>
+          <button type="button" class="btn btn-secondary btn-sm btn-tool-minimal" onclick="addModalQuestion()" id="btn-add-q" title="Add another question column">
+            <span class="desktop-text">+ Add Q</span><span class="mobile-text">+ Q</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm btn-tool-minimal" onclick="removeModalQuestion()" id="btn-remove-q" title="Remove last question column">
+            <span class="desktop-text">&minus; Remove Q</span><span class="mobile-text">&minus; Q</span>
+          </button>
           
           <!-- Columns Visibility Filter Dropdown (hide SR, Enrollment, Reg by default to save space) -->
           <div style="position:relative;display:inline-block" id="marks-col-filter-wrapper">
-            <button type="button" class="btn btn-secondary btn-sm" id="btn-marks-col-filter" onclick="toggleMarksColFilterMenu(event)" style="font-size:.74rem;padding:.2rem .55rem;font-weight:600;display:inline-flex;align-items:center;gap:0.35rem" title="Filter columns: Show/Hide SR. NO., Enrollment No., Registration No.">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg>
+            <button type="button" class="btn btn-secondary btn-sm btn-tool-minimal" id="btn-marks-col-filter" onclick="toggleMarksColFilterMenu(event)" title="Filter columns: Show/Hide SR. NO., Enrollment No., Registration No.">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
               <span>Columns</span>
               <span id="marks-col-filter-count" class="badge badge-primary" style="font-size:0.68rem;padding:0.1rem 0.35rem;display:none">0</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -1687,32 +1695,14 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="marks-toolbar-right">
-          <div class="view-mode-toggle">
-            <button type="button" id="btn-view-table" class="view-mode-btn" onclick="setMarksModalView('table')" title="Compact normal table format" style="display:inline-flex;align-items:center;gap:0.35rem">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              <span>Table</span>
-            </button>
-            <button type="button" id="btn-view-excel" class="view-mode-btn" onclick="setMarksModalView('excel')" title="Excel Ledger format matching Attendance Register" style="display:inline-flex;align-items:center;gap:0.35rem">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-              <span>Excel</span>
-            </button>
-          </div>
-          <button type="button" id="btn-set-default-view" class="btn btn-secondary btn-sm marks-toolbar-extra-btn" onclick="saveCurrentViewAsDefault()" style="font-size:.74rem;padding:.2rem .55rem;display:inline-flex;align-items:center;gap:0.35rem" title="Save this view as your preferred default">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span class="btn-default-text">Set Default</span>
-          </button>
 
           <!-- Export Dropdown (Excel, PDF, Word DOC) -->
           <div style="position:relative;display:inline-block" id="marks-export-wrapper">
-            <button type="button" class="btn btn-secondary btn-sm" id="btn-marks-export" onclick="toggleMarksExportMenu(event)" style="font-size:.74rem;padding:.2rem .6rem;font-weight:700;display:inline-flex;align-items:center;gap:0.35rem;color:var(--status-present)" title="Export marksheet in multiple formats">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <button type="button" class="btn btn-secondary btn-sm btn-tool-minimal" id="btn-marks-export" onclick="toggleMarksExportMenu(event)" title="Export marksheet in multiple formats">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
               <span>Export</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
-            <div id="marks-export-dropdown" class="dropdown-menu" style="display:none;position:absolute;right:0;top:100%;margin-top:0.3rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:100;min-width:190px;padding:0.4rem 0">
+            <div id="marks-export-dropdown" class="dropdown-menu" style="display:none;position:absolute;left:0;top:100%;margin-top:0.3rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:100;min-width:190px;padding:0.4rem 0">
               <button type="button" onclick="exportGroupTestMarks('excel')" style="width:100%;text-align:left;display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.75rem;background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--text-main);font-family:inherit">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--status-present)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                 <span>Excel Spreadsheet (.xlsx)</span>
@@ -1727,6 +1717,23 @@
               </button>
             </div>
           </div>
+        </div>
+
+        <div class="marks-toolbar-right desktop-only-toolbar-right">
+          <div class="view-mode-toggle desktop-only-toggle">
+            <button type="button" id="btn-view-table" class="view-mode-btn" onclick="setMarksModalView('table')" title="Compact normal table format" style="display:inline-flex;align-items:center;gap:0.35rem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Table</span>
+            </button>
+            <button type="button" id="btn-view-excel" class="view-mode-btn" onclick="setMarksModalView('excel')" title="Excel Ledger format matching Attendance Register" style="display:inline-flex;align-items:center;gap:0.35rem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+              <span>Excel</span>
+            </button>
+          </div>
+          <button type="button" id="btn-set-default-view" class="btn btn-secondary btn-sm marks-toolbar-extra-btn desktop-only-toggle" onclick="saveCurrentViewAsDefault()" style="font-size:.74rem;padding:.2rem .55rem;display:inline-flex;align-items:center;gap:0.35rem" title="Save this view as your preferred default">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span class="btn-default-text">Set Default</span>
+          </button>
         </div>
       </div>
 
@@ -1753,16 +1760,14 @@
           </table>
         </div>
       </div>
-      <div class="modal-footer marks-modal-footer" style="display:flex;justify-content:space-between;align-items:center">
-        <div class="footer-meta-text" style="font-size:.82rem;color:var(--text-muted)">
-          Total Maximum Marks: <strong id="marks-footer-max" style="color:var(--color-primary);font-size:.95rem">20</strong> &bull; Sum calculates automatically
+      <div class="modal-footer marks-modal-footer marks-modal-footer-minimal" style="display:flex;justify-content:space-between;align-items:center">
+        <div class="marks-footer-left">
+          <div class="marks-footer-max-text">Total Max Marks: <strong id="marks-footer-max" style="color:var(--text-main);font-size:.92rem">20</strong></div>
+          <div class="marks-footer-sub">&bull; Auto-calculated</div>
         </div>
-        <div style="display:flex;gap:.5rem">
-          <button class="btn btn-secondary" onclick="closeModal('modal-enter-marks')">Cancel</button>
-          <button class="btn btn-primary" id="btn-save-marks-entry" onclick="saveMarksEntry()" style="display:inline-flex;align-items:center;gap:0.4rem">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span>Save Marks</span>
-          </button>
+        <div class="marks-footer-right" style="display:flex;gap:.65rem;align-items:center">
+          <button type="button" class="btn-modal-cancel" onclick="closeModal('modal-enter-marks')">Cancel</button>
+          <button type="button" class="btn btn-primary btn-modal-save-dark" id="btn-save-marks-entry" onclick="saveMarksEntry()">Save Marks</button>
         </div>
       </div>
     </div>
