@@ -745,57 +745,322 @@
   gap: 1rem;
 }
 
-.kpi-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
+/* Marks Workspace Redesign (Image 4 - PC & Image 5 - Mobile) */
+.marks-stats-strip {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1.25rem 0;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
 }
 
-.kpi-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 1.1rem 1.25rem;
-  box-shadow: var(--shadow-sm);
+.marks-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 120px;
 }
 
-.kpi-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 0.3rem;
-}
-
-.kpi-value {
-  font-size: 1.8rem;
-  font-weight: 900;
+.marks-stat-val {
+  font-size: 1.85rem;
+  font-weight: 800;
   color: var(--text-main);
-  line-height: 1;
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
-.kpi-sub {
+.marks-stat-lbl {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Mobile Stats Row (Image 5) */
+.marks-mobile-stats-row {
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0.65rem 0.5rem;
+  margin-bottom: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.mobile-stat-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mobile-stat-num {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+
+.mobile-stat-sub {
   font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  font-weight: 500;
+}
+
+.mobile-stat-dot {
+  color: var(--border-color);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Header Bar & Actions */
+.marks-hdr-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+.marks-hdr-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.marks-hdr-sub {
+  font-size: 0.85rem;
   color: var(--text-muted);
   margin-top: 0.2rem;
 }
 
-.kpi-value.green {
-  color: var(--status-present);
+.marks-hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
-.kpi-value.blue {
-  color: var(--color-primary);
+.btn-dark-action {
+  background: var(--text-main) !important;
+  color: var(--bg-card) !important;
+  border-color: var(--text-main) !important;
 }
 
+.btn-dark-action:hover {
+  opacity: 0.9;
+}
+
+/* Filter Sub-Nav and Search Toolbar */
+.marks-filter-search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.marks-filter-search-bar .expand-filter-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.marks-filter-search-bar .expand-filter-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.marks-filter-search-bar .expand-filter-btn:hover {
+  color: var(--text-main);
+}
+
+.marks-filter-search-bar .expand-filter-btn.active {
+  color: var(--text-main);
+  border-bottom-color: var(--text-main);
+  font-weight: 700;
+}
+
+.marks-filter-search-bar .expand-filter-btn .badge-count {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-pill);
+}
+
+.marks-search-wrapper {
+  position: relative;
+  min-width: 240px;
+}
+
+#marks-search-input {
+  width: 100%;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+#marks-search-input:focus {
+  border-color: var(--color-primary);
+}
+
+/* Section Container & Headers */
 .marks-table-wrap {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+}
+
+.marks-section-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.marks-sec-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.marks-sec-count-paren {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.marks-sec-mobile-count {
+  display: none;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.marks-sec-help {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.mobile-sec-add-btn {
+  display: none;
+}
+
+/* Graded Badge & Action Button */
+.marks-graded-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.marks-graded-badge.is-graded {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.btn-enter-marks-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-enter-marks-action:hover {
+  background: var(--bg-surface);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-enter-marks-action.mob-btn {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.74rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+}
+
+/* Mobile Cards List */
+.marks-mobile-list {
+  display: none;
+  padding: 0.75rem;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: var(--bg-surface);
+}
+
+.marks-mobile-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.marks-mobile-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.marks-mobile-item-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  flex: 1;
+}
+
+.marks-mobile-item-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.marks-mobile-item-status {
+  margin-top: 0.2rem;
 }
 
 .marks-table-toolbar {
@@ -1141,6 +1406,47 @@ table.sheet-table .excel-cell-total {
    ============================================================ */
 
 @media (max-width: 768px) {
+  /* Marks Tab Responsive Redesign (Image 5 - Mobile) */
+  .marks-stats-strip {
+    display: none !important;
+  }
+
+  .marks-mobile-stats-row {
+    display: flex !important;
+  }
+
+  .marks-hdr-bar {
+    display: none !important;
+  }
+
+  .marks-filter-search-bar {
+    margin-bottom: 0.75rem;
+  }
+
+  .marks-desktop-table-container {
+    display: none !important;
+  }
+
+  .marks-mobile-list {
+    display: flex !important;
+  }
+
+  .marks-sec-count-paren {
+    display: none !important;
+  }
+
+  .marks-sec-mobile-count {
+    display: block !important;
+  }
+
+  .marks-sec-help {
+    display: none !important;
+  }
+
+  .mobile-sec-add-btn {
+    display: inline-flex !important;
+  }
+
   /* Full screen modal dialog on phone to maximize table visibility */
   #modal-enter-marks .modal-card {
     width: 100vw !important;

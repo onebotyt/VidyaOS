@@ -1212,6 +1212,17 @@ function renderAllMarksTables() {
   if (ById('badge-tests-count')) ById('badge-tests-count').textContent = testsCount + (testsCount === 1 ? ' test' : ' tests');
   if (ById('badge-assign-count')) ById('badge-assign-count').textContent = assignCount + (assignCount === 1 ? ' item' : ' items');
 
+  // Mobile section counts & parentheses (Image 4 & 5)
+  if (ById('badge-tests-count-paren')) ById('badge-tests-count-paren').textContent = '(' + testsCount + ')';
+  if (ById('badge-tests-mobile-count')) ById('badge-tests-mobile-count').textContent = testsCount + ' ' + (testsCount === 1 ? 'Test' : 'Tests');
+  if (ById('badge-assign-count-paren')) ById('badge-assign-count-paren').textContent = '(' + assignCount + ')';
+  if (ById('badge-assign-mobile-count')) ById('badge-assign-mobile-count').textContent = assignCount + ' ' + (assignCount === 1 ? 'Item' : 'Items');
+
+  // Mobile mini ticker counts (Image 5)
+  if (ById('mob-kpi-tests')) ById('mob-kpi-tests').textContent = testsCount;
+  if (ById('mob-kpi-assignments')) ById('mob-kpi-assignments').textContent = assignCount;
+  if (ById('mob-kpi-students')) ById('mob-kpi-students').textContent = membersCount;
+
   // Compute tests average
   let testsAvg = null;
   const scoredTests = (S.tests || []).filter(t => t.avg_score != null);
@@ -1219,7 +1230,9 @@ function renderAllMarksTables() {
     const sum = scoredTests.reduce((acc, t) => acc + (parseFloat(t.avg_score) / (t.max_marks || 20)) * 100, 0);
     testsAvg = Math.round((sum / scoredTests.length) * 10) / 10;
   }
-  if (ById('kpi-avg-score')) ById('kpi-avg-score').textContent = testsAvg != null ? (testsAvg + '%') : '—';
+  const avgStr = testsAvg != null ? (testsAvg + '%') : '—';
+  if (ById('kpi-avg-score')) ById('kpi-avg-score').textContent = avgStr;
+  if (ById('mob-kpi-avg')) ById('mob-kpi-avg').textContent = avgStr;
 
   // Compute assignments average
   let assignAvg = null;
@@ -1246,93 +1259,147 @@ function renderAllMarksTables() {
 
 function renderMarksTable() {
   const tbody = ById('marks-tests-tbody');
-  if (!tbody) return;
+  const mobList = ById('marks-tests-mobile-list');
+  if (!tbody && !mobList) return;
+
   if (!S.tests || !S.tests.length) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2.5rem">' + emptyState('test', 'No tests scheduled yet', 'Click Schedule New Test to create your first class test.') + '</td></tr>';
+    const emptyHtml = emptyState('test', 'No tests scheduled yet', 'Click Schedule Test to create your first class test.');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.5rem">' + emptyHtml + '</td></tr>';
+    if (mobList) mobList.innerHTML = '<div style="text-align:center;padding:2rem">' + emptyHtml + '</div>';
     return;
   }
+
   const membersCount = (S.members || []).length;
-  tbody.innerHTML = S.tests.map((t, i) => {
-    const ds = t.test_date ? new Date(t.test_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '--';
-    const gc = t.graded_count || 0;
-    const avg = t.avg_score != null ? parseFloat(t.avg_score).toFixed(1) + '/' + t.max_marks : '--';
-    const pr = t.pass_rate != null ? parseFloat(t.pass_rate).toFixed(0) + '%' : '--';
-    const ij = JSON.stringify(t).replace(/"/g, '&quot;');
-    return '<tr>' +
-      '<td style="font-weight:700;color:var(--text-muted);text-align:center">' + (i + 1) + '</td>' +
-      '<td style="font-weight:700;color:var(--text-main)">' + esc(t.name || t.title || 'Test') + '</td>' +
-      '<td>' + ds + '</td>' +
-      '<td style="font-weight:700;font-family:var(--font-family-mono)">' + (t.max_marks || '--') + '</td>' +
-      '<td><span style="font-weight:600;color:' + (gc === membersCount && membersCount > 0 ? 'var(--status-present)' : 'var(--text-main)') + '">' + gc + '</span><span style="color:var(--text-muted);font-size:0.78rem">/' + membersCount + '</span></td>' +
-      '<td style="font-weight:700;color:var(--status-present);font-family:var(--font-family-mono)">' + avg + '</td>' +
-      '<td style="font-weight:600">' + pr + '</td>' +
-      '<td style="text-align:right;white-space:nowrap">' +
-        '<div style="display:inline-flex;align-items:center;gap:0.35rem">' +
-          '<button class="work-action-btn" onclick="openMarksModal(' + ij + ')">' +
-            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>Enter Marks' +
+
+  // Desktop Table Rows (Image 4): 6 columns (#, TEST NAME, DATE, MAX MARKS, GRADED, ACTIONS)
+  if (tbody) {
+    tbody.innerHTML = S.tests.map((t, i) => {
+      const ds = t.test_date ? new Date(t.test_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '--';
+      const gc = t.graded_count || 0;
+      const isGraded = gc > 0;
+      const badgeCls = isGraded ? 'marks-graded-badge is-graded' : 'marks-graded-badge';
+      const ij = JSON.stringify(t).replace(/"/g, '&quot;');
+      const maxMarks = t.max_marks || 20;
+
+      return '<tr>' +
+        '<td style="font-weight:700;color:var(--text-muted);text-align:center">' + (i + 1) + '</td>' +
+        '<td style="font-weight:700;color:var(--text-main)">' + esc(t.name || t.title || 'Test') + '</td>' +
+        '<td style="color:var(--text-muted);font-size:0.85rem">' + ds + '</td>' +
+        '<td style="font-weight:700;font-family:var(--font-family-mono)">' + maxMarks + '</td>' +
+        '<td><span class="' + badgeCls + '">' + gc + '/' + membersCount + '</span></td>' +
+        '<td style="text-align:right;white-space:nowrap">' +
+          '<button class="btn-enter-marks-action" onclick="openMarksModal(' + ij + ')">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' +
+            '<span>Enter Marks</span>' +
           '</button>' +
-          '<button class="work-action-btn" onclick="openEditWorkModal(\'test\', ' + t.id + ')" title="Edit">' +
-            GD_ICONS.edit +
-          '</button>' +
-          '<button class="work-action-btn danger" onclick="delWork(\'test\', ' + t.id + ')" title="Delete">' +
-            GD_ICONS.trash +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  // Mobile Cards List (Image 5)
+  if (mobList) {
+    mobList.innerHTML = S.tests.map((t) => {
+      const ds = t.test_date ? new Date(t.test_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '--';
+      const gc = t.graded_count || 0;
+      const isGraded = gc > 0;
+      const badgeCls = isGraded ? 'marks-graded-badge is-graded' : 'marks-graded-badge';
+      const ij = JSON.stringify(t).replace(/"/g, '&quot;');
+      const maxMarks = t.max_marks || 20;
+
+      return '<div class="marks-mobile-item" data-search-text="' + esc((t.name || t.title || '') + ' ' + ds).toLowerCase() + '">' +
+        '<div class="marks-mobile-item-top">' +
+          '<div class="marks-mobile-item-title">' + esc(t.name || t.title || 'Test') + '</div>' +
+          '<button class="btn-enter-marks-action mob-btn" onclick="openMarksModal(' + ij + ')">' +
+            '<span>Enter Marks</span>' +
           '</button>' +
         '</div>' +
-      '</td>' +
-    '</tr>';
-  }).join('');
+        '<div class="marks-mobile-item-meta">' + ds + ' &bull; ' + maxMarks + ' Max Marks</div>' +
+        '<div class="marks-mobile-item-status">' +
+          '<span class="' + badgeCls + '">' + gc + '/' + membersCount + ' Graded</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
 }
 
 function renderAssignmentMarksTable() {
   const tbody = ById('marks-assignments-tbody');
-  if (!tbody) return;
+  const mobList = ById('marks-assignments-mobile-list');
+  if (!tbody && !mobList) return;
+
   if (!S.assignments || !S.assignments.length) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2.5rem">' + emptyState('assignment', 'No assignments or coursework created yet', 'Click + New Assignment to publish your first coursework item.') + '</td></tr>';
+    const emptyHtml = emptyState('assignment', 'No assignments or coursework created yet', 'Click + New Assignment to publish your first coursework item.');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2.5rem">' + emptyHtml + '</td></tr>';
+    if (mobList) mobList.innerHTML = '<div style="text-align:center;padding:2rem">' + emptyHtml + '</div>';
     return;
   }
-  const membersCount = (S.members || []).length;
-  tbody.innerHTML = S.assignments.map((a, i) => {
-    const rawType = (a.type || 'ASSIGNMENT').toUpperCase();
-    const typeLabel = rawType === 'FINAL_DOCS' ? 'Final Docs' : (rawType === 'PRACTICAL' ? 'Lab Practical' : 'Assignment');
-    const typePillClass = rawType === 'FINAL_DOCS' ? 'finaldocs' : (rawType === 'PRACTICAL' ? 'practical' : 'assignment');
-    const dd = a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No due date';
-    const subCount = a.submission_count || 0;
-    const gradedCount = a.graded_count || 0;
-    const maxMarks = a.max_marks || 100;
-    const avg = a.avg_score != null ? (parseFloat(a.avg_score).toFixed(1) + '/' + maxMarks) : '—';
-    const ij = JSON.stringify(a).replace(/"/g, '&quot;');
-    const rawTypeParam = rawType.toLowerCase() === 'final_docs' ? 'finaldocs' : rawType.toLowerCase();
 
-    return '<tr>' +
-      '<td style="font-weight:700;color:var(--text-muted);text-align:center">' + (i + 1) + '</td>' +
-      '<td>' +
-        '<div style="font-weight:700;color:var(--text-main)">' + esc(a.title || 'Coursework') + '</div>' +
-        (a.description ? '<div style="font-size:0.75rem;color:var(--text-muted);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(a.description) + '</div>' : '') +
-      '</td>' +
-      '<td><span class="work-type-pill ' + typePillClass + '" style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);font-weight:700">' + typeLabel + '</span></td>' +
-      '<td style="font-size:0.8rem">' + dd + '</td>' +
-      '<td style="font-weight:700;font-family:var(--font-family-mono)">' + maxMarks + '</td>' +
-      '<td><span style="font-weight:600">' + subCount + '</span><span style="color:var(--text-muted);font-size:0.78rem">/' + membersCount + '</span></td>' +
-      '<td><span style="font-weight:600;color:' + (gradedCount === membersCount && membersCount > 0 ? 'var(--status-present)' : 'var(--text-main)') + '">' + gradedCount + '</span><span style="color:var(--text-muted);font-size:0.78rem">/' + membersCount + '</span></td>' +
-      '<td style="font-weight:700;color:var(--status-present);font-family:var(--font-family-mono)">' + avg + '</td>' +
-      '<td style="text-align:right;white-space:nowrap">' +
-        '<div style="display:inline-flex;align-items:center;gap:0.35rem">' +
-          '<button class="work-action-btn" onclick="openAssignmentMarksModal(' + ij + ')">' +
-            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>Enter Marks' +
+  const membersCount = (S.members || []).length;
+
+  // Desktop Table Rows (Image 4): 8 columns
+  if (tbody) {
+    tbody.innerHTML = S.assignments.map((a, i) => {
+      const rawType = (a.type || 'ASSIGNMENT').toUpperCase();
+      const typeLabel = rawType === 'FINAL_DOCS' ? 'Final Docs' : (rawType === 'PRACTICAL' ? 'Lab Practical' : 'Assignment');
+      const typePillClass = rawType === 'FINAL_DOCS' ? 'finaldocs' : (rawType === 'PRACTICAL' ? 'practical' : 'assignment');
+      const dd = a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No due date';
+      const subCount = a.submission_count || 0;
+      const gradedCount = a.graded_count || 0;
+      const maxMarks = a.max_marks || 100;
+      const isGraded = gradedCount > 0;
+      const badgeCls = isGraded ? 'marks-graded-badge is-graded' : 'marks-graded-badge';
+      const ij = JSON.stringify(a).replace(/"/g, '&quot;');
+
+      return '<tr>' +
+        '<td style="font-weight:700;color:var(--text-muted);text-align:center">' + (i + 1) + '</td>' +
+        '<td>' +
+          '<div style="font-weight:700;color:var(--text-main)">' + esc(a.title || 'Coursework') + '</div>' +
+          (a.description ? '<div style="font-size:0.75rem;color:var(--text-muted);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(a.description) + '</div>' : '') +
+        '</td>' +
+        '<td><span class="work-type-pill ' + typePillClass + '" style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);font-weight:700">' + typeLabel + '</span></td>' +
+        '<td style="font-size:0.8rem;color:var(--text-muted)">' + dd + '</td>' +
+        '<td style="font-weight:700;font-family:var(--font-family-mono)">' + maxMarks + '</td>' +
+        '<td><span style="font-weight:600">' + subCount + '</span><span style="color:var(--text-muted);font-size:0.78rem">/' + membersCount + '</span></td>' +
+        '<td><span class="' + badgeCls + '">' + gradedCount + '/' + membersCount + '</span></td>' +
+        '<td style="text-align:right;white-space:nowrap">' +
+          '<button class="btn-enter-marks-action" onclick="openAssignmentMarksModal(' + ij + ')">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' +
+            '<span>Enter Marks</span>' +
           '</button>' +
-          '<button class="work-action-btn" onclick="toggleWorkSubmissionsExpand(' + a.id + ', \'' + rawTypeParam + '\')" title="View Submissions Roster">' +
-            GD_ICONS.users +
-          '</button>' +
-          '<button class="work-action-btn" onclick="openEditWorkModal(\'' + rawTypeParam + '\', ' + a.id + ')" title="Edit">' +
-            GD_ICONS.edit +
-          '</button>' +
-          '<button class="work-action-btn danger" onclick="delWork(\'' + rawTypeParam + '\', ' + a.id + ')" title="Delete">' +
-            GD_ICONS.trash +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  // Mobile Cards List (Image 5 style for assignments)
+  if (mobList) {
+    mobList.innerHTML = S.assignments.map((a) => {
+      const rawType = (a.type || 'ASSIGNMENT').toUpperCase();
+      const typeLabel = rawType === 'FINAL_DOCS' ? 'Final Docs' : (rawType === 'PRACTICAL' ? 'Lab Practical' : 'Assignment');
+      const typePillClass = rawType === 'FINAL_DOCS' ? 'finaldocs' : (rawType === 'PRACTICAL' ? 'practical' : 'assignment');
+      const dd = a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No due date';
+      const gradedCount = a.graded_count || 0;
+      const maxMarks = a.max_marks || 100;
+      const isGraded = gradedCount > 0;
+      const badgeCls = isGraded ? 'marks-graded-badge is-graded' : 'marks-graded-badge';
+      const ij = JSON.stringify(a).replace(/"/g, '&quot;');
+
+      return '<div class="marks-mobile-item" data-search-text="' + esc((a.title || '') + ' ' + dd + ' ' + typeLabel).toLowerCase() + '">' +
+        '<div class="marks-mobile-item-top">' +
+          '<div class="marks-mobile-item-title">' + esc(a.title || 'Coursework') + '</div>' +
+          '<button class="btn-enter-marks-action mob-btn" onclick="openAssignmentMarksModal(' + ij + ')">' +
+            '<span>Enter Marks</span>' +
           '</button>' +
         '</div>' +
-      '</td>' +
-    '</tr>';
-  }).join('');
+        '<div class="marks-mobile-item-meta">' + dd + ' &bull; ' + maxMarks + ' Max Marks</div>' +
+        '<div class="marks-mobile-item-status" style="display:flex;justify-content:space-between;align-items:center">' +
+          '<span class="work-type-pill ' + typePillClass + '" style="font-size:0.68rem;padding:0.12rem 0.45rem;border-radius:var(--radius-pill);font-weight:700">' + typeLabel + '</span>' +
+          '<span class="' + badgeCls + '">' + gradedCount + '/' + membersCount + ' Graded</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
 }
 
 function filterMarksCategory(cat) {
@@ -1348,11 +1415,21 @@ function filterMarksCategory(cat) {
 
 function filterAllMarks(q) {
   const term = (q || '').toLowerCase();
+  // Filter desktop tables
   document.querySelectorAll('#marks-tests-tbody tr').forEach(r => {
     r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
   });
   document.querySelectorAll('#marks-assignments-tbody tr').forEach(r => {
     r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+  // Filter mobile cards
+  document.querySelectorAll('#marks-tests-mobile-list .marks-mobile-item').forEach(card => {
+    const text = card.getAttribute('data-search-text') || card.textContent.toLowerCase();
+    card.style.display = text.includes(term) ? '' : 'none';
+  });
+  document.querySelectorAll('#marks-assignments-mobile-list .marks-mobile-item').forEach(card => {
+    const text = card.getAttribute('data-search-text') || card.textContent.toLowerCase();
+    card.style.display = text.includes(term) ? '' : 'none';
   });
 }
 
