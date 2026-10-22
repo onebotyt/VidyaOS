@@ -186,6 +186,10 @@
       <span id="user-profile-badge" style="display:none;" aria-hidden="true"></span>
     </div>
   </header>
+  <div class="mobile-class-header-bar" id="mobile-class-header-bar">
+    <div class="mobile-class-header-title" id="mobile-class-name">Loading…</div>
+    <div class="mobile-class-header-sub" id="mobile-class-sub"></div>
+  </div>
 
   <!-- Backward-compatibility hidden navigation for automated test contracts -->
   <nav style="display: none !important;" id="top-nav-bar" aria-hidden="true">
@@ -540,18 +544,30 @@
     </div>
     <div id="tab-classwork" class="tab-pane" style="display:none">
       <div class="classwork-layout">
-        <!-- Mobile Horizontal Category Pills Strip -->
+        <!-- Mobile Horizontal Category Pills Strip (Screenshot 3 / Image 3) -->
         <div class="cw-pills-scroll" id="cw-pills-scroll">
-          <button type="button" class="cw-pill-btn active" id="cwpill-all" onclick="filterCW('all')">All Work</button>
-          <button type="button" class="cw-pill-btn" id="cwpill-assignments" onclick="filterCW('assignments')">Assignments</button>
-          <button type="button" class="cw-pill-btn" id="cwpill-practicals" onclick="filterCW('practicals')">Lab Practical</button>
-          <button type="button" class="cw-pill-btn" id="cwpill-finaldocs" onclick="filterCW('finaldocs')">Final Docs</button>
-          <button type="button" class="cw-pill-btn" id="cwpill-tests" onclick="filterCW('tests')">Class Tests</button>
-          <button type="button" class="cw-pill-btn" id="cwpill-materials" onclick="filterCW('materials')">Materials</button>
+          <button type="button" class="cw-pill-btn active" id="cwpill-all" onclick="filterCW('all')">
+            <span>All Work</span> <span class="cw-pill-badge" id="cwpill-badge-all">0</span>
+          </button>
+          <button type="button" class="cw-pill-btn" id="cwpill-assignments" onclick="filterCW('assignments')">
+            <span>Assignments</span> <span class="cw-pill-badge" id="cwpill-badge-assignments">0</span>
+          </button>
+          <button type="button" class="cw-pill-btn" id="cwpill-practicals" onclick="filterCW('practicals')">
+            <span>Lab Practical</span> <span class="cw-pill-badge" id="cwpill-badge-practicals">0</span>
+          </button>
+          <button type="button" class="cw-pill-btn" id="cwpill-finaldocs" onclick="filterCW('finaldocs')">
+            <span>Final Documents</span> <span class="cw-pill-badge" id="cwpill-badge-finaldocs">0</span>
+          </button>
+          <button type="button" class="cw-pill-btn" id="cwpill-tests" onclick="filterCW('tests')">
+            <span>Class Tests</span> <span class="cw-pill-badge" id="cwpill-badge-tests">0</span>
+          </button>
+          <button type="button" class="cw-pill-btn" id="cwpill-materials" onclick="filterCW('materials')">
+            <span>Materials</span> <span class="cw-pill-badge" id="cwpill-badge-materials">0</span>
+          </button>
         </div>
 
         <div class="cw-categories">
-          <div class="cw-cat-hdr">Filter</div>
+          <div class="cw-cat-hdr">FILTER</div>
           <div class="cw-cat-item active" id="cwcat-all" onclick="filterCW('all')">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
             <span>All Work</span>
@@ -577,25 +593,25 @@
             <span>Materials</span>
           </div>
 
-          <div class="cw-cat-hdr" style="margin-top:1.25rem;">Syllabus Units</div>
+          <div class="cw-cat-hdr" style="margin-top:1.5rem;">SYLLABUS UNITS</div>
           <div id="cw-unit-filter-list">
             <!-- Populated via JS -->
           </div>
         </div>
         <div class="cw-main">
-          <div class="cw-toolbar" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-              <div style="font-size:.9rem;font-weight:700;color:var(--text-main)" id="cw-section-title">All Classwork</div>
-              <div class="cw-unit-select-wrap" style="display:inline-flex;align-items:center;gap:0.4rem;">
-                <select id="cw-unit-filter-select" onchange="filterCWByUnit(this.value)" style="padding:0.35rem 0.65rem;font-size:0.8rem;font-weight:600;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-main);cursor:pointer;outline:none;">
+          <div class="cw-toolbar">
+            <div class="cw-toolbar-left">
+              <div class="cw-section-title" id="cw-section-title">All Classwork</div>
+              <div class="cw-unit-select-wrap">
+                <select id="cw-unit-filter-select" onchange="filterCWByUnit(this.value)">
                   <option value="all" selected>All Units (Show All)</option>
                 </select>
               </div>
             </div>
             <div class="cw-dd-wrap" id="cw-dd-wrap">
-              <button class="cw-create-btn" onclick="toggleCWDrop()">
+              <button type="button" class="cw-create-btn" id="cw-main-create-btn" onclick="toggleCWDrop()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                <span>Create</span>
+                <span>+ Create</span>
               </button>
               <div class="cw-dd-menu" id="cw-dd-menu" style="display:none">
                 <div class="cw-dd-item" onclick="openCreateAssignmentModal();closeCWDrop()">

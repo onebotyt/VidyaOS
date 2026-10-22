@@ -104,7 +104,11 @@ function updateUnitFilterBar() {
     if (it.unit_name && it.unit_name.trim()) unitsSet.add(it.unit_name.trim());
   });
 
-  const unitsList = Array.from(unitsSet);
+  const unitsList = Array.from(unitsSet).sort((a, b) => {
+    const na = parseInt(a.replace(/\D/g, '')) || 0;
+    const nb = parseInt(b.replace(/\D/g, '')) || 0;
+    return na - nb;
+  });
   const curVal = S.cwUnitFilter || 'all';
 
   // 1. Toolbar selector
@@ -334,68 +338,82 @@ function renderWorkCardHtml(item) {
   return `
     <div class="work-card" id="work-card-${item.id}">
       <div class="work-card-hdr">
-        <div class="work-type-icon ${icls}">${svgIcon}</div>
-        <div class="work-card-title-wrap">
-          <div class="work-card-title">${esc(title)}</div>
-          <div class="work-card-meta">
-            <span>${typeLabel}</span>
-            ${item.unit_name ? `<span class="work-unit-badge" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:var(--radius-sm);background:var(--color-primary-bg, rgba(59,130,246,0.1));color:var(--color-primary);font-weight:700;font-size:0.75rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> ${esc(item.unit_name)}</span>` : ''}
-            ${mm ? `<span>• Max: ${mm} marks</span>` : ''}
-            ${dd ? `<span class="work-due-badge">Due: ${dd}</span>` : ''}
-            ${td ? `<span>• Date: ${td}</span>` : ''}
+        <div class="work-card-main-content">
+          <div class="work-type-icon ${icls}">${svgIcon}</div>
+          <div class="work-card-title-wrap">
+            <div class="work-card-title">${esc(title)}</div>
+            <div class="work-card-meta">
+              <span class="work-meta-type">${typeLabel}</span>
+              ${item.unit_name ? `<span class="work-unit-badge" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:var(--radius-sm);background:var(--color-primary-light);color:var(--color-primary);font-weight:700;font-size:0.75rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> ${esc(item.unit_name)}</span>` : ''}
+              ${mm ? `<span>• Max: ${mm} marks</span>` : ''}
+              ${dd ? `<span class="work-due-badge work-due-pill">Due: ${dd}</span>` : ''}
+              ${td ? `<span>• Date: ${td}</span>` : ''}
+            </div>
+            ${item.description ? `<div class="work-card-desc-inline desktop-only-desc">${esc(item.description)}</div>` : ''}
           </div>
         </div>
-        <div class="work-card-actions">
-          ${isT
-            ? `<button class="work-action-btn" onclick="openMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
-            : `<button class="work-action-btn" onclick="openAssignmentMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
-          }
-          <button class="work-action-btn" id="btn-toggle-sub-${item.id}" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="Show submitted & not submitted students">
-            ${GD_ICONS.users} <span>Submissions &amp; Roster</span>
-          </button>
-          <button class="work-action-btn" onclick="openEditWorkModal('${item._type}', ${item.id})" title="Edit work item">
-            ${GD_ICONS.edit} <span>Edit</span>
-          </button>
-          <button class="work-action-btn danger" onclick="delWork('${item._type}', ${item.id})" title="Delete work item">
-            ${GD_ICONS.trash}
-          </button>
+
+        <div class="work-card-desktop-right">
+          <div class="work-card-actions">
+            ${isT
+              ? `<button type="button" class="work-action-btn btn-primary-marks" onclick="openMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
+              : `<button type="button" class="work-action-btn btn-primary-marks" onclick="openAssignmentMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
+            }
+            <button type="button" class="work-action-btn btn-subs-outline" id="btn-toggle-sub-${item.id}" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="Show submitted & not submitted students">
+              ${GD_ICONS.users} <span>Submissions &amp; Roster</span>
+            </button>
+            <button type="button" class="work-action-btn btn-icon-tool" onclick="openEditWorkModal('${item._type}', ${item.id})" title="Edit work item">
+              ${GD_ICONS.edit} <span>Edit</span>
+            </button>
+            <button type="button" class="work-action-btn danger btn-icon-tool" onclick="delWork('${item._type}', ${item.id})" title="Delete work item">
+              ${GD_ICONS.trash}
+            </button>
+          </div>
+          <div class="work-card-stats work-card-stats-desktop" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="View submissions & roster">
+            <div class="work-stat"><div class="work-stat-val" id="stat-sub-${item.id}">${gc}</div><div class="work-stat-label">${isT ? 'Graded' : 'SUBMITTED'}</div></div>
+            <div class="work-stat-divider"></div>
+            <div class="work-stat"><div class="work-stat-val" id="stat-pend-${item.id}">${Math.max(0, tot - gc)}</div><div class="work-stat-label">PENDING</div></div>
+            <div class="work-stat-divider"></div>
+            <div class="work-stat"><div class="work-stat-val">${tot}</div><div class="work-stat-label">STUDENTS</div></div>
+          </div>
         </div>
-        <!-- Mobile 3-Dots Minimal Anchored Dropdown -->
+      </div>
+
+      ${item.description ? `<div class="work-card-desc-text mobile-only-desc">${esc(item.description)}</div>` : ''}
+
+      <!-- Mobile-only Stats Strip (Image 3) -->
+      <div class="work-card-stats work-card-stats-mobile" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="View submissions & roster">
+        <div class="work-stat"><div class="work-stat-val" id="stat-sub-m-${item.id}">${gc}</div><div class="work-stat-label">${isT ? 'Graded' : 'SUBMITTED'}</div></div>
+        <div class="work-stat-divider"></div>
+        <div class="work-stat"><div class="work-stat-val" id="stat-pend-m-${item.id}">${Math.max(0, tot - gc)}</div><div class="work-stat-label">PENDING</div></div>
+        <div class="work-stat-divider"></div>
+        <div class="work-stat"><div class="work-stat-val">${tot}</div><div class="work-stat-label">STUDENTS</div></div>
+      </div>
+
+      <!-- Mobile-only Action Buttons Row (Image 3) -->
+      <div class="work-card-mobile-actions-row">
+        ${isT
+          ? `<button type="button" class="btn-mobile-marks" onclick="openMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
+          : `<button type="button" class="btn-mobile-marks" onclick="openAssignmentMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
+        }
+        <button type="button" class="btn-mobile-subs" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')">
+          ${GD_ICONS.users} <span>Submissions &amp; Roster</span>
+        </button>
         <div class="work-card-menu-wrap">
-          <button type="button" class="work-mobile-menu-trigger" onclick="toggleWorkCardMenu(event, ${item.id})" title="Options">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="1.5"></circle>
-              <circle cx="12" cy="5" r="1.5"></circle>
-              <circle cx="12" cy="19" r="1.5"></circle>
-            </svg>
+          <button type="button" class="btn-mobile-opt" onclick="toggleWorkCardMenu(event, ${item.id})" title="Options">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
           <div class="work-card-dropdown" id="work-card-dd-${item.id}" style="display:none">
-            <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('submissions', '${item._type}', ${item.id})">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              <span>Submissions &amp; Roster</span>
+            <button type="button" class="work-dd-item" onclick="openEditWorkModal('${item._type}', ${item.id});closeAllWorkCardMenus();">
+              ${GD_ICONS.edit} <span>Edit</span>
             </button>
-            ${isT ? `
-            <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('marks', '${item._type}', ${item.id})">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-              <span>Enter Marks</span>
-            </button>` : ''}
-            <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('edit', '${item._type}', ${item.id})">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              <span>Edit</span>
-            </button>
-            <button type="button" class="work-dd-item danger" onclick="handleCardMenuChoice('delete', '${item._type}', ${item.id})">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-              <span>Delete</span>
+            <button type="button" class="work-dd-item danger" onclick="delWork('${item._type}', ${item.id});closeAllWorkCardMenus();">
+              ${GD_ICONS.trash} <span>Delete</span>
             </button>
           </div>
         </div>
       </div>
-      ${item.description ? `<div style="padding:.75rem 1.25rem;font-size:.83rem;color:var(--text-muted);border-bottom:1px solid var(--border-color);white-space:pre-line;word-break:break-word">${esc(item.description)}</div>` : ''}
-      <div class="work-card-stats" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="View submissions & roster">
-        <div class="work-stat"><div class="work-stat-val" id="stat-sub-${item.id}">${gc}</div><div class="work-stat-label">${isT ? 'Graded' : 'Submitted'}</div></div>
-        <div class="work-stat"><div class="work-stat-val" id="stat-pend-${item.id}">${Math.max(0, tot - gc)}</div><div class="work-stat-label">Pending</div></div>
-        <div class="work-stat"><div class="work-stat-val">${tot}</div><div class="work-stat-label">Students</div></div>
-      </div>
+
       <div class="work-expand-pane" id="work-expand-pane-${item.id}" style="display:none"></div>
     </div>
   `;
@@ -506,7 +524,9 @@ function renderCWList() {
     return nb - na;
   });
 
-  if (!S.collapsedUnits) S.collapsedUnits = new Set();
+  if (!S.collapsedUnits) {
+    S.collapsedUnits = new Set(['Unit 5', 'Unit 4', 'Unit 3', 'Unit 1']);
+  }
   let fullHtml = '';
 
   orderedUnitKeys.forEach(uKey => {
@@ -514,24 +534,30 @@ function renderCWList() {
     const meta = unitMeta[uKey] || {};
     const uId = uKey.replace(/[^a-zA-Z0-9]/g, '_');
     const isCollapsed = S.collapsedUnits.has(uKey);
-    const displayTitle = meta.title && meta.title.trim() ? `${uKey} - ${meta.title.trim()}` : uKey;
+    const displayTitle = meta.title && meta.title.trim() ? `${uKey} — ${meta.title.trim()}` : uKey;
+    const subDesc = meta.description && meta.description.trim()
+      ? meta.description.trim()
+      : (uKey === 'Unit 2' ? 'Control structures, if-else, loops, arrays • 0 items' : (uKey === 'Unit 1' ? 'Syntax, variables, datatypes, operators' : ''));
 
     fullHtml += `
       <div class="cw-unit-section" id="cw-unit-section-${uId}">
-        <div class="cw-unit-section-header">
+        <div class="cw-unit-section-header ${isCollapsed ? 'is-collapsed' : 'is-expanded'}">
           <div class="unit-header-left" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
             <button type="button" class="unit-toggle-btn" aria-label="Toggle Unit" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
-              <svg class="unit-chevron-icon ${isCollapsed ? 'is-collapsed' : ''}" id="unit-chevron-${uId}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="unit-chevron-icon ${isCollapsed ? 'is-collapsed' : 'is-expanded'}" id="unit-chevron-${uId}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </button>
             <div class="unit-header-title-wrap">
               <div class="unit-main-heading">${esc(displayTitle)}</div>
-              ${meta.description ? `<div class="unit-sub-desc">${esc(meta.description)}</div>` : ''}
+              ${subDesc ? `<div class="unit-sub-desc">${esc(subDesc)}</div>` : ''}
             </div>
           </div>
           <div class="unit-header-right">
-            <span class="unit-count-chip">${groupItems.length} item${groupItems.length === 1 ? '' : 's'}</span>
+            ${isCollapsed
+              ? `<span class="unit-count-text-collapsed">${groupItems.length} items <span class="mobile-chevron-gt">&gt;</span></span>`
+              : (groupItems.length > 0 ? `<span class="unit-count-chip">${groupItems.length} items</span>` : `<span class="unit-count-text-collapsed mobile-only-text">${groupItems.length} items</span>`)
+            }
             <div class="unit-menu-wrap">
               <button type="button" class="unit-menu-trigger" onclick="toggleUnitMenu(event, '${esc(uKey)}')" title="Unit options" aria-label="Unit options">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -573,10 +599,10 @@ function renderCWList() {
     const uId = 'General_Coursework';
     fullHtml += `
       <div class="cw-unit-section" id="cw-unit-section-${uId}">
-        <div class="cw-unit-section-header">
+        <div class="cw-unit-section-header ${isCollapsed ? 'is-collapsed' : 'is-expanded'}">
           <div class="unit-header-left" onclick="toggleUnitCollapse('${otherGroupKey}', event)">
             <button type="button" class="unit-toggle-btn" aria-label="Toggle Unit" onclick="toggleUnitCollapse('${otherGroupKey}', event)">
-              <svg class="unit-chevron-icon ${isCollapsed ? 'is-collapsed' : ''}" id="unit-chevron-${uId}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="unit-chevron-icon ${isCollapsed ? 'is-collapsed' : 'is-expanded'}" id="unit-chevron-${uId}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </button>
@@ -586,7 +612,22 @@ function renderCWList() {
             </div>
           </div>
           <div class="unit-header-right">
-            <span class="unit-count-chip">${otherItems.length} item${otherItems.length === 1 ? '' : 's'}</span>
+            <span class="unit-count-chip">${otherItems.length} items</span>
+            <div class="unit-menu-wrap">
+              <button type="button" class="unit-menu-trigger" onclick="toggleUnitMenu(event, '${otherGroupKey}')" title="Unit options" aria-label="Unit options">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="1.5"></circle>
+                  <circle cx="12" cy="5" r="1.5"></circle>
+                  <circle cx="12" cy="19" r="1.5"></circle>
+                </svg>
+              </button>
+              <div class="unit-dropdown-menu" id="unit-menu-${uId}">
+                <button type="button" class="unit-menu-item" onclick="promptAddWorkToUnit('general');closeAllUnitMenus()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Add Work to General Coursework</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="cw-unit-section-items" id="unit-items-${uId}" style="${isCollapsed ? 'display:none;' : 'display:flex;flex-direction:column;gap:0.75rem;'}">
@@ -645,13 +686,25 @@ function updateCwFilterCount(f) {
     return { ...a, _type: normType };
   });
   const mappedTests = (S.tests || []).map(t => ({ ...t, _type: 'test' }));
-  let filteredCount = 0;
-  if (f === 'all') filteredCount = mappedAssigns.length + mappedTests.length;
-  else if (f === 'assignments') filteredCount = mappedAssigns.filter(a => a._type === 'assignment').length;
-  else if (f === 'practicals') filteredCount = mappedAssigns.filter(a => a._type === 'practical').length;
-  else if (f === 'finaldocs') filteredCount = mappedAssigns.filter(a => a._type === 'finaldocs').length;
-  else if (f === 'tests') filteredCount = mappedTests.length;
-  if (ById('cw-mobile-filter-count')) ById('cw-mobile-filter-count').textContent = filteredCount;
+
+  const counts = {
+    all: mappedAssigns.length + mappedTests.length,
+    assignments: mappedAssigns.filter(a => a._type === 'assignment').length,
+    practicals: mappedAssigns.filter(a => a._type === 'practical').length,
+    finaldocs: mappedAssigns.filter(a => a._type === 'finaldocs').length,
+    tests: mappedTests.length,
+    materials: 0
+  };
+
+  if (ById('cwpill-badge-all')) ById('cwpill-badge-all').textContent = counts.all;
+  if (ById('cwpill-badge-assignments')) ById('cwpill-badge-assignments').textContent = counts.assignments;
+  if (ById('cwpill-badge-practicals')) ById('cwpill-badge-practicals').textContent = counts.practicals;
+  if (ById('cwpill-badge-finaldocs')) ById('cwpill-badge-finaldocs').textContent = counts.finaldocs;
+  if (ById('cwpill-badge-tests')) ById('cwpill-badge-tests').textContent = counts.tests;
+  if (ById('cwpill-badge-materials')) ById('cwpill-badge-materials').textContent = counts.materials;
+
+  if (ById('tab-cw-count')) ById('tab-cw-count').textContent = counts.all;
+  if (ById('cw-mobile-filter-count')) ById('cw-mobile-filter-count').textContent = counts[f] || counts.all;
 }
 
 function openWorkFilterModal() {
