@@ -1716,13 +1716,53 @@ table.sheet-table .excel-cell-total {
     display: inline-flex !important;
   }
 
-  /* Full screen modal dialog on phone to maximize table visibility */
+  /* Full screen Separate Page mode on phone - hides all background content so no background scrollbar exists */
+  html.marks-standalone-page,
+  body.marks-standalone-page {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--bg-card) !important;
+    touch-action: none !important;
+  }
+
+  body.marks-standalone-page > :not(#modal-enter-marks):not(#modal-edit-questions):not(#gd-toast):not(.classroom-toast) {
+    display: none !important;
+  }
+
+  body.marks-standalone-page #modal-enter-marks {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    z-index: 99999 !important;
+    background: var(--bg-card) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body.marks-standalone-page #modal-enter-marks .modal-card,
   #modal-enter-marks .modal-card {
     width: 100vw !important;
     max-width: 100vw !important;
     height: 100dvh !important;
     max-height: 100dvh !important;
     border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
