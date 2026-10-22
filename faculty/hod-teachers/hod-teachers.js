@@ -58,23 +58,15 @@
       el.classList.add('open');
     }
     function hideModal(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.classList.remove('open');
-      el.style.display = 'none';
+      if (window.closeModal) window.closeModal(id);
+      else {
+        const el = document.getElementById(id);
+        if (el) { el.classList.remove('open'); el.style.display = 'none'; }
+      }
     }
     function closeModal(id) { hideModal(id); }
 
-    // Toast Helper
-    function showToast(msg, type = 'info') {
-      const t = document.getElementById('toast');
-      if (!t) return;
-      t.textContent = msg;
-      t.style.background = type === 'error' ? 'var(--status-absent)' : (type === 'success' ? 'var(--status-present)' : 'var(--color-primary)');
-      t.style.color = 'var(--text-white, white)';
-      t.style.display = 'block';
-      setTimeout(() => { t.style.display = 'none'; }, 3500);
-    }
+    // Main Workspace Tab Switching
 
     // Main Workspace Tab Switching
     function showMainTab(tab) {

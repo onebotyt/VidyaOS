@@ -432,7 +432,7 @@
       display: flex; align-items: center; justify-content: center; gap: 0.4rem;
       width: 100%; padding: 0.75rem 1rem;
       border: none; border-radius: var(--reg-radius-sm);
-      background: var(--reg-accent); color: #fff;
+      background: var(--reg-accent); color: var(--text-white);
       font-size: 0.88rem; font-weight: 700; font-family: inherit;
       cursor: pointer; text-decoration: none;
       transition: all 0.2s;
@@ -444,6 +444,19 @@
       font-size: 0.73rem; font-weight: 700; letter-spacing: 0.07em;
       text-transform: uppercase; color: var(--reg-muted);
       margin-bottom: 0.6rem; margin-top: 0.25rem;
+    }
+
+    /* Google Connected Badge */
+    .google-connected-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0.9rem;
+      background: var(--reg-success-soft);
+      border: 1px solid var(--reg-success);
+      border-radius: var(--reg-radius-sm);
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
     }
 
     /* Responsive */

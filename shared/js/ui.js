@@ -81,6 +81,8 @@ function openModal(idOrEl) {
   if (modal) {
     modal.classList.add('open');
     modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
     document.body.classList.add('modal-open');
     // Trap focus / autofocus first input
     const firstInput = modal.querySelector('input:not([disabled]), select:not([disabled]), button:not([disabled])');
@@ -97,10 +99,20 @@ function closeModal(idOrEl) {
   if (modal) {
     modal.classList.remove('open');
     modal.style.display = 'none';
+    modal.style.opacity = '';
+    modal.style.pointerEvents = '';
     if (!document.querySelector('.modal-backdrop.open, .modal.open')) {
       document.body.classList.remove('modal-open');
     }
   }
+}
+
+/**
+ * Modal hide alias
+ * @param {string|HTMLElement} idOrEl
+ */
+function hideModal(idOrEl) {
+  closeModal(idOrEl);
 }
 
 if (typeof document !== 'undefined') {
@@ -535,6 +547,12 @@ if (typeof window !== 'undefined') {
   window.closeStudentDossier = closeStudentDossier;
   window.esc = esc;
   window.escapeHtml = escapeHtml;
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+  window.hideModal = hideModal;
+  window.showToast = showToast;
+  window.formatDate = formatDate;
+  window.formatTime = formatTime;
 }
 
 // ─────────────────────────────────────────────────────────

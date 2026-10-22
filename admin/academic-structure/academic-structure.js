@@ -439,24 +439,6 @@ guardRoute(['SYSTEM_ADMIN']);
       });
     });
 
-    // ─── Helpers ──────────────────────────────────────────────
-    function esc(str) {
-      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function showToast(msg, type = 'info') {
-      const t = document.getElementById('toast');
-      if (!t) return;
-      t.textContent = msg;
-      t.style.position = 'fixed';
-      t.style.bottom = 'calc(64px + 1.25rem + env(safe-area-inset-bottom, 0px))';
-      t.style.right = '1.5rem';
-      t.style.zIndex = '99999';
-      t.style.display = 'block';
-      t.style.background = type === 'error' ? 'var(--status-absent)' : type === 'success' ? 'var(--status-present)' : 'var(--color-primary)';
-      t.style.color = 'var(--text-white)';
-      setTimeout(() => { t.style.display = 'none'; }, 4000);
-    }
-
     init();
+
 

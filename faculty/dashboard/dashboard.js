@@ -52,7 +52,7 @@
             <div class="cf-doc-card-actions">
               ${isAvail 
                 ? `<a href="/faculty/course-file.html?group_id=${groupId}${regParam}&doc=${doc.slug}&action=view" class="cf-action-btn cf-action-view" title="View document">
-                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                      <span>View</span>
                    </a>`
                 : `<span class="cf-action-empty" title="Nothing to view yet">
@@ -2371,38 +2371,6 @@
       showToast(`Copied code "${text}"`, 'info');
     }
 
-    function openModal(id) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.classList.add('open');
-        el.style.display = 'flex';
-        el.style.opacity = '1';
-        el.style.pointerEvents = 'auto';
-        const firstInput = el.querySelector('input:not([disabled]), select:not([disabled]), button:not([disabled])');
-        if (firstInput) setTimeout(() => firstInput.focus(), 50);
-      }
-    }
-
-    function closeModal(id) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.classList.remove('open');
-        el.style.display = 'none';
-        el.style.opacity = '';
-        el.style.pointerEvents = '';
-      }
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
     // Dismiss on backdrop click or outside menu click
     document.addEventListener('click', (e) => {
       if (e.target && typeof e.target.closest === 'function') {
@@ -2474,7 +2442,7 @@
             ${list.map(f => {
               const roles = [];
               if (f.is_hod) roles.push('<span class="badge badge-admin" style="font-size:0.65rem;">HOD</span>');
-              if (f.is_class_teacher) roles.push('<span class="badge badge-pending" style="font-size:0.65rem;">Class Teacher</span>');
+              else roles.push('<span class="badge badge-pending" style="font-size:0.65rem;">Faculty</span>');
               const subjects = Array.isArray(f.assigned_subjects) && f.assigned_subjects.length
                 ? f.assigned_subjects.map(s => `<span class="badge badge-sem" style="font-size:0.68rem; margin:1px;">${escapeHtml(s)}</span>`).join(' ')
                 : '<span style="color:var(--text-muted); font-size:0.75rem;">None assigned</span>';
@@ -2558,8 +2526,8 @@
           <tbody>
             ${list.map(st => {
               const att = st.attendance_pct != null ? `${st.attendance_pct}%` : 'N/A';
-              const statusBadge = st.is_defaulter
-                ? '<span class="badge badge-absent" style="font-size:0.7rem; font-weight:700;">Defaulter (&lt;75%)</span>'
+              const statusBadge = (st.below_threshold || st.is_defaulter || (st.attendance_pct != null && st.attendance_pct < 75))
+                ? '<span class="badge badge-absent" style="font-size:0.7rem; font-weight:700;">Below 75%</span>'
                 : '<span class="badge badge-present" style="font-size:0.7rem; font-weight:700;">Regular</span>';
               return `
                 <tr>
@@ -2660,7 +2628,7 @@
                   </td>
                   <td style="text-align:right;">
                     <button type="button" class="btn btn-primary btn-sm" onclick="loadHodClassAttendance(${c.register_id}, '${escapeHtml(c.subject_name || c.class_name).replace(/'/g, "\\'")}', ${c.semester})" style="font-size:0.78rem; padding:0.35rem 0.65rem; display:inline-flex; align-items:center; gap:0.35rem;">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                       <span>View Student Attendance</span>
                     </button>
                   </td>
@@ -2709,8 +2677,8 @@
               </thead>
               <tbody>
                 ${students.map(st => {
-                  const statusBadge = st.is_defaulter
-                    ? '<span class="badge badge-absent" style="font-size:0.7rem; font-weight:700;">Defaulter (&lt;75%)</span>'
+                  const statusBadge = (st.below_threshold || st.is_defaulter || (st.attendance_pct != null && st.attendance_pct < 75))
+                    ? '<span class="badge badge-absent" style="font-size:0.7rem; font-weight:700;">Below 75%</span>'
                     : '<span class="badge badge-present" style="font-size:0.7rem; font-weight:700;">Regular</span>';
                   return `
                     <tr>
@@ -2785,8 +2753,8 @@
               const classes = Array.isArray(st.enrolled_classes) && st.enrolled_classes.length
                 ? st.enrolled_classes.map(c => `<span class="badge badge-sem" style="font-size:0.68rem; margin:1px;">${escapeHtml(c)}</span>`).join(' ')
                 : '<span style="color:var(--text-muted); font-size:0.75rem;">None</span>';
-              const statusBadge = st.is_defaulter
-                ? '<span class="badge badge-absent" style="font-size:0.7rem; font-weight:700;">Defaulter (&lt;75%)</span>'
+              const statusBadge = (st.below_threshold || st.is_defaulter || (st.attendance_pct != null && st.attendance_pct < 75))
+                ? '<span class="badge badge-absent" style="font-size:0.7rem; font-weight:700;">Below 75%</span>'
                 : '<span class="badge badge-present" style="font-size:0.7rem; font-weight:700;">Regular</span>';
               return `
                 <tr>

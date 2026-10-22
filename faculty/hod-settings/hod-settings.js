@@ -114,7 +114,7 @@ guardRoute({ roles: ['TEACHER'], requireHOD: true });
           })
         });
         if (res.success) {
-          showToast('Attendance defaulter threshold updated successfully!', 'success');
+          showToast('Attendance eligibility threshold updated successfully!', 'success');
           await loadSettings();
         }
       } catch (err) {
