@@ -839,3 +839,11 @@
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* Modal Open Background Scroll Lock */
+body.modal-open {
+  overflow: hidden !important;
+  touch-action: none !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+
