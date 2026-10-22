@@ -23,92 +23,56 @@
       "destination": "/shared/:path*"
     },
     {
-      "source": "/login",
-      "destination": "/login/index.html"
-    },
-    {
-      "source": "/login/",
-      "destination": "/login/index.html"
-    },
-    {
-      "source": "/login.html",
-      "destination": "/login/index.html"
-    },
-    {
       "source": "/register",
-      "destination": "/login/register/index.html"
+      "destination": "/login/register"
     },
     {
       "source": "/register.html",
-      "destination": "/login/register/index.html"
-    },
-    {
-      "source": "/login/register",
-      "destination": "/login/register/index.html"
+      "destination": "/login/register"
     },
     {
       "source": "/login/register.html",
-      "destination": "/login/register/index.html"
+      "destination": "/login/register"
     },
     {
       "source": "/login/student-register.html",
-      "destination": "/login/register/index.html?role=student"
+      "destination": "/login/register?role=student"
     },
     {
       "source": "/login/faculty-register.html",
-      "destination": "/login/register/index.html?role=faculty"
+      "destination": "/login/register?role=faculty"
     },
     {
       "source": "/admin",
-      "destination": "/admin/academic-structure/index.html"
+      "destination": "/admin/academic-structure"
     },
     {
-      "source": "/admin/",
-      "destination": "/admin/academic-structure/index.html"
-    },
-    {
-      "source": "/admin/academic_structure.html",
-      "destination": "/admin/academic-structure/index.html"
-    },
-    {
-      "source": "/admin/departments.html",
-      "destination": "/admin/academic-structure/index.html?tab=departments"
+      "source": "/admin/departments",
+      "destination": "/admin/academic-structure?tab=departments"
     },
     {
       "source": "/faculty",
-      "destination": "/faculty/dashboard/index.html"
+      "destination": "/faculty/dashboard"
     },
     {
-      "source": "/faculty/",
-      "destination": "/faculty/dashboard/index.html"
+      "source": "/faculty/analytics",
+      "destination": "/faculty/reports?tab=analytics"
     },
     {
-      "source": "/faculty/analytics.html",
-      "destination": "/faculty/reports/index.html?tab=analytics"
+      "source": "/faculty/marks",
+      "destination": "/faculty/tests"
     },
     {
-      "source": "/faculty/marks.html",
-      "destination": "/faculty/tests/index.html"
-    },
-    {
-      "source": "/faculty/attendance/quick.html",
-      "destination": "/faculty/registers/index.html"
+      "source": "/faculty/attendance/quick",
+      "destination": "/faculty/registers"
     },
     {
       "source": "/student",
-      "destination": "/student/dashboard/index.html"
+      "destination": "/student/dashboard"
     },
     {
-      "source": "/student/",
-      "destination": "/student/dashboard/index.html"
-    },
-    {
-      "source": "/student/attendance/subjects.html",
-      "destination": "/student/attendance/index.html"
-    },
-    {
-      "source": "/:section/:page.html",
-      "destination": "/:section/:page/index.html"
+      "source": "/student/attendance/subjects",
+      "destination": "/student/attendance"
     },
     {
       "source": "/:section/:page.css",
