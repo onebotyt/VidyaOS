@@ -2015,7 +2015,7 @@ function renderMarksEntryTable(preserveInputs = false) {
         return `
           <tr class="${isAb ? 'is-absent' : ''}" style="${isAb ? 'background:var(--status-absent-bg);' : ''}">
             ${showSr ? `<td class="cell-sr" style="font-weight:700;color:var(--text-muted)">${rIdx + 1}</td>` : ''}
-            <td class="cell-roll cell-roll-minimal" style="font-weight:500;color:var(--text-muted);font-family:var(--font-family-mono, monospace)">${esc(rollStr)}</td>
+            <td class="cell-roll cell-roll-minimal">${esc(rollStr)}</td>
             ${showEnroll ? `<td class="cell-enroll" style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.official_enrollment_no || '--')}</td>` : ''}
             ${showReg ? `<td class="cell-reg" style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.registration_no || '--')}</td>` : ''}
             <td class="cell-student-name cell-name-minimal">
@@ -2032,7 +2032,7 @@ function renderMarksEntryTable(preserveInputs = false) {
               </button>
             </td>
             ${qTds}
-            <td class="cell-total cell-total-minimal" style="text-align:right;padding-right:0.75rem"><span id="tot-${m.student_id}" class="auto-total-badge minimal-total-text ${isAb ? 'is-absent' : ''}">${isAb ? '0/' + totalMax : '0/' + totalMax}</span></td>
+            <td class="cell-total cell-total-minimal"><span id="tot-${m.student_id}" class="auto-total-badge minimal-total-text ${isAb ? 'is-absent' : ''}">${isAb ? '0/' + totalMax : '0/' + totalMax}</span></td>
           </tr>
         `;
       }).join('');
