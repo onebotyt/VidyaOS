@@ -1978,7 +1978,7 @@ function renderMarksEntryTable(preserveInputs = false) {
       thead.innerHTML = `
         <tr id="marks-table-header-row">
           ${showSr ? '<th class="col-sr" style="width:36px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">SR</th>' : ''}
-          <th class="col-roll col-student-hdr" style="width:36px;position:sticky;top:0;left:0;z-index:20;background:var(--bg-surface)">
+          <th class="col-roll col-student-hdr" style="width:32px;position:sticky;top:0;left:0;z-index:20;background:var(--bg-surface)">
             <span class="desktop-text">Roll</span>
             <span class="mobile-text">R.N</span>
           </th>
