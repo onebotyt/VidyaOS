@@ -1583,8 +1583,7 @@ table.sheet-table .excel-cell-total {
   display: flex !important;
   align-items: baseline !important;
   gap: 0.35rem !important;
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
+  flex: 0 0 auto !important;
   white-space: nowrap !important;
 }
 
@@ -2060,7 +2059,7 @@ table.sheet-table .excel-cell-total {
     height: 0 !important;
   }
 
-  /* Modal Footer: Clean single-line Total Max Marks & Primary Blue Save Marks */
+  /* Modal Footer: Clean single-line Total & Primary Blue Save Marks */
   #modal-enter-marks .modal-footer,
   .marks-modal-footer-minimal {
     flex-shrink: 0 !important;
@@ -2070,15 +2069,16 @@ table.sheet-table .excel-cell-total {
     padding: 0.65rem 0.85rem calc(0.65rem + env(safe-area-inset-bottom, 0px)) !important;
     background: var(--bg-card) !important;
     border-top: 1px solid var(--border-color) !important;
-    gap: 0.5rem !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .marks-footer-left {
     display: flex !important;
     align-items: baseline !important;
     gap: 0.35rem !important;
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
+    flex: 0 0 auto !important;
     white-space: nowrap !important;
   }
 
@@ -2100,14 +2100,14 @@ table.sheet-table .excel-cell-total {
     display: flex !important;
     align-items: center !important;
     gap: 0.6rem !important;
-    flex-shrink: 0 !important;
+    flex: 0 0 auto !important;
   }
 
   #modal-enter-marks .btn-modal-cancel {
-    font-size: 0.84rem !important;
+    font-size: 0.82rem !important;
     font-weight: 600 !important;
     color: var(--text-muted) !important;
-    padding: 0.4rem 0.5rem !important;
+    padding: 0.35rem 0.5rem !important;
     background: transparent !important;
     border: none !important;
     cursor: pointer !important;
@@ -2120,9 +2120,9 @@ table.sheet-table .excel-cell-total {
 
   #modal-enter-marks .btn-modal-save,
   #modal-enter-marks .btn-modal-save-dark {
-    font-size: 0.84rem !important;
+    font-size: 0.82rem !important;
     font-weight: 700 !important;
-    padding: 0.45rem 1rem !important;
+    padding: 0.42rem 0.95rem !important;
     background: var(--color-primary) !important;
     color: #ffffff !important;
     border: none !important;
