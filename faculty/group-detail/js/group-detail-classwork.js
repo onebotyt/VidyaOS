@@ -484,40 +484,48 @@ function updateScheduleTestQPreview() {
   const numQ = numQInp ? Math.max(1, Math.min(50, parseInt(numQInp.value, 10) || 4)) : 4;
   const perQ = Math.round((totalMarks / numQ) * 10) / 10;
 
-  S.scheduleTestQuestions = Array.from({ length: numQ }, (_, i) => ({
-    num: i + 1,
-    label: 'Q' + (i + 1),
-    max: perQ
-  }));
+  if (!S.scheduleTestQuestions || S.scheduleTestQuestions.length !== numQ) {
+    S.scheduleTestQuestions = Array.from({ length: numQ }, (_, i) => ({
+      num: i + 1,
+      label: 'Q' + (i + 1),
+      max: perQ,
+      text: ''
+    }));
+  }
 
   const dispEl = ById('test-marks-per-q-display');
   if (dispEl) dispEl.textContent = perQ + ' pts / question';
 
-  const sumBadge = ById('test-q-summary-badge');
-  if (sumBadge) sumBadge.textContent = numQ + ' questions • ' + totalMarks + ' marks total';
-
-  renderScheduleQChips();
+  renderScheduleQRows();
 }
 
-function renderScheduleQChips() {
-  const container = ById('test-schedule-q-chips');
+function renderScheduleQRows() {
+  const container = ById('test-schedule-q-rows');
   if (!container || !S.scheduleTestQuestions) return;
+  const total = Math.round(S.scheduleTestQuestions.reduce((sum, q) => sum + (Number(q.max) || 0), 0) * 10) / 10;
+  const sumBadge = ById('test-q-summary-badge');
+  if (sumBadge) sumBadge.textContent = S.scheduleTestQuestions.length + ' questions • ' + total + ' marks total';
+
   container.innerHTML = S.scheduleTestQuestions.map((q, idx) => `
-    <span class="q-chip" style="display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .45rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm)">
-      <span style="font-weight:700;color:var(--text-main);font-size:.8rem">${esc(q.label)}</span>
-      <input type="number" min="0.5" max="500" step="0.5" value="${q.max}" style="width:46px;padding:.12rem .2rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--color-primary);font-weight:700;font-size:.8rem;text-align:center" onchange="updateScheduleQChip(${idx}, this.value)" title="Marks for ${esc(q.label)}">
-      <span style="font-size:.7rem;color:var(--text-muted);font-weight:600">pts</span>
-    </span>
+    <div style="display:flex;align-items:center;gap:0.4rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:0.35rem 0.5rem">
+      <span style="font-weight:750;font-size:0.78rem;color:var(--color-primary);min-width:28px">${esc(q.label)}</span>
+      <input type="text" class="form-input" style="flex:1;padding:0.25rem 0.45rem;font-size:0.78rem;min-height:30px" placeholder="Question topic / text (optional)..." value="${esc(q.text || '')}" oninput="updateScheduleQRowText(${idx}, this.value)">
+      <div style="display:flex;align-items:center;gap:0.2rem">
+        <input type="number" min="0.5" max="500" step="0.5" value="${q.max}" style="width:48px;padding:0.25rem 0.2rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--color-primary);font-weight:750;font-size:0.8rem;text-align:center" onchange="updateScheduleQRowMarks(${idx}, this.value)">
+        <span style="font-size:0.7rem;color:var(--text-muted);font-weight:600">pts</span>
+      </div>
+      <button type="button" onclick="removeScheduleQRow(${idx})" style="background:none;border:none;color:var(--status-absent);cursor:pointer;padding:0.2rem;display:inline-flex;align-items:center;font-size:0.95rem" title="Remove question">&times;</button>
+    </div>
   `).join('');
 }
 
-function updateScheduleQChip(idx, val) {
+function updateScheduleQRowMarks(idx, val) {
   const q = S.scheduleTestQuestions?.[idx];
   if (!q) return;
   const num = parseFloat(val);
   if (isNaN(num) || num <= 0) {
     toast('Please enter a valid positive number');
-    renderScheduleQChips();
+    renderScheduleQRows();
     return;
   }
   q.max = Math.round(num * 10) / 10;
@@ -526,6 +534,46 @@ function updateScheduleQChip(idx, val) {
   if (ById('test-marks')) ById('test-marks').value = roundedTotal;
   const sumBadge = ById('test-q-summary-badge');
   if (sumBadge) sumBadge.textContent = S.scheduleTestQuestions.length + ' questions • ' + roundedTotal + ' marks total';
+}
+
+function updateScheduleQRowText(idx, val) {
+  if (S.scheduleTestQuestions?.[idx]) {
+    S.scheduleTestQuestions[idx].text = val.trim();
+  }
+}
+
+function addScheduleTestQuestion() {
+  if (!S.scheduleTestQuestions) S.scheduleTestQuestions = [];
+  const nextNum = S.scheduleTestQuestions.length + 1;
+  const totalMarks = parseFloat(ById('test-marks')?.value) || 20;
+  const perQ = Math.round((totalMarks / nextNum) * 10) / 10;
+  S.scheduleTestQuestions.push({
+    num: nextNum,
+    label: 'Q' + nextNum,
+    max: perQ,
+    text: ''
+  });
+  if (ById('test-num-questions')) ById('test-num-questions').value = S.scheduleTestQuestions.length;
+  renderScheduleQRows();
+}
+
+function removeScheduleQRow(idx) {
+  if (!S.scheduleTestQuestions || S.scheduleTestQuestions.length <= 1) return;
+  S.scheduleTestQuestions.splice(idx, 1);
+  S.scheduleTestQuestions.forEach((q, i) => {
+    q.num = i + 1;
+    q.label = 'Q' + (i + 1);
+  });
+  if (ById('test-num-questions')) ById('test-num-questions').value = S.scheduleTestQuestions.length;
+  renderScheduleQRows();
+}
+
+function autoSplitScheduleQuestions() {
+  if (!S.scheduleTestQuestions || !S.scheduleTestQuestions.length) return;
+  const totalMarks = parseFloat(ById('test-marks')?.value) || 20;
+  const perQ = Math.round((totalMarks / S.scheduleTestQuestions.length) * 10) / 10;
+  S.scheduleTestQuestions.forEach(q => { q.max = perQ; });
+  renderScheduleQRows();
 }
 
 function openScheduleTestModal() {
@@ -1437,11 +1485,31 @@ async function openMarksModal(test) {
     ById('marks-modal-meta').textContent = 'Max Marks: ' + (test.max_marks || '--') + ' • Date: ' + (test.test_date ? new Date(test.test_date).toLocaleDateString() : '--');
   }
   let scores = {};
+  let attMeta = null;
   try {
     const sr = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + test.id + '/scores');
     (sr.data || []).forEach(s => { scores[s.student_id] = s; });
+    attMeta = sr.meta || null;
   } catch {}
   S.cachedTestScores = scores;
+
+  // Digital Register Attendance Correlation Banner
+  const attBanner = ById('marks-register-att-banner');
+  if (attBanner) {
+    if (attMeta && attMeta.attendance_session_found) {
+      attBanner.style.display = 'flex';
+      const textEl = ById('marks-register-att-text');
+      const countEl = ById('marks-register-att-count');
+      if (textEl) {
+        textEl.textContent = `Digital Register: Attendance checked on exam date (${attMeta.test_date || ''}). Absent students are automatically marked AB.`;
+      }
+      if (countEl) {
+        countEl.textContent = `${attMeta.absent_from_register_count || 0} Absent`;
+      }
+    } else {
+      attBanner.style.display = 'none';
+    }
+  }
 
   let initialQuestions = null;
   const firstSavedQuestions = Object.values(scores).find(s => Array.isArray(s.questions) && s.questions.length > 0)?.questions;
@@ -1488,7 +1556,11 @@ async function openMarksModal(test) {
   updateColumnsVisibilityUI();
 
   const savedMode = localStorage.getItem('vidyaos_marks_view_mode');
-  S.marksViewMode = savedMode || ((window.innerWidth >= 900) ? 'excel' : 'table');
+  if (window.innerWidth < 768) {
+    S.marksViewMode = 'mobile';
+  } else {
+    S.marksViewMode = savedMode || ((window.innerWidth >= 900) ? 'excel' : 'table');
+  }
   updateViewModeUI();
   renderMarksEntryTable(false);
   openModal('modal-enter-marks');
@@ -1501,8 +1573,10 @@ function setMarksModalView(mode) {
 }
 
 function updateViewModeUI() {
+  const btnMobile = ById('btn-view-mobile');
   const btnExcel = ById('btn-view-excel');
   const btnTable = ById('btn-view-table');
+  if (btnMobile) btnMobile.classList.toggle('active', S.marksViewMode === 'mobile');
   if (btnExcel) btnExcel.classList.toggle('active', S.marksViewMode === 'excel');
   if (btnTable) btnTable.classList.toggle('active', S.marksViewMode === 'table');
 }
@@ -1614,242 +1688,350 @@ function renderMarksEntryTable(preserveInputs = false) {
   const showReg = Boolean(S.marksColumnsVisibility?.registrationNo);
   const extraCols = (showSr ? 1 : 0) + (showEnroll ? 1 : 0) + (showReg ? 1 : 0);
 
-  if (S.marksViewMode === 'excel') {
-    table.className = 'excel-table sheet-table data-subtable';
-    const totalCols = 4 + extraCols + S.currentTestQuestions.length;
+  const mobileViewport = ById('marks-mobile-viewport');
+  const tableViewport = ById('marks-table-viewport');
 
-    thead.innerHTML = `
-      <tr class="excel-hdr-blue row-1">
-        <th colspan="${totalCols}" style="padding:0.4rem 0.75rem">
-          <div style="display:flex;align-items:center;justify-content:center;gap:0.45rem;position:relative">
-            <h3 class="excel-editable-inst-header"
-                contenteditable="true"
-                spellcheck="false"
-                title="Click to edit institute header (changes sync automatically across all tests & registers in this session)"
-                onblur="updateGlobalInstituteHeader(this.innerText, '${sessionKey}')"
-                onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
-                style="margin:0;font-size:1.02rem;font-weight:700;letter-spacing:0.02em;color:var(--text-main);outline:none;cursor:text;padding:0.15rem 0.5rem;border-radius:var(--radius-sm);border:1px dashed transparent;transition:all 0.15s ease"
-                onfocus="this.style.borderColor='var(--color-primary)';this.style.background='var(--bg-card)';"
-            >${instHeader}</h3>
-            <span title="Click text to edit header. Automatically updates all tests." style="cursor:pointer;display:inline-flex;align-items:center;opacity:0.75;" onclick="const h=this.previousElementSibling;if(h)h.focus()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </span>
-          </div>
-        </th>
-      </tr>
-      <tr class="excel-hdr-blue row-2">
-        <th colspan="${totalCols}">
-          Internal Evaluation - ${unitTestOnly} | Subject : ${subName}
-        </th>
-      </tr>
-      <tr class="excel-hdr-blue row-3">
-        <th colspan="${totalCols}">
-          ${deptCode ? deptCode + ' ' : (deptName ? deptName + ' ' : '')}Year ${yr} | Semester ${sem}
-        </th>
-      </tr>
-      <tr class="excel-hdr-tan">
-        ${showSr ? '<th rowspan="2" style="width:48px;vertical-align:middle">SR. NO.</th>' : ''}
-        <th rowspan="2" style="width:75px;vertical-align:middle">ROLL NO.</th>
-        ${showEnroll ? '<th rowspan="2" style="width:115px;vertical-align:middle">ENROLLMENT NO.</th>' : ''}
-        ${showReg ? '<th rowspan="2" style="width:115px;vertical-align:middle">REGISTRATION NO.</th>' : ''}
-        <th rowspan="2" style="min-width:180px;vertical-align:middle">STUDENT NAME</th>
-        <th colspan="${S.currentTestQuestions.length}">${unitTestOnly} (Total Marks : ${totalMax})</th>
-        <th style="width:75px">Total</th>
-        <th style="min-width:320px">Unit Test Details (Mode : OFFLINE)</th>
-      </tr>
-      <tr class="excel-hdr-sub">
-        ${S.currentTestQuestions.map(q => `
-          <th style="min-width:54px;font-weight:800">
-            <span>${esc(q.label)}</span><br>
-            <span style="font-size:0.72rem;font-weight:600;opacity:0.85">( ${q.max} )</span>
-          </th>
-        `).join('')}
-        <th style="font-weight:800">(${totalMax})</th>
-        <th style="font-size:0.74rem;font-weight:700;padding:0.35rem 0.6rem;text-align:center">
-          Maximum Marks : ${totalMax} | Date : ${testDate}
-        </th>
-      </tr>
-    `;
+  if (S.marksViewMode === 'mobile') {
+    if (tableViewport) tableViewport.style.display = 'none';
+    if (mobileViewport) mobileViewport.style.display = 'block';
 
-    if (!S.members.length) {
-      tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:2rem;color:var(--text-muted)">No students enrolled in this group.</td></tr>`;
-      if (tfoot) tfoot.innerHTML = '';
-      return;
+    const hdrName = ById('mobile-hdr-test-name');
+    const hdrMeta = ById('mobile-hdr-test-meta');
+    const qPills = ById('mobile-q-pills-bar');
+    if (hdrName) hdrName.textContent = test.name || test.title || 'Unit Test';
+    if (hdrMeta) hdrMeta.textContent = `Max Marks: ${totalMax} • Date: ${testDate}`;
+    if (qPills) {
+      qPills.innerHTML = S.currentTestQuestions.map(q => `
+        <span style="font-size:0.72rem;font-weight:750;padding:0.2rem 0.5rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-main);display:inline-flex;align-items:center;gap:0.25rem">
+          <span>${esc(q.label)}:</span>
+          <strong style="color:var(--color-primary)">${q.max}m</strong>
+        </span>
+      `).join('');
     }
 
-    tbody.innerHTML = S.members.map((m, rIdx) => {
-      const ex = S.cachedTestScores[m.student_id] || {};
-      const isAb = Boolean(ex.is_absent);
-      let qTds = '';
-      S.currentTestQuestions.forEach((q, qIdx) => {
-        let val = '';
-        if (preserveInputs && savedInputValues[m.student_id]?.[qIdx] !== undefined) {
-          val = savedInputValues[m.student_id][qIdx];
-        } else if (Array.isArray(ex.question_scores) && ex.question_scores[qIdx] !== undefined && ex.question_scores[qIdx] !== null) {
-          val = ex.question_scores[qIdx];
-        } else if (!preserveInputs && ex.marks_obtained != null && S.currentTestQuestions.length === 1 && qIdx === 0) {
-          val = ex.marks_obtained;
-        }
-        qTds += `<td><input type="number" class="sheet-cell-input q-score-input" id="q-${m.student_id}-${qIdx}" data-student="${m.student_id}" data-q="${qIdx}" min="0" max="${q.max}" step="0.5" value="${isAb ? 0 : val}" ${isAb ? 'disabled' : ''} placeholder="0" oninput="recalcStudentTotal(${m.student_id})"></td>`;
-      });
+    const cardsContainer = ById('marks-mobile-cards-list');
+    if (cardsContainer) {
+      if (!S.members.length) {
+        cardsContainer.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)">No students enrolled in this group.</div>`;
+      } else {
+        cardsContainer.innerHTML = S.members.map((m, rIdx) => {
+          const ex = S.cachedTestScores[m.student_id] || {};
+          const isAb = Boolean(ex.is_absent);
+          const rollStr = String(m.class_roll_no || (rIdx + 1)).replace(/^#/, '');
 
-      const rollStr = String(m.class_roll_no || (rIdx + 1)).replace(/^#/, '');
+          const qInputs = S.currentTestQuestions.map((q, qIdx) => {
+            let val = '';
+            if (preserveInputs && savedInputValues[m.student_id]?.[qIdx] !== undefined) {
+              val = savedInputValues[m.student_id][qIdx];
+            } else if (Array.isArray(ex.question_scores) && ex.question_scores[qIdx] !== undefined && ex.question_scores[qIdx] !== null) {
+              val = ex.question_scores[qIdx];
+            } else if (!preserveInputs && ex.marks_obtained != null && S.currentTestQuestions.length === 1 && qIdx === 0) {
+              val = ex.marks_obtained;
+            }
 
-      const sideDetailsTd = (rIdx === 0) ? `
-        <td rowspan="${S.members.length}" style="vertical-align:top;background:var(--bg-card);text-align:left;padding:0.75rem;font-size:0.75rem;line-height:1.55;color:var(--text-muted);border:1px solid var(--border-color)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem">
-            <strong style="color:var(--text-main);font-size:0.8rem">Instructions:</strong>
-            <button type="button" onclick="addModalInstruction()" style="background:none;border:none;color:var(--color-primary);font-size:0.72rem;font-weight:700;cursor:pointer;padding:0" title="Add an instruction line">+ Add Line</button>
-          </div>
-          <ol class="sheet-instructions-box" style="margin:0 0 0.75rem 1.2rem;padding:0;font-size:0.75rem;color:var(--text-muted)">
-            ${S.currentTestInstructions.map((ins, iIdx) => `
-              <li style="margin-bottom:0.25rem">
-                <span contenteditable="true"
-                      spellcheck="false"
-                      title="Click to edit instruction"
-                      onblur="updateModalInstruction(${iIdx}, this.innerText)"
-                      style="outline:none;border-bottom:1px dashed transparent;transition:border-color 0.15s ease"
-                      onfocus="this.style.borderBottomColor='var(--color-primary)'">${esc(ins)}</span>
-                ${S.currentTestInstructions.length > 1 ? `<span onclick="removeModalInstruction(${iIdx})" style="cursor:pointer;margin-left:4px;color:var(--text-muted);opacity:0.6;font-size:0.75rem" title="Remove this line">&times;</span>` : ''}
-              </li>
-            `).join('')}
-          </ol>
-
-          <strong style="color:var(--text-main);font-size:0.8rem;display:block;margin-bottom:0.35rem">Questions Breakdown:</strong>
-          <div style="font-size:0.75rem;line-height:1.5">
-            ${S.currentTestQuestions.map((q, qIdx) => `
-              <div style="margin-bottom:0.35rem;display:flex;align-items:flex-start;gap:0.3rem">
-                <strong style="white-space:nowrap">${esc(q.label)}:</strong>
-                <span contenteditable="true"
-                      spellcheck="false"
-                      title="Click to edit question statement / topic"
-                      onblur="updateModalQuestionText(${qIdx}, this.innerText)"
-                      style="flex:1;outline:none;border-bottom:1px dashed var(--border-color);padding:0 2px"
-                      onfocus="this.style.borderBottomColor='var(--color-primary)'">${esc(q.text || ('(Click to set topic)'))}</span>
-                <strong style="white-space:nowrap;color:var(--color-primary)">(${q.max} pts)</strong>
+            return `
+              <div class="mobile-q-item">
+                <label class="mobile-q-label">
+                  <span>${esc(q.label)}</span>
+                  <span class="mobile-q-max">/ ${q.max}</span>
+                </label>
+                <input type="number" 
+                       inputmode="decimal" 
+                       class="mobile-q-input q-score-input" 
+                       id="q-${m.student_id}-${qIdx}" 
+                       data-student="${m.student_id}" 
+                       data-q="${qIdx}" 
+                       min="0" 
+                       max="${q.max}" 
+                       step="0.5" 
+                       value="${isAb ? 0 : val}" 
+                       ${isAb ? 'disabled' : ''} 
+                       placeholder="0" 
+                       oninput="recalcStudentTotal(${m.student_id})">
               </div>
-            `).join('')}
-          </div>
+            `;
+          }).join('');
 
-          <div style="margin-top:0.75rem;color:var(--status-absent);font-weight:700;font-size:0.74rem">
-            NOTE : All marked as AB were absent.
-          </div>
+          return `
+            <div class="mobile-marks-card ${isAb ? 'is-absent' : ''}" id="m-card-${m.student_id}">
+              <div class="mobile-marks-card-top">
+                <div class="mobile-student-info">
+                  <span class="mobile-roll-pill">#${esc(rollStr)}</span>
+                  <div style="min-width:0;flex:1">
+                    <div class="mobile-student-name">${esc(m.full_name)}</div>
+                    ${m.official_enrollment_no ? `<div class="mobile-student-sub">${esc(m.official_enrollment_no)}</div>` : ''}
+                  </div>
+                </div>
+                <button type="button" 
+                        class="mobile-att-toggle-btn ${isAb ? 'is-absent' : ''}" 
+                        onclick="toggleModalStudentAbsent(${m.student_id})" 
+                        title="${isAb ? 'Marked Absent. Tap to mark Present' : 'Tap to mark Absent'}">
+                  <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${isAb ? 'var(--status-absent)' : 'var(--status-present)'}"></span>
+                  <span>${isAb ? 'AB' : 'Present'}</span>
+                </button>
+              </div>
 
-          <div style="margin-top:0.75rem;padding:0.4rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:0.72rem;display:flex;align-items:center;gap:0.35rem">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            <span>Totals calculate automatically as marks are entered.</span>
-          </div>
-        </td>
-      ` : '';
+              <div class="mobile-q-grid">
+                ${qInputs}
+              </div>
 
-      return `
-        <tr class="${isAb ? 'is-absent' : ''}" style="${isAb ? 'background:var(--status-absent-bg);' : ''}">
-          ${showSr ? `<td class="excel-cell-sr">${rIdx + 1}</td>` : ''}
-          <td class="cell-roll">${esc(rollStr)}</td>
-          ${showEnroll ? `<td style="font-family:var(--font-family-mono);font-size:0.74rem;text-align:center">${esc(m.official_enrollment_no || '--')}</td>` : ''}
-          ${showReg ? `<td style="font-family:var(--font-family-mono);font-size:0.74rem;text-align:center">${esc(m.registration_no || '--')}</td>` : ''}
-          <td class="cell-student-name">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem">
-              <span style="font-weight:700;color:var(--text-main)">${esc(m.full_name)}</span>
-              <button type="button" 
-                      class="btn-sheet-att-toggle ${isAb ? 'is-absent' : ''}" 
-                      onclick="toggleModalStudentAbsent(${m.student_id})" 
-                      title="${isAb ? 'Marked Absent. Click to mark Present' : 'Click to mark Absent'}"
-                      style="font-size:0.7rem;padding:0.12rem 0.4rem;border-radius:var(--radius-sm);border:1px solid var(--border-color);background:var(--bg-surface);color:${isAb ? 'var(--status-absent)' : 'var(--text-muted)'};cursor:pointer;font-weight:700">
-                ${isAb ? 'AB' : 'P'}
-              </button>
+              <div class="mobile-card-bottom">
+                <div class="mobile-card-total-box">
+                  <span>Total:</span>
+                  <span id="tot-${m.student_id}" class="mobile-card-total-val ${isAb ? 'is-absent' : ''}">${isAb ? '0 (AB)' : '--'}</span>
+                  <span style="font-size:0.75rem;color:var(--text-muted)">/ ${totalMax}</span>
+                </div>
+              </div>
             </div>
-          </td>
-          ${qTds}
-          <td><span id="tot-${m.student_id}" class="excel-cell-total" style="${isAb ? 'color:var(--status-absent);font-weight:800' : ''}">${isAb ? '0 (AB)' : '--'}</span></td>
-          ${sideDetailsTd}
-        </tr>
-      `;
-    }).join('');
-
-    if (tfoot) {
-      tfoot.innerHTML = `
-        <tr>
-          <th colspan="${1 + extraCols + 1 + 1}" style="text-align:right;padding:.5rem .75rem;background:var(--bg-surface);font-weight:800;border:1px solid var(--border-color)">
-            Average of the class (Only present students)
-          </th>
-          <th colspan="${S.currentTestQuestions.length + 1}" style="background:var(--bg-surface);font-weight:800;color:var(--color-primary);text-align:center;border:1px solid var(--border-color)" id="excel-class-avg">
-            -- / ${totalMax}
-          </th>
-          <th style="background:var(--bg-surface);font-size:.76rem;color:var(--text-muted);text-align:center;border:1px solid var(--border-color)" id="excel-class-tally">
-            Total: ${S.members.length} Students
-          </th>
-        </tr>
-      `;
+          `;
+        }).join('');
+      }
     }
 
   } else {
-    table.className = 'marks-table';
-    if (tfoot) tfoot.innerHTML = '';
+    if (tableViewport) tableViewport.style.display = 'block';
+    if (mobileViewport) mobileViewport.style.display = 'none';
 
-    thead.innerHTML = `
-      <tr id="marks-table-header-row">
-        ${showSr ? '<th style="width:48px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">SR</th>' : ''}
-        <th style="width:55px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Roll</th>
-        ${showEnroll ? '<th style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Enrollment No.</th>' : ''}
-        ${showReg ? '<th style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Reg No.</th>' : ''}
-        <th style="min-width:180px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Student Name</th>
-        ${S.currentTestQuestions.map(q => `
-          <th style="width:75px;text-align:center;position:sticky;top:0;z-index:10;background:var(--bg-surface)">
-            ${esc(q.label)} <span style="font-size:.72rem;color:var(--text-muted);display:block;font-weight:normal">max ${q.max}</span>
-          </th>
-        `).join('')}
-        <th style="width:90px;text-align:center;background:var(--bg-surface);font-weight:800;color:var(--color-primary);position:sticky;top:0;z-index:10">
-          TOTAL <span style="font-size:.72rem;display:block;font-weight:normal">/${totalMax}</span>
-        </th>
-      </tr>
-    `;
+    if (S.marksViewMode === 'excel') {
+      table.className = 'excel-table sheet-table data-subtable';
+      const totalCols = 4 + extraCols + S.currentTestQuestions.length;
 
-    if (!S.members.length) {
-      tbody.innerHTML = `<tr><td colspan="${S.currentTestQuestions.length + 3 + extraCols}" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No students enrolled.</td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = S.members.map((m, rIdx) => {
-      const ex = S.cachedTestScores[m.student_id] || {};
-      const isAb = Boolean(ex.is_absent);
-      let qTds = '';
-      S.currentTestQuestions.forEach((q, qIdx) => {
-        let val = '';
-        if (preserveInputs && savedInputValues[m.student_id]?.[qIdx] !== undefined) {
-          val = savedInputValues[m.student_id][qIdx];
-        } else if (Array.isArray(ex.question_scores) && ex.question_scores[qIdx] !== undefined && ex.question_scores[qIdx] !== null) {
-          val = ex.question_scores[qIdx];
-        } else if (!preserveInputs && ex.marks_obtained != null && S.currentTestQuestions.length === 1 && qIdx === 0) {
-          val = ex.marks_obtained;
-        }
-        qTds += `<td style="text-align:center"><input type="number" class="marks-input-cell q-score-input" id="q-${m.student_id}-${qIdx}" data-student="${m.student_id}" data-q="${qIdx}" min="0" max="${q.max}" step="0.5" value="${isAb ? 0 : val}" ${isAb ? 'disabled' : ''} placeholder="0" oninput="recalcStudentTotal(${m.student_id})" style="width:65px"></td>`;
-      });
-
-      const rollStr = String(m.class_roll_no || (rIdx + 1)).replace(/^#/, '');
-
-      return `
-        <tr class="${isAb ? 'is-absent' : ''}" style="${isAb ? 'background:var(--status-absent-bg);' : ''}">
-          ${showSr ? `<td style="font-weight:700;color:var(--text-muted)">${rIdx + 1}</td>` : ''}
-          <td style="font-weight:700;color:var(--text-muted)">${esc(rollStr)}</td>
-          ${showEnroll ? `<td style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.official_enrollment_no || '--')}</td>` : ''}
-          ${showReg ? `<td style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.registration_no || '--')}</td>` : ''}
-          <td style="font-weight:600">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem">
-              <span>${esc(m.full_name)}</span>
-              <button type="button" 
-                      onclick="toggleModalStudentAbsent(${m.student_id})" 
-                      title="${isAb ? 'Marked Absent. Click to mark Present' : 'Click to mark Absent'}"
-                      style="font-size:0.7rem;padding:0.12rem 0.4rem;border-radius:var(--radius-sm);border:1px solid var(--border-color);background:var(--bg-surface);color:${isAb ? 'var(--status-absent)' : 'var(--text-muted)'};cursor:pointer;font-weight:700">
-                ${isAb ? 'AB' : 'P'}
-              </button>
+      thead.innerHTML = `
+        <tr class="excel-hdr-blue row-1">
+          <th colspan="${totalCols}" style="padding:0.4rem 0.75rem">
+            <div style="display:flex;align-items:center;justify-content:center;gap:0.45rem;position:relative">
+              <h3 class="excel-editable-inst-header"
+                  contenteditable="true"
+                  spellcheck="false"
+                  title="Click to edit institute header (changes sync automatically across all tests & registers in this session)"
+                  onblur="updateGlobalInstituteHeader(this.innerText, '${sessionKey}')"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+                  style="margin:0;font-size:1.02rem;font-weight:700;letter-spacing:0.02em;color:var(--text-main);outline:none;cursor:text;padding:0.15rem 0.5rem;border-radius:var(--radius-sm);border:1px dashed transparent;transition:all 0.15s ease"
+                  onfocus="this.style.borderColor='var(--color-primary)';this.style.background='var(--bg-card)';"
+              >${instHeader}</h3>
+              <span title="Click text to edit header. Automatically updates all tests." style="cursor:pointer;display:inline-flex;align-items:center;opacity:0.75;" onclick="const h=this.previousElementSibling;if(h)h.focus()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </span>
             </div>
-          </td>
-          ${qTds}
-          <td style="text-align:center;background:var(--bg-surface)"><span id="tot-${m.student_id}" class="auto-total-badge" style="${isAb ? 'color:var(--status-absent);border-color:var(--status-absent)' : ''}">${isAb ? '0 (AB)' : '--'}</span></td>
+          </th>
+        </tr>
+        <tr class="excel-hdr-blue row-2">
+          <th colspan="${totalCols}">
+            Internal Evaluation - ${unitTestOnly} | Subject : ${subName}
+          </th>
+        </tr>
+        <tr class="excel-hdr-blue row-3">
+          <th colspan="${totalCols}">
+            ${deptCode ? deptCode + ' ' : (deptName ? deptName + ' ' : '')}Year ${yr} | Semester ${sem}
+          </th>
+        </tr>
+        <tr class="excel-hdr-tan">
+          ${showSr ? '<th rowspan="2" style="width:48px;vertical-align:middle">SR. NO.</th>' : ''}
+          <th rowspan="2" style="width:75px;vertical-align:middle">ROLL NO.</th>
+          ${showEnroll ? '<th rowspan="2" style="width:115px;vertical-align:middle">ENROLLMENT NO.</th>' : ''}
+          ${showReg ? '<th rowspan="2" style="width:115px;vertical-align:middle">REGISTRATION NO.</th>' : ''}
+          <th rowspan="2" style="min-width:180px;vertical-align:middle">STUDENT NAME</th>
+          <th colspan="${S.currentTestQuestions.length}">${unitTestOnly} (Total Marks : ${totalMax})</th>
+          <th style="width:75px">Total</th>
+          <th style="min-width:320px">Unit Test Details (Mode : OFFLINE)</th>
+        </tr>
+        <tr class="excel-hdr-sub">
+          ${S.currentTestQuestions.map(q => `
+            <th style="min-width:54px;font-weight:800">
+              <span>${esc(q.label)}</span><br>
+              <span style="font-size:0.72rem;font-weight:600;opacity:0.85">( ${q.max} )</span>
+            </th>
+          `).join('')}
+          <th style="font-weight:800">(${totalMax})</th>
+          <th style="font-size:0.74rem;font-weight:700;padding:0.35rem 0.6rem;text-align:center">
+            Maximum Marks : ${totalMax} | Date : ${testDate}
+          </th>
         </tr>
       `;
-    }).join('');
+
+      if (!S.members.length) {
+        tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:2rem;color:var(--text-muted)">No students enrolled in this group.</td></tr>`;
+        if (tfoot) tfoot.innerHTML = '';
+        return;
+      }
+
+      tbody.innerHTML = S.members.map((m, rIdx) => {
+        const ex = S.cachedTestScores[m.student_id] || {};
+        const isAb = Boolean(ex.is_absent);
+        let qTds = '';
+        S.currentTestQuestions.forEach((q, qIdx) => {
+          let val = '';
+          if (preserveInputs && savedInputValues[m.student_id]?.[qIdx] !== undefined) {
+            val = savedInputValues[m.student_id][qIdx];
+          } else if (Array.isArray(ex.question_scores) && ex.question_scores[qIdx] !== undefined && ex.question_scores[qIdx] !== null) {
+            val = ex.question_scores[qIdx];
+          } else if (!preserveInputs && ex.marks_obtained != null && S.currentTestQuestions.length === 1 && qIdx === 0) {
+            val = ex.marks_obtained;
+          }
+          qTds += `<td><input type="number" class="sheet-cell-input q-score-input" id="q-${m.student_id}-${qIdx}" data-student="${m.student_id}" data-q="${qIdx}" min="0" max="${q.max}" step="0.5" value="${isAb ? 0 : val}" ${isAb ? 'disabled' : ''} placeholder="0" oninput="recalcStudentTotal(${m.student_id})"></td>`;
+        });
+
+        const rollStr = String(m.class_roll_no || (rIdx + 1)).replace(/^#/, '');
+
+        const sideDetailsTd = (rIdx === 0) ? `
+          <td rowspan="${S.members.length}" style="vertical-align:top;background:var(--bg-card);text-align:left;padding:0.75rem;font-size:0.75rem;line-height:1.55;color:var(--text-muted);border:1px solid var(--border-color)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem">
+              <strong style="color:var(--text-main);font-size:0.8rem">Instructions:</strong>
+              <button type="button" onclick="addModalInstruction()" style="background:none;border:none;color:var(--color-primary);font-size:0.72rem;font-weight:700;cursor:pointer;padding:0" title="Add an instruction line">+ Add Line</button>
+            </div>
+            <ol class="sheet-instructions-box" style="margin:0 0 0.75rem 1.2rem;padding:0;font-size:0.75rem;color:var(--text-muted)">
+              ${S.currentTestInstructions.map((ins, iIdx) => `
+                <li style="margin-bottom:0.25rem">
+                  <span contenteditable="true"
+                        spellcheck="false"
+                        title="Click to edit instruction"
+                        onblur="updateModalInstruction(${iIdx}, this.innerText)"
+                        style="outline:none;border-bottom:1px dashed transparent;transition:border-color 0.15s ease"
+                        onfocus="this.style.borderBottomColor='var(--color-primary)'">${esc(ins)}</span>
+                  ${S.currentTestInstructions.length > 1 ? `<span onclick="removeModalInstruction(${iIdx})" style="cursor:pointer;margin-left:4px;color:var(--text-muted);opacity:0.6;font-size:0.75rem" title="Remove this line">&times;</span>` : ''}
+                </li>
+              `).join('')}
+            </ol>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem">
+              <strong style="color:var(--text-main);font-size:0.8rem">Questions Breakdown:</strong>
+              <button type="button" onclick="openEditQuestionsModal()" style="background:none;border:none;color:var(--color-primary);font-size:0.72rem;font-weight:700;cursor:pointer;padding:0" title="Edit questions and marks distribution">Edit Questions</button>
+            </div>
+            <div style="font-size:0.75rem;line-height:1.5">
+              ${S.currentTestQuestions.map((q, qIdx) => `
+                <div style="margin-bottom:0.35rem;display:flex;align-items:flex-start;gap:0.3rem">
+                  <strong style="white-space:nowrap">${esc(q.label)}:</strong>
+                  <span contenteditable="true"
+                        spellcheck="false"
+                        title="Click to edit question statement / topic"
+                        onblur="updateModalQuestionText(${qIdx}, this.innerText)"
+                        style="flex:1;outline:none;border-bottom:1px dashed var(--border-color);padding:0 2px"
+                        onfocus="this.style.borderBottomColor='var(--color-primary)'">${esc(q.text || ('(Click to set topic)'))}</span>
+                  <strong style="white-space:nowrap;color:var(--color-primary)">(${q.max} pts)</strong>
+                </div>
+              `).join('')}
+            </div>
+
+            <div style="margin-top:0.75rem;color:var(--status-absent);font-weight:700;font-size:0.74rem">
+              NOTE : All marked as AB were absent.
+            </div>
+
+            <div style="margin-top:0.75rem;padding:0.4rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:0.72rem;display:flex;align-items:center;gap:0.35rem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Totals calculate automatically as marks are entered.</span>
+            </div>
+          </td>
+        ` : '';
+
+        return `
+          <tr class="${isAb ? 'is-absent' : ''}" style="${isAb ? 'background:var(--status-absent-bg);' : ''}">
+            ${showSr ? `<td class="excel-cell-sr">${rIdx + 1}</td>` : ''}
+            <td class="cell-roll">${esc(rollStr)}</td>
+            ${showEnroll ? `<td style="font-family:var(--font-family-mono);font-size:0.74rem;text-align:center">${esc(m.official_enrollment_no || '--')}</td>` : ''}
+            ${showReg ? `<td style="font-family:var(--font-family-mono);font-size:0.74rem;text-align:center">${esc(m.registration_no || '--')}</td>` : ''}
+            <td class="cell-student-name">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem">
+                <span style="font-weight:700;color:var(--text-main)">${esc(m.full_name)}</span>
+                <button type="button" 
+                        class="btn-sheet-att-toggle ${isAb ? 'is-absent' : ''}" 
+                        onclick="toggleModalStudentAbsent(${m.student_id})" 
+                        title="${isAb ? 'Marked Absent. Click to mark Present' : 'Click to mark Absent'}"
+                        style="font-size:0.7rem;padding:0.12rem 0.4rem;border-radius:var(--radius-sm);border:1px solid var(--border-color);background:var(--bg-surface);color:${isAb ? 'var(--status-absent)' : 'var(--text-muted)'};cursor:pointer;font-weight:700">
+                  ${isAb ? 'AB' : 'P'}
+                </button>
+              </div>
+            </td>
+            ${qTds}
+            <td><span id="tot-${m.student_id}" class="excel-cell-total" style="${isAb ? 'color:var(--status-absent);font-weight:800' : ''}">${isAb ? '0 (AB)' : '--'}</span></td>
+            ${sideDetailsTd}
+          </tr>
+        `;
+      }).join('');
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr>
+            <th colspan="${1 + extraCols + 1 + 1}" style="text-align:right;padding:.5rem .75rem;background:var(--bg-surface);font-weight:800;border:1px solid var(--border-color)">
+              Average of the class (Only present students)
+            </th>
+            <th colspan="${S.currentTestQuestions.length + 1}" style="background:var(--bg-surface);font-weight:800;color:var(--color-primary);text-align:center;border:1px solid var(--border-color)" id="excel-class-avg">
+              -- / ${totalMax}
+            </th>
+            <th style="background:var(--bg-surface);font-size:.76rem;color:var(--text-muted);text-align:center;border:1px solid var(--border-color)" id="excel-class-tally">
+              Total: ${S.members.length} Students
+            </th>
+          </tr>
+        `;
+      }
+
+    } else {
+      table.className = 'marks-table';
+      if (tfoot) tfoot.innerHTML = '';
+
+      thead.innerHTML = `
+        <tr id="marks-table-header-row">
+          ${showSr ? '<th style="width:48px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">SR</th>' : ''}
+          <th style="width:55px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Roll</th>
+          ${showEnroll ? '<th style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Enrollment No.</th>' : ''}
+          ${showReg ? '<th style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Reg No.</th>' : ''}
+          <th style="min-width:180px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Student Name</th>
+          ${S.currentTestQuestions.map(q => `
+            <th style="width:75px;text-align:center;position:sticky;top:0;z-index:10;background:var(--bg-surface)">
+              ${esc(q.label)} <span style="font-size:.72rem;color:var(--text-muted);display:block;font-weight:normal">max ${q.max}</span>
+            </th>
+          `).join('')}
+          <th style="width:90px;text-align:center;background:var(--bg-surface);font-weight:800;color:var(--color-primary);position:sticky;top:0;z-index:10">
+            TOTAL <span style="font-size:.72rem;display:block;font-weight:normal">/${totalMax}</span>
+          </th>
+        </tr>
+      `;
+
+      if (!S.members.length) {
+        tbody.innerHTML = `<tr><td colspan="${S.currentTestQuestions.length + 3 + extraCols}" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No students enrolled.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = S.members.map((m, rIdx) => {
+        const ex = S.cachedTestScores[m.student_id] || {};
+        const isAb = Boolean(ex.is_absent);
+        let qTds = '';
+        S.currentTestQuestions.forEach((q, qIdx) => {
+          let val = '';
+          if (preserveInputs && savedInputValues[m.student_id]?.[qIdx] !== undefined) {
+            val = savedInputValues[m.student_id][qIdx];
+          } else if (Array.isArray(ex.question_scores) && ex.question_scores[qIdx] !== undefined && ex.question_scores[qIdx] !== null) {
+            val = ex.question_scores[qIdx];
+          } else if (!preserveInputs && ex.marks_obtained != null && S.currentTestQuestions.length === 1 && qIdx === 0) {
+            val = ex.marks_obtained;
+          }
+          qTds += `<td style="text-align:center"><input type="number" class="marks-input-cell q-score-input" id="q-${m.student_id}-${qIdx}" data-student="${m.student_id}" data-q="${qIdx}" min="0" max="${q.max}" step="0.5" value="${isAb ? 0 : val}" ${isAb ? 'disabled' : ''} placeholder="0" oninput="recalcStudentTotal(${m.student_id})" style="width:65px"></td>`;
+        });
+
+        const rollStr = String(m.class_roll_no || (rIdx + 1)).replace(/^#/, '');
+
+        return `
+          <tr class="${isAb ? 'is-absent' : ''}" style="${isAb ? 'background:var(--status-absent-bg);' : ''}">
+            ${showSr ? `<td style="font-weight:700;color:var(--text-muted)">${rIdx + 1}</td>` : ''}
+            <td style="font-weight:700;color:var(--text-muted)">${esc(rollStr)}</td>
+            ${showEnroll ? `<td style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.official_enrollment_no || '--')}</td>` : ''}
+            ${showReg ? `<td style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.registration_no || '--')}</td>` : ''}
+            <td style="font-weight:600">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem">
+                <span>${esc(m.full_name)}</span>
+                <button type="button" 
+                        onclick="toggleModalStudentAbsent(${m.student_id})" 
+                        title="${isAb ? 'Marked Absent. Click to mark Present' : 'Click to mark Absent'}"
+                        style="font-size:0.7rem;padding:0.12rem 0.4rem;border-radius:var(--radius-sm);border:1px solid var(--border-color);background:var(--bg-surface);color:${isAb ? 'var(--status-absent)' : 'var(--text-muted)'};cursor:pointer;font-weight:700">
+                  ${isAb ? 'AB' : 'P'}
+                </button>
+              </div>
+            </td>
+            ${qTds}
+            <td style="text-align:center;background:var(--bg-surface)"><span id="tot-${m.student_id}" class="auto-total-badge" style="${isAb ? 'color:var(--status-absent);border-color:var(--status-absent)' : ''}">${isAb ? '0 (AB)' : '--'}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
   }
 
   S.members.forEach(m => recalcStudentTotal(m.student_id));
@@ -1866,14 +2048,17 @@ function recalcStudentTotal(sid) {
       hasAny = true;
     }
   });
+
   const totEl = ById('tot-' + sid);
   if (totEl) {
     if (isAb) {
       totEl.textContent = '0 (AB)';
+      totEl.classList.add('is-absent');
       totEl.style.color = 'var(--status-absent)';
       totEl.style.borderColor = 'var(--status-absent)';
       totEl.title = 'Student marked Absent';
     } else {
+      totEl.classList.remove('is-absent');
       const rounded = Math.round(sum * 10) / 10;
       totEl.textContent = hasAny ? rounded : '--';
       const totalMax = S.currentTestQuestions.reduce((s, q) => s + (Number(q.max) || 0), 0);
@@ -1887,6 +2072,11 @@ function recalcStudentTotal(sid) {
         totEl.title = '';
       }
     }
+  }
+
+  const mCard = ById('m-card-' + sid);
+  if (mCard) {
+    mCard.classList.toggle('is-absent', isAb);
   }
 
   const avgEl = ById('excel-class-avg');
@@ -1923,6 +2113,138 @@ function recalcStudentTotal(sid) {
   if (tallyEl) {
     tallyEl.innerHTML = `P: <strong>${presentCount}</strong> | AB: <strong style="color:var(--status-absent)">${absentCount}</strong> | Tot: <strong>${S.members.length}</strong>`;
   }
+}
+
+// ==========================================
+// Question Editor Modal Engine (Mobile & Desktop)
+// ==========================================
+S.editingTestQuestions = [];
+
+function openEditQuestionsModal() {
+  if (!S.currentTestQuestions || S.currentTestQuestions.length === 0) {
+    const testMax = Number(S.currentTest?.max_marks) || 20;
+    S.currentTestQuestions = [
+      { num: 1, label: 'Q1', max: 5, text: '' },
+      { num: 2, label: 'Q2', max: 5, text: '' },
+      { num: 3, label: 'Q3', max: 5, text: '' },
+      { num: 4, label: 'Q4', max: 5, text: '' }
+    ];
+  }
+  S.editingTestQuestions = S.currentTestQuestions.map((q, i) => ({
+    num: i + 1,
+    label: q.label || ('Q' + (i + 1)),
+    max: Number(q.max) || 5,
+    text: q.text || ''
+  }));
+  renderEditQuestionRows();
+  openModal('modal-edit-questions');
+}
+
+function renderEditQuestionRows() {
+  const container = ById('edit-questions-rows-container');
+  if (!container) return;
+  const totalMax = S.editingTestQuestions.reduce((s, q) => s + (Number(q.max) || 0), 0);
+  const roundedMax = Math.round(totalMax * 10) / 10;
+  if (ById('edit-q-total-max')) ById('edit-q-total-max').textContent = roundedMax;
+
+  container.innerHTML = S.editingTestQuestions.map((q, idx) => `
+    <div class="edit-q-row">
+      <span class="edit-q-row-label">${esc(q.label)}</span>
+      <input type="text" class="edit-q-row-text" placeholder="Question topic / text (optional)..." value="${esc(q.text || '')}" oninput="updateEditQuestionText(${idx}, this.value)">
+      <div style="display:flex;align-items:center;gap:0.25rem">
+        <input type="number" min="0.5" max="500" step="0.5" class="edit-q-row-marks" value="${q.max}" onchange="updateEditQuestionMarks(${idx}, this.value)" title="Max marks for ${esc(q.label)}">
+        <span style="font-size:0.72rem;color:var(--text-muted);font-weight:700">pts</span>
+      </div>
+      <button type="button" class="edit-q-del-btn" onclick="removeEditQuestionRow(${idx})" ${S.editingTestQuestions.length <= 1 ? 'disabled' : ''} title="Delete question">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function updateEditQuestionText(idx, val) {
+  if (S.editingTestQuestions[idx]) {
+    S.editingTestQuestions[idx].text = val.trim();
+  }
+}
+
+function updateEditQuestionMarks(idx, val) {
+  const num = parseFloat(val);
+  if (isNaN(num) || num <= 0) {
+    toast('Please enter a valid positive number');
+    renderEditQuestionRows();
+    return;
+  }
+  if (S.editingTestQuestions[idx]) {
+    S.editingTestQuestions[idx].max = Math.round(num * 10) / 10;
+  }
+  const totalMax = S.editingTestQuestions.reduce((s, q) => s + (Number(q.max) || 0), 0);
+  if (ById('edit-q-total-max')) ById('edit-q-total-max').textContent = Math.round(totalMax * 10) / 10;
+}
+
+function addEditQuestionRow() {
+  const nextNum = S.editingTestQuestions.length + 1;
+  const defaultPerQ = S.editingTestQuestions.length > 0 ? S.editingTestQuestions[0].max : 5;
+  S.editingTestQuestions.push({
+    num: nextNum,
+    label: 'Q' + nextNum,
+    max: defaultPerQ,
+    text: ''
+  });
+  renderEditQuestionRows();
+}
+
+function removeEditQuestionRow(idx) {
+  if (S.editingTestQuestions.length <= 1) return;
+  S.editingTestQuestions.splice(idx, 1);
+  S.editingTestQuestions.forEach((q, i) => {
+    q.num = i + 1;
+    q.label = 'Q' + (i + 1);
+  });
+  renderEditQuestionRows();
+}
+
+function distributeEditQuestionsEvenly() {
+  if (!S.editingTestQuestions.length) return;
+  const currentTotal = S.editingTestQuestions.reduce((s, q) => s + (Number(q.max) || 0), 0) || Number(S.currentTest?.max_marks) || 20;
+  const perQ = Math.round((currentTotal / S.editingTestQuestions.length) * 10) / 10;
+  S.editingTestQuestions.forEach(q => { q.max = perQ; });
+  renderEditQuestionRows();
+}
+
+async function saveEditedQuestions() {
+  if (!S.editingTestQuestions || S.editingTestQuestions.length === 0) {
+    toast('At least one question is required');
+    return;
+  }
+  const newTotalMax = Math.round(S.editingTestQuestions.reduce((s, q) => s + (Number(q.max) || 0), 0) * 10) / 10;
+  S.currentTestQuestions = S.editingTestQuestions.map((q, i) => ({
+    num: i + 1,
+    label: q.label || ('Q' + (i + 1)),
+    max: Number(q.max) || 5,
+    text: q.text || ''
+  }));
+
+  if (S.currentTest) {
+    S.currentTest.questions = JSON.stringify(S.currentTestQuestions);
+    S.currentTest.max_marks = newTotalMax;
+  }
+
+  try {
+    await apiFetch(`/api/v1/teaching-groups/${S.groupId}/tests/${S.currentTest.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        questions: S.currentTestQuestions,
+        max_marks: newTotalMax
+      })
+    });
+  } catch (err) {
+    console.warn('Could not persist question update immediately to backend:', err.message);
+  }
+
+  closeModal('modal-edit-questions');
+  renderMarksEntryTable(true);
+  toast('Questions updated! (' + S.currentTestQuestions.length + ' questions, ' + newTotalMax + ' marks total)');
 }
 
 async function exportGroupTestMarks(format) {
@@ -2441,3 +2763,16 @@ window.renderMarksEntryTable = renderMarksEntryTable;
 window.recalcStudentTotal = recalcStudentTotal;
 window.exportGroupTestMarks = exportGroupTestMarks;
 window.saveMarksEntry = saveMarksEntry;
+window.openEditQuestionsModal = openEditQuestionsModal;
+window.renderEditQuestionRows = renderEditQuestionRows;
+window.updateEditQuestionText = updateEditQuestionText;
+window.updateEditQuestionMarks = updateEditQuestionMarks;
+window.addEditQuestionRow = addEditQuestionRow;
+window.removeEditQuestionRow = removeEditQuestionRow;
+window.distributeEditQuestionsEvenly = distributeEditQuestionsEvenly;
+window.saveEditedQuestions = saveEditedQuestions;
+window.addScheduleTestQuestion = addScheduleTestQuestion;
+window.removeScheduleQRow = removeScheduleQRow;
+window.autoSplitScheduleQuestions = autoSplitScheduleQuestions;
+window.updateScheduleQRowMarks = updateScheduleQRowMarks;
+window.updateScheduleQRowText = updateScheduleQRowText;
