@@ -1556,10 +1556,10 @@ async function openMarksModal(test) {
   updateColumnsVisibilityUI();
 
   const savedMode = localStorage.getItem('vidyaos_marks_view_mode');
-  if (window.innerWidth < 768) {
-    S.marksViewMode = 'mobile';
+  if (savedMode === 'excel' || savedMode === 'table') {
+    S.marksViewMode = savedMode;
   } else {
-    S.marksViewMode = savedMode || ((window.innerWidth >= 900) ? 'excel' : 'table');
+    S.marksViewMode = (window.innerWidth >= 900) ? 'excel' : 'table';
   }
   updateViewModeUI();
   renderMarksEntryTable(false);
@@ -1567,16 +1567,14 @@ async function openMarksModal(test) {
 }
 
 function setMarksModalView(mode) {
-  S.marksViewMode = mode;
+  S.marksViewMode = (mode === 'excel') ? 'excel' : 'table';
   updateViewModeUI();
   renderMarksEntryTable(true);
 }
 
 function updateViewModeUI() {
-  const btnMobile = ById('btn-view-mobile');
   const btnExcel = ById('btn-view-excel');
   const btnTable = ById('btn-view-table');
-  if (btnMobile) btnMobile.classList.toggle('active', S.marksViewMode === 'mobile');
   if (btnExcel) btnExcel.classList.toggle('active', S.marksViewMode === 'excel');
   if (btnTable) btnTable.classList.toggle('active', S.marksViewMode === 'table');
 }
@@ -1688,112 +1686,11 @@ function renderMarksEntryTable(preserveInputs = false) {
   const showReg = Boolean(S.marksColumnsVisibility?.registrationNo);
   const extraCols = (showSr ? 1 : 0) + (showEnroll ? 1 : 0) + (showReg ? 1 : 0);
 
-  const mobileViewport = ById('marks-mobile-viewport');
   const tableViewport = ById('marks-table-viewport');
+  if (tableViewport) tableViewport.style.display = 'block';
 
-  if (S.marksViewMode === 'mobile') {
-    if (tableViewport) tableViewport.style.display = 'none';
-    if (mobileViewport) mobileViewport.style.display = 'block';
-
-    const hdrName = ById('mobile-hdr-test-name');
-    const hdrMeta = ById('mobile-hdr-test-meta');
-    const qPills = ById('mobile-q-pills-bar');
-    if (hdrName) hdrName.textContent = test.name || test.title || 'Unit Test';
-    if (hdrMeta) hdrMeta.textContent = `Max Marks: ${totalMax} • Date: ${testDate}`;
-    if (qPills) {
-      qPills.innerHTML = S.currentTestQuestions.map(q => `
-        <span style="font-size:0.72rem;font-weight:750;padding:0.2rem 0.5rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);color:var(--text-main);display:inline-flex;align-items:center;gap:0.25rem">
-          <span>${esc(q.label)}:</span>
-          <strong style="color:var(--color-primary)">${q.max}m</strong>
-        </span>
-      `).join('');
-    }
-
-    const cardsContainer = ById('marks-mobile-cards-list');
-    if (cardsContainer) {
-      if (!S.members.length) {
-        cardsContainer.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted);background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md)">No students enrolled in this group.</div>`;
-      } else {
-        cardsContainer.innerHTML = S.members.map((m, rIdx) => {
-          const ex = S.cachedTestScores[m.student_id] || {};
-          const isAb = Boolean(ex.is_absent);
-          const rollStr = String(m.class_roll_no || (rIdx + 1)).replace(/^#/, '');
-
-          const qInputs = S.currentTestQuestions.map((q, qIdx) => {
-            let val = '';
-            if (preserveInputs && savedInputValues[m.student_id]?.[qIdx] !== undefined) {
-              val = savedInputValues[m.student_id][qIdx];
-            } else if (Array.isArray(ex.question_scores) && ex.question_scores[qIdx] !== undefined && ex.question_scores[qIdx] !== null) {
-              val = ex.question_scores[qIdx];
-            } else if (!preserveInputs && ex.marks_obtained != null && S.currentTestQuestions.length === 1 && qIdx === 0) {
-              val = ex.marks_obtained;
-            }
-
-            return `
-              <div class="mobile-q-item">
-                <label class="mobile-q-label">
-                  <span>${esc(q.label)}</span>
-                  <span class="mobile-q-max">/ ${q.max}</span>
-                </label>
-                <input type="number" 
-                       inputmode="decimal" 
-                       class="mobile-q-input q-score-input" 
-                       id="q-${m.student_id}-${qIdx}" 
-                       data-student="${m.student_id}" 
-                       data-q="${qIdx}" 
-                       min="0" 
-                       max="${q.max}" 
-                       step="0.5" 
-                       value="${isAb ? 0 : val}" 
-                       ${isAb ? 'disabled' : ''} 
-                       placeholder="0" 
-                       oninput="recalcStudentTotal(${m.student_id})">
-              </div>
-            `;
-          }).join('');
-
-          return `
-            <div class="mobile-marks-card ${isAb ? 'is-absent' : ''}" id="m-card-${m.student_id}">
-              <div class="mobile-marks-card-top">
-                <div class="mobile-student-info">
-                  <span class="mobile-roll-pill">#${esc(rollStr)}</span>
-                  <div style="min-width:0;flex:1">
-                    <div class="mobile-student-name">${esc(m.full_name)}</div>
-                    ${m.official_enrollment_no ? `<div class="mobile-student-sub">${esc(m.official_enrollment_no)}</div>` : ''}
-                  </div>
-                </div>
-                <button type="button" 
-                        class="mobile-att-toggle-btn ${isAb ? 'is-absent' : ''}" 
-                        onclick="toggleModalStudentAbsent(${m.student_id})" 
-                        title="${isAb ? 'Marked Absent. Tap to mark Present' : 'Tap to mark Absent'}">
-                  <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${isAb ? 'var(--status-absent)' : 'var(--status-present)'}"></span>
-                  <span>${isAb ? 'AB' : 'Present'}</span>
-                </button>
-              </div>
-
-              <div class="mobile-q-grid">
-                ${qInputs}
-              </div>
-
-              <div class="mobile-card-bottom">
-                <div class="mobile-card-total-box">
-                  <span>Total:</span>
-                  <span id="tot-${m.student_id}" class="mobile-card-total-val ${isAb ? 'is-absent' : ''}">${isAb ? '0 (AB)' : '--'}</span>
-                  <span style="font-size:0.75rem;color:var(--text-muted)">/ ${totalMax}</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
-
-  } else {
-    if (tableViewport) tableViewport.style.display = 'block';
-    if (mobileViewport) mobileViewport.style.display = 'none';
-
-    if (S.marksViewMode === 'excel') {
-      table.className = 'excel-table sheet-table data-subtable';
+  if (S.marksViewMode === 'excel') {
+    table.className = 'excel-table sheet-table data-subtable';
       const totalCols = 4 + extraCols + S.currentTestQuestions.length;
 
       thead.innerHTML = `
@@ -1970,18 +1867,19 @@ function renderMarksEntryTable(preserveInputs = false) {
 
       thead.innerHTML = `
         <tr id="marks-table-header-row">
-          ${showSr ? '<th style="width:48px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">SR</th>' : ''}
-          <th style="width:55px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Roll</th>
-          ${showEnroll ? '<th style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Enrollment No.</th>' : ''}
-          ${showReg ? '<th style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Reg No.</th>' : ''}
-          <th style="min-width:180px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Student Name</th>
+          ${showSr ? '<th class="col-sr" style="width:40px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">SR</th>' : ''}
+          <th class="col-roll" style="width:48px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Roll</th>
+          ${showEnroll ? '<th class="col-enroll" style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Enrollment No.</th>' : ''}
+          ${showReg ? '<th class="col-reg" style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Reg No.</th>' : ''}
+          <th class="col-name" style="position:sticky;top:0;z-index:10;background:var(--bg-surface)">Student Name</th>
           ${S.currentTestQuestions.map(q => `
-            <th style="width:75px;text-align:center;position:sticky;top:0;z-index:10;background:var(--bg-surface)">
-              ${esc(q.label)} <span style="font-size:.72rem;color:var(--text-muted);display:block;font-weight:normal">max ${q.max}</span>
+            <th class="col-q" style="text-align:center;position:sticky;top:0;z-index:10;background:var(--bg-surface)">
+              <span class="q-hdr-label">${esc(q.label)}</span>
+              <span class="q-hdr-max" style="font-size:.68rem;color:var(--text-muted);display:block;font-weight:normal">/${q.max}</span>
             </th>
           `).join('')}
-          <th style="width:90px;text-align:center;background:var(--bg-surface);font-weight:800;color:var(--color-primary);position:sticky;top:0;z-index:10">
-            TOTAL <span style="font-size:.72rem;display:block;font-weight:normal">/${totalMax}</span>
+          <th class="col-total" style="text-align:center;background:var(--bg-surface);font-weight:800;color:var(--color-primary);position:sticky;top:0;z-index:10">
+            TOTAL <span style="font-size:.68rem;display:block;font-weight:normal">/${totalMax}</span>
           </th>
         </tr>
       `;
@@ -2004,30 +1902,30 @@ function renderMarksEntryTable(preserveInputs = false) {
           } else if (!preserveInputs && ex.marks_obtained != null && S.currentTestQuestions.length === 1 && qIdx === 0) {
             val = ex.marks_obtained;
           }
-          qTds += `<td style="text-align:center"><input type="number" class="marks-input-cell q-score-input" id="q-${m.student_id}-${qIdx}" data-student="${m.student_id}" data-q="${qIdx}" min="0" max="${q.max}" step="0.5" value="${isAb ? 0 : val}" ${isAb ? 'disabled' : ''} placeholder="0" oninput="recalcStudentTotal(${m.student_id})" style="width:65px"></td>`;
+          qTds += `<td class="cell-q-score" style="text-align:center"><input type="number" inputmode="decimal" class="marks-input-cell q-score-input" id="q-${m.student_id}-${qIdx}" data-student="${m.student_id}" data-q="${qIdx}" min="0" max="${q.max}" step="0.5" value="${isAb ? 0 : val}" ${isAb ? 'disabled' : ''} placeholder="0" oninput="recalcStudentTotal(${m.student_id})"></td>`;
         });
 
         const rollStr = String(m.class_roll_no || (rIdx + 1)).replace(/^#/, '');
 
         return `
           <tr class="${isAb ? 'is-absent' : ''}" style="${isAb ? 'background:var(--status-absent-bg);' : ''}">
-            ${showSr ? `<td style="font-weight:700;color:var(--text-muted)">${rIdx + 1}</td>` : ''}
-            <td style="font-weight:700;color:var(--text-muted)">${esc(rollStr)}</td>
-            ${showEnroll ? `<td style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.official_enrollment_no || '--')}</td>` : ''}
-            ${showReg ? `<td style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.registration_no || '--')}</td>` : ''}
-            <td style="font-weight:600">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem">
-                <span>${esc(m.full_name)}</span>
+            ${showSr ? `<td class="cell-sr" style="font-weight:700;color:var(--text-muted)">${rIdx + 1}</td>` : ''}
+            <td class="cell-roll" style="font-weight:700;color:var(--text-muted)">${esc(rollStr)}</td>
+            ${showEnroll ? `<td class="cell-enroll" style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.official_enrollment_no || '--')}</td>` : ''}
+            ${showReg ? `<td class="cell-reg" style="font-family:var(--font-family-mono);font-size:0.75rem">${esc(m.registration_no || '--')}</td>` : ''}
+            <td class="cell-student-name">
+              <div class="student-name-flex">
+                <span class="student-name-text">${esc(m.full_name)}</span>
                 <button type="button" 
+                        class="btn-sheet-att-toggle ${isAb ? 'is-absent' : ''}" 
                         onclick="toggleModalStudentAbsent(${m.student_id})" 
-                        title="${isAb ? 'Marked Absent. Click to mark Present' : 'Click to mark Absent'}"
-                        style="font-size:0.7rem;padding:0.12rem 0.4rem;border-radius:var(--radius-sm);border:1px solid var(--border-color);background:var(--bg-surface);color:${isAb ? 'var(--status-absent)' : 'var(--text-muted)'};cursor:pointer;font-weight:700">
+                        title="${isAb ? 'Marked Absent. Click to mark Present' : 'Click to mark Absent'}">
                   ${isAb ? 'AB' : 'P'}
                 </button>
               </div>
             </td>
             ${qTds}
-            <td style="text-align:center;background:var(--bg-surface)"><span id="tot-${m.student_id}" class="auto-total-badge" style="${isAb ? 'color:var(--status-absent);border-color:var(--status-absent)' : ''}">${isAb ? '0 (AB)' : '--'}</span></td>
+            <td class="cell-total" style="text-align:center;background:var(--bg-surface)"><span id="tot-${m.student_id}" class="auto-total-badge" style="${isAb ? 'color:var(--status-absent);border-color:var(--status-absent)' : ''}">${isAb ? '0 (AB)' : '--'}</span></td>
           </tr>
         `;
       }).join('');
@@ -2122,13 +2020,29 @@ S.editingTestQuestions = [];
 
 function openEditQuestionsModal() {
   if (!S.currentTestQuestions || S.currentTestQuestions.length === 0) {
-    const testMax = Number(S.currentTest?.max_marks) || 20;
-    S.currentTestQuestions = [
-      { num: 1, label: 'Q1', max: 5, text: '' },
-      { num: 2, label: 'Q2', max: 5, text: '' },
-      { num: 3, label: 'Q3', max: 5, text: '' },
-      { num: 4, label: 'Q4', max: 5, text: '' }
-    ];
+    const test = S.currentTest || {};
+    const testMax = Number(test.max_marks) || 20;
+    let initialQuestions = null;
+    if (test.questions) {
+      try {
+        initialQuestions = typeof test.questions === 'string' ? JSON.parse(test.questions) : test.questions;
+      } catch {}
+    }
+    if (Array.isArray(initialQuestions) && initialQuestions.length > 0) {
+      S.currentTestQuestions = initialQuestions.map((q, idx) => ({
+        num: idx + 1,
+        label: q.label || ('Q' + (idx + 1)),
+        max: Number(q.max) || Math.round((testMax / initialQuestions.length) * 10) / 10,
+        text: q.text || ''
+      }));
+    } else {
+      const qCount = Math.max(1, Number(test.num_questions) || (testMax >= 25 ? 5 : (testMax >= 20 ? 4 : (testMax >= 10 ? 2 : 1))));
+      const marksPerQ = Math.max(0.5, Math.round((testMax / qCount) * 10) / 10);
+      S.currentTestQuestions = [];
+      for (let i = 1; i <= qCount; i++) {
+        S.currentTestQuestions.push({ num: i, label: 'Q' + i, max: marksPerQ, text: '' });
+      }
+    }
   }
   S.editingTestQuestions = S.currentTestQuestions.map((q, i) => ({
     num: i + 1,

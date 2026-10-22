@@ -1562,12 +1562,12 @@
         <button class="modal-close-btn" onclick="closeModal('modal-enter-marks')">&#10005;</button>
       </div>
 
-      <!-- Minimalist Toolbar: Add/Remove Question, Columns Filter, Excel / Normal Table / Mobile Cards View Mode & Multi-Format Export -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 1.25rem;background:var(--bg-surface);border-bottom:1px solid var(--border-color);gap:.75rem;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:.35rem;flex-wrap:wrap">
+      <!-- Clean Toolbar: Add/Remove Question, Columns Filter, Table / Excel View Mode & Multi-Format Export -->
+      <div class="marks-modal-toolbar">
+        <div class="marks-toolbar-left">
           <button type="button" class="btn btn-secondary btn-sm" onclick="openEditQuestionsModal()" style="font-size:.74rem;padding:.2rem .55rem;font-weight:700;display:inline-flex;align-items:center;gap:0.35rem" id="btn-modal-edit-q" title="Edit questions, max marks &amp; topics">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            <span>Edit Questions</span>
+            <span class="btn-edit-q-text">Edit Questions</span>
           </button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="addModalQuestion()" style="font-size:.74rem;padding:.2rem .55rem;font-weight:600" title="Add another question column">+ Add Q</button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="removeModalQuestion()" style="font-size:.74rem;padding:.2rem .55rem;font-weight:600" id="btn-remove-q" title="Remove last question column">&minus; Remove Q</button>
@@ -1601,24 +1601,20 @@
           </div>
         </div>
 
-        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+        <div class="marks-toolbar-right">
           <div class="view-mode-toggle">
-            <button type="button" id="btn-view-mobile" class="view-mode-btn" onclick="setMarksModalView('mobile')" title="Minimal student cards list for mobile touch screens" style="display:inline-flex;align-items:center;gap:0.35rem">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-              <span>Mobile Cards</span>
+            <button type="button" id="btn-view-table" class="view-mode-btn" onclick="setMarksModalView('table')" title="Compact normal table format" style="display:inline-flex;align-items:center;gap:0.35rem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Table</span>
             </button>
             <button type="button" id="btn-view-excel" class="view-mode-btn" onclick="setMarksModalView('excel')" title="Excel Ledger format matching Attendance Register" style="display:inline-flex;align-items:center;gap:0.35rem">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-              <span>Excel Sheet</span>
-            </button>
-            <button type="button" id="btn-view-table" class="view-mode-btn" onclick="setMarksModalView('table')" title="Compact normal list table" style="display:inline-flex;align-items:center;gap:0.35rem">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              <span>Normal Table</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+              <span>Excel</span>
             </button>
           </div>
-          <button type="button" id="btn-set-default-view" class="btn btn-secondary btn-sm" onclick="saveCurrentViewAsDefault()" style="font-size:.74rem;padding:.2rem .55rem;display:inline-flex;align-items:center;gap:0.35rem" title="Save this view as your preferred default">
+          <button type="button" id="btn-set-default-view" class="btn btn-secondary btn-sm marks-toolbar-extra-btn" onclick="saveCurrentViewAsDefault()" style="font-size:.74rem;padding:.2rem .55rem;display:inline-flex;align-items:center;gap:0.35rem" title="Save this view as your preferred default">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span>Set as Default</span>
+            <span class="btn-default-text">Set Default</span>
           </button>
 
           <!-- Export Dropdown (Excel, PDF, Word DOC) -->
@@ -1658,7 +1654,7 @@
           <span class="badge" style="background:var(--status-absent-bg);color:var(--status-absent);font-size:0.7rem;font-weight:700" id="marks-register-att-count">0 Absent</span>
         </div>
 
-        <!-- Desktop / Tablet Table Viewport -->
+        <!-- Table Viewport -->
         <div class="marks-scroll-container" id="marks-table-viewport">
           <table class="marks-table" id="marks-entry-table">
             <thead id="marks-entry-thead">
@@ -1668,33 +1664,12 @@
             <tfoot id="marks-entry-tfoot"></tfoot>
           </table>
         </div>
-
-        <!-- Minimal Mobile Cards List Viewport -->
-        <div id="marks-mobile-viewport" style="display:none;padding:0.65rem;max-height:65vh;overflow-y:auto">
-          <!-- Mobile Top Quick Bar -->
-          <div class="mobile-marks-header-card">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem">
-              <div>
-                <div style="font-size:0.95rem;font-weight:800;color:var(--text-main)" id="mobile-hdr-test-name">Unit Test</div>
-                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px" id="mobile-hdr-test-meta">Max Marks: 20 &bull; Date: --</div>
-              </div>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="openEditQuestionsModal()" style="font-weight:700;display:inline-flex;align-items:center;gap:0.35rem;font-size:0.75rem;padding:0.3rem 0.6rem">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                <span>Edit Questions</span>
-              </button>
-            </div>
-            <div id="mobile-q-pills-bar" style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem"></div>
-          </div>
-
-          <!-- Dynamic Student Cards Container -->
-          <div id="marks-mobile-cards-list" style="display:flex;flex-direction:column;gap:0.65rem;margin-top:0.65rem"></div>
-        </div>
       </div>
-      <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:.82rem;color:var(--text-muted)">
+      <div class="modal-footer marks-modal-footer" style="display:flex;justify-content:space-between;align-items:center">
+        <div class="footer-meta-text" style="font-size:.82rem;color:var(--text-muted)">
           Total Maximum Marks: <strong id="marks-footer-max" style="color:var(--color-primary);font-size:.95rem">20</strong> &bull; Sum calculates automatically
         </div>
-        <div style="display:flex;gap:.65rem">
+        <div style="display:flex;gap:.5rem">
           <button class="btn btn-secondary" onclick="closeModal('modal-enter-marks')">Cancel</button>
           <button class="btn btn-primary" id="btn-save-marks-entry" onclick="saveMarksEntry()" style="display:inline-flex;align-items:center;gap:0.4rem">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>

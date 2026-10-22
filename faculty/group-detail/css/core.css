@@ -664,8 +664,8 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: hsl(0 0% 0% / 0.45);
-  z-index: 1000;
+  background: hsl(0 0% 0% / 0.55);
+  z-index: 1500 !important;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(2px);
