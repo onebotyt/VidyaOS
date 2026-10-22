@@ -57,17 +57,36 @@ function updateClassworkNavDot() {
   }
 }
 
+function getGroupSyllabusUnits() {
+  let units = S.group?.syllabus_units;
+  if (typeof units === 'string') {
+    try { units = JSON.parse(units); } catch (_) { units = []; }
+  }
+  if (!Array.isArray(units) || units.length === 0) {
+    const totalUnits = parseInt(S.group?.total_units) || 5;
+    units = Array.from({ length: totalUnits }, (_, i) => ({
+      num: i + 1,
+      name: `Unit ${i + 1}`,
+      title: '',
+      description: ''
+    }));
+  }
+  return units;
+}
+
 function populateUnitDropdowns(selectedVal, targetId) {
-  const totalUnits = parseInt(S.group?.total_units) || 5;
+  const units = getGroupSyllabusUnits();
   const targets = targetId ? [targetId] : ['assign-unit', 'practical-unit', 'test-unit', 'edit-work-unit'];
   targets.forEach(id => {
     const el = ById(id);
     if (!el) return;
     const isTest = id === 'test-unit';
     let html = `<option value="">${isTest ? 'Full Syllabus / General' : 'No Specific Unit / General'}</option>`;
-    for (let u = 1; u <= totalUnits; u++) {
-      html += `<option value="Unit ${u}">Unit ${u}</option>`;
-    }
+    units.forEach(u => {
+      const uName = u.name || `Unit ${u.num}`;
+      const label = u.title && u.title.trim() ? `${uName} — ${u.title.trim()}` : uName;
+      html += `<option value="${esc(uName)}">${esc(label)}</option>`;
+    });
     el.innerHTML = html;
     if (selectedVal !== undefined && selectedVal !== null) {
       el.value = selectedVal;
@@ -76,13 +95,11 @@ function populateUnitDropdowns(selectedVal, targetId) {
 }
 
 function updateUnitFilterBar() {
-  const totalUnits = parseInt(S.group?.total_units) || 5;
+  const units = getGroupSyllabusUnits();
   const allItems = [...(S.assignments || []), ...(S.tests || [])];
 
   const unitsSet = new Set();
-  for (let u = 1; u <= totalUnits; u++) {
-    unitsSet.add(`Unit ${u}`);
-  }
+  units.forEach(u => unitsSet.add(u.name || `Unit ${u.num}`));
   allItems.forEach(it => {
     if (it.unit_name && it.unit_name.trim()) unitsSet.add(it.unit_name.trim());
   });
@@ -95,12 +112,14 @@ function updateUnitFilterBar() {
   if (selectEl) {
     let html = `<option value="all">All Units (Show All)</option>`;
     unitsList.forEach(u => {
+      const meta = units.find(unit => (unit.name || `Unit ${unit.num}`) === u);
+      const label = meta && meta.title && meta.title.trim() ? `${u} — ${meta.title.trim()}` : u;
       const cnt = allItems.filter(it => (it.unit_name || '').trim().toLowerCase() === u.toLowerCase()).length;
-      html += `<option value="${esc(u)}">${esc(u)} (${cnt})</option>`;
+      html += `<option value="${esc(u)}">${esc(label)} (${cnt})</option>`;
     });
     const generalCnt = allItems.filter(it => !it.unit_name || !it.unit_name.trim()).length;
     if (generalCnt > 0) {
-      html += `<option value="general">General / Other (${generalCnt})</option>`;
+      html += `<option value="general">General Coursework (${generalCnt})</option>`;
     }
     selectEl.innerHTML = html;
     selectEl.value = curVal;
@@ -117,11 +136,13 @@ function updateUnitFilterBar() {
       </div>
     `;
     unitsList.forEach(u => {
+      const meta = units.find(unit => (unit.name || `Unit ${unit.num}`) === u);
+      const displayLabel = meta && meta.title && meta.title.trim() ? `${u}: ${meta.title.trim()}` : u;
       const cnt = allItems.filter(it => (it.unit_name || '').trim().toLowerCase() === u.toLowerCase()).length;
       sideHtml += `
         <div class="cw-cat-item ${curVal.toLowerCase() === u.toLowerCase() ? 'active' : ''}" onclick="filterCWByUnit('${esc(u)}')">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span>${esc(u)}</span>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(displayLabel)}">${esc(displayLabel)}</span>
           <span class="cw-cat-badge">${cnt}</span>
         </div>
       `;
@@ -131,7 +152,7 @@ function updateUnitFilterBar() {
       sideHtml += `
         <div class="cw-cat-item ${curVal.toLowerCase() === 'general' ? 'active' : ''}" onclick="filterCWByUnit('general')">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span>General / Other</span>
+          <span>General Coursework</span>
           <span class="cw-cat-badge">${generalCnt}</span>
         </div>
       `;
@@ -145,6 +166,152 @@ function filterCWByUnit(unit) {
   updateUnitFilterBar();
   renderCWList();
 }
+
+function openCreateUnitModal() {
+  const units = getGroupSyllabusUnits();
+  const nextNum = units.length > 0 ? Math.max(...units.map(u => u.num || 0)) + 1 : 1;
+  if (ById('unit-editor-modal-heading')) ById('unit-editor-modal-heading').textContent = 'Add Syllabus Unit';
+  if (ById('unit-editor-mode')) ById('unit-editor-mode').value = 'create';
+  if (ById('unit-editor-num')) ById('unit-editor-num').value = nextNum;
+  if (ById('unit-editor-name')) ById('unit-editor-name').value = `Unit ${nextNum}`;
+  if (ById('unit-editor-title')) ById('unit-editor-title').value = '';
+  if (ById('unit-editor-desc')) ById('unit-editor-desc').value = '';
+  if (ById('btn-save-unit-editor')) ById('btn-save-unit-editor').textContent = 'Add Unit';
+  openModal('modal-unit-editor');
+}
+
+function openEditUnitModal(unitName) {
+  const units = getGroupSyllabusUnits();
+  const unit = units.find(u => (u.name || `Unit ${u.num}`) === unitName) || {
+    num: parseInt(unitName.replace(/\D/g, '')) || 1,
+    name: unitName,
+    title: '',
+    description: ''
+  };
+  if (ById('unit-editor-modal-heading')) ById('unit-editor-modal-heading').textContent = 'Edit Unit Details';
+  if (ById('unit-editor-mode')) ById('unit-editor-mode').value = 'edit';
+  if (ById('unit-editor-num')) ById('unit-editor-num').value = unit.num;
+  if (ById('unit-editor-name')) ById('unit-editor-name').value = unit.name || unitName;
+  if (ById('unit-editor-title')) ById('unit-editor-title').value = unit.title || '';
+  if (ById('unit-editor-desc')) ById('unit-editor-desc').value = unit.description || '';
+  if (ById('btn-save-unit-editor')) ById('btn-save-unit-editor').textContent = 'Save Changes';
+  openModal('modal-unit-editor');
+}
+
+async function submitSaveUnit() {
+  const mode = ById('unit-editor-mode')?.value || 'create';
+  const num = parseInt(ById('unit-editor-num')?.value) || 1;
+  const name = ById('unit-editor-name')?.value.trim() || `Unit ${num}`;
+  const title = ById('unit-editor-title')?.value.trim() || '';
+  const desc = ById('unit-editor-desc')?.value.trim() || '';
+
+  const btn = ById('btn-save-unit-editor');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+  }
+
+  try {
+    const res = await apiFetch(`/api/v1/teaching-groups/${S.groupId}/units`, {
+      method: 'POST',
+      body: JSON.stringify({
+        num,
+        name,
+        title,
+        description: desc,
+        action: 'save'
+      })
+    });
+
+    if (res && res.data) {
+      if (!S.group) S.group = {};
+      S.group.syllabus_units = res.data.syllabus_units;
+      if (res.data.total_units) S.group.total_units = res.data.total_units;
+    }
+
+    closeModal('modal-unit-editor');
+    toast(mode === 'create' ? 'Unit created successfully' : 'Unit updated successfully');
+    populateUnitDropdowns();
+    updateUnitFilterBar();
+    renderCWList();
+  } catch (err) {
+    toast(err.message || 'Failed to save unit');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = mode === 'create' ? 'Add Unit' : 'Save Changes';
+    }
+  }
+}
+
+async function deleteUnit(uKey) {
+  if (!confirm(`Are you sure you want to remove ${uKey}? Any assigned work items will be moved to General Coursework.`)) return;
+  try {
+    const res = await apiFetch(`/api/v1/teaching-groups/${S.groupId}/units`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: uKey,
+        action: 'delete'
+      })
+    });
+    if (res && res.data) {
+      if (!S.group) S.group = {};
+      S.group.syllabus_units = res.data.syllabus_units;
+      if (res.data.total_units) S.group.total_units = res.data.total_units;
+    }
+    toast(`${uKey} deleted`);
+    populateUnitDropdowns();
+    updateUnitFilterBar();
+    renderCWList();
+  } catch (err) {
+    toast(err.message || 'Failed to delete unit');
+  }
+}
+
+function promptAddWorkToUnit(uKey) {
+  openCreateAssignmentModal();
+  setTimeout(() => {
+    const sel = ById('assign-unit');
+    if (sel) sel.value = uKey;
+  }, 100);
+}
+
+function toggleUnitCollapse(uKey, event) {
+  if (event) event.stopPropagation();
+  if (!S.collapsedUnits) S.collapsedUnits = new Set();
+  if (S.collapsedUnits.has(uKey)) {
+    S.collapsedUnits.delete(uKey);
+  } else {
+    S.collapsedUnits.add(uKey);
+  }
+  const uId = uKey.replace(/[^a-zA-Z0-9]/g, '_');
+  const itemsEl = ById('unit-items-' + uId);
+  const chevronEl = ById('unit-chevron-' + uId);
+  const isCollapsed = S.collapsedUnits.has(uKey);
+  if (itemsEl) itemsEl.style.display = isCollapsed ? 'none' : 'flex';
+  if (chevronEl) chevronEl.classList.toggle('is-collapsed', isCollapsed);
+}
+
+function toggleUnitMenu(event, uKey) {
+  if (event) event.stopPropagation();
+  const uId = uKey.replace(/[^a-zA-Z0-9]/g, '_');
+  const menu = ById('unit-menu-' + uId);
+  const isOpen = menu && menu.style.display === 'block';
+  closeAllUnitMenus();
+  if (menu && !isOpen) {
+    menu.style.display = 'block';
+  }
+}
+
+function closeAllUnitMenus() {
+  document.querySelectorAll('.unit-dropdown-menu').forEach(m => m.style.display = 'none');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.unit-menu-wrap')) {
+    closeAllUnitMenus();
+  }
+});
 
 function renderWorkCardHtml(item) {
   const isA = item._type === 'assignment';
@@ -296,70 +463,133 @@ function renderCWList() {
     return;
   }
 
-  // Default: Show All. If any items have unit_name, group them by unit for clean LMS structure
-  const hasAnyUnits = items.some(it => it.unit_name && it.unit_name.trim());
-  if (!hasAnyUnits) {
-    c.innerHTML = items.map(renderWorkCardHtml).join('');
-    return;
-  }
-
+  // Default: Show All Units. Group items under units
+  const syllabusUnits = getGroupSyllabusUnits();
   const groups = {};
-  const unitOrder = [];
-  const totalUnits = parseInt(S.group?.total_units) || 5;
-  for (let u = 1; u <= totalUnits; u++) {
-    const uKey = `Unit ${u}`;
+  const unitMeta = {};
+  syllabusUnits.forEach(u => {
+    const uKey = u.name || `Unit ${u.num}`;
     groups[uKey] = [];
-    unitOrder.push(uKey);
-  }
+    unitMeta[uKey] = u;
+  });
   const otherGroupKey = 'General Coursework';
   groups[otherGroupKey] = [];
 
   items.forEach(it => {
-    const u = (it.unit_name || '').trim();
-    if (u) {
-      if (!groups[u]) {
-        groups[u] = [];
-        unitOrder.push(u);
-      }
-      groups[u].push(it);
-    } else {
+    const rawU = (it.unit_name || '').trim();
+    if (!rawU) {
       groups[otherGroupKey].push(it);
+      return;
+    }
+    // Match to known unit
+    let matchedKey = Object.keys(groups).find(k => {
+      if (k === otherGroupKey) return false;
+      const kl = k.toLowerCase();
+      const rl = rawU.toLowerCase();
+      return kl === rl || rl.startsWith(kl + ' ') || rl.startsWith(kl + ' -') || rl.startsWith(kl + ':') || kl.startsWith(rl + ' -');
+    });
+    if (matchedKey) {
+      groups[matchedKey].push(it);
+    } else {
+      if (!groups[rawU]) {
+        groups[rawU] = [];
+        unitMeta[rawU] = { name: rawU, title: '', num: 99 };
+      }
+      groups[rawU].push(it);
     }
   });
 
+  // Sort units descending by num (e.g. Unit 2, Unit 1), matching the Google Classroom app screenshot
+  const orderedUnitKeys = Object.keys(groups).filter(k => k !== otherGroupKey).sort((a, b) => {
+    const na = unitMeta[a]?.num || parseInt(a.replace(/\D/g, '')) || 0;
+    const nb = unitMeta[b]?.num || parseInt(b.replace(/\D/g, '')) || 0;
+    return nb - na;
+  });
+
+  if (!S.collapsedUnits) S.collapsedUnits = new Set();
   let fullHtml = '';
-  unitOrder.forEach(uKey => {
-    const groupItems = groups[uKey];
-    if (groupItems && groupItems.length > 0) {
-      fullHtml += `
-        <div class="cw-unit-section" style="margin-bottom:1.5rem;">
-          <div class="cw-unit-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.85rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:0.75rem;">
-            <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;font-size:0.92rem;color:var(--text-main);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-              <span>${esc(uKey)}</span>
+
+  orderedUnitKeys.forEach(uKey => {
+    const groupItems = groups[uKey] || [];
+    const meta = unitMeta[uKey] || {};
+    const uId = uKey.replace(/[^a-zA-Z0-9]/g, '_');
+    const isCollapsed = S.collapsedUnits.has(uKey);
+    const displayTitle = meta.title && meta.title.trim() ? `${uKey} - ${meta.title.trim()}` : uKey;
+
+    fullHtml += `
+      <div class="cw-unit-section" id="cw-unit-section-${uId}">
+        <div class="cw-unit-section-header">
+          <div class="unit-header-left" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
+            <button type="button" class="unit-toggle-btn" aria-label="Toggle Unit" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
+              <svg class="unit-chevron-icon ${isCollapsed ? 'is-collapsed' : ''}" id="unit-chevron-${uId}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="unit-header-title-wrap">
+              <div class="unit-main-heading">${esc(displayTitle)}</div>
+              ${meta.description ? `<div class="unit-sub-desc">${esc(meta.description)}</div>` : ''}
             </div>
-            <span style="font-size:0.75rem;font-weight:600;color:var(--text-muted);background:var(--bg-card);padding:2px 8px;border-radius:12px;border:1px solid var(--border-color);">${groupItems.length} item${groupItems.length === 1 ? '' : 's'}</span>
           </div>
-          <div class="cw-unit-section-items" style="display:flex;flex-direction:column;gap:0.75rem;">
-            ${groupItems.map(renderWorkCardHtml).join('')}
+          <div class="unit-header-right">
+            <span class="unit-count-chip">${groupItems.length} item${groupItems.length === 1 ? '' : 's'}</span>
+            <div class="unit-menu-wrap">
+              <button type="button" class="unit-menu-trigger" onclick="toggleUnitMenu(event, '${esc(uKey)}')" title="Unit options" aria-label="Unit options">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="1.5"></circle>
+                  <circle cx="12" cy="5" r="1.5"></circle>
+                  <circle cx="12" cy="19" r="1.5"></circle>
+                </svg>
+              </button>
+              <div class="unit-dropdown-menu" id="unit-menu-${uId}">
+                <button type="button" class="unit-menu-item" onclick="openEditUnitModal('${esc(uKey)}');closeAllUnitMenus()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  <span>Edit Unit Details</span>
+                </button>
+                <button type="button" class="unit-menu-item" onclick="promptAddWorkToUnit('${esc(uKey)}');closeAllUnitMenus()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Add Work to Unit</span>
+                </button>
+                <button type="button" class="unit-menu-item danger" onclick="deleteUnit('${esc(uKey)}');closeAllUnitMenus()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  <span>Delete Unit</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      `;
-    }
+        <div class="cw-unit-section-items" id="unit-items-${uId}" style="${isCollapsed ? 'display:none;' : 'display:flex;flex-direction:column;gap:0.75rem;'}">
+          ${groupItems.length > 0
+            ? groupItems.map(renderWorkCardHtml).join('')
+            : `<div class="unit-empty-state">No assignments or tests added to this unit yet. <button type="button" class="btn-link" onclick="promptAddWorkToUnit('${esc(uKey)}')" style="color:var(--color-primary);font-weight:600;background:none;border:none;cursor:pointer;margin-left:4px;">+ Add Work</button></div>`
+          }
+        </div>
+      </div>
+    `;
   });
 
-  const otherItems = groups[otherGroupKey];
-  if (otherItems && otherItems.length > 0) {
+  const otherItems = groups[otherGroupKey] || [];
+  if (otherItems.length > 0) {
+    const isCollapsed = S.collapsedUnits.has(otherGroupKey);
+    const uId = 'General_Coursework';
     fullHtml += `
-      <div class="cw-unit-section" style="margin-bottom:1.5rem;">
-        <div class="cw-unit-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.85rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:0.75rem;">
-          <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;font-size:0.92rem;color:var(--text-main);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span>General Coursework</span>
+      <div class="cw-unit-section" id="cw-unit-section-${uId}">
+        <div class="cw-unit-section-header">
+          <div class="unit-header-left" onclick="toggleUnitCollapse('${otherGroupKey}', event)">
+            <button type="button" class="unit-toggle-btn" aria-label="Toggle Unit" onclick="toggleUnitCollapse('${otherGroupKey}', event)">
+              <svg class="unit-chevron-icon ${isCollapsed ? 'is-collapsed' : ''}" id="unit-chevron-${uId}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="unit-header-title-wrap">
+              <div class="unit-main-heading">General Coursework</div>
+              <div class="unit-sub-desc">Items not assigned to any specific unit</div>
+            </div>
           </div>
-          <span style="font-size:0.75rem;font-weight:600;color:var(--text-muted);background:var(--bg-card);padding:2px 8px;border-radius:12px;border:1px solid var(--border-color);">${otherItems.length} item${otherItems.length === 1 ? '' : 's'}</span>
+          <div class="unit-header-right">
+            <span class="unit-count-chip">${otherItems.length} item${otherItems.length === 1 ? '' : 's'}</span>
+          </div>
         </div>
-        <div class="cw-unit-section-items" style="display:flex;flex-direction:column;gap:0.75rem;">
+        <div class="cw-unit-section-items" id="unit-items-${uId}" style="${isCollapsed ? 'display:none;' : 'display:flex;flex-direction:column;gap:0.75rem;'}">
           ${otherItems.map(renderWorkCardHtml).join('')}
         </div>
       </div>
@@ -3016,3 +3246,12 @@ window.updateScheduleQRowText = updateScheduleQRowText;
 window.filterCWByUnit = filterCWByUnit;
 window.populateUnitDropdowns = populateUnitDropdowns;
 window.updateUnitFilterBar = updateUnitFilterBar;
+window.openCreateUnitModal = openCreateUnitModal;
+window.openEditUnitModal = openEditUnitModal;
+window.submitSaveUnit = submitSaveUnit;
+window.deleteUnit = deleteUnit;
+window.promptAddWorkToUnit = promptAddWorkToUnit;
+window.toggleUnitCollapse = toggleUnitCollapse;
+window.toggleUnitMenu = toggleUnitMenu;
+window.closeAllUnitMenus = closeAllUnitMenus;
+window.getGroupSyllabusUnits = getGroupSyllabusUnits;

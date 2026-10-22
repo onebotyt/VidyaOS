@@ -2672,3 +2672,179 @@ table.sheet-table .excel-cell-total {
   letter-spacing: 0.01em;
 }
 
+/* ============================================================
+   COLLAPSIBLE SYLLABUS UNIT SECTIONS & TITLE CARDS (Google Classroom Style)
+   ============================================================ */
+
+.cw-unit-section {
+  margin-bottom: 2rem;
+}
+
+.cw-unit-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.25rem 0.65rem 0.25rem;
+  border-bottom: 1.5px solid var(--border-color);
+  margin-bottom: 1rem;
+  user-select: none;
+  background: transparent;
+}
+
+.unit-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.unit-toggle-btn {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-muted) !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease, transform 0.2s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.unit-toggle-btn:hover {
+  background: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+}
+
+.unit-chevron-icon {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-muted);
+}
+
+.unit-chevron-icon.is-collapsed {
+  transform: rotate(-90deg);
+}
+
+.unit-header-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.unit-main-heading {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.unit-sub-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  line-height: 1.4;
+}
+
+.unit-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.unit-count-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 3px 9px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.unit-menu-wrap {
+  position: relative;
+}
+
+.unit-menu-trigger {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-muted) !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.unit-menu-trigger:hover {
+  background: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+}
+
+.unit-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.3));
+  min-width: 175px;
+  z-index: 1000;
+  padding: 0.35rem;
+  display: none;
+}
+
+.unit-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: transparent !important;
+  border: none !important;
+  border-radius: var(--radius-sm);
+  color: var(--text-main) !important;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.unit-menu-item:hover {
+  background: var(--bg-card) !important;
+  color: var(--color-primary) !important;
+}
+
+.unit-menu-item.danger:hover {
+  background: var(--status-absent-bg, rgba(239, 68, 68, 0.1)) !important;
+  color: var(--status-absent) !important;
+}
+
+.cw-unit-section-items {
+  transition: all 0.25s ease;
+}
+
+.unit-empty-state {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  margin-top: 0.35rem;
+}
+

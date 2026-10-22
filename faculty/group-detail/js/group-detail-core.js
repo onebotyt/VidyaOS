@@ -166,7 +166,7 @@ document.addEventListener('keydown', e => {
     [
       'modal-create-assignment', 'modal-create-practical', 'modal-create-finaldocs',
       'modal-edit-classwork', 'modal-delete-work-direct', 'modal-schedule-test',
-      'modal-enter-marks', 'modal-archive', 'modal-edit-group', 'modal-add-unenrolled',
+      'modal-unit-editor', 'modal-enter-marks', 'modal-archive', 'modal-edit-group', 'modal-add-unenrolled',
       'modal-confirm-delete', 'modal-work-filter', 'esp-confirm-modal', 'add-session-modal'
     ].forEach(closeModal);
     if (typeof closeAllWorkCardMenus === 'function') closeAllWorkCardMenus();

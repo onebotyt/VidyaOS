@@ -614,6 +614,10 @@
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
                   <span>Class Test</span>
                 </div>
+                <div class="cw-dd-item" onclick="openCreateUnitModal();closeCWDrop()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                  <span>Unit / Topic</span>
+                </div>
                 <div class="cw-dd-item" onclick="showToast('Material coming soon');closeCWDrop()">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
                   <span>Material</span>
@@ -1581,6 +1585,46 @@
       </div>
     </div>
   </div>
+
+  <!-- UNIT / TOPIC EDITOR MODAL -->
+  <div class="modal-backdrop" id="modal-unit-editor">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display:flex;align-items:center;gap:0.5rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span id="unit-editor-modal-heading">Add Syllabus Unit</span>
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('modal-unit-editor')">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="unit-editor-mode" value="create">
+        <input type="hidden" id="unit-editor-num" value="1">
+        
+        <div class="form-grid-2" style="display:grid;grid-template-columns:120px 1fr;gap:0.75rem;">
+          <div class="form-field">
+            <label class="form-label">Unit Tag *</label>
+            <input type="text" class="form-input" id="unit-editor-name" placeholder="e.g. Unit 1" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Unit / Module Title</label>
+            <input type="text" class="form-input" id="unit-editor-title" placeholder="e.g. Basics and Language Fundamentals">
+          </div>
+        </div>
+
+        <div class="form-field" style="margin-top:0.75rem;">
+          <label class="form-label">Description / Syllabus Outline (Optional)</label>
+          <textarea class="form-textarea" id="unit-editor-desc" rows="3" placeholder="e.g. Syntax, control structures, loops, and 1D/2D arrays"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:0.6rem;padding:0.85rem 1.25rem;border-top:1px solid var(--border-color);background:var(--bg-surface);">
+        <button class="btn btn-secondary" onclick="closeModal('modal-unit-editor')">Cancel</button>
+        <button class="btn btn-primary" id="btn-save-unit-editor" onclick="submitSaveUnit()" style="background:var(--color-primary);color:var(--text-white);font-weight:700;">
+          Add Unit
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="modal-schedule-test">
     <div class="modal-card" style="max-width:560px">
       <div class="modal-header">
@@ -2274,6 +2318,12 @@
       <span>Final Documents</span>
       <span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:var(--text-white);align-items:center;justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      </span>
+    </button>
+    <button type="button" class="cw-fab-menu-item" onclick="openCreateUnitModal();toggleCwFabMenu(false)">
+      <span>Unit / Topic</span>
+      <span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:var(--text-white);align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       </span>
     </button>
   </div>
