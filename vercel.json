@@ -32,27 +32,27 @@
     },
     {
       "source": "/register",
-      "destination": "/login/register/index.html"
+      "destination": "/login/register"
     },
     {
       "source": "/register/",
-      "destination": "/login/register/index.html"
+      "destination": "/login/register"
     },
     {
       "source": "/register.html",
-      "destination": "/login/register/index.html"
+      "destination": "/login/register"
     },
     {
       "source": "/login/register.html",
-      "destination": "/login/register/index.html"
+      "destination": "/login/register"
     },
     {
       "source": "/login/student-register.html",
-      "destination": "/login/register/index.html?role=student"
+      "destination": "/login/register?role=student"
     },
     {
       "source": "/login/faculty-register.html",
-      "destination": "/login/register/index.html?role=faculty"
+      "destination": "/login/register?role=faculty"
     },
     {
       "source": "/admin",
