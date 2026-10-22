@@ -235,6 +235,12 @@ function renderBanner(g) {
     const deptTxt = g.department_name ? (' • ' + g.department_name) : '';
     ById('navbar-class-sub').textContent = (semTxt + deptTxt) || '';
   }
+  if (ById('mobile-class-name')) ById('mobile-class-name').textContent = (g.name || 'Classroom') + ' •';
+  if (ById('mobile-class-sub')) {
+    const semTxt = g.semester ? ('Sem ' + g.semester) : '';
+    const deptTxt = g.department_name ? (' • ' + g.department_name) : '';
+    ById('mobile-class-sub').textContent = (semTxt + deptTxt) || '';
+  }
   if (ById('banner-code-display')) ById('banner-code-display').textContent = g.invite_code || '——';
   if (ById('banner-group-name')) ById('banner-group-name').textContent = g.name || '';
   if (ById('banner-subject-name')) ById('banner-subject-name').textContent = g.subject_name || '';
