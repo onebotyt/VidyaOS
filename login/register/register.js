@@ -292,7 +292,7 @@ window.addEventListener('message', (event) => {
     if (payload) {
       if (payload.already_registered && payload.status === 'ACTIVE') {
         showAlert('An active student account already exists for this Google email. Redirecting to login...', 'warning');
-        setTimeout(() => { window.location.href = '/login/index.html'; }, 1500);
+        setTimeout(() => { window.location.href = '/login'; }, 1500);
         return;
       }
       if (payload.action === 'STUDENT_REGISTER' || payload.google_email) {
