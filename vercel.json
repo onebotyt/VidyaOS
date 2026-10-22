@@ -9,6 +9,114 @@
     {
       "source": "/uploads/:path*",
       "destination": "https://vidyaos-backend.onrender.com/uploads/:path*"
+    },
+    {
+      "source": "/css/:path*",
+      "destination": "/shared/css/:path*"
+    },
+    {
+      "source": "/js/:path*",
+      "destination": "/shared/js/:path*"
+    },
+    {
+      "source": "/shared/:path*",
+      "destination": "/shared/:path*"
+    },
+    {
+      "source": "/login",
+      "destination": "/login/index.html"
+    },
+    {
+      "source": "/login/",
+      "destination": "/login/index.html"
+    },
+    {
+      "source": "/login.html",
+      "destination": "/login/index.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/login/register/index.html"
+    },
+    {
+      "source": "/register.html",
+      "destination": "/login/register/index.html"
+    },
+    {
+      "source": "/login/register",
+      "destination": "/login/register/index.html"
+    },
+    {
+      "source": "/login/register.html",
+      "destination": "/login/register/index.html"
+    },
+    {
+      "source": "/login/student-register.html",
+      "destination": "/login/register/index.html?role=student"
+    },
+    {
+      "source": "/login/faculty-register.html",
+      "destination": "/login/register/index.html?role=faculty"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/academic-structure/index.html"
+    },
+    {
+      "source": "/admin/",
+      "destination": "/admin/academic-structure/index.html"
+    },
+    {
+      "source": "/admin/academic_structure.html",
+      "destination": "/admin/academic-structure/index.html"
+    },
+    {
+      "source": "/admin/departments.html",
+      "destination": "/admin/academic-structure/index.html?tab=departments"
+    },
+    {
+      "source": "/faculty",
+      "destination": "/faculty/dashboard/index.html"
+    },
+    {
+      "source": "/faculty/",
+      "destination": "/faculty/dashboard/index.html"
+    },
+    {
+      "source": "/faculty/analytics.html",
+      "destination": "/faculty/reports/index.html?tab=analytics"
+    },
+    {
+      "source": "/faculty/marks.html",
+      "destination": "/faculty/tests/index.html"
+    },
+    {
+      "source": "/faculty/attendance/quick.html",
+      "destination": "/faculty/registers/index.html"
+    },
+    {
+      "source": "/student",
+      "destination": "/student/dashboard/index.html"
+    },
+    {
+      "source": "/student/",
+      "destination": "/student/dashboard/index.html"
+    },
+    {
+      "source": "/student/attendance/subjects.html",
+      "destination": "/student/attendance/index.html"
+    },
+    {
+      "source": "/:section/:page.html",
+      "destination": "/:section/:page/index.html"
+    },
+    {
+      "source": "/:section/:page.css",
+      "destination": "/:section/:page/:page.css"
+    },
+    {
+      "source": "/:section/:page.js",
+      "destination": "/:section/:page/:page.js"
     }
   ]
 }
