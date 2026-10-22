@@ -576,10 +576,22 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
             <span>Materials</span>
           </div>
+
+          <div class="cw-cat-hdr" style="margin-top:1.25rem;">Syllabus Units</div>
+          <div id="cw-unit-filter-list">
+            <!-- Populated via JS -->
+          </div>
         </div>
         <div class="cw-main">
-          <div class="cw-toolbar">
-            <div style="font-size:.9rem;font-weight:700;color:var(--text-main)" id="cw-section-title">All Classwork</div>
+          <div class="cw-toolbar" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+              <div style="font-size:.9rem;font-weight:700;color:var(--text-main)" id="cw-section-title">All Classwork</div>
+              <div class="cw-unit-select-wrap" style="display:inline-flex;align-items:center;gap:0.4rem;">
+                <select id="cw-unit-filter-select" onchange="filterCWByUnit(this.value)" style="padding:0.35rem 0.65rem;font-size:0.8rem;font-weight:600;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-main);cursor:pointer;outline:none;">
+                  <option value="all" selected>All Units (Show All)</option>
+                </select>
+              </div>
+            </div>
             <div class="cw-dd-wrap" id="cw-dd-wrap">
               <button class="cw-create-btn" onclick="toggleCWDrop()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -1342,9 +1354,15 @@
         </div>
         <div class="form-field"><label class="form-label">Instructions</label><textarea class="form-textarea" id="assign-desc" placeholder="Detailed instructions&#8230;"></textarea></div>
         <div class="form-grid-2">
-          <div class="form-field"><label class="form-label">Due Date</label><input type="date" class="form-input" id="assign-due"></div>
+          <div class="form-field">
+            <label class="form-label">Syllabus Unit / Module (Optional)</label>
+            <select class="form-select" id="assign-unit">
+              <option value="">No Specific Unit / General</option>
+            </select>
+          </div>
           <div class="form-field"><label class="form-label">Maximum Marks *</label><input type="number" class="form-input" id="assign-marks" required value="100" min="1" max="200"></div>
         </div>
+        <div class="form-field"><label class="form-label">Due Date</label><input type="date" class="form-input" id="assign-due"></div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('modal-create-assignment')">Cancel</button>
@@ -1377,13 +1395,19 @@
         </div>
         <div class="form-grid-2">
           <div class="form-field">
-            <label class="form-label">Lab Due Date</label>
-            <input type="date" class="form-input" id="practical-due">
+            <label class="form-label">Syllabus Unit / Module (Optional)</label>
+            <select class="form-select" id="practical-unit">
+              <option value="">No Specific Unit / General</option>
+            </select>
           </div>
           <div class="form-field">
             <label class="form-label">Maximum Marks</label>
             <input type="number" class="form-input" id="practical-marks" value="25" min="1" max="100">
           </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Lab Due Date</label>
+          <input type="date" class="form-input" id="practical-due">
         </div>
         <div class="form-field" style="margin-top: 0.5rem;">
           <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; color: var(--text-main);">
@@ -1490,13 +1514,19 @@
 
         <div class="form-grid-2">
           <div class="form-field">
-            <label class="form-label" id="edit-work-date-label">Due Date (Optional)</label>
-            <input type="date" class="form-input" id="edit-work-due">
+            <label class="form-label">Syllabus Unit / Module (Optional)</label>
+            <select class="form-select" id="edit-work-unit">
+              <option value="">No Specific Unit / General</option>
+            </select>
           </div>
           <div class="form-field" id="edit-work-marks-wrap">
             <label class="form-label">Maximum Marks</label>
             <input type="number" class="form-input" id="edit-work-marks" min="0" max="500">
           </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" id="edit-work-date-label">Due Date (Optional)</label>
+          <input type="date" class="form-input" id="edit-work-due">
         </div>
 
         <!-- Dynamic Requirements List for Final Documents in Edit Modal -->
@@ -1587,15 +1617,22 @@
             <input type="date" class="form-input" id="test-date" required>
           </div>
           <div class="form-field">
-            <label class="form-label">Maximum Marks *</label>
-            <input type="number" class="form-input" id="test-marks" required value="20" min="1" max="500" oninput="updateScheduleTestQPreview()">
+            <label class="form-label">Syllabus Unit / Module (Optional)</label>
+            <select class="form-select" id="test-unit">
+              <option value="">Full Syllabus / General</option>
+            </select>
           </div>
         </div>
         <div class="form-grid-2">
           <div class="form-field">
+            <label class="form-label">Maximum Marks *</label>
+            <input type="number" class="form-input" id="test-marks" required value="20" min="1" max="500" oninput="updateScheduleTestQPreview()">
+          </div>
+          <div class="form-field">
             <label class="form-label">Number of Questions *</label>
             <input type="number" class="form-input" id="test-num-questions" required value="4" min="1" max="50" oninput="updateScheduleTestQPreview()">
           </div>
+        </div>
           <div class="form-field">
             <label class="form-label">Marks Per Question</label>
             <div id="test-marks-per-q-display" style="padding:.5rem .75rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-sm);font-weight:700;color:var(--color-primary);font-size:.85rem;min-height:38px;display:flex;align-items:center">
@@ -1932,12 +1969,17 @@
             <label style="display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem;color:var(--text-main)">Subject Name *</label>
             <input type="text" id="edit-group-subject" required style="width:100%;padding:.6rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-main);box-sizing:border-box">
           </div>
-          <div style="margin-bottom:1.25rem">
+          <div style="margin-bottom:1rem">
             <label style="display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem;color:var(--text-main)">Academic Component *</label>
             <select id="edit-group-component" style="width:100%;padding:.6rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-main);box-sizing:border-box">
               <option value="THEORY">THEORY (Lecture Register)</option>
               <option value="PRACTICAL">PRACTICAL (Lab Work)</option>
+              <option value="THEORY + PRACTICAL">THEORY + PRACTICAL (Both)</option>
             </select>
+          </div>
+          <div style="margin-bottom:1.25rem">
+            <label style="display:block;font-size:.82rem;font-weight:700;margin-bottom:.35rem;color:var(--text-main)">Number of Units / Modules</label>
+            <input type="number" id="edit-group-total-units" min="1" max="20" placeholder="e.g. 5" style="width:100%;padding:.6rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-main);box-sizing:border-box">
           </div>
           <div style="display:flex;justify-content:flex-end;gap:.75rem">
             <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit-group')">Cancel</button>

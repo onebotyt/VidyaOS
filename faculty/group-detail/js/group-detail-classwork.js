@@ -57,8 +57,187 @@ function updateClassworkNavDot() {
   }
 }
 
+function populateUnitDropdowns(selectedVal, targetId) {
+  const totalUnits = parseInt(S.group?.total_units) || 5;
+  const targets = targetId ? [targetId] : ['assign-unit', 'practical-unit', 'test-unit', 'edit-work-unit'];
+  targets.forEach(id => {
+    const el = ById(id);
+    if (!el) return;
+    const isTest = id === 'test-unit';
+    let html = `<option value="">${isTest ? 'Full Syllabus / General' : 'No Specific Unit / General'}</option>`;
+    for (let u = 1; u <= totalUnits; u++) {
+      html += `<option value="Unit ${u}">Unit ${u}</option>`;
+    }
+    el.innerHTML = html;
+    if (selectedVal !== undefined && selectedVal !== null) {
+      el.value = selectedVal;
+    }
+  });
+}
+
+function updateUnitFilterBar() {
+  const totalUnits = parseInt(S.group?.total_units) || 5;
+  const allItems = [...(S.assignments || []), ...(S.tests || [])];
+
+  const unitsSet = new Set();
+  for (let u = 1; u <= totalUnits; u++) {
+    unitsSet.add(`Unit ${u}`);
+  }
+  allItems.forEach(it => {
+    if (it.unit_name && it.unit_name.trim()) unitsSet.add(it.unit_name.trim());
+  });
+
+  const unitsList = Array.from(unitsSet);
+  const curVal = S.cwUnitFilter || 'all';
+
+  // 1. Toolbar selector
+  const selectEl = ById('cw-unit-filter-select');
+  if (selectEl) {
+    let html = `<option value="all">All Units (Show All)</option>`;
+    unitsList.forEach(u => {
+      const cnt = allItems.filter(it => (it.unit_name || '').trim().toLowerCase() === u.toLowerCase()).length;
+      html += `<option value="${esc(u)}">${esc(u)} (${cnt})</option>`;
+    });
+    const generalCnt = allItems.filter(it => !it.unit_name || !it.unit_name.trim()).length;
+    if (generalCnt > 0) {
+      html += `<option value="general">General / Other (${generalCnt})</option>`;
+    }
+    selectEl.innerHTML = html;
+    selectEl.value = curVal;
+  }
+
+  // 2. Sidebar categories
+  const sideEl = ById('cw-unit-filter-list');
+  if (sideEl) {
+    let sideHtml = `
+      <div class="cw-cat-item ${curVal === 'all' ? 'active' : ''}" onclick="filterCWByUnit('all')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>All Units</span>
+        <span class="cw-cat-badge">${allItems.length}</span>
+      </div>
+    `;
+    unitsList.forEach(u => {
+      const cnt = allItems.filter(it => (it.unit_name || '').trim().toLowerCase() === u.toLowerCase()).length;
+      sideHtml += `
+        <div class="cw-cat-item ${curVal.toLowerCase() === u.toLowerCase() ? 'active' : ''}" onclick="filterCWByUnit('${esc(u)}')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>${esc(u)}</span>
+          <span class="cw-cat-badge">${cnt}</span>
+        </div>
+      `;
+    });
+    const generalCnt = allItems.filter(it => !it.unit_name || !it.unit_name.trim()).length;
+    if (generalCnt > 0) {
+      sideHtml += `
+        <div class="cw-cat-item ${curVal.toLowerCase() === 'general' ? 'active' : ''}" onclick="filterCWByUnit('general')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>General / Other</span>
+          <span class="cw-cat-badge">${generalCnt}</span>
+        </div>
+      `;
+    }
+    sideEl.innerHTML = sideHtml;
+  }
+}
+
+function filterCWByUnit(unit) {
+  S.cwUnitFilter = unit || 'all';
+  updateUnitFilterBar();
+  renderCWList();
+}
+
+function renderWorkCardHtml(item) {
+  const isA = item._type === 'assignment';
+  const isP = item._type === 'practical';
+  const isF = item._type === 'finaldocs';
+  const isT = item._type === 'test';
+
+  const svgIcon = isP ? GD_ICONS.practical : isF ? GD_ICONS.finaldocs : isT ? GD_ICONS.test : GD_ICONS.assignment;
+  const icls = isP ? 'wt-practical' : isF ? 'wt-finaldocs' : isT ? 'wt-test' : 'wt-assignment';
+  const typeLabel = isP ? 'Practical Work' : isF ? 'Final Documents' : isT ? 'Class Test' : 'Assignment';
+
+  const title = item.title || item.name || 'Untitled';
+  const mm = item.max_marks;
+  const dd = item.due_date ? new Date(item.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
+  const td = item.test_date ? new Date(item.test_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
+  const gc = item.graded_count || item.submission_count || 0;
+  const tot = S.members.length || 0;
+  const ij = JSON.stringify(item).replace(/"/g, '&quot;');
+
+  return `
+    <div class="work-card" id="work-card-${item.id}">
+      <div class="work-card-hdr">
+        <div class="work-type-icon ${icls}">${svgIcon}</div>
+        <div class="work-card-title-wrap">
+          <div class="work-card-title">${esc(title)}</div>
+          <div class="work-card-meta">
+            <span>${typeLabel}</span>
+            ${item.unit_name ? `<span class="work-unit-badge" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:var(--radius-sm);background:var(--color-primary-bg, rgba(59,130,246,0.1));color:var(--color-primary);font-weight:700;font-size:0.75rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> ${esc(item.unit_name)}</span>` : ''}
+            ${mm ? `<span>• Max: ${mm} marks</span>` : ''}
+            ${dd ? `<span class="work-due-badge">Due: ${dd}</span>` : ''}
+            ${td ? `<span>• Date: ${td}</span>` : ''}
+          </div>
+        </div>
+        <div class="work-card-actions">
+          ${isT
+            ? `<button class="work-action-btn" onclick="openMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
+            : `<button class="work-action-btn" onclick="openAssignmentMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
+          }
+          <button class="work-action-btn" id="btn-toggle-sub-${item.id}" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="Show submitted & not submitted students">
+            ${GD_ICONS.users} <span>Submissions &amp; Roster</span>
+          </button>
+          <button class="work-action-btn" onclick="openEditWorkModal('${item._type}', ${item.id})" title="Edit work item">
+            ${GD_ICONS.edit} <span>Edit</span>
+          </button>
+          <button class="work-action-btn danger" onclick="delWork('${item._type}', ${item.id})" title="Delete work item">
+            ${GD_ICONS.trash}
+          </button>
+        </div>
+        <!-- Mobile 3-Dots Minimal Anchored Dropdown -->
+        <div class="work-card-menu-wrap">
+          <button type="button" class="work-mobile-menu-trigger" onclick="toggleWorkCardMenu(event, ${item.id})" title="Options">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1.5"></circle>
+              <circle cx="12" cy="5" r="1.5"></circle>
+              <circle cx="12" cy="19" r="1.5"></circle>
+            </svg>
+          </button>
+          <div class="work-card-dropdown" id="work-card-dd-${item.id}" style="display:none">
+            <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('submissions', '${item._type}', ${item.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Submissions &amp; Roster</span>
+            </button>
+            ${isT ? `
+            <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('marks', '${item._type}', ${item.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <span>Enter Marks</span>
+            </button>` : ''}
+            <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('edit', '${item._type}', ${item.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Edit</span>
+            </button>
+            <button type="button" class="work-dd-item danger" onclick="handleCardMenuChoice('delete', '${item._type}', ${item.id})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      ${item.description ? `<div style="padding:.75rem 1.25rem;font-size:.83rem;color:var(--text-muted);border-bottom:1px solid var(--border-color);white-space:pre-line;word-break:break-word">${esc(item.description)}</div>` : ''}
+      <div class="work-card-stats" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="View submissions & roster">
+        <div class="work-stat"><div class="work-stat-val" id="stat-sub-${item.id}">${gc}</div><div class="work-stat-label">${isT ? 'Graded' : 'Submitted'}</div></div>
+        <div class="work-stat"><div class="work-stat-val" id="stat-pend-${item.id}">${Math.max(0, tot - gc)}</div><div class="work-stat-label">Pending</div></div>
+        <div class="work-stat"><div class="work-stat-val">${tot}</div><div class="work-stat-label">Students</div></div>
+      </div>
+      <div class="work-expand-pane" id="work-expand-pane-${item.id}" style="display:none"></div>
+    </div>
+  `;
+}
+
 function renderCWList() {
+  updateUnitFilterBar();
   const f = S.cwFilter || 'all';
+  const uf = S.cwUnitFilter || 'all';
   let items = [];
   const mappedAssigns = (S.assignments || []).map(a => {
     const rawType = (a.type || 'ASSIGNMENT').toLowerCase();
@@ -79,12 +258,22 @@ function renderCWList() {
     items = mappedTests;
   }
 
+  // Filter by Unit
+  if (uf && uf !== 'all') {
+    if (uf.toLowerCase() === 'general') {
+      items = items.filter(it => !it.unit_name || !it.unit_name.trim());
+    } else {
+      items = items.filter(it => (it.unit_name || '').trim().toLowerCase() === uf.toLowerCase());
+    }
+  }
+
   items.sort((a, b) => new Date(b.created_at || b.test_date) - new Date(a.created_at || a.test_date));
   const c = ById('classwork-list');
   if (!c) return;
 
   if (!items.length) {
-    const emptyMsg = f === 'practicals' ? 'No practical assignments or lab work posted yet.' :
+    const emptyMsg = uf !== 'all' ? `No work items found under ${uf}.` :
+                     f === 'practicals' ? 'No practical assignments or lab work posted yet.' :
                      f === 'finaldocs' ? 'No final semester document requests posted yet.' :
                      f === 'tests' ? 'No class tests scheduled yet.' :
                      f === 'assignments' ? 'No assignments posted yet.' :
@@ -101,92 +290,83 @@ function renderCWList() {
     return;
   }
 
-  c.innerHTML = items.map(item => {
-    const isA = item._type === 'assignment';
-    const isP = item._type === 'practical';
-    const isF = item._type === 'finaldocs';
-    const isT = item._type === 'test';
+  // If filtered by specific unit, render items directly
+  if (uf && uf !== 'all') {
+    c.innerHTML = items.map(renderWorkCardHtml).join('');
+    return;
+  }
 
-    const svgIcon = isP ? GD_ICONS.practical : isF ? GD_ICONS.finaldocs : isT ? GD_ICONS.test : GD_ICONS.assignment;
-    const icls = isP ? 'wt-practical' : isF ? 'wt-finaldocs' : isT ? 'wt-test' : 'wt-assignment';
-    const typeLabel = isP ? 'Practical Work' : isF ? 'Final Documents' : isT ? 'Class Test' : 'Assignment';
+  // Default: Show All. If any items have unit_name, group them by unit for clean LMS structure
+  const hasAnyUnits = items.some(it => it.unit_name && it.unit_name.trim());
+  if (!hasAnyUnits) {
+    c.innerHTML = items.map(renderWorkCardHtml).join('');
+    return;
+  }
 
-    const title = item.title || item.name || 'Untitled';
-    const mm = item.max_marks;
-    const dd = item.due_date ? new Date(item.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
-    const td = item.test_date ? new Date(item.test_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
-    const gc = item.graded_count || item.submission_count || 0;
-    const tot = S.members.length || 0;
-    const ij = JSON.stringify(item).replace(/"/g, '&quot;');
+  const groups = {};
+  const unitOrder = [];
+  const totalUnits = parseInt(S.group?.total_units) || 5;
+  for (let u = 1; u <= totalUnits; u++) {
+    const uKey = `Unit ${u}`;
+    groups[uKey] = [];
+    unitOrder.push(uKey);
+  }
+  const otherGroupKey = 'General Coursework';
+  groups[otherGroupKey] = [];
 
-    return `
-      <div class="work-card" id="work-card-${item.id}">
-        <div class="work-card-hdr">
-          <div class="work-type-icon ${icls}">${svgIcon}</div>
-          <div class="work-card-title-wrap">
-            <div class="work-card-title">${esc(title)}</div>
-            <div class="work-card-meta">
-              <span>${typeLabel}</span>
-              ${mm ? `<span>• Max: ${mm} marks</span>` : ''}
-              ${dd ? `<span class="work-due-badge">Due: ${dd}</span>` : ''}
-              ${td ? `<span>• Date: ${td}</span>` : ''}
+  items.forEach(it => {
+    const u = (it.unit_name || '').trim();
+    if (u) {
+      if (!groups[u]) {
+        groups[u] = [];
+        unitOrder.push(u);
+      }
+      groups[u].push(it);
+    } else {
+      groups[otherGroupKey].push(it);
+    }
+  });
+
+  let fullHtml = '';
+  unitOrder.forEach(uKey => {
+    const groupItems = groups[uKey];
+    if (groupItems && groupItems.length > 0) {
+      fullHtml += `
+        <div class="cw-unit-section" style="margin-bottom:1.5rem;">
+          <div class="cw-unit-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.85rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;font-size:0.92rem;color:var(--text-main);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span>${esc(uKey)}</span>
             </div>
+            <span style="font-size:0.75rem;font-weight:600;color:var(--text-muted);background:var(--bg-card);padding:2px 8px;border-radius:12px;border:1px solid var(--border-color);">${groupItems.length} item${groupItems.length === 1 ? '' : 's'}</span>
           </div>
-          <div class="work-card-actions">
-            ${isT
-              ? `<button class="work-action-btn" onclick="openMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
-              : `<button class="work-action-btn" onclick="openAssignmentMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
-            }
-            <button class="work-action-btn" id="btn-toggle-sub-${item.id}" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="Show submitted & not submitted students">
-              ${GD_ICONS.users} <span>Submissions &amp; Roster</span>
-            </button>
-            <button class="work-action-btn" onclick="openEditWorkModal('${item._type}', ${item.id})" title="Edit work item">
-              ${GD_ICONS.edit} <span>Edit</span>
-            </button>
-            <button class="work-action-btn danger" onclick="delWork('${item._type}', ${item.id})" title="Delete work item">
-              ${GD_ICONS.trash}
-            </button>
-          </div>
-          <!-- Mobile 3-Dots Minimal Anchored Dropdown -->
-          <div class="work-card-menu-wrap">
-            <button type="button" class="work-mobile-menu-trigger" onclick="toggleWorkCardMenu(event, ${item.id})" title="Options">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="1.5"></circle>
-                <circle cx="12" cy="5" r="1.5"></circle>
-                <circle cx="12" cy="19" r="1.5"></circle>
-              </svg>
-            </button>
-            <div class="work-card-dropdown" id="work-card-dd-${item.id}" style="display:none">
-              <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('submissions', '${item._type}', ${item.id})">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span>Submissions &amp; Roster</span>
-              </button>
-              ${isT ? `
-              <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('marks', '${item._type}', ${item.id})">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                <span>Enter Marks</span>
-              </button>` : ''}
-              <button type="button" class="work-dd-item" onclick="handleCardMenuChoice('edit', '${item._type}', ${item.id})">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                <span>Edit</span>
-              </button>
-              <button type="button" class="work-dd-item danger" onclick="handleCardMenuChoice('delete', '${item._type}', ${item.id})">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                <span>Delete</span>
-              </button>
-            </div>
+          <div class="cw-unit-section-items" style="display:flex;flex-direction:column;gap:0.75rem;">
+            ${groupItems.map(renderWorkCardHtml).join('')}
           </div>
         </div>
-        ${item.description ? `<div style="padding:.75rem 1.25rem;font-size:.83rem;color:var(--text-muted);border-bottom:1px solid var(--border-color);white-space:pre-line;word-break:break-word">${esc(item.description)}</div>` : ''}
-        <div class="work-card-stats" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="View submissions & roster">
-          <div class="work-stat"><div class="work-stat-val" id="stat-sub-${item.id}">${gc}</div><div class="work-stat-label">${isT ? 'Graded' : 'Submitted'}</div></div>
-          <div class="work-stat"><div class="work-stat-val" id="stat-pend-${item.id}">${Math.max(0, tot - gc)}</div><div class="work-stat-label">Pending</div></div>
-          <div class="work-stat"><div class="work-stat-val">${tot}</div><div class="work-stat-label">Students</div></div>
+      `;
+    }
+  });
+
+  const otherItems = groups[otherGroupKey];
+  if (otherItems && otherItems.length > 0) {
+    fullHtml += `
+      <div class="cw-unit-section" style="margin-bottom:1.5rem;">
+        <div class="cw-unit-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.85rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);margin-bottom:0.75rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;font-size:0.92rem;color:var(--text-main);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>General Coursework</span>
+          </div>
+          <span style="font-size:0.75rem;font-weight:600;color:var(--text-muted);background:var(--bg-card);padding:2px 8px;border-radius:12px;border:1px solid var(--border-color);">${otherItems.length} item${otherItems.length === 1 ? '' : 's'}</span>
         </div>
-        <div class="work-expand-pane" id="work-expand-pane-${item.id}" style="display:none"></div>
+        <div class="cw-unit-section-items" style="display:flex;flex-direction:column;gap:0.75rem;">
+          ${otherItems.map(renderWorkCardHtml).join('')}
+        </div>
       </div>
     `;
-  }).join('');
+  }
+
+  c.innerHTML = fullHtml;
 }
 
 function filterCW(f) {
@@ -350,6 +530,7 @@ function toggleCwFabMenu(forceState) {
 
 // Assignment Creation
 function openCreateAssignmentModal() {
+  populateUnitDropdowns('', 'assign-unit');
   openModal('modal-create-assignment');
 }
 
@@ -370,6 +551,7 @@ async function submitCreateAssignment() {
   const desc = ById('assign-desc')?.value.trim() || '';
   const due = ById('assign-due')?.value;
   const marks = parseInt(ById('assign-marks')?.value, 10);
+  const unit_name = ById('assign-unit')?.value?.trim() || null;
   if (!title || !marks) {
     toast('Title and marks are required');
     return;
@@ -380,13 +562,14 @@ async function submitCreateAssignment() {
   try {
     await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments', {
       method: 'POST',
-      body: JSON.stringify({ title, description: desc, due_date: due || null, max_marks: marks })
+      body: JSON.stringify({ title, description: desc, due_date: due || null, max_marks: marks, unit_name })
     });
     toast('Assignment published!');
     closeModal('modal-create-assignment');
     if (ById('assign-title')) ById('assign-title').value = '';
     if (ById('assign-desc')) ById('assign-desc').value = '';
     if (ById('assign-due')) ById('assign-due').value = '';
+    if (ById('assign-unit')) ById('assign-unit').value = '';
     await loadAssignments();
   } catch (e) {
     toast(e.message);
@@ -399,6 +582,7 @@ function openCreatePracticalModal() {
   if (ById('practical-desc')) ById('practical-desc').value = '';
   if (ById('practical-due')) ById('practical-due').value = '';
   if (ById('practical-marks')) ById('practical-marks').value = '25';
+  populateUnitDropdowns('', 'practical-unit');
   openModal('modal-create-practical');
 }
 
@@ -409,6 +593,7 @@ async function submitCreatePractical() {
   const due = ById('practical-due')?.value;
   const marks = parseFloat(ById('practical-marks')?.value) || 25;
   const postStream = ById('practical-post-stream')?.checked;
+  const unit_name = ById('practical-unit')?.value?.trim() || null;
 
   const btn = ById('btn-submit-practical');
   if (btn) {
@@ -424,7 +609,8 @@ async function submitCreatePractical() {
         due_date: due || null,
         max_marks: marks,
         type: 'PRACTICAL',
-        post_to_stream: postStream
+        post_to_stream: postStream,
+        unit_name
       })
     });
     toast('Practical work published & announcement sent!');
@@ -577,6 +763,7 @@ function autoSplitScheduleQuestions() {
 }
 
 function openScheduleTestModal() {
+  populateUnitDropdowns('', 'test-unit');
   updateScheduleTestQPreview();
   openModal('modal-schedule-test');
 }
@@ -595,6 +782,7 @@ async function submitScheduleTest() {
   const marks = parseFloat(ById('test-marks')?.value);
   const numQ = parseInt(ById('test-num-questions')?.value, 10) || (S.scheduleTestQuestions?.length || 4);
   const desc = ById('test-desc')?.value.trim() || '';
+  const unit_name = ById('test-unit')?.value?.trim() || null;
   if (!name || !date || !marks) {
     toast('Title, date and marks are required');
     return;
@@ -620,6 +808,7 @@ async function submitScheduleTest() {
         max_marks: marks,
         num_questions: numQ,
         questions,
+        unit_name,
         description: desc || null
       })
     });
@@ -627,6 +816,7 @@ async function submitScheduleTest() {
     closeModal('modal-schedule-test');
     if (ById('test-title')) ById('test-title').value = '';
     if (ById('test-date')) ById('test-date').value = '';
+    if (ById('test-unit')) ById('test-unit').value = '';
     if (ById('test-marks')) ById('test-marks').value = '20';
     if (ById('test-num-questions')) ById('test-num-questions').value = '4';
     await loadTests();
@@ -861,6 +1051,8 @@ function openEditWorkModal(type, id) {
   const due = item.due_date || item.test_date;
   if (ById('edit-work-due')) ById('edit-work-due').value = due ? due.slice(0, 10) : '';
 
+  populateUnitDropdowns(item.unit_name || '', 'edit-work-unit');
+
   if (ById('edit-work-date-label')) ById('edit-work-date-label').textContent = isTest ? 'Test Date' : 'Due Date (Optional)';
   if (ById('edit-work-modal-heading')) ById('edit-work-modal-heading').textContent = isTest ? 'Edit Class Test' : type === 'finaldocs' ? 'Edit Final Documents Request' : type === 'practical' ? 'Edit Practical Work' : 'Edit Assignment';
 
@@ -898,6 +1090,7 @@ async function submitEditWork() {
   const desc = ById('edit-work-desc')?.value.trim();
   const due = ById('edit-work-due')?.value;
   const marks = ById('edit-work-marks')?.value;
+  const unit_name = ById('edit-work-unit')?.value?.trim() || null;
 
   const btn = ById('btn-save-edit-work');
   if (btn) {
@@ -913,7 +1106,8 @@ async function submitEditWork() {
           name: title,
           description: desc || null,
           test_date: due || null,
-          max_marks: marks ? parseFloat(marks) : null
+          max_marks: marks ? parseFloat(marks) : null,
+          unit_name
         })
       });
       toast('Class test updated successfully');
@@ -924,7 +1118,8 @@ async function submitEditWork() {
         title,
         description: desc || null,
         due_date: due || null,
-        max_marks: type === 'finaldocs' ? null : (marks ? parseFloat(marks) : null)
+        max_marks: type === 'finaldocs' ? null : (marks ? parseFloat(marks) : null),
+        unit_name
       };
       if (type === 'finaldocs') {
         bodyPayload.questions = S.editFinalDocReqs;
@@ -2818,3 +3013,6 @@ window.removeScheduleQRow = removeScheduleQRow;
 window.autoSplitScheduleQuestions = autoSplitScheduleQuestions;
 window.updateScheduleQRowMarks = updateScheduleQRowMarks;
 window.updateScheduleQRowText = updateScheduleQRowText;
+window.filterCWByUnit = filterCWByUnit;
+window.populateUnitDropdowns = populateUnitDropdowns;
+window.updateUnitFilterBar = updateUnitFilterBar;

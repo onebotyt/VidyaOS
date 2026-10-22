@@ -2623,4 +2623,52 @@ table.sheet-table .excel-cell-total {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   Syllabus Unit Organization & Filtering
+   ══════════════════════════════════════════════════════════════ */
+.cw-unit-section {
+  margin-bottom: 1.5rem;
+}
+
+.cw-unit-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.95rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+}
+
+.cw-unit-select-wrap select {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.cw-unit-select-wrap select:focus {
+  border-color: var(--color-primary);
+}
+
+.work-unit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+}
 

@@ -233,6 +233,7 @@ function openEditGroupModal() {
   if (ById('edit-group-name')) ById('edit-group-name').value = S.group.name || '';
   if (ById('edit-group-subject')) ById('edit-group-subject').value = S.group.subject_name || '';
   if (ById('edit-group-component')) ById('edit-group-component').value = S.group.component || 'THEORY';
+  if (ById('edit-group-total-units')) ById('edit-group-total-units').value = S.group.total_units || 5;
   openModal('modal-edit-group');
 }
 
@@ -243,13 +244,14 @@ async function submitEditGroup(e) {
     btn.disabled = true;
     btn.textContent = 'Saving...';
   }
-  const name = ById('edit-group-name')?.value.trim() || '';
+  const name = ById('edit-group-name')?.value.trim() || ById('edit-group-subject')?.value.trim() || '';
   const subject_name = ById('edit-group-subject')?.value.trim() || '';
   const component = ById('edit-group-component')?.value || 'THEORY';
+  const total_units = parseInt(ById('edit-group-total-units')?.value) || 5;
   try {
     const res = await apiFetch('/api/v1/teaching-groups/' + S.groupId, {
       method: 'PUT',
-      body: JSON.stringify({ name, subject_name, component })
+      body: JSON.stringify({ name, subject_name, component, total_units })
     });
     if (res.success) {
       toast('Class settings updated!');
@@ -257,7 +259,9 @@ async function submitEditGroup(e) {
       S.group.name = name;
       S.group.subject_name = subject_name;
       S.group.component = component;
+      S.group.total_units = total_units;
       renderBanner(S.group);
+      if (typeof renderCWList === 'function') renderCWList();
     } else {
       toast(res.error?.message || 'Failed to update class settings');
     }
