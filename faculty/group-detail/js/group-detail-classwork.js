@@ -2182,22 +2182,31 @@ function renderEditQuestionRows() {
 
   container.innerHTML = S.editingTestQuestions.map((q, idx) => `
     <div class="edit-q-row">
-      <span class="edit-q-row-label">${esc(q.label)}</span>
-      <input type="text" class="edit-q-row-text" placeholder="Question topic / text (optional)..." value="${esc(q.text || '')}" oninput="updateEditQuestionText(${idx}, this.value)">
-      <div style="display:flex;align-items:center;gap:0.25rem">
-        <input type="number" min="0.5" max="500" step="0.5" class="edit-q-row-marks" value="${q.max}" onchange="updateEditQuestionMarks(${idx}, this.value)" title="Max marks for ${esc(q.label)}">
-        <span style="font-size:0.72rem;color:var(--text-muted);font-weight:700">pts</span>
+      <div class="edit-q-row-top">
+        <div class="edit-q-badge-wrap">
+          <span class="edit-q-row-label">${esc(q.label)}</span>
+        </div>
+        <div class="edit-q-meta-wrap">
+          <div class="edit-q-marks-pill">
+            <span class="edit-q-marks-tag">Marks:</span>
+            <input type="number" min="0.5" max="500" step="0.5" class="edit-q-row-marks" value="${q.max}" onchange="updateEditQuestionMarks(${idx}, this.value)" title="Max marks for ${esc(q.label)}">
+            <span class="edit-q-pts-tag">pts</span>
+          </div>
+          <button type="button" class="edit-q-del-btn" onclick="removeEditQuestionRow(${idx})" ${S.editingTestQuestions.length <= 1 ? 'disabled' : ''} title="Delete question">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
       </div>
-      <button type="button" class="edit-q-del-btn" onclick="removeEditQuestionRow(${idx})" ${S.editingTestQuestions.length <= 1 ? 'disabled' : ''} title="Delete question">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <div class="edit-q-row-bottom">
+        <textarea rows="2" class="edit-q-row-text" placeholder="Question topic or description (e.g., Relational Algebra, SQL Joins, Triggers)..." oninput="updateEditQuestionText(${idx}, this.value)">${esc(q.text || '')}</textarea>
+      </div>
     </div>
   `).join('');
 }
 
 function updateEditQuestionText(idx, val) {
   if (S.editingTestQuestions[idx]) {
-    S.editingTestQuestions[idx].text = val.trim();
+    S.editingTestQuestions[idx].text = val;
   }
 }
 
