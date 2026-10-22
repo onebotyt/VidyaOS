@@ -176,10 +176,15 @@ document.addEventListener('keydown', e => {
 
 document.addEventListener('click', e => {
   if (e.target && e.target.classList && e.target.classList.contains('modal-backdrop')) {
-    e.target.classList.remove('open');
-    e.target.style.display = 'none';
-    if (!document.querySelector('.modal-backdrop.open')) {
-      document.body.classList.remove('modal-open');
+    const modalId = e.target.id;
+    if (modalId && typeof closeModal === 'function') {
+      closeModal(modalId);
+    } else {
+      e.target.classList.remove('open');
+      e.target.style.display = 'none';
+      if (!document.querySelector('.modal-backdrop.open')) {
+        document.body.classList.remove('modal-open');
+      }
     }
   }
 });
