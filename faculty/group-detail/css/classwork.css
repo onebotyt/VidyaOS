@@ -1738,6 +1738,12 @@ table.sheet-table .excel-cell-total {
     display: none !important;
   }
 
+  body.marks-standalone-page #modal-edit-questions {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100010 !important;
+  }
+
   body.marks-standalone-page #modal-enter-marks {
     position: fixed !important;
     inset: 0 !important;
@@ -2290,3 +2296,40 @@ table.sheet-table .excel-cell-total {
   opacity: 0.3;
   cursor: not-allowed;
 }
+
+/* Question Editor Modal - ensure it is ALWAYS on top of marks modal (both mobile and desktop) */
+#modal-edit-questions {
+  z-index: 100010 !important;
+}
+
+#modal-edit-questions.open,
+#modal-edit-questions[style*="display: flex"] {
+  display: flex !important;
+}
+
+#modal-edit-questions .modal-card {
+  z-index: 100015 !important;
+  box-shadow: var(--shadow-lg) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+@media (max-width: 768px) {
+  #modal-edit-questions {
+    z-index: 100010 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 1rem !important;
+  }
+
+  #modal-edit-questions .modal-card {
+    width: 95vw !important;
+    max-width: 440px !important;
+    max-height: 85vh !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+    z-index: 100015 !important;
+    margin: auto !important;
+  }
+}
+
