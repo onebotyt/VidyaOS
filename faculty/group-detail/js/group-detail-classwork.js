@@ -1661,7 +1661,20 @@ async function openMarksModal(test) {
   updateViewModeUI();
   renderMarksEntryTable(false);
   openModal('modal-enter-marks');
+  if (isMobileScreen) {
+    document.body.classList.add('marks-standalone-page');
+    document.documentElement.classList.add('marks-standalone-page');
+    try {
+      window.history.pushState({ marksPage: true }, '');
+    } catch {}
+  }
 }
+
+window.addEventListener('popstate', (e) => {
+  if (document.body.classList.contains('marks-standalone-page')) {
+    closeModal('modal-enter-marks');
+  }
+});
 
 function setMarksModalView(mode) {
   S.marksViewMode = (mode === 'excel') ? 'excel' : 'table';

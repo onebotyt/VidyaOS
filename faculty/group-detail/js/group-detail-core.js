@@ -138,6 +138,10 @@ function openModal(id) {
   el.classList.add('open');
   el.style.display = 'flex';
   document.body.classList.add('modal-open');
+  if (id === 'modal-enter-marks' && window.innerWidth < 768) {
+    document.body.classList.add('marks-standalone-page');
+    document.documentElement.classList.add('marks-standalone-page');
+  }
 }
 
 function closeModal(id) {
@@ -145,6 +149,10 @@ function closeModal(id) {
   if (!el) return;
   el.classList.remove('open');
   el.style.display = 'none';
+  if (id === 'modal-enter-marks') {
+    document.body.classList.remove('marks-standalone-page');
+    document.documentElement.classList.remove('marks-standalone-page');
+  }
   if (!document.querySelector('.modal-backdrop.open')) {
     document.body.classList.remove('modal-open');
   }
