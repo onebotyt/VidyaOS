@@ -1978,14 +1978,15 @@ function renderMarksEntryTable(preserveInputs = false) {
       thead.innerHTML = `
         <tr id="marks-table-header-row">
           ${showSr ? '<th class="col-sr" style="width:36px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">SR</th>' : ''}
-          <th class="col-roll col-student-hdr" style="width:36px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">
+          <th class="col-roll col-student-hdr" style="width:36px;position:sticky;top:0;left:0;z-index:20;background:var(--bg-surface)">
             <span class="desktop-text">Roll</span>
-            <span class="mobile-text">STUDENT</span>
+            <span class="mobile-text">R.N</span>
           </th>
           ${showEnroll ? '<th class="col-enroll" style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Enrollment No.</th>' : ''}
           ${showReg ? '<th class="col-reg" style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Reg No.</th>' : ''}
-          <th class="col-name" style="position:sticky;top:0;z-index:10;background:var(--bg-surface)">
+          <th class="col-name" style="position:sticky;top:0;left:32px;z-index:18;background:var(--bg-surface)">
             <span class="desktop-text">Student Name</span>
+            <span class="mobile-text">STUDENT</span>
           </th>
           <th class="col-att-hdr" style="width:32px;text-align:center;position:sticky;top:0;z-index:10;background:var(--bg-surface)">P</th>
           ${S.currentTestQuestions.map(q => `
@@ -1994,7 +1995,7 @@ function renderMarksEntryTable(preserveInputs = false) {
               <span class="q-hdr-max desktop-text" style="font-size:.68rem;color:var(--text-muted);display:block;font-weight:normal">/${q.max}</span>
             </th>
           `).join('')}
-          <th class="col-total" style="text-align:right;background:var(--bg-surface);font-weight:700;color:var(--text-muted);position:sticky;top:0;z-index:10;padding-right:0.75rem">
+          <th class="col-total" style="text-align:right;background:var(--bg-surface);font-weight:700;color:var(--text-muted);position:sticky;top:0;right:0;z-index:20;padding-right:0.75rem">
             TOTAL
           </th>
         </tr>
