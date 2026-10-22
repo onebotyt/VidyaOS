@@ -1930,7 +1930,6 @@ function renderMarksEntryTable(preserveInputs = false) {
         `;
       }).join('');
     }
-  }
 
   S.members.forEach(m => recalcStudentTotal(m.student_id));
 }
