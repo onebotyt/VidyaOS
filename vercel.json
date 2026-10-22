@@ -23,24 +23,36 @@
       "destination": "/shared/:path*"
     },
     {
+      "source": "/login",
+      "destination": "/login/index.html"
+    },
+    {
+      "source": "/login/",
+      "destination": "/login/index.html"
+    },
+    {
       "source": "/register",
-      "destination": "/login/register"
+      "destination": "/login/register/index.html"
+    },
+    {
+      "source": "/register/",
+      "destination": "/login/register/index.html"
     },
     {
       "source": "/register.html",
-      "destination": "/login/register"
+      "destination": "/login/register/index.html"
     },
     {
       "source": "/login/register.html",
-      "destination": "/login/register"
+      "destination": "/login/register/index.html"
     },
     {
       "source": "/login/student-register.html",
-      "destination": "/login/register?role=student"
+      "destination": "/login/register/index.html?role=student"
     },
     {
       "source": "/login/faculty-register.html",
-      "destination": "/login/register?role=faculty"
+      "destination": "/login/register/index.html?role=faculty"
     },
     {
       "source": "/admin",
