@@ -50,12 +50,13 @@
     <div class="studio-bar studio-bar-1 sheets-top-command-bar" id="studio-bar-1">
       <div class="studio-bar-left">
         <!-- Small Minimal Back Button -->
-        <button type="button" class="btn-icon-minimal" id="btn-back-bar1" onclick="window.history.length > 1 ? window.history.back() : window.location.href='/faculty/groups.html'" title="Go Back">
+        <button type="button" class="btn-icon-minimal" id="btn-back-bar1" onclick="const p = new URLSearchParams(window.location.search); const gid = p.get('id') || p.get('group_id'); if (gid) { window.location.href = '/faculty/group-detail.html?id=' + encodeURIComponent(gid); } else if (window.history.length > 1) { window.history.back(); } else { window.location.href = '/faculty/groups.html'; }" title="Back to Classroom">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </button>
+
 
         <!-- Hidden legacy classroom link for backward compatibility with scripts -->
         <a href="/faculty/groups.html" class="back-classroom-link" id="btn-back-classroom" style="display:none !important;"><span class="btn-text">Back</span></a>
@@ -84,8 +85,11 @@
             <button type="button" class="dropdown-item" onclick="exportCurrentSheet('pdf')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
               <span style="color:var(--status-absent);font-weight:800;">.PDF</span> Printable PDF Document
             </button>
+            <button type="button" class="dropdown-item" onclick="exportCurrentSheet('doc')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
+              <span style="color:var(--color-primary);font-weight:800;">.DOC</span> Word Document
+            </button>
             <button type="button" class="dropdown-item" onclick="exportCurrentSheet('csv')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-              <span style="color:var(--color-primary);font-weight:800;">.CSV</span> Raw Data Values
+              <span style="color:var(--text-muted);font-weight:800;">.CSV</span> Raw Data Values
             </button>
           </div>
         </div>
@@ -126,8 +130,7 @@
         <select class="sheet-select-dropdown" id="sheet-selector-dropdown" onchange="switchSheetDropdown(this.value)" title="Choose Active Spreadsheet">
           <option value="evaluation">1. Master Evaluation Sheet</option>
           <option value="tests">2. Class Test Marksheet</option>
-          <option value="assignments">3. Assignment Marksheet</option>
-          <option value="attendance">4. Attendance Matrix</option>
+          <option value="assignments">3. Assignment &amp; Coursework Marksheet</option>
         </select>
 
         <!-- Context-dependent sub-sheet dropdown / calendar button container -->
@@ -205,7 +208,7 @@
           <option value="TOP">Top Performers (≥ 80%)</option>
           <option value="AVERAGE">Average (50% - 79%)</option>
           <option value="LOW">Low (&lt; 50%)</option>
-          <option value="ATT_LOW">Defaulters (&lt; 75%)</option>
+          <option value="ATT_LOW">Below 75% Attendance</option>
           <option value="ABSENT">Absent</option>
         </select>
 
@@ -310,13 +313,9 @@
           </div>
         </div>
 
-        <!-- PANE 4: ATTENDANCE MATRIX LEDGER -->
-        <div class="sheet-pane" id="pane-attendance">
-          <div id="attendance-table-container">
-            <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
-              Loading Attendance Register Ledger...
-            </div>
-          </div>
+        <!-- PANE 4: ATTENDANCE MATRIX LEDGER (REMOVED PER USER REQUEST) -->
+        <div class="sheet-pane" id="pane-attendance" style="display:none !important;" aria-hidden="true">
+          <div id="attendance-table-container"></div>
         </div>
 
       </div>
@@ -577,7 +576,7 @@
             </label>
             <label class="filter-option-row">
               <input type="radio" name="filter_student_radio" value="ATT_LOW" onchange="onFilterModalRadioChange()">
-              <span class="filter-option-label">Defaulters (&lt; 75% Attendance)</span>
+              <span class="filter-option-label">Below 75% Attendance</span>
             </label>
             <label class="filter-option-row">
               <input type="radio" name="filter_student_radio" value="ABSENT" onchange="onFilterModalRadioChange()">
@@ -784,7 +783,7 @@
         <h4 id="drawer-user-name" style="margin:0;font-size:0.95rem;font-weight:800;color:var(--text-main);">Faculty Member</h4>
         <div id="drawer-user-email" style="font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem;">faculty@college.edu</div>
         <div style="display:flex;gap:0.35rem;margin-top:0.35rem;">
-          <span class="badge" id="drawer-user-role" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.68rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);">Faculty / Class Teacher</span>
+          <span class="badge" id="drawer-user-role" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.68rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);">Faculty Member</span>
         </div>
       </div>
       <button type="button" class="drawer-close-btn" onclick="toggleAndroidProfileDrawer(false)">✕</button>
@@ -983,7 +982,8 @@
   <script src="/js/api.js?v=20261003"></script>
   <script src="/js/auth.js?v=20261003"></script>
   <script src="/js/ui.js?v=20261003"></script>
+  <script src="/js/exceljs.min.js"></script>
   
-  <script src="/faculty/sheets/sheets.js?v=20261003"></script>
+  <script src="/faculty/sheets/sheets.js?v=20261022"></script>
 </body>
 </html>

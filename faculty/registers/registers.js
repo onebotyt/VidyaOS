@@ -535,7 +535,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                     badgeLabel = 'Short';
                   } else {
                     badgeClass = 'defaulter';
-                    badgeLabel = 'Defaulter';
+                    badgeLabel = 'Below 75%';
                   }
                 }
                 const safeName = (st.full_name || '').replace(/'/g, "\\'");
@@ -3440,16 +3440,6 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
         }
       } catch (e) {}
       showToast('Internal evaluation spreadsheet synced and saved!', 'success');
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
     }
 
 

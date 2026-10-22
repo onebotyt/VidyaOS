@@ -10,26 +10,6 @@ guardRoute(['STUDENT']);
     window._stagedDocs = window._stagedDocs || {};
     window._cachedAssignments = [];
 
-    function openModal(id) {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'flex';
-    }
-
-    function closeModal(id) {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
     async function authedFetch(url, options = {}) {
       const token = localStorage.getItem('access_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
       const headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };

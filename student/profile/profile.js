@@ -85,7 +85,7 @@ guardRoute(['STUDENT']);
             healthStanding.style.color = 'var(--status-present)';
           } else {
             standingBadge.className = 'std-badge defaulter';
-            standingBadge.innerText = 'Defaulter (< 75%)';
+            standingBadge.innerText = 'Below 75%';
             healthPct.style.color = 'var(--status-absent)';
             healthProgressBar.className = 'progress-bar-fill defaulter';
             healthStatusTag.innerText = 'Attendance Shortage';

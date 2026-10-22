@@ -52,7 +52,7 @@
             <div class="cf-doc-card-actions">
               ${isAvail 
                 ? `<a href="/faculty/course-file.html?group_id=${groupId}${regParam}&doc=${doc.slug}&action=view" class="cf-action-btn cf-action-view" title="View document">
-                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                      <span>View</span>
                    </a>`
                 : `<span class="cf-action-empty" title="Nothing to view yet">
@@ -2377,16 +2377,6 @@
         el.style.opacity = '';
         el.style.pointerEvents = '';
       }
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
     }
 
     // Dismiss on backdrop click or outside menu click

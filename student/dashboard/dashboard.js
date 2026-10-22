@@ -833,19 +833,6 @@ function getInitials(name) {
   return clean.slice(0, 2).toUpperCase() || 'ST';
 }
 
-/**
- * Helper: HTML escaping for XSS safety
- */
-function escapeHtml(str) {
-  if (str === null || str === undefined) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 // Window interoperability exports
 window.openJoinModal = openStudentJoinModal;
 window.closeJoinModal = closeJoinModal;

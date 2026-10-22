@@ -15,7 +15,7 @@
       allGroups: [],
       group: null,
       members: [],
-      activeSheet: 'evaluation', // 'evaluation' | 'tests' | 'assignments' | 'attendance'
+      activeSheet: 'evaluation', // 'evaluation' | 'tests' | 'assignments'
       searchQuery: '',
       filterMode: 'ALL',
       sortMode: 'ROLL_ASC',
@@ -213,8 +213,9 @@
        SHEET TABS SWITCHER
        ══════════════════════════════════════════════════════════════ */
     async function switchSheetTab(sheetName, updateUrl = true) {
+      if (sheetName === 'attendance') sheetName = 'evaluation';
       S.activeSheet = sheetName;
-      ['evaluation', 'tests', 'assignments', 'attendance'].forEach(tab => {
+      ['evaluation', 'tests', 'assignments'].forEach(tab => {
         const btn = document.getElementById(`tab-sheet-${tab}`);
         const pane = document.getElementById(`pane-${tab}`);
         if (btn) btn.classList.toggle('active', tab === sheetName);
@@ -295,23 +296,6 @@
         right.innerHTML = `
           <span style="font-size:0.76rem;color:var(--text-muted);font-weight:600;">Total Assignments: <strong>${S.assignments.length}</strong></span>
         `;
-      } else if (S.activeSheet === 'attendance') {
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const mOpts = months.map((m, i) => `<option value="${i+1}" ${(i+1)===S.attendanceMonth ? 'selected':''}>${m}</option>`).join('');
-        left.innerHTML = `
-          <span style="font-size:0.8rem;font-weight:700;color:var(--text-main);">Attendance Month &amp; Year:</span>
-          <select class="group-selector-select" style="max-width:90px;" onchange="S.attendanceMonth=Number(this.value);loadAttendanceSheetData()">
-            ${mOpts}
-          </select>
-          <select class="group-selector-select" style="max-width:90px;" onchange="S.attendanceYear=Number(this.value);loadAttendanceSheetData()">
-            <option value="2026" selected>2026</option>
-            <option value="2025">2025</option>
-          </select>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="openAddRowModal()" title="Add student row" style="font-weight:700;">+ Add Student</button>
-        `;
-        right.innerHTML = `
-          <span style="font-size:0.76rem;color:var(--text-muted);font-weight:600;">Eligibility Threshold: <strong style="color:var(--status-present);">≥ 75%</strong></span>
-        `;
       }
     }
 
@@ -322,8 +306,8 @@
         await loadTestSheetData();
       } else if (sheetName === 'assignments') {
         await loadAssignmentsSheetData();
-      } else if (sheetName === 'attendance') {
-        await loadAttendanceSheetData();
+      } else {
+        await loadEvaluationSheetData();
       }
     }
 
@@ -345,7 +329,7 @@
       if (S.activeSheet === 'evaluation') renderEvaluationSheetTable();
       else if (S.activeSheet === 'tests') renderTestSheetTable();
       else if (S.activeSheet === 'assignments') renderAssignmentsSheetTable();
-      else if (S.activeSheet === 'attendance') renderAttendanceSheetTable();
+      else renderEvaluationSheetTable();
     }
 
     /* ══════════════════════════════════════════════════════════════
@@ -2901,8 +2885,12 @@
       const container = document.getElementById('attendance-table-container');
       if (!container) return;
 
-      const m = S.attendanceMonth;
-      const y = S.attendanceYear;
+      const m = S.attendanceMonth || (new Date().getMonth() + 1);
+      const y = S.attendanceYear || new Date().getFullYear();
+      const daysInMonth = new Date(y, m, 0).getDate();
+      const yr = S.group?.year || 3;
+      const sem = S.group?.semester || 5;
+      const esc = window.escapeHtml || (s => String(s == null ? '' : s));
       const rawRoster = S.members.length ? S.members : Array.from({length: 10}, (_, i) => ({
         student_id: i + 1,
         class_roll_no: i + 1,
@@ -2929,8 +2917,8 @@
       const tallyEl = document.getElementById('sheet-visible-tally');
       if (tallyEl) tallyEl.textContent = `Showing ${roster.length} of ${rawRoster.length} students`;
 
-      const deptCode = escapeHtml(S.group?.department_code || 'IT');
-      const subName = escapeHtml(S.group?.subject_name || 'Database Management Systems');
+      const deptCode = esc(S.group?.department_code || 'IT');
+      const subName = esc(S.group?.subject_name || 'Database Management Systems');
       const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       const totalCols = 4 + daysInMonth + 3;
 
@@ -3123,6 +3111,212 @@
       }
     });
 
+    async function exportTableToRealXlsx(tableOrClone, filename, sheetTitle) {
+      if (!tableOrClone) return;
+
+      const clone = tableOrClone.cloneNode ? tableOrClone.cloneNode(true) : tableOrClone;
+      // Convert nested student cell to readable format
+      clone.querySelectorAll('.dyn-student-cell').forEach(cell => {
+        const name = cell.querySelector('.dyn-student-name')?.textContent?.trim() || '';
+        const enrl = cell.querySelector('.dyn-student-enroll')?.textContent?.trim() || '';
+        if (name && enrl) {
+          cell.textContent = `${name} (${enrl})`;
+        } else if (name) {
+          cell.textContent = name;
+        }
+      });
+
+      // Primary client-side binary OpenXML (.xlsx) generator with ExcelJS
+      if (typeof ExcelJS !== 'undefined') {
+        try {
+          const wb = new ExcelJS.Workbook();
+          wb.creator = 'VidyaOS Institutional Campus OS';
+          wb.created = new Date();
+
+          const cleanSheetName = (sheetTitle || filename || 'Evaluation')
+            .replace(/[*?:/\\\[\]]/g, ' ')
+            .trim()
+            .substring(0, 31) || 'Sheet1';
+
+          const ws = wb.addWorksheet(cleanSheetName, {
+            views: [{ showGridLines: true }],
+            pageSetup: { orientation: 'landscape', fitToPage: true }
+          });
+
+          const borderThin = {
+            top: { style: 'thin', color: { argb: 'FF94A3B8' } },
+            left: { style: 'thin', color: { argb: 'FF94A3B8' } },
+            bottom: { style: 'thin', color: { argb: 'FF94A3B8' } },
+            right: { style: 'thin', color: { argb: 'FF94A3B8' } }
+          };
+
+          const matrix = [];
+          let maxCols = 1;
+          const trElements = clone.querySelectorAll('tr');
+
+          trElements.forEach((tr, rIdx) => {
+            const excelRowIdx = rIdx + 1;
+            if (!matrix[excelRowIdx]) matrix[excelRowIdx] = [];
+            let excelColIdx = 1;
+
+            const cells = tr.querySelectorAll('th, td');
+            cells.forEach(cell => {
+              while (matrix[excelRowIdx][excelColIdx]) {
+                excelColIdx++;
+              }
+
+              const rowspan = parseInt(cell.getAttribute('rowspan') || '1', 10);
+              const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+
+              const isBlue = cell.classList.contains('excel-hdr-blue') || tr.classList.contains('excel-hdr-blue');
+              const isTan = cell.classList.contains('excel-hdr-tan') || tr.classList.contains('excel-hdr-tan');
+              const isSub = cell.classList.contains('excel-hdr-sub') || tr.classList.contains('excel-hdr-sub') || cell.classList.contains('excel-hdr-numbers') || tr.classList.contains('excel-hdr-numbers');
+              const isSummary = cell.classList.contains('excel-summary-lbl') || cell.classList.contains('excel-summary-avg') || tr.closest('tfoot');
+              const isName = cell.classList.contains('cell-student-name') || cell.querySelector('.dyn-student-name');
+              const isHeader = cell.tagName.toLowerCase() === 'th' || tr.closest('thead');
+              const isAbsent = cell.classList.contains('is-absent');
+
+              let text = cell.textContent.replace(/\s+/g, ' ').trim();
+              let val = text;
+              if (!isHeader && text !== '' && !isNaN(text) && !text.includes('/') && !text.includes('-') && !(text.length > 1 && text.startsWith('0'))) {
+                const num = Number(text);
+                if (!isNaN(num)) val = num;
+              }
+
+              const excelCell = ws.getCell(excelRowIdx, excelColIdx);
+              excelCell.value = val;
+
+              if (isBlue) {
+                excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0F2FE' } };
+                excelCell.font = { name: 'Calibri', size: tr.classList.contains('row-1') ? 12 : 10, bold: true, color: { argb: 'FF0369A1' } };
+                excelCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+              } else if (isTan) {
+                excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3C7' } };
+                excelCell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF92400E' } };
+                excelCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+              } else if (isSub) {
+                excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+                excelCell.font = { name: 'Calibri', size: 9.5, bold: true, color: { argb: 'FF334155' } };
+                excelCell.alignment = { horizontal: 'center', vertical: 'middle' };
+              } else if (isSummary) {
+                excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cell.classList.contains('excel-summary-lbl') ? 'FFF1F5F9' : 'FFE2E8F0' } };
+                excelCell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF0F172A' } };
+                excelCell.alignment = { horizontal: cell.classList.contains('excel-summary-lbl') ? 'right' : 'center', vertical: 'middle' };
+              } else if (isAbsent || text === 'AB' || text === 'A') {
+                excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
+                excelCell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFDC2626' } };
+                excelCell.alignment = { horizontal: 'center', vertical: 'middle' };
+              } else {
+                excelCell.font = { name: 'Calibri', size: 10, bold: Boolean(isName || isHeader) };
+                excelCell.alignment = { horizontal: isName ? 'left' : 'center', vertical: 'middle' };
+              }
+
+              if (rowspan > 1 || colspan > 1) {
+                const endRow = excelRowIdx + rowspan - 1;
+                const endCol = excelColIdx + colspan - 1;
+                ws.mergeCells(excelRowIdx, excelColIdx, endRow, endCol);
+
+                for (let r = excelRowIdx; r <= endRow; r++) {
+                  if (!matrix[r]) matrix[r] = [];
+                  for (let c = excelColIdx; c <= endCol; c++) {
+                    matrix[r][c] = true;
+                    ws.getCell(r, c).border = borderThin;
+                  }
+                }
+              } else {
+                matrix[excelRowIdx][excelColIdx] = true;
+                excelCell.border = borderThin;
+              }
+
+              excelColIdx += colspan;
+              if (excelColIdx > maxCols) maxCols = excelColIdx;
+            });
+
+            const isFirst = rIdx === 0;
+            ws.getRow(excelRowIdx).height = isFirst ? 28 : (tr.closest('thead') ? 22 : 20);
+          });
+
+          for (let c = 1; c <= maxCols; c++) {
+            const col = ws.getColumn(c);
+            let maxLen = 8;
+            col.eachCell({ includeEmpty: false }, cell => {
+              const v = cell.value ? String(cell.value) : '';
+              if (v.length > maxLen && v.length < 50) maxLen = v.length;
+            });
+            col.width = Math.max(9, Math.min(maxLen + 3, 35));
+          }
+
+          const buffer = await wb.xlsx.writeBuffer();
+          const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${filename}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          return true;
+        } catch (clientErr) {
+          console.warn('Client-side ExcelJS export failed, trying backend fallback:', clientErr);
+        }
+      }
+
+      // Backend fallback route
+      try {
+        const rows = [];
+        const trElements = clone.querySelectorAll('tr');
+        trElements.forEach(tr => {
+          const rowCells = [];
+          tr.querySelectorAll('th, td').forEach(c => {
+            rowCells.push({
+              text: c.textContent.replace(/\s+/g, ' ').trim(),
+              colspan: parseInt(c.getAttribute('colspan') || '1', 10),
+              rowspan: parseInt(c.getAttribute('rowspan') || '1', 10),
+              is_blue: c.classList.contains('excel-hdr-blue') || tr.classList.contains('excel-hdr-blue'),
+              is_tan: c.classList.contains('excel-hdr-tan') || tr.classList.contains('excel-hdr-tan'),
+              is_sub: c.classList.contains('excel-hdr-sub') || tr.classList.contains('excel-hdr-sub'),
+              is_summary: c.classList.contains('excel-summary-lbl') || c.classList.contains('excel-summary-avg') || tr.closest('tfoot'),
+              is_label: c.classList.contains('excel-summary-lbl'),
+              is_name: c.classList.contains('cell-student-name'),
+              is_header: c.tagName.toLowerCase() === 'th' || tr.closest('thead'),
+              is_absent: c.classList.contains('is-absent')
+            });
+          });
+          rows.push(rowCells);
+        });
+
+        const token = (typeof getAuthToken === 'function' && getAuthToken()) || localStorage.getItem('token') || '';
+        const resp = await fetch('/api/v1/faculty/export/table-to-excel', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            title: filename,
+            sheet_name: sheetTitle,
+            rows: rows
+          })
+        });
+
+        if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${filename}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        return true;
+      } catch (fallbackErr) {
+        console.error('All XLSX export strategies failed:', fallbackErr);
+        throw fallbackErr;
+      }
+    }
+
     function exportCurrentSheet(format) {
       const menu = document.getElementById('export-dropdown-menu');
       if (menu) menu.style.display = 'none';
@@ -3134,15 +3328,15 @@
 
       let activeTableId = 'table-master-evaluation';
       let filename = 'Institutional_Evaluation_Sheet';
+      let sheetTitle = 'Master Internal Evaluation Sheet';
       if (S.activeSheet === 'tests') {
         activeTableId = 'table-test-marksheet';
         filename = `Unit_Test_Marksheet_${S.currentTestId || 1}`;
+        sheetTitle = 'Class Test Marksheet';
       } else if (S.activeSheet === 'assignments') {
         activeTableId = 'table-assignments-marksheet';
         filename = 'Assignment_Coursework_Marksheet';
-      } else if (S.activeSheet === 'attendance') {
-        activeTableId = 'table-attendance-matrix';
-        filename = `Attendance_Ledger_${S.attendanceMonth}_${S.attendanceYear}`;
+        sheetTitle = 'Coursework & Assignment Marksheet';
       }
 
       const table = document.getElementById(activeTableId);
@@ -3151,53 +3345,122 @@
         return;
       }
 
-      if (format === 'xlsx') {
+      // Clone table and transform all input and select elements to text
+      const clone = table.cloneNode(true);
+      const origInputs = table.querySelectorAll('input, select');
+      const cloneInputs = clone.querySelectorAll('input, select');
+      cloneInputs.forEach((inp, idx) => {
+        const orig = origInputs[idx] || inp;
+        let val = '';
+        if (inp.tagName.toLowerCase() === 'select') {
+          val = orig.options && orig.selectedIndex >= 0 ? orig.options[orig.selectedIndex].text : (orig.value || '');
+        } else {
+          val = orig.value !== undefined ? orig.value : inp.getAttribute('value') || '';
+        }
+        const span = document.createElement('span');
+        span.textContent = val;
+        inp.parentNode.replaceChild(span, inp);
+      });
+
+      // Remove non-export elements (buttons, checkboxes, indicators)
+      clone.querySelectorAll('button, .banner-edit-indicator, .no-export, .dropdown-item, .screen-ctrl-btn, .col-check, input[type="checkbox"]').forEach(el => el.remove());
+
+      // Ensure institutional blue header rows exist in thead
+      const thead = clone.querySelector('thead');
+      if (thead && !clone.querySelector('.excel-hdr-blue')) {
+        let colCount = 0;
+        const firstRow = thead.querySelector('tr');
+        if (firstRow) {
+          firstRow.querySelectorAll('th, td').forEach(c => {
+            colCount += parseInt(c.getAttribute('colspan') || '1', 10);
+          });
+        }
+        if (colCount > 0) {
+          const b1 = document.getElementById('hdr-banner-line1')?.textContent?.trim() || 'Uttarakhand Government Institute of Polytechnic, Nainital';
+          const b2 = document.getElementById('hdr-banner-line2')?.textContent?.trim() || `Department (${S.group?.department_code || 'IT'}) | ${sheetTitle} | Subject : ${S.group?.name || 'Classroom'}`;
+          const b3 = document.getElementById('hdr-banner-cohort')?.textContent?.trim() || `Academic Session ${S.group?.academic_year_label || '2026-27'}`;
+          
+          const tr3 = document.createElement('tr');
+          tr3.className = 'excel-hdr-blue row-3';
+          tr3.innerHTML = `<th colspan="${colCount}" style="background-color:#e0f2fe;color:#0369a1;font-weight:bold;font-size:9.5pt;padding:4px;text-align:center;">${esc(b3)}</th>`;
+
+          const tr2 = document.createElement('tr');
+          tr2.className = 'excel-hdr-blue row-2';
+          tr2.innerHTML = `<th colspan="${colCount}" style="background-color:#e0f2fe;color:#0369a1;font-weight:bold;font-size:10pt;padding:5px;text-align:center;">${esc(b2)}</th>`;
+
+          const tr1 = document.createElement('tr');
+          tr1.className = 'excel-hdr-blue row-1';
+          tr1.innerHTML = `<th colspan="${colCount}" style="background-color:#e0f2fe;color:#0369a1;font-weight:bold;font-size:12pt;padding:8px;text-align:center;"><h3>${esc(b1)}</h3></th>`;
+
+          thead.insertBefore(tr3, thead.firstChild);
+          thead.insertBefore(tr2, thead.firstChild);
+          thead.insertBefore(tr1, thead.firstChild);
+        }
+      }
+
+      const cssStyles = `
+        table { border-collapse: collapse; width: 100%; font-family: Calibri, Arial, sans-serif; font-size: 10pt; color: #1e293b; margin-top: 8pt; }
+        th, td { border: 1px solid #94a3b8; padding: 5px 6px; text-align: center; }
+        .excel-hdr-blue, tr.excel-hdr-blue th { background-color: #e0f2fe !important; color: #0369a1 !important; font-weight: bold; text-align: center; }
+        .excel-hdr-tan, tr.excel-hdr-tan th { background-color: #fef3c7 !important; color: #92400e !important; font-weight: bold; text-align: center; }
+        .excel-hdr-sub, tr.excel-hdr-sub th { background-color: #f8fafc !important; color: #334155 !important; font-weight: bold; text-align: center; }
+        .excel-hdr-numbers, tr.excel-hdr-numbers th { background-color: #f1f5f9 !important; color: #475569 !important; font-weight: bold; text-align: center; }
+        .excel-summary-lbl { background-color: #f1f5f9 !important; font-weight: bold; text-align: right; }
+        .excel-summary-avg { background-color: #e2e8f0 !important; font-weight: bold; text-align: center; }
+        .is-absent { background-color: #fee2e2 !important; color: #dc2626 !important; font-weight: bold; }
+        .cell-student-name { text-align: left !important; padding-left: 8px !important; font-weight: 600; }
+        .cell-roll { font-weight: bold; text-align: center; }
+      `;
+
+      if (format === 'doc') {
         const html = `
-          <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+          <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
             <head>
+              <meta charset="utf-8">
               <!--[if gte mso 9]>
               <xml>
-                <x:ExcelWorkbook>
-                  <x:ExcelWorksheets>
-                    <x:ExcelWorksheet>
-                      <x:Name>${esc(filename)}</x:Name>
-                      <x:WorksheetOptions>
-                        <x:DisplayGridlines/>
-                      </x:WorksheetOptions>
-                    </x:ExcelWorksheet>
-                  </x:ExcelWorksheets>
-                </x:ExcelWorkbook>
+                <w:WordDocument>
+                  <w:View>Print</w:View>
+                  <w:Zoom>100</w:Zoom>
+                  <w:DoNotOptimizeForBrowser/>
+                </w:WordDocument>
               </xml>
               <![endif]-->
-              <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
               <style>
-                table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11pt; }
-                th, td { border: 1px solid #1e293b; padding: 6px; text-align: center; }
-                .excel-hdr-blue { background-color: #e0f2fe; color: #0369a1; font-weight: bold; }
-                .excel-hdr-tan { background-color: #fef3c7; color: #92400e; font-weight: bold; }
-                .excel-hdr-sub { background-color: #f8fafc; font-weight: bold; }
-                .is-absent { background-color: #fee2e2; color: #dc2626; font-weight: bold; }
+                @page Section1 {
+                  size: 841.9pt 595.3pt;
+                  mso-page-orientation: landscape;
+                  margin: 0.4in 0.4in 0.4in 0.4in;
+                }
+                div.Section1 { page: Section1; }
+                body { font-family: Calibri, Arial, sans-serif; font-size: 10pt; color: #1e293b; }
+                ${cssStyles}
               </style>
             </head>
             <body>
-              ${table.outerHTML}
+              <div class="Section1">
+                ${clone.outerHTML}
+              </div>
             </body>
           </html>
         `;
-
-        const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+        const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${filename}.xlsx`;
+        a.download = `${filename}.doc`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast(`Exported ${filename}.xlsx successfully!`, 'success');
+        showToast(`Exported ${filename}.doc successfully!`, 'success');
+      } else if (format === 'xlsx') {
+        exportTableToRealXlsx(clone, filename, sheetTitle)
+          .then(() => showToast(`Exported ${filename}.xlsx successfully!`, 'success'))
+          .catch(err => showToast(`Failed to export Excel: ${err.message}`, 'error'));
       } else if (format === 'csv') {
         let csv = [];
-        const rows = table.querySelectorAll('tr');
+        const rows = clone.querySelectorAll('tr');
         rows.forEach(r => {
           const cols = r.querySelectorAll('th, td');
           let rowData = [];
@@ -3348,26 +3611,6 @@
             <option value="ALL" ${S.currentTestViewMode === 'ALL' ? 'selected' : ''}>All Unit Tests Combined</option>
             ${testOptions || '<option value="">No tests scheduled</option>'}
           </select>
-        `;
-      } else if (S.activeSheet === 'attendance') {
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const curMName = months[(S.attendanceMonth || 1) - 1];
-        const curYr = S.attendanceYear || new Date().getFullYear();
-        const mVal = `${curYr}-${String(S.attendanceMonth || 1).padStart(2, '0')}`;
-
-        container.innerHTML = `
-          <div style="position:relative;display:inline-flex;align-items:center;">
-            <button type="button" class="btn btn-secondary btn-sm subsheet-calendar-btn" onclick="triggerAttendanceCalendarPicker()" title="Choose Attendance Month &amp; Year">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              <span id="attendance-calendar-label">${curMName} ${curYr}</span> ▾
-            </button>
-            <input type="month" id="subsheet-att-month-input" value="${mVal}" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;left:0;bottom:0;" onchange="onAttendanceMonthPickerChange(this.value)">
-          </div>
         `;
       } else if (S.activeSheet === 'assignments') {
         const assignments = S.assignments || [];
@@ -3833,7 +4076,7 @@
           if (bAvatar) bAvatar.textContent = init;
           if (dName) dName.textContent = user.full_name || user.username || 'Faculty Member';
           if (dEmail) dEmail.textContent = user.email || 'faculty@college.edu';
-          if (dRole) dRole.textContent = user.role || 'Faculty / Class Teacher';
+          if (dRole) dRole.textContent = user.role || 'Faculty Member';
         }
         updateDrawerThemeLabel();
       }

@@ -1,0 +1,229 @@
+/* ══════════════════════════════════════════════════════════════
+   GROUP-DETAIL: SHEETS TAB & SPREADSHEET STUDIO STYLES
+   frontend/faculty/group-detail/css/sheets.css
+   ══════════════════════════════════════════════════════════════ */
+
+.classroom-sheets-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  animation: fadeInTab 0.15s ease-out;
+}
+
+/* Sheets Studio Toolbar */
+.sheet-studio-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-xs, var(--shadow-sm));
+}
+
+.sheet-selector-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.sheet-type-dropdown {
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.sheet-type-dropdown:focus {
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+.sheet-search-input {
+  min-width: 220px;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.84rem;
+  outline: none;
+}
+
+.sheet-search-input:focus {
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+/* Master Evaluation Matrix Grid & Spreadsheet Tables */
+.sheets-grid-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 68vh;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.eval-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  color: var(--text-main);
+}
+
+.eval-matrix-table th,
+.eval-matrix-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.45rem 0.65rem;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.eval-matrix-table th {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.eval-matrix-table tr.header-tier-1 th {
+  background: var(--col-att-group-bg);
+  color: var(--col-att-group-color, var(--color-primary));
+  font-size: 0.88rem;
+  padding: 0.6rem 0.85rem;
+  z-index: 11;
+}
+
+.eval-matrix-table td.student-name-cell {
+  text-align: left;
+  font-weight: 700;
+  position: sticky;
+  left: 0;
+  background: var(--table-sticky-bg, var(--bg-card));
+  z-index: 5;
+  border-right: 2px solid var(--border-color);
+}
+
+.eval-matrix-table td.roll-no-cell {
+  font-family: var(--font-family-mono);
+  font-weight: 800;
+  min-width: 50px;
+}
+
+.eval-matrix-table td.total-score-cell {
+  font-weight: 900;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  background: var(--color-primary-light);
+}
+
+/* Sheets Export Actions */
+.sheet-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.sheet-export-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PRINT STYLES FOR CLASSROOM SHEETS (PDF EXPORT)
+   ══════════════════════════════════════════════════════════════ */
+@media print {
+  @page {
+    size: landscape;
+    margin: 8mm;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+  }
+  .gc-navbar,
+  .group-header-card,
+  .gc-tabs-header,
+  .stream-sidebar,
+  .modal-backdrop,
+  #classroom-roll-modal,
+  #modal-add-announcement,
+  #modal-stream-settings,
+  #class-sheet-export-menu,
+  .card:has(#class-sheet-type-dropdown),
+  .card:has(.launch-banner),
+  .btn,
+  button,
+  input {
+    display: none !important;
+  }
+  #tab-sheets {
+    display: block !important;
+    padding: 0 !important;
+  }
+  .sheets-viewport-wrap,
+  #class-sheets-viewport {
+    overflow: visible !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  table.excel-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+  table.excel-table th,
+  table.excel-table td {
+    border: 1px solid #94a3b8 !important;
+    padding: 4px 6px !important;
+    font-size: 8.5pt !important;
+  }
+  .excel-hdr-blue,
+  tr.excel-hdr-blue th {
+    background-color: #e0f2fe !important;
+    color: #0369a1 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .excel-hdr-tan,
+  tr.excel-hdr-tan th {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+}

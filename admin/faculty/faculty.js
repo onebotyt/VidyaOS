@@ -939,40 +939,6 @@ try {
       return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
-    function showToast(message, type = 'info', duration = 4000) {
-      let container = document.getElementById('toast-container');
-      if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        container.style.position = 'fixed';
-        container.style.bottom = 'calc(64px + 1.25rem + env(safe-area-inset-bottom, 0px))';
-        container.style.right = '1.5rem';
-        container.style.zIndex = '99999';
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
-        container.style.gap = '0.6rem';
-        document.body.appendChild(container);
-      }
-
-      const toast = document.createElement('div');
-      toast.style.background = type === 'error' ? 'var(--status-absent)' : (type === 'success' ? 'var(--status-present)' : 'var(--color-primary)');
-      toast.style.color = 'var(--text-white)';
-      toast.style.padding = '0.65rem 1.1rem';
-      toast.style.borderRadius = 'var(--radius-md)';
-      toast.style.boxShadow = 'var(--shadow-md)';
-      toast.style.fontSize = '0.85rem';
-      toast.style.fontWeight = '500';
-      toast.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
-      toast.textContent = message;
-
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(8px)';
-        setTimeout(() => toast.remove(), 250);
-      }, duration);
-    }
-
     async function apiFetch(url, opts = {}) {
       const token = localStorage.getItem('access_token');
       const r = await fetch(url, {

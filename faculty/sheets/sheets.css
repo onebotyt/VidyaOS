@@ -1517,20 +1517,36 @@
       border-color: var(--color-primary);
     }
 
-    /* Print Styles */
+    /* Print Styles for High-Fidelity PDF / Document Export */
     @media print {
+      @page {
+        size: landscape;
+        margin: 8mm;
+      }
       body {
         overflow: visible !important;
-        background: var(--bg-card) !important;
+        background: #ffffff !important;
+        color: #000000 !important;
       }
       .gc-navbar,
+      .studio-bar,
+      .studio-bar-1,
+      .studio-bar-2,
+      .studio-bar-3,
       .sheets-top-command-bar,
       .sheet-tabs-container,
       .sheet-subtoolbar,
       .eval-filter-toolbar,
       .sheets-bottom-status-bar,
       .btn-sheet-att-toggle,
-      .studio-modal-backdrop {
+      .studio-modal-backdrop,
+      .tools-modal-backdrop,
+      #export-dropdown-menu,
+      .side-panel-toggle-btn,
+      .sheet-side-panel,
+      .pc-screen-toolbar,
+      .btn,
+      button {
         display: none !important;
       }
       .sheets-studio-layout,
@@ -1547,10 +1563,51 @@
       .sheet-pane.active {
         display: block !important;
       }
+      .sheets-header-banner {
+        display: block !important;
+        margin-bottom: 8px !important;
+      }
       table.excel-table {
         border-collapse: collapse !important;
         width: 100% !important;
         page-break-inside: auto;
+      }
+      table.excel-table th,
+      table.excel-table td {
+        border: 1px solid #94a3b8 !important;
+        padding: 5px 6px !important;
+        font-size: 8.5pt !important;
+      }
+      .excel-hdr-blue,
+      tr.excel-hdr-blue th {
+        background-color: #e0f2fe !important;
+        color: #0369a1 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .excel-hdr-tan,
+      tr.excel-hdr-tan th {
+        background-color: #fef3c7 !important;
+        color: #92400e !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .excel-hdr-sub,
+      tr.excel-hdr-sub th {
+        background-color: #f8fafc !important;
+        color: #334155 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .excel-summary-lbl {
+        background-color: #f1f5f9 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .excel-summary-avg {
+        background-color: #e2e8f0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
       tr {
         page-break-inside: avoid;

@@ -5,7 +5,7 @@
  * ══════════════════════════════════════════════════════════════
  */
 
-guardRoute({ roles: ['TEACHER'], requireClassTeacher: true });
+guardRoute({ roles: ['TEACHER'], requireDepartmentFaculty: true });
     let currentFilter = 'PENDING';
 
     function setFilter(status) {
@@ -61,12 +61,6 @@ guardRoute({ roles: ['TEACHER'], requireClassTeacher: true });
       }
     }
 
-    function formatDate(d) {
-      if (!d) return '';
-      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-    var escapeHtml = window.escapeHtml || (typeof esc !== 'undefined' ? esc : (s => s));
-
-
     loadLeaves();
+
 

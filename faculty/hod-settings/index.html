@@ -145,7 +145,7 @@
       <div class="kpi-card" style="--kpi-accent: var(--status-late);">
         <div class="kpi-lbl">Exam Eligibility Threshold</div>
         <div class="kpi-val" id="kpi-threshold" style="color: var(--status-late);">75%</div>
-        <div class="kpi-desc">Attendance defaulter cutoff</div>
+        <div class="kpi-desc">Minimum attendance cutoff</div>
       </div>
       <div class="kpi-card" style="--kpi-accent: var(--color-primary);">
         <div class="kpi-lbl">Department Resources</div>
@@ -195,11 +195,11 @@
         </div>
       </div>
 
-      <!-- Panel 2: Attendance Defaulter Policy -->
+      <!-- Panel 2: Attendance Eligibility Policy -->
       <div class="settings-panel">
         <div class="settings-panel-header">
           <div>
-            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Attendance Defaulter Policies</h3>
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Attendance Eligibility Policies</h3>
             <span style="font-size: 0.78rem; color: var(--text-muted);">Threshold cutoffs for examination eligibility &amp; warnings</span>
           </div>
           <span class="badge" style="background: var(--chip-hod-bg); color: var(--chip-hod-color); font-weight: 700;">Policies</span>
@@ -214,7 +214,7 @@
               <span style="font-weight: 700; color: var(--text-muted); font-size: 1.1rem;">%</span>
             </div>
             <span style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.35rem; display: block;">
-              Students with cumulative attendance below this threshold will be flagged as <strong>DEFICIENT / Defaulter</strong> in reports and examination hall-ticket rosters.
+              Students with cumulative attendance below this threshold will be flagged as <strong>Attendance Shortage (&lt; 75%)</strong> in reports and examination rosters.
             </span>
           </div>
 
@@ -232,7 +232,7 @@
                 <span style="font-weight: 700; color: var(--status-late);">50% – 74%</span>
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: var(--status-absent); font-weight: 600;">Critical Defaulter (Ineligible)</span>
+                <span style="color: var(--status-absent); font-weight: 600;">Attendance Shortage (Ineligible)</span>
                 <span style="font-weight: 700; color: var(--status-absent);">&lt; 50%</span>
               </div>
             </div>

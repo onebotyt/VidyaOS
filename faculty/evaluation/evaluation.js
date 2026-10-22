@@ -2176,16 +2176,6 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
       }, 200);
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       loadRegistersList();
     });

@@ -275,9 +275,9 @@ function guardRoute(options = []) {
     }
   }
 
-  // 3. Department faculty / Class Teacher cohort requirement (redesign.md Section 13, 14, 65 & Invariant 5)
+  // 3. Department faculty authorization (Any branch faculty can manage students & cohorts)
   if ((config.requireDepartmentFaculty || config.requireClassTeacher) && !user.roles?.includes('SYSTEM_ADMIN')) {
-    const isDeptFaculty = Boolean(user.department_id || user.teacher?.department_id || user.is_class_teacher || user.is_hod);
+    const isDeptFaculty = Boolean(user.department_id || user.teacher?.department_id || user.is_class_teacher || user.is_hod || user.roles?.includes('TEACHER'));
     if (!isDeptFaculty) {
       try {
         if (typeof sessionStorage !== 'undefined') {
@@ -775,9 +775,7 @@ function renderSidebar() {
     roleBadge = 'HOD';
   } else if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
     roleBadge = 'COMMON MGR';
-  } else if (user.is_class_teacher) {
-    roleBadge = 'CLASS TEACHER';
-  } else if (user.roles?.includes('TEACHER')) {
+  } else if (user.roles?.includes('TEACHER') || user.is_class_teacher) {
     roleBadge = 'FACULTY';
   } else if (user.roles?.includes('STUDENT')) {
     roleBadge = 'STUDENT';
@@ -1017,8 +1015,8 @@ function renderSidebar() {
     if (e.key === 'Escape') closeSidebar();
   });
 
-  // Async: load pending registration count badge for Department Teachers / Class Teachers
-  if (user.is_class_teacher || user.department_id || user.teacher?.department_id || user.is_hod) {
+  // Async: load pending registration count badge for Department Faculty / HODs
+  if (user.roles?.includes('TEACHER') || user.department_id || user.teacher?.department_id || user.is_hod || user.is_class_teacher) {
     _loadNavPendingBadge();
   }
 
@@ -1383,10 +1381,6 @@ function renderUserNav() {
       roleChipText = 'Common Mgr';
       roleClass = 'chip-hod';
       avatarRoleClass = 'role-hod';
-    } else if (user.is_class_teacher) {
-      roleChipText = 'Class Teacher';
-      roleClass = 'chip-classteacher';
-      avatarRoleClass = 'role-classteacher';
     } else {
       roleChipText = 'Faculty';
       roleClass = 'chip-faculty';
@@ -1914,9 +1908,7 @@ function _initNavigationState() {
         drawerRole.textContent = 'System Administrator';
       } else if (user.is_hod) {
         drawerRole.textContent = 'Head of Department (HOD)';
-      } else if (user.is_class_teacher) {
-        drawerRole.textContent = 'Class Teacher / Faculty';
-      } else if (user.roles?.includes('TEACHER')) {
+      } else if (user.roles?.includes('TEACHER') || user.is_class_teacher) {
         drawerRole.textContent = 'Faculty Member';
       } else if (user.roles?.includes('STUDENT')) {
         drawerRole.textContent = 'Student';
@@ -2011,7 +2003,7 @@ function _buildFallbackUniversalNavigation() {
       <h4 id="drawer-user-name" style="margin:0;font-size:0.95rem;font-weight:800;color:var(--text-main);">Faculty Member</h4>
       <div id="drawer-user-email" style="font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem;">faculty@college.edu</div>
       <div style="display:flex;gap:0.35rem;margin-top:0.35rem;">
-        <span class="badge" id="drawer-user-role" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.68rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);">Faculty / Class Teacher</span>
+        <span class="badge" id="drawer-user-role" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.68rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);">Faculty Member</span>
       </div>
     </div>
     <button type="button" class="drawer-close-btn" onclick="toggleAndroidProfileDrawer(false)">✕</button>

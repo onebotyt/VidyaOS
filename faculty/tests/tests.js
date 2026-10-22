@@ -1380,16 +1380,6 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
       }, 200);
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-    }
-
     // ─── 2-STEP DELETE MODAL ───
     let _pendingDelete = { type: null, id: null };
 
