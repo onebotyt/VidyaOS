@@ -1708,7 +1708,9 @@ table.sheet-table .excel-cell-total {
 
   .desktop-close-btn,
   .desktop-only-toggle,
-  .desktop-only-toolbar-right {
+  .desktop-only-toolbar-right,
+  .desktop-only-col-filter,
+  #marks-col-filter-wrapper {
     display: none !important;
   }
 
@@ -1955,7 +1957,7 @@ table.sheet-table .excel-cell-total {
   .marks-table .col-name,
   .marks-table .cell-student-name {
     min-width: 95px !important;
-    max-width: 130px !important;
+    max-width: 140px !important;
     padding-left: 0.15rem !important;
     padding-right: 0.25rem !important;
     position: sticky !important;
@@ -1964,6 +1966,7 @@ table.sheet-table .excel-cell-total {
     background: var(--bg-card) !important;
     box-shadow: none !important;
     border: none !important;
+    white-space: normal !important;
   }
 
   .marks-table th.col-name {
@@ -1980,10 +1983,11 @@ table.sheet-table .excel-cell-total {
     font-size: 0.82rem !important;
     font-weight: 600 !important;
     color: var(--text-main) !important;
-    max-width: 120px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    max-width: 135px !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.25 !important;
     display: block !important;
   }
 
@@ -2062,8 +2066,21 @@ table.sheet-table .excel-cell-total {
     background: var(--bg-surface) !important;
   }
 
-  /* Total Column */
-  .marks-table .col-total,
+  /* Total Column - Sticky Right */
+  .marks-table .col-total {
+    width: 44px !important;
+    min-width: 40px !important;
+    max-width: 48px !important;
+    text-align: right !important;
+    padding-left: 0.1rem !important;
+    padding-right: 0.75rem !important;
+    position: sticky !important;
+    top: 0 !important;
+    right: 0 !important;
+    z-index: 22 !important;
+    background: var(--bg-surface) !important;
+  }
+
   .marks-table .cell-total {
     width: 44px !important;
     min-width: 40px !important;
@@ -2071,6 +2088,19 @@ table.sheet-table .excel-cell-total {
     text-align: right !important;
     padding-left: 0.1rem !important;
     padding-right: 0.75rem !important;
+    position: sticky !important;
+    right: 0 !important;
+    z-index: 11 !important;
+    background: var(--bg-card) !important;
+    box-shadow: -4px 0 8px hsla(0, 0%, 0%, 0.05) !important;
+  }
+
+  .marks-table tr.is-absent td.cell-total {
+    background: var(--status-absent-bg) !important;
+  }
+
+  .marks-table tr:hover td.cell-total {
+    background: var(--bg-surface) !important;
   }
 
   .auto-total-badge,
