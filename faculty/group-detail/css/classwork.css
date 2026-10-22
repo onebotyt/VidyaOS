@@ -1928,11 +1928,12 @@ table.sheet-table .excel-cell-total {
   /* Roll Column */
   .marks-table .col-roll,
   .marks-table .cell-roll {
-    width: 24px !important;
-    min-width: 22px !important;
-    max-width: 26px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    box-sizing: border-box !important;
     text-align: left !important;
-    padding-left: 0.75rem !important;
+    padding-left: 0.45rem !important;
     padding-right: 0.1rem !important;
     font-size: 0.82rem !important;
     font-weight: 400 !important;
@@ -1949,8 +1950,15 @@ table.sheet-table .excel-cell-total {
   .marks-table th.col-roll {
     z-index: 15 !important;
     background: var(--bg-surface) !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     white-space: nowrap !important;
+  }
+
+  .col-roll .mobile-text {
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    display: inline-block !important;
   }
 
   /* Student Name Column */
@@ -1958,7 +1966,8 @@ table.sheet-table .excel-cell-total {
   .marks-table .cell-student-name {
     min-width: 95px !important;
     max-width: 140px !important;
-    padding-left: 0.15rem !important;
+    box-sizing: border-box !important;
+    padding-left: 0.45rem !important;
     padding-right: 0.25rem !important;
     position: sticky !important;
     left: 32px !important;
@@ -1972,6 +1981,14 @@ table.sheet-table .excel-cell-total {
   .marks-table th.col-name {
     z-index: 14 !important;
     background: var(--bg-surface) !important;
+    white-space: nowrap !important;
+  }
+
+  .col-name .mobile-text {
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    display: inline-block !important;
   }
 
   .marks-table tr.is-absent td.cell-roll,
