@@ -379,20 +379,13 @@
       </div>
       <div class="modal-body" style="padding: 1.25rem;">
         <form id="create-group-form" onsubmit="submitCreateGroup(event)">
+          <input type="hidden" id="group-name">
           <div class="form-group" style="margin-bottom: 1rem;">
             <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
-              Group Name *
+              Subject Name *
             </label>
-            <input type="text" id="group-name" required placeholder="e.g. DBMS - Theory (Sem 5)" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
-            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">The label visible to you and your students.</div>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 1rem;">
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
-              Subject Name * (Free-Text, No Catalog Lock)
-            </label>
-            <input type="text" id="group-subject" required placeholder="e.g. Database Management Systems" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
-            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Direct subject title. No complex catalog lookup needed.</div>
+            <input type="text" id="group-subject" required placeholder="e.g. Database Management Systems" oninput="if(document.getElementById('group-name')) document.getElementById('group-name').value = this.value;" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">This will be your group title visible to you and your students.</div>
           </div>
 
           <div class="form-group" style="margin-bottom: 1rem;">
@@ -403,7 +396,7 @@
             <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Short identifier used across registers, headers, and switcher menus.</div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
             <div class="form-group">
               <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
                 Component *
@@ -411,6 +404,7 @@
               <select id="group-component" required style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
                 <option value="THEORY">THEORY</option>
                 <option value="PRACTICAL">PRACTICAL</option>
+                <option value="THEORY + PRACTICAL">THEORY + PRACTICAL</option>
               </select>
             </div>
             <div class="form-group">
@@ -427,6 +421,14 @@
                 <option value="6">Semester 6</option>
               </select>
             </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Number of Units / Modules (Optional)
+            </label>
+            <input type="number" id="group-total-units" min="1" max="20" value="5" placeholder="e.g. 5" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.25rem;">Allows automatic grouping of assignments and tests into Unit 1, Unit 2, etc. (Default: 5).</div>
           </div>
 
           <div style="display: flex; justify-content: flex-end; gap: 0.65rem;">
@@ -738,6 +740,20 @@
             <textarea id="group-assign-desc" rows="3" placeholder="Specify instructions, reference materials, or problem statements..." style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);"></textarea>
           </div>
 
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Syllabus Unit / Module (Optional)
+            </label>
+            <select id="group-assign-unit" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+              <option value="">No Specific Unit / General</option>
+              <option value="Unit 1">Unit 1</option>
+              <option value="Unit 2">Unit 2</option>
+              <option value="Unit 3">Unit 3</option>
+              <option value="Unit 4">Unit 4</option>
+              <option value="Unit 5">Unit 5</option>
+            </select>
+          </div>
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
             <div class="form-group">
               <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
@@ -813,6 +829,20 @@
               Test Name / Evaluation Title *
             </label>
             <input type="text" id="group-test-name" required placeholder="e.g. Unit Test 1 (Modules 1 & 2)" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Syllabus Unit / Module (Optional)
+            </label>
+            <select id="group-test-unit" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
+              <option value="">Full Syllabus / General</option>
+              <option value="Unit 1">Unit 1</option>
+              <option value="Unit 2">Unit 2</option>
+              <option value="Unit 3">Unit 3</option>
+              <option value="Unit 4">Unit 4</option>
+              <option value="Unit 5">Unit 5</option>
+            </select>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
@@ -1276,14 +1306,21 @@
             </label>
             <input type="text" id="edit-group-subject-code" required placeholder="e.g. DBMS or CS-501" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
           </div>
-          <div class="form-group" style="margin-bottom: 1.25rem;">
+          <div class="form-group" style="margin-bottom: 1rem;">
             <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
               Academic Component *
             </label>
             <select id="edit-group-component" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
               <option value="THEORY">THEORY (Lecture Register)</option>
               <option value="PRACTICAL">PRACTICAL (Lab Work)</option>
+              <option value="THEORY + PRACTICAL">THEORY + PRACTICAL (Both)</option>
             </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-main);">
+              Number of Units / Modules
+            </label>
+            <input type="number" id="edit-group-total-units" min="1" max="20" placeholder="e.g. 5" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main);">
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
             <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit-group')">Cancel</button>

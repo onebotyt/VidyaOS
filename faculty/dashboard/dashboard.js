@@ -1055,6 +1055,9 @@
       document.getElementById('edit-group-subject').value = g.subject_name || '';
       document.getElementById('edit-group-subject-code').value = g.subject_code || (g.subject_name || '').split(/[\s-]+/).map(w => w[0]).join('').toUpperCase().slice(0, 8);
       document.getElementById('edit-group-component').value = g.component || 'THEORY';
+      if (document.getElementById('edit-group-total-units')) {
+        document.getElementById('edit-group-total-units').value = g.total_units || 5;
+      }
       openModal('modal-edit-group');
     }
 
@@ -1065,11 +1068,13 @@
       btn.disabled = true;
       btn.innerText = 'Saving...';
 
+      const totalUnits = parseInt(document.getElementById('edit-group-total-units')?.value) || 5;
       const payload = {
-        name: document.getElementById('edit-group-name').value.trim(),
+        name: document.getElementById('edit-group-name').value.trim() || document.getElementById('edit-group-subject').value.trim(),
         subject_name: document.getElementById('edit-group-subject').value.trim(),
         subject_code: document.getElementById('edit-group-subject-code').value.trim(),
-        component: document.getElementById('edit-group-component').value
+        component: document.getElementById('edit-group-component').value,
+        total_units: totalUnits
       };
 
       try {
@@ -1099,10 +1104,10 @@
       btn.disabled = true;
       btn.innerText = 'Creating...';
 
-      const nameVal = document.getElementById('group-name')?.value?.trim();
       const subjectVal = document.getElementById('group-subject')?.value?.trim();
-      if (!nameVal || !subjectVal) {
-        showToast('Please provide both Class Name and Subject Name', 'warning');
+      const nameVal = document.getElementById('group-name')?.value?.trim() || subjectVal;
+      if (!subjectVal) {
+        showToast('Please provide Subject Name', 'warning');
         btn.disabled = false;
         btn.innerText = 'Create Teaching Group';
         return;
@@ -1111,6 +1116,7 @@
       const semVal = parseInt(document.getElementById('group-semester').value, 10);
       const compVal = document.getElementById('group-component').value;
       const codeVal = document.getElementById('group-subject-code')?.value?.trim() || subjectVal.split(/[\s-]+/).map(w => w[0]).join('').toUpperCase().slice(0, 8);
+      const totalUnits = parseInt(document.getElementById('group-total-units')?.value) || 5;
 
       const payload = {
         name: nameVal,
@@ -1118,6 +1124,7 @@
         subject_code: codeVal,
         component: compVal,
         semester: semVal,
+        total_units: totalUnits,
         enrollment_mode: 'INVITE_CODE'
       };
 
@@ -1388,6 +1395,7 @@
       const description = document.getElementById('group-assign-desc').value.trim();
       const due_date = document.getElementById('group-assign-due').value || null;
       const max_marks = parseInt(document.getElementById('group-assign-marks').value, 10) || 100;
+      const unit_name = document.getElementById('group-assign-unit')?.value?.trim() || null;
 
       const btn = document.getElementById('btn-submit-group-assign');
       btn.disabled = true;
@@ -1400,6 +1408,7 @@
             description,
             due_date,
             max_marks,
+            unit_name,
             group_id: state.activeGroupId,
             department_id: state.activeGroupData?.department_id || 1,
             year: 1,
@@ -1545,6 +1554,7 @@
       const name = document.getElementById('group-test-name').value.trim();
       const exam_date = document.getElementById('group-test-date').value;
       const max_marks = parseInt(document.getElementById('group-test-marks').value, 10) || 20;
+      const unit_name = document.getElementById('group-test-unit')?.value?.trim() || null;
 
       const btn = document.getElementById('btn-submit-group-test');
       btn.disabled = true;
@@ -1556,6 +1566,7 @@
             name,
             exam_date,
             max_marks,
+            unit_name,
             group_id: state.activeGroupId,
             department_id: state.activeGroupData?.department_id || 1,
             year: 1,
