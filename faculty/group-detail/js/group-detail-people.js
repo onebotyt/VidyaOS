@@ -33,6 +33,7 @@ function renderPeople() {
     sl.innerHTML = emptyState('students', 'No students enrolled yet', 'Add students using their enrollment number or share the invite code.');
     return;
   }
+  const isStudent = document.body.classList.contains('student-mode') || S.isStudent;
   sl.innerHTML = S.members.map((m, i) =>
     '<div class="person-row">' +
       '<div class="person-av" style="background:hsl(' + ((i * 47 + 142) % 360) + ',55%,48%)">' + initials(m.full_name) + '</div>' +
@@ -40,9 +41,11 @@ function renderPeople() {
         '<div class="person-name">' + esc(m.full_name || 'Student') + '</div>' +
         '<div class="person-sub">Roll ' + (m.class_roll_no || '—') + ' • ' + esc(m.official_enrollment_no || m.enrollment_no || 'No enrollment no.') + '</div>' +
       '</div>' +
-      '<button class="person-rm-btn" onclick="removeStudent(' + m.student_id + ')" title="Remove">' +
-        (window.getSvgIcon ? window.getSvgIcon('close', 14) : '✕') +
-      '</button>' +
+      (!isStudent ? (
+        '<button class="person-rm-btn" onclick="removeStudent(' + m.student_id + ')" title="Remove">' +
+          (window.getSvgIcon ? window.getSvgIcon('close', 14) : '✕') +
+        '</button>'
+      ) : '') +
     '</div>'
   ).join('');
 }

@@ -372,7 +372,7 @@ function renderGoogleClassCards() {
           </div>
 
           <div>
-            <a href="/student/attendance.html?subject=${encodeURIComponent(code)}" class="gc-card-title" title="${escapeHtml(c.subject_name || c.name)}">
+            <a href="/student/group-detail.html?id=${c.id}" class="gc-card-title" title="${escapeHtml(c.subject_name || c.name)}">
               ${escapeHtml(c.name || c.subject_name || 'Subject Class')}
             </a>
             <div class="gc-card-teacher" title="Instructor: ${escapeHtml(c.teacher_name || 'Faculty')}">
@@ -387,7 +387,7 @@ function renderGoogleClassCards() {
         </header>
 
         <!-- Card Body with Live Attendance Telemetry -->
-        <div class="gc-card-body">
+        <div class="gc-card-body" onclick="window.location.href='/student/group-detail.html?id=${c.id}'" style="cursor:pointer;">
           <div class="gc-card-att-box">
             <div class="gc-card-att-top">
               <span class="gc-card-att-pct" style="color: ${isSafe ? 'var(--status-present)' : 'var(--status-absent)'};">
@@ -408,8 +408,8 @@ function renderGoogleClassCards() {
             </div>
           </div>
 
-          <div class="gc-card-coursework-row">
-            <a href="/student/assignments.html?group=${c.id}" class="gc-coursework-pill ${(c.pending_work_count > 0) ? 'gc-coursework-pending' : ''}" title="View Coursework Assignments">
+          <div class="gc-card-coursework-row" onclick="event.stopPropagation()">
+            <a href="/student/group-detail.html?id=${c.id}&tab=classwork" class="gc-coursework-pill ${(c.pending_work_count > 0) ? 'gc-coursework-pending' : ''}" title="View Coursework Assignments">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
@@ -418,7 +418,7 @@ function renderGoogleClassCards() {
               ${(c.pending_work_count > 0) ? '<span class="gc-pill-dot"></span>' : ''}
             </a>
 
-            <a href="/student/scores.html?group=${c.id}" class="gc-coursework-pill" title="View Class Tests & Exam Marks">
+            <a href="/student/group-detail.html?id=${c.id}&tab=classwork" class="gc-coursework-pill" title="View Class Tests & Exam Marks">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="9 11 12 14 22 4"></polyline>
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
@@ -430,17 +430,17 @@ function renderGoogleClassCards() {
 
         <!-- 4 Action Toolbar Footer -->
         <footer class="gc-card-footer">
-          <a href="/student/attendance.html?subject=${encodeURIComponent(code)}" class="gc-action-btn" title="View Detailed Attendance Register">
+          <a href="/student/group-detail.html?id=${c.id}&tab=attendance" class="gc-action-btn" title="View Detailed Attendance Register">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
               <line x1="8" y1="2" x2="8" y2="6"></line>
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            <span>Register</span>
+            <span>Attendance</span>
           </a>
 
-          <a href="/student/assignments.html?group=${c.id}" class="gc-action-btn ${(c.pending_work_count > 0) ? 'has-pending' : ''}" title="Classwork & Assignments${(c.pending_work_count > 0) ? (' (' + c.pending_work_count + ' pending)') : ''}">
+          <a href="/student/group-detail.html?id=${c.id}&tab=classwork" class="gc-action-btn ${(c.pending_work_count > 0) ? 'has-pending' : ''}" title="Classwork & Assignments${(c.pending_work_count > 0) ? (' (' + c.pending_work_count + ' pending)') : ''}">
             <div class="gc-action-icon-wrap">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 20h9"></path>
@@ -451,21 +451,22 @@ function renderGoogleClassCards() {
             <span>Classwork</span>
           </a>
 
-          <a href="/student/scores.html?group=${c.id}" class="gc-action-btn" title="Marks & Performance">
+          <a href="/student/group-detail.html?id=${c.id}&tab=people" class="gc-action-btn" title="Classmates & Teachers">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>Scores</span>
+            <span>People</span>
           </a>
 
-          <button type="button" class="gc-action-btn" onclick="openStudentStreamModal(${c.id}, '${escapeHtml(c.name)}', '${escapeHtml(c.teacher_name || 'Faculty')}')" title="Classroom Stream & Announcements">
+          <a href="/student/group-detail.html?id=${c.id}&tab=stream" class="gc-action-btn" title="Classroom Stream & Announcements">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             <span>Stream</span>
-          </button>
+          </a>
         </footer>
       </article>
     `;
@@ -506,9 +507,8 @@ function renderDrawerClasses() {
 
   container.innerHTML = studentDashboardState.classes.map((c, i) => {
     const color = dotColors[i % dotColors.length];
-    const code = c.subject_code || (c.subject_name || '').slice(0, 6).toUpperCase();
     return `
-      <a href="/student/attendance.html?subject=${encodeURIComponent(code)}" class="gc-drawer-link" style="font-size:0.84rem;padding:0.5rem 1.5rem;">
+      <a href="/student/group-detail.html?id=${c.id}" class="gc-drawer-link" style="font-size:0.84rem;padding:0.5rem 1.5rem;">
         <span class="gc-class-dot" style="background: ${color}; width:10px; height:10px; border-radius:50%; flex-shrink:0;"></span>
         <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(c.name || c.subject_name)}</span>
       </a>
@@ -735,6 +735,11 @@ async function handleStudentJoinSubmit(e) {
     if (res && res.success) {
       if (typeof showToast === 'function') showToast(res.message || 'Successfully joined class!', 'success');
       closeJoinModal();
+      const joinedId = res.data?.id || res.data?.group_id;
+      if (joinedId) {
+        window.location.href = `/student/group-detail.html?id=${joinedId}`;
+        return;
+      }
       await loadEnrolledClasses();
     } else {
       throw new Error(res?.error?.message || res?.message || 'Failed to join group');

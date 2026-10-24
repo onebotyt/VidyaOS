@@ -2276,7 +2276,26 @@ html, body {
   }
 
   .classes-header-actions {
-    display: none; /* Secondary toolbar buttons accessible via FAB or Drawer */
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    margin-left: auto !important;
+  }
+
+  .classes-header-actions #btn-broadcast-notice,
+  .classes-header-actions #btn-my-students-roster {
+    display: none !important;
+  }
+
+  .classes-header-actions #btn-create-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
   }
 
   .classes-header-right {

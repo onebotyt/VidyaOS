@@ -1,18 +1,481 @@
-/* ══════════════════════════════════════════════════════════════
-   PAGE STYLES: ASSIGNMENTS
-   frontend/student/assignments/assignments.css
-══════════════════════════════════════════════════════════════ */
+/**
+ * ══════════════════════════════════════════════════════════════
+ * GOOGLE CLASSROOM DESIGN SYSTEM: STUDENT TO-DO HUB
+ * frontend/student/assignments/assignments.css
+ * 100% Theme Token Compliant — Zero Hardcoded Hex/RGB Colors
+ * ══════════════════════════════════════════════════════════════
+ */
 
-.assignment-card { border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-card); padding: 1.1rem 1.3rem; margin-bottom: 0.9rem; }
-    .assignment-title { font-weight: 700; font-size: 1.02rem; }
-    .assignment-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
-    .assignment-desc { font-size: 0.88rem; margin-top: 0.5rem; }
-    .status-tag { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 999px; }
-    .status-tag.SUBMITTED { background: var(--status-pending-bg); color: var(--status-pending); }
-    .status-tag.LATE { background: var(--status-late-bg); color: var(--status-late); }
-    .status-tag.GRADED { background: var(--status-present-bg); color: var(--status-present); }
-    .status-tag.NOT_SUBMITTED { background: var(--status-absent-bg); color: var(--status-absent); }
-    .upload-row { display: flex; gap: 0.6rem; margin-top: 0.75rem; align-items: center; flex-wrap: wrap; }
-    .file-link { color: var(--color-primary); font-weight: 600; text-decoration: none; font-size: 0.85rem; }
-    .feedback-box { margin-top: 0.6rem; font-size: 0.85rem; background: var(--bg-surface); border-radius: var(--radius-sm); padding: 0.6rem; }
+/* Classroom Page Isolation */
+body.classroom-page {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-app);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
+#app-sidebar,
+.app-sidebar,
+.sidebar-backdrop,
+body.classroom-page #app-sidebar,
+body.classroom-page .app-sidebar,
+body.classroom-page .sidebar-backdrop {
+  display: none !important;
+}
+
+body.sidebar-open,
+body.classroom-page.sidebar-open {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Main Container */
+.todo-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 6rem;
+  box-sizing: border-box;
+}
+
+/* ─── Hero Bar with Filter ──────────────────────────────────── */
+.todo-hero-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.todo-hero-left h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.todo-hero-left p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.todo-filter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.todo-class-select {
+  padding: 0.55rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-main);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  min-width: 190px;
+  box-shadow: var(--shadow-sm);
+}
+
+.todo-class-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+/* ─── Google Classroom Material Tabs ────────────────────────── */
+.todo-tabs-nav {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  padding: 0 0.5rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.todo-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.todo-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.25rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.todo-tab-btn:hover {
+  color: var(--text-main);
+}
+
+.todo-tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 700;
+}
+
+.todo-tab-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.todo-tab-btn.active .todo-tab-badge {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.todo-tab-btn#tab-btn-missing.active {
+  color: var(--status-absent);
+  border-bottom-color: var(--status-absent);
+}
+
+.todo-tab-btn#tab-btn-missing.active .todo-tab-badge,
+.todo-tab-btn#tab-btn-missing.has-missing .todo-tab-badge {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+.todo-tab-btn#tab-btn-done.active {
+  color: var(--status-present);
+  border-bottom-color: var(--status-present);
+}
+
+.todo-tab-btn#tab-btn-done.active .todo-tab-badge {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+}
+
+/* ─── Tab Panes ─────────────────────────────────────────────── */
+.todo-tab-pane {
+  display: none;
+}
+
+.todo-tab-pane.active {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Collapsible Deadline Sections ─────────────────────────── */
+.todo-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.todo-section-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.todo-section-hdr:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+}
+
+.todo-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.todo-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.todo-section-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.todo-section-toggle-icon {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.todo-section.is-collapsed .todo-section-toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.todo-section.is-collapsed .todo-section-items {
+  display: none;
+}
+
+.todo-section.is-collapsed .todo-section-hdr {
+  border-bottom: none;
+}
+
+/* ─── Work Item Rows ────────────────────────────────────────── */
+.todo-section-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.todo-item-row:last-child {
+  border-bottom: none;
+}
+
+.todo-item-row:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+}
+
+.todo-item-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.todo-item-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.todo-item-icon-box.is-test {
+  background: var(--col-att-group-bg);
+  color: var(--status-present);
+}
+
+.todo-item-icon-box.is-missing {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+.todo-item-icon-box.is-done {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+}
+
+.todo-item-details {
+  min-width: 0;
+  flex: 1;
+}
+
+.todo-item-course-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.todo-item-course-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.todo-item-title {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-item-meta-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.todo-item-meta-strip .due-date {
+  font-weight: 600;
+}
+
+.todo-item-meta-strip .due-date.is-overdue {
+  color: var(--status-absent);
+}
+
+.todo-item-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+}
+
+.todo-status-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.todo-status-pill.status-assigned {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.todo-status-pill.status-missing {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+  border: 1px solid var(--status-absent);
+}
+
+.todo-status-pill.status-submitted,
+.todo-status-pill.status-turned-in {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+}
+
+.todo-status-pill.status-graded {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border: 1px solid var(--status-present);
+}
+
+.todo-action-arrow {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Empty State ───────────────────────────────────────────── */
+.todo-empty-state {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.todo-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.todo-empty-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 0.35rem 0;
+}
+
+.todo-empty-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ─── Mobile Responsiveness ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .todo-container {
+    padding: 1rem 0.75rem 5rem;
+  }
+
+  .todo-hero-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .todo-class-select {
+    width: 100%;
+  }
+
+  .todo-item-row {
+    padding: 0.85rem 1rem;
+    gap: 0.65rem;
+  }
+
+  .todo-item-icon-box {
+    width: 36px;
+    height: 36px;
+  }
+
+  .todo-item-title {
+    font-size: 0.9rem;
+  }
+
+  .todo-action-arrow {
+    display: none;
+  }
+}

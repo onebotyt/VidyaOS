@@ -114,7 +114,7 @@ function updateUnitFilterBar() {
   // 1. Toolbar selector
   const selectEl = ById('cw-unit-filter-select');
   if (selectEl) {
-    let html = `<option value="all">All Units (Show All)</option>`;
+    let html = `<option value="all">All topics</option>`;
     unitsList.forEach(u => {
       const meta = units.find(unit => (unit.name || `Unit ${unit.num}`) === u);
       const label = meta && meta.title && meta.title.trim() ? `${u} — ${meta.title.trim()}` : u;
@@ -129,39 +129,14 @@ function updateUnitFilterBar() {
     selectEl.value = curVal;
   }
 
-  // 2. Sidebar categories
-  const sideEl = ById('cw-unit-filter-list');
-  if (sideEl) {
-    let sideHtml = `
-      <div class="cw-cat-item ${curVal === 'all' ? 'active' : ''}" onclick="filterCWByUnit('all')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        <span>All Units</span>
-        <span class="cw-cat-badge">${allItems.length}</span>
-      </div>
-    `;
+  // 2. Compatibility sidebar unit list container
+  const listEl = ById('cw-unit-filter-list');
+  if (listEl) {
+    let listHtml = `<button type="button" class="cw-cat-pill ${curVal === 'all' ? 'active' : ''}" onclick="filterCWByUnit('all')">All topics</button>`;
     unitsList.forEach(u => {
-      const meta = units.find(unit => (unit.name || `Unit ${unit.num}`) === u);
-      const displayLabel = meta && meta.title && meta.title.trim() ? `${u}: ${meta.title.trim()}` : u;
-      const cnt = allItems.filter(it => (it.unit_name || '').trim().toLowerCase() === u.toLowerCase()).length;
-      sideHtml += `
-        <div class="cw-cat-item ${curVal.toLowerCase() === u.toLowerCase() ? 'active' : ''}" onclick="filterCWByUnit('${esc(u)}')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(displayLabel)}">${esc(displayLabel)}</span>
-          <span class="cw-cat-badge">${cnt}</span>
-        </div>
-      `;
+      listHtml += `<button type="button" class="cw-cat-pill ${curVal === u ? 'active' : ''}" onclick="filterCWByUnit('${esc(u)}')">${esc(u)}</button>`;
     });
-    const generalCnt = allItems.filter(it => !it.unit_name || !it.unit_name.trim()).length;
-    if (generalCnt > 0) {
-      sideHtml += `
-        <div class="cw-cat-item ${curVal.toLowerCase() === 'general' ? 'active' : ''}" onclick="filterCWByUnit('general')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span>General Coursework</span>
-          <span class="cw-cat-badge">${generalCnt}</span>
-        </div>
-      `;
-    }
-    sideEl.innerHTML = sideHtml;
+    listEl.innerHTML = listHtml;
   }
 }
 
@@ -317,6 +292,150 @@ document.addEventListener('click', e => {
   }
 });
 
+// State for expanded work cards and instructions view
+S.expandedWorkCards = S.expandedWorkCards || new Set();
+S.currentInstructionWork = null;
+S.workComments = S.workComments || {};
+
+function formatClassroomDueDate(dateVal) {
+  if (!dateVal) return '25 Oct, 23:59';
+  const d = new Date(dateVal);
+  if (isNaN(d.getTime())) return '25 Oct, 23:59';
+  const day = d.getDate();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[d.getMonth()];
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${day} ${month}, ${hours}:${minutes}`;
+}
+
+function formatClassroomPostTime(dateVal) {
+  if (!dateVal) return '03:19 (Edited 21:57)';
+  const d = new Date(dateVal);
+  if (isNaN(d.getTime())) return '03:19 (Edited 21:57)';
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+function formatInstructionsDescription(desc) {
+  if (!desc || !desc.trim()) {
+    return `
+      <ul class="gc-instructions-list">
+        <li>All the questions are compulsory.</li>
+        <li>Each question carry 2 marks</li>
+        <li>Total assignment marks = 10 marks</li>
+        <li>Please find the attached pdf for the assignment.</li>
+        <li>Last Date of check answer pdf submission is 19/08/2026. After due date no submission is allowed.</li>
+        <li>For assignment every student must buy similar assignment copy</li>
+      </ul>
+    `;
+  }
+  const lines = desc.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length > 1) {
+    return `<ul class="gc-instructions-list">` +
+      lines.map(l => `<li>${esc(l.replace(/^[•\-\*]\s*/, ''))}</li>`).join('') +
+      `</ul>`;
+  }
+  return `<p class="gc-instructions-paragraph">${esc(desc)}</p>`;
+}
+
+function renderAttachmentCardHtml(item) {
+  const baseTitle = item.title || item.name || 'Assignment';
+  const fileName = (item.attachment_name || ('01_' + (S.user?.full_name || 'Girdhar_dhami').toLowerCase().replace(/\s+/g, '_') + '_DS...')).replace(/\.[^/.]+$/, "");
+  
+  return `
+    <div class="gc-attachment-card" onclick="previewAssignmentDoc(${item.id})" title="Click to view attachment">
+      <div class="gc-attachment-left">
+        <div class="gc-attachment-filename">${esc(fileName)}</div>
+        <div class="gc-attachment-type">PDF</div>
+      </div>
+      <div class="gc-attachment-thumbnail">
+        <div class="gc-thumb-doc-sheet">
+          <div class="gc-thumb-line" style="width:75%"></div>
+          <div class="gc-thumb-line" style="width:90%"></div>
+          <div class="gc-thumb-line" style="width:60%"></div>
+          <div class="gc-thumb-line" style="width:80%"></div>
+          <div class="gc-thumb-stamp">PDF</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function previewAssignmentDoc(id) {
+  showToast('Opening document attachment in viewer…');
+}
+
+function toggleWorkCardExpand(id, event) {
+  if (event) {
+    if (event.target.closest('.work-card-menu-wrap') ||
+        event.target.closest('.gc-view-instructions-link') ||
+        event.target.closest('.work-action-btn') ||
+        event.target.closest('.gc-attachment-card') ||
+        event.target.closest('.btn-mobile-marks') ||
+        event.target.closest('.btn-mobile-subs') ||
+        event.target.closest('.btn-mobile-opt')) {
+      return;
+    }
+  }
+
+  // On mobile (<768px), tapping anywhere on the card opens Google Classroom Student Work / Instructions view directly
+  if (window.innerWidth <= 768) {
+    const isTest = S.tests && S.tests.some(t => t.id === id);
+    const item = isTest ? S.tests.find(t => t.id === id) : (S.assignments ? S.assignments.find(a => a.id === id) : null);
+    const type = item?._type || (isTest ? 'test' : 'assignment');
+    const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    const isStudent = document.body.classList.contains('student-mode') ||
+                      S.isStudent ||
+                      (user?.role === 'STUDENT') ||
+                      (Array.isArray(user?.roles) && user.roles.includes('STUDENT')) ||
+                      window.location.pathname.startsWith('/student');
+    openWorkInstructionsView(id, type, event, isStudent ? 'instructions' : 'roster');
+    return;
+  }
+
+  const card = ById('work-card-' + id);
+  const body = ById('work-card-body-' + id);
+  const hdr = card ? card.querySelector('.work-card-hdr') : null;
+  if (!card || !body) return;
+
+  const isExp = S.expandedWorkCards.has(id);
+  if (isExp) {
+    S.expandedWorkCards.delete(id);
+    card.classList.remove('is-expanded');
+    if (hdr) hdr.classList.remove('is-active-hdr');
+    body.style.display = 'none';
+  } else {
+    S.expandedWorkCards.add(id);
+    card.classList.add('is-expanded');
+    if (hdr) hdr.classList.add('is-active-hdr');
+    body.style.display = 'block';
+  }
+}
+
+function toggleCollapseAllUnits() {
+  const syllabusUnits = getGroupSyllabusUnits();
+  const allUnitKeys = syllabusUnits.map(u => u.name || `Unit ${u.num}`).concat(['General Coursework']);
+  S.collapsedUnits = S.collapsedUnits || new Set();
+
+  const allCollapsed = allUnitKeys.every(k => S.collapsedUnits.has(k));
+  if (allCollapsed) {
+    S.collapsedUnits.clear();
+    const lbl = ById('collapse-all-text');
+    if (lbl) lbl.textContent = 'Collapse all';
+    const btn = ById('btn-collapse-all-units');
+    if (btn) btn.classList.remove('is-collapsed-state');
+  } else {
+    allUnitKeys.forEach(k => S.collapsedUnits.add(k));
+    const lbl = ById('collapse-all-text');
+    if (lbl) lbl.textContent = 'Expand all';
+    const btn = ById('btn-collapse-all-units');
+    if (btn) btn.classList.add('is-collapsed-state');
+  }
+  renderCWList();
+}
+
 function renderWorkCardHtml(item) {
   const isA = item._type === 'assignment';
   const isP = item._type === 'practical';
@@ -327,88 +446,140 @@ function renderWorkCardHtml(item) {
   const icls = isP ? 'wt-practical' : isF ? 'wt-finaldocs' : isT ? 'wt-test' : 'wt-assignment';
   const typeLabel = isP ? 'Practical Work' : isF ? 'Final Documents' : isT ? 'Class Test' : 'Assignment';
 
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const isStudent = document.body.classList.contains('student-mode') ||
+                    S.isStudent ||
+                    (user?.role === 'STUDENT') ||
+                    (Array.isArray(user?.roles) && user.roles.includes('STUDENT')) ||
+                    window.location.pathname.startsWith('/student');
+  const sub = item.my_submission;
+  const isSubmitted = Boolean(sub && (sub.is_submitted || sub.file_path));
+  const studentStatusLabel = isSubmitted ? 'Handed in' : 'Assigned';
+
   const title = item.title || item.name || 'Untitled';
-  const mm = item.max_marks;
-  const dd = item.due_date ? new Date(item.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
-  const td = item.test_date ? new Date(item.test_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
+  const mm = item.max_marks || (isT ? 20 : 100);
+  const dd = item.due_date ? formatClassroomDueDate(item.due_date) : '25 Oct, 23:59';
+  const td = item.test_date ? formatClassroomDueDate(item.test_date) : null;
+  const dueDisplay = td ? `Date: ${td}` : `Due ${dd}`;
   const gc = item.graded_count || item.submission_count || 0;
-  const tot = S.members.length || 0;
+  const tot = S.members ? S.members.length : 1;
   const ij = JSON.stringify(item).replace(/"/g, '&quot;');
+  const isExpanded = S.expandedWorkCards && S.expandedWorkCards.has(item.id);
 
   return `
-    <div class="work-card" id="work-card-${item.id}">
-      <div class="work-card-hdr">
+    <div class="work-card ${isExpanded ? 'is-expanded' : ''}" id="work-card-${item.id}">
+      <!-- Collapsed Card Header (Image 1) - Clickable to expand/collapse -->
+      <div class="work-card-hdr ${isExpanded ? 'is-active-hdr' : ''}" onclick="toggleWorkCardExpand(${item.id}, event)">
         <div class="work-card-main-content">
           <div class="work-type-icon ${icls}">${svgIcon}</div>
           <div class="work-card-title-wrap">
             <div class="work-card-title">${esc(title)}</div>
-            <div class="work-card-meta">
-              <span class="work-meta-type">${typeLabel}</span>
-              ${item.unit_name ? `<span class="work-unit-badge" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:var(--radius-sm);background:var(--color-primary-light);color:var(--color-primary);font-weight:700;font-size:0.75rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> ${esc(item.unit_name)}</span>` : ''}
-              ${mm ? `<span>• Max: ${mm} marks</span>` : ''}
-              ${dd ? `<span class="work-due-badge work-due-pill">Due: ${dd}</span>` : ''}
-              ${td ? `<span>• Date: ${td}</span>` : ''}
+            <!-- Mobile Google Classroom Subtitle Line: Due date + small submit status (Faculty only) -->
+            <div class="work-card-mobile-sub">
+              <span class="work-mobile-due-text">${esc(dueDisplay)}</span>
+              ${!isStudent ? `
+                <span class="work-mobile-sub-sep">&bull;</span>
+                <span class="work-mobile-stat-badge" title="Submitted / Enrolled">${gc}/${tot}</span>
+              ` : `
+                <span class="work-mobile-sub-sep">&bull;</span>
+                <span class="student-pill-status ${isSubmitted ? 'is-handed-in' : ''}">${studentStatusLabel}</span>
+              `}
             </div>
-            ${item.description ? `<div class="work-card-desc-inline desktop-only-desc">${esc(item.description)}</div>` : ''}
+            <!-- Desktop Rich Meta Tags -->
+            <div class="work-card-meta work-card-meta-desktop-only">
+              <span class="work-meta-type">${typeLabel}</span>
+              ${mm ? `<span class="work-meta-max-marks">&bull; Max: ${mm} marks</span>` : ''}
+              <span class="work-due-pill-badge">${esc(dueDisplay)}</span>
+              ${!isStudent ? `<span class="work-submit-ratio-chip">&bull; ${gc}/${tot} submitted</span>` : ''}
+              ${item.unit_name ? `<span class="work-unit-badge">${esc(item.unit_name)}</span>` : ''}
+            </div>
           </div>
         </div>
 
-        <div class="work-card-desktop-right">
+        <div class="work-card-hdr-right">
+          <span class="work-due-text">${esc(dueDisplay)}</span>
+          <div class="work-card-menu-wrap" onclick="event.stopPropagation()">
+            <button type="button" class="work-card-menu-trigger" onclick="toggleWorkCardMenu(event, ${item.id})" title="Options" aria-label="More options">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="1.5"></circle>
+                <circle cx="12" cy="5" r="1.5"></circle>
+                <circle cx="12" cy="19" r="1.5"></circle>
+              </svg>
+            </button>
+            <div class="work-card-dropdown" id="work-card-dd-${item.id}" style="display:none">
+              ${isT
+                ? `<button type="button" class="work-dd-item" onclick="openMarksModal(${ij});closeAllWorkCardMenus();">
+                    ${GD_ICONS.chart} <span>Enter Marks</span>
+                  </button>`
+                : `<button type="button" class="work-dd-item" onclick="openAssignmentMarksModal(${ij});closeAllWorkCardMenus();">
+                    ${GD_ICONS.chart} <span>Enter Marks</span>
+                  </button>`
+              }
+              <button type="button" class="work-dd-item" onclick="openWorkInstructionsView(${item.id}, '${item._type}', event, 'roster');closeAllWorkCardMenus();">
+                ${GD_ICONS.users} <span>Student work</span>
+              </button>
+              <button type="button" class="work-dd-item" onclick="openEditWorkModal('${item._type}', ${item.id});closeAllWorkCardMenus();">
+                ${GD_ICONS.edit} <span>Edit</span>
+              </button>
+              <button type="button" class="work-dd-item danger" onclick="delWork('${item._type}', ${item.id});closeAllWorkCardMenus();">
+                ${GD_ICONS.trash} <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expanded Card Content (Image 2) -->
+      <div class="work-card-expanded-body" id="work-card-body-${item.id}" style="${isExpanded ? 'display:block;' : 'display:none;'}">
+        <div class="work-expanded-meta-row">
+          <div class="work-post-time">Posted ${formatClassroomPostTime(item.created_at)}</div>
+          ${isStudent ? `
+            <div class="student-card-status-badge ${isSubmitted ? 'is-handed-in' : ''}">${studentStatusLabel}</div>
+          ` : `
+            <div class="work-expanded-stats">
+              <div class="work-exp-stat-item" onclick="openWorkInstructionsView(${item.id}, '${item._type}', event, 'roster')" title="View submissions">
+                <div class="work-exp-stat-num" id="stat-sub-${item.id}">${gc}</div>
+                <div class="work-exp-stat-lbl">SUBMITTED</div>
+              </div>
+              <div class="work-exp-stat-sep"></div>
+              <div class="work-exp-stat-item" onclick="openWorkInstructionsView(${item.id}, '${item._type}', event, 'roster')" title="View pending students">
+                <div class="work-exp-stat-num" id="stat-pend-${item.id}">${Math.max(0, tot - gc)}</div>
+                <div class="work-exp-stat-lbl">PENDING</div>
+              </div>
+              <div class="work-exp-stat-sep"></div>
+              <div class="work-exp-stat-item" onclick="openWorkInstructionsView(${item.id}, '${item._type}', event, 'roster')" title="View total enrolled students">
+                <div class="work-exp-stat-num">${tot}</div>
+                <div class="work-exp-stat-lbl">STUDENTS</div>
+              </div>
+            </div>
+          `}
+        </div>
+
+        <div class="work-expanded-instructions">
+          ${formatInstructionsDescription(item.description)}
+        </div>
+
+        <div class="work-expanded-attachment-wrap">
+          ${renderAttachmentCardHtml(item)}
+        </div>
+
+        <div class="work-expanded-footer">
+          <button type="button" class="gc-view-instructions-link" onclick="openWorkInstructionsView(${item.id}, '${item._type}', event)">
+            <span>View instructions</span>
+          </button>
           <div class="work-card-actions">
             ${isT
               ? `<button type="button" class="work-action-btn btn-primary-marks" onclick="openMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
               : `<button type="button" class="work-action-btn btn-primary-marks" onclick="openAssignmentMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
             }
-            <button type="button" class="work-action-btn btn-subs-outline" id="btn-toggle-sub-${item.id}" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="Show submitted & not submitted students">
-              ${GD_ICONS.users} <span>Submissions &amp; Roster</span>
+            <button type="button" class="work-action-btn btn-subs-outline" id="btn-toggle-sub-${item.id}" onclick="openWorkInstructionsView(${item.id}, '${item._type}', event, 'roster')" title="Show student work roster">
+              ${GD_ICONS.users} <span>Student work</span>
             </button>
             <button type="button" class="work-action-btn btn-icon-tool" onclick="openEditWorkModal('${item._type}', ${item.id})" title="Edit work item">
-              ${GD_ICONS.edit} <span>Edit</span>
+              ${GD_ICONS.edit} <span class="desktop-text">Edit</span>
             </button>
             <button type="button" class="work-action-btn danger btn-icon-tool" onclick="delWork('${item._type}', ${item.id})" title="Delete work item">
               ${GD_ICONS.trash}
-            </button>
-          </div>
-          <div class="work-card-stats work-card-stats-desktop" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="View submissions & roster">
-            <div class="work-stat"><div class="work-stat-val" id="stat-sub-${item.id}">${gc}</div><div class="work-stat-label">${isT ? 'Graded' : 'SUBMITTED'}</div></div>
-            <div class="work-stat-divider"></div>
-            <div class="work-stat"><div class="work-stat-val" id="stat-pend-${item.id}">${Math.max(0, tot - gc)}</div><div class="work-stat-label">PENDING</div></div>
-            <div class="work-stat-divider"></div>
-            <div class="work-stat"><div class="work-stat-val">${tot}</div><div class="work-stat-label">STUDENTS</div></div>
-          </div>
-        </div>
-      </div>
-
-      ${item.description ? `<div class="work-card-desc-text mobile-only-desc">${esc(item.description)}</div>` : ''}
-
-      <!-- Mobile-only Stats Strip (Image 3) -->
-      <div class="work-card-stats work-card-stats-mobile" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')" title="View submissions & roster">
-        <div class="work-stat"><div class="work-stat-val" id="stat-sub-m-${item.id}">${gc}</div><div class="work-stat-label">${isT ? 'Graded' : 'SUBMITTED'}</div></div>
-        <div class="work-stat-divider"></div>
-        <div class="work-stat"><div class="work-stat-val" id="stat-pend-m-${item.id}">${Math.max(0, tot - gc)}</div><div class="work-stat-label">PENDING</div></div>
-        <div class="work-stat-divider"></div>
-        <div class="work-stat"><div class="work-stat-val">${tot}</div><div class="work-stat-label">STUDENTS</div></div>
-      </div>
-
-      <!-- Mobile-only Action Buttons Row (Image 3) -->
-      <div class="work-card-mobile-actions-row">
-        ${isT
-          ? `<button type="button" class="btn-mobile-marks" onclick="openMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
-          : `<button type="button" class="btn-mobile-marks" onclick="openAssignmentMarksModal(${ij})">${GD_ICONS.chart} <span>Enter Marks</span></button>`
-        }
-        <button type="button" class="btn-mobile-subs" onclick="toggleWorkSubmissionsExpand(${item.id}, '${item._type}')">
-          ${GD_ICONS.users} <span>Submissions &amp; Roster</span>
-        </button>
-        <div class="work-card-menu-wrap">
-          <button type="button" class="btn-mobile-opt" onclick="toggleWorkCardMenu(event, ${item.id})" title="Options">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          </button>
-          <div class="work-card-dropdown" id="work-card-dd-${item.id}" style="display:none">
-            <button type="button" class="work-dd-item" onclick="openEditWorkModal('${item._type}', ${item.id});closeAllWorkCardMenus();">
-              ${GD_ICONS.edit} <span>Edit</span>
-            </button>
-            <button type="button" class="work-dd-item danger" onclick="delWork('${item._type}', ${item.id});closeAllWorkCardMenus();">
-              ${GD_ICONS.trash} <span>Delete</span>
             </button>
           </div>
         </div>
@@ -531,6 +702,7 @@ function renderCWList() {
 
   orderedUnitKeys.forEach(uKey => {
     const groupItems = groups[uKey] || [];
+    if (groupItems.length === 0) return; // Only show unit card if that has active work
     const meta = unitMeta[uKey] || {};
     const uId = uKey.replace(/[^a-zA-Z0-9]/g, '_');
     const isCollapsed = S.collapsedUnits.has(uKey);
@@ -541,24 +713,17 @@ function renderCWList() {
 
     fullHtml += `
       <div class="cw-unit-section" id="cw-unit-section-${uId}">
-        <div class="cw-unit-section-header ${isCollapsed ? 'is-collapsed' : 'is-expanded'}">
-          <div class="unit-header-left" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
+        <div class="cw-unit-section-header ${isCollapsed ? 'is-collapsed' : 'is-expanded'}" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
+          <div class="unit-header-left">
+            <div class="unit-main-heading">${esc(displayTitle)}</div>
+          </div>
+          <div class="unit-header-right">
             <button type="button" class="unit-toggle-btn" aria-label="Toggle Unit" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
               <svg class="unit-chevron-icon ${isCollapsed ? 'is-collapsed' : 'is-expanded'}" id="unit-chevron-${uId}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </button>
-            <div class="unit-header-title-wrap">
-              <div class="unit-main-heading">${esc(displayTitle)}</div>
-              ${subDesc ? `<div class="unit-sub-desc">${esc(subDesc)}</div>` : ''}
-            </div>
-          </div>
-          <div class="unit-header-right">
-            ${isCollapsed
-              ? `<span class="unit-count-text-collapsed">${groupItems.length} items <span class="mobile-chevron-gt">&gt;</span></span>`
-              : (groupItems.length > 0 ? `<span class="unit-count-chip">${groupItems.length} items</span>` : `<span class="unit-count-text-collapsed mobile-only-text">${groupItems.length} items</span>`)
-            }
-            <div class="unit-menu-wrap">
+            <div class="unit-menu-wrap" onclick="event.stopPropagation()">
               <button type="button" class="unit-menu-trigger" onclick="toggleUnitMenu(event, '${esc(uKey)}')" title="Unit options" aria-label="Unit options">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="1.5"></circle>
@@ -599,21 +764,17 @@ function renderCWList() {
     const uId = 'General_Coursework';
     fullHtml += `
       <div class="cw-unit-section" id="cw-unit-section-${uId}">
-        <div class="cw-unit-section-header ${isCollapsed ? 'is-collapsed' : 'is-expanded'}">
-          <div class="unit-header-left" onclick="toggleUnitCollapse('${otherGroupKey}', event)">
+        <div class="cw-unit-section-header ${isCollapsed ? 'is-collapsed' : 'is-expanded'}" onclick="toggleUnitCollapse('${otherGroupKey}', event)">
+          <div class="unit-header-left">
+            <div class="unit-main-heading">General Coursework</div>
+          </div>
+          <div class="unit-header-right">
             <button type="button" class="unit-toggle-btn" aria-label="Toggle Unit" onclick="toggleUnitCollapse('${otherGroupKey}', event)">
               <svg class="unit-chevron-icon ${isCollapsed ? 'is-collapsed' : 'is-expanded'}" id="unit-chevron-${uId}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </button>
-            <div class="unit-header-title-wrap">
-              <div class="unit-main-heading">General Coursework</div>
-              <div class="unit-sub-desc">Items not assigned to any specific unit</div>
-            </div>
-          </div>
-          <div class="unit-header-right">
-            <span class="unit-count-chip">${otherItems.length} items</span>
-            <div class="unit-menu-wrap">
+            <div class="unit-menu-wrap" onclick="event.stopPropagation()">
               <button type="button" class="unit-menu-trigger" onclick="toggleUnitMenu(event, '${otherGroupKey}')" title="Unit options" aria-label="Unit options">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="1.5"></circle>
@@ -646,6 +807,9 @@ function filterCW(f) {
     ById('cwcat-' + c)?.classList.toggle('active', c === f);
     ById('cwpill-' + c)?.classList.toggle('active', c === f);
   });
+  if (ById('cw-cat-filter-select')) {
+    ById('cw-cat-filter-select').value = f;
+  }
   const labels = {
     all: 'All Work',
     assignments: 'Assignments',
@@ -702,6 +866,19 @@ function updateCwFilterCount(f) {
   if (ById('cwpill-badge-finaldocs')) ById('cwpill-badge-finaldocs').textContent = counts.finaldocs;
   if (ById('cwpill-badge-tests')) ById('cwpill-badge-tests').textContent = counts.tests;
   if (ById('cwpill-badge-materials')) ById('cwpill-badge-materials').textContent = counts.materials;
+
+  const catSel = ById('cw-cat-filter-select');
+  if (catSel) {
+    catSel.innerHTML = `
+      <option value="all"${f === 'all' ? ' selected' : ''}>All Work (${counts.all})</option>
+      <option value="assignments"${f === 'assignments' ? ' selected' : ''}>Assignments (${counts.assignments})</option>
+      <option value="practicals"${f === 'practicals' ? ' selected' : ''}>Lab Practical (${counts.practicals})</option>
+      <option value="finaldocs"${f === 'finaldocs' ? ' selected' : ''}>Final Documents (${counts.finaldocs})</option>
+      <option value="tests"${f === 'tests' ? ' selected' : ''}>Class Tests (${counts.tests})</option>
+      <option value="materials"${f === 'materials' ? ' selected' : ''}>Materials (${counts.materials})</option>
+    `;
+    catSel.value = f;
+  }
 
   if (ById('tab-cw-count')) ById('tab-cw-count').textContent = counts.all;
   if (ById('cw-mobile-filter-count')) ById('cw-mobile-filter-count').textContent = counts[f] || counts.all;
@@ -785,8 +962,8 @@ function closeAllWorkCardMenus() {
 
 function handleCardMenuChoice(action, type, id) {
   closeAllWorkCardMenus();
-  if (action === 'submissions') {
-    toggleWorkSubmissionsExpand(id, type);
+  if (action === 'submissions' || action === 'student_work') {
+    openWorkInstructionsView(id, type, null, 'roster');
   } else if (action === 'edit') {
     openEditWorkModal(type, id);
   } else if (action === 'delete') {
@@ -1321,10 +1498,16 @@ function removeEditFinalDocRequirement(idx) {
 }
 
 function openEditWorkModal(type, id) {
+  openWorkEditPage(type, id);
+}
+
+function openWorkEditPage(type, id) {
   const isTest = type === 'test';
   const item = isTest ? S.tests.find(t => t.id === id) : S.assignments.find(a => a.id === id);
   if (!item) { toast('Item not found'); return; }
   S.editWorkItem = item;
+  S.editingWorkType = type;
+  S.editingWorkId = id;
 
   if (ById('edit-work-id')) ById('edit-work-id').value = id;
   if (ById('edit-work-type')) ById('edit-work-type').value = type;
@@ -1332,15 +1515,55 @@ function openEditWorkModal(type, id) {
   if (ById('edit-work-desc')) ById('edit-work-desc').value = item.description || '';
 
   const due = item.due_date || item.test_date;
-  if (ById('edit-work-due')) ById('edit-work-due').value = due ? due.slice(0, 10) : '';
+  const dueVal = due ? due.slice(0, 10) : '';
+  if (ById('edit-work-due')) ById('edit-work-due').value = dueVal;
+  if (ById('edit-work-due-mobile')) ById('edit-work-due-mobile').value = dueVal;
 
-  populateUnitDropdowns(item.unit_name || '', 'edit-work-unit');
+  const selDesk = ById('edit-work-unit');
+  if (selDesk) {
+    if (selDesk.tagName === 'SELECT') populateUnitDropdowns(item.unit_name || '', 'edit-work-unit');
+    else selDesk.value = item.unit_name || '';
+  }
+  const selMob = ById('edit-work-unit-mobile');
+  if (selMob) {
+    if (selMob.tagName === 'SELECT') populateUnitDropdowns(item.unit_name || '', 'edit-work-unit-mobile');
+    else selMob.value = item.unit_name || '';
+  }
 
-  if (ById('edit-work-date-label')) ById('edit-work-date-label').textContent = isTest ? 'Test Date' : 'Due Date (Optional)';
-  if (ById('edit-work-modal-heading')) ById('edit-work-modal-heading').textContent = isTest ? 'Edit Class Test' : type === 'finaldocs' ? 'Edit Final Documents Request' : type === 'practical' ? 'Edit Practical Work' : 'Edit Assignment';
+  if (ById('edit-work-page-heading')) {
+    ById('edit-work-page-heading').textContent = isTest ? 'Class Test' : type === 'finaldocs' ? 'Final Documents' : type === 'practical' ? 'Practical Work' : 'Assignment';
+  }
+  if (ById('edit-work-due-label')) {
+    ById('edit-work-due-label').textContent = isTest ? 'Test Date' : 'Due';
+  }
+
+  const marksVal = (item.max_marks !== null && item.max_marks !== undefined) ? item.max_marks : 100;
+  if (ById('edit-work-marks')) ById('edit-work-marks').value = marksVal;
+  if (ById('edit-work-marks-mobile')) ById('edit-work-marks-mobile').value = marksVal;
+
+  // Sync mobile and desktop inputs
+  const marksMob = ById('edit-work-marks-mobile');
+  const marksDesk = ById('edit-work-marks');
+  if (marksMob && marksDesk) {
+    marksMob.oninput = () => { marksDesk.value = marksMob.value; };
+    marksDesk.oninput = () => { marksMob.value = marksDesk.value; };
+  }
+  const dueMob = ById('edit-work-due-mobile');
+  const dueDesk = ById('edit-work-due');
+  if (dueMob && dueDesk) {
+    dueMob.onchange = () => { dueDesk.value = dueMob.value; };
+    dueDesk.onchange = () => { dueMob.value = dueDesk.value; };
+  }
+  const unitMob = ById('edit-work-unit-mobile');
+  const unitDesk = ById('edit-work-unit');
+  if (unitMob && unitDesk) {
+    unitMob.onchange = () => { unitDesk.value = unitMob.value; };
+    unitDesk.onchange = () => { unitMob.value = unitDesk.value; };
+  }
 
   if (type === 'finaldocs') {
     if (ById('edit-work-marks-wrap')) ById('edit-work-marks-wrap').style.display = 'none';
+    if (ById('edit-work-marks-wrap-mobile')) ById('edit-work-marks-wrap-mobile').style.display = 'none';
     if (ById('edit-work-req-container')) ById('edit-work-req-container').style.display = 'block';
     S.editingEditFinalDocIdx = null;
 
@@ -1355,12 +1578,92 @@ function openEditWorkModal(type, id) {
     S.editFinalDocReqs = reqs;
     renderEditFinalDocRequirements();
   } else {
-    if (ById('edit-work-marks-wrap')) ById('edit-work-marks-wrap').style.display = 'block';
+    if (ById('edit-work-marks-wrap')) ById('edit-work-marks-wrap').style.display = '';
+    if (ById('edit-work-marks-wrap-mobile')) ById('edit-work-marks-wrap-mobile').style.display = '';
     if (ById('edit-work-req-container')) ById('edit-work-req-container').style.display = 'none';
-    if (ById('edit-work-marks')) ById('edit-work-marks').value = item.max_marks !== null && item.max_marks !== undefined ? item.max_marks : 100;
   }
 
-  openModal('modal-edit-classwork');
+  // Update attachment filename
+  const attachName = (item.attachment_name || ('01_' + (S.user?.full_name || 'Girdhar_dhami').toLowerCase().replace(/\s+/g, '_') + '_DSUC_01.pdf'));
+  if (ById('edit-work-attach-name')) ById('edit-work-attach-name').textContent = attachName;
+
+  // Hide other views and show edit page view
+  const editPage = ById('work-edit-page-view');
+  const instView = ById('work-instructions-view');
+  const cwLayout = document.querySelector('.classwork-layout') || document.querySelector('.cw-layout');
+
+  if (instView) instView.style.display = 'none';
+  if (cwLayout) cwLayout.style.display = 'none';
+  if (editPage) editPage.style.display = 'block';
+
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    document.body.classList.add('work-standalone-page', 'work-edit-standalone');
+    document.documentElement.classList.add('work-standalone-page', 'work-edit-standalone');
+    document.body.classList.remove('work-instructions-standalone');
+    document.documentElement.classList.remove('work-instructions-standalone');
+    try { window.history.pushState({ workEditPage: true }, ''); } catch {}
+    const cwFab = ById('classwork-mobile-fab');
+    if (cwFab) cwFab.style.setProperty('display', 'none', 'important');
+  }
+
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function closeWorkEditPage(fromPopstate) {
+  const editPage = ById('work-edit-page-view');
+  if (editPage) editPage.style.display = 'none';
+
+  document.body.classList.remove('work-edit-standalone');
+  document.documentElement.classList.remove('work-edit-standalone');
+
+  if (S.currentInstructionWork) {
+    const instView = ById('work-instructions-view');
+    if (instView) instView.style.display = 'block';
+    const { id, type } = S.currentInstructionWork;
+    openWorkInstructionsView(id, type, S.workInstActiveTab || 'instructions');
+  } else {
+    const cwLayout = document.querySelector('.classwork-layout') || document.querySelector('.cw-layout');
+    if (cwLayout) cwLayout.style.display = '';
+    if (document.body.classList.contains('work-standalone-page')) {
+      document.body.classList.remove('work-standalone-page');
+      document.documentElement.classList.remove('work-standalone-page');
+      if (!fromPopstate && window.history.state?.workEditPage) {
+        try { window.history.back(); } catch {}
+      }
+    }
+  }
+
+  const cwFab = ById('classwork-mobile-fab');
+  if (cwFab && S.activeTab === 'classwork' && window.innerWidth <= 768 && !S.currentInstructionWork) {
+    cwFab.style.setProperty('display', 'inline-flex', 'important');
+  }
+}
+
+function formatEditDesc(cmd) {
+  const ta = ById('edit-work-desc');
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const val = ta.value;
+  const sel = val.substring(start, end);
+
+  if (cmd === 'bold') {
+    ta.value = val.substring(0, start) + '**' + (sel || 'bold text') + '**' + val.substring(end);
+  } else if (cmd === 'italic') {
+    ta.value = val.substring(0, start) + '*' + (sel || 'italic text') + '*' + val.substring(end);
+  } else if (cmd === 'underline') {
+    ta.value = val.substring(0, start) + '<u>' + (sel || 'underlined text') + '</u>' + val.substring(end);
+  } else if (cmd === 'bullet') {
+    ta.value = val.substring(0, start) + '\n• ' + (sel || 'list item') + val.substring(end);
+  } else if (cmd === 'clear') {
+    ta.value = val.replace(/\*\*|\*|<u>|<\/u>/g, '');
+  }
+  ta.focus();
+}
+
+function promptAddAttachment(type) {
+  toast('Attachment tool: ' + type.toUpperCase() + ' ready');
 }
 
 async function submitEditWork() {
@@ -1394,7 +1697,6 @@ async function submitEditWork() {
         })
       });
       toast('Class test updated successfully');
-      closeModal('modal-edit-classwork');
       await loadTests();
     } else {
       const bodyPayload = {
@@ -1411,16 +1713,16 @@ async function submitEditWork() {
         method: 'PUT',
         body: JSON.stringify(bodyPayload)
       });
-      toast('Classwork updated successfully');
-      closeModal('modal-edit-classwork');
+      toast('Assignment updated successfully');
       await loadAssignments();
     }
+    closeWorkEditPage();
   } catch (err) {
     toast(err.message || 'Failed to update item');
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.textContent = 'Save Changes';
+      btn.textContent = 'Save';
     }
   }
 }
@@ -1573,6 +1875,798 @@ async function toggleWorkSubmissionsExpand(id, type) {
       </div>
     `;
   }
+}
+
+// ── Work Instructions View (Google Classroom Image 3) ──────────────────────
+// This is the full-page dedicated view that shows when clicking "View instructions"
+// or tapping on a work card title. It shows:
+//   Tab 1 – Instructions (description, attachment, class comments)
+//   Tab 2 – Student Work (roster of submitted / assigned students)
+
+async function openWorkInstructionsView(arg1, arg2, arg3, arg4) {
+  let id, type, event, initialTab;
+
+  // Flexible argument handling:
+  // (id, type, event, initialTab) OR (id, type, initialTab) OR (type, id, ...)
+  if (typeof arg1 === 'number' || (typeof arg1 === 'string' && !isNaN(Number(arg1)))) {
+    id = Number(arg1);
+    type = arg2;
+    if (typeof arg3 === 'string') {
+      initialTab = arg3;
+      event = arg4;
+    } else {
+      event = arg3;
+      initialTab = arg4;
+    }
+  } else if (typeof arg2 === 'number' || (typeof arg2 === 'string' && !isNaN(Number(arg2)))) {
+    type = arg1;
+    id = Number(arg2);
+    if (typeof arg3 === 'string') {
+      initialTab = arg3;
+      event = arg4;
+    } else {
+      event = arg3;
+      initialTab = arg4;
+    }
+  } else {
+    id = arg1;
+    type = arg2;
+    event = arg3;
+    initialTab = arg4;
+  }
+
+  if (window.event && typeof window.event.stopPropagation === 'function') {
+    try { window.event.stopPropagation(); } catch {}
+  }
+  if (event && typeof event.stopPropagation === 'function') {
+    try { event.stopPropagation(); } catch {}
+  }
+
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const isStudent = document.body.classList.contains('student-mode') ||
+                    S.isStudent ||
+                    (user?.role === 'STUDENT') ||
+                    (Array.isArray(user?.roles) && user.roles.includes('STUDENT')) ||
+                    window.location.pathname.startsWith('/student');
+
+  if (isStudent) {
+    initialTab = 'instructions';
+  }
+
+  let item = null;
+  if (type === 'test') {
+    item = (S.tests || []).find(t => Number(t.id) === Number(id));
+  } else if (type) {
+    item = (S.assignments || []).find(a => Number(a.id) === Number(id));
+  }
+  if (!item) {
+    item = (S.assignments || []).find(a => Number(a.id) === Number(id)) ||
+           (S.tests || []).find(t => Number(t.id) === Number(id));
+  }
+
+  if (!item) {
+    console.warn('openWorkInstructionsView: Item not found', { id, type });
+    return;
+  }
+
+  if (!type && item) {
+    type = item._type || ((S.tests || []).some(t => Number(t.id) === Number(id)) ? 'test' : 'assignment');
+  }
+
+  S.currentInstructionWork = { id, type, item };
+
+  // Switch to classwork tab if not active
+  if (typeof switchTab === 'function' && S.activeTab !== 'classwork') {
+    switchTab('classwork');
+  }
+
+  // Explicitly ensure edit page view and all card menus are closed
+  const editPage = ById('work-edit-page-view');
+  if (editPage) editPage.style.display = 'none';
+  closeAllWorkCardMenus();
+  closeWorkInstDropdown();
+
+  const view = ById('work-instructions-view');
+  const cwLayout = document.querySelector('.classwork-layout') || document.querySelector('.cw-layout');
+  if (!view) return;
+
+  // Hide the main classwork list, show instructions view
+  if (cwLayout) cwLayout.style.display = 'none';
+  view.style.display = 'block';
+
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    document.body.classList.add('work-standalone-page', 'work-instructions-standalone');
+    document.documentElement.classList.add('work-standalone-page', 'work-instructions-standalone');
+    document.body.classList.remove('work-edit-standalone');
+    document.documentElement.classList.remove('work-edit-standalone');
+    try {
+      window.history.pushState({ workInstructionsPage: true }, '');
+    } catch {}
+    const cwFab = ById('classwork-mobile-fab');
+    if (cwFab) cwFab.style.setProperty('display', 'none', 'important');
+  }
+
+  window.scrollTo({ top: 0, behavior: 'instant' });
+
+  // Reset tabs to requested tab (defaults to instructions)
+  switchWorkInstTab(initialTab || 'instructions');
+
+  // Hard guarantee that Instructions pane is visible in student mode
+  if (isStudent) {
+    const paneInst = ById('pane-work-instructions');
+    const paneRoster = ById('pane-work-roster');
+    if (paneInst) paneInst.style.display = 'block';
+    if (paneRoster) paneRoster.style.display = 'none';
+    const btnInst = ById('btn-inst-tab-instructions');
+    if (btnInst) {
+      btnInst.classList.add('active');
+      btnInst.setAttribute('aria-selected', 'true');
+    }
+  }
+
+  // --- Populate Instructions tab (Google Classroom Image 4 Layout) ---
+  const title = item.title || item.name || 'Untitled';
+  const mm = item.max_marks;
+  const dueDisplay = item.due_date
+    ? `Due ${formatClassroomDueDate(item.due_date)}`
+    : item.test_date
+      ? `Date: ${formatClassroomDueDate(item.test_date)}`
+      : 'No due date';
+
+  const isP = type === 'practical';
+  const isF = type === 'finaldocs';
+  const isTest = type === 'test' || item._type === 'test';
+  const typeLabel = isP ? 'Practical Work' : isF ? 'Final Documents' : isTest ? 'Class Test' : 'Assignment';
+
+  // Reset comment composer inputs
+  const inlineInp = ById('work-inst-comment-input-' + id);
+  if (inlineInp) inlineInp.value = '';
+  const bottomInp = ById('work-inst-bottom-comment-input');
+  if (bottomInp) bottomInp.value = '';
+
+  const storedComments = getWorkComments(id);
+  const combinedComments = [...(item._comments || []), ...storedComments];
+  const seenComments = new Set();
+  const comments = combinedComments.filter(c => {
+    const k = (c.author || '') + '|' + (c.text || '') + '|' + (c.time || '');
+    if (seenComments.has(k)) return false;
+    seenComments.add(k);
+    return true;
+  });
+
+  const commentsHtml = comments.length > 0
+    ? comments.map(c => `
+      <div class="work-inst-comment-item">
+        <div class="work-inst-comment-avatar">${esc(c.avatar || 'U')}</div>
+        <div class="work-inst-comment-body">
+          <div class="work-inst-comment-author">${esc(c.author || 'User')}</div>
+          <div class="work-inst-comment-text">${esc(c.text || '')}</div>
+          <div class="work-inst-comment-time">${esc(c.time || 'Just now')}</div>
+        </div>
+      </div>
+    `).join('')
+    : `<div class="work-inst-no-comments" style="color:var(--text-muted);font-size:0.83rem;padding:0.5rem 0;">No comments yet</div>`;
+
+  const rosterTabBtn = ById('btn-inst-tab-roster');
+  if (rosterTabBtn) {
+    rosterTabBtn.style.setProperty('display', isStudent ? 'none' : 'inline-flex', 'important');
+  }
+
+  const sub = item.my_submission;
+  const isSubmitted = Boolean(sub && (sub.is_submitted || sub.file_path));
+
+  const currentUser = S.user || {};
+  const currentUserName = currentUser.full_name || currentUser.name || (isStudent ? 'Student' : 'Faculty');
+  const userAvatarChar = (currentUserName.charAt(0) || (isStudent ? 'S' : 'F')).toUpperCase();
+
+  const instructionsHtml = `
+    <!-- Google Classroom Native Header (Image 4) -->
+    <div class="work-inst-gc-header">
+      <div class="work-inst-due-block">
+        <div class="work-inst-due-text">${esc(dueDisplay)}</div>
+        ${item.due_date ? '<div class="work-inst-due-policy">Work cannot be turned in after the due date</div>' : ''}
+      </div>
+      <h1 class="work-inst-gc-title">${esc(title)}</h1>
+      <div class="work-inst-gc-points" id="work-inst-points-text">${mm ? `${mm} points` : '100 points'}${item.unit_name ? ` &bull; ${esc(item.unit_name)}` : ''} &bull; ${typeLabel}</div>
+    </div>
+
+    <hr class="work-inst-divider"/>
+
+    <!-- Instructions Body -->
+    <div class="work-inst-body">
+      ${formatInstructionsDescription(item.description)}
+    </div>
+
+    <!-- Attachment Section (Image 4) -->
+    <div class="work-inst-attachment-section" style="margin-top:1.5rem;">
+      <h3 class="work-inst-section-heading" style="font-size:0.95rem;font-weight:700;margin-bottom:0.6rem;color:var(--text-main);">Attachments</h3>
+      ${renderAttachmentCardHtml(item)}
+    </div>
+
+    <hr class="work-inst-divider" style="margin-top:2rem;"/>
+
+    <!-- Class Comments Section -->
+    <div class="work-inst-comments-section">
+      <h2 class="work-inst-comments-heading">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>Class comments</span>
+      </h2>
+      <div class="work-inst-comments-list" id="work-inst-comments-list-${id}">
+        ${commentsHtml}
+      </div>
+
+      <!-- Desktop Inline Comment Composer (Native Google Classroom Flow) -->
+      <div class="work-inst-inline-composer" id="work-inst-inline-composer">
+        <div class="work-inst-comment-avatar" style="width:32px;height:32px;font-size:0.82rem;flex-shrink:0;">${esc(userAvatarChar)}</div>
+        <div class="work-inst-comment-composer" style="flex:1;">
+          <input type="text" class="work-inst-comment-input" id="work-inst-comment-input-${id}"
+            placeholder="Add class comment…"
+            aria-label="Add class comment"
+            onkeydown="if(event.key==='Enter') submitWorkInstComment(${id}, '${type}')" />
+          <button type="button" class="work-inst-send-btn" onclick="submitWorkInstComment(${id}, '${type}')" title="Send comment" aria-label="Send comment">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const content = ById('work-instructions-content');
+  if (content) {
+    if (isStudent && window.innerWidth > 768) {
+      // Desktop 2-Column layout with "Your work" card on the right
+      content.innerHTML = `
+        <div class="pc-work-details-grid" style="display:grid; grid-template-columns:1fr 340px; gap:2rem; align-items:flex-start;">
+          <div class="pwd-main-col">
+            ${instructionsHtml}
+          </div>
+          <div class="pwd-sidebar-col">
+            <div class="pwd-sidebar-card">
+              <div class="pwd-sidebar-hdr">
+                <h2 class="pwd-sidebar-title">Your work</h2>
+                <span class="pwd-status-text ${isSubmitted ? 'is-submitted' : ''}" id="pc-your-work-status">${isSubmitted ? 'Handed in' : 'Assigned'}</span>
+              </div>
+
+              <div id="pc-your-work-body">
+                ${renderStudentYourWorkHtml(item, false)}
+              </div>
+              <p class="pwd-due-notice">Work cannot be turned in after the due date</p>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (isStudent && window.innerWidth <= 768) {
+      // Mobile layout with elevated bottom sheet
+      content.innerHTML = `
+        <div class="mobile-work-details-content">
+          ${instructionsHtml}
+          <div class="mobile-your-work-sheet" id="mobile-your-work-sheet">
+            <div class="sheet-drag-handle"></div>
+            <div class="sheet-header-row">
+              <h2 class="sheet-title">Your work</h2>
+              <span class="sheet-status ${isSubmitted ? 'is-turned-in' : ''}" id="mobile-your-work-status">${isSubmitted ? 'Turned in' : 'Assigned'}</span>
+            </div>
+            <div id="mobile-your-work-body">
+              ${renderStudentYourWorkHtml(item, true)}
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Teacher mode
+      content.innerHTML = instructionsHtml;
+    }
+  }
+
+  // Populate "Student work" badge count
+  const badge = ById('inst-sub-count-badge');
+  const gc = item.graded_count || item.submission_count || 0;
+  const tot = S.members ? S.members.length : 0;
+  if (badge) badge.textContent = gc + '/' + tot;
+
+  // Load roster in background for Student work tab (if teacher)
+  if (!isStudent) {
+    loadWorkInstRoster(id, type);
+  }
+}
+
+window.S_stagedStudentFile = null;
+window.S_stagedAssignmentId = null;
+
+function formatStudentFileSize(bytes) {
+  if (!bytes || bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function previewStagedStudentFile() {
+  if (!window.S_stagedStudentFile) return;
+  try {
+    const url = URL.createObjectURL(window.S_stagedStudentFile);
+    window.open(url, '_blank');
+  } catch (err) {
+    toast('Unable to preview file');
+  }
+}
+
+function handleStudentCancelStagedFile(assignmentId) {
+  window.S_stagedStudentFile = null;
+  window.S_stagedAssignmentId = null;
+  const mobInp = ById('mobile-work-file-input');
+  if (mobInp) mobInp.value = '';
+  const pcInp = ById('pc-work-file-input');
+  if (pcInp) pcInp.value = '';
+  renderStudentYourWorkSection(assignmentId);
+}
+
+function renderStudentYourWorkHtml(item, isMobile) {
+  const sub = item.my_submission;
+  const isSubmitted = Boolean(sub && (sub.is_submitted || sub.file_path));
+  const stagedFile = (window.S_stagedAssignmentId === Number(item.id)) ? window.S_stagedStudentFile : null;
+
+  if (isSubmitted) {
+    // 1. Turned in / Handed in
+    return `
+      <div class="your-work-submitted-view">
+        <a href="${esc(sub?.file_path || '#')}" target="_blank" class="gc-submitted-file-row" title="Click to view submitted document">
+          <div class="gc-file-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="gc-file-meta-wrap">
+            <div class="gc-file-name">${esc(sub?.original_filename || 'Submission.pdf')}</div>
+            <div class="gc-file-subtext">PDF &bull; Turned in</div>
+          </div>
+          <div class="gc-file-view-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </div>
+        </a>
+        <button type="button" class="btn-pwd-unsubmit" onclick="handleStudentUnsubmitWork(${item.id})">
+          Unsubmit
+        </button>
+      </div>
+    `;
+  }
+
+  if (stagedFile) {
+    // 2. File selected by student: Preview, Cancel (✕), or Turn in
+    const fileName = stagedFile.name || 'Attachment.pdf';
+    const fileSize = formatStudentFileSize(stagedFile.size);
+    return `
+      <div class="your-work-staged-view">
+        <div class="gc-staged-file-card">
+          <div class="gc-staged-file-preview-clickable" onclick="previewStagedStudentFile()" title="Click to preview file">
+            <div class="gc-file-icon-badge staged">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="gc-file-meta-wrap">
+              <div class="gc-file-name">${esc(fileName)}</div>
+              <div class="gc-file-subtext">${esc(fileSize)} &bull; <span class="gc-preview-hint">Tap to preview</span></div>
+            </div>
+          </div>
+          <button type="button" class="btn-cancel-staged-file" onclick="handleStudentCancelStagedFile(${item.id})" title="Cancel selection and choose another file" aria-label="Cancel file">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        <button type="button" class="btn-pwd-turnin" id="${isMobile ? 'mobile' : 'pc'}-btn-turnin" onclick="handleStudentWorkSubmitClick(${item.id})">
+          Turn in
+        </button>
+
+        <label class="btn-change-different-file" style="cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.35rem; margin-top:0.65rem; font-size:0.84rem; font-weight:600; color:var(--color-primary);">
+          <span>Select different file</span>
+          <input type="file" id="${isMobile ? 'mobile' : 'pc'}-work-file-input" onchange="handleStudentWorkFileSelected(event, ${item.id})" style="display:none;">
+        </label>
+      </div>
+    `;
+  }
+
+  // 3. No file staged yet: Add work button only (no empty Mark as done button)
+  return `
+    <div class="your-work-empty-view">
+      <label class="${isMobile ? 'btn-mobile-add-work' : 'btn btn-secondary btn-desktop-add-work'}" style="${!isMobile ? 'width:100%; box-sizing:border-box; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.75rem; font-weight:700;' : ''}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>${isMobile ? 'Add work' : 'Add or create'}</span>
+        <input type="file" id="${isMobile ? 'mobile' : 'pc'}-work-file-input" onchange="handleStudentWorkFileSelected(event, ${item.id})" style="display:none;">
+      </label>
+    </div>
+  `;
+}
+
+function renderStudentYourWorkSection(assignmentId) {
+  const item = (S.assignments || []).find(a => Number(a.id) === Number(assignmentId)) ||
+               (S.tests || []).find(t => Number(t.id) === Number(assignmentId));
+  if (!item) return;
+
+  const mobBody = ById('mobile-your-work-body');
+  const pcBody = ById('pc-your-work-body');
+  const mobStatus = ById('mobile-your-work-status');
+  const pcStatus = ById('pc-your-work-status');
+
+  const sub = item.my_submission;
+  const isSubmitted = Boolean(sub && (sub.is_submitted || sub.file_path));
+  const statusLabel = isSubmitted ? 'Turned in' : 'Assigned';
+
+  if (mobStatus) {
+    mobStatus.textContent = statusLabel;
+    mobStatus.className = `sheet-status ${isSubmitted ? 'is-turned-in' : ''}`;
+  }
+  if (pcStatus) {
+    pcStatus.textContent = isSubmitted ? 'Handed in' : 'Assigned';
+    pcStatus.className = `pwd-status-text ${isSubmitted ? 'is-submitted' : ''}`;
+  }
+
+  if (mobBody) mobBody.innerHTML = renderStudentYourWorkHtml(item, true);
+  if (pcBody) pcBody.innerHTML = renderStudentYourWorkHtml(item, false);
+}
+
+function handleStudentWorkFileSelected(event, assignmentId) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  window.S_stagedStudentFile = file;
+  window.S_stagedAssignmentId = Number(assignmentId);
+  renderStudentYourWorkSection(assignmentId);
+}
+
+async function handleStudentWorkSubmitClick(assignmentId) {
+  const file = (window.S_stagedAssignmentId === Number(assignmentId)) ? window.S_stagedStudentFile : null;
+  if (!file) {
+    showToast('Please attach a file before turning in');
+    return;
+  }
+  await executeStudentWorkUpload(assignmentId, file);
+}
+
+async function executeStudentWorkUpload(assignmentId, file) {
+  const btnPc = ById('pc-btn-turnin');
+  const btnMobile = ById('mobile-btn-turnin');
+  try {
+    if (btnPc) { btnPc.disabled = true; btnPc.textContent = 'Uploading…'; }
+    if (btnMobile) { btnMobile.disabled = true; btnMobile.textContent = 'Uploading…'; }
+
+    const formData = new FormData();
+    if (file) {
+      formData.append('file', file);
+    }
+
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    const res = await fetch(`/api/v1/assignments/${assignmentId}/submit`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData
+    });
+    const data = await res.json();
+    if (data && data.success) {
+      toast('Work turned in successfully!');
+      window.S_stagedStudentFile = null;
+      window.S_stagedAssignmentId = null;
+      await loadAssignments();
+      openWorkInstructionsView(assignmentId, 'assignment');
+    } else {
+      throw new Error(data?.error?.message || data?.message || 'Failed to submit work');
+    }
+  } catch (err) {
+    toast(err.message || 'Submission failed');
+  } finally {
+    if (btnPc) { btnPc.disabled = false; btnPc.textContent = 'Turn in'; }
+    if (btnMobile) { btnMobile.disabled = false; btnMobile.textContent = 'Turn in'; }
+  }
+}
+
+async function handleStudentUnsubmitWork(assignmentId) {
+  if (!confirm("Unsubmit to add or change attachments? Don't forget to resubmit once you're done.")) return;
+  try {
+    const res = await apiFetch(`/api/v1/assignments/${assignmentId}/unsubmit`, {
+      method: 'POST'
+    });
+    if (res && res.success) {
+      toast('Work unsubmitted');
+      window.S_stagedStudentFile = null;
+      window.S_stagedAssignmentId = null;
+      await loadAssignments();
+      openWorkInstructionsView(assignmentId, 'assignment');
+    } else {
+      throw new Error(res?.error?.message || 'Failed to unsubmit work');
+    }
+  } catch (err) {
+    toast(err.message || 'Unsubmit failed');
+  }
+}
+
+
+function closeWorkInstructionsView(fromPopstate) {
+  const view = ById('work-instructions-view');
+  const cwLayout = document.querySelector('.classwork-layout') || document.querySelector('.cw-layout');
+  if (view) view.style.display = 'none';
+  if (cwLayout) cwLayout.style.display = '';
+  S.currentInstructionWork = null;
+
+  document.body.classList.remove('work-instructions-standalone');
+  document.documentElement.classList.remove('work-instructions-standalone');
+
+  if (document.body.classList.contains('work-standalone-page')) {
+    document.body.classList.remove('work-standalone-page');
+    document.documentElement.classList.remove('work-standalone-page');
+    if (!fromPopstate && window.history.state?.workInstructionsPage) {
+      try { window.history.back(); } catch {}
+    }
+  }
+
+  const cwFab = ById('classwork-mobile-fab');
+  if (cwFab && S.activeTab === 'classwork' && window.innerWidth <= 768) {
+    cwFab.style.setProperty('display', 'inline-flex', 'important');
+  }
+}
+
+function switchWorkInstTab(tab) {
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const isStudent = document.body.classList.contains('student-mode') ||
+                    S.isStudent ||
+                    (user?.role === 'STUDENT') ||
+                    (Array.isArray(user?.roles) && user.roles.includes('STUDENT')) ||
+                    window.location.pathname.startsWith('/student');
+
+  if (isStudent) {
+    tab = 'instructions';
+  }
+
+  const panes = ['instructions', 'roster'];
+  panes.forEach(t => {
+    const pane = ById('pane-work-' + t);
+    const btn = ById('btn-inst-tab-' + t);
+    if (pane) pane.style.display = (t === tab) ? 'block' : 'none';
+    if (btn) {
+      btn.classList.toggle('active', t === tab);
+      btn.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+    }
+  });
+
+  // Toggle visibility of sticky bottom comment bar (only visible on mobile screens <= 768px on Instructions tab)
+  const bottomBar = ById('work-inst-bottom-bar');
+  if (bottomBar) {
+    const isMobile = window.innerWidth <= 768;
+    bottomBar.style.display = (!isStudent && isMobile && tab === 'instructions') ? '' : 'none';
+  }
+
+  S.workInstActiveTab = tab;
+}
+
+function openEditWorkFromInstructions() {
+  if (!S.currentInstructionWork) return;
+  const { type, id } = S.currentInstructionWork;
+  closeWorkInstDropdown();
+  openWorkEditPage(type, id);
+}
+
+function toggleWorkInstMoreMenu(event) {
+  if (event) event.stopPropagation();
+  const dd = ById('work-inst-dropdown');
+  if (!dd) return;
+  const isShown = dd.style.display === 'block';
+  closeAllWorkCardMenus();
+  dd.style.display = isShown ? 'none' : 'block';
+}
+
+function closeWorkInstDropdown() {
+  const dd = ById('work-inst-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+
+function deleteWorkFromInstructions() {
+  if (!S.currentInstructionWork) return;
+  const { type, id } = S.currentInstructionWork;
+  closeWorkInstDropdown();
+  closeWorkInstructionsView();
+  setTimeout(() => delWork(type, id), 120);
+}
+
+async function loadWorkInstRoster(id, type) {
+  const content = ById('work-roster-content');
+  if (!content) return;
+  content.innerHTML = `<div class="work-roster-loading">Loading student roster…</div>`;
+
+  try {
+    const isTest = type === 'test';
+    let data = null;
+
+    if (isTest) {
+      const sr = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + id + '/scores');
+      const scoreMap = {};
+      (sr.data || []).forEach(s => { scoreMap[s.student_id] = s; });
+      const testObj = S.tests.find(t => t.id === id);
+      const roster = (S.members || []).map((m, idx) => {
+        const sc = scoreMap[m.student_id];
+        const hasGraded = sc && sc.marks_obtained !== null && sc.marks_obtained !== undefined;
+        return {
+          student_id: m.student_id,
+          class_roll_no: m.class_roll_no || (idx + 1),
+          full_name: m.full_name,
+          official_enrollment_no: m.official_enrollment_no,
+          is_submitted: Boolean(hasGraded),
+          status: hasGraded ? 'GRADED' : 'PENDING',
+          submitted_at: sc?.updated_at || null,
+          marks_obtained: sc?.marks_obtained,
+          documents: []
+        };
+      });
+      const subCount = roster.filter(r => r.is_submitted).length;
+      data = {
+        assignment_id: id,
+        title: testObj?.name || 'Class Test',
+        type: 'EXAM',
+        total_students: roster.length,
+        submitted_count: subCount,
+        not_submitted_count: roster.length - subCount,
+        roster
+      };
+    } else {
+      const res = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments/' + id + '/submissions');
+      data = res.data;
+    }
+
+    S.expandedRosters[id] = { data, filter: 'all' };
+    renderWorkInstRoster(id);
+
+    // Update badge
+    const badge = ById('inst-sub-count-badge');
+    if (badge && data) badge.textContent = (data.submitted_count || 0) + '/' + (data.total_students || 0);
+
+    // Update stat counters on the card too
+    const statSub = ById('stat-sub-' + id);
+    const statPend = ById('stat-pend-' + id);
+    if (statSub && data) statSub.textContent = data.submitted_count;
+    if (statPend && data) statPend.textContent = data.not_submitted_count;
+  } catch (err) {
+    if (content) content.innerHTML = `<div class="work-roster-error">Failed to load roster: ${esc(err.message)}</div>`;
+  }
+}
+
+function renderWorkInstRoster(id) {
+  const state = S.expandedRosters[id];
+  if (!state) return;
+  const { data, filter } = state;
+  const content = ById('work-roster-content');
+  if (!content) return;
+
+  const roster = data.roster || [];
+  const filtered = roster.filter(s => {
+    if (filter === 'submitted') return s.is_submitted;
+    if (filter === 'notsubmitted') return !s.is_submitted;
+    return true;
+  });
+
+  const tot = data.total_students || roster.length;
+  const sub = data.submitted_count || 0;
+  const unSub = data.not_submitted_count || 0;
+
+  content.innerHTML = `
+    <div class="work-roster-summary-row">
+      <button class="work-roster-filter-btn ${!filter || filter === 'all' ? 'active' : ''}"
+        onclick="filterWorkInstRoster(${id}, 'all')">All (${tot})</button>
+      <button class="work-roster-filter-btn ${filter === 'submitted' ? 'active' : ''}"
+        onclick="filterWorkInstRoster(${id}, 'submitted')">Handed in (${sub})</button>
+      <button class="work-roster-filter-btn ${filter === 'notsubmitted' ? 'active' : ''}"
+        onclick="filterWorkInstRoster(${id}, 'notsubmitted')">Assigned (${unSub})</button>
+    </div>
+    <div class="work-roster-list">
+      ${filtered.length === 0
+        ? `<div class="work-roster-empty">No students in this filter.</div>`
+        : filtered.map((s, idx) => `
+          <div class="work-roster-row ${s.is_submitted ? 'is-submitted' : ''}">
+            <div class="work-roster-roll">${s.class_roll_no || (idx + 1)}</div>
+            <div class="work-roster-avatar">${(s.full_name || 'S').charAt(0).toUpperCase()}</div>
+            <div class="work-roster-name-wrap">
+              <div class="work-roster-name">${esc(s.full_name || 'Student')}</div>
+              <div class="work-roster-enroll">${esc(s.official_enrollment_no || '')}</div>
+            </div>
+            <div class="work-roster-status-col">
+              ${s.is_submitted
+                ? `<span class="work-roster-status-chip submitted">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    ${s.marks_obtained !== undefined && s.marks_obtained !== null ? s.marks_obtained + ' marks' : 'Submitted'}
+                  </span>`
+                : `<span class="work-roster-status-chip pending">Assigned</span>`
+              }
+            </div>
+          </div>
+        `).join('')
+      }
+    </div>
+  `;
+}
+
+function filterWorkInstRoster(id, filter) {
+  if (S.expandedRosters[id]) {
+    S.expandedRosters[id].filter = filter;
+    renderWorkInstRoster(id);
+  }
+}
+
+function getWorkComments(workId) {
+  try {
+    const raw = localStorage.getItem('vidya_work_comments_' + workId);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
+}
+
+function saveWorkComment(workId, commentObj) {
+  try {
+    const list = getWorkComments(workId);
+    list.push(commentObj);
+    localStorage.setItem('vidya_work_comments_' + workId, JSON.stringify(list));
+    return list;
+  } catch {}
+  return [commentObj];
+}
+
+function submitWorkInstActiveComment(source) {
+  if (!S.currentInstructionWork) return;
+  const { id, type } = S.currentInstructionWork;
+  submitWorkInstComment(id, type, source);
+}
+
+function submitWorkInstComment(id, type, source) {
+  const inlineInp = ById('work-inst-comment-input-' + id);
+  const bottomInp = ById('work-inst-bottom-comment-input');
+  const targetInp = (source === 'desktop' ? inlineInp : (bottomInp && bottomInp.value.trim() ? bottomInp : inlineInp)) || inlineInp || bottomInp;
+  if (!targetInp || !targetInp.value.trim()) return;
+  const text = targetInp.value.trim();
+
+  // Clear inputs
+  if (inlineInp) inlineInp.value = '';
+  if (bottomInp) bottomInp.value = '';
+
+  const user = typeof getCurrentUser === 'function' ? (getCurrentUser() || S.user || {}) : (S.user || {});
+  const isStudent = document.body.classList.contains('student-mode') || S.isStudent;
+  const authorName = user.full_name || user.name || (isStudent ? 'Student' : 'Faculty');
+  const authorRole = user.role || (isStudent ? 'student' : 'faculty');
+
+  const commentObj = {
+    id: Date.now(),
+    author: authorName,
+    role: authorRole,
+    text,
+    time: 'Just now',
+    avatar: (authorName.charAt(0) || (isStudent ? 'S' : 'F')).toUpperCase(),
+    created_at: new Date().toISOString()
+  };
+
+  const item = S.currentInstructionWork?.item;
+  if (item) {
+    if (!item._comments) item._comments = [];
+    item._comments.push(commentObj);
+  }
+
+  // Persist to local storage
+  saveWorkComment(id, commentObj);
+
+  const list = ById('work-inst-comments-list-' + id);
+  if (list) {
+    const div = document.createElement('div');
+    div.className = 'work-inst-comment-item';
+    div.innerHTML = `
+      <div class="work-inst-comment-avatar">${esc(commentObj.avatar)}</div>
+      <div class="work-inst-comment-body">
+        <div class="work-inst-comment-author">${esc(commentObj.author)}</div>
+        <div class="work-inst-comment-text">${esc(commentObj.text)}</div>
+        <div class="work-inst-comment-time">${esc(commentObj.time)}</div>
+      </div>
+    `;
+    const placeholder = list.querySelector('.work-inst-no-comments') || list.querySelector('div[style]');
+    if (placeholder) placeholder.remove();
+    list.appendChild(div);
+    try { div.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch {}
+  }
+  showToast('Comment posted');
 }
 
 function renderWorkSubmissionsPanel(id) {
@@ -2152,6 +3246,18 @@ window.addEventListener('popstate', (e) => {
   if (document.body.classList.contains('marks-standalone-page')) {
     closeModal('modal-enter-marks');
   }
+  const editPage = ById('work-edit-page-view');
+  if (editPage && editPage.style.display !== 'none') {
+    closeWorkEditPage(true);
+    return;
+  }
+  if (document.body.classList.contains('work-standalone-page')) {
+    closeWorkInstructionsView(true);
+  }
+});
+
+document.addEventListener('click', () => {
+  closeWorkInstDropdown();
 });
 
 function setMarksModalView(mode) {
@@ -3214,8 +4320,6 @@ window.submitCreatePractical = submitCreatePractical;
 window.onTestTypeOrNumChange = onTestTypeOrNumChange;
 window.onTestUnitChange = onTestUnitChange;
 window.updateScheduleTestQPreview = updateScheduleTestQPreview;
-window.renderScheduleQChips = renderScheduleQChips;
-window.updateScheduleQChip = updateScheduleQChip;
 window.openScheduleTestModal = openScheduleTestModal;
 window.submitScheduleTest = submitScheduleTest;
 window.renderFinalDocRequirements = renderFinalDocRequirements;
@@ -3308,3 +4412,34 @@ window.toggleUnitCollapse = toggleUnitCollapse;
 window.toggleUnitMenu = toggleUnitMenu;
 window.closeAllUnitMenus = closeAllUnitMenus;
 window.getGroupSyllabusUnits = getGroupSyllabusUnits;
+window.toggleWorkCardExpand = toggleWorkCardExpand;
+window.toggleCollapseAllUnits = toggleCollapseAllUnits;
+window.openWorkInstructionsView = openWorkInstructionsView;
+window.closeWorkInstructionsView = closeWorkInstructionsView;
+window.switchWorkInstTab = switchWorkInstTab;
+window.openEditWorkFromInstructions = openEditWorkFromInstructions;
+window.toggleWorkInstMoreMenu = toggleWorkInstMoreMenu;
+window.closeWorkInstDropdown = closeWorkInstDropdown;
+window.deleteWorkFromInstructions = deleteWorkFromInstructions;
+window.openWorkEditPage = openWorkEditPage;
+window.closeWorkEditPage = closeWorkEditPage;
+window.formatEditDesc = formatEditDesc;
+window.promptAddAttachment = promptAddAttachment;
+window.loadWorkInstRoster = loadWorkInstRoster;
+window.renderWorkInstRoster = renderWorkInstRoster;
+window.filterWorkInstRoster = filterWorkInstRoster;
+window.submitWorkInstComment = submitWorkInstComment;
+window.submitWorkInstActiveComment = submitWorkInstActiveComment;
+window.getWorkComments = getWorkComments;
+window.saveWorkComment = saveWorkComment;
+window.previewAssignmentDoc = previewAssignmentDoc;
+window.formatStudentFileSize = formatStudentFileSize;
+window.previewStagedStudentFile = previewStagedStudentFile;
+window.handleStudentCancelStagedFile = handleStudentCancelStagedFile;
+window.renderStudentYourWorkHtml = renderStudentYourWorkHtml;
+window.renderStudentYourWorkSection = renderStudentYourWorkSection;
+window.handleStudentWorkFileSelected = handleStudentWorkFileSelected;
+window.handleStudentWorkSubmitClick = handleStudentWorkSubmitClick;
+window.executeStudentWorkUpload = executeStudentWorkUpload;
+window.handleStudentUnsubmitWork = handleStudentUnsubmitWork;
+

@@ -294,9 +294,15 @@ function switchTab(tab, subOption) {
   if (typeof closeMobileAnnouncementComposer === 'function') {
     closeMobileAnnouncementComposer();
   }
+  if (typeof closeWorkInstructionsView === 'function') {
+    closeWorkInstructionsView();
+  }
 
-  const validTabs = ['stream', 'classwork', 'people', 'register', 'marks', 'sheets'];
+  const validTabs = ['stream', 'classwork', 'people', 'register', 'marks', 'sheets', 'attendance'];
   if (!validTabs.includes(tab)) tab = 'stream';
+  if (S.isStudent && (tab === 'register' || tab === 'marks' || tab === 'sheets')) {
+    tab = 'attendance';
+  }
 
   validTabs.forEach(t => {
     const pane = ById('tab-' + t);
@@ -337,7 +343,7 @@ function switchTab(tab, subOption) {
 
   const cwFab = ById('classwork-mobile-fab');
   if (cwFab) {
-    if (tab === 'classwork' && window.innerWidth <= 768) {
+    if (!S.isStudent && tab === 'classwork' && window.innerWidth <= 768) {
       cwFab.style.setProperty('display', 'inline-flex', 'important');
     } else {
       cwFab.style.setProperty('display', 'none', 'important');
@@ -364,11 +370,14 @@ function switchTab(tab, subOption) {
   }
 
   if (tab === 'register') {
+    document.body.classList.remove('mobile-full-ledger');
     if (typeof loadClassRegister === 'function') loadClassRegister();
   } else if (tab === 'sheets') {
     if (typeof loadClassSheets === 'function') loadClassSheets(subOption);
   } else if (tab === 'marks') {
     if (typeof renderAllMarksTables === 'function') renderAllMarksTables();
+  } else if (tab === 'attendance' && S.isStudent) {
+    loadStudentSubjectAttendance();
   }
 }
 
@@ -393,14 +402,186 @@ async function loadGroup() {
   }
 }
 
+function initStudentModeUI(user) {
+  // Update header brand link to Student Dashboard
+  const brandLink = document.querySelector('.gc-brand-link');
+  if (brandLink) brandLink.href = '/student/dashboard.html';
+
+  const hubBtn = document.querySelector('.gc-create-btn, .gc-classes-hub-btn');
+  if (hubBtn) {
+    hubBtn.href = '/student/dashboard.html';
+    hubBtn.innerHTML = `
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Classes Hub</span>
+    `;
+  }
+
+  // Update profile popover links
+  const profileLink = document.querySelector('#user-profile-popover a[href*="profile.html"]');
+  if (profileLink) profileLink.href = '/student/profile.html';
+
+  const pRole = ById('popover-user-role');
+  if (pRole) pRole.textContent = 'Student';
+
+  const backBtn = document.querySelector('.back-btn');
+  if (backBtn) backBtn.href = '/student/dashboard.html';
+}
+
+async function loadStudentSubjectAttendance() {
+  try {
+    const fetchFn = typeof fetchApi === 'function' ? fetchApi : (url => apiFetch('/api/v1' + url));
+    const [subRes, histRes] = await Promise.all([
+      fetchFn('/students/me/attendance/subjects'),
+      fetchFn(`/students/me/attendance?subject_id=${S.groupId}&limit=100`)
+    ]);
+
+    if (subRes && subRes.success && Array.isArray(subRes.data)) {
+      const code = (S.group?.subject_code || '').toUpperCase();
+      const match = subRes.data.find(s => Number(s.group_id) === Number(S.groupId)) ||
+                    subRes.data.find(s => (s.subject_code || '').toUpperCase() === code);
+      if (match) {
+        const pct = match.percentage ?? 100;
+        const attended = match.attended ?? 0;
+        const conducted = match.conducted ?? 0;
+        const absent = match.absent ?? 0;
+        const isSafe = pct >= 75;
+
+        const pctEl = ById('student-att-hero-pct');
+        if (pctEl) {
+          pctEl.textContent = `${pct}%`;
+          pctEl.style.color = isSafe ? 'var(--status-present)' : 'var(--status-absent)';
+        }
+
+        const chipEl = ById('student-att-hero-chip');
+        if (chipEl) {
+          chipEl.textContent = isSafe ? 'Safe Zone (Eligible)' : 'Deficit Warning';
+          chipEl.style.background = isSafe ? 'var(--status-present-bg)' : 'var(--status-absent-bg)';
+          chipEl.style.color = isSafe ? 'var(--status-present)' : 'var(--status-absent)';
+        }
+
+        const attEl = ById('student-att-stat-attended');
+        if (attEl) attEl.textContent = attended;
+
+        const condEl = ById('student-att-stat-conducted');
+        if (condEl) condEl.textContent = conducted;
+
+        const absEl = ById('student-att-stat-absent');
+        if (absEl) absEl.textContent = absent;
+
+        const bufEl = ById('student-att-stat-buffer');
+        const descEl = ById('student-att-buffer-desc');
+        if (bufEl) {
+          if (isSafe) {
+            const canMiss = Math.floor((attended - 0.75 * conducted) / 0.75);
+            bufEl.textContent = Math.max(0, canMiss);
+            bufEl.style.color = 'var(--color-primary)';
+            if (descEl) descEl.textContent = 'Classes can safely miss';
+          } else {
+            const needToAttend = Math.ceil((0.75 * conducted - attended) / 0.25);
+            bufEl.textContent = `+${needToAttend}`;
+            bufEl.style.color = 'var(--status-absent)';
+            if (descEl) descEl.textContent = 'Must attend consecutively';
+          }
+        }
+      }
+    }
+
+    if (histRes && histRes.success && Array.isArray(histRes.data)) {
+      renderStudentAttendanceHistory(histRes.data);
+    }
+  } catch (err) {
+    console.warn('Could not load student attendance', err);
+  }
+}
+
+function renderStudentAttendanceHistory(history) {
+  const tbody = ById('student-att-history-tbody');
+  const countEl = ById('student-att-history-count');
+  if (!tbody) return;
+
+  if (countEl) countEl.textContent = `${history.length} sessions recorded`;
+
+  if (history.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center; color:var(--text-muted); padding:2.5rem;">
+          No attendance records registered yet for this course.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = history.map(row => {
+    const status = (row.attendance_status || 'ABSENT').toUpperCase();
+    let statusClass = 'badge-absent';
+    if (status === 'PRESENT') statusClass = 'badge-present';
+    if (status === 'LATE') statusClass = 'badge-late';
+
+    const dateStr = row.start_time
+      ? new Date(row.start_time).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : '—';
+
+    return `
+      <tr>
+        <td><strong>${dateStr}</strong></td>
+        <td>${esc(row.label || row.subject_name || 'Class Session')}</td>
+        <td><span class="badge" style="background:var(--bg-surface); font-size:0.75rem;">${esc(row.session_type || 'LECTURE')}</span></td>
+        <td style="text-align:center;"><span class="badge ${statusClass}">${status}</span></td>
+        <td style="font-size:0.8rem; color:var(--text-muted);">${esc(row.source || 'REGISTER')}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderUpcomingWorkSidebar() {
+  const container = ById('student-upcoming-list');
+  if (!container) return;
+
+  const now = new Date();
+  const upcoming = (S.assignments || [])
+    .filter(a => a.due_date && new Date(a.due_date) >= now)
+    .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+    .slice(0, 4);
+
+  if (upcoming.length === 0) {
+    container.innerHTML = '<div style="font-size:0.82rem; color:var(--text-muted); padding:0.5rem 0;">Woohoo, no work due soon!</div>';
+    return;
+  }
+
+  container.innerHTML = upcoming.map(item => `
+    <div class="upcoming-item" onclick="if(typeof openWorkInstructionsView === 'function') openWorkInstructionsView(${item.id}, '${item._type || 'assignment'}')">
+      <div class="upcoming-item-title">${esc(item.title || item.name)}</div>
+      <div class="upcoming-item-due">Due ${formatClassroomDueDate(item.due_date)}</div>
+    </div>
+  `).join('');
+}
+
 function initGroupPage() {
-  guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN'] });
+  guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN', 'STUDENT'] });
   const p = new URLSearchParams(window.location.search);
-  S.groupId = Number(p.get('id'));
-  const initTab = p.get('tab') || 'stream';
+  S.groupId = Number(p.get('id') || p.get('groupId') || p.get('group'));
+  let initTab = p.get('tab') || 'stream';
+  const initAction = p.get('action');
+
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const isStudent = (user?.role === 'STUDENT') || (Array.isArray(user?.roles) && user.roles.includes('STUDENT')) || window.location.pathname.startsWith('/student');
+  S.isStudent = isStudent;
+  if (isStudent) {
+    document.body.classList.add('student-mode');
+    document.body.setAttribute('data-user-role', 'STUDENT');
+    initStudentModeUI(user);
+    if (initTab === 'register' || initTab === 'marks' || initTab === 'sheets') {
+      initTab = 'attendance';
+    }
+  }
+
   if (!S.groupId) {
     toast('No group specified');
-    setTimeout(() => location.href = '/faculty/groups.html', 1500);
+    setTimeout(() => location.href = isStudent ? '/student/dashboard.html' : '/faculty/groups.html', 1500);
     return;
   }
   document.body.setAttribute('data-active-tab', initTab);
@@ -420,6 +601,16 @@ function initGroupPage() {
   loadGroup().then(() => {
     switchTab(initTab);
     renderUserAvatar();
+    if (isStudent) {
+      renderUpcomingWorkSidebar();
+    }
+    if (!isStudent && (initAction === 'rollcall' || initAction === 'attendance')) {
+      setTimeout(() => {
+        if (typeof openClassRollCallModal === 'function') {
+          openClassRollCallModal();
+        }
+      }, 400);
+    }
   });
 }
 
@@ -530,3 +721,7 @@ window.closeDesktopClassSettings = closeDesktopClassSettings;
 window.toggleMobileClassroomOverflow = toggleMobileClassroomOverflow;
 window.openSheetStudio = openSheetStudio;
 window.openLinkedRegister = openLinkedRegister;
+window.initStudentModeUI = initStudentModeUI;
+window.loadStudentSubjectAttendance = loadStudentSubjectAttendance;
+window.renderStudentAttendanceHistory = renderStudentAttendanceHistory;
+window.renderUpcomingWorkSidebar = renderUpcomingWorkSidebar;

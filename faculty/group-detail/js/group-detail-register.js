@@ -60,6 +60,7 @@
         classRegState.gridData = res.data.grid;
         classRegState.currentMonth = res.data.grid?.month || month || new Date().toISOString().slice(0, 7);
 
+        document.body.classList.remove('mobile-full-ledger');
         renderClassRegisterHeader();
         renderClassRegisterMatrix();
         renderMobileCompactMatrix();
@@ -1093,7 +1094,12 @@
   async function openClassRollCallModal() {
     const modal = ById('classroom-roll-modal');
     if (!modal) return;
-    modal.classList.add('active');
+    if (typeof openModal === 'function') {
+      openModal('classroom-roll-modal');
+    } else {
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+    }
 
     const S = getS();
     const grp = S.group || {};
@@ -1104,60 +1110,172 @@
     if (subjEl) subjEl.textContent = reg.name || grp.name || 'Class Attendance';
 
     const dateEl = ById('class-rc-date');
-    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const dateVal = classRegState.selectedDate || todayStr;
+    if (dateEl) {
+      dateEl.textContent = new Date(dateVal + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
 
-    // Generate or fetch PIN & QR
-    const regId = classRegState.registerId || grp.register_id || 1;
-    try {
-      const res = await apiFetch('/api/v1/attendance/roll-call/start', {
-        method: 'POST',
-        body: JSON.stringify({ register_id: regId })
-      });
-      if (res && res.success && res.data) {
-        _classRollSession = res.data;
-        const pinEl = ById('class-rc-pin-display');
-        if (pinEl) pinEl.textContent = res.data.pin_code || '847291';
-
-        const qrWrap = ById('class-rc-qr-code');
-        if (qrWrap) {
-          qrWrap.innerHTML = `
-            <svg width="150" height="150" viewBox="0 0 100 100" fill="var(--text-main)">
-              <rect width="100" height="100" fill="var(--bg-surface)" />
-              <path d="M10 10h30v30h-30zM15 15v20h20v-20zM22 22h6v6h-6zM60 10h30v30h-30zM65 15v20h20v-20zM72 22h6v6h-6zM10 60h30v30h-30zM15 65v20h20v-20zM22 72h6v6h-6zM50 15h5v5h-5zM50 30h5v15h-5zM60 60h10v10h-10zM75 60h15v5h-15zM60 75h5v15h-5zM75 75h15v15h-15z" />
-            </svg>
-          `;
+    // Resolve register ID
+    let regId = classRegState.registerId || grp.register_id;
+    if (!regId) {
+      try {
+        const listRes = await apiFetch('/api/v1/faculty/registers');
+        if (listRes && listRes.success && Array.isArray(listRes.data)) {
+          const found = listRes.data.find(r => r.group_id === Number(S.groupId) || r.subject_id === grp.subject_id);
+          if (found) regId = found.id;
+          else if (listRes.data.length > 0) regId = listRes.data[0].id;
         }
+      } catch (_) {}
+    }
+    if (regId) classRegState.registerId = regId;
+
+    // Resolve or create live session
+    let sess = null;
+    if (classRegState.gridData?.finalized_sessions) {
+      sess = classRegState.gridData.finalized_sessions.find(s => s.session_date === dateVal);
+    }
+
+    if (!sess && regId) {
+      try {
+        const sListRes = await apiFetch(`/api/v1/faculty/registers/${regId}/sessions`);
+        if (sListRes && sListRes.success && Array.isArray(sListRes.data)) {
+          sess = sListRes.data.find(s => s.session_date === dateVal);
+        }
+        if (!sess) {
+          const createRes = await apiFetch(`/api/v1/faculty/registers/${regId}/sessions`, {
+            method: 'POST',
+            body: JSON.stringify({
+              session_date: dateVal,
+              session_type: grp.component || 'THEORY',
+              label: 'Class 1 (Period 1)',
+              period_number: 1
+            })
+          });
+          if (createRes && createRes.success && createRes.data) {
+            sess = createRes.data;
+          }
+        }
+      } catch (e) {
+        console.warn('Session resolution note:', e);
       }
-    } catch {
-      const pinEl = ById('class-rc-pin-display');
-      if (pinEl) pinEl.textContent = String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+    _classRollSession = sess;
+
+    // Ensure session is open
+    if (sess && sess.id && sess.state === 'DRAFT') {
+      try {
+        await apiFetch(`/api/v1/attendance/sessions/${sess.id}/state`, {
+          method: 'PUT',
+          body: JSON.stringify({ state: 'OPEN' })
+        });
+        sess.state = 'OPEN';
+      } catch (_) {}
+    }
+
+    // Generate dynamic PIN and dynamic QR Code
+    let pinCode = '';
+    let qrPayload = '';
+    if (sess && sess.id) {
+      try {
+        const pinRes = await apiFetch(`/api/v1/attendance/sessions/${sess.id}/pin`, { method: 'POST' });
+        if (pinRes && pinRes.success && pinRes.data?.pin) {
+          pinCode = pinRes.data.pin;
+        }
+      } catch (_) {}
+
+      try {
+        const qrRes = await apiFetch(`/api/v1/attendance/sessions/${sess.id}/qr`, { method: 'POST' });
+        if (qrRes && qrRes.success && qrRes.data?.payload) {
+          qrPayload = qrRes.data.payload;
+        }
+      } catch (_) {}
+    }
+
+    if (!pinCode) {
+      pinCode = String(Math.floor(100000 + Math.random() * 900000));
+    }
+    const pinEl = ById('class-rc-pin-display');
+    if (pinEl) pinEl.textContent = pinCode;
+
+    const qrWrap = ById('class-rc-qr-code');
+    if (qrWrap) {
+      if (qrPayload) {
+        const encoded = encodeURIComponent(qrPayload);
+        qrWrap.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encoded}&margin=4" alt="Dynamic Attendance QR Code" style="width:160px;height:160px;display:block;border-radius:var(--radius-sm);">`;
+      } else {
+        qrWrap.innerHTML = `
+          <svg width="150" height="150" viewBox="0 0 100 100" fill="var(--text-main)">
+            <rect width="100" height="100" fill="var(--bg-surface)" />
+            <path d="M10 10h30v30h-30zM15 15v20h20v-20zM22 22h6v6h-6zM60 10h30v30h-30zM65 15v20h20v-20zM72 22h6v6h-6zM10 60h30v30h-30zM15 65v20h20v-20zM22 72h6v6h-6zM50 15h5v5h-5zM50 30h5v15h-5zM60 60h10v10h-10zM75 60h15v5h-15zM60 75h5v15h-5zM75 75h15v15h-15z" />
+          </svg>
+        `;
+      }
+    }
+
+    // Setup live student claims polling
+    if (_classRollPollInterval) {
+      clearInterval(_classRollPollInterval);
+      _classRollPollInterval = null;
+    }
+    if (sess && sess.id) {
+      const pollLiveCheckins = async () => {
+        try {
+          const cRes = await apiFetch(`/api/v1/attendance/sessions/${sess.id}/self-attendance`);
+          if (cRes && cRes.success && Array.isArray(cRes.data)) {
+            const countEl = ById('class-rc-live-count');
+            if (countEl) countEl.textContent = cRes.data.length;
+          }
+        } catch (_) {}
+      };
+      pollLiveCheckins();
+      _classRollPollInterval = setInterval(pollLiveCheckins, 3000);
     }
 
     // Populate manual roster view
+    const students = (classRegState.gridData?.students && classRegState.gridData.students.length)
+      ? classRegState.gridData.students
+      : (S.members || []);
+
     const tbody = ById('class-rc-manual-tbody');
-    if (tbody && S.members && S.members.length) {
-      tbody.innerHTML = S.members.map((m, i) => `
-        <tr style="border-bottom: 1px solid var(--border-color);">
-          <td style="padding: 0.45rem 0.6rem; font-weight: 700;">${m.class_roll_no || i + 1}</td>
-          <td style="padding: 0.45rem 0.6rem;">${esc(m.full_name || '')}</td>
-          <td style="padding: 0.45rem 0.6rem; text-align: center;">
-            <button type="button" class="btn btn-secondary btn-xs" id="rc-btn-toggle-${m.student_id}" onclick="toggleRollCallStudent(${m.student_id})" style="font-size:0.75rem;padding:0.2rem 0.5rem;">
-              Toggle Present
-            </button>
-          </td>
-        </tr>
-      `).join('');
+    if (tbody && students.length) {
+      tbody.innerHTML = students.map((m, i) => {
+        const roll = m.class_roll_no || m.roll_no || i + 1;
+        const name = m.full_name || m.name || 'Student';
+        const sid = m.student_id || m.id;
+        return `
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.45rem 0.6rem; font-weight: 700;">${roll}</td>
+            <td style="padding: 0.45rem 0.6rem;">${esc(name)}</td>
+            <td style="padding: 0.45rem 0.6rem; text-align: center;">
+              <button type="button" class="btn btn-secondary btn-xs" id="rc-btn-toggle-${sid}" onclick="toggleRollCallStudent(${sid})" style="font-size:0.75rem;padding:0.2rem 0.5rem;">
+                Present
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
   }
 
   function closeClassRollCallModal() {
     const modal = ById('classroom-roll-modal');
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+      if (typeof closeModal === 'function') {
+        closeModal('classroom-roll-modal');
+      } else {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
     if (_classRollPollInterval) {
       clearInterval(_classRollPollInterval);
       _classRollPollInterval = null;
     }
-    loadClassRegister(classRegState.currentMonth);
+    if (typeof loadClassRegister === 'function') {
+      loadClassRegister(classRegState.currentMonth);
+    }
   }
 
   function switchClassRollCallMode(mode) {
@@ -1175,10 +1293,20 @@
   function toggleRollCallStudent(studentId) {
     const btn = ById(`rc-btn-toggle-${studentId}`);
     if (btn) {
-      const isPres = btn.classList.contains('btn-primary');
-      btn.classList.toggle('btn-primary', !isPres);
-      btn.classList.toggle('btn-secondary', isPres);
-      btn.textContent = isPres ? 'Absent' : 'Present';
+      const isAbsent = btn.textContent.trim().toLowerCase() === 'absent';
+      if (isAbsent) {
+        btn.className = 'btn btn-secondary btn-xs';
+        btn.textContent = 'Present';
+        btn.style.color = '';
+        btn.style.background = '';
+        btn.style.border = '';
+      } else {
+        btn.className = 'btn btn-xs';
+        btn.style.background = 'var(--status-absent-bg)';
+        btn.style.color = 'var(--status-absent)';
+        btn.style.border = '1px solid var(--status-absent)';
+        btn.textContent = 'Absent';
+      }
     }
   }
 

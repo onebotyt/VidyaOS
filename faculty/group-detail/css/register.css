@@ -536,6 +536,9 @@ body:not([data-active-tab="stream"]) #mobile-stream-actions,
 }
 
 @media (max-width: 768px) {
+  #btn-toggle-mobile-mode {
+    display: none !important;
+  }
   .mobile-compact-section {
     display: block !important;
   }
@@ -543,10 +546,10 @@ body:not([data-active-tab="stream"]) #mobile-stream-actions,
     display: none !important;
   }
   body.mobile-full-ledger #desktop-matrix-container {
-    display: block !important;
+    display: none !important;
   }
   body.mobile-full-ledger .mobile-compact-section {
-    display: none !important;
+    display: block !important;
   }
 
   /* Minimal Mobile Header & Toolbar Improvements */

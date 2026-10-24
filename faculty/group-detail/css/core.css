@@ -3,12 +3,21 @@
    frontend/faculty/group-detail/css/core.css
    ══════════════════════════════════════════════════════════════ */
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
 .classroom-page {
   min-height: 100vh;
+  max-width: 100%;
   background: var(--bg-app);
   display: flex;
   flex-direction: column;
-  overflow-x: clip;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* Sticky Universal Google Classroom Top Navbar */
@@ -594,7 +603,11 @@
     display: none !important;
   }
   .classroom-body {
-    padding: 1rem 1rem 5.5rem !important;
+    padding: 0.75rem 0.75rem 5.5rem !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
   .classroom-mobile-bottom-nav {
     display: flex !important;
@@ -611,6 +624,9 @@
     justify-content: space-around;
     padding: 0 0.5rem;
     box-sizing: border-box;
+  }
+  #mobile-tab-btn-sheets {
+    display: none !important;
   }
   .classroom-mobile-nav-btn {
     display: flex;
@@ -845,5 +861,115 @@ body.modal-open {
   overflow: hidden !important;
   touch-action: none !important;
   -webkit-overflow-scrolling: auto !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STUDENT MODE RESTRICTIONS & PARITY (Unified Single Engine)
+   ══════════════════════════════════════════════════════════════ */
+body.student-mode .banner-actions,
+body.student-mode .gc-desktop-settings-wrap,
+body.student-mode #btn-desktop-class-settings,
+body.student-mode #btn-edit-group,
+body.student-mode #btn-archive-group,
+body.student-mode .quick-actions-card,
+body.student-mode .compact-invite-card,
+body.student-mode .add-student-bar,
+body.student-mode .person-rm-btn,
+body.student-mode #tab-btn-register,
+body.student-mode #tab-btn-marks,
+body.student-mode #tab-btn-sheets,
+body.student-mode #mobile-tab-btn-register,
+body.student-mode #mobile-tab-btn-marks,
+body.student-mode #btn-create-work-dropdown,
+body.student-mode #cw-main-create-btn,
+body.student-mode .cw-dd-wrap,
+body.student-mode #classwork-mobile-fab,
+body.student-mode #cw-mobile-fab-menu,
+body.student-mode #btn-edit-units-modal,
+body.student-mode .unit-menu-wrap,
+body.student-mode .work-card-menu-wrap,
+body.student-mode .work-action-btn,
+body.student-mode .work-expanded-stats,
+body.student-mode .work-exp-stats,
+body.student-mode .work-submit-ratio-chip,
+body.student-mode .work-mobile-stat-badge,
+body.student-mode .work-mobile-sub-sep,
+body.student-mode .mobile-cw-add-btn,
+body.student-mode #btn-inst-tab-roster,
+body.student-mode #work-inst-more-wrap,
+body.student-mode .work-inst-bottom-bar,
+body.student-mode .faculty-only-el {
+  display: none !important;
+}
+
+body.student-mode #tab-btn-attendance {
+  display: inline-flex !important;
+}
+
+body.student-mode #student-upcoming-card {
+  display: block !important;
+}
+
+.student-card-status-badge {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.student-card-status-badge.is-handed-in {
+  color: var(--status-present);
+  font-weight: 700;
+}
+.student-pill-status {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.student-pill-status.is-handed-in {
+  color: var(--status-present);
+  font-weight: 700;
+}
+
+body:not(.student-mode) .student-only-el,
+body:not(.student-mode) .student-only-tab,
+body:not(.student-mode) .student-only-pane {
+  display: none !important;
+}
+
+/* Student Upcoming Card in Stream Sidebar */
+.upcoming-work-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.upcoming-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.upcoming-item:last-child {
+  border-bottom: none;
+}
+
+.upcoming-item:hover {
+  opacity: 0.8;
+}
+
+.upcoming-item-title {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  line-height: 1.35;
+}
+
+.upcoming-item-due {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
 }
 

@@ -734,6 +734,19 @@ function renderSidebar() {
   const header = document.querySelector('.app-header, .gc-navbar');
   if (!header || !user) return;
 
+  // Dedicated Classroom workspaces manage their own drawer and should not render legacy fixed sidebar
+  const currentPath = window.location.pathname.toLowerCase();
+  if (document.body.classList.contains('classroom-page') || 
+      currentPath.includes('group-detail') || 
+      document.getElementById('gc-drawer')) {
+    document.body.classList.remove('sidebar-open');
+    const existingSidebar = document.getElementById('app-sidebar');
+    if (existingSidebar) existingSidebar.remove();
+    const existingBackdrop = document.getElementById('sidebar-backdrop');
+    if (existingBackdrop) existingBackdrop.remove();
+    return;
+  }
+
   // 1. Inject toggle button into header left
   if (!document.getElementById('sidebar-toggle-btn') && !document.getElementById('btn-menu-toggle')) {
     const toggleBtn = document.createElement('button');
@@ -766,7 +779,6 @@ function renderSidebar() {
   // 2. Build sidebar if not present
   if (document.getElementById('app-sidebar')) return;
 
-  const currentPath = window.location.pathname.toLowerCase();
   const currentUrl = (window.location.pathname + window.location.search).toLowerCase();
   let roleBadge = 'USER';
   if (user.roles?.includes('SYSTEM_ADMIN')) {
@@ -918,7 +930,8 @@ function renderSidebar() {
 
   const isFacultyPortal = currentPath.includes('/faculty/');
   const isAdminPortal = currentPath.includes('/admin/');
-  const isDrawerPortal = isFacultyPortal || isAdminPortal;
+  const isStudentPortal = currentPath.includes('/student/') || Boolean(user.roles?.includes('STUDENT'));
+  const isDrawerPortal = isFacultyPortal || isAdminPortal || isStudentPortal;
 
   let sidebarHeaderHtml = '';
   if (isFacultyPortal) {

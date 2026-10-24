@@ -186,10 +186,6 @@
       <span id="user-profile-badge" style="display:none;" aria-hidden="true"></span>
     </div>
   </header>
-  <div class="mobile-class-header-bar" id="mobile-class-header-bar">
-    <div class="mobile-class-header-title" id="mobile-class-name">Loading…</div>
-    <div class="mobile-class-header-sub" id="mobile-class-sub"></div>
-  </div>
 
   <!-- Backward-compatibility hidden navigation for automated test contracts -->
   <nav style="display: none !important;" id="top-nav-bar" aria-hidden="true">
@@ -319,11 +315,14 @@
       <button type="button" class="gc-nav-tab" id="tab-btn-sheets" onclick="switchTab('sheets')" role="tab" aria-selected="false">
         <span>Sheets</span>
       </button>
+      <button type="button" class="gc-nav-tab student-only-tab" id="tab-btn-attendance" onclick="switchTab('attendance')" role="tab" aria-selected="false" style="display:none;">
+        <span>Attendance</span>
+      </button>
     </nav>
 
     <div id="tab-stream" class="tab-pane">
       <div class="stream-layout">
-        <!-- Left Column: Quick Actions Sidebar -->
+        <!-- Left Column: Quick Actions / Student Upcoming Sidebar -->
         <aside class="stream-sidebar">
           <!-- State compatibility hooks -->
           <div style="display:none;" aria-hidden="true">
@@ -334,7 +333,20 @@
             <span id="stat-attendance"></span>
             <span id="stat-register-id"></span>
           </div>
-          <div class="sidebar-card quick-actions-card">
+          <!-- Student Mode Left Column: Upcoming Work Box (Google Classroom parity) -->
+          <div class="sidebar-card upcoming-work-card student-only-el" id="student-upcoming-card" style="display:none;">
+            <div class="sidebar-card-hdr" style="display:flex;justify-content:space-between;align-items:center;">
+              <span>Upcoming</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="sidebar-card-body" id="student-upcoming-list" style="padding:0.75rem;">
+              <div style="font-size:0.82rem; color:var(--text-muted); padding:0.5rem 0;">Woohoo, no work due soon!</div>
+            </div>
+            <div style="padding:0.5rem 0.75rem; border-top:1px solid var(--border-color); text-align:right;">
+              <a href="javascript:void(0)" onclick="switchTab('classwork')" style="font-size:0.82rem; font-weight:600; color:var(--color-primary); text-decoration:none;">View all</a>
+            </div>
+          </div>
+          <div class="sidebar-card quick-actions-card faculty-only-el" id="faculty-quick-actions">
             <div class="sidebar-card-hdr">Quick Actions</div>
             <div class="sidebar-card-body" style="padding:.5rem .75rem">
               <div class="quick-action-list">
@@ -544,28 +556,6 @@
     </div>
     <div id="tab-classwork" class="tab-pane" style="display:none">
       <div class="classwork-layout">
-        <!-- Mobile Horizontal Category Pills Strip (Screenshot 3 / Image 3) -->
-        <div class="cw-pills-scroll" id="cw-pills-scroll">
-          <button type="button" class="cw-pill-btn active" id="cwpill-all" onclick="filterCW('all')">
-            <span>All Work</span> <span class="cw-pill-badge" id="cwpill-badge-all">0</span>
-          </button>
-          <button type="button" class="cw-pill-btn" id="cwpill-assignments" onclick="filterCW('assignments')">
-            <span>Assignments</span> <span class="cw-pill-badge" id="cwpill-badge-assignments">0</span>
-          </button>
-          <button type="button" class="cw-pill-btn" id="cwpill-practicals" onclick="filterCW('practicals')">
-            <span>Lab Practical</span> <span class="cw-pill-badge" id="cwpill-badge-practicals">0</span>
-          </button>
-          <button type="button" class="cw-pill-btn" id="cwpill-finaldocs" onclick="filterCW('finaldocs')">
-            <span>Final Documents</span> <span class="cw-pill-badge" id="cwpill-badge-finaldocs">0</span>
-          </button>
-          <button type="button" class="cw-pill-btn" id="cwpill-tests" onclick="filterCW('tests')">
-            <span>Class Tests</span> <span class="cw-pill-badge" id="cwpill-badge-tests">0</span>
-          </button>
-          <button type="button" class="cw-pill-btn" id="cwpill-materials" onclick="filterCW('materials')">
-            <span>Materials</span> <span class="cw-pill-badge" id="cwpill-badge-materials">0</span>
-          </button>
-        </div>
-
         <div class="cw-categories">
           <div class="cw-cat-hdr">FILTER</div>
           <div class="cw-cat-item active" id="cwcat-all" onclick="filterCW('all')">
@@ -592,59 +582,379 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
             <span>Materials</span>
           </div>
-
-          <div class="cw-cat-hdr" style="margin-top:1.5rem;">SYLLABUS UNITS</div>
-          <div id="cw-unit-filter-list">
-            <!-- Populated via JS -->
-          </div>
+          <!-- Backward-compatible unit filter list container -->
+          <div id="cw-unit-filter-list" style="display:none;" aria-hidden="true"></div>
         </div>
         <div class="cw-main">
-          <div class="cw-toolbar">
+          <!-- Classwork Action Toolbar (Google Classroom Standard) -->
+          <div class="cw-toolbar gc-cw-toolbar">
             <div class="cw-toolbar-left">
-              <div class="cw-section-title" id="cw-section-title">All Classwork</div>
-              <div class="cw-unit-select-wrap">
-                <select id="cw-unit-filter-select" onchange="filterCWByUnit(this.value)">
-                  <option value="all" selected>All Units (Show All)</option>
+              <div class="cw-dd-wrap" id="cw-dd-wrap">
+                <button type="button" class="cw-create-btn gc-create-pill-btn" id="cw-main-create-btn" onclick="toggleCWDrop()">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Create</span>
+                </button>
+                <div class="cw-dd-menu" id="cw-dd-menu" style="display:none">
+                  <div class="cw-dd-item" onclick="openCreateAssignmentModal();closeCWDrop()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <span>Assignment</span>
+                  </div>
+                  <div class="cw-dd-item" id="cw-dd-practical-item" onclick="openCreatePracticalModal();closeCWDrop()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/><line x1="6.5" y1="15" x2="17.5" y2="15"/></svg>
+                    <span>Lab Practical</span>
+                  </div>
+                  <div class="cw-dd-item" onclick="openFinalDocsModal();closeCWDrop()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    <span>Final Documents Request</span>
+                  </div>
+                  <div class="cw-dd-item" onclick="openScheduleTestModal();closeCWDrop()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                    <span>Class Test</span>
+                  </div>
+                  <div class="cw-dd-item" onclick="openCreateUnitModal();closeCWDrop()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <span>Unit / Topic</span>
+                  </div>
+                  <div class="cw-dd-item" onclick="showToast('Material coming soon');closeCWDrop()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+                    <span>Material</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Topic Filter Dropdown with Material Outline & Floating Label -->
+              <div class="gc-topic-filter-field" id="cw-unit-filter-wrap">
+                <span class="gc-topic-filter-label">Topic filter</span>
+                <select id="cw-unit-filter-select" class="gc-topic-filter-select" onchange="filterCWByUnit(this.value)">
+                  <option value="all" selected>All topics</option>
                 </select>
+                <svg class="gc-topic-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </div>
+
+              <!-- Category Filter Dropdown (in mobile moved under dropdown list) -->
+              <div class="gc-topic-filter-field gc-cat-filter-field" id="cw-cat-filter-wrap">
+                <span class="gc-topic-filter-label">Filter</span>
+                <select id="cw-cat-filter-select" class="gc-topic-filter-select" onchange="filterCW(this.value)">
+                  <option value="all" selected>All Work</option>
+                  <option value="assignments">Assignments</option>
+                  <option value="practicals">Lab Practical</option>
+                  <option value="finaldocs">Final Documents</option>
+                  <option value="tests">Class Tests</option>
+                  <option value="materials">Materials</option>
+                </select>
+                <svg class="gc-topic-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+
+              <div class="cw-section-title" id="cw-section-title" style="display:none;">All Classwork</div>
             </div>
-            <div class="cw-dd-wrap" id="cw-dd-wrap">
-              <button type="button" class="cw-create-btn" id="cw-main-create-btn" onclick="toggleCWDrop()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                <span>+ Create</span>
+
+            <!-- Collapse All / Expand All Action (Image 1) -->
+            <div class="cw-toolbar-right">
+              <button type="button" class="gc-collapse-all-btn" id="btn-collapse-all-units" onclick="toggleCollapseAllUnits()" title="Collapse all topics">
+                <svg class="gc-collapse-all-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
+                </svg>
+                <span id="collapse-all-text">Collapse all</span>
               </button>
-              <div class="cw-dd-menu" id="cw-dd-menu" style="display:none">
-                <div class="cw-dd-item" onclick="openCreateAssignmentModal();closeCWDrop()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                  <span>Assignment</span>
-                </div>
-                <div class="cw-dd-item" id="cw-dd-practical-item" onclick="openCreatePracticalModal();closeCWDrop()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/><line x1="6.5" y1="15" x2="17.5" y2="15"/></svg>
-                  <span>Lab Practical</span>
-                </div>
-                <div class="cw-dd-item" onclick="openFinalDocsModal();closeCWDrop()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                  <span>Final Documents Request</span>
-                </div>
-                <div class="cw-dd-item" onclick="openScheduleTestModal();closeCWDrop()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-                  <span>Class Test</span>
-                </div>
-                <div class="cw-dd-item" onclick="openCreateUnitModal();closeCWDrop()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                  <span>Unit / Topic</span>
-                </div>
-                <div class="cw-dd-item" onclick="showToast('Material coming soon');closeCWDrop()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
-                  <span>Material</span>
-                </div>
-              </div>
             </div>
           </div>
+
           <div id="classwork-list">
             <div class="shimmer" style="height:88px;margin-bottom:1rem"></div>
             <div class="shimmer" style="height:88px;margin-bottom:1rem"></div>
           </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           DEDICATED ASSIGNMENT INSTRUCTIONS & STUDENT WORK PAGE (Images 1-4)
+           ══════════════════════════════════════════════════════════════ -->
+      <div class="work-instructions-view" id="work-instructions-view" style="display:none;">
+        <!-- Top Sticky Sub-Header with Back & Options (Image 4) -->
+        <div class="work-inst-top-nav">
+          <div class="work-inst-nav-left">
+            <button type="button" class="work-inst-back-btn" onclick="closeWorkInstructionsView()" title="Back to Classwork" aria-label="Back to Classwork">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              <span>Classwork</span>
+            </button>
+          </div>
+          <div class="work-inst-nav-right">
+            <div class="work-inst-more-wrap" id="work-inst-more-wrap" style="position:relative;">
+              <button type="button" class="work-inst-tool-btn" id="btn-work-inst-more" onclick="toggleWorkInstMoreMenu(event)" title="Options" aria-label="Options">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="1.5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="22.5" r="1.5"/></svg>
+              </button>
+              <div class="work-card-dropdown work-inst-dropdown" id="work-inst-dropdown" style="display:none; position:absolute; right:0; top:calc(100% + 4px); z-index:1000; min-width:140px;">
+                <button type="button" class="work-dd-item" onclick="openEditWorkFromInstructions(); closeWorkInstDropdown();">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  <span>Edit</span>
+                </button>
+                <button type="button" class="work-dd-item danger" onclick="deleteWorkFromInstructions(); closeWorkInstDropdown();">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Dual Tabs Bar (Instructions / Student work) (Images 1 & 4) -->
+        <div class="work-inst-tab-bar" role="tablist">
+          <button type="button" class="work-inst-tab-btn active" id="btn-inst-tab-instructions" onclick="switchWorkInstTab('instructions')" role="tab" aria-selected="true">
+            <span>Instructions</span>
+          </button>
+          <button type="button" class="work-inst-tab-btn" id="btn-inst-tab-roster" onclick="switchWorkInstTab('roster')" role="tab" aria-selected="false">
+            <span>Student work</span>
+            <span class="work-inst-tab-badge" id="inst-sub-count-badge">0</span>
+          </button>
+        </div>
+
+        <!-- Tab Pane 1: Instructions (Image 4) -->
+        <div class="work-inst-pane" id="pane-work-instructions">
+          <div class="work-inst-container" id="work-instructions-content">
+            <!-- Dynamically populated in openWorkInstructionsView -->
+          </div>
+          <!-- Sticky Bottom Comment Composer Bar (Image 4) -->
+          <div class="work-inst-bottom-bar" id="work-inst-bottom-bar">
+            <div class="work-inst-bottom-bar-inner">
+              <input type="text" class="work-inst-bottom-input" id="work-inst-bottom-comment-input"
+                placeholder="Add class comment…"
+                aria-label="Add class comment"
+                onkeydown="if(event.key==='Enter') submitWorkInstActiveComment()"/>
+              <button type="button" class="work-inst-bottom-send-btn" id="work-inst-bottom-send-btn" onclick="submitWorkInstActiveComment()" title="Send comment" aria-label="Send comment">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Pane 2: Student Work / Submissions Roster -->
+        <div class="work-inst-pane" id="pane-work-roster" style="display:none;">
+          <div class="work-roster-container" id="work-roster-content">
+            <!-- Dynamically populated in renderWorkInstRoster -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           GOOGLE CLASSROOM EDIT PAGE (Image 2 Mobile, Image 3 PC)
+           ══════════════════════════════════════════════════════════════ -->
+      <div class="work-edit-page-view" id="work-edit-page-view" style="display:none;">
+        <!-- Top Navigation Bar (Image 2 & 3) -->
+        <header class="work-edit-top-nav">
+          <div class="work-edit-nav-left">
+            <button type="button" class="work-edit-close-btn" onclick="closeWorkEditPage()" title="Close without saving" aria-label="Close">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <div class="work-edit-pc-title-group">
+              <div class="work-edit-pc-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+              </div>
+              <span class="work-edit-pc-heading" id="edit-work-page-heading">Assignment</span>
+            </div>
+          </div>
+          <div class="work-edit-nav-right">
+            <button type="button" class="work-edit-save-btn" id="btn-save-edit-work" onclick="submitEditWork()">
+              <span>Save</span>
+            </button>
+            <button type="button" class="work-edit-more-btn" onclick="toast('Assignment settings')" title="More options" aria-label="More options">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="1.5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="22.5" r="1.5"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Main Workspace (Image 2 Mobile, Image 3 PC) -->
+        <div class="work-edit-workspace">
+          <!-- Main Content Column -->
+          <div class="work-edit-main-col">
+            <!-- Main Content Card -->
+            <div class="work-edit-card">
+              <!-- Title Field -->
+              <div class="gc-edit-field-box">
+                <label class="gc-edit-field-label" for="edit-work-title">Title*</label>
+                <input type="text" class="gc-edit-title-input" id="edit-work-title" placeholder="Title" required />
+              </div>
+
+              <!-- Audience Chip (Mobile Image 2) -->
+              <div class="gc-edit-audience-row">
+                <button type="button" class="gc-edit-audience-chip" onclick="toast('Assigned to all active students')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <span>All students</span>
+                </button>
+              </div>
+
+              <!-- Description / Instructions Field -->
+              <div class="gc-edit-field-box gc-edit-desc-box">
+                <label class="gc-edit-field-label" for="edit-work-desc">Instructions (optional)</label>
+                <div class="gc-edit-desc-wrap">
+                  <div class="gc-edit-desc-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
+                  </div>
+                  <textarea class="gc-edit-desc-input" id="edit-work-desc" placeholder="Instructions (optional)" rows="5"></textarea>
+                </div>
+                <!-- Rich formatting toolbar (Image 3) -->
+                <div class="gc-edit-rich-toolbar">
+                  <button type="button" class="gc-rich-btn" onclick="formatEditDesc('bold')" title="Bold"><b>B</b></button>
+                  <button type="button" class="gc-rich-btn" onclick="formatEditDesc('italic')" title="Italic"><i>I</i></button>
+                  <button type="button" class="gc-rich-btn" onclick="formatEditDesc('underline')" title="Underline"><u>U</u></button>
+                  <button type="button" class="gc-rich-btn" onclick="formatEditDesc('bullet')" title="Bullet list">&#8226;</button>
+                  <button type="button" class="gc-rich-btn" onclick="formatEditDesc('clear')" title="Clear formatting">&#10006;</button>
+                </div>
+              </div>
+
+              <!-- Attachment Preview Card (Image 2 & 3) -->
+              <div class="gc-edit-attach-preview" id="edit-work-attach-preview">
+                <div class="gc-edit-attach-left">
+                  <div class="gc-edit-paperclip-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                  </div>
+                  <div class="gc-edit-pdf-badge">PDF</div>
+                  <div class="gc-edit-attach-info">
+                    <div class="gc-edit-attach-name" id="edit-work-attach-name">01_Girdhar_dhami_DSUC_01.pdf</div>
+                    <div class="gc-edit-attach-subtext">Students can view file</div>
+                  </div>
+                </div>
+                <div class="gc-edit-attach-right">
+                  <div class="gc-edit-attach-access-select">
+                    <span>Students can view file</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <button type="button" class="gc-edit-attach-more-btn" onclick="toast('File options')" title="Options">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+                  </button>
+                  <button type="button" class="gc-edit-attach-remove-btn" onclick="toast('Attachment preserved')" title="Remove file">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- + Add attachment Button (Image 2) -->
+              <div class="gc-edit-add-attach-row">
+                <button type="button" class="gc-edit-add-attach-btn" onclick="promptAddAttachment('upload')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Add attachment</span>
+                </button>
+              </div>
+
+              <!-- Mobile Settings Links (Image 2) -->
+              <div class="gc-edit-mobile-settings-list">
+                <div class="gc-edit-mobile-setting-item" id="edit-work-marks-wrap-mobile">
+                  <span class="gc-mobile-set-label">Points</span>
+                  <input type="number" class="gc-mobile-set-input" id="edit-work-marks-mobile" min="0" max="500" placeholder="100" />
+                </div>
+                <div class="gc-edit-mobile-setting-item">
+                  <span class="gc-mobile-set-label">Due Date</span>
+                  <input type="date" class="gc-mobile-set-input" id="edit-work-due-mobile" />
+                </div>
+                <!-- Topic setting removed as requested; retained as hidden input for payload compatibility -->
+                <input type="hidden" id="edit-work-unit-mobile" value="" />
+              </div>
+
+              <!-- Dynamic Requirements List for Final Documents in Edit Page -->
+              <div class="form-field" id="edit-work-req-container" style="display:none; margin-top:1.25rem;">
+                <label class="form-label" style="display:flex;justify-content:space-between;align-items:center">
+                  <span>Required Documents Checklist</span>
+                  <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal">Edit or add document requirements</span>
+                </label>
+                <div style="background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.75rem">
+                  <div id="edit-finaldocs-req-items" style="display:flex;flex-direction:column;gap:0.45rem;margin-bottom:0.6rem"></div>
+                  <div style="display:flex;gap:0.5rem;align-items:center">
+                    <input type="text" id="edit-finaldocs-new-req-input" class="form-input" placeholder="Type document name..." style="font-size:0.84rem;padding:0.5rem 0.75rem" onkeydown="if(event.key==='Enter'){event.preventDefault();addEditFinalDocRequirement();}">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="addEditFinalDocRequirement()" style="white-space:nowrap;display:inline-flex;align-items:center;gap:0.35rem">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      <span>Add</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Attach Card (Image 3 Desktop) -->
+            <div class="work-edit-card gc-edit-attach-card-box">
+              <div class="gc-edit-card-subheading">Attach</div>
+              <div class="gc-edit-attach-tools-grid">
+                <button type="button" class="gc-attach-tool-btn" onclick="promptAddAttachment('drive')">
+                  <div class="gc-attach-tool-icon drive">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 19 22 19"/></svg>
+                  </div>
+                  <span>Drive</span>
+                </button>
+                <button type="button" class="gc-attach-tool-btn" onclick="promptAddAttachment('youtube')">
+                  <div class="gc-attach-tool-icon youtube">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+                  </div>
+                  <span>YouTube</span>
+                </button>
+                <button type="button" class="gc-attach-tool-btn" onclick="promptAddAttachment('create')">
+                  <div class="gc-attach-tool-icon create">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                  <span>Create</span>
+                </button>
+                <button type="button" class="gc-attach-tool-btn" onclick="promptAddAttachment('upload')">
+                  <div class="gc-attach-tool-icon upload">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  </div>
+                  <span>Upload</span>
+                </button>
+                <button type="button" class="gc-attach-tool-btn" onclick="promptAddAttachment('link')">
+                  <div class="gc-attach-tool-icon link">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  </div>
+                  <span>Link</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Sidebar (Image 3 Desktop) -->
+          <aside class="work-edit-sidebar">
+            <div class="gc-sidebar-item">
+              <label class="gc-sidebar-label">Assign to</label>
+              <button type="button" class="gc-sidebar-pill-btn" onclick="toast('Assigned to all students in cohort')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>All students</span>
+              </button>
+            </div>
+
+            <div class="gc-sidebar-item" id="edit-work-marks-wrap">
+              <label class="gc-sidebar-label">Points</label>
+              <input type="number" class="form-input gc-sidebar-input" id="edit-work-marks" min="0" max="500" value="100" />
+            </div>
+
+            <div class="gc-sidebar-item">
+              <label class="gc-sidebar-label" id="edit-work-due-label">Due</label>
+              <input type="date" class="form-input gc-sidebar-input" id="edit-work-due" />
+              <label class="gc-sidebar-checkbox-row">
+                <input type="checkbox" id="edit-work-close-due" checked />
+                <span>Close submissions after due date</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="gc-info-icon" title="Strict due date enforced"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </label>
+            </div>
+
+            <!-- Topic setting removed as requested; retained as hidden input for payload compatibility -->
+            <input type="hidden" id="edit-work-unit" value="" />
+
+            <div class="gc-sidebar-item">
+              <label class="gc-sidebar-label">Rubric</label>
+              <button type="button" class="gc-sidebar-rubric-btn" onclick="toast('Rubrics configured for this coursework')">
+                <span>+ Rubric</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="gc-info-icon" title="Evaluation criteria rubrics"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </button>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
@@ -889,8 +1199,8 @@
 
             <!-- Month Navigator & View Mode Controls -->
             <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-              <!-- Mobile Compact vs Full Toggle -->
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-mobile-mode" onclick="toggleMobileRegisterMode()" style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.75rem;padding:0.25rem 0.55rem;" title="Switch between Compact Daily view and Full 31-Day Ledger">
+              <!-- Mobile Compact vs Full Toggle (Disabled: Mobile is pure compact UI/UX) -->
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-mobile-mode" onclick="toggleMobileRegisterMode()" style="display:none !important;" title="Switch between Compact Daily view and Full 31-Day Ledger">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                 <span id="lbl-toggle-mobile-mode">Full 31-Day Ledger</span>
               </button>
@@ -1141,6 +1451,64 @@
             <div style="padding:3rem 1rem;text-align:center;color:var(--text-muted)">Loading classroom spreadsheet...</div>
           </div>
         </div>
+    <!-- ══════════════════════════════════════════════════════════════
+         TAB: STUDENT ATTENDANCE (Course-specific attendance telemetry)
+         ══════════════════════════════════════════════════════════════ -->
+    <div id="tab-attendance" class="tab-pane student-only-pane" style="display:none">
+      <div class="student-attendance-layout" style="max-width: 1000px; margin: 0 auto; padding: 0.5rem 0;">
+        <!-- Telemetry Stats Cards -->
+        <div class="att-telemetry-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+          <div class="card att-stat-card" style="padding: 1.25rem; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: var(--radius-md);">
+            <div style="font-size: 0.76rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">Subject Attendance</div>
+            <div style="display:flex; align-items:baseline; gap:0.6rem;">
+              <span id="student-att-hero-pct" style="font-size: 2.2rem; font-weight: 900; color: var(--status-present);">100%</span>
+              <span id="student-att-hero-chip" class="badge" style="font-size: 0.75rem; background: var(--status-present-bg); color: var(--status-present); font-weight: 700;">Safe Zone</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">Minimum 75% required for examination eligibility</div>
+          </div>
+
+          <div class="card att-stat-card" style="padding: 1.25rem; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: var(--radius-md);">
+            <div style="font-size: 0.76rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">Classes Attended</div>
+            <div id="student-att-stat-attended" style="font-size: 2rem; font-weight: 900; color: var(--text-main);">0</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">Out of <span id="student-att-stat-conducted" style="font-weight:700;">0</span> conducted classes</div>
+          </div>
+
+          <div class="card att-stat-card" style="padding: 1.25rem; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: var(--radius-md);">
+            <div style="font-size: 0.76rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">Classes Absent</div>
+            <div id="student-att-stat-absent" style="font-size: 2rem; font-weight: 900; color: var(--status-absent);">0</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">Missed sessions</div>
+          </div>
+
+          <div class="card att-stat-card" style="padding: 1.25rem; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: var(--radius-md);">
+            <div style="font-size: 0.76rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">Attendance Buffer</div>
+            <div id="student-att-stat-buffer" style="font-size: 2rem; font-weight: 900; color: var(--color-primary);">0</div>
+            <div id="student-att-buffer-desc" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">Classes can safely miss</div>
+          </div>
+        </div>
+
+        <!-- Attendance History Table -->
+        <div class="card" style="border: 1px solid var(--border-color); background: var(--bg-card); border-radius: var(--radius-md); overflow: hidden;">
+          <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 1rem; font-weight: 800; color: var(--text-main);">Course Attendance History</h3>
+            <span id="student-att-history-count" style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">0 sessions recorded</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="marks-table" style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="padding: 0.65rem 1rem; text-align: left;">Date &amp; Time</th>
+                  <th style="padding: 0.65rem 1rem; text-align: left;">Session Label</th>
+                  <th style="padding: 0.65rem 1rem; text-align: left;">Type</th>
+                  <th style="padding: 0.65rem 1rem; text-align: center;">Status</th>
+                  <th style="padding: 0.65rem 1rem; text-align: left;">Source</th>
+                </tr>
+              </thead>
+              <tbody id="student-att-history-tbody">
+                <tr><td colspan="5" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">Loading attendance history...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -1148,7 +1516,7 @@
   <!-- ══════════════════════════════════════════════════════════════
        CLASSROOM ROLL CALL MODAL (Dynamic QR, PIN & Live Feed)
        ══════════════════════════════════════════════════════════════ -->
-  <div id="classroom-roll-modal" class="modal-backdrop" onclick="if(event.target===this)closeClassRollCallModal()">
+  <div id="classroom-roll-modal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)closeClassRollCallModal()">
     <div class="modal-card" style="max-width: 620px;">
       <div class="rollcall-modal-header">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
@@ -2369,18 +2737,6 @@
       <span class="classroom-mobile-nav-label">Classwork</span>
     </button>
 
-    <button type="button" class="classroom-mobile-nav-btn" id="mobile-tab-btn-people" onclick="switchTab('people')">
-      <div class="classroom-mobile-nav-pill">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-        </svg>
-      </div>
-      <span class="classroom-mobile-nav-label">People</span>
-    </button>
-
     <button type="button" class="classroom-mobile-nav-btn" id="mobile-tab-btn-register" onclick="switchTab('register')" title="Attendance Register">
       <div class="classroom-mobile-nav-pill">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2401,26 +2757,25 @@
       <span class="classroom-mobile-nav-label">Marks</span>
     </button>
 
-    <button type="button" class="classroom-mobile-nav-btn" id="mobile-tab-btn-sheets" onclick="switchTab('sheets')" title="Sheets Studio">
+    <button type="button" class="classroom-mobile-nav-btn" id="mobile-tab-btn-people" onclick="switchTab('people')">
       <div class="classroom-mobile-nav-pill">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-          <line x1="3" y1="9" x2="21" y2="9"></line>
-          <line x1="3" y1="15" x2="21" y2="15"></line>
-          <line x1="9" y1="3" x2="9" y2="21"></line>
-          <line x1="15" y1="3" x2="15" y2="21"></line>
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
       </div>
-      <span class="classroom-mobile-nav-label">Sheets</span>
+      <span class="classroom-mobile-nav-label">People</span>
     </button>
   </nav>
   <!-- Modular Classroom Scripts (Element-wise architecture) -->
-  <script src="/faculty/group-detail/js/group-detail-core.js?v=20261022"></script>
-  <script src="/faculty/group-detail/js/group-detail-stream.js?v=20261022"></script>
-  <script src="/faculty/group-detail/js/group-detail-people.js?v=20261022"></script>
-  <script src="/faculty/group-detail/js/group-detail-classwork.js?v=20261022"></script>
-  <script src="/faculty/group-detail/js/group-detail-register.js?v=20261022"></script>
-  <script src="/faculty/group-detail/js/group-detail-sheets.js?v=20261022"></script>
-  <script src="/faculty/group-detail/group-detail.js?v=20261022"></script>
+  <script src="/faculty/group-detail/js/group-detail-core.js?v=20261023"></script>
+  <script src="/faculty/group-detail/js/group-detail-stream.js?v=20261023"></script>
+  <script src="/faculty/group-detail/js/group-detail-people.js?v=20261023"></script>
+  <script src="/faculty/group-detail/js/group-detail-classwork.js?v=20261023"></script>
+  <script src="/faculty/group-detail/js/group-detail-register.js?v=20261023"></script>
+  <script src="/faculty/group-detail/js/group-detail-sheets.js?v=20261023"></script>
+  <script src="/faculty/group-detail/group-detail.js?v=20261023"></script>
 </body>
 </html>
