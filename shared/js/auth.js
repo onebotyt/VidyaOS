@@ -329,39 +329,9 @@ function guardRoute(options = []) {
   } catch (_) {}
 
   try {
-    renderSidebar();
+    mountNavigationSystem();
   } catch (err) {
-    console.error('Error in renderSidebar:', err);
-  }
-
-  try {
-    renderFooter();
-  } catch (err) {
-    console.error('Error in renderFooter:', err);
-  }
-
-  try {
-    renderMobileBottomNav(user);
-  } catch (err) {
-    console.error('Error in renderMobileBottomNav:', err);
-  }
-
-  try {
-    renderUserNav();
-  } catch (err) {
-    console.error('Error in renderUserNav:', err);
-  }
-
-  try {
-    renderClassroomNavbar();
-  } catch (err) {
-    console.error('Error in renderClassroomNavbar:', err);
-  }
-
-  try {
-    loadUniversalNavigation();
-  } catch (err) {
-    console.error('Error in loadUniversalNavigation:', err);
+    console.error('Error in mountNavigationSystem:', err);
   }
 
   return true;
@@ -777,307 +747,479 @@ if (typeof window !== 'undefined') {
   window.getSvgIcon = getSvgIcon;
 }
 
-function renderSidebar() {
-  const user = getCurrentUser();
-  const header = document.querySelector('.app-header, .gc-navbar');
-  if (!header || !user) return;
+// ─────────────────────────────────────────────────────────
+// 4-ROLE UNIFIED INSTITUTIONAL NAVIGATION ENGINE
+// 1 for Admin, 1 for HOD, 1 for Faculty, 1 for Student
+// Zero Legacy AJAX Collisions, Zero Network Latency
+// ─────────────────────────────────────────────────────────
 
-  const currentPath = window.location.pathname.toLowerCase();
+const NAVIGATION_PROFILES = {
+  admin: {
+    role: 'admin',
+    portalLabel: 'Administration',
+    pageBadge: 'ADMIN CONSOLE',
+    badgeClass: 'badge-admin',
+    homeUrl: '/admin/dashboard.html',
+    appsTiles: [
+      { href: '/admin/dashboard.html', icon: 'dashboard', label: 'Dashboard' },
+      { href: '/admin/academic-structure.html', icon: 'academic', label: 'Structure' },
+      { href: '/admin/faculty.html', icon: 'hod', label: 'HODs' },
+      { href: '/admin/reports.html', icon: 'reports', label: 'Reports' },
+      { href: '/admin/audit-logs.html', icon: 'audit', label: 'Audit Logs' },
+      { href: '/admin/settings.html', icon: 'settings', label: 'Settings' }
+    ],
+    sections: [
+      {
+        label: 'Administration',
+        items: [
+          { href: '/admin/dashboard.html', icon: 'dashboard', label: 'Dashboard' },
+          { href: '/admin/academic-structure.html', icon: 'academic', label: 'Academic Structure' },
+          { href: '/admin/faculty.html', icon: 'hod', label: 'HOD Management' },
+          { href: '/admin/reports.html', icon: 'reports', label: 'Reports & Analytics' },
+          { href: '/admin/audit-logs.html', icon: 'audit', label: 'Audit Logs' },
+          { href: '/admin/settings.html', icon: 'settings', label: 'System Settings' }
+        ]
+      }
+    ],
+    bottomTabs: [
+      { href: '/admin/dashboard.html', icon: 'home', label: 'Home' },
+      { href: '/admin/academic-structure.html', icon: 'academic', label: 'Structure' },
+      { href: '/admin/faculty.html', icon: 'hod', label: 'HODs' },
+      { isMenu: true, icon: 'menu', label: 'Menu' }
+    ]
+  },
 
-  // If a sidebar or drawer already exists in DOM, initialize its state and avoid duplicate aside
-  if (document.getElementById('app-sidebar') || document.getElementById('gc-drawer') || document.getElementById('classroom-drawer')) {
-    _initSidebarState();
+  hod: {
+    role: 'hod',
+    portalLabel: (u) => `HOD • ${u?.hod_department_name || u?.department_name || 'Department'}`,
+    pageBadge: 'HOD COMMAND',
+    badgeClass: 'badge-hod',
+    homeUrl: '/faculty/dashboard.html',
+    appsTiles: [
+      { href: '/faculty/dashboard.html', icon: 'home', label: 'Classes' },
+      { href: '/faculty/hod-teachers.html', icon: 'hod', label: 'Faculty' },
+      { href: '/faculty/students.html', icon: 'students', label: 'Students' },
+      { href: '/faculty/registers.html', icon: 'book', label: 'Registers' },
+      { href: '/faculty/assignments.html', icon: 'assignment', label: 'Coursework' },
+      { href: '/faculty/tests.html', icon: 'test', label: 'Marksheets' },
+      { href: '/faculty/evaluation.html', icon: 'trendingUp', label: 'Evaluation' },
+      { href: '/faculty/hod-settings.html', icon: 'settings', label: 'Settings' }
+    ],
+    sections: [
+      {
+        label: 'HOD Department Command',
+        items: [
+          { href: '/faculty/dashboard.html', icon: 'home', label: 'Department Overview' },
+          { href: '/faculty/hod-teachers.html', icon: 'hod', label: 'Department Faculty' },
+          { href: '/faculty/students.html', icon: 'students', label: 'Student Directory & Approvals', hasBadge: true, id: 'nav-students-item' },
+          { href: '/faculty/hod-settings.html', icon: 'settings', label: 'Department Settings' }
+        ]
+      },
+      {
+        label: 'Academic Management',
+        items: [
+          { href: '/faculty/registers.html', icon: 'book', label: 'Attendance Registers', id: 'nav-reg' },
+          { href: '/faculty/assignments.html', icon: 'assignment', label: 'Coursework & Assignments', id: 'nav-assign' },
+          { href: '/faculty/tests.html', icon: 'test', label: 'Class Tests & Marksheets', id: 'nav-marks' },
+          { href: '/faculty/evaluation.html', icon: 'trendingUp', label: 'Internal Evaluation', id: 'nav-eval' },
+          { href: '/faculty/reports.html', icon: 'reports', label: 'Department Analytics', id: 'nav-reports' },
+          { href: '/faculty/media.html', icon: 'folder', label: 'Faculty Drive & Vault', id: 'nav-drive' },
+          { href: '/faculty/timetable.html', icon: 'calendar', label: 'Department Timetable' },
+          { href: '/faculty/leave-approvals.html', icon: 'leave', label: 'Leave Approvals' }
+        ]
+      },
+      {
+        label: 'Archive & Safety',
+        items: [
+          { href: '/faculty/dashboard.html?filter=ARCHIVED', icon: 'archive', label: 'Archived Classes' },
+          { href: '/faculty/dashboard.html?trash=1', icon: 'trash', label: 'Trash Bin (7d Recovery)' }
+        ]
+      }
+    ],
+    bottomTabs: [
+      { href: '/faculty/dashboard.html', icon: 'home', label: 'Home' },
+      { href: '/faculty/hod-teachers.html', icon: 'hod', label: 'Faculty' },
+      { href: '/faculty/registers.html', icon: 'book', label: 'Registers' },
+      { isMenu: true, icon: 'menu', label: 'Menu' }
+    ]
+  },
+
+  faculty: {
+    role: 'faculty',
+    portalLabel: (u) => u?.is_class_teacher ? `Class Teacher • ${u?.class_cohort || 'Cohort'}` : 'Faculty Portal',
+    pageBadge: 'FACULTY WORKSPACE',
+    badgeClass: 'badge-faculty',
+    homeUrl: '/faculty/dashboard.html',
+    appsTiles: [
+      { href: '/faculty/dashboard.html', icon: 'home', label: 'Classes' },
+      { href: '/faculty/media.html', icon: 'folder', label: 'Drive Vault' },
+      { href: '/faculty/registers.html', icon: 'book', label: 'Registers' },
+      { href: '/faculty/assignments.html', icon: 'assignment', label: 'Coursework' },
+      { href: '/faculty/tests.html', icon: 'test', label: 'Marksheets' },
+      { href: '/faculty/evaluation.html', icon: 'trendingUp', label: 'Evaluation' },
+      { href: '/faculty/students.html', icon: 'students', label: 'Students' },
+      { href: '/faculty/reports.html', icon: 'reports', label: 'Analytics' }
+    ],
+    sections: [
+      {
+        label: '',
+        items: [
+          { href: '/faculty/dashboard.html', icon: 'home', label: 'Classes Hub' },
+          { href: '/faculty/media.html', icon: 'folder', label: 'Faculty Drive & Vault', id: 'nav-drive' },
+          { href: '/faculty/timetable.html', icon: 'calendar', label: 'Timetable' }
+        ]
+      },
+      {
+        label: 'Teaching Classes',
+        customContent: '<div id="drawer-classes-list"><div style="padding:0.4rem 1.25rem;color:var(--text-muted);font-size:0.78rem;">Loading classes...</div></div>',
+        items: []
+      },
+      {
+        label: 'Academic Tools',
+        items: [
+          { href: '/faculty/registers.html', icon: 'book', label: 'Attendance Registers', id: 'nav-reg' },
+          { href: '/faculty/assignments.html', icon: 'assignment', label: 'Coursework & Assignments', id: 'nav-assign' },
+          { href: '/faculty/tests.html', icon: 'test', label: 'Class Tests & Marksheets', id: 'nav-marks' },
+          { href: '/faculty/evaluation.html', icon: 'trendingUp', label: 'Internal Evaluation', id: 'nav-eval' },
+          { href: '/faculty/students.html', icon: 'students', label: 'Faculty & Students', id: 'nav-students-item', hasBadge: true },
+          { href: '/faculty/reports.html', icon: 'reports', label: 'Reports & Analytics', id: 'nav-reports' },
+          { href: '/faculty/leave-approvals.html', icon: 'leave', label: 'Leave Requests' }
+        ]
+      },
+      {
+        label: 'Archive & Safety',
+        items: [
+          { href: '/faculty/dashboard.html?filter=ARCHIVED', icon: 'archive', label: 'Archived Classes' },
+          { href: '/faculty/dashboard.html?trash=1', icon: 'trash', label: 'Trash Bin (7d Recovery)' },
+          { href: '/faculty/profile.html', icon: 'settings', label: 'Settings & Profile' }
+        ]
+      }
+    ],
+    bottomTabs: [
+      { href: '/faculty/dashboard.html', icon: 'home', label: 'Home' },
+      { href: '/faculty/registers.html', icon: 'book', label: 'Registers' },
+      { href: '/faculty/students.html', icon: 'students', label: 'Students' },
+      { isMenu: true, icon: 'menu', label: 'Menu' }
+    ]
+  },
+
+  student: {
+    role: 'student',
+    portalLabel: 'Student Portal',
+    pageBadge: 'STUDENT WORKSPACE',
+    badgeClass: 'badge-student',
+    homeUrl: '/student/dashboard.html',
+    appsTiles: [
+      { href: '/student/dashboard.html', icon: 'reports', label: 'Dashboard' },
+      { href: '/student/groups.html', icon: 'home', label: 'Classes' },
+      { href: '/student/attendance.html', icon: 'calendar', label: 'Attendance' },
+      { href: '/student/timetable.html', icon: 'clock', label: 'Timetable' },
+      { href: '/student/assignments.html', icon: 'assignment', label: 'Assignments' },
+      { href: '/student/scores.html', icon: 'reports', label: 'Scores' }
+    ],
+    sections: [
+      {
+        label: 'Academics',
+        items: [
+          { href: '/student/dashboard.html', icon: 'reports', label: 'Dashboard Overview' },
+          { href: '/student/groups.html', icon: 'home', label: 'My Classes & Subjects' },
+          { href: '/student/attendance.html', icon: 'calendar', label: 'Attendance & Biometrics' },
+          { href: '/student/timetable.html', icon: 'clock', label: 'My Timetable' }
+        ]
+      },
+      {
+        label: 'Coursework & Evaluation',
+        items: [
+          { href: '/student/assignments.html', icon: 'assignment', label: 'My Assignments' },
+          { href: '/student/scores.html', icon: 'reports', label: 'Test Scores & Marks' },
+          { href: '/student/leave.html', icon: 'leave', label: 'Apply for Leave' }
+        ]
+      },
+      {
+        label: 'Account',
+        items: [
+          { href: '/student/profile.html', icon: 'settings', label: 'My Profile' }
+        ]
+      }
+    ],
+    bottomTabs: [
+      { href: '/student/dashboard.html', icon: 'home', label: 'Home' },
+      { href: '/student/attendance.html', icon: 'calendar', label: 'Attendance' },
+      { href: '/student/assignments.html', icon: 'assignment', label: 'Tasks' },
+      { isMenu: true, icon: 'menu', label: 'Menu' }
+    ]
+  }
+};
+
+function resolveNavigationRole(user, pathname) {
+  const p = (pathname || (typeof window !== 'undefined' && window.location ? window.location.pathname : '')).toLowerCase();
+  if (user?.roles?.includes('SYSTEM_ADMIN') || p.includes('/admin/')) return 'admin';
+  if (user?.is_hod || p.includes('/faculty/hod-')) return 'hod';
+  if (user?.roles?.includes('TEACHER') || p.includes('/faculty/')) return 'faculty';
+  if (user?.roles?.includes('STUDENT') || p.includes('/student/')) return 'student';
+  return 'faculty';
+}
+
+function mountNavigationSystem(options = {}) {
+  if (typeof document === 'undefined') return;
+
+  const currentPath = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+  const isPublicAuthPage = currentPath.includes('/login/') || 
+                           currentPath.startsWith('/login') || 
+                           currentPath.startsWith('/register') || 
+                           currentPath.includes('student-register') ||
+                           currentPath === '/' || 
+                           currentPath === '/index.html';
+
+  // 1. Clean up any conflicting legacy DOM elements
+  const staleElements = [
+    '#universal-bottom-nav',
+    '#studio-main-bottom-menu',
+    '#android-profile-drawer',
+    '#android-profile-backdrop',
+    '#universal-app-header',
+    '.app-footer'
+  ];
+  staleElements.forEach(selector => {
+    document.querySelectorAll(selector).forEach(el => el.remove());
+  });
+
+  if (isPublicAuthPage) {
+    document.body.classList.remove('has-bottom-nav', 'has-sidebar');
     return;
   }
 
-  // 1. Inject toggle button into header left
+  const user = getCurrentUser();
+  if (!user) return;
+
+  const roleKey = options.role || resolveNavigationRole(user, currentPath);
+  const profile = NAVIGATION_PROFILES[roleKey] || NAVIGATION_PROFILES.faculty;
+
+  const displayName = getUserDisplayName(user);
+  const email = user.email || user.username || `${roleKey}@college.edu`;
+  const cleanName = displayName.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
+  const parts = cleanName.split(/\s+/).filter(Boolean);
+  const initial = parts.length > 0 ? (parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].slice(0, 2).toUpperCase()) : roleKey.slice(0, 2).toUpperCase();
+
+  const portalLabel = typeof profile.portalLabel === 'function' ? profile.portalLabel(user) : profile.portalLabel;
+
+  // 2. HEADER (.gc-navbar)
+  _ensureHeader(profile, user, initial, displayName, email, portalLabel);
+
+  // 3. SIDEBAR (#app-sidebar)
+  _ensureSidebar(profile, user, portalLabel);
+
+  // 4. MOBILE BOTTOM NAV (.mobile-bottom-nav)
+  _ensureMobileBottomNav(profile, currentPath);
+
+  // 5. Async enrichments for faculty & HOD
+  if (roleKey === 'faculty' || roleKey === 'hod') {
+    _loadDrawerTeachingClasses();
+    _loadNavPendingBadge();
+  }
+}
+
+function _ensureHeader(profile, user, initial, displayName, email, portalLabel) {
+  let header = document.querySelector('.gc-navbar, .app-header');
+  
+  if (!header) {
+    const headerHtml = `
+      <header class="gc-navbar">
+        <div class="gc-nav-left">
+          <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">
+            <span style="display:inline-flex;align-items:center;justify-content:center;">${getSvgIcon('menu', 18)}</span>
+          </button>
+          <a href="${profile.homeUrl}" class="gc-brand-link" title="VidyaOS ${portalLabel}">
+            <div class="gc-brand-icon">${getSvgIcon('gradCap', 22)}</div>
+            <div class="gc-brand-title">VidyaOS</div>
+          </a>
+          <span class="gc-page-badge" id="app-header-page-title">${profile.pageBadge}</span>
+        </div>
+        <div class="gc-nav-right">
+          <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher(event)" id="btn-apps-launcher" title="Apps &amp; Modules" aria-label="Apps Launcher">
+            ${getSvgIcon('apps', 18)}
+          </button>
+          <button type="button" class="gc-icon-btn" onclick="toggleAppTheme()" id="btn-theme-toggle" title="Toggle Theme" aria-label="Toggle Theme">
+            ${getSvgIcon('moon', 18)}
+          </button>
+          <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile(event)" title="Account Profile">${initial}</div>
+        </div>
+      </header>
+    `;
+    document.body.insertAdjacentHTML('afterbegin', headerHtml);
+    header = document.querySelector('.gc-navbar');
+  }
+
+  // Ensure toggle button in left wrap
   if (!document.getElementById('sidebar-toggle-btn') && !document.getElementById('btn-menu-toggle')) {
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'sidebar-toggle-btn';
     toggleBtn.className = 'sidebar-toggle-btn gc-menu-btn';
     toggleBtn.type = 'button';
     toggleBtn.onclick = toggleSidebar;
-    toggleBtn.setAttribute('aria-label', 'Toggle navigation sidebar');
-    toggleBtn.setAttribute('aria-pressed', 'false');
+    toggleBtn.setAttribute('aria-label', 'Toggle navigation');
     toggleBtn.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;">${getSvgIcon('menu', 18)}</span>`;
 
-    const brand = header.querySelector('.brand, .gc-brand-link');
-    let leftWrap = header.querySelector('.header-left, .gc-nav-left');
-    if (!leftWrap) {
-      leftWrap = document.createElement('div');
-      leftWrap.className = 'header-left';
-      if (brand) {
-        brand.parentNode.insertBefore(leftWrap, brand);
-        leftWrap.appendChild(toggleBtn);
-        leftWrap.appendChild(brand);
-      } else {
-        header.insertBefore(leftWrap, header.firstChild);
-        leftWrap.appendChild(toggleBtn);
-      }
-    } else {
+    const leftWrap = header.querySelector('.gc-nav-left, .header-left');
+    if (leftWrap) {
       leftWrap.insertBefore(toggleBtn, leftWrap.firstChild);
     }
   }
 
-  // 2. Build sidebar if not present
-  if (document.getElementById('app-sidebar')) return;
-
-  const currentUrl = (window.location.pathname + window.location.search).toLowerCase();
-  let roleBadge = 'USER';
-  if (user.roles?.includes('SYSTEM_ADMIN')) {
-    roleBadge = 'ADMIN';
-  } else if (user.is_hod) {
-    roleBadge = 'HOD';
-  } else if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
-    roleBadge = 'COMMON MGR';
-  } else if (user.roles?.includes('TEACHER') || user.is_class_teacher) {
-    roleBadge = 'FACULTY';
-  } else if (user.roles?.includes('STUDENT')) {
-    roleBadge = 'STUDENT';
-  } else if (user.roles && user.roles[0]) {
-    roleBadge = user.roles[0];
-  }
-  const displayName = getUserDisplayName(user);
-  const email = user.email || user.username || 'System Account';
-
-  let navSections = [];
-  let portalLabel = 'College Portal';
-
-  if (user.roles?.includes('SYSTEM_ADMIN') || currentPath.includes('/admin/')) {
-    portalLabel = 'Administration';
-    navSections = [{
-      label: 'Admin',
-      items: [
-        { icon: 'dashboard', label: 'Dashboard', href: '/admin/dashboard.html' },
-        { icon: 'academic', label: 'Academic Structure', href: '/admin/academic-structure.html' },
-        { icon: 'hod', label: 'HOD Management', href: '/admin/faculty.html' },
-        { icon: 'reports', label: 'Reports & Analytics', href: '/admin/reports.html' },
-        { icon: 'settings', label: 'System Settings', href: '/admin/settings.html' },
-        { icon: 'audit', label: 'Audit Logs', href: '/admin/audit-logs.html' }
-      ]
-    }];
-  } else if (user.roles?.includes('TEACHER') || currentPath.includes('/faculty/')) {
-    portalLabel = user.is_hod ? `HOD — ${user.hod_department_name || 'Dept'}` : 'Faculty Portal';
-
-    const isDeptFaculty = Boolean(user.department_id || user.teacher?.department_id || user.is_class_teacher || user.is_hod || (user.roles?.includes('TEACHER') && !user.is_common_faculty_manager));
-    const isHodUser = Boolean(user.is_hod || currentPath.includes('hod-'));
-
-    // Top Level: Google Classroom Style
-    navSections.push({
-      label: '',
-      items: [
-        { icon: 'home', label: 'Classes', href: '/faculty/dashboard.html' },
-        { icon: 'folder', label: 'Faculty Drive & Vault', href: '/faculty/media.html', id: 'nav-drive' },
-        { icon: 'calendar', label: 'Calendar & Timetable', href: '/faculty/timetable.html' }
-      ]
-    });
-
-    // Teaching Classes List
-    navSections.push({
-      label: 'Teaching Classes',
-      customContent: '<div id="drawer-classes-list"><div style="padding:0.4rem 1.25rem;color:var(--text-muted);font-size:0.78rem;">Loading classes...</div></div>',
-      items: []
-    });
-
-    // Academic Tools
-    const academicTools = [
-      { icon: 'book', label: 'Attendance Registers', href: '/faculty/registers.html', id: 'nav-reg' },
-      { icon: 'assignment', label: 'Coursework & Assignments', href: '/faculty/assignments.html', id: 'nav-assign' },
-      { icon: 'reports', label: 'Marks & Tests', href: '/faculty/tests.html', id: 'nav-marks' },
-      { icon: 'trendingUp', label: 'Internal Evaluation', href: '/faculty/evaluation.html', id: 'nav-eval' },
-      { icon: 'trendingDown', label: 'Reports & Analytics', href: '/faculty/reports.html', id: 'nav-reports' },
-      { icon: 'leave', label: 'Leave Requests', href: '/faculty/leave-approvals.html' }
-    ];
-
-    if (isDeptFaculty || isHodUser) {
-      academicTools.push({ icon: 'students', label: 'Faculty & Students', href: '/faculty/students.html', id: 'nav-students-item', hasBadge: true });
-    }
-    if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
-      academicTools.push({ icon: 'commonFaculty', label: 'Common Faculty', href: '/faculty/common-teachers.html' });
-    }
-    navSections.push({ label: 'Academic Tools', items: academicTools });
-
-    // HOD Exclusive Management Section (Only 2 exclusive links here + HOD Dashboard on Classes)
-    if (isHodUser) {
-      navSections.push({
-        label: 'HOD Management',
-        items: [
-          { icon: 'hod', label: 'Department Faculty', href: '/faculty/hod-teachers.html' },
-          { icon: 'settings', label: 'Department Settings', href: '/faculty/hod-settings.html' }
-        ]
-      });
-    }
-
-    navSections.push({
-      label: 'Archive & Safety',
-      items: [
-        { icon: 'archive', label: 'Archived Classes', href: '/faculty/dashboard.html?filter=ARCHIVED' },
-        { icon: 'trash', label: 'Trash Bin (7d Recovery)', href: '/faculty/dashboard.html?trash=1' },
-        { icon: 'settings', label: 'Settings', href: isHodUser ? '/faculty/hod-settings.html' : '/faculty/profile.html' }
-      ]
-    });
-  } else if (user.roles?.includes('STUDENT') || currentPath.includes('/student/')) {
-    portalLabel = 'Student Portal';
-    navSections = [{
-      label: 'Student',
-      items: [
-        { icon: 'reports', label: 'Dashboard', href: '/student/dashboard.html' },
-        { icon: 'home', label: 'Teaching Groups', href: '/student/groups.html' },
-        { icon: 'calendar', label: 'Attendance & Calendar', href: '/student/attendance.html' },
-        { icon: 'clock', label: 'My Timetable', href: '/student/timetable.html' },
-        { icon: 'assignment', label: 'My Assignments', href: '/student/assignments.html' },
-        { icon: 'leave', label: 'Apply for Leave', href: '/student/leave.html' },
-        { icon: 'reports', label: 'My Test Scores', href: '/student/scores.html' }
-      ]
-    }];
+  // Update Avatar and Profile
+  const avatarEl = document.getElementById('gc-user-avatar') || header.querySelector('.gc-user-avatar');
+  if (avatarEl) {
+    avatarEl.textContent = initial;
+    avatarEl.setAttribute('onclick', 'toggleUserProfile(event)');
   }
 
-  // Build link HTML
-  function buildLinks(sections) {
-    return sections.map((section, idx) => {
-      let customHtml = '';
-      if (section.customContent) {
-        customHtml = section.customContent;
-      }
-      const links = (section.items || []).map(item => {
-        const hrefLower = (item.href || '').toLowerCase();
-        const itemBase = hrefLower.replace('.html', '').replace('/index', '');
-        const pathBase = currentPath.replace('.html', '').replace('/index', '').replace(/\/$/, '');
-        const isActive = (hrefLower.includes('?') ? currentUrl === hrefLower : (currentPath === hrefLower || pathBase === itemBase))
-          || (item.href.endsWith('dashboard.html') && (currentPath.endsWith('/') || currentPath.includes('dashboard') || currentPath.includes('groups.html')));
-        return `
-          <a href="${item.href}" ${item.id ? `id="${item.id}"` : ''}
-             class="sidebar-item gc-drawer-link ${isActive ? 'active' : ''}"
-             onclick="if(window.innerWidth<=768)closeSidebar()" style="position:relative;">
-            <span class="sidebar-item-icon" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0;">${getSvgIcon(item.icon, 18)}</span>
-            <span>${item.label}</span>
-            ${item.hasBadge ? `<span id="${item.id}-badge" style="display:none;position:absolute;right:0.65rem;top:50%;transform:translateY(-50%);background:var(--status-absent);color:var(--text-white, hsl(0, 0%, 100%));border-radius:9999px;min-width:18px;height:18px;font-size:0.65rem;font-weight:700;align-items:center;justify-content:center;padding:0 5px;"></span>` : ''}
-          </a>`;
-      }).join('');
-      const dividerHtml = isDrawerPortal && idx > 0 ? '<div class="gc-drawer-divider"></div>' : '';
-      const labelHtml = section.label ? `<div class="sidebar-section-label gc-drawer-sec-title">${section.label}</div>` : '';
-      return `${dividerHtml}${labelHtml}${customHtml}${links}`;
-    }).join('');
-  }
+  // Ensure and populate Apps Launcher Dropdown
+  _ensureAppsLauncher(header, profile);
 
-  // Safe escape helper for HTML attributes
-  const safeAttr = (s) => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // Ensure and populate User Profile Popover
+  _ensureUserProfilePopover(header, user, initial, displayName, email, portalLabel);
 
-  const isFacultyPortal = currentPath.includes('/faculty/');
-  const isAdminPortal = currentPath.includes('/admin/');
-  const isStudentPortal = currentPath.includes('/student/') || Boolean(user.roles?.includes('STUDENT'));
-  const isDrawerPortal = isFacultyPortal || isAdminPortal || isStudentPortal;
-
-  // Single Brand Logo Rule: The stationary top navbar displays the one and only brand logo.
-  // Sidebar header with duplicate logo, three-lines button, and close button is removed.
-  const sidebarHeaderHtml = '';
-
-  const sidebarHtml = `
-    <aside id="app-sidebar" class="app-sidebar ${isDrawerPortal ? 'gc-drawer' : ''}" aria-label="Site Navigation">
-      ${sidebarHeaderHtml}
-
-      <!-- Scoped Navigation Links -->
-      <div class="${isDrawerPortal ? 'gc-drawer-body ' : ''}sidebar-links">
-        ${buildLinks(navSections)}
-      </div>
-
-      <!-- Institutional Footer Tier -->
-      <div class="sidebar-footer">
-        <div class="sidebar-footer-row">
-          <div class="sidebar-system-pill">
-            <span class="sidebar-system-dot"></span>
-            <span>VidyaOS &bull; ${safeAttr(portalLabel)}</span>
-          </div>
-          <button type="button" class="sidebar-logout-btn" onclick="logout()" title="Sign out of system">
-            <span style="display:inline-flex;align-items:center;">${getSvgIcon('logout', 16)}</span>
-            <span>Logout</span>
-          </button>
-        </div>
-      </div>
-    </aside>
-    <div id="sidebar-backdrop" class="sidebar-backdrop gc-drawer-backdrop" onclick="closeSidebar()"></div>
-  `;
-
-  document.body.insertAdjacentHTML('afterbegin', sidebarHtml);
-  document.body.classList.add('has-sidebar');
-
-  // Initialize sidebar open/closed state and convert toggle button icon
-  _initSidebarState();
-
-  // Keep toggle button icon and responsive layout synchronized on window resize
-  window.addEventListener('resize', () => {
-    _initSidebarState();
-  });
-
-  // Close on Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeSidebar();
-  });
-
-  // Async: load pending registration count badge for Department Faculty / HODs
-  if (user.roles?.includes('TEACHER') || user.department_id || user.teacher?.department_id || user.is_hod || user.is_class_teacher) {
-    _loadNavPendingBadge();
-  }
-
-  // Async: load teaching classes into drawer
-  _loadDrawerTeachingClasses();
+  // Sync theme toggle icon
+  const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('app_theme') || 'light';
+  updateThemeToggleUI(currentTheme);
 }
 
-// ─────────────────────────────────────────────────────────
-// UNIVERSAL INSTITUTIONAL PAGE FOOTER (.app-footer)
-// ─────────────────────────────────────────────────────────
-function renderFooter() {
-  // Institutional page footer removed across all pages per user specification
-  const existing = document.querySelector('.app-footer');
-  if (existing) existing.remove();
+function _ensureAppsLauncher(header, profile) {
+  let launcher = document.getElementById('apps-launcher-dropdown');
+  if (!launcher) {
+    launcher = document.createElement('div');
+    launcher.id = 'apps-launcher-dropdown';
+    launcher.className = 'apps-launcher-dropdown';
+    launcher.style.display = 'none';
+    const navRight = header.querySelector('.gc-nav-right, .header-right') || header;
+    navRight.appendChild(launcher);
+  }
+
+  const tilesHtml = (profile.appsTiles || []).map(tile => `
+    <a href="${tile.href}" class="app-tile">
+      <div class="app-tile-icon" style="display:flex;align-items:center;justify-content:center;">${getSvgIcon(tile.icon, 20)}</div>
+      <span>${tile.label}</span>
+    </a>
+  `).join('');
+
+  launcher.innerHTML = tilesHtml;
 }
 
-// ─────────────────────────────────────────────────────────
-// MOBILE BOTTOM NAVIGATION BAR (.mobile-bottom-nav)
-// ─────────────────────────────────────────────────────────
-function renderMobileBottomNav(user) {
-  if (document.querySelector('.mobile-bottom-nav') || !user) return;
+function _ensureUserProfilePopover(header, user, initial, displayName, email, portalLabel) {
+  let popover = document.getElementById('user-profile-popover');
+  if (!popover) {
+    popover = document.createElement('div');
+    popover.id = 'user-profile-popover';
+    popover.className = 'user-profile-popover';
+    popover.style.display = 'none';
+    const navRight = header.querySelector('.gc-nav-right, .header-right') || header;
+    navRight.appendChild(popover);
+  }
+
+  const popoverAvatar = popover.querySelector('#popover-avatar');
+  if (popoverAvatar) popoverAvatar.textContent = initial;
+  const popoverName = popover.querySelector('#popover-user-name');
+  if (popoverName) popoverName.textContent = displayName;
+  const popoverEmail = popover.querySelector('#popover-user-email');
+  if (popoverEmail) popoverEmail.textContent = email;
+
+  // If popover has no children or needs structure
+  if (!popover.querySelector('#popover-avatar')) {
+    popover.innerHTML = `
+      <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">${initial}</div>
+      <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">${displayName}</div>
+      <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">${email}</div>
+      <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+      <button type="button" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.35rem;" onclick="toggleAppTheme()">
+        <span style="display:inline-flex;align-items:center;">${getSvgIcon('moon', 14)}</span>
+        <span>Toggle Appearance</span>
+      </button>
+      <button type="button" class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);display:flex;align-items:center;justify-content:center;gap:0.35rem;" onclick="logout()">
+        <span style="display:inline-flex;align-items:center;">${getSvgIcon('logout', 14)}</span>
+        <span>Sign Out</span>
+      </button>
+    `;
+  }
+}
+
+function _ensureSidebar(profile, user, portalLabel) {
   const currentPath = window.location.pathname.toLowerCase();
+  const currentUrl = (window.location.pathname + window.location.search).toLowerCase();
 
-  let tabs = [];
-  const svgHome = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`;
-  const svgRegisters = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>`;
-  const svgUsers = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`;
-  const svgStructure = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>`;
-  const svgAttendance = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
-  const svgScores = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`;
-  const svgMenu = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+  let sidebar = document.getElementById('app-sidebar');
 
-  if (user.roles?.includes('SYSTEM_ADMIN') || currentPath.includes('/admin/')) {
-    tabs = [
-      { icon: svgHome, label: 'Home', href: '/admin/dashboard.html' },
-      { icon: svgStructure, label: 'Structure', href: '/admin/academic-structure.html' },
-      { icon: svgUsers, label: 'Faculty', href: '/admin/faculty.html' },
-      { icon: svgMenu, label: 'Menu', isMenu: true }
-    ];
-  } else if (user.roles?.includes('TEACHER') || currentPath.includes('/faculty/')) {
-    tabs = [
-      { icon: svgHome, label: 'Home', href: '/faculty/dashboard.html' },
-      { icon: svgRegisters, label: 'Registers', href: '/faculty/registers.html' },
-      { icon: svgUsers, label: 'Students', href: '/faculty/students.html' },
-      { icon: svgMenu, label: 'Menu', isMenu: true }
-    ];
-  } else if (user.roles?.includes('STUDENT') || currentPath.includes('/student/')) {
-    tabs = [
-      { icon: svgHome, label: 'Home', href: '/student/dashboard.html' },
-      { icon: svgAttendance, label: 'Attendance', href: '/student/attendance.html' },
-      { icon: svgScores, label: 'Scores', href: '/student/scores.html' },
-      { icon: svgMenu, label: 'Menu', isMenu: true }
-    ];
+  if (!sidebar) {
+    function buildLinks(sections) {
+      return sections.map((section, idx) => {
+        let customHtml = section.customContent || '';
+        const links = (section.items || []).map(item => {
+          const hrefLower = (item.href || '').toLowerCase();
+          const itemBase = hrefLower.replace('.html', '').replace('/index', '');
+          const pathBase = currentPath.replace('.html', '').replace('/index', '').replace(/\/$/, '');
+          const isActive = (hrefLower.includes('?') ? currentUrl === hrefLower : (currentPath === hrefLower || pathBase === itemBase))
+            || (item.href.endsWith('dashboard.html') && (currentPath.endsWith('/') || currentPath.includes('dashboard') || currentPath.includes('groups.html')));
+
+          return `
+            <a href="${item.href}" ${item.id ? `id="${item.id}"` : ''}
+               class="sidebar-item gc-drawer-link ${isActive ? 'active' : ''}"
+               onclick="if(window.innerWidth<=768)closeSidebar()" style="position:relative;">
+              <span class="sidebar-item-icon" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0;">${getSvgIcon(item.icon, 18)}</span>
+              <span>${item.label}</span>
+              ${item.hasBadge ? `<span id="${item.id}-badge" style="display:none;position:absolute;right:0.65rem;top:50%;transform:translateY(-50%);background:var(--status-absent);color:var(--text-white, hsl(0, 0%, 100%));border-radius:9999px;min-width:18px;height:18px;font-size:0.65rem;font-weight:700;align-items:center;justify-content:center;padding:0 5px;"></span>` : ''}
+            </a>`;
+        }).join('');
+        const dividerHtml = idx > 0 ? '<div class="gc-drawer-divider"></div>' : '';
+        const labelHtml = section.label ? `<div class="sidebar-section-label gc-drawer-sec-title">${section.label}</div>` : '';
+        return `${dividerHtml}${labelHtml}${customHtml}${links}`;
+      }).join('');
+    }
+
+    const safePortalLabel = String(portalLabel || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const sidebarHtml = `
+      <aside id="app-sidebar" class="app-sidebar gc-drawer" aria-label="Site Navigation">
+        <!-- Scoped Navigation Links -->
+        <div class="gc-drawer-body sidebar-links">
+          ${buildLinks(profile.sections || [])}
+        </div>
+
+        <!-- Institutional Footer Tier -->
+        <div class="sidebar-footer">
+          <div class="sidebar-footer-row">
+            <div class="sidebar-system-pill">
+              <span class="sidebar-system-dot"></span>
+              <span>VidyaOS &bull; ${safePortalLabel}</span>
+            </div>
+            <button type="button" class="sidebar-logout-btn" onclick="logout()" title="Sign out of system">
+              <span style="display:inline-flex;align-items:center;">${getSvgIcon('logout', 16)}</span>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+      <div id="sidebar-backdrop" class="sidebar-backdrop gc-drawer-backdrop" onclick="closeSidebar()"></div>
+    `;
+
+    document.body.insertAdjacentHTML('afterbegin', sidebarHtml);
+    document.body.classList.add('has-sidebar');
   }
 
+  // Initialize and update state
+  _initSidebarState();
+}
+
+function _ensureMobileBottomNav(profile, currentPath) {
+  let existing = document.querySelector('.mobile-bottom-nav');
+  if (existing) existing.remove();
+
+  const tabs = profile.bottomTabs || [];
   if (!tabs.length) return;
 
   const itemsHtml = tabs.map(tab => {
     if (tab.isMenu) {
       return `
         <button type="button" class="mobile-nav-item" onclick="toggleSidebar()" aria-label="Open Navigation Menu">
-          <span class="mobile-nav-icon">${tab.icon}</span>
+          <span class="mobile-nav-icon">${getSvgIcon(tab.icon, 19)}</span>
           <span class="mobile-nav-label">${tab.label}</span>
         </button>
       `;
@@ -1088,20 +1230,42 @@ function renderMobileBottomNav(user) {
       (tab.href.endsWith('dashboard.html') && (currentPath.endsWith('/') || currentPath.includes('dashboard'))));
     return `
       <a href="${tab.href}" class="mobile-nav-item ${isActive ? 'active' : ''}">
-        <span class="mobile-nav-icon">${tab.icon}</span>
+        <span class="mobile-nav-icon">${getSvgIcon(tab.icon, 19)}</span>
         <span class="mobile-nav-label">${tab.label}</span>
       </a>
     `;
   }).join('');
 
   const navHtml = `
-    <nav class="mobile-bottom-nav" aria-label="Mobile Quick Navigation">
+    <nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
       <div class="mobile-bottom-nav-inner">
         ${itemsHtml}
       </div>
     </nav>
   `;
   document.body.insertAdjacentHTML('beforeend', navHtml);
+}
+
+// Global backward compatibility wrappers
+function renderSidebar() {
+  mountNavigationSystem();
+}
+
+function renderClassroomNavbar() {
+  mountNavigationSystem();
+}
+
+function renderMobileBottomNav() {
+  mountNavigationSystem();
+}
+
+function renderFooter() {
+  const existing = document.querySelector('.app-footer');
+  if (existing) existing.remove();
+}
+
+function renderUserNav() {
+  // Backwards compat stub
 }
 
 // ─────────────────────────────────────────────────────────
@@ -1697,414 +1861,31 @@ document.addEventListener('click', (e) => {
 });
 
 // ─────────────────────────────────────────────────────────
-// UNIVERSAL AJAX NAVIGATION COMPONENT (Header, Bottom Nav & Profile Drawer)
+// LEGACY COMPATIBILITY STUBS (Universal AJAX Nav Deprecated)
+// All navigation is handled deterministically by mountNavigationSystem()
 // ─────────────────────────────────────────────────────────
-let _navLoadingPromise = null;
-
-async function loadUniversalNavigation() {
-  if (typeof document === 'undefined') return;
-
-  const currentPath = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
-  const isPublicAuthPage = currentPath.includes('/login/') || 
-                           currentPath.startsWith('/login') || 
-                           currentPath.startsWith('/register') || 
-                           currentPath.includes('student-register') ||
-                           currentPath === '/' || 
-                           currentPath === '/index.html';
-  
-  const token = typeof getAuthToken === 'function' ? getAuthToken() : null;
-  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-  const isPortalPage = (currentPath.includes('/faculty/') || 
-                        currentPath.includes('/admin/') || 
-                        currentPath.includes('/student/')) && !isPublicAuthPage;
-
-  // ── Design Preview Mode ──────────────────────────────────────────────────
-  // When opened via Live Server (port 5500) or dev-server (port 5000) on a
-  // portal page, inject the nav with a mock "Designer Preview" user so the
-  // full UI renders without a backend. A small badge indicates preview mode.
-  const serverPort = window.location.port;
-  const isPreviewMode = isPortalPage &&
-    (!token || !user) &&
-    serverPort !== '' && serverPort !== '3000' && serverPort !== '80' && serverPort !== '443';
-
-  if (isPreviewMode && !window._vidyaosPreviewNavInjected) {
-    window._vidyaosPreviewNavInjected = true;
-    window._vidyaosPreviewUser = {
-      name: 'Designer Preview',
-      email: 'designer@college.edu',
-      roles: ['TEACHER'],
-      is_class_teacher: true,
-      is_hod: false
-    };
-    // Monkey-patch getCurrentUser so _initNavigationState can populate avatars
-    const _origGetCurrentUser = typeof getCurrentUser === 'function' ? getCurrentUser : null;
-    window._previewGetCurrentUser = () => window._vidyaosPreviewUser;
-    // Inject a floating preview-mode badge (bottom-left, non-intrusive)
-    if (!document.getElementById('vidyaos-preview-badge')) {
-      const badge = document.createElement('div');
-      badge.id = 'vidyaos-preview-badge';
-      badge.title = 'Design Preview Mode — CSS & UI only. API calls disabled.';
-      badge.style.cssText = [
-        'position:fixed', 'bottom:72px', 'left:8px', 'z-index:99999',
-        'background:var(--primary-color,#6366f1)', 'color:#fff',
-        'font:700 10px/1 system-ui,sans-serif', 'padding:4px 8px',
-        'border-radius:20px', 'pointer-events:none', 'letter-spacing:0.5px',
-        'box-shadow:0 2px 8px rgba(0,0,0,0.25)', 'opacity:0.85'
-      ].join(';');
-      badge.textContent = 'Preview';
-      document.body.appendChild(badge);
-    }
-    // Fall through to the main loading logic below with overridden user
-  } else if (!isPreviewMode) {
-    // Normal production path: bail if not authed on a portal page
-    if (isPublicAuthPage || !isPortalPage || !token || !user) {
-      const orphanBottom = document.getElementById('universal-bottom-nav');
-      if (orphanBottom) orphanBottom.remove();
-      const orphanDrawer = document.getElementById('android-profile-drawer');
-      if (orphanDrawer) orphanDrawer.remove();
-      const orphanBackdrop = document.getElementById('android-profile-backdrop');
-      if (orphanBackdrop) orphanBackdrop.remove();
-      const orphanHeader = document.getElementById('universal-app-header');
-      if (orphanHeader) orphanHeader.remove();
-      document.body.classList.remove('has-bottom-nav');
-      return;
-    }
+function loadUniversalNavigation() {
+  if (typeof mountNavigationSystem === 'function') {
+    mountNavigationSystem();
   }
-
-  // For Student Portal or pages with Google Classroom navigation (.gc-navbar), do NOT mount faculty universal-bottom-nav
-  const isStudentPortal = currentPath.includes('/student/') || (user && user.roles && user.roles.includes('STUDENT') && !user.roles.includes('TEACHER'));
-  if (isStudentPortal || document.querySelector('.gc-navbar')) {
-    const orphanBottom = document.getElementById('universal-bottom-nav') || document.getElementById('studio-main-bottom-menu');
-    if (orphanBottom) orphanBottom.remove();
-    const orphanDrawer = document.getElementById('android-profile-drawer');
-    if (orphanDrawer) orphanDrawer.remove();
-    const orphanBackdrop = document.getElementById('android-profile-backdrop');
-    if (orphanBackdrop) orphanBackdrop.remove();
-    const orphanHeader = document.getElementById('universal-app-header');
-    if (orphanHeader) orphanHeader.remove();
-    document.body.classList.remove('has-bottom-nav');
-    return;
-  }
-
-  // Add spacing class to body immediately so content is not obscured
-  document.body.classList.add('has-bottom-nav');
-
-  // If already loaded and mounted, simply update states
-  if (document.getElementById('universal-bottom-nav') || document.getElementById('studio-main-bottom-menu')) {
-    _initNavigationState();
-    return;
-  }
-
-  if (_navLoadingPromise) return _navLoadingPromise;
-
-  _navLoadingPromise = (async () => {
-    try {
-      // Completely secure, zero-AJAX local navigation builder (no external HTML fetches)
-      const html = _buildFallbackUniversalNavigation();
-
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-
-      // 1. Mount Universal Top Header if page has no header at all
-      if (!document.getElementById('universal-app-header') && !document.getElementById('app-header') && !document.querySelector('.gc-navbar') && !document.querySelector('.app-header')) {
-        const header = doc.getElementById('universal-app-header') || doc.querySelector('.app-header');
-        if (header) {
-          document.body.insertBefore(document.importNode(header, true), document.body.firstChild);
-        }
-      }
-
-      // 2. Mount Universal Bottom Nav if not present
-      if (!document.getElementById('universal-bottom-nav') && !document.getElementById('studio-main-bottom-menu')) {
-        const bottomNav = doc.getElementById('universal-bottom-nav') || doc.querySelector('.universal-bottom-nav') || doc.querySelector('.studio-bottom-nav');
-        if (bottomNav) {
-          document.body.appendChild(document.importNode(bottomNav, true));
-        }
-      }
-
-      // 3. Mount Android Profile Drawer & Backdrop if not present
-      if (!document.getElementById('android-profile-drawer')) {
-        const backdrop = doc.getElementById('android-profile-backdrop') || doc.querySelector('.android-profile-backdrop');
-        const drawer = doc.getElementById('android-profile-drawer') || doc.querySelector('.android-profile-drawer');
-        if (backdrop) document.body.appendChild(document.importNode(backdrop, true));
-        if (drawer) document.body.appendChild(document.importNode(drawer, true));
-      }
-
-      // Initialize navigation state & profile details
-      _initNavigationState();
-    } catch (e) {
-      console.error('loadUniversalNavigation error:', e);
-    } finally {
-      _navLoadingPromise = null;
-    }
-  })();
-
-  return _navLoadingPromise;
-}
-
-function _initNavigationState() {
-  const user = getCurrentUser();
-  const currentPath = window.location.pathname.toLowerCase();
-
-  // 1. Determine active navigation tab
-  const bottomNav = document.getElementById('universal-bottom-nav') || document.getElementById('studio-main-bottom-menu');
-  if (bottomNav) {
-    const items = bottomNav.querySelectorAll('.bottom-nav-item');
-    items.forEach(item => {
-      const href = (item.getAttribute('href') || '').toLowerCase();
-      const route = item.getAttribute('data-route') || '';
-
-      let isActive = false;
-      if (route === 'home' || href.includes('dashboard.html')) {
-        isActive = currentPath.includes('dashboard.html');
-      } else if (route === 'work' || href.includes('groups.html')) {
-        isActive = currentPath.includes('groups.html') || currentPath.includes('group-detail.html');
-      } else if (route === 'register' || href.includes('registers.html')) {
-        isActive = currentPath.includes('registers.html');
-      } else if (route === 'sheets' || href.includes('sheets.html')) {
-        isActive = currentPath.includes('sheets.html') || currentPath.includes('tests.html') || currentPath.includes('assignments.html') || currentPath.includes('evaluation.html');
-      }
-
-      if (isActive) {
-        item.classList.add('active');
-      } else if (!item.classList.contains('bottom-nav-profile-btn') && item.id !== 'btn-profile-bottom' && item.id !== 'btn-universal-profile-bottom') {
-        item.classList.remove('active');
-      }
-    });
-  }
-
-  // 2. Populate User Profile details into Drawer & Avatars
-  // In preview mode, use the injected mock user
-  const effectiveUser = user || (window._vidyaosPreviewUser) || null;
-  if (effectiveUser) {
-    const user = effectiveUser; // shadow param for rest of block
-    const displayName = getUserDisplayName(user);
-    const email = user.email || user.username || 'faculty@college.edu';
-    const cleanName = displayName.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
-    const parts = cleanName.split(/\s+/).filter(Boolean);
-    const initial = parts.length > 0 ? (parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].slice(0, 2).toUpperCase()) : 'DS';
-
-    // Top Header Avatar
-    const univTopAvatar = document.getElementById('universal-user-avatar');
-    if (univTopAvatar) univTopAvatar.textContent = initial;
-
-    // Bottom Navigation Bar Avatar
-    const bottomAvatar = document.getElementById('universal-bottom-avatar') || document.getElementById('bottom-avatar-circle');
-    if (bottomAvatar) bottomAvatar.textContent = initial;
-
-    // Drawer Avatar & Text
-    const drawerAvatar = document.getElementById('drawer-user-avatar');
-    if (drawerAvatar) drawerAvatar.textContent = initial;
-
-    const drawerName = document.getElementById('drawer-user-name');
-    if (drawerName) drawerName.textContent = displayName;
-
-    const drawerEmail = document.getElementById('drawer-user-email');
-    if (drawerEmail) drawerEmail.textContent = email;
-
-    const drawerRole = document.getElementById('drawer-user-role');
-    if (drawerRole) {
-      if (user.roles?.includes('SYSTEM_ADMIN')) {
-        drawerRole.textContent = 'System Administrator';
-      } else if (user.is_hod) {
-        drawerRole.textContent = 'Head of Department (HOD)';
-      } else if (user.roles?.includes('TEACHER') || user.is_class_teacher) {
-        drawerRole.textContent = 'Faculty Member';
-      } else if (user.roles?.includes('STUDENT')) {
-        drawerRole.textContent = 'Student';
-      }
-    }
-  } // end effectiveUser block
-
-  updateDrawerThemeLabel();
 }
 
 function toggleAndroidProfileDrawer(forceState) {
-  const drawer = document.getElementById('android-profile-drawer');
-  const backdrop = document.getElementById('android-profile-backdrop');
-  if (!drawer) return;
-
-  const isOpen = typeof forceState === 'boolean' ? forceState : !drawer.classList.contains('open');
-
-  if (isOpen) {
-    drawer.style.display = 'block';
-    if (backdrop) backdrop.style.display = 'block';
-    const scheduleFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : (fn => setTimeout(fn, 16));
-    scheduleFrame(() => {
-      drawer.classList.add('open');
-      if (backdrop) backdrop.classList.add('active');
-    });
-    updateDrawerThemeLabel();
-  } else {
-    drawer.classList.remove('open');
-    if (backdrop) backdrop.classList.remove('active');
-    setTimeout(() => {
-      if (!drawer.classList.contains('open')) {
-        drawer.style.display = 'none';
-        if (backdrop) backdrop.style.display = 'none';
-      }
-    }, 260);
+  if (typeof toggleUserProfile === 'function') {
+    toggleUserProfile();
   }
 }
 
 function updateDrawerThemeLabel() {
-  const label = document.getElementById('drawer-theme-label');
-  if (!label) return;
-  const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('app_theme') || 'light';
-  if (currentTheme === 'dark') {
-    label.textContent = 'Dark Mode Active (Tap to switch to Light)';
-  } else {
-    label.textContent = 'Light Mode Active (Tap to switch to Dark)';
-  }
-}
-
-function _buildFallbackUniversalNavigation() {
-  return `
-<nav class="studio-bottom-nav universal-bottom-nav" id="universal-bottom-nav" aria-label="Main Site Navigation">
-  <a href="/faculty/dashboard.html" class="bottom-nav-item" data-route="home">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-      <polyline points="9 22 9 12 15 12 15 22"></polyline>
-    </svg>
-    <span>Home</span>
-  </a>
-
-  <a href="/faculty/registers.html" class="bottom-nav-item" data-route="register">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-    </svg>
-    <span>Register</span>
-  </a>
-
-  <a href="/faculty/sheets.html" class="bottom-nav-item" data-route="sheets">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-      <line x1="3" y1="9" x2="21" y2="9"></line>
-      <line x1="3" y1="15" x2="21" y2="15"></line>
-      <line x1="9" y1="3" x2="9" y2="21"></line>
-      <line x1="15" y1="3" x2="15" y2="21"></line>
-    </svg>
-    <span>Sheet Studio</span>
-  </a>
-
-  <button type="button" class="bottom-nav-item bottom-nav-profile-btn" id="btn-universal-profile-bottom" onclick="toggleAndroidProfileDrawer()" style="background:none;border:none;">
-    <div class="bottom-profile-avatar" id="universal-bottom-avatar">DS</div>
-    <span>Profile</span>
-  </button>
-</nav>
-
-<div class="android-profile-backdrop" id="android-profile-backdrop" onclick="toggleAndroidProfileDrawer(false)" style="display:none;"></div>
-<div class="android-profile-drawer" id="android-profile-drawer" style="display:none;">
-  <div class="drawer-handle-pill" onclick="toggleAndroidProfileDrawer(false)"></div>
-  <div class="profile-drawer-header">
-    <div class="profile-drawer-avatar" id="drawer-user-avatar">DS</div>
-    <div class="profile-drawer-info">
-      <h4 id="drawer-user-name" style="margin:0;font-size:0.95rem;font-weight:800;color:var(--text-main);">Faculty Member</h4>
-      <div id="drawer-user-email" style="font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem;">faculty@college.edu</div>
-      <div style="display:flex;gap:0.35rem;margin-top:0.35rem;">
-        <span class="badge" id="drawer-user-role" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.68rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);">Faculty Member</span>
-      </div>
-    </div>
-    <button type="button" class="drawer-close-btn" onclick="toggleAndroidProfileDrawer(false)" data-icon="close" aria-label="Close"></button>
-  </div>
-
-  <div class="profile-quick-links-list">
-    <button type="button" class="quick-link-item" onclick="if(typeof toggleTheme === 'function'){ toggleTheme(); } else if(typeof toggleAppTheme === 'function'){ toggleAppTheme(); } if(typeof updateDrawerThemeLabel === 'function'){ updateDrawerThemeLabel(); }">
-      <div class="quick-link-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-      </div>
-      <div class="quick-link-text">
-        <span class="quick-link-title">App Theme</span>
-        <span class="quick-link-subtitle" id="drawer-theme-label">Switch Dark / Light Mode</span>
-      </div>
-      <div class="quick-link-arrow" data-icon="arrowRight"></div>
-    </button>
-
-    <a href="/faculty/groups.html" class="quick-link-item">
-      <div class="quick-link-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-      </div>
-      <div class="quick-link-text">
-        <span class="quick-link-title">My Classes &amp; Teaching Groups</span>
-        <span class="quick-link-subtitle">Google Classroom-style teaching groups</span>
-      </div>
-      <div class="quick-link-arrow" data-icon="arrowRight"></div>
-    </a>
-
-    <a href="/faculty/registers.html" class="quick-link-item">
-      <div class="quick-link-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-      </div>
-      <div class="quick-link-text">
-        <span class="quick-link-title">Attendance Registers &amp; Live Studio</span>
-        <span class="quick-link-subtitle">Dynamic QR roll call &amp; monthly ledger</span>
-      </div>
-      <div class="quick-link-arrow" data-icon="arrowRight"></div>
-    </a>
-
-    <a href="/faculty/tests.html" class="quick-link-item">
-      <div class="quick-link-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-      </div>
-      <div class="quick-link-text">
-        <span class="quick-link-title">Class Tests &amp; Periodic Exams</span>
-        <span class="quick-link-subtitle">Question-wise marks entry &amp; gradebooks</span>
-      </div>
-      <div class="quick-link-arrow" data-icon="arrowRight"></div>
-    </a>
-
-    <a href="/faculty/assignments.html" class="quick-link-item">
-      <div class="quick-link-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-      </div>
-      <div class="quick-link-text">
-        <span class="quick-link-title">Coursework Assignments</span>
-        <span class="quick-link-subtitle">Assignment grading &amp; submissions</span>
-      </div>
-      <div class="quick-link-arrow" data-icon="arrowRight"></div>
-    </a>
-
-    <a href="/faculty/sheets.html" class="quick-link-item">
-      <div class="quick-link-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
-      </div>
-      <div class="quick-link-text">
-        <span class="quick-link-title">Unified Sheet Studio</span>
-        <span class="quick-link-subtitle">Master evaluations &amp; spreadsheet gradebooks</span>
-      </div>
-      <div class="quick-link-arrow" data-icon="arrowRight"></div>
-    </a>
-
-    <a href="/faculty/profile.html" class="quick-link-item">
-      <div class="quick-link-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-      </div>
-      <div class="quick-link-text">
-        <span class="quick-link-title">Account Settings</span>
-        <span class="quick-link-subtitle">Profile details &amp; preferences</span>
-      </div>
-      <div class="quick-link-arrow" data-icon="arrowRight"></div>
-    </a>
-
-    <button type="button" class="quick-link-item quick-link-logout" onclick="logout()">
-      <div class="quick-link-icon" style="color:var(--status-absent);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-      </div>
-      <div class="quick-link-text">
-        <span class="quick-link-title" style="color:var(--status-absent);">Sign Out of VidyaOS</span>
-        <span class="quick-link-subtitle">Safely terminate active session</span>
-      </div>
-      <div class="quick-link-arrow" style="color:var(--status-absent);" data-icon="arrowRight"></div>
-    </button>
-  </div>
-</div>
-`;
+  // Legacy stub — theme is managed via popover & navbar
 }
 
 if (typeof window !== 'undefined') {
+  window.mountNavigationSystem = mountNavigationSystem;
   window.loadUniversalNavigation = loadUniversalNavigation;
   window.toggleAndroidProfileDrawer = toggleAndroidProfileDrawer;
   window.updateDrawerThemeLabel = updateDrawerThemeLabel;
+  window.resolveNavigationRole = resolveNavigationRole;
 }
 
 // Auto-initialize theme & sync session on script execution
@@ -2113,10 +1894,11 @@ if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => { 
       syncCurrentUser(); 
-      loadUniversalNavigation();
+      mountNavigationSystem();
     });
   } else {
     syncCurrentUser();
-    loadUniversalNavigation();
+    mountNavigationSystem();
   }
 }
+

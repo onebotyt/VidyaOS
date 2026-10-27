@@ -351,10 +351,11 @@
     document.body.insertAdjacentHTML('beforeend', navHtml);
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // 8. MASTER INITIALIZER
-  // ─────────────────────────────────────────────────────────────
   function initAdminNav() {
+    if (typeof window.mountNavigationSystem === 'function') {
+      window.mountNavigationSystem({ role: 'admin' });
+      return;
+    }
     mountAdminSidebar();
     mountAdminBottomNav();
     enhanceAdminHeader();

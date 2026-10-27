@@ -5173,6 +5173,10 @@
     }
 
     function toggleAndroidProfileDrawer(forceState) {
+      if (typeof window.toggleUserProfile === 'function') {
+        window.toggleUserProfile();
+        return;
+      }
       const backdrop = document.getElementById('android-profile-backdrop');
       const drawer = document.getElementById('android-profile-drawer');
       if (!drawer) return;
@@ -5181,31 +5185,10 @@
 
       drawer.style.display = shouldOpen ? 'block' : 'none';
       if (backdrop) backdrop.style.display = shouldOpen ? 'block' : 'none';
-
-      if (shouldOpen) {
-        const user = S.user || (typeof getCurrentUser === 'function' ? getCurrentUser() : null);
-        if (user) {
-          const dAvatar = document.getElementById('drawer-user-avatar');
-          const bAvatar = document.getElementById('bottom-avatar-circle');
-          const dName = document.getElementById('drawer-user-name');
-          const dEmail = document.getElementById('drawer-user-email');
-          const dRole = document.getElementById('drawer-user-role');
-          const init = initials(user.full_name || user.username || 'DS');
-          if (dAvatar) dAvatar.textContent = init;
-          if (bAvatar) bAvatar.textContent = init;
-          if (dName) dName.textContent = user.full_name || user.username || 'Faculty Member';
-          if (dEmail) dEmail.textContent = user.email || 'faculty@college.edu';
-          if (dRole) dRole.textContent = user.role || 'Faculty Member';
-        }
-        updateDrawerThemeLabel();
-      }
     }
 
     function updateDrawerThemeLabel() {
-      const lbl = document.getElementById('drawer-theme-label');
-      if (!lbl) return;
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      lbl.textContent = isDark ? 'Currently Dark Mode (Tap to switch)' : 'Currently Light Mode (Tap to switch)';
+      // Legacy stub
     }
 
     function handleLogout() {
