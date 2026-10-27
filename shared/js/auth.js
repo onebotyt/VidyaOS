@@ -1012,14 +1012,104 @@ function mountNavigationSystem(options = {}) {
   // 4. MOBILE BOTTOM NAV (.mobile-bottom-nav)
   _ensureMobileBottomNav(profile, currentPath);
 
-  // 5. Async enrichments for faculty & HOD
+  // 5. Navigation progress bar & View Transitions wiring (once per session)
+  _ensureNavProgress();
+
+  // 6. Async enrichments for faculty & HOD
   if (roleKey === 'faculty' || roleKey === 'hod') {
     _loadDrawerTeachingClasses();
     _loadNavPendingBadge();
   }
 }
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NAVIGATION PROGRESS BAR + VIEW TRANSITIONS WIRING
+// Injects #vidyaos-nav-progress and hooks pageswap/pagereveal/navigate events
+// so the 2.5px top bar animates on every internal page navigation.
+// ─────────────────────────────────────────────────────────────────────────────
+let _navProgressInitialized = false;
+function _ensureNavProgress() {
+  if (_navProgressInitialized) return;
+  _navProgressInitialized = true;
+
+  // Inject the progress bar element if not already present
+  if (!document.getElementById('vidyaos-nav-progress')) {
+    const bar = document.createElement('div');
+    bar.id = 'vidyaos-nav-progress';
+    document.body.insertAdjacentElement('afterbegin', bar);
+  }
+
+  const bar = document.getElementById('vidyaos-nav-progress');
+  if (!bar) return;
+
+  function _showProgress() {
+    bar.className = '';
+    // Force reflow so the transition restarts
+    void bar.offsetWidth;
+    bar.classList.add('loading');
+  }
+  function _doneProgress() {
+    bar.classList.remove('loading');
+    bar.classList.add('done');
+    setTimeout(() => { bar.className = ''; }, 400);
+  }
+
+  // --- Cross-Document View Transitions (Chrome 126+) ---
+  // pageswap fires on the OLD page just before unload (navigation starts)
+  if ('onpageswap' in window) {
+    window.addEventListener('pageswap', (e) => {
+      if (e.viewTransition) _showProgress();
+    });
+  }
+  // pagereveal fires on the NEW page just before first render (navigation done)
+  if ('onpagereveal' in window) {
+    window.addEventListener('pagereveal', (e) => {
+      if (e.viewTransition) {
+        e.viewTransition.ready.then(_doneProgress).catch(_doneProgress);
+      }
+    });
+  }
+
+  // --- Navigation API fallback (Chrome 102+) for browsers without pageswap/pagereveal ---
+  if (typeof navigation !== 'undefined' && navigation.addEventListener) {
+    navigation.addEventListener('navigate', (e) => {
+      if (!e.canIntercept || e.hashChange || e.downloadRequest) return;
+      // Only intercept same-origin navigations to HTML pages
+      const url = new URL(e.destination.url);
+      if (url.origin !== location.origin) return;
+      _showProgress();
+      e.intercept({
+        handler: async () => {
+          try {
+            // Let the browser do its normal navigation; just track progress
+            // We only show the bar — the browser handles the actual page load.
+          } finally {
+            _doneProgress();
+          }
+        }
+      });
+    });
+  } else {
+    // --- Minimal click-based fallback for Firefox/older browsers ---
+    document.addEventListener('click', (e) => {
+      const anchor = e.target.closest('a[href]');
+      if (!anchor) return;
+      const href = anchor.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
+      try {
+        const url = new URL(href, location.href);
+        if (url.origin !== location.origin) return;
+        if (url.pathname === location.pathname && url.search === location.search) return;
+      } catch (_) { return; }
+      _showProgress();
+      // The bar will clear naturally when the new page loads & re-mounts
+    }, { capture: true, passive: true });
+  }
+}
+
 function _ensureHeader(profile, user, initial, displayName, email, portalLabel) {
+
   let header = document.querySelector('.gc-navbar, .app-header');
   
   if (!header) {

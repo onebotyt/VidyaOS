@@ -827,3 +827,80 @@ body.has-bottom-nav .mobile-bottom-nav {
     font-size: 0.64rem !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   NATIVE PERSISTENT APP SHELL VIEW TRANSITIONS
+   Freezes .gc-navbar, #app-sidebar, and .mobile-bottom-nav
+   completely stationary across page navigations (Zero Reload Flash)
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+.gc-navbar {
+  view-transition-name: app-header;
+}
+
+#app-sidebar {
+  view-transition-name: app-sidebar;
+}
+
+.mobile-bottom-nav {
+  view-transition-name: app-bottom-nav;
+}
+
+::view-transition-old(app-header),
+::view-transition-new(app-header),
+::view-transition-old(app-sidebar),
+::view-transition-new(app-sidebar),
+::view-transition-old(app-bottom-nav),
+::view-transition-new(app-bottom-nav) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  animation: 0.15s cubic-bezier(0.4, 0, 1, 1) both vidyaos-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 0.2s cubic-bezier(0, 0, 0.2, 1) both vidyaos-fade-in;
+}
+
+@keyframes vidyaos-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes vidyaos-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Instant Navigation Top Progress Indicator */
+#vidyaos-nav-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2.5px;
+  width: 0%;
+  background: var(--color-primary);
+  z-index: 999999;
+  transition: width 0.2s ease, opacity 0.25s ease;
+  pointer-events: none;
+  box-shadow: 0 0 10px var(--color-primary);
+  opacity: 0;
+}
+
+#vidyaos-nav-progress.loading {
+  opacity: 1;
+  width: 75%;
+}
+
+#vidyaos-nav-progress.done {
+  opacity: 1;
+  width: 100%;
+}
+
