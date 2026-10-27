@@ -1,0 +1,490 @@
+/**
+ * ══════════════════════════════════════════════════════════════════════════
+ * VIDYAOS INSTITUTIONAL NAVIGATION & HEADER STYLES
+ * Location: /frontend/shared/nav/nav.css
+ * (Also mirrored to /frontend/shared/css/nav.css for /css/nav.css compatibility)
+ *
+ * 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * Provides:
+ * - App-Shell View Transitions (Stationary Navbar, Sidebar & Bottom Nav)
+ * - Navigation Top Progress Indicator (#vidyaos-nav-progress)
+ * - Anti-Flash Navigation Stability
+ * - Universal Header (.gc-navbar)
+ * - Collapsible Drawer / Sidebar (#app-sidebar / .gc-drawer)
+ * - Apps Launcher Dropdown (#apps-launcher-dropdown)
+ * - User Profile Popover (#user-profile-popover)
+ * - Mobile Bottom Navigation Bar (.mobile-bottom-nav)
+ * ══════════════════════════════════════════════════════════════════════════
+ */
+
+/* ─────────────────────────────────────────────────────────────
+   NATIVE PERSISTENT APP SHELL VIEW TRANSITIONS
+   Freezes .gc-navbar, #app-sidebar, and .mobile-bottom-nav
+   completely stationary across cross-document page navigations.
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+.gc-navbar {
+  view-transition-name: app-header;
+  contain: layout style;
+}
+
+#app-sidebar {
+  view-transition-name: app-sidebar;
+  contain: layout style;
+}
+
+.mobile-bottom-nav {
+  view-transition-name: app-bottom-nav;
+  contain: layout style;
+}
+
+/* Keep header, sidebar, and bottom-nav stationary during transition */
+::view-transition-old(app-header),
+::view-transition-new(app-header),
+::view-transition-old(app-sidebar),
+::view-transition-new(app-sidebar),
+::view-transition-old(app-bottom-nav),
+::view-transition-new(app-bottom-nav) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Page content cross-fade */
+::view-transition-old(root) {
+  animation: 0.1s cubic-bezier(0.4, 0, 1, 1) both vidyaos-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 0.15s cubic-bezier(0, 0, 0.2, 1) both vidyaos-fade-in;
+}
+
+@keyframes vidyaos-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes vidyaos-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Instant Navigation Top Progress Indicator */
+#vidyaos-nav-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2.5px;
+  width: 0%;
+  background: var(--color-primary);
+  z-index: 999999;
+  transition: width 0.2s ease, opacity 0.25s ease;
+  pointer-events: none;
+  box-shadow: 0 0 10px var(--color-primary);
+  opacity: 0;
+}
+
+#vidyaos-nav-progress.loading {
+  opacity: 1;
+  width: 75%;
+}
+
+#vidyaos-nav-progress.done {
+  opacity: 1;
+  width: 100%;
+}
+
+/* Anti-Flash Skeleton & Stability */
+body[data-nav-ready="1"] .gc-navbar {
+  opacity: 1;
+  transition: opacity 0.12s ease;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   UNIVERSAL HEADER (.gc-navbar)
+   ───────────────────────────────────────────────────────────── */
+.gc-navbar {
+  height: 52px !important;
+  min-height: 52px !important;
+  max-height: 52px !important;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem !important;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-xs, var(--shadow-sm));
+  box-sizing: border-box;
+}
+
+.gc-navbar .gc-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gc-navbar .gc-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.gc-navbar .gc-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.gc-navbar .gc-brand-title {
+  letter-spacing: -0.02em;
+}
+
+.gc-navbar .gc-page-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  text-transform: uppercase;
+}
+
+.gc-navbar .gc-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.gc-navbar .gc-icon-btn,
+.gc-navbar .gc-menu-btn,
+.gc-navbar #sidebar-toggle-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.gc-navbar .gc-icon-btn:hover,
+.gc-navbar .gc-menu-btn:hover,
+.gc-navbar #sidebar-toggle-btn:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+  border-color: var(--border-color);
+}
+
+.gc-navbar .gc-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0, 0%, 100%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gc-navbar .gc-user-avatar:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--color-primary);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   APPS LAUNCHER DROPDOWN & USER PROFILE POPOVER
+   ───────────────────────────────────────────────────────────── */
+.apps-launcher-dropdown {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 290px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg, 0 10px 25px -5px rgba(0,0,0,0.1));
+  padding: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  z-index: 1050;
+}
+
+.apps-launcher-dropdown .app-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 0.35rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.apps-launcher-dropdown .app-tile:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+
+.apps-launcher-dropdown .app-tile-icon {
+  color: var(--color-primary);
+}
+
+.user-profile-popover {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 260px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg, 0 10px 25px -5px rgba(0,0,0,0.1));
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 1050;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLLAPSIBLE SIDEBAR (#app-sidebar / .gc-drawer)
+   ───────────────────────────────────────────────────────────── */
+.app-sidebar,
+.gc-drawer {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: 990;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+body.sidebar-closed .app-sidebar,
+body.sidebar-closed .gc-drawer {
+  transform: translateX(-100%);
+}
+
+.gc-drawer-body,
+.sidebar-links {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  overflow-y: auto;
+}
+
+.sidebar-section-label,
+.gc-drawer-sec-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 0.6rem 0.85rem 0.35rem 0.85rem;
+}
+
+.gc-drawer-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.5rem 0.75rem;
+}
+
+.sidebar-item,
+.gc-drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-item:hover,
+.gc-drawer-link:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+
+.sidebar-item.active,
+.gc-drawer-link.active {
+  background: var(--color-primary-soft, var(--bg-surface));
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  padding: 0.75rem 0.85rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.sidebar-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sidebar-system-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.sidebar-system-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-present, hsl(142, 71%, 45%));
+}
+
+.sidebar-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--status-absent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sidebar-logout-btn:hover {
+  background: var(--status-absent-bg);
+  border-color: var(--status-absent);
+}
+
+.sidebar-backdrop,
+.gc-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 980;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-backdrop.active,
+.sidebar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE BOTTOM NAVIGATION (.mobile-bottom-nav)
+   ───────────────────────────────────────────────────────────── */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  z-index: 970;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-bottom-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 100%;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.mobile-nav-item.active {
+  color: var(--color-primary);
+}
+
+.mobile-nav-item:hover {
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: block;
+  }
+  body.has-bottom-nav {
+    padding-bottom: 56px;
+  }
+  .app-sidebar,
+  .gc-drawer {
+    transform: translateX(-100%);
+  }
+  .app-sidebar.sidebar-open,
+  .app-sidebar.open,
+  .gc-drawer.sidebar-open,
+  .gc-drawer.open {
+    transform: translateX(0);
+  }
+}

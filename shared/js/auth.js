@@ -1071,41 +1071,32 @@ function _ensureNavProgress() {
     });
   }
 
-  // --- Navigation API fallback (Chrome 102+) for browsers without pageswap/pagereveal ---
+  // --- Navigation API (Chrome 102+) - notify only, NEVER intercept cross-document navigation ---
   if (typeof navigation !== 'undefined' && navigation.addEventListener) {
     navigation.addEventListener('navigate', (e) => {
-      if (!e.canIntercept || e.hashChange || e.downloadRequest) return;
-      // Only intercept same-origin navigations to HTML pages
-      const url = new URL(e.destination.url);
-      if (url.origin !== location.origin) return;
-      _showProgress();
-      e.intercept({
-        handler: async () => {
-          try {
-            // Let the browser do its normal navigation; just track progress
-            // We only show the bar — the browser handles the actual page load.
-          } finally {
-            _doneProgress();
-          }
-        }
-      });
-    });
-  } else {
-    // --- Minimal click-based fallback for Firefox/older browsers ---
-    document.addEventListener('click', (e) => {
-      const anchor = e.target.closest('a[href]');
-      if (!anchor) return;
-      const href = anchor.getAttribute('href');
-      if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
+      if (e.hashChange || e.downloadRequest) return;
       try {
-        const url = new URL(href, location.href);
+        const url = new URL(e.destination.url);
         if (url.origin !== location.origin) return;
-        if (url.pathname === location.pathname && url.search === location.search) return;
       } catch (_) { return; }
       _showProgress();
-      // The bar will clear naturally when the new page loads & re-mounts
-    }, { capture: true, passive: true });
+      // NOTE: NEVER call e.intercept()! It cancels cross-document page navigation and causes blank/stuck pages.
+    });
   }
+
+  // --- Click fallback for all browsers to start progress indicator instantly on link tap ---
+  document.addEventListener('click', (e) => {
+    const anchor = e.target.closest('a[href]');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript') || href.startsWith('mailto')) return;
+    try {
+      const url = new URL(href, location.href);
+      if (url.origin !== location.origin) return;
+      if (url.pathname === location.pathname && url.search === location.search) return;
+    } catch (_) { return; }
+    _showProgress();
+  }, { capture: true, passive: true });
 }
 
 function _ensureHeader(profile, user, initial, displayName, email, portalLabel) {
