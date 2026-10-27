@@ -36,9 +36,13 @@ async function fetchApi(endpoint, options = {}) {
       if (response.status === 401) {
         if (data?.error?.code === 'SESSION_REVOKED') {
           if (typeof handleSessionRevocation === 'function') {
-            handleSessionRevocation();
+            handleSessionRevocation('session_transferred');
             return;
           }
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          window.location.href = '/login/index.html?reason=session_transferred';
+          return;
         }
         if (!endpoint.includes('/auth/')) {
           // Attempt token refresh
@@ -49,9 +53,14 @@ async function fetchApi(endpoint, options = {}) {
             const retryRes = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
             return await retryRes.json();
           } else {
+            if (typeof handleSessionRevocation === 'function') {
+              handleSessionRevocation('session_expired');
+              return;
+            }
             localStorage.removeItem('access_token');
             localStorage.removeItem('user');
-            window.location.href = '/index.html';
+            window.location.href = '/login/index.html?reason=session_expired';
+            return;
           }
         }
       }

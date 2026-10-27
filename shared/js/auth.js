@@ -149,11 +149,16 @@ async function syncCurrentUser() {
   } catch (_) {}
 }
 
-function handleSessionRevocation() {
+function handleSessionRevocation(reason = 'session_transferred') {
+  if (typeof window === 'undefined') return;
   localStorage.removeItem('access_token');
   localStorage.removeItem('user');
-  alert('Your session has ended because this account was logged into from another PC/device or signed out.');
-  window.location.href = '/index.html';
+  try {
+    sessionStorage.setItem('vidya_logout_notice', reason === 'session_expired'
+      ? 'Your session expired due to inactivity. Please sign in again.'
+      : 'Your session has ended because this account was logged into from another device or signed out.');
+  } catch (_) {}
+  window.location.href = `/login/index.html?reason=${encodeURIComponent(reason)}`;
 }
 
 let _heartbeatTimer = null;

@@ -25,6 +25,43 @@
   /* ── State ── */
   let currentActivationToken = null;
 
+  /* ── Check for session revocation or logout notice ── */
+  (function checkSessionNotice() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const reason = params.get('reason');
+      let notice = '';
+      try {
+        notice = sessionStorage.getItem('vidya_logout_notice') || '';
+        sessionStorage.removeItem('vidya_logout_notice');
+      } catch (_) {}
+
+      if (!notice && reason) {
+        if (reason === 'session_transferred') {
+          notice = 'Your session has ended because this account was logged into from another device.';
+        } else if (reason === 'session_expired') {
+          notice = 'Your session expired due to 30 minutes of inactivity. Please sign in again.';
+        }
+      }
+
+      if (notice) {
+        const sb = document.getElementById('status-alert-banner');
+        if (sb) {
+          const titleEl = document.getElementById('status-alert-title');
+          const bodyEl = document.getElementById('status-alert-body');
+          const linkEl = document.getElementById('status-alert-link');
+          if (titleEl) titleEl.textContent = reason === 'session_expired' ? 'Session Expired' : 'Session Transferred';
+          if (bodyEl) bodyEl.textContent = notice;
+          if (linkEl) linkEl.style.display = 'none';
+          sb.style.display = 'block';
+        }
+        if (window.history && window.history.replaceState && reason) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+    } catch (_) {}
+  })();
+
   /* ── Role compatibility (Unified single login for all roles) ── */
   function setRole(role) {
     hideBanners();
