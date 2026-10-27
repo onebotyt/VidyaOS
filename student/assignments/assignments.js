@@ -225,7 +225,7 @@ function renderAssignedPane(items) {
   if (items.length === 0) {
     container.innerHTML = `
       <div class="todo-empty-state">
-        <div class="todo-empty-icon">🎉</div>
+        <div class="todo-empty-icon" style="color:var(--status-present);">${window.getSvgIcon('checkCircle', 48)}</div>
         <div class="todo-empty-title">Woohoo, no work due!</div>
         <div class="todo-empty-desc">You don't have any upcoming coursework or pending assessments right now.</div>
       </div>
@@ -315,7 +315,7 @@ function renderMissingPane(items) {
   if (items.length === 0) {
     container.innerHTML = `
       <div class="todo-empty-state">
-        <div class="todo-empty-icon">✨</div>
+        <div class="todo-empty-icon" style="color:var(--color-primary);">${window.getSvgIcon('sparkle', 48)}</div>
         <div class="todo-empty-title">Nothing missing!</div>
         <div class="todo-empty-desc">Great job! You have zero overdue unsubmitted assignments. Keep it up!</div>
       </div>
@@ -400,7 +400,7 @@ function renderDonePane(items) {
   if (items.length === 0) {
     container.innerHTML = `
       <div class="todo-empty-state">
-        <div class="todo-empty-icon">📝</div>
+        <div class="todo-empty-icon" style="color:var(--text-muted);">${window.getSvgIcon('assignment', 48)}</div>
         <div class="todo-empty-title">No completed work yet</div>
         <div class="todo-empty-desc">When you turn in coursework or receive exam grades, they will appear here.</div>
       </div>
@@ -461,7 +461,7 @@ function renderDoneRow(item) {
     : 'Turned in';
 
   const feedbackSnippet = item.my_feedback
-    ? `<span style="color:var(--color-primary); font-weight:600;">💬 Teacher feedback</span>`
+    ? `<span style="color:var(--color-primary); font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">${window.getSvgIcon('comment', 14)} Teacher feedback</span>`
     : '';
 
   return `
@@ -570,19 +570,23 @@ function handleClassFilterChange(groupId) {
  * Drawer & Popover UI controls
  */
 function toggleStudentDrawer(forceState) {
+  if (typeof toggleSidebar === 'function') {
+    return toggleSidebar(forceState);
+  }
   const drawer = document.getElementById('gc-drawer');
   const backdrop = document.getElementById('gc-drawer-backdrop');
-  if (!drawer || !backdrop) return;
+  if (!drawer) return;
 
   const isOpen = forceState !== undefined ? forceState : !drawer.classList.contains('open');
   if (isOpen) {
     drawer.classList.add('open');
-    backdrop.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    if (backdrop) backdrop.classList.add('open');
   } else {
     drawer.classList.remove('open');
-    backdrop.classList.remove('open');
-    document.body.style.overflow = '';
+    if (backdrop) backdrop.classList.remove('open');
+  }
+  if (typeof _updateMenuToggleButtons === 'function') {
+    _updateMenuToggleButtons(isOpen);
   }
 }
 
@@ -648,7 +652,7 @@ function showEmptyState(tabName, title, message) {
   if (container) {
     container.innerHTML = `
       <div class="todo-empty-state">
-        <div class="todo-empty-icon">⚠️</div>
+        <div class="todo-empty-icon" style="color:var(--status-absent);">${window.getSvgIcon('alert', 48)}</div>
         <div class="todo-empty-title">${escapeHtml(title)}</div>
         <div class="todo-empty-desc">${escapeHtml(message)}</div>
       </div>

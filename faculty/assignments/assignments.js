@@ -220,6 +220,10 @@
   }
 
   function openCreateAssignmentModal() {
+    if (currentRegisterId) {
+      window.location.href = `/faculty/classwork/create.html?type=assignment&register=${encodeURIComponent(currentRegisterId)}`;
+      return;
+    }
     if (!registerData) {
       if (typeof showToast === 'function') showToast('Please select a subject register first', 'error');
       return;

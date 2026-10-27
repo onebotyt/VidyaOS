@@ -1063,8 +1063,8 @@
                     const stId = Number(s.student_id);
                     const isChecked = selectedStudentIds.has(stId);
                     const decisionTag = isChecked
-                      ? `<span class="badge badge-present" style="font-size: 0.68rem; padding: 0.2rem 0.5rem;">✓ Pass &bull; ${isGrad ? 'Graduate' : 'Promote'}</span>`
-                      : `<span class="badge badge-absent" style="font-size: 0.68rem; padding: 0.2rem 0.5rem;">✕ Retain in Sem ${sem}</span>`;
+                      ? `<span class="badge badge-present" style="font-size: 0.68rem; padding: 0.2rem 0.5rem; display: inline-flex; align-items: center; gap: 0.25rem;">${window.getSvgIcon('check', 11)} Pass &bull; ${isGrad ? 'Graduate' : 'Promote'}</span>`
+                      : `<span class="badge badge-absent" style="font-size: 0.68rem; padding: 0.2rem 0.5rem; display: inline-flex; align-items: center; gap: 0.25rem;">${window.getSvgIcon('close', 11)} Retain in Sem ${sem}</span>`;
 
                     return `
                       <tr style="background: ${isChecked ? 'transparent' : 'var(--status-absent-bg)'};">

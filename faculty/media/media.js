@@ -257,7 +257,7 @@
     if (a.student_name) {
       studentPill = `
         <div class="media-student-row">
-          <span>🎓</span>
+          <span>${window.getSvgIcon('gradCap', 14)}</span>
           <span>${escapeHtml(a.student_name)} (Roll ${escapeHtml(a.student_roll_no || '-')})</span>
         </div>
       `;
@@ -517,7 +517,7 @@
       // Document / Presentation fallback
       bodyEl.innerHTML = `
         <div style="text-align:center;padding:3rem 1rem;color:var(--text-main);">
-          <div style="font-size:3rem;margin-bottom:1rem;">📄</div>
+          <div style="margin-bottom:1rem;color:var(--text-muted);">${window.getSvgIcon('document', 48)}</div>
           <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:0.4rem;">${escapeHtml(asset.title)}</h3>
           <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem;">${escapeHtml(asset.original_name)} (${formatBytes(asset.file_size)})</p>
           <a href="${escapeHtml(asset.file_path)}" download="${escapeHtml(asset.original_name)}" class="btn btn-primary">
@@ -594,21 +594,21 @@
         <div class="omnisearch-hints">
           <div class="omnisearch-group-title">QUICK ACTIONS</div>
           <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/media.html?action=upload')">
-            <span class="omni-item-icon">📤</span>
+            <span class="omni-item-icon">${window.getSvgIcon('upload', 18)}</span>
             <div class="omni-item-text">
               <span class="omni-title">Upload New Media / Document</span>
               <span class="omni-sub">Add lecture recording, notes, or student records to drive</span>
             </div>
           </div>
           <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/registers.html')">
-            <span class="omni-item-icon">📅</span>
+            <span class="omni-item-icon">${window.getSvgIcon('calendar', 18)}</span>
             <div class="omni-item-text">
               <span class="omni-title">Open Attendance Registers</span>
               <span class="omni-sub">Ledger view, daily sessions, and PIN roll call studio</span>
             </div>
           </div>
           <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/students.html')">
-            <span class="omni-item-icon">👥</span>
+            <span class="omni-item-icon">${window.getSvgIcon('students', 18)}</span>
             <div class="omni-item-text">
               <span class="omni-title">Department Students Directory</span>
               <span class="omni-sub">View roster, student dossiers, and self-registration</span>
@@ -627,9 +627,9 @@
 
       // 1. Media Assets Results
       if (data.media && data.media.length > 0) {
-        html += `<div class="omnisearch-group-title">📁 MEDIA &amp; DOCUMENTS (${data.media.length})</div>`;
+        html += `<div class="omnisearch-group-title">MEDIA &amp; DOCUMENTS (${data.media.length})</div>`;
         data.media.forEach(m => {
-          const icon = m.file_type === 'VIDEO' ? '🎥' : (m.file_type === 'IMAGE' ? '🖼️' : '📄');
+          const icon = m.file_type === 'VIDEO' ? window.getSvgIcon('video', 16) : (m.file_type === 'IMAGE' ? window.getSvgIcon('image', 16) : window.getSvgIcon('document', 16));
           html += `
             <div class="omnisearch-item" onclick="previewAssetFromOmni(${m.id})">
               <span class="omni-item-icon">${icon}</span>
@@ -644,11 +644,11 @@
 
       // 2. Student Results
       if (data.students && data.students.length > 0) {
-        html += `<div class="omnisearch-group-title">🎓 STUDENTS (${data.students.length})</div>`;
+        html += `<div class="omnisearch-group-title">STUDENTS (${data.students.length})</div>`;
         data.students.forEach(s => {
           html += `
             <div class="omnisearch-item" onclick="navigateFromOmni('/faculty/students.html?search=${encodeURIComponent(s.official_enrollment_no || s.class_roll_no || s.full_name)}')">
-              <span class="omni-item-icon">👤</span>
+              <span class="omni-item-icon">${window.getSvgIcon('user', 16)}</span>
               <div class="omni-item-text">
                 <span class="omni-title">${escapeHtml(s.full_name)}</span>
                 <span class="omni-sub">Roll #${escapeHtml(s.class_roll_no || '-')} • Enrollment: ${escapeHtml(s.official_enrollment_no || '-')} • ${escapeHtml(s.department_code || '')}</span>
@@ -660,12 +660,12 @@
 
       // 3. Courses & Registers
       if (data.courses && data.courses.length > 0) {
-        html += `<div class="omnisearch-group-title">📚 COURSES &amp; REGISTERS (${data.courses.length})</div>`;
+        html += `<div class="omnisearch-group-title">COURSES &amp; REGISTERS (${data.courses.length})</div>`;
         data.courses.forEach(c => {
           const url = c.register_id ? `/faculty/registers.html?id=${c.register_id}` : `/faculty/dashboard.html`;
           html += `
             <div class="omnisearch-item" onclick="navigateFromOmni('${url}')">
-              <span class="omni-item-icon">📖</span>
+              <span class="omni-item-icon">${window.getSvgIcon('book', 16)}</span>
               <div class="omni-item-text">
                 <span class="omni-title">${escapeHtml(c.subject_name)} (${escapeHtml(c.subject_code || '')})</span>
                 <span class="omni-sub">${escapeHtml(c.register_name || 'Classroom Subject Register')}</span>
@@ -677,11 +677,11 @@
 
       // 4. Quick Actions
       if (data.actions && data.actions.length > 0) {
-        html += `<div class="omnisearch-group-title">⚡ ACTIONS</div>`;
+        html += `<div class="omnisearch-group-title">ACTIONS</div>`;
         data.actions.forEach(a => {
           html += `
             <div class="omnisearch-item" onclick="navigateFromOmni('${a.url}')">
-              <span class="omni-item-icon">✨</span>
+              <span class="omni-item-icon">${window.getSvgIcon('sparkle', 16)}</span>
               <div class="omni-item-text">
                 <span class="omni-title">${escapeHtml(a.title)}</span>
                 <span class="omni-sub">${escapeHtml(a.category)}</span>
@@ -718,13 +718,88 @@
     }
   };
 
-  // Navigation Drawer Toggles
-  window.toggleDrawer = function() {
-    const drawer = document.getElementById('gc-drawer');
-    const backdrop = document.getElementById('gc-drawer-backdrop');
-    drawer.classList.toggle('open');
-    backdrop.classList.toggle('open');
+  // Navigation Drawer Toggles (Desktop & Mobile)
+  window.toggleDrawer = function(forceState) {
+    if (typeof window.toggleSidebar === 'function') {
+      return window.toggleSidebar(forceState);
+    }
+    const drawer = document.getElementById('app-sidebar') || document.getElementById('gc-drawer');
+    const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('gc-drawer-backdrop');
+    if (!drawer) return;
+    const isDesktop = window.innerWidth >= 769;
+    const isCurrentlyOpen = isDesktop
+      ? !document.body.classList.contains('sidebar-closed')
+      : (drawer.classList.contains('open') || drawer.classList.contains('sidebar-open'));
+    const targetState = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
+    if (targetState) {
+      drawer.classList.add('open', 'sidebar-open');
+      drawer.classList.remove('sidebar-closed');
+      document.body.classList.add('sidebar-open');
+      document.body.classList.remove('sidebar-closed');
+      if (!isDesktop && backdrop) {
+        backdrop.classList.add('open', 'active');
+      }
+    } else {
+      drawer.classList.remove('open', 'sidebar-open');
+      drawer.classList.add('sidebar-closed');
+      document.body.classList.remove('sidebar-open');
+      document.body.classList.add('sidebar-closed');
+      if (backdrop) {
+        backdrop.classList.remove('open', 'active');
+      }
+    }
+    localStorage.setItem('sidebar_open', targetState ? 'true' : 'false');
+    const btn = document.getElementById('btn-menu-toggle') || document.getElementById('sidebar-toggle-btn');
+    if (btn) btn.setAttribute('aria-pressed', targetState ? 'true' : 'false');
   };
+
+  window.closeDrawer = function() {
+    if (typeof window.closeSidebar === 'function') {
+      return window.closeSidebar();
+    }
+    window.toggleDrawer(false);
+  };
+  window.closeSidebar = function() {
+    if (typeof window.toggleSidebar === 'function') {
+      return window.toggleSidebar(false);
+    }
+    window.toggleDrawer(false);
+  };
+
+  // Close on Escape key press
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (typeof window.closeSidebar === 'function') {
+        window.closeSidebar();
+      } else {
+        window.toggleDrawer(false);
+      }
+    }
+  });
+
+  // Restore saved sidebar preference on load
+  (function initDrawerState() {
+    const isDesktop = window.innerWidth >= 769;
+    const isSidebarClosed = localStorage.getItem('sidebar_open') === 'false';
+    const initDrawer = document.getElementById('app-sidebar') || document.getElementById('gc-drawer');
+    if (isDesktop) {
+      if (isSidebarClosed) {
+        if (initDrawer) {
+          initDrawer.classList.remove('open', 'sidebar-open');
+          initDrawer.classList.add('sidebar-closed');
+        }
+        document.body.classList.remove('sidebar-open');
+        document.body.classList.add('sidebar-closed');
+      } else {
+        if (initDrawer) {
+          initDrawer.classList.add('open', 'sidebar-open');
+          initDrawer.classList.remove('sidebar-closed');
+        }
+        document.body.classList.add('sidebar-open');
+        document.body.classList.remove('sidebar-closed');
+      }
+    }
+  })();
 
   window.toggleAppsLauncher = function() {
     const menu = document.getElementById('apps-launcher-dropdown');

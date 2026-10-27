@@ -4,14 +4,21 @@
  * 100% Theme Tokenized — Zero Hardcoded Hex Colors
  */
 
+/* ══════════════════════════════════════════════════════════════
+   MINIMAL UNIVERSAL HEADER BAR (.gc-navbar)
+   Contains strictly: Logo, VidyaOS, Tools, Profile
+   Zero hardcoded colors — 100% Theme Tokenized
+   ══════════════════════════════════════════════════════════════ */
 .gc-navbar {
-  height: 64px;
+  height: 52px !important;
+  min-height: 52px !important;
+  max-height: 52px !important;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.25rem;
+  padding: 0 1rem !important;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -19,31 +26,55 @@
   box-sizing: border-box;
 }
 
-.gc-nav-left {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  min-width: 0;
+/* Explicitly hide obsolete secondary tags/buttons per minimal header design */
+.gc-navbar .gc-brand-sub,
+.gc-navbar .gc-page-badge,
+.gc-navbar .gc-create-btn {
+  display: none !important;
 }
 
-.gc-menu-btn {
-  width: 42px;
-  height: 42px;
+/* Ensure hamburger menu toggle button is always accessible and visible */
+.gc-navbar .gc-menu-btn,
+.gc-navbar #sidebar-toggle-btn,
+.gc-navbar #btn-menu-toggle,
+.gc-navbar .sidebar-toggle-btn,
+.gc-menu-btn,
+#sidebar-toggle-btn,
+#btn-menu-toggle,
+.sidebar-toggle-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   color: var(--text-main);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
   flex-shrink: 0;
+  padding: 0;
 }
 
-.gc-menu-btn:hover {
+.gc-navbar .gc-menu-btn:hover,
+.gc-navbar #sidebar-toggle-btn:hover,
+.gc-navbar #btn-menu-toggle:hover,
+.gc-navbar .sidebar-toggle-btn:hover,
+.gc-menu-btn:hover,
+#sidebar-toggle-btn:hover,
+#btn-menu-toggle:hover,
+.sidebar-toggle-btn:hover {
   background: var(--bg-surface-hover, var(--bg-surface));
+  border-color: var(--border-color);
+  color: var(--color-primary);
+}
+
+.gc-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
 }
 
 .gc-brand-link {
@@ -52,131 +83,104 @@
   gap: 0.65rem;
   text-decoration: none;
   color: var(--text-main);
+  user-select: none;
   flex-shrink: 0;
 }
 
 .gc-brand-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-md);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
   background: linear-gradient(135deg, hsl(142, 70%, 35%) 0%, hsl(160, 75%, 42%) 100%);
   color: var(--text-white, hsl(0, 0%, 100%));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
 }
 
+.gc-brand-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+
 .gc-brand-title {
-  font-size: 1.28rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 1.18rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
   color: var(--text-main);
+  line-height: 1;
   white-space: nowrap;
 }
 
 .gc-brand-sub {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  margin-left: 0.2rem;
-  padding: 0.15rem 0.45rem;
-  border-radius: 999px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  white-space: nowrap;
+  display: none !important;
 }
 
 .gc-page-badge {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  background: var(--color-primary-light, var(--bg-surface));
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
-  border: 1px solid var(--border-color);
-  margin-left: 0.5rem;
-  white-space: nowrap;
+  display: none !important;
 }
 
 .gc-nav-right {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   position: relative;
   flex-shrink: 0;
 }
 
 .gc-icon-btn {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   color: var(--text-main);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
   flex-shrink: 0;
 }
 
 .gc-icon-btn:hover {
   background: var(--bg-surface-hover, var(--bg-surface));
+  border-color: var(--border-color);
 }
 
 .gc-create-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  background: var(--color-primary);
-  color: var(--text-white, hsl(0, 0%, 100%));
-  border: none;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: all 0.15s ease;
-}
-
-.gc-create-btn:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
+  display: none !important;
 }
 
 .gc-user-avatar {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--color-primary);
   color: var(--text-white, hsl(0, 0%, 100%));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
   border: 2px solid var(--border-color);
-  transition: transform 0.15s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   flex-shrink: 0;
 }
 
 .gc-user-avatar:hover {
   transform: scale(1.05);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Apps Launcher Grid Menu */
 .apps-launcher-dropdown {
   position: absolute;
-  top: 54px;
+  top: 48px;
   right: 48px;
   width: 310px;
   background: var(--bg-card);
@@ -225,7 +229,7 @@
 /* User Profile Popover */
 .user-profile-popover {
   position: absolute;
-  top: 54px;
+  top: 48px;
   right: 0;
   width: 270px;
   background: var(--bg-card);
@@ -257,9 +261,12 @@
 }
 
 .gc-drawer-backdrop.open,
-.gc-drawer-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
+.gc-drawer-backdrop.active,
+.sidebar-backdrop.open,
+.sidebar-backdrop.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  display: block !important;
 }
 
 .gc-drawer {
@@ -734,9 +741,228 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
+   PC / DESKTOP SIDEBAR MENU ARCHITECTURE (>= 769px)
+   On PC, navigation is a permanent docked sidebar (NOT hamburger)
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+  /* Docked persistent sidebar on PC docks below top navbar (never covers header) */
+  .app-sidebar,
+  aside#app-sidebar,
+  aside#gc-drawer,
+  .gc-drawer {
+    position: fixed !important;
+    top: 52px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 260px !important;
+    height: calc(100vh - 52px) !important;
+    transform: translateX(0) !important;
+    z-index: 950 !important;
+    box-shadow: none !important;
+    border-right: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--bg-card) !important;
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  body:has(.app-header) .app-sidebar,
+  body:has(.app-header) aside#app-sidebar,
+  body.has-app-header .app-sidebar,
+  body.has-app-header aside#app-sidebar {
+    top: 60px !important;
+    height: calc(100vh - 60px) !important;
+  }
+
+  /* When sidebar is closed on PC (via close button or toggle) */
+  body.sidebar-closed .app-sidebar,
+  body.sidebar-closed aside#app-sidebar,
+  body.sidebar-closed aside#gc-drawer,
+  body.sidebar-closed .gc-drawer,
+  .app-sidebar.sidebar-closed,
+  aside#app-sidebar.sidebar-closed,
+  aside#gc-drawer.sidebar-closed,
+  .gc-drawer.sidebar-closed {
+    transform: translateX(-100%) !important;
+    box-shadow: none !important;
+  }
+
+  /* Universal Stationary Header Bar: stays fixed at top across full 100% width (never covered, never shifted) */
+  .gc-navbar,
+  body .gc-navbar,
+  body.has-sidebar .gc-navbar,
+  body:not(.sidebar-closed) .gc-navbar,
+  body.sidebar-closed .gc-navbar {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+    transition: none !important;
+  }
+
+  /* Single Logo Rule: The brand logo in navbar is ALWAYS displayed (1 logo on screen) */
+  .gc-navbar .gc-brand-link {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Three-lines / Close toggle button in navbar is ALWAYS displayed */
+  .gc-navbar .gc-menu-btn,
+  .gc-navbar #sidebar-toggle-btn,
+  .gc-navbar #btn-menu-toggle,
+  .gc-navbar .sidebar-toggle-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+  }
+
+  /* Remove duplicate brand header and inner three-lines/close buttons inside the sidebar */
+  .gc-drawer-header,
+  .app-sidebar .gc-drawer-header,
+  aside#app-sidebar .gc-drawer-header,
+  aside#gc-drawer .gc-drawer-header,
+  .gc-drawer > .gc-drawer-header {
+    display: none !important;
+  }
+
+  /* Offset ONLY main page content to the right when sidebar is OPEN on PC */
+  body:not(.sidebar-closed) main,
+  body:not(.sidebar-closed) .page-main-container,
+  body:not(.sidebar-closed) .container,
+  body:not(.sidebar-closed) .classroom-body,
+  body:not(.sidebar-closed) .classroom-banner,
+  body:not(.sidebar-closed) .student-classroom-container,
+  body:not(.sidebar-closed) .todo-container {
+    margin-left: 260px !important;
+    width: calc(100% - 260px) !important;
+    max-width: calc(100vw - 260px) !important;
+    box-sizing: border-box !important;
+    transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1), width 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Expand main page content to full width when sidebar is CLOSED on PC */
+  body.sidebar-closed main,
+  body.sidebar-closed .page-main-container,
+  body.sidebar-closed .container,
+  body.sidebar-closed .classroom-body,
+  body.sidebar-closed .classroom-banner,
+  body.sidebar-closed .student-classroom-container,
+  body.sidebar-closed .todo-container {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1), width 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Desktop: Never dim the screen with modal backdrop */
+  .gc-drawer-backdrop,
+  .sidebar-backdrop {
+    display: none !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
    MOBILE & RESPONSIVE NAVBAR SYSTEM (<= 768px & <= 420px)
    ══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
+  /* Mobile: Hamburger/Close menu button in navbar */
+  .gc-navbar .gc-menu-btn,
+  .gc-navbar #sidebar-toggle-btn,
+  .gc-navbar #btn-menu-toggle,
+  .gc-navbar .sidebar-toggle-btn {
+    display: inline-flex !important;
+  }
+
+  /* Single Logo Rule: The brand logo in navbar is ALWAYS displayed */
+  .gc-navbar .gc-brand-link {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Remove duplicate brand header inside sidebar on mobile */
+  .gc-drawer-header,
+  .app-sidebar .gc-drawer-header,
+  aside#app-sidebar .gc-drawer-header,
+  aside#gc-drawer .gc-drawer-header,
+  .gc-drawer > .gc-drawer-header {
+    display: none !important;
+  }
+
+  .app-sidebar,
+  aside#app-sidebar,
+  aside#gc-drawer,
+  .gc-drawer {
+    position: fixed !important;
+    top: 52px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: min(290px, 86vw) !important;
+    height: calc(100vh - 52px) !important;
+    transform: translateX(-100%) !important;
+    z-index: 950 !important;
+    box-shadow: var(--shadow-xl) !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  body:has(.app-header) .app-sidebar,
+  body:has(.app-header) aside#app-sidebar {
+    top: 60px !important;
+    height: calc(100vh - 60px) !important;
+  }
+
+  .app-sidebar.sidebar-open,
+  .app-sidebar.open,
+  .gc-drawer.sidebar-open,
+  .gc-drawer.open,
+  aside#gc-drawer.open,
+  aside#app-sidebar.sidebar-open {
+    transform: translateX(0) !important;
+  }
+
+  .gc-navbar,
+  main,
+  .page-main-container,
+  .container,
+  .classroom-body,
+  .classroom-banner,
+  .student-classroom-container,
+  .todo-container {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+
+  .gc-drawer-backdrop.open,
+  .gc-drawer-backdrop.active,
+  .sidebar-backdrop.open,
+  .sidebar-backdrop.active {
+    position: fixed !important;
+    top: 52px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: calc(100vh - 52px) !important;
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 940 !important;
+  }
+
+  body:has(.app-header) .sidebar-backdrop.open,
+  body:has(.app-header) .sidebar-backdrop.active {
+    top: 60px !important;
+    height: calc(100vh - 60px) !important;
+  }
+
   .gc-navbar {
     height: 58px;
     padding: 0 0.75rem;

@@ -70,19 +70,19 @@
   <!-- Apps Launcher Dropdown -->
   <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
     <a href="/student/dashboard.html" class="app-item">
-      <div class="app-icon" style="background:var(--color-primary-light); color:var(--color-primary);">📚</div>
+      <div class="app-icon" data-icon="book" style="background:var(--color-primary-light); color:var(--color-primary);"></div>
       <span class="app-name">Classes</span>
     </a>
     <a href="/student/attendance.html" class="app-item">
-      <div class="app-icon" style="background:var(--status-present-bg); color:var(--status-present);">📅</div>
+      <div class="app-icon" data-icon="calendar" style="background:var(--status-present-bg); color:var(--status-present);"></div>
       <span class="app-name">Attendance</span>
     </a>
     <a href="/student/timetable.html" class="app-item">
-      <div class="app-icon" style="background:var(--col-att-group-bg); color:var(--col-att-group-color);">🗓</div>
+      <div class="app-icon" data-icon="clock" style="background:var(--col-att-group-bg); color:var(--col-att-group-color);"></div>
       <span class="app-name">Timetable</span>
     </a>
     <a href="/student/profile.html" class="app-item">
-      <div class="app-icon" style="background:var(--chip-faculty-bg); color:var(--chip-faculty-color);">👤</div>
+      <div class="app-icon" data-icon="user" style="background:var(--chip-faculty-bg); color:var(--chip-faculty-color);"></div>
       <span class="app-name">Profile</span>
     </a>
   </div>
@@ -205,7 +205,7 @@
       <div class="mobile-filter-sheet" style="background:var(--bg-card); border-top:1px solid var(--border-color); border-radius:var(--radius-lg) var(--radius-lg) 0 0; width:100%; max-width:500px; padding:1.25rem; max-height:80vh; overflow-y:auto; box-shadow:var(--shadow-lg);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border-color);">
           <h3 style="margin:0; font-size:1.05rem; font-weight:700; color:var(--text-main);">Filter by Topic</h3>
-          <button type="button" class="btn-icon-ghost" onclick="closeMobileUnitFilter()" aria-label="Close Filter">✕</button>
+          <button type="button" class="btn-icon-ghost" onclick="closeMobileUnitFilter()" aria-label="Close Filter" data-icon="close"></button>
         </div>
         <div id="mobile-unit-filter-options" style="display:flex; flex-direction:column; gap:0.35rem;">
           <!-- Populated dynamically -->
@@ -218,7 +218,7 @@
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-lg); width:90%; max-width:440px; padding:1.5rem; box-shadow:var(--shadow-lg);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border-color);">
           <h3 style="margin:0; font-size:1.1rem; font-weight:700; color:var(--text-main);">Class Information</h3>
-          <button type="button" class="btn-icon-ghost" onclick="closeCourseInfoModal()" aria-label="Close">✕</button>
+          <button type="button" class="btn-icon-ghost" onclick="closeCourseInfoModal()" aria-label="Close" data-icon="close"></button>
         </div>
         <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.9rem;">
           <div>
@@ -334,7 +334,7 @@
                 
                 <div id="composer-attachment-preview" style="display:none; align-items:center; justify-content:space-between; padding:0.5rem 0.75rem; background:var(--bg-surface); border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:0.85rem;">
                   <span id="composer-attachment-name" style="font-weight:600; color:var(--text-main); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
-                  <button type="button" class="btn btn-secondary btn-sm" onclick="clearComposerAttachment()" style="padding:0.2rem 0.5rem;">✕</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="clearComposerAttachment()" style="padding:0.2rem 0.5rem;" data-icon="close" aria-label="Remove attachment"></button>
                 </div>
 
                 <div class="composer-actions-bar">
@@ -734,6 +734,7 @@
   <div id="gd-toast" class="classroom-toast" style="display:none; position:fixed; bottom:20px; right:20px; z-index:999999; padding:0.75rem 1.25rem; border-radius:var(--radius-md); font-weight:600; font-size:0.88rem; box-shadow:var(--shadow-lg);"></div>
 
   <!-- Core Scripts -->
+  <script src="/js/icons.js?v=20261026"></script>
   <script src="/js/auth.js?v=20261023_03"></script>
   <script src="/js/api.js?v=20261023_03"></script>
   <script src="/student/group-detail/student-group.js?v=20261023_03"></script>

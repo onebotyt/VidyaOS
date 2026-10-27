@@ -260,10 +260,10 @@
     const popoverEmail = document.getElementById('popover-user-email');
     if (popoverEmail) popoverEmail.textContent = email;
 
-    const toggleBtn = document.getElementById('sidebar-toggle-btn');
-    if (toggleBtn && !toggleBtn.querySelector('svg')) {
-      toggleBtn.innerHTML = ADMIN_ICONS.menu;
-    }
+    // Enforce Minimal Universal Header Bar (Logo, VidyaOS, Tools, Profile)
+    document.querySelectorAll('.gc-navbar .gc-brand-title').forEach(el => {
+      el.textContent = 'VidyaOS';
+    });
   }
 
   // ─────────────────────────────────────────────────────────────

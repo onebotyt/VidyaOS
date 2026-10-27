@@ -279,7 +279,7 @@
     }
     if (capEl) {
       capEl.innerText = pct === 100 
-        ? '✓ Complete — 100% NBA/NAAC Ready' 
+        ? 'Complete — 100% NBA/NAAC Ready' 
         : (pct >= 70 ? 'Satisfactory — Final Reviews Pending' : 'Documentation In Progress');
     }
 
@@ -1031,7 +1031,7 @@
             <td style="font-family:var(--font-family-mono);color:var(--text-muted);">${escapeHtml(s.enrollment_no || '--')}</td>
             <td><strong>${escapeHtml(s.full_name)}</strong></td>
             <td style="text-align:center;"><span class="badge ${isAdvanced ? 'badge-present' : 'badge-absent'}">${s.attendance_pct != null ? s.attendance_pct + '%' : '—'}</span></td>
-            <td>${isAdvanced ? '✓ Special GATE / competitive task mentoring assigned' : '⚠️ Remedial counseling & extra classes scheduled'}</td>
+            <td>${isAdvanced ? `${window.getSvgIcon('check', 14)} Special GATE / competitive task mentoring assigned` : `${window.getSvgIcon('alert', 14)} Remedial counseling & extra classes scheduled`}</td>
           </tr>
         `).join('');
       }
@@ -1157,7 +1157,7 @@
             <tbody>
               ${items.map(item => {
                 const doc = item.document;
-                const statusStr = doc ? `✓ ${doc.file_name.slice(-18)}` : (item.has_system_data ? '⚡ Auto-Synced' : '— Missing');
+                const statusStr = doc ? `Attached: ${doc.file_name.slice(-18)}` : (item.has_system_data ? 'Auto-Synced' : '— Missing');
                 return `
                   <tr>
                     <td style="text-align: center; font-weight: bold;">${item.num}</td>

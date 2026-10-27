@@ -18,20 +18,7 @@ body.classroom-page {
   overflow-x: hidden;
 }
 
-#app-sidebar,
-.app-sidebar,
-.sidebar-backdrop,
-body.classroom-page #app-sidebar,
-body.classroom-page .app-sidebar,
-body.classroom-page .sidebar-backdrop {
-  display: none !important;
-}
-
-body.sidebar-open,
-body.classroom-page.sidebar-open {
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-}
+/* Sidebar styles delegated to shared classroom-nav.css */
 
 /* Root Layout Container */
 .student-classroom-container {

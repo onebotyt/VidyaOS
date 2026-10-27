@@ -242,7 +242,7 @@ function renderStreamPosts() {
   if (S.streamPosts.length === 0) {
     container.innerHTML = `
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:3rem 1.5rem; text-align:center;">
-        <div style="font-size:2rem; margin-bottom:0.6rem;">📢</div>
+        <div style="margin-bottom:0.6rem; color:var(--text-muted);">${window.getSvgIcon('megaphone', 36)}</div>
         <h3 style="margin:0 0 0.35rem 0; font-size:1.1rem; font-weight:800; color:var(--text-main);">No Announcements Yet</h3>
         <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">
           This is where you can talk to your class and see updates from your teacher.
@@ -287,7 +287,7 @@ function renderStreamPosts() {
         <!-- Inline Comments Section -->
         <section class="stream-comments-section">
           <div class="comment-count-label" onclick="togglePostComments(${post.id})">
-            💬 ${post.comment_count || 0} class comments
+            <span style="display:inline-flex; align-items:center; gap:0.35rem;">${window.getSvgIcon('comment', 14)} ${post.comment_count || 0} class comments</span>
           </div>
           <div id="comments-container-${post.id}" class="comments-list" style="display:none;"></div>
 
@@ -563,7 +563,7 @@ function renderClasswork() {
   if (filtered.length === 0) {
     container.innerHTML = `
       <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:3rem 1.5rem; text-align:center;">
-        <div style="font-size:2rem; margin-bottom:0.6rem;">📚</div>
+        <div style="margin-bottom:0.6rem; color:var(--text-muted);">${window.getSvgIcon('book', 36)}</div>
         <h3 style="margin:0 0 0.35rem 0; font-size:1.1rem; font-weight:800; color:var(--text-main);">No Classwork Found</h3>
         <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">
           No assignments or class tests match your active filter.
@@ -1152,9 +1152,10 @@ function submitPcClassComment() {
 }
 
 function focusMobileCommentInput() {
-  const comment = prompt('Add class comment:');
-  if (comment && comment.trim()) {
-    showToast('Comment added', 'success');
+  const input = document.getElementById('pc-class-comment-input');
+  if (input) {
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    input.focus();
   }
 }
 
@@ -1379,19 +1380,23 @@ async function loadDrawerEnrolledClasses() {
    ───────────────────────────────────────────────────────────── */
 
 function toggleStudentDrawer(forceState) {
+  if (typeof toggleSidebar === 'function') {
+    return toggleSidebar(forceState);
+  }
   const drawer = document.getElementById('gc-drawer');
   const backdrop = document.getElementById('gc-drawer-backdrop');
-  if (!drawer || !backdrop) return;
+  if (!drawer) return;
 
   const isOpen = forceState !== undefined ? forceState : !drawer.classList.contains('open');
   if (isOpen) {
     drawer.classList.add('open');
-    backdrop.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    if (backdrop) backdrop.classList.add('open');
   } else {
     drawer.classList.remove('open');
-    backdrop.classList.remove('open');
-    document.body.style.overflow = '';
+    if (backdrop) backdrop.classList.remove('open');
+  }
+  if (typeof _updateMenuToggleButtons === 'function') {
+    _updateMenuToggleButtons(isOpen);
   }
 }
 
@@ -1489,11 +1494,11 @@ function toggleMobileUnitFilter() {
     let html = `
       <div class="mobile-unit-opt ${currentVal === 'ALL' ? 'active' : ''}" onclick="selectMobileUnitFilter('ALL')">
         <span>All Topics</span>
-        ${currentVal === 'ALL' ? '<span style="color:var(--color-primary); font-weight:700;">✓</span>' : ''}
+        ${currentVal === 'ALL' ? `<span style="color:var(--color-primary);">${window.getSvgIcon('check', 14)}</span>` : ''}
       </div>
       <div class="mobile-unit-opt ${currentVal === 'GENERAL' ? 'active' : ''}" onclick="selectMobileUnitFilter('GENERAL')">
         <span>General Coursework</span>
-        ${currentVal === 'GENERAL' ? '<span style="color:var(--color-primary); font-weight:700;">✓</span>' : ''}
+        ${currentVal === 'GENERAL' ? `<span style="color:var(--color-primary);">${window.getSvgIcon('check', 14)}</span>` : ''}
       </div>
     `;
     units.forEach(u => {
@@ -1502,7 +1507,7 @@ function toggleMobileUnitFilter() {
       html += `
         <div class="mobile-unit-opt ${isActive ? 'active' : ''}" onclick="selectMobileUnitFilter('${escapeHtml(uName)}')">
           <span>${escapeHtml(uName)}</span>
-          ${isActive ? '<span style="color:var(--color-primary); font-weight:700;">✓</span>' : ''}
+          ${isActive ? `<span style="color:var(--color-primary);">${window.getSvgIcon('check', 14)}</span>` : ''}
         </div>
       `;
     });

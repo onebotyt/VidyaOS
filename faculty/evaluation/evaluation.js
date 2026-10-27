@@ -1326,14 +1326,14 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                   </th>
                   <th rowspan="2" class="excel-hdr-tan resizable-th" data-col-idx="1" style="width: ${(savedWidths && savedWidths[1]) || 135}px;" ondblclick="autoFitColumn(1)" title="Double-click to auto-fit">
                     ${isEditMode 
-                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('enroll_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Enrollment No Header" style="font-weight: 700; font-size: 0.72rem;">${escapeHtml(state.scheme.enroll_label || 'ENROLLMENT NO')}</div>`
-                      : `${escapeHtml(state.scheme.enroll_label || 'ENROLLMENT NO')}`
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('reg_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Reg No Header" style="font-weight: 700; font-size: 0.72rem;">${escapeHtml(state.scheme.reg_label || 'REG NO')}</div>`
+                      : `${escapeHtml(state.scheme.reg_label || 'REG NO')}`
                     }
                   </th>
                   <th rowspan="2" class="excel-hdr-tan resizable-th" data-col-idx="2" style="width: ${(savedWidths && savedWidths[2]) || 135}px;" ondblclick="autoFitColumn(2)" title="Double-click to auto-fit">
                     ${isEditMode 
-                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('reg_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Reg No Header" style="font-weight: 700; font-size: 0.72rem;">${escapeHtml(state.scheme.reg_label || 'REG NO')}</div>`
-                      : `${escapeHtml(state.scheme.reg_label || 'REG NO')}`
+                      ? `<div class="sheet-th-input" contenteditable="true" oninput="onHeaderLabelChange('enroll_label', this.innerText.trim())" onkeydown="if(event.key==='Enter'){event.preventDefault();}" title="Edit Enrollment No Header" style="font-weight: 700; font-size: 0.72rem;">${escapeHtml(state.scheme.enroll_label || 'ENROLLMENT NO')}</div>`
+                      : `${escapeHtml(state.scheme.enroll_label || 'ENROLLMENT NO')}`
                     }
                   </th>
                   <th rowspan="2" class="excel-hdr-tan resizable-th" data-col-idx="3" style="width: ${(savedWidths && savedWidths[3]) || 200}px; text-align: left;" ondblclick="autoFitColumn(3)" title="Double-click to auto-fit">
@@ -1439,10 +1439,10 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                       ${escapeHtml(String(s.class_roll_no))}
                     </td>
                     <td class="col-cell col-idx-1" data-col-idx="1" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">
-                      ${escapeHtml(s.official_enrollment_no || '—')}
+                      ${escapeHtml(s.registration_no || '—')}
                     </td>
                     <td class="col-cell col-idx-2" data-col-idx="2" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">
-                      ${escapeHtml(s.registration_no || '—')}
+                      ${escapeHtml(s.official_enrollment_no || '—')}
                     </td>
                     <td class="cell-student-name col-cell col-idx-3" data-col-idx="3" title="${escapeHtml(s.full_name)}">
                       <span style="font-weight: 700; text-transform: uppercase;">${escapeHtml(s.full_name)}</span>
@@ -1456,7 +1456,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                                value="${s.assignment_scores[aIdx] ?? 0}" 
                                min="0" 
                                max="${a.max_marks || 25}" 
-                               step="0.5" 
+                               step="any" 
                                ${isEditMode ? '' : 'readonly'}
                                oninput="onEvalAssignmentScoreChange(${s.student_id}, ${aIdx}, this.value, this)">
                       </td>
@@ -1493,7 +1493,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                                  value="${val}" 
                                  min="0" 
                                  max="${c.max || 10}" 
-                                 step="0.5" 
+                                 step="any" 
                                  ${isEditMode ? '' : 'readonly'}
                                  oninput="onEvalAssessmentScoreChange(${s.student_id}, ${cIdx}, this.value, this)">
                         </td>
@@ -1585,8 +1585,8 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
 
       const cols = [
         { key: 'roll', label: 'ROLL NO', defaultWidth: 70, minWidth: 50 },
-        { key: 'enrollment', label: 'ENROLLMENT NO', defaultWidth: 135, minWidth: 85 },
         { key: 'reg', label: 'REG NO', defaultWidth: 135, minWidth: 85 },
+        { key: 'enrollment', label: 'ENROLLMENT NO', defaultWidth: 135, minWidth: 85 },
         { key: 'name', label: 'STUDENT NAME', defaultWidth: 200, minWidth: 120, align: 'left' }
       ];
 

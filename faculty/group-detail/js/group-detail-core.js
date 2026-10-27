@@ -138,7 +138,7 @@ function openModal(id) {
   el.classList.add('open');
   el.style.display = 'flex';
   document.body.classList.add('modal-open');
-  if (id === 'modal-enter-marks' && window.innerWidth < 768) {
+  if ((id === 'modal-enter-marks' || id === 'modal-enter-assignment-marks') && window.innerWidth < 768) {
     document.body.classList.add('marks-standalone-page');
     document.documentElement.classList.add('marks-standalone-page');
   }
@@ -149,7 +149,7 @@ function closeModal(id) {
   if (!el) return;
   el.classList.remove('open');
   el.style.display = 'none';
-  if (id === 'modal-enter-marks') {
+  if (id === 'modal-enter-marks' || id === 'modal-enter-assignment-marks') {
     document.body.classList.remove('marks-standalone-page');
     document.documentElement.classList.remove('marks-standalone-page');
   }
@@ -343,16 +343,21 @@ function switchTab(tab, subOption) {
 
   const cwFab = ById('classwork-mobile-fab');
   if (cwFab) {
-    if (!S.isStudent && tab === 'classwork' && window.innerWidth <= 768) {
+    if (!S.isStudent && (tab === 'classwork' || tab === 'marks') && window.innerWidth <= 768) {
       cwFab.style.setProperty('display', 'inline-flex', 'important');
     } else {
       cwFab.style.setProperty('display', 'none', 'important');
     }
   }
   const fabMenu = ById('cw-mobile-fab-menu');
-  if (fabMenu && tab !== 'classwork') {
+  if (fabMenu && tab !== 'classwork' && tab !== 'marks') {
     fabMenu.style.setProperty('display', 'none', 'important');
     if (cwFab) cwFab.classList.remove('menu-open');
+  }
+
+  const mobileBulk = ById('mobile-bulk-bar');
+  if (mobileBulk && tab !== 'register') {
+    mobileBulk.style.display = 'none';
   }
 
   const titleEl = ById('mobile-nav-class-title');
@@ -564,7 +569,9 @@ function initGroupPage() {
   guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN', 'STUDENT'] });
   const p = new URLSearchParams(window.location.search);
   S.groupId = Number(p.get('id') || p.get('groupId') || p.get('group'));
-  let initTab = p.get('tab') || 'stream';
+  const hashTab = (window.location.hash || '').replace('#', '').trim();
+  const validTabs = ['stream', 'classwork', 'attendance', 'people', 'grades', 'analytics'];
+  let initTab = p.get('tab') || (validTabs.includes(hashTab) ? hashTab : '') || 'stream';
   const initAction = p.get('action');
 
   const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
@@ -692,6 +699,11 @@ document.addEventListener('click', (e) => {
   const fab = ById('classwork-mobile-fab');
   if (fabMenu && fabMenu.style.display !== 'none' && !fabMenu.contains(e.target) && (!fab || !fab.contains(e.target))) {
     if (typeof toggleCwFabMenu === 'function') toggleCwFabMenu(false);
+  }
+  const marksMenu = ById('marks-create-dropdown-menu');
+  const marksBtn = ById('btn-marks-create-main');
+  if (marksMenu && marksMenu.style.display !== 'none' && !marksMenu.contains(e.target) && (!marksBtn || !marksBtn.contains(e.target))) {
+    marksMenu.style.display = 'none';
   }
 });
 

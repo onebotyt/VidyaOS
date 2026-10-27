@@ -94,7 +94,7 @@
 
     const assignCols = data.assignments || [{ assignment_number: 1 }, { assignment_number: 2 }];
     const examCols = data.exams || [{ title: 'UT1', max_marks: 20 }, { title: 'UT2', max_marks: 20 }];
-    const totalCols = 2 + assignCols.length + examCols.length + 3;
+    const totalCols = 4 + assignCols.length + examCols.length + 3;
 
     let html = `
       <table class="excel-table sheet-table">
@@ -111,6 +111,8 @@
           </tr>
           <tr class="excel-hdr-tan">
             <th style="width:45px;">ROLL</th>
+            <th style="width:110px;">REG. NO.</th>
+            <th style="width:120px;">ENROLLMENT NO.</th>
             <th style="text-align:left;padding-left:0.75rem;">STUDENT NAME</th>
             ${assignCols.map((a, i) => `<th>Assign ${a.assignment_number || i + 1}</th>`).join('')}
             ${examCols.map((e, i) => `<th>${esc(e.title || 'UT' + (i + 1))}</th>`).join('')}
@@ -145,11 +147,10 @@
             return `
               <tr>
                 <td style="font-weight:700;">${st.class_roll_no || idx + 1}</td>
+                <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.registration_no || '—')}</td>
+                <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.official_enrollment_no || st.enrollment_no || '—')}</td>
                 <td class="cell-student-name">
-                  <div class="dyn-student-cell">
-                    <span class="dyn-student-name">${esc(st.full_name || st.student_name || '')}</span>
-                    <span class="dyn-student-enroll">${esc(st.official_enrollment_no || st.enrollment_no || '')}</span>
-                  </div>
+                  <span class="dyn-student-name" style="font-weight:700;">${esc(st.full_name || st.student_name || '')}</span>
                 </td>
                 ${aCells}
                 ${eCells}
@@ -171,13 +172,15 @@
     const members = S.members || [];
     const esc = window.escapeHtml || (s => String(s == null ? '' : s));
 
-    const totalCols = 2 + (tests.length || 1) + 2;
+    const totalCols = 4 + (tests.length || 1) + 2;
     let html = `
       <table class="excel-table sheet-table">
         <thead>
           <tr class="excel-hdr-blue row-1"><th colspan="${totalCols}"><h3>Class Tests &amp; Examinations Marksheet</h3></th></tr>
           <tr class="excel-hdr-tan">
             <th style="width:45px;">ROLL</th>
+            <th style="width:110px;">REG. NO.</th>
+            <th style="width:120px;">ENROLLMENT NO.</th>
             <th style="text-align:left;padding-left:0.75rem;">STUDENT NAME</th>
             ${tests.length ? tests.map(t => `<th>${esc(t.title || 'Test')}<br><small style="font-weight:500;">(Max ${t.max_marks || 20})</small></th>`).join('') : `<th>Test 1</th>`}
             <th>Avg Score</th>
@@ -188,11 +191,10 @@
           ${members.map((m, idx) => `
             <tr>
               <td style="font-weight:700;">${m.class_roll_no || idx + 1}</td>
+              <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.registration_no || '—')}</td>
+              <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.official_enrollment_no || m.enrollment_no || '—')}</td>
               <td class="cell-student-name">
-                <div class="dyn-student-cell">
-                  <span class="dyn-student-name">${esc(m.full_name || '')}</span>
-                  <span class="dyn-student-enroll">${esc(m.official_enrollment_no || '')}</span>
-                </div>
+                <span class="dyn-student-name" style="font-weight:700;">${esc(m.full_name || '')}</span>
               </td>
               ${tests.length ? tests.map(() => `<td>${Math.floor(12 + Math.random() * 8)}</td>`).join('') : `<td>16</td>`}
               <td style="font-weight:800;color:var(--color-primary);">78%</td>
@@ -211,13 +213,15 @@
     const members = S.members || [];
     const esc = window.escapeHtml || (s => String(s == null ? '' : s));
 
-    const totalCols = 2 + (assigns.length || 1) + 2;
+    const totalCols = 4 + (assigns.length || 1) + 2;
     let html = `
       <table class="excel-table sheet-table">
         <thead>
           <tr class="excel-hdr-blue row-1"><th colspan="${totalCols}"><h3>Coursework &amp; Assignments Marksheet</h3></th></tr>
           <tr class="excel-hdr-tan">
             <th style="width:45px;">ROLL</th>
+            <th style="width:110px;">REG. NO.</th>
+            <th style="width:120px;">ENROLLMENT NO.</th>
             <th style="text-align:left;padding-left:0.75rem;">STUDENT NAME</th>
             ${assigns.length ? assigns.map((a, i) => `<th>Assignment ${a.assignment_number || i + 1}<br><small style="font-weight:500;">(Max ${a.max_marks || 20})</small></th>`).join('') : `<th>Assignment 1</th>`}
             <th>Total Score</th>
@@ -228,11 +232,10 @@
           ${members.map((m, idx) => `
             <tr>
               <td style="font-weight:700;">${m.class_roll_no || idx + 1}</td>
+              <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.registration_no || '—')}</td>
+              <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.official_enrollment_no || m.enrollment_no || '—')}</td>
               <td class="cell-student-name">
-                <div class="dyn-student-cell">
-                  <span class="dyn-student-name">${esc(m.full_name || '')}</span>
-                  <span class="dyn-student-enroll">${esc(m.official_enrollment_no || '')}</span>
-                </div>
+                <span class="dyn-student-name" style="font-weight:700;">${esc(m.full_name || '')}</span>
               </td>
               ${assigns.length ? assigns.map(() => `<td>${Math.floor(14 + Math.random() * 6)}</td>`).join('') : `<td>18</td>`}
               <td style="font-weight:800;color:var(--status-present);">88%</td>

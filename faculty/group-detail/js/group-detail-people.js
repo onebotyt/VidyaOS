@@ -43,7 +43,7 @@ function renderPeople() {
       '</div>' +
       (!isStudent ? (
         '<button class="person-rm-btn" onclick="removeStudent(' + m.student_id + ')" title="Remove">' +
-          (window.getSvgIcon ? window.getSvgIcon('close', 14) : '✕') +
+          (window.getSvgIcon ? window.getSvgIcon('close', 14) : '&times;') +
         '</button>'
       ) : '') +
     '</div>'

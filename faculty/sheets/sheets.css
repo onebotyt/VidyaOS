@@ -25,10 +25,111 @@
       display: none !important;
     }
 
-    /* Universal GC Top Nav */
+    /* Universal Minimal Sheets GC Top Nav: Logo, VidyaOS, Tools, Profile */
     .gc-navbar {
-      flex-shrink: 0;
+      height: 52px;
+      min-height: 52px;
+      padding: 0 1rem;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
       z-index: 1000;
+      box-shadow: var(--shadow-xs, var(--shadow-sm));
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+    .gc-navbar #sidebar-toggle-btn,
+    .gc-navbar .sidebar-toggle-btn,
+    .gc-navbar .gc-menu-btn {
+      display: none !important;
+    }
+    .gc-navbar .gc-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+    }
+    .gc-navbar .gc-brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: var(--text-main);
+      user-select: none;
+    }
+    .gc-navbar .gc-brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, hsl(142, 70%, 35%) 0%, hsl(160, 75%, 42%) 100%);
+      color: var(--text-white, hsl(0, 0%, 100%));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+    .gc-navbar .gc-brand-title {
+      font-size: 1.18rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .gc-navbar .gc-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .gc-navbar .gc-icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .gc-navbar .gc-icon-btn:hover {
+      background: var(--bg-surface-hover, var(--bg-surface));
+      border-color: var(--border-color);
+    }
+    .gc-navbar .gc-user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--text-white, hsl(0, 0%, 100%));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 2px solid var(--border-color);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      flex-shrink: 0;
+    }
+    .gc-navbar .gc-user-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-sm);
+    }
+    .gc-navbar .apps-launcher-dropdown {
+      top: 48px;
+    }
+    .gc-navbar .user-profile-popover {
+      top: 48px;
     }
 
     /* Studio Main Layout Container */
@@ -146,13 +247,9 @@
       border-right: 1px solid var(--border-color);
       border-bottom: 1px solid var(--border-color);
       min-height: 38px;
-      overflow-x: auto;
-      white-space: nowrap;
-      scrollbar-width: none;
+      overflow: visible;
+      white-space: normal;
       z-index: 25;
-    }
-    .studio-bar-2::-webkit-scrollbar {
-      display: none;
     }
     .bar-tools-badge {
       display: none !important;
@@ -283,6 +380,7 @@
     }
     #sheets-viewport.sheet-mode-dynamic .sheet-scale-wrapper {
       transform: none !important;
+      zoom: 1 !important;
       width: max-content !important;
       min-width: 100% !important;
     }
@@ -355,6 +453,175 @@
       z-index: 6 !important;
       text-align: left !important;
       padding-left: 0.75rem !important;
+    }
+
+    /* ========================================================
+       STICKY TABLE HEADER & FOOTER (SCROLLABLE STUDENT DATA)
+       Header (titles + max marks) sticks to top
+       Footer (class averages) sticks to bottom
+       Only tbody student rows scroll in between
+       ======================================================== */
+    #sheets-viewport table.excel-table thead,
+    #sheets-viewport table.sheet-table thead {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 25 !important;
+    }
+    #sheets-viewport table.excel-table thead tr.excel-hdr-tan th,
+    #sheets-viewport table.sheet-table thead tr.excel-hdr-tan th {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 26 !important;
+      background-clip: padding-box !important;
+    }
+    #sheets-viewport table.excel-table thead tr.excel-hdr-sub th,
+    #sheets-viewport table.sheet-table thead tr.excel-hdr-sub th {
+      position: sticky !important;
+      top: var(--th-row1-height, 27px) !important;
+      z-index: 25 !important;
+      background-clip: padding-box !important;
+    }
+    #sheets-viewport table.excel-table thead tr.excel-hdr-numbers th,
+    #sheets-viewport table.sheet-table thead tr.excel-hdr-numbers th {
+      position: sticky !important;
+      top: calc(var(--th-row1-height, 27px) + var(--th-row2-height, 24px)) !important;
+      z-index: 24 !important;
+      background-clip: padding-box !important;
+      border-bottom: 2px solid var(--border-color) !important;
+      box-shadow: 0 4px 6px -2px var(--shadow-sm);
+    }
+
+    /* Sticky Table Footer (Class Average Summary Row) */
+    #sheets-viewport table.excel-table tfoot,
+    #sheets-viewport table.sheet-table tfoot {
+      position: sticky !important;
+      bottom: 0 !important;
+      z-index: 20 !important;
+    }
+    #sheets-viewport table.excel-table tfoot tr td,
+    #sheets-viewport table.sheet-table tfoot tr td {
+      position: sticky !important;
+      bottom: 0 !important;
+      z-index: 20 !important;
+      border-top: 2px solid var(--border-color) !important;
+      box-shadow: 0 -4px 6px -2px var(--shadow-sm);
+      background-clip: padding-box !important;
+    }
+
+    /* Sticky Last Column (Total Marks / Grand Total) pinned to right side */
+    #sheets-viewport table.excel-table th.col-total:last-child,
+    #sheets-viewport table.excel-table td.col-total:last-child,
+    #sheets-viewport table.excel-table td.cell-total:last-child,
+    #sheets-viewport table.sheet-table th.col-total:last-child,
+    #sheets-viewport table.sheet-table td.col-total:last-child,
+    #sheets-viewport table.sheet-table td.cell-total:last-child,
+    #sheets-viewport.sheet-mode-dynamic table.excel-table th.col-total,
+    #sheets-viewport.sheet-mode-dynamic table.excel-table td.col-total,
+    #sheets-viewport.sheet-mode-dynamic table.excel-table td.cell-total,
+    #sheets-viewport.sheet-mode-dynamic table.sheet-table th.col-total,
+    #sheets-viewport.sheet-mode-dynamic table.sheet-table td.col-total,
+    #sheets-viewport.sheet-mode-dynamic table.sheet-table td.cell-total,
+    #sheets-viewport.hide-col-side-panel table.excel-table th.col-total,
+    #sheets-viewport.hide-col-side-panel table.excel-table td.col-total,
+    #sheets-viewport.hide-col-side-panel table.excel-table td.cell-total,
+    #sheets-viewport.hide-col-side-panel table.sheet-table th.col-total,
+    #sheets-viewport.hide-col-side-panel table.sheet-table td.col-total,
+    #sheets-viewport.hide-col-side-panel table.sheet-table td.cell-total {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 8 !important;
+      background: var(--bg-card) !important;
+      min-width: 75px !important;
+      border-left: 2px solid var(--border-color) !important;
+      box-shadow: -2px 0 6px var(--shadow-sm) !important;
+    }
+    #sheets-viewport table.excel-table thead tr.excel-hdr-tan th.col-total:last-child,
+    #sheets-viewport table.sheet-table thead tr.excel-hdr-tan th.col-total:last-child,
+    #sheets-viewport.sheet-mode-dynamic table.excel-table thead tr.excel-hdr-tan th.col-total,
+    #sheets-viewport.sheet-mode-dynamic table.sheet-table thead tr.excel-hdr-tan th.col-total,
+    #sheets-viewport.hide-col-side-panel table.excel-table thead tr.excel-hdr-tan th.col-total,
+    #sheets-viewport.hide-col-side-panel table.sheet-table thead tr.excel-hdr-tan th.col-total {
+      position: sticky !important;
+      top: 0 !important;
+      right: 0 !important;
+      z-index: 36 !important;
+      background: var(--chip-hod-bg) !important;
+    }
+    #sheets-viewport table.excel-table thead tr.excel-hdr-numbers th.col-total:last-child,
+    #sheets-viewport table.sheet-table thead tr.excel-hdr-numbers th.col-total:last-child,
+    #sheets-viewport.sheet-mode-dynamic table.excel-table thead tr.excel-hdr-numbers th.col-total,
+    #sheets-viewport.sheet-mode-dynamic table.sheet-table thead tr.excel-hdr-numbers th.col-total,
+    #sheets-viewport.hide-col-side-panel table.excel-table thead tr.excel-hdr-numbers th.col-total,
+    #sheets-viewport.hide-col-side-panel table.sheet-table thead tr.excel-hdr-numbers th.col-total {
+      position: sticky !important;
+      top: calc(var(--th-row1-height, 27px) + var(--th-row2-height, 24px)) !important;
+      right: 0 !important;
+      z-index: 36 !important;
+      background: var(--bg-surface-secondary) !important;
+    }
+    #sheets-viewport table.excel-table tbody td.col-total,
+    #sheets-viewport table.sheet-table tbody td.col-total {
+      background: var(--bg-surface-secondary) !important;
+    }
+    #sheets-viewport table.excel-table tfoot td.col-total:last-child,
+    #sheets-viewport table.sheet-table tfoot td.col-total:last-child,
+    #sheets-viewport table.excel-table tfoot td:last-child,
+    #sheets-viewport table.sheet-table tfoot td:last-child,
+    #sheets-viewport.sheet-mode-dynamic table.excel-table tfoot td.col-total,
+    #sheets-viewport.sheet-mode-dynamic table.sheet-table tfoot td.col-total,
+    #sheets-viewport.hide-col-side-panel table.excel-table tfoot td.col-total,
+    #sheets-viewport.hide-col-side-panel table.sheet-table tfoot td.col-total {
+      position: sticky !important;
+      bottom: 0 !important;
+      right: 0 !important;
+      z-index: 30 !important;
+      background: var(--bg-surface-secondary) !important;
+      border-left: 2px solid var(--border-color) !important;
+      box-shadow: -2px -2px 6px var(--shadow-sm) !important;
+    }
+
+    /* Dynamic Mode Corners: Left Sticky Columns in Sticky Header & Footer */
+    #sheets-viewport.sheet-mode-dynamic thead tr.excel-hdr-tan th.col-roll {
+      position: sticky !important;
+      top: 0 !important;
+      left: 0 !important;
+      z-index: 36 !important;
+      background: var(--chip-hod-bg) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic thead tr.excel-hdr-numbers th.col-roll {
+      position: sticky !important;
+      top: calc(var(--th-row1-height, 27px) + var(--th-row2-height, 24px)) !important;
+      left: 0 !important;
+      z-index: 36 !important;
+      background: var(--bg-surface-secondary) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic thead tr.excel-hdr-tan th.col-name {
+      position: sticky !important;
+      top: 0 !important;
+      left: 44px !important;
+      z-index: 36 !important;
+      background: var(--chip-hod-bg) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic thead tr.excel-hdr-numbers th.col-name {
+      position: sticky !important;
+      top: calc(var(--th-row1-height, 27px) + var(--th-row2-height, 24px)) !important;
+      left: 44px !important;
+      z-index: 36 !important;
+      background: var(--bg-surface-secondary) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic tfoot td.col-roll {
+      position: sticky !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      z-index: 30 !important;
+      background: var(--bg-surface) !important;
+    }
+    #sheets-viewport.sheet-mode-dynamic tfoot td.col-name {
+      position: sticky !important;
+      bottom: 0 !important;
+      left: 44px !important;
+      z-index: 30 !important;
+      background: var(--bg-surface) !important;
     }
     /* Temporary pulse when jumping to a column */
     @keyframes columnPulseHighlight {
@@ -893,7 +1160,9 @@
       flex: 1 1 0;
       min-height: 0;
       position: relative;
-      overflow: auto;
+      overflow-x: auto;
+      overflow-y: auto;
+      overscroll-behavior-x: contain;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-top: none;
@@ -907,12 +1176,13 @@
       transform-origin: top left;
       transition: transform 0.12s ease-out;
       width: 100%;
+      max-width: 100%;
     }
 
     .sheet-pane {
       display: none;
       width: 100%;
-      min-width: max-content;
+      min-width: 100%;
       box-sizing: border-box;
       padding: 0;
     }
@@ -925,7 +1195,8 @@
     table.sheet-table,
     table.studio-sheet-table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       font-family: var(--font-family-sans);
       font-size: 0.82rem;
       color: var(--text-main);
@@ -1619,25 +1890,6 @@
        RESPONSIVE DESIGN FOR TABLETS & SMALL SCREENS (iPhone, Mobile)
        ══════════════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
-      /* Universal Navigation Bar */
-      .gc-navbar {
-        min-height: 38px !important;
-        height: 38px !important;
-        padding: 0.15rem 0.4rem !important;
-      }
-      .gc-brand-text {
-        font-size: 0.84rem !important;
-      }
-      .gc-navbar .badge,
-      .gc-nav-right a.btn {
-        display: none !important;
-      }
-      #gc-user-avatar {
-        width: 26px !important;
-        height: 26px !important;
-        font-size: 0.72rem !important;
-      }
-
       /* Sheets Studio Main Layout */
       .sheets-studio-layout {
         padding: 0.1rem 0.2rem !important;
@@ -2181,7 +2433,31 @@
       height: 1.6rem !important;
       transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
     }
-    input.excel-hdr-num-input:focus {
+    input[readonly].excel-hdr-num-input,
+    input.excel-hdr-num-input:not(.is-editable),
+    input[readonly].excel-cell-input,
+    input.excel-cell-input:not(.is-editable),
+    input[readonly].sheet-cell-input,
+    input.sheet-cell-input:not(.is-editable) {
+      border: 1px solid transparent !important;
+      background: transparent !important;
+      cursor: default !important;
+      pointer-events: none !important;
+      box-shadow: none !important;
+      user-select: none !important;
+    }
+    input[readonly]::-webkit-outer-spin-button,
+    input[readonly]::-webkit-inner-spin-button,
+    input:not(.is-editable)::-webkit-outer-spin-button,
+    input:not(.is-editable)::-webkit-inner-spin-button {
+      -webkit-appearance: none !important;
+      margin: 0 !important;
+    }
+    input[readonly],
+    input:not(.is-editable) {
+      -moz-appearance: textfield !important;
+    }
+    input.excel-hdr-num-input.is-editable:focus {
       border-color: var(--color-primary) !important;
       box-shadow: 0 0 0 2px var(--color-primary-subtle) !important;
       background: var(--bg-card) !important;
@@ -2196,13 +2472,189 @@
       border-radius: var(--radius-sm, 3px);
       border: 1px solid var(--border-color);
     }
+    .btn-sheet-att-toggle[disabled] {
+      cursor: default !important;
+      opacity: 0.9 !important;
+      pointer-events: none !important;
+    }
+    .editable-test-field {
+      display: inline-block;
+      transition: background 0.15s ease, outline 0.15s ease;
+      border-radius: var(--radius-sm, 3px);
+      padding: 0.05rem 0.25rem;
+    }
+    .editable-test-field.is-editable {
+      outline: 1px dashed var(--color-primary) !important;
+      background: var(--color-primary-subtle) !important;
+      cursor: text !important;
+    }
+    .editable-test-field.is-editable:focus {
+      outline: 2px solid var(--color-primary) !important;
+      background: var(--bg-card) !important;
+    }
 
-    /* PC Screen Toolbar - Tools placed directly on toolbar for desktop, hiding floating button */
+    /* ══════════════════════════════════════════════════════════════
+       STUDIO EXPORT DROPDOWN MENU
+       ══════════════════════════════════════════════════════════════ */
+    .studio-export-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .studio-export-btn {
+      font-weight: 700;
+      padding: 0.24rem 0.55rem;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .studio-export-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 5px);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.25));
+      z-index: 1050;
+      min-width: 250px;
+      padding: 0.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      box-sizing: border-box;
+    }
+    .export-menu-header {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      padding: 0.25rem 0.6rem 0.35rem 0.6rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 0.2rem;
+    }
+    .export-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      width: 100%;
+      padding: 0.45rem 0.65rem;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease;
+      box-sizing: border-box;
+    }
+    .export-menu-item:hover {
+      background: var(--bg-surface-hover, var(--bg-surface));
+    }
+    .export-item-badge {
+      font-family: 'JetBrains Mono', monospace, monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.2rem 0.45rem;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+      min-width: 44px;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .export-item-badge.badge-xlsx {
+      color: var(--status-present);
+      background: var(--status-present-bg);
+      border: 1px solid var(--status-present);
+    }
+    .export-item-badge.badge-pdf {
+      color: var(--status-absent);
+      background: var(--status-absent-bg);
+      border: 1px solid var(--status-absent);
+    }
+    .export-item-badge.badge-doc {
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      border: 1px solid var(--color-primary);
+    }
+    .export-item-badge.badge-csv {
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+    }
+    .export-item-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      gap: 1px;
+    }
+    .export-item-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+    .export-item-desc {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* PC Screen Toolbar - Tools placed directly on toolbar for desktop */
     .pc-screen-toolbar {
       display: flex;
       align-items: center;
       gap: 0.35rem;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
+    }
+
+    /* Responsive Toolbar Wrapping for Width <= 1085px */
+    @media (max-width: 1085px) {
+      .studio-bar-2 {
+        flex-wrap: wrap !important;
+        height: auto !important;
+        min-height: 38px;
+        padding-top: 0.28rem !important;
+        padding-bottom: 0.28rem !important;
+        row-gap: 0.35rem !important;
+        overflow: visible !important;
+        white-space: normal !important;
+      }
+      .studio-bar-2 .studio-bar-left {
+        flex-wrap: wrap !important;
+        gap: 0.35rem !important;
+        flex: 0 1 auto;
+      }
+      .studio-bar-2 .studio-bar-right {
+        flex-wrap: wrap !important;
+        gap: 0.35rem !important;
+        margin-left: auto;
+        justify-content: flex-end;
+      }
+      .pc-screen-toolbar {
+        flex-wrap: wrap !important;
+        gap: 0.28rem !important;
+        row-gap: 0.28rem !important;
+        justify-content: flex-end;
+        white-space: normal !important;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .studio-bar-2 .studio-bar-left,
+      .studio-bar-2 .studio-bar-right {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        margin-left: 0 !important;
+      }
+      .pc-screen-toolbar {
+        justify-content: flex-start !important;
+        width: 100% !important;
+      }
     }
 
     @media (max-width: 899px) {

@@ -397,42 +397,87 @@ function _setSidebarState(open) {
   localStorage.setItem('sidebar_open', open ? 'true' : 'false');
 }
 
-function toggleSidebar() {
-  const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer');
-  const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop');
+function _updateMenuToggleButtons(isOpen) {
+  const hamburgerSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+  const closeSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+
+  const btns = document.querySelectorAll('#sidebar-toggle-btn, #btn-menu-toggle, .gc-navbar .gc-menu-btn, .app-header .sidebar-toggle-btn');
+  btns.forEach(btn => {
+    btn.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;">${isOpen ? closeSvg : hamburgerSvg}</span>`;
+    btn.setAttribute('aria-label', isOpen ? 'Close navigation sidebar' : 'Open navigation sidebar');
+    btn.setAttribute('title', isOpen ? 'Close Main Menu' : 'Main Menu');
+    btn.setAttribute('aria-pressed', isOpen ? 'true' : 'false');
+  });
+}
+
+function toggleSidebar(forceState) {
+  const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer') || document.getElementById('gc-drawer');
+  const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop') || document.getElementById('gc-drawer-backdrop');
   if (!sidebar) return;
-  const isOpen = sidebar.classList.toggle('sidebar-open');
-  sidebar.classList.toggle('open', isOpen);
-  document.body.classList.toggle('sidebar-open', isOpen);
-  if (backdrop) {
-    backdrop.classList.toggle('active', isOpen);
-    backdrop.classList.toggle('open', isOpen);
+
+  const isDesktop = window.innerWidth >= 769;
+  const isCurrentlyOpen = isDesktop
+    ? !document.body.classList.contains('sidebar-closed')
+    : (sidebar.classList.contains('sidebar-open') || sidebar.classList.contains('open'));
+
+  const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
+
+  if (shouldOpen) {
+    sidebar.classList.add('sidebar-open', 'open');
+    sidebar.classList.remove('sidebar-closed');
+    document.body.classList.add('sidebar-open');
+    document.body.classList.remove('sidebar-closed');
+    if (!isDesktop && backdrop) {
+      backdrop.classList.add('active', 'open');
+    }
+  } else {
+    sidebar.classList.remove('sidebar-open', 'open');
+    sidebar.classList.add('sidebar-closed');
+    document.body.classList.remove('sidebar-open');
+    document.body.classList.add('sidebar-closed');
+    if (backdrop) {
+      backdrop.classList.remove('active', 'open');
+    }
   }
-  _setSidebarState(isOpen);
-  // Update toggle button icon
-  const btn = document.getElementById('sidebar-toggle-btn') || document.getElementById('btn-menu-toggle');
-  if (btn) btn.setAttribute('aria-pressed', isOpen ? 'true' : 'false');
+
+  _setSidebarState(shouldOpen);
+  _updateMenuToggleButtons(shouldOpen);
 }
 
 function closeSidebar() {
-  const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer');
-  const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop');
-  if (!sidebar) return;
-  sidebar.classList.remove('sidebar-open');
-  sidebar.classList.remove('open');
-  document.body.classList.remove('sidebar-open');
-  if (backdrop) {
-    backdrop.classList.remove('active');
-    backdrop.classList.remove('open');
-  }
-  _setSidebarState(false);
+  toggleSidebar(false);
 }
 
-// Global aliases to ensure all faculty pages work with either function name
+function _initSidebarState() {
+  const isDesktop = window.innerWidth >= 769;
+  const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer') || document.getElementById('gc-drawer');
+  const isSidebarClosed = localStorage.getItem('sidebar_open') === 'false';
+  const shouldBeOpen = isDesktop ? !isSidebarClosed : false;
+
+  if (sidebar) {
+    if (shouldBeOpen) {
+      sidebar.classList.add('sidebar-open', 'open');
+      sidebar.classList.remove('sidebar-closed');
+      document.body.classList.add('sidebar-open');
+      document.body.classList.remove('sidebar-closed');
+    } else {
+      sidebar.classList.remove('sidebar-open', 'open');
+      sidebar.classList.add('sidebar-closed');
+      document.body.classList.remove('sidebar-open');
+      document.body.classList.add('sidebar-closed');
+    }
+  }
+  _updateMenuToggleButtons(shouldBeOpen);
+}
+
+// Global aliases to ensure all pages work with either function name
 window.toggleSidebar = toggleSidebar;
 window.closeSidebar = closeSidebar;
 window.toggleDrawer = toggleSidebar;
 window.closeDrawer = closeSidebar;
+window.toggleStudentDrawer = toggleSidebar;
+window._updateMenuToggleButtons = _updateMenuToggleButtons;
+window._initSidebarState = _initSidebarState;
 
 function toggleAppsLauncher(event) {
   if (event) {
@@ -590,6 +635,7 @@ const SVG_ICONS = {
   assignment: (s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6"/><path d="M9 10h6"/><path d="M9 18h4"/></svg>`,
   test: (s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
   practical: (s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/><line x1="6.5" y1="15" x2="17.5" y2="15"/></svg>`,
+  folder: (s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
   finaldocs: (s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
   leave: (s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>`,
   commonFaculty: (s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
@@ -636,72 +682,71 @@ const SVG_ICONS = {
 };
 
 const EMOJI_TO_SVG = {
-  '⏳': 'clock',
-  '⌛': 'clock',
-  '⚖️': 'scale',
-  '✓': 'check',
-  '✕': 'close',
-  '📊': 'reports',
-  '🏛️': 'academic',
-  '👨‍🏫': 'hod',
-  '👥': 'students',
-  '📈': 'trendingUp',
-  '⚙️': 'settings',
-  '🛡️': 'audit',
-  '🏠': 'home',
-  '📅': 'calendar',
-  '📖': 'book',
-  '📝': 'assignment',
-  '📉': 'trendingDown',
-  '🧾': 'leave',
-  '🌐': 'commonFaculty',
-  '📡': 'devices',
-  '📦': 'archive',
-  '🗑️': 'trash',
-  '🗑': 'trash',
-  '🏫': 'home',
-  '🗓️': 'calendar',
-  '🧮': 'reports',
-  '🎓': 'gradCap',
-  '👤': 'user',
-  '🔑': 'key',
-  '🚪': 'logout',
-  '🔔': 'bell',
-  '🌙': 'moon',
-  '☀️': 'sun',
-  '🌓': 'moon',
-  '✱': 'apps',
-  '☰': 'menu',
-  '✕': 'close',
-  '✅': 'check',
-  '⚠️': 'alert',
-  '✏️': 'edit',
-  '📋': 'assignment',
-  '📢': 'megaphone',
-  '🧪': 'practical',
-  '💾': 'save',
-  '⭐': 'star',
-  '🔄': 'refresh',
-  '🖨️': 'printer',
-  '📥': 'download',
-  '📤': 'upload',
-  '👁️': 'eye',
-  '🙈': 'eyeOff',
-  '⚡': 'zap',
-  '🔍': 'search',
-  '➕': 'plus',
-  '📱': 'devices',
-  '🔢': 'table',
-  '📚': 'book',
-  '💡': 'alert',
-  '🛑': 'alert',
-  '🎉': 'star',
-  '✨': 'star',
-  '✍️': 'edit',
-  '📄': 'assignment',
-  '💬': 'comment',
-  '💯': 'star',
-  '⏱️': 'calendar',
+  '\u23F3': 'clock',
+  '\u231B': 'clock',
+  '\u2696\uFE0F': 'scale',
+  '\u2713': 'check',
+  '\u2715': 'close',
+  '\uD83D\uDCCA': 'reports',
+  '\uD83C\uDFDB\uFE0F': 'academic',
+  '\uD83D\uDC68\u200D\uD83C\uDFEB': 'hod',
+  '\uD83D\uDC65': 'students',
+  '\uD83D\uDCC8': 'trendingUp',
+  '\u2699\uFE0F': 'settings',
+  '\uD83D\uDEE1\uFE0F': 'audit',
+  '\uD83C\uDFE0': 'home',
+  '\uD83D\uDCC5': 'calendar',
+  '\uD83D\uDCD6': 'book',
+  '\uD83D\uDCDD': 'assignment',
+  '\uD83D\uDCC9': 'trendingDown',
+  '\uD83E\uDDFE': 'leave',
+  '\uD83C\uDF10': 'commonFaculty',
+  '\uD83D\uDCE1': 'devices',
+  '\uD83D\uDCE6': 'archive',
+  '\uD83D\uDDD1\uFE0F': 'trash',
+  '\uD83D\uDDD1': 'trash',
+  '\uD83C\uDFEB': 'home',
+  '\uD83D\uDDD3\uFE0F': 'calendar',
+  '\uD83E\uDDEE': 'reports',
+  '\uD83C\uDF93': 'gradCap',
+  '\uD83D\uDC64': 'user',
+  '\uD83D\uDD11': 'key',
+  '\uD83D\uDEAA': 'logout',
+  '\uD83D\uDD14': 'bell',
+  '\uD83C\uDF19': 'moon',
+  '\u2600\uFE0F': 'sun',
+  '\uD83C\uDF13': 'moon',
+  '\u2731': 'apps',
+  '\u2630': 'menu',
+  '\u2705': 'check',
+  '\u26A0\uFE0F': 'alert',
+  '\u270F\uFE0F': 'edit',
+  '\uD83D\uDCCB': 'assignment',
+  '\uD83D\uDCE2': 'megaphone',
+  '\uD83E\uDDEA': 'practical',
+  '\uD83D\uDCBE': 'save',
+  '\u2B50': 'star',
+  '\uD83D\uDD04': 'refresh',
+  '\uD83D\uDDA8\uFE0F': 'printer',
+  '\uD83D\uDCE5': 'download',
+  '\uD83D\uDCE4': 'upload',
+  '\uD83D\uDC41\uFE0F': 'eye',
+  '\uD83D\uDE48': 'eyeOff',
+  '\u26A1': 'zap',
+  '\uD83D\uDD0D': 'search',
+  '\u2795': 'plus',
+  '\uD83D\uDCF1': 'devices',
+  '\uD83D\uDD22': 'table',
+  '\uD83D\uDCDA': 'book',
+  '\uD83D\uDCA1': 'alert',
+  '\uD83D\uDED1': 'alert',
+  '\uD83C\uDF89': 'star',
+  '\u2728': 'star',
+  '\u270D\uFE0F': 'edit',
+  '\uD83D\uDCC4': 'assignment',
+  '\uD83D\uDCAC': 'comment',
+  '\uD83D\uDCAF': 'star',
+  '\u23F1\uFE0F': 'calendar',
   '&#128226;': 'stream',
   '&#128100;': 'students',
   '&#128221;': 'test',
@@ -719,6 +764,9 @@ const EMOJI_TO_SVG = {
 function getSvgIcon(icon, size = 18) {
   if (!icon) return '';
   if (typeof icon === 'string' && icon.trim().startsWith('<svg')) return icon;
+  if (typeof window !== 'undefined' && window.VIDYA_ICONS && typeof window.getSvgIcon === 'function') {
+    return window.getSvgIcon(icon, size);
+  }
   const key = EMOJI_TO_SVG[icon] || icon;
   if (SVG_ICONS[key]) return SVG_ICONS[key](size);
   return icon;
@@ -734,16 +782,11 @@ function renderSidebar() {
   const header = document.querySelector('.app-header, .gc-navbar');
   if (!header || !user) return;
 
-  // Dedicated Classroom workspaces manage their own drawer and should not render legacy fixed sidebar
   const currentPath = window.location.pathname.toLowerCase();
-  if (document.body.classList.contains('classroom-page') || 
-      currentPath.includes('group-detail') || 
-      document.getElementById('gc-drawer')) {
-    document.body.classList.remove('sidebar-open');
-    const existingSidebar = document.getElementById('app-sidebar');
-    if (existingSidebar) existingSidebar.remove();
-    const existingBackdrop = document.getElementById('sidebar-backdrop');
-    if (existingBackdrop) existingBackdrop.remove();
+
+  // If a sidebar or drawer already exists in DOM, initialize its state and avoid duplicate aside
+  if (document.getElementById('app-sidebar') || document.getElementById('gc-drawer') || document.getElementById('classroom-drawer')) {
+    _initSidebarState();
     return;
   }
 
@@ -823,9 +866,9 @@ function renderSidebar() {
     navSections.push({
       label: '',
       items: [
-        { icon: '🏠', label: 'Classes', href: '/faculty/dashboard.html' },
-        { icon: '📁', label: 'Faculty Drive & Vault', href: '/faculty/media.html', id: 'nav-drive' },
-        { icon: '📅', label: 'Calendar & Timetable', href: '/faculty/timetable.html' }
+        { icon: 'home', label: 'Classes', href: '/faculty/dashboard.html' },
+        { icon: 'folder', label: 'Faculty Drive & Vault', href: '/faculty/media.html', id: 'nav-drive' },
+        { icon: 'calendar', label: 'Calendar & Timetable', href: '/faculty/timetable.html' }
       ]
     });
 
@@ -838,19 +881,19 @@ function renderSidebar() {
 
     // Academic Tools
     const academicTools = [
-      { icon: '📖', label: 'Attendance Registers', href: '/faculty/registers.html', id: 'nav-reg' },
-      { icon: '📝', label: 'Coursework & Assignments', href: '/faculty/assignments.html', id: 'nav-assign' },
-      { icon: '📊', label: 'Marks & Tests', href: '/faculty/tests.html', id: 'nav-marks' },
-      { icon: '📈', label: 'Internal Evaluation', href: '/faculty/evaluation.html', id: 'nav-eval' },
-      { icon: '📉', label: 'Reports & Analytics', href: '/faculty/reports.html', id: 'nav-reports' },
-      { icon: '🧾', label: 'Leave Requests', href: '/faculty/leave-approvals.html' }
+      { icon: 'book', label: 'Attendance Registers', href: '/faculty/registers.html', id: 'nav-reg' },
+      { icon: 'assignment', label: 'Coursework & Assignments', href: '/faculty/assignments.html', id: 'nav-assign' },
+      { icon: 'reports', label: 'Marks & Tests', href: '/faculty/tests.html', id: 'nav-marks' },
+      { icon: 'trendingUp', label: 'Internal Evaluation', href: '/faculty/evaluation.html', id: 'nav-eval' },
+      { icon: 'trendingDown', label: 'Reports & Analytics', href: '/faculty/reports.html', id: 'nav-reports' },
+      { icon: 'leave', label: 'Leave Requests', href: '/faculty/leave-approvals.html' }
     ];
 
     if (isDeptFaculty || isHodUser) {
-      academicTools.push({ icon: '👥', label: 'Faculty & Students', href: '/faculty/students.html', id: 'nav-students-item', hasBadge: true });
+      academicTools.push({ icon: 'students', label: 'Faculty & Students', href: '/faculty/students.html', id: 'nav-students-item', hasBadge: true });
     }
     if (user.is_common_faculty_manager && user.roles?.includes('COMMON_FACULTY_MANAGER')) {
-      academicTools.push({ icon: '🌐', label: 'Common Faculty', href: '/faculty/common-teachers.html' });
+      academicTools.push({ icon: 'commonFaculty', label: 'Common Faculty', href: '/faculty/common-teachers.html' });
     }
     navSections.push({ label: 'Academic Tools', items: academicTools });
 
@@ -859,8 +902,8 @@ function renderSidebar() {
       navSections.push({
         label: 'HOD Management',
         items: [
-          { icon: '👨‍🏫', label: 'Department Faculty', href: '/faculty/hod-teachers.html' },
-          { icon: '⚙️', label: 'Department Settings', href: '/faculty/hod-settings.html' }
+          { icon: 'hod', label: 'Department Faculty', href: '/faculty/hod-teachers.html' },
+          { icon: 'settings', label: 'Department Settings', href: '/faculty/hod-settings.html' }
         ]
       });
     }
@@ -868,9 +911,9 @@ function renderSidebar() {
     navSections.push({
       label: 'Archive & Safety',
       items: [
-        { icon: '📦', label: 'Archived Classes', href: '/faculty/dashboard.html?filter=ARCHIVED' },
-        { icon: '🗑️', label: 'Trash Bin (7d Recovery)', href: '/faculty/dashboard.html?trash=1' },
-        { icon: '⚙️', label: 'Settings', href: isHodUser ? '/faculty/hod-settings.html' : '/faculty/profile.html' }
+        { icon: 'archive', label: 'Archived Classes', href: '/faculty/dashboard.html?filter=ARCHIVED' },
+        { icon: 'trash', label: 'Trash Bin (7d Recovery)', href: '/faculty/dashboard.html?trash=1' },
+        { icon: 'settings', label: 'Settings', href: isHodUser ? '/faculty/hod-settings.html' : '/faculty/profile.html' }
       ]
     });
   } else if (user.roles?.includes('STUDENT') || currentPath.includes('/student/')) {
@@ -878,13 +921,13 @@ function renderSidebar() {
     navSections = [{
       label: 'Student',
       items: [
-        { icon: '📊', label: 'Dashboard', href: '/student/dashboard.html' },
-        { icon: '🏫', label: 'Teaching Groups', href: '/student/groups.html' },
-        { icon: '📅', label: 'Attendance & Calendar', href: '/student/attendance.html' },
-        { icon: '🗓️', label: 'My Timetable', href: '/student/timetable.html' },
-        { icon: '📝', label: 'My Assignments', href: '/student/assignments.html' },
-        { icon: '🧾', label: 'Apply for Leave', href: '/student/leave.html' },
-        { icon: '🧮', label: 'My Test Scores', href: '/student/scores.html' }
+        { icon: 'reports', label: 'Dashboard', href: '/student/dashboard.html' },
+        { icon: 'home', label: 'Teaching Groups', href: '/student/groups.html' },
+        { icon: 'calendar', label: 'Attendance & Calendar', href: '/student/attendance.html' },
+        { icon: 'clock', label: 'My Timetable', href: '/student/timetable.html' },
+        { icon: 'assignment', label: 'My Assignments', href: '/student/assignments.html' },
+        { icon: 'leave', label: 'Apply for Leave', href: '/student/leave.html' },
+        { icon: 'reports', label: 'My Test Scores', href: '/student/scores.html' }
       ]
     }];
   }
@@ -920,66 +963,14 @@ function renderSidebar() {
   // Safe escape helper for HTML attributes
   const safeAttr = (s) => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  // Extract initials for executive avatar
-  const userInitials = (displayName || 'U')
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(part => part[0].toUpperCase())
-    .join('') || 'U';
-
   const isFacultyPortal = currentPath.includes('/faculty/');
   const isAdminPortal = currentPath.includes('/admin/');
   const isStudentPortal = currentPath.includes('/student/') || Boolean(user.roles?.includes('STUDENT'));
   const isDrawerPortal = isFacultyPortal || isAdminPortal || isStudentPortal;
 
-  let sidebarHeaderHtml = '';
-  if (isFacultyPortal) {
-    sidebarHeaderHtml = `
-      <!-- Brand Header / Drawer Header -->
-      <div class="gc-drawer-header sidebar-user-card" style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;border-bottom:1px solid var(--border-color);gap:0.65rem;">
-        <a href="/faculty/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;flex:1;min-width:0;">
-          <div style="width:34px;height:34px;font-size:1.1rem;border-radius:9px;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-hover));color:var(--text-white, hsl(0, 0%, 100%));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--shadow-sm);">${getSvgIcon('gradCap', 20)}</div>
-          <div style="display:flex;flex-direction:column;line-height:1.1;">
-            <span style="font-size:0.9rem;font-weight:800;color:var(--text-main);letter-spacing:-0.01em;">Classroom</span>
-            <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.06em;color:var(--color-primary);text-transform:uppercase;">VidyaOS</span>
-          </div>
-        </a>
-        <button type="button" class="sidebar-close-btn gc-menu-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar" style="display:inline-flex;align-items:center;justify-content:center;">${getSvgIcon('close', 16)}</button>
-      </div>
-    `;
-  } else if (isAdminPortal) {
-    sidebarHeaderHtml = `
-      <!-- Admin Drawer Header -->
-      <div class="gc-drawer-header sidebar-user-card" style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;border-bottom:1px solid var(--border-color);gap:0.65rem;">
-        <a href="/admin/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;flex:1;min-width:0;">
-          <div style="width:34px;height:34px;font-size:1.1rem;border-radius:9px;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-hover));color:var(--text-white, hsl(0, 0%, 100%));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--shadow-sm);">${getSvgIcon('academic', 20)}</div>
-          <div style="display:flex;flex-direction:column;line-height:1.1;">
-            <span style="font-size:0.9rem;font-weight:800;color:var(--text-main);letter-spacing:-0.01em;">Admin Console</span>
-            <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.06em;color:var(--color-primary);text-transform:uppercase;">VidyaOS</span>
-          </div>
-        </a>
-        <button type="button" class="sidebar-close-btn gc-menu-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar" style="display:inline-flex;align-items:center;justify-content:center;">${getSvgIcon('close', 16)}</button>
-      </div>
-    `;
-  } else {
-    sidebarHeaderHtml = `
-      <!-- Executive Profile Card -->
-      <div class="sidebar-user-card">
-        <div class="sidebar-avatar" style="background:linear-gradient(135deg,var(--color-primary),var(--color-primary-hover));">
-          <span>${userInitials}</span>
-          <div class="sidebar-avatar-status"></div>
-        </div>
-        <div class="sidebar-user-info">
-          <div class="sidebar-user-name">${safeAttr(displayName)}</div>
-          <div class="sidebar-user-role-badge">
-            <span class="user-role-chip">${roleBadge}</span>
-          </div>
-        </div>
-        <button type="button" class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Close sidebar" title="Close sidebar" style="display:inline-flex;align-items:center;justify-content:center;">${getSvgIcon('close', 16)}</button>
-      </div>
-    `;
-  }
+  // Single Brand Logo Rule: The stationary top navbar displays the one and only brand logo.
+  // Sidebar header with duplicate logo, three-lines button, and close button is removed.
+  const sidebarHeaderHtml = '';
 
   const sidebarHtml = `
     <aside id="app-sidebar" class="app-sidebar ${isDrawerPortal ? 'gc-drawer' : ''}" aria-label="Site Navigation">
@@ -1008,20 +999,15 @@ function renderSidebar() {
   `;
 
   document.body.insertAdjacentHTML('afterbegin', sidebarHtml);
+  document.body.classList.add('has-sidebar');
 
-  // Restore sidebar state (drawer closed by default for faculty and admin, open on desktop by default for student)
-  const isDesktop = window.innerWidth >= 769;
-  const savedOpen = _getSidebarState();
-  const shouldOpen = isDrawerPortal ? false : (isDesktop ? (savedOpen !== false) : false);
-  if (shouldOpen) {
-    const sidebar = document.getElementById('app-sidebar');
-    if (sidebar) sidebar.classList.add('sidebar-open');
-    document.body.classList.add('sidebar-open');
-    const btn = document.getElementById('sidebar-toggle-btn') || document.getElementById('btn-menu-toggle');
-    if (btn) btn.setAttribute('aria-pressed', 'true');
-  } else if (isDrawerPortal) {
-    document.body.classList.remove('sidebar-open');
-  }
+  // Initialize sidebar open/closed state and convert toggle button icon
+  _initSidebarState();
+
+  // Keep toggle button icon and responsive layout synchronized on window resize
+  window.addEventListener('resize', () => {
+    _initSidebarState();
+  });
 
   // Close on Escape key
   document.addEventListener('keydown', (e) => {
@@ -1376,14 +1362,14 @@ function renderUserNav() {
   let roleChipText = 'USER';
   let roleClass = 'chip-user';
   let avatarRoleClass = 'role-user';
-  let avatarContent = '👤';
+  let avatarContent = 'U';
 
   if (user.roles?.includes('STUDENT')) {
     profileHref = '/student/profile.html';
     roleChipText = 'Student';
     roleClass = 'chip-student';
     avatarRoleClass = 'role-student';
-    avatarContent = '🎓';
+    avatarContent = 'ST';
   } else if (user.roles?.includes('TEACHER')) {
     profileHref = '/faculty/profile.html';
     if (user.is_hod) {
@@ -1426,7 +1412,7 @@ function renderUserNav() {
     roleChipText = 'Student';
     roleClass = 'chip-student';
     avatarRoleClass = 'role-student';
-    avatarContent = '🎓';
+    avatarContent = 'ST';
   } else if (currentPath.includes('/faculty/')) {
     profileHref = '/faculty/profile.html';
     roleChipText = 'Faculty';
@@ -1765,7 +1751,7 @@ async function loadUniversalNavigation() {
         'border-radius:20px', 'pointer-events:none', 'letter-spacing:0.5px',
         'box-shadow:0 2px 8px rgba(0,0,0,0.25)', 'opacity:0.85'
       ].join(';');
-      badge.textContent = '🎨 Preview';
+      badge.textContent = 'Preview';
       document.body.appendChild(badge);
     }
     // Fall through to the main loading logic below with overridden user
@@ -2019,7 +2005,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="badge" id="drawer-user-role" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.68rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);">Faculty Member</span>
       </div>
     </div>
-    <button type="button" class="drawer-close-btn" onclick="toggleAndroidProfileDrawer(false)">✕</button>
+    <button type="button" class="drawer-close-btn" onclick="toggleAndroidProfileDrawer(false)" data-icon="close" aria-label="Close"></button>
   </div>
 
   <div class="profile-quick-links-list">
@@ -2031,7 +2017,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="quick-link-title">App Theme</span>
         <span class="quick-link-subtitle" id="drawer-theme-label">Switch Dark / Light Mode</span>
       </div>
-      <div class="quick-link-arrow">➔</div>
+      <div class="quick-link-arrow" data-icon="arrowRight"></div>
     </button>
 
     <a href="/faculty/groups.html" class="quick-link-item">
@@ -2042,7 +2028,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="quick-link-title">My Classes &amp; Teaching Groups</span>
         <span class="quick-link-subtitle">Google Classroom-style teaching groups</span>
       </div>
-      <div class="quick-link-arrow">➔</div>
+      <div class="quick-link-arrow" data-icon="arrowRight"></div>
     </a>
 
     <a href="/faculty/registers.html" class="quick-link-item">
@@ -2053,7 +2039,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="quick-link-title">Attendance Registers &amp; Live Studio</span>
         <span class="quick-link-subtitle">Dynamic QR roll call &amp; monthly ledger</span>
       </div>
-      <div class="quick-link-arrow">➔</div>
+      <div class="quick-link-arrow" data-icon="arrowRight"></div>
     </a>
 
     <a href="/faculty/tests.html" class="quick-link-item">
@@ -2064,7 +2050,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="quick-link-title">Class Tests &amp; Periodic Exams</span>
         <span class="quick-link-subtitle">Question-wise marks entry &amp; gradebooks</span>
       </div>
-      <div class="quick-link-arrow">➔</div>
+      <div class="quick-link-arrow" data-icon="arrowRight"></div>
     </a>
 
     <a href="/faculty/assignments.html" class="quick-link-item">
@@ -2075,7 +2061,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="quick-link-title">Coursework Assignments</span>
         <span class="quick-link-subtitle">Assignment grading &amp; submissions</span>
       </div>
-      <div class="quick-link-arrow">➔</div>
+      <div class="quick-link-arrow" data-icon="arrowRight"></div>
     </a>
 
     <a href="/faculty/sheets.html" class="quick-link-item">
@@ -2086,7 +2072,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="quick-link-title">Unified Sheet Studio</span>
         <span class="quick-link-subtitle">Master evaluations &amp; spreadsheet gradebooks</span>
       </div>
-      <div class="quick-link-arrow">➔</div>
+      <div class="quick-link-arrow" data-icon="arrowRight"></div>
     </a>
 
     <a href="/faculty/profile.html" class="quick-link-item">
@@ -2097,7 +2083,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="quick-link-title">Account Settings</span>
         <span class="quick-link-subtitle">Profile details &amp; preferences</span>
       </div>
-      <div class="quick-link-arrow">➔</div>
+      <div class="quick-link-arrow" data-icon="arrowRight"></div>
     </a>
 
     <button type="button" class="quick-link-item quick-link-logout" onclick="logout()">
@@ -2108,7 +2094,7 @@ function _buildFallbackUniversalNavigation() {
         <span class="quick-link-title" style="color:var(--status-absent);">Sign Out of VidyaOS</span>
         <span class="quick-link-subtitle">Safely terminate active session</span>
       </div>
-      <div class="quick-link-arrow" style="color:var(--status-absent);">➔</div>
+      <div class="quick-link-arrow" style="color:var(--status-absent);" data-icon="arrowRight"></div>
     </button>
   </div>
 </div>

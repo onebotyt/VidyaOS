@@ -18,15 +18,14 @@
   <!-- Google Classroom Navbar with Global Omnisearch -->
   <header class="gc-navbar">
     <div class="gc-nav-left">
-      <button type="button" class="gc-menu-btn" id="btn-menu-toggle" onclick="toggleDrawer()" title="Main Menu">
+      <button type="button" class="gc-menu-btn" id="btn-menu-toggle" onclick="toggleDrawer()" title="Main Menu" aria-label="Toggle navigation">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
-      <a href="/faculty/dashboard.html" class="gc-brand-link">
+      <a href="/faculty/dashboard.html" class="gc-brand-link" title="VidyaOS Academic Workspace">
         <div class="gc-brand-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
         </div>
-        <div class="gc-brand-title">Classroom</div>
-        <span class="gc-brand-sub">VidyaOS</span>
+        <div class="gc-brand-title">VidyaOS</div>
       </a>
     </div>
 
@@ -97,45 +96,6 @@
       </div>
     </div>
   </header>
-
-  <!-- Slide-Out Left Navigation Drawer -->
-  <aside class="gc-drawer" id="gc-drawer">
-    <div class="gc-drawer-header">
-      <div class="gc-brand-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></div>
-      <span class="gc-drawer-title">VidyaOS Classroom</span>
-    </div>
-    <nav class="gc-drawer-nav">
-      <a href="/faculty/dashboard.html" class="gc-drawer-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-        <span>Classes Hub</span>
-      </a>
-      <a href="/faculty/media.html" class="gc-drawer-item active">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-        <span>Faculty Drive &amp; Vault</span>
-      </a>
-      <a href="/faculty/registers.html" class="gc-drawer-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-        <span>Attendance Registers</span>
-      </a>
-      <a href="/faculty/assignments.html" class="gc-drawer-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-        <span>Coursework &amp; Assignments</span>
-      </a>
-      <a href="/faculty/tests.html" class="gc-drawer-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-        <span>Class Tests &amp; Marksheets</span>
-      </a>
-      <a href="/faculty/students.html" class="gc-drawer-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-        <span>Department Students</span>
-      </a>
-      <a href="/faculty/reports.html" class="gc-drawer-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-        <span>Reports &amp; Analytics</span>
-      </a>
-    </nav>
-  </aside>
-  <div class="gc-drawer-backdrop" id="gc-drawer-backdrop" onclick="toggleDrawer()"></div>
 
   <!-- Main Faculty Drive Page Container -->
   <main class="page-main-container container" style="max-width:1380px;padding-top:1.5rem;padding-bottom:3rem;">
@@ -360,21 +320,21 @@
         <div class="omnisearch-hints">
           <div style="font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:0.4rem;">QUICK SUGGESTIONS</div>
           <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/media.html?action=upload')">
-            <span class="omni-item-icon">📤</span>
+            <span class="omni-item-icon" data-icon="upload"></span>
             <div class="omni-item-text">
               <span class="omni-title">Upload New Media / Document</span>
               <span class="omni-sub">Add lecture recording, notes, or student records to drive</span>
             </div>
           </div>
           <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/registers.html')">
-            <span class="omni-item-icon">📅</span>
+            <span class="omni-item-icon" data-icon="calendar"></span>
             <div class="omni-item-text">
               <span class="omni-title">Open Attendance Registers</span>
               <span class="omni-sub">Ledger view, daily sessions, and PIN roll call studio</span>
             </div>
           </div>
           <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/students.html')">
-            <span class="omni-item-icon">👥</span>
+            <span class="omni-item-icon" data-icon="students"></span>
             <div class="omni-item-text">
               <span class="omni-title">Department Students Directory</span>
               <span class="omni-sub">View roster, student dossiers, and self-registration</span>

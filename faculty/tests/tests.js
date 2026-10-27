@@ -238,6 +238,10 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
     }
 
     function openCreateExamModal() {
+      if (currentRegisterId) {
+        window.location.href = `/faculty/classwork/create.html?type=test&register=${encodeURIComponent(currentRegisterId)}`;
+        return;
+      }
       if (!registerData) {
         showToast('Please select a register first', 'error');
         return;
@@ -361,22 +365,80 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
           'Submit your answer sheet to the invigilator.'
         ];
 
-        const defaultQuestionsMeta = [
-          { num: 1, text: '', marks: defaultQuestions[0].max },
-          { num: 2, text: '', marks: defaultQuestions[1].max },
-          { num: 3, text: '', marks: defaultQuestions[2].max },
-          { num: 4, text: '', marks: defaultQuestions[3].max }
-        ];
+        let activeQuestions = [];
+        if (exam.questions) {
+          try {
+            const parsed = typeof exam.questions === 'string' ? JSON.parse(exam.questions) : exam.questions;
+            if (Array.isArray(parsed) && parsed.length) {
+              const splitMax = totalMax ? +(totalMax / parsed.length).toFixed(1) : 5;
+              activeQuestions = parsed.map((q, i) => ({
+                num: q.num || (i + 1),
+                label: `Q${q.num || (i + 1)}`,
+                text: typeof q === 'string' ? q : (q.text || q.question || `Question ${i + 1}`),
+                max: Number(q.max || q.max_marks || q.marks || splitMax)
+              }));
+            }
+          } catch (_) {}
+        }
+
+        let activeInstructions = [];
+        if (exam.instructions) {
+          if (Array.isArray(exam.instructions) && exam.instructions.length) {
+            activeInstructions = exam.instructions;
+          } else if (typeof exam.instructions === 'string') {
+            try {
+              const parsed = JSON.parse(exam.instructions);
+              if (Array.isArray(parsed) && parsed.length) activeInstructions = parsed;
+              else if (typeof parsed === 'string') {
+                const lines = parsed.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+                if (lines.length) activeInstructions = lines;
+              }
+            } catch (_) {
+              const lines = exam.instructions.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+              if (lines.length) activeInstructions = lines;
+            }
+          }
+        }
+
+        if (!activeQuestions.length && activeInstructions.length) {
+          const detectedQ = [];
+          const remainingIns = [];
+          activeInstructions.forEach(line => {
+            if (/^(?:Q\.?\s*\d+|\d+)[\.\:\-\)]/i.test(line)) {
+              detectedQ.push(line.replace(/^(?:Q\.?\s*\d+|\d+)[\.\:\-\)]\s*/i, ''));
+            } else {
+              remainingIns.push(line);
+            }
+          });
+          if (detectedQ.length) {
+            const splitMax = totalMax ? +(totalMax / detectedQ.length).toFixed(1) : 5;
+            activeQuestions = detectedQ.map((qText, idx) => ({
+              num: idx + 1,
+              label: `Q${idx + 1}`,
+              text: qText,
+              max: splitMax
+            }));
+            if (remainingIns.length) activeInstructions = remainingIns;
+          }
+        }
+
+        const finalQuestions = activeQuestions.length ? activeQuestions : defaultQuestions;
+        const finalInstructions = activeInstructions.length ? activeInstructions : defaultInstructions;
+        const finalQuestionsMeta = finalQuestions.map((q, idx) => ({
+          num: q.num || (idx + 1),
+          text: q.text || '',
+          marks: q.max
+        }));
 
         const formattedRoster = roster.map((r, idx) => {
           const isAb = Boolean(r.is_absent || r.status === 'ABSENT');
           let qScores = Array.isArray(r.question_scores) && r.question_scores.length ? r.question_scores : null;
           if (!qScores) {
             if (r.marks_obtained !== null && r.marks_obtained !== undefined) {
-              const part = Number(r.marks_obtained) / defaultQuestions.length;
-              qScores = defaultQuestions.map(() => Math.round(part * 10) / 10);
+              const part = Number(r.marks_obtained) / finalQuestions.length;
+              qScores = finalQuestions.map(() => Math.round(part * 10) / 10);
             } else {
-              qScores = defaultQuestions.map(() => 0);
+              qScores = finalQuestions.map(() => 0);
             }
           }
           const tot = isAb ? 0 : qScores.reduce((sum, v) => sum + (Number(v) || 0), 0);
@@ -398,9 +460,9 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
           session_label: (registerData && registerData.session_label) || 'Internal Evaluation Sheet 2026 Session',
           duration: '50 Minute',
           mode: 'OFFLINE',
-          questions: defaultQuestions,
-          instructions: defaultInstructions,
-          questions_meta: defaultQuestionsMeta,
+          questions: finalQuestions,
+          instructions: finalInstructions,
+          questions_meta: finalQuestionsMeta,
           roster: formattedRoster
         };
 
@@ -430,7 +492,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
       const yr = state.exam.year || (registerData && registerData.year) || (state.exam.semester ? Math.ceil(state.exam.semester / 2) : 1);
       const sem = state.exam.semester || (registerData && registerData.semester) || 1;
       const examNum = (state.exam.name.match(/\d+/) || ['1'])[0];
-      const totalCols = 5 + state.questions.length;
+      const totalCols = 7 + state.questions.length;
 
       panel.innerHTML = `
         <div class="sheet-studio-container">
@@ -475,8 +537,10 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                 <!-- ROW 4: Column Headers (Tan fill) -->
                 <tr class="excel-hdr-tan">
                   <th rowspan="2" style="width: 55px; vertical-align: middle;">SR. NO.</th>
-                  <th rowspan="2" style="width: 100px; vertical-align: middle;">ROLL NO.</th>
-                  <th rowspan="2" style="width: 220px; vertical-align: middle;">STUDENT NAME</th>
+                  <th rowspan="2" style="width: 85px; vertical-align: middle;">ROLL NO.</th>
+                  <th rowspan="2" style="width: 125px; vertical-align: middle;">REG. NO.</th>
+                  <th rowspan="2" style="width: 125px; vertical-align: middle;">ENROLLMENT NO.</th>
+                  <th rowspan="2" style="width: 200px; vertical-align: middle;">STUDENT NAME</th>
                   <th colspan="${state.questions.length}">${escapeHtml(state.exam.name)} (Total Marks : ${examMaxMarks})</th>
                   <th style="width: 75px;">Total</th>
                   <th style="min-width: 380px;">Unit Test Details (Mode : OFFLINE)</th>
@@ -502,11 +566,12 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                     <tr class="${isAb ? 'is-absent' : ''}" id="exam-row-${examId}-${r.student_id}">
                       <td class="excel-cell-sr">${rIdx + 1}</td>
                       <td class="cell-roll">${escapeHtml(String(r.class_roll_no || rIdx + 1))}</td>
+                      <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${escapeHtml(r.registration_no || '—')}</td>
+                      <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${escapeHtml(r.official_enrollment_no || '—')}</td>
                       <td class="cell-student-name">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                           <div>
                             <span title="${escapeHtml(r.full_name)}" style="font-weight: 700;">${escapeHtml(r.full_name)}</span>
-                            <div style="font-family: var(--font-family-mono); font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(r.registration_no || r.official_enrollment_no || '')}</div>
                           </div>
                           <button type="button" 
                                   class="btn-sheet-att-toggle ${isAb ? 'is-absent' : ''}" 
@@ -526,7 +591,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                                    value="${isAb ? 0 : qVal}" 
                                    min="0" 
                                    max="${q.max}" 
-                                   step="0.1" 
+                                   step="any" 
                                    ${isAb ? 'disabled' : ''} 
                                    oninput="onExamQuestionScoreChange(${examId}, ${r.student_id}, ${qIdx}, this.value)">
                           </td>
@@ -572,7 +637,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="${3 + state.questions.length}" class="excel-summary-lbl" style="text-align: right; font-weight: 800;">
+                  <td colspan="${5 + state.questions.length}" class="excel-summary-lbl" style="text-align: right; font-weight: 800;">
                     Average of the class (Only present students)
                   </td>
                   <td class="excel-summary-avg" id="exam-class-avg-${examId}" style="font-weight: 800; text-align: center;">

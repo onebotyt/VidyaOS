@@ -1361,3 +1361,374 @@
       color: var(--text-muted);
     }
 
+/* ══════════════════════════════════════════════════════════════
+   ATTENDANCE EXPORT STUDIO MODAL (Modern & Ultra-Compact)
+   ══════════════════════════════════════════════════════════════ */
+.btn-export-register {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  padding: 0.25rem 0.55rem;
+}
+
+.export-modal-card {
+  max-width: 430px;
+  width: 92%;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+
+.export-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.export-modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.export-modal-header-icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.export-modal-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.export-modal-close {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.export-modal-close:hover {
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.export-modal-body {
+  padding: 0.65rem 0.85rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.export-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.export-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+/* 1. Format Grid */
+.export-format-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+}
+
+.export-format-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.45rem;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.export-format-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.export-format-card small {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.export-format-card:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+.export-format-card.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.export-format-card.active small {
+  color: var(--color-primary);
+}
+
+.format-icon-xlsx {
+  color: var(--status-present);
+}
+
+.format-icon-pdf {
+  color: var(--status-absent);
+}
+
+.format-icon-doc {
+  color: var(--color-primary);
+}
+
+/* 2. Range Grid & Items */
+.export-scope-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.export-scope-row-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+
+.export-scope-row-sub {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+.export-range-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.36rem 0.4rem;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.export-range-pill input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.export-range-pill:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+.export-range-pill.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* Contextual Input Rows (Only visible when Specific Month or Specific Day is chosen) */
+.export-context-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.28rem 0.5rem;
+  background: var(--color-primary-light);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  margin-top: 0.15rem;
+}
+
+.context-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.export-inline-select,
+.export-inline-date {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.72rem;
+  padding: 0.15rem 0.3rem;
+  height: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* Dynamic Live Scope Explainer */
+.export-range-hint {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.28rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.export-range-hint svg {
+  color: var(--color-primary);
+}
+
+.export-range-hint b {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* 3. Segmented Component Scope */
+.export-scope-segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.export-scope-btn {
+  text-align: center;
+  padding: 0.28rem 0.35rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.export-scope-btn:hover {
+  color: var(--text-main);
+}
+
+.export-scope-btn.active {
+  background: var(--color-primary);
+  color: var(--text-white, #fff);
+  font-weight: 700;
+}
+
+/* Footer */
+.export-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.btn-download-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.76rem;
+  padding: 0.32rem 0.85rem;
+}
+
+/* Mobile: ALWAYS stay compact, never stack into tall cards */
+@media (max-width: 576px) {
+  .export-modal-card {
+    max-width: 95%;
+    width: 95%;
+  }
+  .export-modal-body {
+    padding: 0.55rem 0.7rem;
+    gap: 0.45rem;
+  }
+  .export-modal-header {
+    padding: 0.45rem 0.7rem;
+  }
+  .export-modal-footer {
+    padding: 0.45rem 0.7rem;
+  }
+  .export-format-grid,
+  .export-scope-segmented,
+  .export-scope-row-sub {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.3rem;
+  }
+  .export-scope-row-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem;
+  }
+  .export-format-card,
+  .export-range-pill {
+    padding: 0.32rem 0.2rem;
+    font-size: 0.7rem;
+  }
+  .export-scope-btn {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.2rem;
+  }
+}
+
+
+

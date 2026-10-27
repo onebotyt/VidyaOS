@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Create Classwork - VidyaOS</title>
+  <meta name="description" content="Google Classroom inspired classwork and assessment creator for VidyaOS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/reset.css?v=20261003">
+  <link rel="stylesheet" href="/css/variables.css?v=20261003">
+  <link rel="stylesheet" href="/faculty/classwork/classwork-create.css?v=20261026_screenfit">
+  <script>
+    window.DISABLE_BOTTOM_NAV = true;
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body class="cw-create-body">
+
+  <!-- Desktop Header (Image 4 Google Classroom) -->
+  <header class="cw-gclass-nav">
+    <div class="cw-nav-left">
+      <button type="button" id="cw-btn-back" class="cw-close-btn" title="Cancel and close">
+        <span data-icon="close"></span>
+      </button>
+
+      <div class="cw-nav-title-group">
+        <div class="cw-gclass-icon-badge" id="cw-header-icon" data-icon="assignment"></div>
+        <div class="cw-nav-headings">
+          <h1 class="cw-page-title" id="cw-header-title">Assignment</h1>
+          <span class="cw-page-subtitle" id="cw-class-info-text">Loading class context...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cw-nav-right">
+      <button type="button" class="btn-gclass-cancel" id="cw-btn-cancel" onclick="window.cwHandleCancel()">Cancel</button>
+      <button type="button" class="btn-gclass-assign" id="cw-btn-publish" onclick="window.cwHandlePublish()">
+        <span id="cw-publish-text">Assign</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Google Classroom 2-Column Desktop Grid: Fits 100% Inside Screen -->
+  <main class="cw-gclass-container">
+    <div class="cw-gclass-grid">
+
+      <!-- LEFT COLUMN: Content & Attachments (~72%) -->
+      <div class="cw-main-col">
+        
+        <!-- CARD 1: Title & Instructions & Questions (Google Classroom Standard) -->
+        <div class="cw-card cw-card-editor">
+          <!-- Row 1: Number + Topic/Unit -->
+          <div class="cw-top-meta-row">
+            <div class="cw-num-badge" title="Work Number">
+              <span class="cw-num-label" id="cw-num-label">No.</span>
+              <input type="number" id="work-number" class="cw-num-input" min="1" max="999" value="1" required>
+            </div>
+
+            <div class="cw-topic-badge" title="Topic / Syllabus Unit">
+              <span class="cw-topic-label">Topic:</span>
+              <div class="cw-select-wrapper cw-topic-select-wrap">
+                <select id="work-unit" class="cw-topic-select" onchange="window.cwHandleTopicSelectChange(this)">
+                  <option value="">No Topic</option>
+                  <option value="Unit 1">Unit 1</option>
+                  <option value="Unit 2">Unit 2</option>
+                  <option value="Unit 3">Unit 3</option>
+                  <option value="Unit 4">Unit 4</option>
+                  <option value="Unit 5">Unit 5</option>
+                  <option value="__ADD_NEW_UNIT__">+ Add Syllabus Unit...</option>
+                </select>
+              </div>
+              <button type="button" class="cw-add-unit-mini-btn" onclick="window.cwOpenAddUnitModal()" title="Add Syllabus Unit">
+                <span data-icon="plus"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 2: Title full width below number & topic -->
+          <div class="cw-title-row">
+            <input type="text" id="work-title" class="cw-title-input" placeholder="Title" required autocomplete="off">
+          </div>
+
+          <!-- Instructions Collapsible Box (Default collapsed on mobile) -->
+          <div class="cw-collapse-card" id="cw-instructions-collapse">
+            <div class="cw-collapse-header" onclick="window.cwToggleCollapse('instructions')">
+              <div class="cw-collapse-header-title">
+                <span class="cw-field-label">Instructions (optional)</span>
+                <span class="cw-collapse-preview" id="cw-instructions-preview">Guidelines configured</span>
+              </div>
+              <button type="button" class="cw-collapse-icon-btn" aria-label="Toggle instructions view">
+                <span class="cw-collapse-icon" data-icon="chevronDown"></span>
+              </button>
+            </div>
+            <div class="cw-collapse-body" id="cw-instructions-body">
+              <textarea id="work-instructions" class="cw-instructions-textarea" rows="4" placeholder="Add instructions, submission guidelines, or notes for students..."></textarea>
+              <div class="cw-box-toolbar">
+                <div class="cw-toolbar-left">
+                  <button type="button" class="cw-tool-btn" onclick="window.cwFormatText('bold', 'work-instructions')" title="Bold">
+                    <strong>B</strong>
+                  </button>
+                  <button type="button" class="cw-tool-btn" onclick="window.cwFormatText('italic', 'work-instructions')" title="Italic">
+                    <em>I</em>
+                  </button>
+                  <button type="button" class="cw-tool-btn" onclick="window.cwFormatText('underline', 'work-instructions')" title="Underline">
+                    <span style="text-decoration: underline;">U</span>
+                  </button>
+                  <span class="cw-tool-divider"></span>
+                  <button type="button" class="cw-tool-btn" onclick="window.cwFormatText('numlist', 'work-instructions')" title="Add numbered line">
+                    <span data-icon="list"></span>
+                  </button>
+                  <button type="button" class="cw-tool-chip" onclick="window.cwInsertInstructionTemplate()" title="Insert official instruction template">
+                    <span data-icon="template"></span>
+                    <span>Insert Template</span>
+                  </button>
+                </div>
+                <div class="cw-toolbar-right">
+                  <button type="button" class="cw-tool-btn" onclick="window.cwClearInstructions()" title="Clear instructions">
+                    <span data-icon="trash"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Questions Collapsible Box with Integrated Question Count Stepper -->
+          <div class="cw-collapse-card" id="cw-questions-collapse">
+            <div class="cw-collapse-header" onclick="window.cwToggleCollapse('questions')">
+              <div class="cw-collapse-header-title">
+                <span class="cw-field-label">Questions</span>
+                <div class="cw-qcount-stepper" onclick="event.stopPropagation()">
+                  <span class="cw-qcount-tag">Count:</span>
+                  <input type="number" id="work-questions-count" class="cw-qcount-input" min="1" max="50" value="5" title="Change count to update question slots & split marks">
+                </div>
+                <span class="cw-questions-badge" id="cw-questions-badge">2 marks each</span>
+              </div>
+              <button type="button" class="cw-collapse-icon-btn" aria-label="Toggle questions view">
+                <span class="cw-collapse-icon" data-icon="chevronDown"></span>
+              </button>
+            </div>
+            <div class="cw-collapse-body" id="cw-questions-body">
+              <textarea id="work-questions" class="cw-questions-textarea" rows="5" placeholder="1. &#10;2. &#10;3. &#10;4. "></textarea>
+              <div class="cw-box-toolbar">
+                <div class="cw-toolbar-left">
+                  <button type="button" class="cw-tool-btn" onclick="window.cwFormatText('bold', 'work-questions')" title="Bold">
+                    <strong>B</strong>
+                  </button>
+                  <button type="button" class="cw-tool-btn" onclick="window.cwFormatText('italic', 'work-questions')" title="Italic">
+                    <em>I</em>
+                  </button>
+                  <button type="button" class="cw-tool-btn" onclick="window.cwFormatText('underline', 'work-questions')" title="Underline">
+                    <span style="text-decoration: underline;">U</span>
+                  </button>
+                  <span class="cw-tool-divider"></span>
+                  <button type="button" class="cw-tool-btn" onclick="window.cwFormatText('numlist', 'work-questions')" title="Add numbered line">
+                    <span data-icon="list"></span>
+                  </button>
+                  <button type="button" class="cw-tool-chip" onclick="window.cwResetQuestionSlots()" title="Reset to simple question numbers">
+                    <span data-icon="list"></span>
+                    <span>Reset Numbers</span>
+                  </button>
+                </div>
+                <div class="cw-toolbar-right">
+                  <button type="button" class="cw-tool-btn" onclick="window.cwClearText()" title="Clear questions">
+                    <span data-icon="trash"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CARD 2: Attach Section (Horizontal Compact Bar) -->
+        <div class="cw-card cw-card-attach">
+          <div class="cw-attach-left">
+            <span class="cw-attach-title">Attach</span>
+            <div class="cw-attach-buttons-row">
+              <button type="button" class="cw-attach-pill-btn" id="btn-attach-doc" onclick="window.cwTriggerAttachDoc()" title="Upload PDF or Document">
+                <span data-icon="upload"></span>
+                <span>Upload File</span>
+              </button>
+              <input type="file" id="input-attach-doc" style="display:none;" onchange="window.cwHandleDocFileSelected(this)">
+
+              <button type="button" class="cw-attach-pill-btn" id="btn-ocr-scan" onclick="window.cwOpenOcrModal()" title="Scan paper or photo to extract questions">
+                <span data-icon="scan"></span>
+                <span>Scan Paper (OCR)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Attached Document Preview Chip -->
+          <div id="attached-doc-card" class="cw-attachment-chip" style="display:none;">
+            <span data-icon="filePdf"></span>
+            <span id="attached-doc-name" class="cw-att-filename">question_paper.pdf</span>
+            <span id="attached-doc-size" class="cw-att-meta">(120 KB)</span>
+            <button type="button" class="cw-att-remove-btn" onclick="window.cwRemoveAttachedDoc()" title="Remove attachment">
+              <span data-icon="close"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Auto-Divider Live Banner -->
+        <div class="cw-auto-divider-pill" id="cw-auto-divider-badge">
+          <span class="cw-divider-icon" id="divider-icon"></span>
+          <span class="cw-divider-text" id="divider-headline-text">Enter questions to automatically divide marks</span>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Minimal Settings Sidebar (~28%, 300px) -->
+      <aside class="cw-sidebar-col">
+        <div class="cw-card cw-sidebar-card">
+          <!-- Hidden Subject/Course Select (preserved for script compatibility) -->
+          <input type="hidden" id="work-course-select" value="1">
+
+          <div class="cw-sidebar-fields">
+            <!-- Group 1: Points / Max Marks -->
+            <div class="cw-sidebar-group">
+              <label for="work-max-marks" class="cw-sidebar-label">Points / Max Marks</label>
+              <input type="number" id="work-max-marks" class="cw-sidebar-input" min="1" max="500" value="10" required>
+            </div>
+
+            <!-- Group 2: Due Date & Time (Google Classroom Style Link / Button Trigger) -->
+            <div class="cw-sidebar-group">
+              <label class="cw-sidebar-label" for="btn-due-date-trigger">
+                <span id="label-work-date">Due Date</span>
+              </label>
+              <input type="hidden" id="work-due-date" value="">
+              <div class="cw-due-control-row">
+                <button type="button" class="cw-due-btn" id="btn-due-date-trigger" onclick="window.cwOpenDueDateModal()">
+                  <span class="cw-due-icon" data-icon="calendar"></span>
+                  <span class="cw-due-text" id="cw-due-display-text">No due date</span>
+                </button>
+                <button type="button" class="cw-due-clear-btn" id="btn-due-date-clear" onclick="window.cwClearDueDate(event)" title="Remove due date" style="display: none;">
+                  <span data-icon="close"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Group 3: Assign To (Span 2 columns) -->
+            <div class="cw-sidebar-group cw-sidebar-group-span">
+              <label class="cw-sidebar-label">Assign to</label>
+              <div class="cw-sidebar-pill-display">
+                <span data-icon="users"></span>
+                <span>All students</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- SMART OCR SCANNER MODAL -->
+  <div class="cw-modal-backdrop" id="ocr-scanner-modal" onclick="if(event.target===this)window.cwCloseOcrModal()">
+    <div class="cw-modal-card">
+      <div class="cw-modal-header">
+        <div>
+          <h2 class="cw-modal-title">Smart Question Paper OCR</h2>
+          <p class="cw-modal-subtitle">Isolates only questions; strips headers, CO tables, and rubrics.</p>
+        </div>
+        <button type="button" class="cw-modal-close" onclick="window.cwCloseOcrModal()" title="Close">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+
+      <div class="cw-modal-body">
+        <div class="cw-dropzone" id="ocr-dropzone" onclick="document.getElementById('input-ocr-file').click()">
+          <input type="file" id="input-ocr-file" accept=".pdf,image/png,image/jpeg,image/webp,image/jpg" style="display:none;" onchange="window.cwHandleOcrFileSelect(this)">
+          <div class="cw-drop-icon" data-icon="upload"></div>
+          <div class="cw-drop-title">Select Question Paper (PDF or Image)</div>
+          <div class="cw-drop-sub">Official test PDF, scanned paper, or photo written with pen</div>
+        </div>
+
+        <div class="cw-ocr-scanning" id="ocr-scanning-indicator">
+          <div class="cw-spinner"></div>
+          <div class="cw-ocr-scan-text">Scanning &amp; Extracting Questions...</div>
+        </div>
+
+        <div class="cw-ocr-results" id="ocr-results-area">
+          <div class="cw-ocr-meta-row">
+            <span class="cw-meta-pill" id="ocr-pill-qcount">0 Questions Found</span>
+            <span class="cw-meta-pill" id="ocr-pill-marks">Max Marks: -</span>
+          </div>
+
+          <div class="cw-ocr-preview-box" id="ocr-preview-text">Questions will preview here...</div>
+        </div>
+      </div>
+
+      <div class="cw-modal-footer">
+        <button type="button" class="btn-gclass-cancel" onclick="window.cwCloseOcrModal()">Cancel</button>
+        <button type="button" class="btn-gclass-assign" id="btn-ingest-ocr" style="display:none;" onclick="window.cwIngestOcrQuestions()">
+          <span data-icon="check"></span>
+          <span>Ingest Questions</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD SYLLABUS UNIT MODAL (Image 1) -->
+  <div class="cw-modal-backdrop" id="modal-add-unit" onclick="if(event.target===this)window.cwCloseAddUnitModal()">
+    <div class="cw-modal-card cw-unit-modal-card">
+      <div class="cw-modal-header">
+        <div class="cw-modal-title-with-icon">
+          <div class="cw-unit-title-icon" data-icon="unit"></div>
+          <h2 class="cw-modal-title">Add Syllabus Unit</h2>
+        </div>
+        <button type="button" class="cw-modal-close" onclick="window.cwCloseAddUnitModal()" title="Close">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+
+      <div class="cw-modal-body cw-unit-modal-body">
+        <div class="cw-unit-form-grid">
+          <div class="cw-form-group">
+            <label class="cw-field-label" for="unit-modal-tag">Unit Tag *</label>
+            <input type="text" id="unit-modal-tag" class="cw-modal-input" placeholder="Unit 6" value="Unit 6" required>
+          </div>
+
+          <div class="cw-form-group">
+            <label class="cw-field-label" for="unit-modal-title">Unit / Module Title</label>
+            <input type="text" id="unit-modal-title" class="cw-modal-input" placeholder="e.g. Basics and Language Features">
+          </div>
+        </div>
+
+        <div class="cw-form-group">
+          <label class="cw-field-label" for="unit-modal-desc">Description / Syllabus Outline (Optional)</label>
+          <textarea id="unit-modal-desc" class="cw-modal-textarea" rows="4" placeholder="e.g. Syntax, control structures, loops, and 1D/2D arrays"></textarea>
+        </div>
+      </div>
+
+      <div class="cw-modal-footer cw-unit-modal-footer">
+        <button type="button" class="btn-gclass-cancel" onclick="window.cwCloseAddUnitModal()">Cancel</button>
+        <button type="button" class="btn-gclass-assign" id="btn-submit-add-unit" onclick="window.cwSubmitAddUnit()">Add Unit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOOGLE CLASSROOM SET DUE DATE MODAL (Image 5) -->
+  <div class="cw-modal-backdrop" id="modal-set-due-date" onclick="if(event.target===this)window.cwCloseDueDateModal()">
+    <div class="cw-modal-card cw-due-modal-card">
+      <div class="cw-modal-header">
+        <h2 class="cw-modal-title">Set due date</h2>
+        <button type="button" class="cw-modal-close" onclick="window.cwCloseDueDateModal()" title="Close">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+
+      <div class="cw-modal-body cw-due-modal-body">
+        <!-- Date field with calendar icon -->
+        <div class="cw-modal-picker-field">
+          <div class="cw-picker-icon-box" data-icon="calendar"></div>
+          <input type="date" id="modal-due-date-input" class="cw-modal-date-inp">
+        </div>
+
+        <!-- Time field with clock icon -->
+        <div class="cw-modal-picker-field">
+          <div class="cw-picker-icon-box" data-icon="clock"></div>
+          <input type="time" id="modal-due-time-input" class="cw-modal-time-inp" value="23:59">
+        </div>
+
+        <!-- Close submissions after due date checkbox -->
+        <label class="cw-due-checkbox-row">
+          <input type="checkbox" id="modal-due-close-submissions">
+          <span class="cw-checkbox-text">Close submissions after due date</span>
+        </label>
+      </div>
+
+      <div class="cw-modal-footer cw-due-modal-footer">
+        <button type="button" class="btn-gclass-cancel" onclick="window.cwCloseDueDateModal()">Cancel</button>
+        <button type="button" class="btn-gclass-assign" onclick="window.cwSaveDueDateModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cw-toast" id="cw-toast" role="alert">Action completed</div>
+
+  <script src="/shared/js/auth.js?v=20261003"></script>
+  <script src="/faculty/classwork/classwork-create.js?v=20261026_screenfit"></script>
+</body>
+</html>

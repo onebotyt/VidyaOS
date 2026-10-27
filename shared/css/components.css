@@ -1717,41 +1717,234 @@
     display: none !important;
   }
 
-  body.sidebar-open:not(:has(.gc-navbar)) main,
-  body.sidebar-open:not(:has(.gc-navbar)) .page-main-container {
-    margin-left: 270px;
-    width: calc(100% - 270px);
-    transition: margin-left 0.26s cubic-bezier(0.16, 1, 0.3, 1), width 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  /* PC & Desktop: Docked permanent sidebar menu docks below top navbar (never covers header) */
+  .app-sidebar,
+  aside#app-sidebar,
+  aside#gc-drawer,
+  .gc-drawer {
+    position: fixed !important;
+    top: 52px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 260px !important;
+    height: calc(100vh - 52px) !important;
+    transform: translateX(0) !important;
+    z-index: 950 !important;
+    box-shadow: none !important;
+    border-right: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--bg-card) !important;
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
-  body:not(.sidebar-open) main,
-  body:not(.sidebar-open) .container,
-  body:not(.sidebar-open) .page-main-container,
-  body.sidebar-open:has(.gc-navbar) main,
-  body.sidebar-open:has(.gc-navbar) .container,
-  body.sidebar-open:has(.gc-navbar) .page-main-container {
-    margin-left: auto !important;
-    margin-right: auto !important;
+
+  body:has(.app-header) .app-sidebar,
+  body:has(.app-header) aside#app-sidebar,
+  body.has-app-header .app-sidebar,
+  body.has-app-header aside#app-sidebar {
+    top: 60px !important;
+    height: calc(100vh - 60px) !important;
+  }
+
+  /* When sidebar is closed on PC (via close button or toggle) */
+  body.sidebar-closed .app-sidebar,
+  body.sidebar-closed aside#app-sidebar,
+  body.sidebar-closed aside#gc-drawer,
+  body.sidebar-closed .gc-drawer,
+  .app-sidebar.sidebar-closed,
+  aside#app-sidebar.sidebar-closed,
+  aside#gc-drawer.sidebar-closed,
+  .gc-drawer.sidebar-closed {
+    transform: translateX(-100%) !important;
+    box-shadow: none !important;
+  }
+
+  /* Universal Stationary Header Bar: stays fixed at top across full 100% width (never covered, never shifted) */
+  .gc-navbar,
+  .app-header,
+  body .gc-navbar,
+  body .app-header,
+  body.has-sidebar .gc-navbar,
+  body.has-sidebar .app-header,
+  body:not(.sidebar-closed) .gc-navbar,
+  body:not(.sidebar-closed) .app-header,
+  body.sidebar-closed .gc-navbar,
+  body.sidebar-closed .app-header {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
-    transition: margin-left 0.26s cubic-bezier(0.16, 1, 0.3, 1), width 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+    transition: none !important;
   }
-  .sidebar-backdrop {
+
+  /* Single Logo Rule: The brand logo in navbar/header is ALWAYS displayed (1 logo on screen) */
+  .gc-navbar .gc-brand-link,
+  .app-header .brand {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Three-lines / Close toggle button in navbar is ALWAYS displayed */
+  .gc-navbar .gc-menu-btn,
+  .gc-navbar #sidebar-toggle-btn,
+  .gc-navbar #btn-menu-toggle,
+  .gc-navbar .sidebar-toggle-btn,
+  .app-header #sidebar-toggle-btn,
+  .app-header #btn-menu-toggle,
+  .app-header .sidebar-toggle-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+  }
+
+  /* Remove duplicate brand header and inner three-lines/close buttons inside the sidebar */
+  .gc-drawer-header,
+  .app-sidebar .gc-drawer-header,
+  aside#app-sidebar .gc-drawer-header,
+  aside#gc-drawer .gc-drawer-header,
+  .gc-drawer > .gc-drawer-header {
     display: none !important;
   }
-  .sidebar-backdrop.gc-drawer-backdrop.active,
-  .sidebar-backdrop.gc-drawer-backdrop.open,
-  .gc-drawer-backdrop.active,
-  .gc-drawer-backdrop.open {
-    display: block !important;
+
+  /* Offset ONLY main page content to the right when sidebar is OPEN on PC */
+  body:not(.sidebar-closed) main,
+  body:not(.sidebar-closed) .page-main-container,
+  body:not(.sidebar-closed) .container,
+  body:not(.sidebar-closed) .classroom-body,
+  body:not(.sidebar-closed) .classroom-banner,
+  body:not(.sidebar-closed) .student-classroom-container,
+  body:not(.sidebar-closed) .todo-container {
+    margin-left: 260px !important;
+    width: calc(100% - 260px) !important;
+    max-width: calc(100vw - 260px) !important;
+    box-sizing: border-box !important;
+    transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1), width 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Expand main page content to full width when sidebar is CLOSED on PC */
+  body.sidebar-closed main,
+  body.sidebar-closed .page-main-container,
+  body.sidebar-closed .container,
+  body.sidebar-closed .classroom-body,
+  body.sidebar-closed .classroom-banner,
+  body.sidebar-closed .student-classroom-container,
+  body.sidebar-closed .todo-container {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1), width 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* Desktop: Never dim the screen with modal backdrop */
+  .gc-drawer-backdrop,
+  .sidebar-backdrop {
+    display: none !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
   }
 }
 
 /* ── Tablet & Mobile Adjustments (<= 768px) ── */
 @media (max-width: 768px) {
-  .app-sidebar {
-    width: min(290px, 86vw);
+  /* Mobile: Hamburger/Close menu button in navbar */
+  .gc-navbar .gc-menu-btn,
+  .gc-navbar #sidebar-toggle-btn,
+  .gc-navbar #btn-menu-toggle,
+  .gc-navbar .sidebar-toggle-btn,
+  .app-header #sidebar-toggle-btn,
+  .app-header #btn-menu-toggle,
+  .app-header .sidebar-toggle-btn {
+    display: inline-flex !important;
   }
-  .sidebar-backdrop {
-    display: block;
+
+  /* Single Logo Rule: The brand logo in navbar/header is ALWAYS displayed */
+  .gc-navbar .gc-brand-link,
+  .app-header .brand {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Remove duplicate brand header inside sidebar on mobile */
+  .gc-drawer-header,
+  .app-sidebar .gc-drawer-header,
+  aside#app-sidebar .gc-drawer-header,
+  aside#gc-drawer .gc-drawer-header,
+  .gc-drawer > .gc-drawer-header {
+    display: none !important;
+  }
+
+  .app-sidebar,
+  aside#app-sidebar,
+  aside#gc-drawer,
+  .gc-drawer {
+    position: fixed !important;
+    top: 52px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: min(290px, 86vw) !important;
+    height: calc(100vh - 52px) !important;
+    transform: translateX(-100%) !important;
+    z-index: 950 !important;
+    box-shadow: var(--shadow-xl) !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  body:has(.app-header) .app-sidebar,
+  body:has(.app-header) aside#app-sidebar {
+    top: 60px !important;
+    height: calc(100vh - 60px) !important;
+  }
+
+  .app-sidebar.sidebar-open,
+  .app-sidebar.open,
+  .gc-drawer.sidebar-open,
+  .gc-drawer.open,
+  aside#gc-drawer.open,
+  aside#app-sidebar.sidebar-open {
+    transform: translateX(0) !important;
+  }
+
+  .gc-navbar,
+  .app-header,
+  main,
+  .page-main-container,
+  .container,
+  .classroom-body,
+  .classroom-banner,
+  .student-classroom-container,
+  .todo-container {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+
+  .gc-drawer-backdrop.open,
+  .gc-drawer-backdrop.active,
+  .sidebar-backdrop.open,
+  .sidebar-backdrop.active {
+    position: fixed !important;
+    top: 52px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: calc(100vh - 52px) !important;
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 940 !important;
+  }
+
+  body:has(.app-header) .sidebar-backdrop.open,
+  body:has(.app-header) .sidebar-backdrop.active {
+    top: 60px !important;
+    height: calc(100vh - 60px) !important;
   }
   .mobile-bottom-nav {
     display: flex;
@@ -2436,17 +2629,37 @@
  * GOOGLE CLASSROOM SUITE COMPONENTS (.gc-navbar, .gc-drawer, etc.)
  * ───────────────────────────────────────────────────────── */
 .gc-navbar {
-  height: 64px;
+  height: 52px !important;
+  min-height: 52px !important;
+  max-height: 52px !important;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.25rem;
+  padding: 0 1rem !important;
   position: sticky;
   top: 0;
   z-index: 500;
   box-shadow: 0 1px 2px hsl(0 0% 0% / 0.04);
+  box-sizing: border-box;
+}
+
+/* Explicitly hide obsolete secondary tags/buttons per minimal header design */
+.gc-navbar .gc-brand-sub,
+.gc-navbar .gc-page-badge,
+.gc-navbar .gc-create-btn {
+  display: none !important;
+}
+
+/* Ensure hamburger menu toggle button is always accessible and visible */
+.gc-navbar .gc-menu-btn,
+.gc-navbar #sidebar-toggle-btn,
+.gc-navbar #btn-menu-toggle,
+.gc-navbar .sidebar-toggle-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
 }
 .gc-nav-left {
   display: flex;
@@ -2666,7 +2879,7 @@ aside.app-sidebar.gc-drawer {
   width: 290px;
   background: var(--bg-card);
   border-right: 1px solid var(--border-color);
-  z-index: 1000;
+  z-index: 9995;
   transform: translateX(-100%);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -2684,14 +2897,18 @@ aside.app-sidebar.gc-drawer.open {
   position: fixed;
   inset: 0;
   background: hsl(0 0% 0% / 0.45);
-  z-index: 999;
+  z-index: 9990;
   display: none;
 }
 .gc-drawer-backdrop.active,
 .gc-drawer-backdrop.open,
+.sidebar-backdrop.active,
+.sidebar-backdrop.open,
 .sidebar-backdrop.gc-drawer-backdrop.active,
 .sidebar-backdrop.gc-drawer-backdrop.open {
-  display: block;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 .gc-drawer-header {
   height: 64px;
@@ -2751,8 +2968,9 @@ aside.app-sidebar.gc-drawer.open {
 /* Mobile & Responsive Classroom Navbar */
 @media (max-width: 768px) {
   .gc-navbar {
-    height: 58px;
-    padding: 0 0.75rem;
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 0 0.75rem !important;
   }
   .gc-nav-left {
     gap: 0.5rem;

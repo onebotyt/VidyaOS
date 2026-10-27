@@ -380,7 +380,7 @@ function selectGoogleAccount(email, customName, googleSub) {
   if (badgeName) badgeName.textContent = displayName;
   if (badgeEmail) badgeEmail.textContent = '(' + cleanEmail + ')';
   if (badge) badge.style.display = 'flex';
-  if (btnText) btnText.textContent = 'Account Linked with Google ✓';
+  if (btnText) btnText.innerHTML = 'Account Linked with Google ' + (window.getSvgIcon ? window.getSvgIcon('check', 14) : '');
 
   closeGoogleCard();
   showAlert('Google account linked! Please complete your academic and password details.', 'success');

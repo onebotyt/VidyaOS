@@ -223,9 +223,30 @@ async function submitSaveUnit() {
   }
 }
 
-async function deleteUnit(uKey) {
-  if (!confirm(`Are you sure you want to remove ${uKey}? Any assigned work items will be moved to General Coursework.`)) return;
+function promptDeleteUnit(uKey) {
+  S.pendingDeleteUnitKey = uKey;
+  const nameEl = ById('delete-unit-display-name');
+  if (nameEl) nameEl.textContent = uKey;
+  const btn = ById('btn-confirm-delete-unit');
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = `
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      <span>Delete Topic</span>
+    `;
+  }
+  openModal('modal-confirm-delete-unit');
+}
+
+async function confirmExecuteDeleteUnit() {
+  const uKey = S.pendingDeleteUnitKey;
+  if (!uKey) return;
+  const btn = ById('btn-confirm-delete-unit');
   try {
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+    }
     const res = await apiFetch(`/api/v1/teaching-groups/${S.groupId}/units`, {
       method: 'POST',
       body: JSON.stringify({
@@ -238,13 +259,27 @@ async function deleteUnit(uKey) {
       S.group.syllabus_units = res.data.syllabus_units;
       if (res.data.total_units) S.group.total_units = res.data.total_units;
     }
+    closeModal('modal-confirm-delete-unit');
     toast(`${uKey} deleted`);
     populateUnitDropdowns();
     updateUnitFilterBar();
     renderCWList();
   } catch (err) {
     toast(err.message || 'Failed to delete unit');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <span>Delete Topic</span>
+      `;
+    }
   }
+}
+
+async function deleteUnit(uKey) {
+  // Gracefully delegate to modern confirmation modal card
+  promptDeleteUnit(uKey);
 }
 
 function promptAddWorkToUnit(uKey) {
@@ -268,7 +303,16 @@ function toggleUnitCollapse(uKey, event) {
   const chevronEl = ById('unit-chevron-' + uId);
   const isCollapsed = S.collapsedUnits.has(uKey);
   if (itemsEl) itemsEl.style.display = isCollapsed ? 'none' : 'flex';
-  if (chevronEl) chevronEl.classList.toggle('is-collapsed', isCollapsed);
+  if (chevronEl) {
+    chevronEl.classList.toggle('is-collapsed', isCollapsed);
+    chevronEl.classList.toggle('is-expanded', !isCollapsed);
+  }
+  const headerEl = chevronEl ? chevronEl.closest('.cw-unit-section-header') : null;
+  if (headerEl) {
+    headerEl.classList.toggle('is-collapsed', isCollapsed);
+    headerEl.classList.toggle('is-expanded', !isCollapsed);
+  }
+  updateCollapseAllButtonState();
 }
 
 function toggleUnitMenu(event, uKey) {
@@ -414,24 +458,72 @@ function toggleWorkCardExpand(id, event) {
   }
 }
 
+function updateCollapseAllButtonState() {
+  const btn = ById('btn-collapse-all-units');
+  if (!btn) return;
+  const unitSections = document.querySelectorAll('#classwork-list .cw-unit-section');
+  if (!unitSections || !unitSections.length) return;
+
+  let totalUnits = 0;
+  let collapsedUnits = 0;
+  unitSections.forEach(sec => {
+    const hdr = sec.querySelector('.cw-unit-section-header');
+    const chevron = sec.querySelector('.unit-chevron-icon');
+    totalUnits++;
+    if ((hdr && hdr.classList.contains('is-collapsed')) || (chevron && chevron.classList.contains('is-collapsed'))) {
+      collapsedUnits++;
+    }
+  });
+
+  const allAreCollapsed = totalUnits > 0 && collapsedUnits === totalUnits;
+
+  if (allAreCollapsed) {
+    btn.setAttribute('title', 'Expand all topics');
+    btn.classList.add('is-collapsed-state');
+    btn.innerHTML = `
+      <svg class="gc-collapse-all-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <polyline points="9 21 3 21 3 15"></polyline>
+        <line x1="21" y1="3" x2="14" y2="10"></line>
+        <line x1="3" y1="21" x2="10" y2="14"></line>
+      </svg>
+      <span id="collapse-all-text">Expand all</span>
+    `;
+  } else {
+    btn.setAttribute('title', 'Collapse all topics');
+    btn.classList.remove('is-collapsed-state');
+    btn.innerHTML = `
+      <svg class="gc-collapse-all-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/>
+      </svg>
+      <span id="collapse-all-text">Collapse all</span>
+    `;
+  }
+}
+
 function toggleCollapseAllUnits() {
-  const syllabusUnits = getGroupSyllabusUnits();
-  const allUnitKeys = syllabusUnits.map(u => u.name || `Unit ${u.num}`).concat(['General Coursework']);
+  const unitSections = document.querySelectorAll('#classwork-list .cw-unit-section');
   S.collapsedUnits = S.collapsedUnits || new Set();
 
-  const allCollapsed = allUnitKeys.every(k => S.collapsedUnits.has(k));
-  if (allCollapsed) {
+  let totalUnits = 0;
+  let collapsedUnits = 0;
+  unitSections.forEach(sec => {
+    const hdr = sec.querySelector('.cw-unit-section-header');
+    const chevron = sec.querySelector('.unit-chevron-icon');
+    totalUnits++;
+    if ((hdr && hdr.classList.contains('is-collapsed')) || (chevron && chevron.classList.contains('is-collapsed'))) {
+      collapsedUnits++;
+    }
+  });
+
+  const allAreCollapsed = totalUnits > 0 && collapsedUnits === totalUnits;
+  const syllabusUnits = getGroupSyllabusUnits();
+  const allUnitKeys = syllabusUnits.map(u => u.name || `Unit ${u.num}`).concat(['General Coursework']);
+
+  if (allAreCollapsed) {
     S.collapsedUnits.clear();
-    const lbl = ById('collapse-all-text');
-    if (lbl) lbl.textContent = 'Collapse all';
-    const btn = ById('btn-collapse-all-units');
-    if (btn) btn.classList.remove('is-collapsed-state');
   } else {
     allUnitKeys.forEach(k => S.collapsedUnits.add(k));
-    const lbl = ById('collapse-all-text');
-    if (lbl) lbl.textContent = 'Expand all';
-    const btn = ById('btn-collapse-all-units');
-    if (btn) btn.classList.add('is-collapsed-state');
   }
   renderCWList();
 }
@@ -740,7 +832,7 @@ function renderCWList() {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                   <span>Add Work to Unit</span>
                 </button>
-                <button type="button" class="unit-menu-item danger" onclick="deleteUnit('${esc(uKey)}');closeAllUnitMenus()">
+                <button type="button" class="unit-menu-item danger" onclick="promptDeleteUnit('${esc(uKey)}');closeAllUnitMenus()">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                   <span>Delete Unit</span>
                 </button>
@@ -785,7 +877,7 @@ function renderCWList() {
               <div class="unit-dropdown-menu" id="unit-menu-${uId}">
                 <button type="button" class="unit-menu-item" onclick="promptAddWorkToUnit('general');closeAllUnitMenus()">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  <span>Add Work to General Coursework</span>
+                  <span>Add Coursework</span>
                 </button>
               </div>
             </div>
@@ -799,6 +891,7 @@ function renderCWList() {
   }
 
   c.innerHTML = fullHtml;
+  updateCollapseAllButtonState();
 }
 
 function filterCW(f) {
@@ -990,6 +1083,10 @@ function toggleCwFabMenu(forceState) {
 
 // Assignment Creation
 function openCreateAssignmentModal() {
+  if (window.S && window.S.groupId) {
+    window.location.href = `/faculty/classwork/create.html?type=assignment&group=${encodeURIComponent(window.S.groupId)}`;
+    return;
+  }
   populateUnitDropdowns('', 'assign-unit');
   openModal('modal-create-assignment');
 }
@@ -1038,6 +1135,10 @@ async function submitCreateAssignment() {
 
 // Practical Creation
 function openCreatePracticalModal() {
+  if (window.S && window.S.groupId) {
+    window.location.href = `/faculty/classwork/create.html?type=lab&group=${encodeURIComponent(window.S.groupId)}`;
+    return;
+  }
   if (ById('practical-title')) ById('practical-title').value = '';
   if (ById('practical-desc')) ById('practical-desc').value = '';
   if (ById('practical-due')) ById('practical-due').value = '';
@@ -1223,6 +1324,10 @@ function autoSplitScheduleQuestions() {
 }
 
 function openScheduleTestModal() {
+  if (window.S && window.S.groupId) {
+    window.location.href = `/faculty/classwork/create.html?type=test&group=${encodeURIComponent(window.S.groupId)}`;
+    return;
+  }
   populateUnitDropdowns('', 'test-unit');
   updateScheduleTestQPreview();
   openModal('modal-schedule-test');
@@ -2234,7 +2339,7 @@ function renderStudentYourWorkHtml(item, isMobile) {
   }
 
   if (stagedFile) {
-    // 2. File selected by student: Preview, Cancel (✕), or Turn in
+    // 2. File selected by student: Preview, Cancel (X), or Turn in
     const fileName = stagedFile.name || 'Attachment.pdf';
     const fileSize = formatStudentFileSize(stagedFile.size);
     return `
@@ -2768,52 +2873,35 @@ function filterSubmissionsRoster(id, filterMode) {
   renderWorkSubmissionsPanel(id);
 }
 
-// Dual Marks Tables in Marks Workspace (Tests & Assignments)
+// Dual Marks Tables in Marks Workspace (Tests & Assignments & Practicals)
 function renderAllMarksTables() {
   const testsCount = (S.tests || []).length;
-  const assignCount = (S.assignments || []).length;
+  const allAssign = S.assignments || [];
+  const practicalsCount = allAssign.filter(a => (a.type || '').toUpperCase() === 'PRACTICAL').length;
+  const assignCount = allAssign.length - practicalsCount;
   const membersCount = (S.members || []).length;
 
   if (ById('kpi-tests')) ById('kpi-tests').textContent = testsCount;
   if (ById('kpi-assignments')) ById('kpi-assignments').textContent = assignCount;
-  if (ById('kpi-students')) ById('kpi-students').textContent = membersCount;
-  if (ById('tab-marks-count')) ById('tab-marks-count').textContent = testsCount + assignCount;
-  if (ById('badge-marks-all-count')) ById('badge-marks-all-count').textContent = testsCount + assignCount;
+  if (ById('kpi-practicals')) ById('kpi-practicals').textContent = practicalsCount;
+  if (ById('tab-marks-count')) ById('tab-marks-count').textContent = testsCount + assignCount + practicalsCount;
+  if (ById('badge-marks-all-count')) ById('badge-marks-all-count').textContent = testsCount + assignCount + practicalsCount;
   if (ById('badge-marks-tests-count')) ById('badge-marks-tests-count').textContent = testsCount;
   if (ById('badge-marks-assign-count')) ById('badge-marks-assign-count').textContent = assignCount;
-  if (ById('badge-tests-count')) ById('badge-tests-count').textContent = testsCount + (testsCount === 1 ? ' test' : ' tests');
-  if (ById('badge-assign-count')) ById('badge-assign-count').textContent = assignCount + (assignCount === 1 ? ' item' : ' items');
+  if (ById('badge-marks-practicals-count')) ById('badge-marks-practicals-count').textContent = practicalsCount;
 
-  // Mobile section counts & parentheses (Image 4 & 5)
+  // Mobile section counts & parentheses
   if (ById('badge-tests-count-paren')) ById('badge-tests-count-paren').textContent = '(' + testsCount + ')';
   if (ById('badge-tests-mobile-count')) ById('badge-tests-mobile-count').textContent = testsCount + ' ' + (testsCount === 1 ? 'Test' : 'Tests');
   if (ById('badge-assign-count-paren')) ById('badge-assign-count-paren').textContent = '(' + assignCount + ')';
-  if (ById('badge-assign-mobile-count')) ById('badge-assign-mobile-count').textContent = assignCount + ' ' + (assignCount === 1 ? 'Item' : 'Items');
+  if (ById('badge-assign-mobile-count')) ById('badge-assign-mobile-count').textContent = assignCount + ' ' + (assignCount === 1 ? 'Assignment' : 'Assignments');
+  if (ById('badge-practicals-count-paren')) ById('badge-practicals-count-paren').textContent = '(' + practicalsCount + ')';
+  if (ById('badge-practicals-mobile-count')) ById('badge-practicals-mobile-count').textContent = practicalsCount + ' ' + (practicalsCount === 1 ? 'Practical' : 'Practicals');
 
-  // Mobile mini ticker counts (Image 5)
+  // Mobile mini ticker counts
   if (ById('mob-kpi-tests')) ById('mob-kpi-tests').textContent = testsCount;
   if (ById('mob-kpi-assignments')) ById('mob-kpi-assignments').textContent = assignCount;
-  if (ById('mob-kpi-students')) ById('mob-kpi-students').textContent = membersCount;
-
-  // Compute tests average
-  let testsAvg = null;
-  const scoredTests = (S.tests || []).filter(t => t.avg_score != null);
-  if (scoredTests.length > 0) {
-    const sum = scoredTests.reduce((acc, t) => acc + (parseFloat(t.avg_score) / (t.max_marks || 20)) * 100, 0);
-    testsAvg = Math.round((sum / scoredTests.length) * 10) / 10;
-  }
-  const avgStr = testsAvg != null ? (testsAvg + '%') : '—';
-  if (ById('kpi-avg-score')) ById('kpi-avg-score').textContent = avgStr;
-  if (ById('mob-kpi-avg')) ById('mob-kpi-avg').textContent = avgStr;
-
-  // Compute assignments average
-  let assignAvg = null;
-  const scoredAssigns = (S.assignments || []).filter(a => a.avg_score != null);
-  if (scoredAssigns.length > 0) {
-    const sum = scoredAssigns.reduce((acc, a) => acc + (parseFloat(a.avg_score) / (a.max_marks || 100)) * 100, 0);
-    assignAvg = Math.round((sum / scoredAssigns.length) * 10) / 10;
-  }
-  if (ById('kpi-assign-avg-score')) ById('kpi-assign-avg-score').textContent = assignAvg != null ? (assignAvg + '%') : '—';
+  if (ById('mob-kpi-practicals')) ById('mob-kpi-practicals').textContent = practicalsCount;
 
   // Compute pending grading count
   let pendingCount = 0;
@@ -2827,6 +2915,7 @@ function renderAllMarksTables() {
 
   renderMarksTable();
   renderAssignmentMarksTable();
+  renderPracticalMarksTable();
 }
 
 function renderMarksTable() {
@@ -2900,40 +2989,41 @@ function renderAssignmentMarksTable() {
   const mobList = ById('marks-assignments-mobile-list');
   if (!tbody && !mobList) return;
 
-  if (!S.assignments || !S.assignments.length) {
-    const emptyHtml = emptyState('assignment', 'No assignments or coursework created yet', 'Click + New Assignment to publish your first coursework item.');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2.5rem">' + emptyHtml + '</td></tr>';
+  const list = (S.assignments || []).filter(a => (a.type || '').toUpperCase() !== 'PRACTICAL');
+
+  if (ById('badge-assign-count-paren')) ById('badge-assign-count-paren').textContent = '(' + list.length + ')';
+  if (ById('badge-assign-mobile-count')) ById('badge-assign-mobile-count').textContent = list.length + ' ' + (list.length === 1 ? 'Assignment' : 'Assignments');
+
+  if (!list.length) {
+    const emptyHtml = emptyState('assignment', 'No assignments created yet', 'Click + Create to publish your first coursework assignment.');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2.5rem">' + emptyHtml + '</td></tr>';
     if (mobList) mobList.innerHTML = '<div style="text-align:center;padding:2rem">' + emptyHtml + '</div>';
     return;
   }
 
   const membersCount = (S.members || []).length;
 
-  // Desktop Table Rows (Image 4): 8 columns
+  // Desktop Table Rows: 7 columns (#, ASSIGNMENT TITLE, TYPE, DUE DATE, MAX MARKS, SUBMISSIONS, ACTIONS)
   if (tbody) {
-    tbody.innerHTML = S.assignments.map((a, i) => {
+    tbody.innerHTML = list.map((a, i) => {
       const rawType = (a.type || 'ASSIGNMENT').toUpperCase();
-      const typeLabel = rawType === 'FINAL_DOCS' ? 'Final Docs' : (rawType === 'PRACTICAL' ? 'Lab Practical' : 'Assignment');
-      const typePillClass = rawType === 'FINAL_DOCS' ? 'finaldocs' : (rawType === 'PRACTICAL' ? 'practical' : 'assignment');
+      const typeLabel = rawType === 'FINAL_DOCS' ? 'Final Docs' : 'Assignment';
+      const typePillClass = rawType === 'FINAL_DOCS' ? 'finaldocs' : 'assignment';
       const dd = a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No due date';
       const subCount = a.submission_count || 0;
-      const gradedCount = a.graded_count || 0;
       const maxMarks = a.max_marks || 100;
-      const isGraded = gradedCount > 0;
-      const badgeCls = isGraded ? 'marks-graded-badge is-graded' : 'marks-graded-badge';
       const ij = JSON.stringify(a).replace(/"/g, '&quot;');
 
       return '<tr>' +
         '<td style="font-weight:700;color:var(--text-muted);text-align:center">' + (i + 1) + '</td>' +
         '<td>' +
-          '<div style="font-weight:700;color:var(--text-main)">' + esc(a.title || 'Coursework') + '</div>' +
+          '<div style="font-weight:700;color:var(--text-main)">' + esc(a.title || 'Assignment') + '</div>' +
           (a.description ? '<div style="font-size:0.75rem;color:var(--text-muted);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(a.description) + '</div>' : '') +
         '</td>' +
         '<td><span class="work-type-pill ' + typePillClass + '" style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);font-weight:700">' + typeLabel + '</span></td>' +
         '<td style="font-size:0.8rem;color:var(--text-muted)">' + dd + '</td>' +
         '<td style="font-weight:700;font-family:var(--font-family-mono)">' + maxMarks + '</td>' +
         '<td><span style="font-weight:600">' + subCount + '</span><span style="color:var(--text-muted);font-size:0.78rem">/' + membersCount + '</span></td>' +
-        '<td><span class="' + badgeCls + '">' + gradedCount + '/' + membersCount + '</span></td>' +
         '<td style="text-align:right;white-space:nowrap">' +
           '<button class="btn-enter-marks-action" onclick="openAssignmentMarksModal(' + ij + ')">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' +
@@ -2944,12 +3034,12 @@ function renderAssignmentMarksTable() {
     }).join('');
   }
 
-  // Mobile Cards List (Image 5 style for assignments)
+  // Mobile Cards List
   if (mobList) {
-    mobList.innerHTML = S.assignments.map((a) => {
+    mobList.innerHTML = list.map((a) => {
       const rawType = (a.type || 'ASSIGNMENT').toUpperCase();
-      const typeLabel = rawType === 'FINAL_DOCS' ? 'Final Docs' : (rawType === 'PRACTICAL' ? 'Lab Practical' : 'Assignment');
-      const typePillClass = rawType === 'FINAL_DOCS' ? 'finaldocs' : (rawType === 'PRACTICAL' ? 'practical' : 'assignment');
+      const typeLabel = rawType === 'FINAL_DOCS' ? 'Final Docs' : 'Assignment';
+      const typePillClass = rawType === 'FINAL_DOCS' ? 'finaldocs' : 'assignment';
       const dd = a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No due date';
       const gradedCount = a.graded_count || 0;
       const maxMarks = a.max_marks || 100;
@@ -2959,7 +3049,85 @@ function renderAssignmentMarksTable() {
 
       return '<div class="marks-mobile-item" data-search-text="' + esc((a.title || '') + ' ' + dd + ' ' + typeLabel).toLowerCase() + '">' +
         '<div class="marks-mobile-item-top">' +
-          '<div class="marks-mobile-item-title">' + esc(a.title || 'Coursework') + '</div>' +
+          '<div class="marks-mobile-item-title">' + esc(a.title || 'Assignment') + '</div>' +
+          '<button class="btn-enter-marks-action mob-btn" onclick="openAssignmentMarksModal(' + ij + ')">' +
+            '<span>Enter Marks</span>' +
+          '</button>' +
+        '</div>' +
+        '<div class="marks-mobile-item-meta">' + dd + ' &bull; ' + maxMarks + ' Max Marks</div>' +
+        '<div class="marks-mobile-item-status" style="display:flex;justify-content:space-between;align-items:center">' +
+          '<span class="work-type-pill ' + typePillClass + '" style="font-size:0.68rem;padding:0.12rem 0.45rem;border-radius:var(--radius-pill);font-weight:700">' + typeLabel + '</span>' +
+          '<span class="' + badgeCls + '">' + gradedCount + '/' + membersCount + ' Graded</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+}
+
+function renderPracticalMarksTable() {
+  const tbody = ById('marks-practicals-tbody');
+  const mobList = ById('marks-practicals-mobile-list');
+  if (!tbody && !mobList) return;
+
+  const list = (S.assignments || []).filter(a => (a.type || '').toUpperCase() === 'PRACTICAL');
+
+  if (ById('badge-practicals-count-paren')) ById('badge-practicals-count-paren').textContent = '(' + list.length + ')';
+  if (ById('badge-practicals-mobile-count')) ById('badge-practicals-mobile-count').textContent = list.length + ' ' + (list.length === 1 ? 'Practical' : 'Practicals');
+
+  if (!list.length) {
+    const emptyHtml = emptyState('assignment', 'No lab practicals created yet', 'Click + Create to schedule or publish your first lab practical.');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2.5rem">' + emptyHtml + '</td></tr>';
+    if (mobList) mobList.innerHTML = '<div style="text-align:center;padding:2rem">' + emptyHtml + '</div>';
+    return;
+  }
+
+  const membersCount = (S.members || []).length;
+
+  // Desktop Table Rows: 7 columns (#, PRACTICAL TITLE, TYPE, DUE DATE, MAX MARKS, SUBMISSIONS, ACTIONS)
+  if (tbody) {
+    tbody.innerHTML = list.map((a, i) => {
+      const typeLabel = 'Lab Practical';
+      const typePillClass = 'practical';
+      const dd = a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No due date';
+      const subCount = a.submission_count || 0;
+      const maxMarks = a.max_marks || 100;
+      const ij = JSON.stringify(a).replace(/"/g, '&quot;');
+
+      return '<tr>' +
+        '<td style="font-weight:700;color:var(--text-muted);text-align:center">' + (i + 1) + '</td>' +
+        '<td>' +
+          '<div style="font-weight:700;color:var(--text-main)">' + esc(a.title || 'Lab Practical') + '</div>' +
+          (a.description ? '<div style="font-size:0.75rem;color:var(--text-muted);max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(a.description) + '</div>' : '') +
+        '</td>' +
+        '<td><span class="work-type-pill ' + typePillClass + '" style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);font-weight:700">' + typeLabel + '</span></td>' +
+        '<td style="font-size:0.8rem;color:var(--text-muted)">' + dd + '</td>' +
+        '<td style="font-weight:700;font-family:var(--font-family-mono)">' + maxMarks + '</td>' +
+        '<td><span style="font-weight:600">' + subCount + '</span><span style="color:var(--text-muted);font-size:0.78rem">/' + membersCount + '</span></td>' +
+        '<td style="text-align:right;white-space:nowrap">' +
+          '<button class="btn-enter-marks-action" onclick="openAssignmentMarksModal(' + ij + ')">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' +
+            '<span>Enter Marks</span>' +
+          '</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  // Mobile Cards List
+  if (mobList) {
+    mobList.innerHTML = list.map((a) => {
+      const typeLabel = 'Lab Practical';
+      const typePillClass = 'practical';
+      const dd = a.due_date ? new Date(a.due_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'No due date';
+      const gradedCount = a.graded_count || 0;
+      const maxMarks = a.max_marks || 100;
+      const isGraded = gradedCount > 0;
+      const badgeCls = isGraded ? 'marks-graded-badge is-graded' : 'marks-graded-badge';
+      const ij = JSON.stringify(a).replace(/"/g, '&quot;');
+
+      return '<div class="marks-mobile-item" data-search-text="' + esc((a.title || '') + ' ' + dd + ' ' + typeLabel).toLowerCase() + '">' +
+        '<div class="marks-mobile-item-top">' +
+          '<div class="marks-mobile-item-title">' + esc(a.title || 'Lab Practical') + '</div>' +
           '<button class="btn-enter-marks-action mob-btn" onclick="openAssignmentMarksModal(' + ij + ')">' +
             '<span>Enter Marks</span>' +
           '</button>' +
@@ -2975,23 +3143,52 @@ function renderAssignmentMarksTable() {
 }
 
 function filterMarksCategory(cat) {
-  ['all', 'tests', 'assignments'].forEach(c => {
+  S.marksCategoryFilter = cat || 'all';
+  ['all', 'tests', 'assignments', 'practicals'].forEach(c => {
     const btn = ById('btn-marks-cat-' + c);
-    if (btn) btn.classList.toggle('active', c === cat);
+    if (btn) btn.classList.toggle('active', c === S.marksCategoryFilter);
   });
   const secTests = ById('marks-tests-section');
   const secAssign = ById('marks-assignments-section');
-  if (secTests) secTests.style.display = (cat === 'all' || cat === 'tests') ? '' : 'none';
-  if (secAssign) secAssign.style.display = (cat === 'all' || cat === 'assignments') ? '' : 'none';
+  const secPracticals = ById('marks-practicals-section');
+  if (secTests) secTests.style.display = (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'tests') ? '' : 'none';
+  if (secAssign) secAssign.style.display = (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'assignments') ? '' : 'none';
+  if (secPracticals) secPracticals.style.display = (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'practicals') ? '' : 'none';
+
+  // If a specific category tab is clicked, automatically uncollapse it so teacher sees the work
+  if (S.marksCategoryFilter !== 'all') {
+    const targetSec = ById('marks-' + S.marksCategoryFilter + '-section');
+    if (targetSec) targetSec.classList.remove('collapsed');
+  }
 }
 
 function filterAllMarks(q) {
-  const term = (q || '').toLowerCase();
+  const raw = (q || '').trim();
+  const term = raw.toLowerCase();
+
+  const sections = ['tests', 'assignments', 'practicals'];
+  if (raw.length > 0) {
+    // When searching, automatically uncollapse all sections so teacher can see matching items
+    sections.forEach(sec => {
+      const el = ById('marks-' + sec + '-section');
+      if (el) el.classList.remove('collapsed');
+    });
+  } else {
+    // When search is cleared, restore default collapsed state
+    sections.forEach(sec => {
+      const el = ById('marks-' + sec + '-section');
+      if (el) el.classList.add('collapsed');
+    });
+  }
+
   // Filter desktop tables
   document.querySelectorAll('#marks-tests-tbody tr').forEach(r => {
     r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
   });
   document.querySelectorAll('#marks-assignments-tbody tr').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+  document.querySelectorAll('#marks-practicals-tbody tr').forEach(r => {
     r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
   });
   // Filter mobile cards
@@ -3003,10 +3200,32 @@ function filterAllMarks(q) {
     const text = card.getAttribute('data-search-text') || card.textContent.toLowerCase();
     card.style.display = text.includes(term) ? '' : 'none';
   });
+  document.querySelectorAll('#marks-practicals-mobile-list .marks-mobile-item').forEach(card => {
+    const text = card.getAttribute('data-search-text') || card.textContent.toLowerCase();
+    card.style.display = text.includes(term) ? '' : 'none';
+  });
 }
 
 function filterMarksTable(q) {
   filterAllMarks(q);
+}
+
+function toggleMarksSection(sec) {
+  const el = ById('marks-' + sec + '-section');
+  if (el) el.classList.toggle('collapsed');
+}
+
+function toggleMarksCreateDropdown(eventOrForce) {
+  if (eventOrForce && eventOrForce.stopPropagation) {
+    eventOrForce.stopPropagation();
+  }
+  const menu = ById('marks-create-dropdown-menu');
+  if (!menu) return;
+  if (typeof eventOrForce === 'boolean') {
+    menu.style.display = eventOrForce ? 'block' : 'none';
+  } else {
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  }
 }
 
 // Marks Entry Modal Functions
@@ -3245,6 +3464,7 @@ async function openMarksModal(test) {
 window.addEventListener('popstate', (e) => {
   if (document.body.classList.contains('marks-standalone-page')) {
     closeModal('modal-enter-marks');
+    closeModal('modal-enter-assignment-marks');
   }
   const editPage = ById('work-edit-page-view');
   if (editPage && editPage.style.display !== 'none') {
@@ -4015,10 +4235,7 @@ async function openAssignmentMarksModal(assign) {
   const maxMarks = assign.max_marks || 100;
 
   if (ById('assign-marks-modal-title')) {
-    ById('assign-marks-modal-title').innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:0.4rem"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span>Enter Marks: ${esc(assign.title || 'Assignment')}</span>
-    `;
+    ById('assign-marks-modal-title').textContent = `Enter Marks: ${assign.title || 'Assignment'}`;
   }
 
   if (ById('assign-marks-modal-meta')) {
@@ -4030,10 +4247,21 @@ async function openAssignmentMarksModal(assign) {
   }
 
   openModal('modal-enter-assignment-marks');
+  if (window.innerWidth < 768) {
+    document.body.classList.add('marks-standalone-page');
+    document.documentElement.classList.add('marks-standalone-page');
+    try {
+      window.history.pushState({ assignMarksPage: true }, '');
+    } catch {}
+  }
 
   const tbody = ById('assign-marks-entry-tbody');
   if (tbody) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2.5rem"><div class="shimmer" style="height:24px;width:300px;margin:0 auto"></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2.5rem"><div class="shimmer" style="height:24px;width:300px;margin:0 auto"></div></td></tr>';
+  }
+  const mobList = ById('assign-marks-mobile-list');
+  if (mobList) {
+    mobList.innerHTML = '<div style="text-align:center;padding:2.5rem"><div class="shimmer" style="height:24px;width:80%;margin:0 auto"></div></div>';
   }
 
   try {
@@ -4085,7 +4313,7 @@ async function openAssignmentMarksModal(assign) {
     renderAssignMarksModalTable();
   } catch (err) {
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--status-absent)">Failed to load assignment submissions roster: ' + esc(err.message) + '</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--status-absent)">Failed to load assignment submissions roster: ' + esc(err.message) + '</td></tr>';
     }
   }
 }
@@ -4104,11 +4332,15 @@ function filterAssignMarksModalRoster(q) {
   document.querySelectorAll('#assign-marks-entry-tbody tr').forEach(r => {
     r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
   });
+  document.querySelectorAll('#assign-marks-mobile-list .am-mob-card').forEach(c => {
+    c.style.display = c.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
 }
 
 function renderAssignMarksModalTable() {
   const tbody = ById('assign-marks-entry-tbody');
-  if (!tbody || !S.currentAssignment) return;
+  const mobList = ById('assign-marks-mobile-list');
+  if (!S.currentAssignment) return;
 
   const roster = S.cachedAssignmentRoster || [];
   const maxMarks = Number(S.currentAssignment.max_marks) || 100;
@@ -4133,91 +4365,121 @@ function renderAssignMarksModalTable() {
   });
 
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">No students match this filter criteria.</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2.5rem;color:var(--text-muted)">No students match this filter criteria.</td></tr>';
+    if (mobList) mobList.innerHTML = '<div style="text-align:center;padding:2.5rem;color:var(--text-muted)">No students match this filter criteria.</div>';
     return;
   }
 
-  tbody.innerHTML = filtered.map((st, idx) => {
-    const isAb = Boolean(st.is_absent);
-    const markVal = (st.marks_obtained !== null && st.marks_obtained !== undefined) ? st.marks_obtained : '';
-    const roll = String(st.class_roll_no || (idx + 1)).replace(/^#/, '');
+  // Render Desktop 4-Column Table (Image 1: ROLL NO, STUDENT NAME, SUBMISSION, MARKS OBTAINED)
+  if (tbody) {
+    tbody.innerHTML = filtered.map((st, idx) => {
+      const isAb = Boolean(st.is_absent);
+      const markVal = (st.marks_obtained !== null && st.marks_obtained !== undefined) ? st.marks_obtained : '';
+      const roll = String(st.class_roll_no || (idx + 1)).replace(/^#/, '');
 
-    let subBadge = '';
-    if (st.is_submitted) {
-      let fileLink = '';
-      if (st.documents && st.documents.length > 0) {
-        fileLink = st.documents.map(d => `
-          <a href="${esc(d.file_path)}" target="_blank" class="doc-link-pill" style="font-size:0.72rem;padding:0.15rem 0.45rem;display:inline-flex;align-items:center;gap:0.3rem" title="View ${esc(d.original_filename || 'document')}">
-            ${GD_ICONS.file}
-            <span style="max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.requirement_name || d.original_filename || 'File')}</span>
-          </a>
-        `).join('');
+      let subBadge = '';
+      if (st.is_submitted) {
+        subBadge = `<span class="am-sub-badge submitted">SUBMITTED</span>`;
+      } else {
+        subBadge = `<span class="am-sub-badge not-submitted">NOT SUBMITTED</span>`;
       }
-      subBadge = `
-        <div style="display:flex;align-items:center;gap:0.35rem;flex-wrap:wrap">
-          <span class="badge" style="background:var(--status-present-bg);color:var(--status-present);border:1px solid var(--status-present);font-size:0.72rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-sm)">Submitted</span>
-          ${fileLink}
+
+      return `
+        <tr>
+          <td class="am-cell-roll">${esc(roll)}</td>
+          <td>
+            <div class="am-student-name">${esc(st.full_name)}</div>
+            <div class="am-student-enrollment">${esc(st.official_enrollment_no || '')}</div>
+          </td>
+          <td>${subBadge}</td>
+          <td class="am-cell-marks">
+            <div class="am-score-input-wrap">
+              <input type="text" class="am-score-input ${isAb ? 'is-absent' : ''}"
+                data-student="${st.student_id}"
+                value="${isAb ? 'AB' : markVal}"
+                placeholder="0-${maxMarks}"
+                oninput="onAssignScoreChange(${st.student_id}, this.value)">
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Render Mobile Cards List (Image 2: Card with Roll No, Name, Enrollment, Status Badge, Marks Input)
+  if (mobList) {
+    mobList.innerHTML = filtered.map((st, idx) => {
+      const isAb = Boolean(st.is_absent);
+      const markVal = (st.marks_obtained !== null && st.marks_obtained !== undefined) ? st.marks_obtained : '';
+      const roll = String(st.class_roll_no || (idx + 1)).replace(/^#/, '');
+
+      let subBadge = '';
+      if (st.is_submitted) {
+        subBadge = `<span class="am-sub-badge submitted">SUBMITTED</span>`;
+      } else {
+        subBadge = `<span class="am-sub-badge not-submitted">NOT SUBMITTED</span>`;
+      }
+
+      return `
+        <div class="am-mob-card">
+          <div class="am-mob-card-left">
+            <span class="am-mob-roll">${esc(roll)}</span>
+            <div class="am-mob-info">
+              <div class="am-mob-name-row">
+                <span class="am-mob-name">${esc(st.full_name)}</span>
+                ${subBadge}
+              </div>
+              <div class="am-mob-enrollment">${esc(st.official_enrollment_no || '')}</div>
+            </div>
+          </div>
+          <div class="am-mob-marks-wrap">
+            <div class="am-score-input-wrap">
+              <input type="text" class="am-score-input am-mob-score-input ${isAb ? 'is-absent' : ''}"
+                data-student="${st.student_id}"
+                value="${isAb ? 'AB' : markVal}"
+                placeholder="0-${maxMarks}"
+                oninput="onAssignScoreChange(${st.student_id}, this.value)">
+            </div>
+          </div>
         </div>
       `;
-    } else {
-      subBadge = `<span class="badge" style="background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);font-size:0.72rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-sm)">Not Submitted</span>`;
-    }
-
-    return `
-      <tr class="${isAb ? 'is-absent-row' : ''}" style="${isAb ? 'background:var(--status-absent-bg);opacity:0.9' : ''}">
-        <td style="text-align:center;font-weight:700;color:var(--text-muted)">${idx + 1}</td>
-        <td style="font-weight:700;font-family:var(--font-family-mono)">${esc(roll)}</td>
-        <td>
-          <div style="font-weight:700;color:var(--text-main)">${esc(st.full_name)}</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);font-family:var(--font-family-mono)">${esc(st.official_enrollment_no || '')}</div>
-        </td>
-        <td>${subBadge}</td>
-        <td style="text-align:center">
-          <input type="number" step="0.5" min="0" max="${maxMarks}" class="marks-input-cell assign-score-input"
-            data-student="${st.student_id}"
-            value="${markVal}"
-            placeholder="0-${maxMarks}"
-            ${isAb ? 'disabled style="background:var(--bg-surface);color:var(--text-muted);border-color:var(--border-color);"' : ''}
-            oninput="onAssignScoreChange(${st.student_id}, this.value)">
-        </td>
-        <td style="text-align:center">
-          <button type="button" class="btn btn-sm"
-            onclick="toggleAssignStudentAbsent(${st.student_id})"
-            style="font-size:0.72rem;padding:0.2rem 0.55rem;font-weight:800;border-radius:var(--radius-sm);background:${isAb ? 'var(--status-absent)' : 'var(--bg-surface)'};color:${isAb ? 'var(--text-white)' : 'var(--text-muted)'};border:1px solid ${isAb ? 'var(--status-absent)' : 'var(--border-color)'}"
-            title="${isAb ? 'Mark Present' : 'Mark Absent (AB)'}">
-            ${isAb ? 'AB' : '—'}
-          </button>
-        </td>
-        <td>
-          <input type="text" class="form-input assign-remark-input"
-            data-student="${st.student_id}"
-            value="${esc(st.feedback || '')}"
-            placeholder="Feedback / notes…"
-            style="padding:0.3rem 0.55rem;font-size:0.8rem;width:100%"
-            oninput="onAssignRemarkChange(${st.student_id}, this.value)">
-        </td>
-      </tr>
-    `;
-  }).join('');
+    }).join('');
+  }
 }
 
 function onAssignScoreChange(sid, val) {
   const st = (S.cachedAssignmentRoster || []).find(s => s.student_id === sid);
   if (!st) return;
   const max = Number(S.currentAssignment?.max_marks) || 100;
-  if (val === '' || val === null || val === undefined) {
+  const trimmed = (val || '').trim().toUpperCase();
+
+  if (trimmed === 'AB') {
+    st.is_absent = true;
+    st.marks_obtained = null;
+  } else if (trimmed === '') {
+    st.is_absent = false;
     st.marks_obtained = null;
   } else {
-    let num = parseFloat(val);
-    if (isNaN(num)) num = 0;
-    if (num < 0) num = 0;
-    if (num > max) num = max;
-    st.marks_obtained = num;
+    let num = parseFloat(trimmed);
+    if (isNaN(num)) {
+      st.marks_obtained = null;
+      st.is_absent = false;
+    } else {
+      if (num < 0) num = 0;
+      if (num > max) num = max;
+      st.marks_obtained = num;
+      st.is_absent = false;
+    }
   }
-  // If score entered, mark as not absent
-  if (st.marks_obtained !== null && st.is_absent) {
-    st.is_absent = false;
-  }
+
+  // Synchronize both PC table and mobile card inputs
+  document.querySelectorAll(`.am-score-input[data-student="${sid}"]`).forEach(inp => {
+    if (inp !== document.activeElement) {
+      inp.value = st.is_absent ? 'AB' : (st.marks_obtained !== null ? st.marks_obtained : '');
+    }
+    inp.classList.toggle('is-absent', Boolean(st.is_absent));
+  });
+
   const total = S.cachedAssignmentRoster.length;
   const graded = S.cachedAssignmentRoster.filter(s => s.is_absent || (s.marks_obtained !== null && s.marks_obtained !== undefined)).length;
   if (ById('assign-marks-footer-graded')) ById('assign-marks-footer-graded').textContent = `${graded}/${total}`;
@@ -4262,6 +4524,7 @@ function bulkFillAssignMaxMarks() {
   renderAssignMarksModalTable();
   toast(`Filled full marks (${max} pts) for ${count} students.`);
 }
+
 
 async function saveAssignmentMarksEntry() {
   const assign = S.currentAssignment;
@@ -4407,6 +4670,9 @@ window.openCreateUnitModal = openCreateUnitModal;
 window.openEditUnitModal = openEditUnitModal;
 window.submitSaveUnit = submitSaveUnit;
 window.deleteUnit = deleteUnit;
+window.promptDeleteUnit = promptDeleteUnit;
+window.confirmExecuteDeleteUnit = confirmExecuteDeleteUnit;
+window.updateCollapseAllButtonState = updateCollapseAllButtonState;
 window.promptAddWorkToUnit = promptAddWorkToUnit;
 window.toggleUnitCollapse = toggleUnitCollapse;
 window.toggleUnitMenu = toggleUnitMenu;
@@ -4442,4 +4708,6 @@ window.handleStudentWorkFileSelected = handleStudentWorkFileSelected;
 window.handleStudentWorkSubmitClick = handleStudentWorkSubmitClick;
 window.executeStudentWorkUpload = executeStudentWorkUpload;
 window.handleStudentUnsubmitWork = handleStudentUnsubmitWork;
-
+window.toggleMarksSection = toggleMarksSection;
+window.toggleMarksCreateDropdown = toggleMarksCreateDropdown;
+window.renderPracticalMarksTable = renderPracticalMarksTable;

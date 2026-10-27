@@ -51,6 +51,10 @@
 
       // Sheet 3: Assignments Marksheet Data
       assignments: [],
+      theoryAssignments: [],
+      practicalAssignments: [],
+      currentPracticalViewMode: 'ALL',
+      currentPracticalId: null,
 
       // Sheet 4: Attendance Matrix Data
       attendanceMonth: new Date().getMonth() + 1,
@@ -66,6 +70,20 @@
     function esc(s) {
       if (s === null || s === undefined) return '';
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    if (typeof window !== 'undefined') {
+      window.escapeHtml = esc;
+      window.esc = esc;
+      window.S = S;
+    }
+
+    function isPracticalCoursework(item) {
+      if (!item) return false;
+      const t = String(item.type || item.assignment_type || item.category || '').toUpperCase();
+      if (t === 'PRACTICAL' || t === 'LAB' || t === 'EXPERIMENT') return true;
+      const title = String(item.title || item.name || '').trim();
+      if (/^(?:lab|experiment|practical)\b/i.test(title)) return true;
+      return false;
     }
 
     function initials(name) {
@@ -86,40 +104,51 @@
     /* ══════════════════════════════════════════════════════════════
        INITIALIZATION & METADATA LOADER
        ══════════════════════════════════════════════════════════════ */
-    window.addEventListener('DOMContentLoaded', async () => {
-      if (typeof guardRoute === 'function') {
-        guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN'] });
+    async function initSheetsStudio() {
+      try {
+        if (typeof guardRoute === 'function') {
+          guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN'] });
+        }
+        S.user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+
+        if (S.user) {
+          const av = document.getElementById('gc-user-avatar');
+          if (av) av.textContent = initials(S.user.full_name || S.user.username || 'DS');
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const qId = params.get('id') || params.get('group_id');
+        if (qId) S.groupId = Number(qId);
+        const qReg = params.get('register_id') || params.get('register');
+        if (qReg) S.registerId = Number(qReg);
+        const initialSheet = params.get('sheet') || 'evaluation';
+
+        setSheetViewMode(S.viewMode, false);
+        setupTouchPinchZoom();
+        initFloatingFabDrag();
+        updateFilterBadgeIndicator();
+        await loadTeacherGroupsList();
+        renderColumnFilterMenu();
+        await switchSheetTab(initialSheet, false);
+      } catch (err) {
+        console.error('Fatal initialization error in Sheets Studio:', err);
+        try {
+          await switchSheetTab('evaluation', false);
+        } catch (_) {}
       }
-      S.user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    }
 
-      if (S.user) {
-        const av = document.getElementById('gc-user-avatar');
-        if (av) av.textContent = initials(S.user.full_name || S.user.username || 'DS');
-      }
-
-      const params = new URLSearchParams(window.location.search);
-      const qId = params.get('id') || params.get('group_id');
-      if (qId) S.groupId = Number(qId);
-      const qReg = params.get('register_id') || params.get('register');
-      if (qReg) S.registerId = Number(qReg);
-      const initialSheet = params.get('sheet') || 'evaluation';
-
-      setSheetViewMode(S.viewMode, false);
-      setupTouchPinchZoom();
-      initFloatingFabDrag();
-      updateFilterBadgeIndicator();
-      await loadTeacherGroupsList();
-      renderColumnFilterMenu();
-      await switchSheetTab(initialSheet, false);
-    });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSheetsStudio);
+    } else {
+      initSheetsStudio();
+    }
 
     async function loadTeacherGroupsList() {
       try {
         const res = await apiFetch('/teaching-groups?status=ACTIVE');
         if (res && res.success && Array.isArray(res.data)) {
           S.allGroups = res.data;
-          renderGroupSwitcherOptions();
-
           if (!S.groupId && S.allGroups.length > 0) {
             S.groupId = S.allGroups[0].id;
           }
@@ -131,12 +160,18 @@
       if (S.groupId) {
         await loadGroupMetadata(S.groupId);
       }
+      renderGroupSwitcherOptions();
     }
 
     function renderGroupSwitcherOptions() {
       const sel = document.getElementById('group-switcher-select');
       if (!sel) return;
-      if (!S.allGroups.length) {
+      if (!S.allGroups || !S.allGroups.length) {
+        if (S.group) {
+          const code = S.group.subject_code ? `[${esc(S.group.subject_code)}] ` : (S.group.code ? `[${esc(S.group.code)}] ` : '');
+          sel.innerHTML = `<option value="${S.group.id}" selected>${code}${esc(S.group.name || S.group.subject_name)} (${esc(S.group.component || 'THEORY')})</option>`;
+          return;
+        }
         sel.innerHTML = `<option value="">No classes found</option>`;
         return;
       }
@@ -215,7 +250,7 @@
     async function switchSheetTab(sheetName, updateUrl = true) {
       if (sheetName === 'attendance') sheetName = 'evaluation';
       S.activeSheet = sheetName;
-      ['evaluation', 'tests', 'assignments'].forEach(tab => {
+      ['evaluation', 'tests', 'assignments', 'practicals'].forEach(tab => {
         const btn = document.getElementById(`tab-sheet-${tab}`);
         const pane = document.getElementById(`pane-${tab}`);
         if (btn) btn.classList.toggle('active', tab === sheetName);
@@ -252,7 +287,7 @@
         <button type="button" class="btn btn-secondary btn-sm" onclick="openAddColumnModal()" title="Add a new column to this sheet" style="font-weight:700;">+ Add Column</button>
         <button type="button" class="btn btn-secondary btn-sm" onclick="openRemoveColumnModal()" title="Remove a column from this sheet" style="font-weight:700;">− Remove Column</button>
         <button type="button" class="btn btn-secondary btn-sm" onclick="openAddRowModal()" title="Add a student row" style="font-weight:700;">+ Add Student</button>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="openEditRowModal()" title="Edit or delete student row" style="font-weight:700;">✏️ Edit Student</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openEditRowModal()" title="Edit or delete student row" style="font-weight:700;display:inline-flex;align-items:center;gap:0.3rem;"><span data-icon="edit"></span> Edit Student</button>
       `;
 
       if (S.activeSheet === 'evaluation') {
@@ -289,12 +324,21 @@
         `;
       } else if (S.activeSheet === 'assignments') {
         left.innerHTML = `
-          <span style="font-size:0.84rem;font-weight:800;color:var(--text-main);">Coursework &amp; Assignment Marksheet</span>
-          <span class="badge" style="background:var(--chip-hod-bg);color:var(--chip-hod-color);font-size:0.7rem;font-weight:800;padding:0.18rem 0.5rem;border-radius:999px;">Continuous Assessment</span>
+          <span style="font-size:0.84rem;font-weight:800;color:var(--text-main);">Theory Assignment Marksheet</span>
+          <span class="badge" style="background:var(--chip-hod-bg);color:var(--chip-hod-color);font-size:0.7rem;font-weight:800;padding:0.18rem 0.5rem;border-radius:999px;">Theory Coursework</span>
           ${structureButtons}
         `;
         right.innerHTML = `
-          <span style="font-size:0.76rem;color:var(--text-muted);font-weight:600;">Total Assignments: <strong>${S.assignments.length}</strong></span>
+          <span style="font-size:0.76rem;color:var(--text-muted);font-weight:600;">Total Assignments: <strong>${(S.theoryAssignments || []).length}</strong></span>
+        `;
+      } else if (S.activeSheet === 'practicals') {
+        left.innerHTML = `
+          <span style="font-size:0.84rem;font-weight:800;color:var(--text-main);">Practical &amp; Lab Work Marksheet</span>
+          <span class="badge" style="background:var(--col-att-group-bg);color:var(--col-att-group-color);font-size:0.7rem;font-weight:800;padding:0.18rem 0.5rem;border-radius:999px;">Lab Experiments &amp; Viva</span>
+          ${structureButtons}
+        `;
+        right.innerHTML = `
+          <span style="font-size:0.76rem;color:var(--text-muted);font-weight:600;">Total Practicals: <strong>${(S.practicalAssignments || []).length}</strong></span>
         `;
       }
     }
@@ -306,6 +350,8 @@
         await loadTestSheetData();
       } else if (sheetName === 'assignments') {
         await loadAssignmentsSheetData();
+      } else if (sheetName === 'practicals') {
+        await loadPracticalsSheetData();
       } else {
         await loadEvaluationSheetData();
       }
@@ -327,8 +373,12 @@
 
     function applySheetFilterAndSearch() {
       if (S.activeSheet === 'evaluation') renderEvaluationSheetTable();
-      else if (S.activeSheet === 'tests') renderTestSheetTable();
+      else if (S.activeSheet === 'tests') {
+        if (S.currentTestViewMode === 'ALL') renderAllTestsCombinedTable();
+        else renderTestSheetTable();
+      }
       else if (S.activeSheet === 'assignments') renderAssignmentsSheetTable();
+      else if (S.activeSheet === 'practicals') renderPracticalsSheetTable();
       else renderEvaluationSheetTable();
     }
 
@@ -537,6 +587,11 @@
       if (sel) sel.value = mode;
       const dSel = document.getElementById('desktop-density-selector');
       if (dSel) dSel.value = mode;
+      setTimeout(() => {
+        const activeTable = document.querySelector('.sheet-pane.active table');
+        if (activeTable) updateStickyHeaderOffsets(activeTable);
+        if (S.autoFit) fitSheetToScreen(false);
+      }, 30);
     }
 
     function zoomIn() {
@@ -559,18 +614,43 @@
       setSheetZoom(1.0);
     }
 
+    function updateStickyHeaderOffsets(table) {
+      if (!table) return;
+      const row1 = table.querySelector('thead tr.excel-hdr-tan');
+      const row2 = table.querySelector('thead tr.excel-hdr-sub');
+      if (row1) {
+        const h1 = row1.offsetHeight || 27;
+        table.style.setProperty('--th-row1-height', `${h1}px`);
+        if (row2 && row2.offsetHeight > 0) {
+          table.style.setProperty('--th-row2-height', `${row2.offsetHeight}px`);
+        } else {
+          table.style.setProperty('--th-row2-height', '0px');
+        }
+      }
+    }
+
     function setSheetZoom(scale) {
       S.zoomScale = scale;
       const wrapper = document.getElementById('scale-wrapper');
       if (wrapper) {
-        wrapper.style.transform = `scale(${scale})`;
-        wrapper.style.width = `${100 / scale}%`;
-        wrapper.style.transformOrigin = 'top left';
+        if ('zoom' in document.documentElement.style) {
+          wrapper.style.zoom = scale;
+          wrapper.style.transform = 'none';
+          wrapper.style.width = '100%';
+          wrapper.style.maxWidth = '100%';
+        } else {
+          wrapper.style.transform = `scale(${scale})`;
+          wrapper.style.transformOrigin = 'top left';
+          wrapper.style.width = '100%';
+          wrapper.style.maxWidth = '100%';
+        }
       }
       const lbl = document.getElementById('zoom-level-label');
       if (lbl) lbl.textContent = `${Math.round(scale * 100)}%`;
       const dLbl = document.getElementById('desktop-zoom-level-label');
       if (dLbl) dLbl.textContent = `${Math.round(scale * 100)}%`;
+      const activeTable = document.querySelector('.sheet-pane.active table');
+      if (activeTable) updateStickyHeaderOffsets(activeTable);
     }
 
     function toggleAutoFit() {
@@ -724,7 +804,7 @@
       const sel = document.getElementById('sheet-column-focus-select');
       if (!sel) return;
 
-      let options = '<option value="">🎯 Column Focus ▾</option>';
+      let options = '<option value="">Column Focus ▾</option>';
 
       if (S.activeSheet === 'evaluation' && S.evalData) {
         const assigns = S.evalData.assignments || [];
@@ -842,11 +922,12 @@
       const wrapper = document.getElementById('scale-wrapper');
       if (!wrapper) return;
 
-      // Reset wrapper scale temporarily to measure actual unscaled table width
+      // Reset wrapper scale and zoom temporarily to measure actual unscaled intrinsic table width
       wrapper.style.transform = 'none';
-      wrapper.style.width = '100%';
+      wrapper.style.zoom = '1';
+      wrapper.style.width = 'max-content';
 
-      const viewportWidth = viewport.clientWidth - 12;
+      const viewportWidth = viewport.clientWidth - 4;
       const tableWidth = table.scrollWidth || table.offsetWidth;
 
       if (tableWidth > 0 && viewportWidth > 60) {
@@ -860,6 +941,8 @@
         if (userTriggered) {
           showToast(`Spreadsheet auto-fitted to screen (${Math.round(scale * 100)}%)`, 'info');
         }
+      } else {
+        setSheetZoom(1.0);
       }
       updateAutoFitUI();
     }
@@ -869,6 +952,8 @@
     window.addEventListener('resize', () => {
       clearTimeout(sheetResizeTimer);
       sheetResizeTimer = setTimeout(() => {
+        const activeTable = document.querySelector('.sheet-pane.active table');
+        if (activeTable) updateStickyHeaderOffsets(activeTable);
         if (S.autoFit) {
           fitSheetToScreen(false);
         }
@@ -1366,9 +1451,17 @@
       const str = String(a.title || a.name || '').trim();
       const m = str.match(/^(?:assignment|assign|a)\s*[:#\-_]?\s*(\d+)/i);
       if (m) return 'A' + m[1];
+      return 'A' + (i + 1);
+    }
+
+    function getPracticalShortHeader(p, i) {
+      if (!p) return 'Lab ' + (i + 1);
+      if (p.short_code) return String(p.short_code);
+      if (p.code) return String(p.code);
+      const str = String(p.title || p.name || '').trim();
       const mLab = str.match(/^(?:lab|experiment|practical)\s*[:#\-_]?\s*(\d+)/i);
       if (mLab) return 'Lab' + mLab[1];
-      return 'A' + (i + 1);
+      return 'Lab ' + (i + 1);
     }
 
     function getTestShortHeader(e, i) {
@@ -1599,21 +1692,34 @@
         total_label: 'Total Marks'
       };
 
-      const students = fallbackNames.map((name, i) => {
+      const rawCohort = (Array.isArray(S.members) && S.members.length > 0)
+        ? S.members
+        : fallbackNames.map((name, i) => ({
+            id: i + 1,
+            student_id: i + 1,
+            class_roll_no: i + 1,
+            official_enrollment_no: `2024IT00${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
+            registration_no: `2410105400${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
+            full_name: name,
+            attendance_percentage: Math.round(((fallbackAtt[i] || 5.0) / 5) * 100)
+          }));
+
+      const students = rawCohort.map((m, i) => {
+        const attVal = fallbackAtt[i] || 5.0;
         const stObj = {
-          student_id: i + 1,
-          class_roll_no: i + 1,
-          official_enrollment_no: `2024IT00${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
-          registration_no: `2410105400${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
-          full_name: name,
-          attendance_percentage: Math.round((fallbackAtt[i] / 5) * 100),
+          student_id: m.student_id || m.id || (i + 1),
+          class_roll_no: m.class_roll_no || (i + 1),
+          official_enrollment_no: m.official_enrollment_no || `2024IT00${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
+          registration_no: m.registration_no || `2410105400${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
+          full_name: m.full_name || m.name || ('Student ' + (i + 1)),
+          attendance_percentage: m.attendance_percentage !== undefined ? Number(m.attendance_percentage) : Math.round((attVal / 5) * 100),
           assignment_scores: [15, 15, 15, 15, 15],
           assignment_avg: 9.0,
           exam_scores: [15, 15, 15, 15],
           exam_absent: [false, false, false, false],
           exam_avg: 12.0,
-          assessment_scores: [fallbackAtt[i]],
-          grand_total: Math.round((9.0 + 12.0 + fallbackAtt[i]) * 10) / 10
+          assessment_scores: [attVal],
+          grand_total: Math.round((9.0 + 12.0 + attVal) * 10) / 10
         };
         return stObj;
       });
@@ -1741,8 +1847,8 @@
         <thead>
           <tr class="excel-hdr-tan">
             <th rowspan="2" class="col-roll" style="width: 70px;">${esc(scheme.roll_label || 'ROLL NO')}</th>
-            <th rowspan="2" class="col-enroll" style="width: 135px;">${esc(scheme.enroll_label || 'ENROLLMENT NO')}</th>
             <th rowspan="2" class="col-reg" style="width: 135px;">${esc(scheme.reg_label || 'REG NO')}</th>
+            <th rowspan="2" class="col-enroll" style="width: 135px;">${esc(scheme.enroll_label || 'ENROLLMENT NO')}</th>
             <th rowspan="2" class="col-name" style="min-width: 190px; text-align: left;">${esc(scheme.name_label || 'STUDENT NAME')}</th>
             <th colspan="${aCount}" class="col-assign">${esc(scheme.assign_label || 'Assignment Marks')}</th>
             <th rowspan="2" class="col-assign-avg" style="width: 95px;">${esc(scheme.assign_avg_label || 'Assign Avg')}</th>
@@ -1770,61 +1876,66 @@
           <!-- Row 3: Dedicated Numbers Row for Direct Marks & Scheme Weightage Editing -->
           <tr class="excel-hdr-numbers">
             <th class="col-roll hdr-num-label">—</th>
-            <th class="col-enroll hdr-num-label">—</th>
             <th class="col-reg hdr-num-label">—</th>
-            <th class="col-name hdr-num-label" style="text-align: right; padding-right: 0.6rem;">Max Marks ➔</th>
+            <th class="col-enroll hdr-num-label">—</th>
+            <th class="col-name hdr-num-label" style="text-align: right; padding-right: 0.6rem;">Max Marks &rarr;</th>
             ${assignments.map((a, i) => `
               <th class="col-assign">
                 <input type="number"
-                       class="excel-hdr-num-input"
+                       class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}"
                        value="${a.max_marks || 25}"
-                       min="1"
+                       min="0.5"
                        max="100"
-                       step="1"
+                       step="any"
+                       ${S.isEditMode ? '' : 'readonly'}
                        title="Assignment ${i + 1} Maximum Marks"
                        onchange="onEvalColMaxChange('assign', ${i}, this.value)">
               </th>
             `).join('')}
             <th class="col-assign-avg">
               <input type="number"
-                     class="excel-hdr-num-input"
+                     class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}"
                      value="${scheme.assign_avg_max || 15}"
                      min="1"
                      max="100"
-                     step="1"
+                     step="any"
+                     ${S.isEditMode ? '' : 'readonly'}
                      title="Assignment Average Target Weightage"
                      onchange="onEvalWeightChange('assign_avg_max', this.value)">
             </th>
             ${exams.map((e, i) => `
               <th class="col-test">
                 <input type="number"
-                       class="excel-hdr-num-input"
+                       class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}"
                        value="${e.max_marks || 25}"
-                       min="1"
+                       min="0.5"
                        max="100"
-                       step="1"
+                       step="any"
+                       ${S.isEditMode ? '' : 'readonly'}
                        title="Unit Test ${i + 1} Maximum Marks"
                        onchange="onEvalColMaxChange('exam', ${i}, this.value)">
               </th>
             `).join('')}
             <th class="col-test-avg">
               <input type="number"
-                     class="excel-hdr-num-input"
+                     class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}"
                      value="${scheme.exam_avg_max || 20}"
                      min="1"
                      max="100"
-                     step="1"
+                     step="any"
+                     ${S.isEditMode ? '' : 'readonly'}
                      title="Unit Test Average Target Weightage"
                      onchange="onEvalWeightChange('exam_avg_max', this.value)">
             </th>
             ${assessCols.map((c, idx) => `
               <th class="col-assess">
                 <input type="number"
-                       class="excel-hdr-num-input"
+                       class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}"
                        value="${c.max || 5}"
-                       min="1"
+                       min="0.5"
                        max="100"
-                       step="1"
+                       step="any"
+                       ${S.isEditMode ? '' : 'readonly'}
                        title="${esc(c.name)} Maximum Marks"
                        onchange="onEvalAssessmentColMaxChange(${idx}, this.value)">
               </th>
@@ -1854,7 +1965,7 @@
                      value="${val}"
                      min="0"
                      max="${a.max_marks || 25}"
-                     step="0.5"
+                     step="any"
                      ${S.isEditMode ? '' : 'readonly'}
                      data-sid="${s.student_id}"
                      data-type="assign"
@@ -1892,7 +2003,7 @@
                      value="${val}"
                      min="0"
                      max="${c.max || 5}"
-                     step="0.1"
+                     step="any"
                      ${S.isEditMode ? '' : 'readonly'}
                      data-sid="${s.student_id}"
                      data-type="assess"
@@ -1905,8 +2016,8 @@
         return `
           <tr id="eval-row-${s.student_id}">
             <td class="cell-roll col-roll">${esc(s.class_roll_no)}</td>
-            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${esc(s.official_enrollment_no || '—')}</td>
             <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${esc(s.registration_no || '—')}</td>
+            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${esc(s.official_enrollment_no || '—')}</td>
             <td class="cell-student-name col-name">
               <span style="font-weight: 700; text-transform: uppercase;">${esc(s.full_name)}</span>
             </td>
@@ -1945,7 +2056,7 @@
             <td colspan="${assessCount}" class="excel-summary-lbl">
               Overall Class Average:
             </td>
-            <td class="excel-summary-avg" style="font-size:0.95rem;font-weight:800;" id="eval-foot-grand">
+            <td class="excel-summary-avg col-total" style="font-size:0.95rem;font-weight:800;" id="eval-foot-grand">
               ${classAvgGrand}
             </td>
           </tr>
@@ -1962,6 +2073,7 @@
         </table>
       `;
 
+      updateStickyHeaderOffsets(document.getElementById('table-master-evaluation'));
       updateColumnFocusSelectOptions();
     }
 
@@ -2270,6 +2382,11 @@
         return;
       }
 
+      if (S.currentTestViewMode === 'ALL') {
+        await loadAllTestsCombinedData();
+        return;
+      }
+
       if (!S.currentTestId) {
         S.currentTestId = S.tests[0].id;
       }
@@ -2277,26 +2394,7 @@
       const activeTest = S.tests.find(t => String(t.id) === String(S.currentTestId)) || S.tests[0];
 
       let questions = [];
-      if (activeTest.questions) {
-        try {
-          const parsed = typeof activeTest.questions === 'string' ? JSON.parse(activeTest.questions) : activeTest.questions;
-          if (Array.isArray(parsed)) {
-            questions = parsed.map((q, i) => ({
-              num: q.num || (i + 1),
-              text: q.text || `Question ${i + 1}`,
-              max: Number(q.max || q.max_marks || 5)
-            }));
-          }
-        } catch (_) {}
-      }
-      if (!questions.length) {
-        questions = [
-          { num: 1, text: 'Explain Relational Database Design principles & ACID properties.', max: 5 },
-          { num: 2, text: 'Discuss 1NF, 2NF, 3NF and BCNF normalization with suitable examples.', max: 5 },
-          { num: 3, text: 'Write SQL queries using INNER JOIN, LEFT OUTER JOIN and GROUP BY.', max: 5 },
-          { num: 4, text: 'Explain Indexing, B-Trees and query optimization techniques in DBMS.', max: 5 }
-        ];
-      }
+      const testTotalMax = Number(activeTest.max_marks || 20);
 
       let instructions = [
         'All questions are compulsory.',
@@ -2304,11 +2402,107 @@
         'Scientific calculator is permitted. Cell phones are strictly prohibited.'
       ];
       if (activeTest.instructions) {
-        try {
-          const parsed = typeof activeTest.instructions === 'string' ? JSON.parse(activeTest.instructions) : activeTest.instructions;
-          if (Array.isArray(parsed) && parsed.length) instructions = parsed;
-        } catch (_) {}
+        if (Array.isArray(activeTest.instructions) && activeTest.instructions.length) {
+          instructions = activeTest.instructions;
+        } else if (typeof activeTest.instructions === 'string') {
+          try {
+            const parsed = JSON.parse(activeTest.instructions);
+            if (Array.isArray(parsed) && parsed.length) {
+              instructions = parsed;
+            } else if (typeof parsed === 'string') {
+              const lines = parsed.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+              if (lines.length) instructions = lines;
+            }
+          } catch (_) {
+            const lines = activeTest.instructions.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            if (lines.length) instructions = lines;
+          }
+        }
       }
+
+      if (activeTest.questions) {
+        try {
+          const parsed = typeof activeTest.questions === 'string' ? JSON.parse(activeTest.questions) : activeTest.questions;
+          if (Array.isArray(parsed) && parsed.length) {
+            const splitMax = testTotalMax ? +(testTotalMax / parsed.length).toFixed(1) : 5;
+            questions = parsed.map((q, i) => ({
+              num: q.num || (i + 1),
+              text: typeof q === 'string' ? q : (q.text || q.question || `Question ${i + 1}`),
+              max: Number(q.max || q.max_marks || q.marks || splitMax)
+            }));
+          }
+        } catch (_) {
+          const rawLines = String(activeTest.questions).split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+          if (rawLines.length) {
+            const splitMax = testTotalMax ? +(testTotalMax / rawLines.length).toFixed(1) : 5;
+            questions = rawLines.map((line, i) => ({
+              num: i + 1,
+              text: line.replace(/^(?:Q\.?\s*\d+[\.\:\-\)]*|\d+[\.\:\-\)])\s*/i, ''),
+              max: splitMax
+            }));
+          }
+        }
+      }
+
+      // Auto-extract question statements from instructions if questions not passed separately
+      if (!questions.length && instructions && instructions.length) {
+        const detectedQ = [];
+        const remainingIns = [];
+        instructions.forEach(line => {
+          if (/^(?:Q\.?\s*\d+|\d+)[\.\:\-\)]/i.test(line)) {
+            detectedQ.push(line.replace(/^(?:Q\.?\s*\d+|\d+)[\.\:\-\)]\s*/i, ''));
+          } else {
+            remainingIns.push(line);
+          }
+        });
+        if (detectedQ.length) {
+          const splitMax = testTotalMax ? +(testTotalMax / detectedQ.length).toFixed(1) : 5;
+          questions = detectedQ.map((qText, idx) => ({
+            num: idx + 1,
+            text: qText,
+            max: splitMax
+          }));
+          if (remainingIns.length) instructions = remainingIns;
+        }
+      }
+
+      if (!questions.length) {
+        const splitMax = testTotalMax ? +(testTotalMax / 4).toFixed(1) : 5;
+        questions = [
+          { num: 1, text: 'Explain Relational Database Design principles & ACID properties.', max: splitMax },
+          { num: 2, text: 'Discuss 1NF, 2NF, 3NF and BCNF normalization with suitable examples.', max: splitMax },
+          { num: 3, text: 'Write SQL queries using INNER JOIN, LEFT OUTER JOIN and GROUP BY.', max: splitMax },
+          { num: 4, text: 'Explain Indexing, B-Trees and query optimization techniques in DBMS.', max: splitMax }
+        ];
+      }
+
+      // Check for saved customized test details in localStorage
+      let savedCustom = null;
+      try {
+        const raw = localStorage.getItem(`test_sheet_custom_${S.groupId}_${activeTest.id}`);
+        if (raw) savedCustom = JSON.parse(raw);
+      } catch (e) {}
+
+      if (savedCustom) {
+        if (Array.isArray(savedCustom.instructions) && savedCustom.instructions.length) {
+          instructions = savedCustom.instructions;
+        }
+        if (Array.isArray(savedCustom.questions) && savedCustom.questions.length) {
+          questions = savedCustom.questions.map((q, i) => ({
+            num: q.num || (i + 1),
+            text: q.text || `Question ${i + 1}`,
+            max: Number(q.max || 5)
+          }));
+        }
+      }
+
+      const testDetails = {
+        mode: (savedCustom && savedCustom.details && savedCustom.details.mode) || activeTest.mode || 'OFFLINE',
+        time: (savedCustom && savedCustom.details && savedCustom.details.time) || (activeTest.duration_minutes ? `${activeTest.duration_minutes} Minutes` : '50 Minutes'),
+        date: (savedCustom && savedCustom.details && savedCustom.details.date) || (activeTest.exam_date ? activeTest.exam_date.slice(0, 10) : '15/10/2026'),
+        subNote: (savedCustom && savedCustom.details && savedCustom.details.subNote) || 'Question Max Marks Row (Auto Calculated & Live Editable)',
+        noteRed: (savedCustom && savedCustom.details && savedCustom.details.noteRed) || 'NOTE : All marked as RED were absent.'
+      };
 
       let scoresMap = {};
       try {
@@ -2357,6 +2551,7 @@
         test: activeTest,
         questions: questions,
         instructions: instructions,
+        details: testDetails,
         roster: roster
       };
 
@@ -2376,15 +2571,17 @@
       if (!container || !st) return;
 
       const test = st.test;
-      const questions = st.questions;
-      const rawRoster = st.roster;
+      const questions = st.questions || [];
+      const rawRoster = st.roster || [];
+      const testDetails = st.details || {};
+      const instructions = st.instructions || [];
       const examMaxMarks = questions.reduce((sum, q) => sum + (Number(q.max) || 0), 0);
 
-      const deptCode = escapeHtml(S.group?.department_code || 'IT');
-      const subName = escapeHtml(S.group?.subject_name || test.subject_name || 'Database Management Systems');
+      const deptCode = esc(S.group?.department_code || 'IT');
+      const subName = esc(S.group?.subject_name || test.subject_name || 'Database Management Systems');
       const yr = S.group?.year || (S.group?.semester ? Math.ceil(S.group.semester / 2) : 3);
       const sem = S.group?.semester || 5;
-      const totalCols = 5 + questions.length;
+      const totalCols = 7 + questions.length;
 
       const q = S.searchQuery;
       let roster = rawRoster.filter(r => {
@@ -2446,11 +2643,13 @@
 
             <tr class="excel-hdr-tan">
               <th rowspan="2" class="col-sr" style="width: 55px; vertical-align: middle;">SR. NO.</th>
-              <th rowspan="2" class="col-roll" style="width: 90px; vertical-align: middle;">ROLL NO.</th>
-              <th rowspan="2" class="col-name" style="width: 220px; vertical-align: middle;">STUDENT NAME</th>
+              <th rowspan="2" class="col-roll" style="width: 85px; vertical-align: middle;">ROLL NO.</th>
+              <th rowspan="2" class="col-reg" style="width: 125px; vertical-align: middle;">REG. NO.</th>
+              <th rowspan="2" class="col-enroll" style="width: 125px; vertical-align: middle;">ENROLLMENT NO.</th>
+              <th rowspan="2" class="col-name" style="width: 200px; vertical-align: middle;">STUDENT NAME</th>
               <th colspan="${questions.length}" class="col-test" title="${esc(testTitle)}">${esc(testShort)} (${esc(testTitle)})</th>
-              <th rowspan="2" style="width: 75px; vertical-align: middle;">Total</th>
-              <th class="col-side-panel" style="min-width: 420px;">Unit Test Details (Mode : OFFLINE)</th>
+              <th rowspan="2" class="col-total excel-cell-total" style="width: 75px; vertical-align: middle;">Total</th>
+              <th class="col-side-panel" style="min-width: 420px;">Unit Test Details (Mode : <span class="editable-test-field ${S.isEditMode ? 'is-editable' : ''}" contenteditable="${S.isEditMode ? 'true' : 'false'}" onblur="onTestDetailChange('mode', this.innerText)">${esc(testDetails.mode || 'OFFLINE')}</span>)</th>
             </tr>
 
             <tr class="excel-hdr-sub">
@@ -2460,7 +2659,7 @@
                 </th>
               `).join('')}
               <th class="excel-meta-bar col-side-panel" style="font-size: 0.74rem; font-weight: 700; padding: 0.35rem 0.6rem; text-align: center;">
-                Maximum Marks : <span id="test-meta-max-display">${examMaxMarks}</span> | Time : 50 Minutes | Date : ${test.exam_date ? test.exam_date.slice(0, 10) : '15/10/2026'}
+                Maximum Marks : <span id="test-meta-max-display">${examMaxMarks}</span> | Time : <span class="editable-test-field ${S.isEditMode ? 'is-editable' : ''}" contenteditable="${S.isEditMode ? 'true' : 'false'}" onblur="onTestDetailChange('time', this.innerText)">${esc(testDetails.time || '50 Minutes')}</span> | Date : <span class="editable-test-field ${S.isEditMode ? 'is-editable' : ''}" contenteditable="${S.isEditMode ? 'true' : 'false'}" onblur="onTestDetailChange('date', this.innerText)">${esc(testDetails.date || '15/10/2026')}</span>
               </th>
             </tr>
 
@@ -2468,24 +2667,27 @@
             <tr class="excel-hdr-numbers">
               <th class="col-sr hdr-num-label">—</th>
               <th class="col-roll hdr-num-label">—</th>
-              <th class="col-name hdr-num-label" style="text-align:right;padding-right:0.6rem;">Max Marks ➔</th>
+              <th class="col-reg hdr-num-label">—</th>
+              <th class="col-enroll hdr-num-label">—</th>
+              <th class="col-name hdr-num-label" style="text-align:right;padding-right:0.6rem;">Max Marks &rarr;</th>
               ${questions.map((q, qIdx) => `
                 <th class="col-test">
                   <input type="number" 
-                         class="excel-hdr-num-input" 
+                         class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}" 
                          value="${q.max}" 
-                         min="1" 
+                         min="0.5" 
                          max="100" 
-                         step="1"
+                         step="any"
+                         ${S.isEditMode ? '' : 'readonly'}
                          title="Q${q.num} Maximum Marks"
                          onchange="onTestQuestionMaxChange(${qIdx}, this.value)">
                 </th>
               `).join('')}
-              <th style="text-align:center;">
+              <th class="col-total" style="text-align:center;">
                 <span class="excel-hdr-num-badge" id="test-hdr-total-max">${examMaxMarks}</span>
               </th>
               <th class="col-side-panel" style="font-size:0.72rem;color:var(--text-muted);font-weight:700;text-align:center;padding:0.25rem 0.6rem;">
-                Question Max Marks Row (Auto Calculated &amp; Live Editable)
+                <span class="editable-test-field ${S.isEditMode ? 'is-editable' : ''}" contenteditable="${S.isEditMode ? 'true' : 'false'}" onblur="onTestDetailChange('subNote', this.innerText)">${esc(testDetails.subNote || 'Question Max Marks Row (Auto Calculated & Live Editable)')}</span>
               </th>
             </tr>
           </thead>
@@ -2497,14 +2699,16 @@
                 <tr class="${isAb ? 'is-absent' : ''}" id="test-student-row-${r.student_id}">
                   <td class="excel-cell-sr col-sr">${rIdx + 1}</td>
                   <td class="cell-roll col-roll">${esc(r.class_roll_no || rIdx + 1)}</td>
+                  <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(r.registration_no || '—')}</td>
+                  <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(r.official_enrollment_no || '—')}</td>
                   <td class="cell-student-name col-name">
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                       <div class="dyn-student-cell">
                         <span class="dyn-student-name" style="font-weight: 700;" title="${esc(r.full_name)}">${esc(r.full_name)}</span>
-                        <div class="dyn-student-enroll col-enroll" style="font-family: var(--font-family-mono); font-size: 0.72rem; color: var(--text-muted);">${esc(r.registration_no || r.official_enrollment_no || '')}</div>
                       </div>
                       <button type="button" 
                               class="btn-sheet-att-toggle ${isAb ? 'is-absent' : ''}" 
+                              ${S.isEditMode ? '' : 'disabled'}
                               onclick="toggleTestStudentAbsent(${r.student_id})" 
                               title="${isAb ? 'Marked Absent. Click to mark Present' : 'Click to mark Absent'}">
                         ${isAb ? 'AB (Absent)' : 'Present'}
@@ -2516,42 +2720,51 @@
                     return `
                       <td class="col-test">
                         <input type="number" 
-                               class="excel-cell-input sheet-cell-input" 
+                               class="excel-cell-input sheet-cell-input ${S.isEditMode ? 'is-editable' : ''}" 
                                id="test-q-${r.student_id}-${qIdx}" 
                                value="${isAb ? 0 : qVal}" 
                                min="0" 
                                max="${q.max}" 
-                               step="0.5" 
+                               step="any" 
                                ${isAb ? 'disabled' : ''} 
+                               ${S.isEditMode ? '' : 'readonly'}
                                oninput="onTestScoreChange(${r.student_id}, ${qIdx}, this.value)">
                       </td>
                     `;
                   }).join('')}
-                  <td class="excel-cell-total" style="font-weight: 800; font-size: 0.9rem;" id="test-total-${r.student_id}">
+                  <td class="excel-cell-total col-total" style="font-weight: 800; font-size: 0.9rem;" id="test-total-${r.student_id}">
                     ${isAb ? '<span style="color:var(--status-absent);font-weight:800;">0 (AB)</span>' : (r.total_marks ?? 0)}
                   </td>
 
                   ${rIdx === 0 ? `
                     <td rowspan="${roster.length || 1}" class="sheet-side-panel excel-side-panel-cell col-side-panel">
                       <div class="excel-side-content">
-                        <div class="excel-side-sec-title">Instructions :</div>
+                        <div class="excel-side-sec-title" style="display:flex;justify-content:space-between;align-items:center;">
+                          <span>Instructions :</span>
+                          ${S.isEditMode ? '<button type="button" class="btn btn-xs btn-secondary" onclick="addTestInstructionLine()" style="font-size:0.7rem;padding:0.1rem 0.4rem;cursor:pointer;">+ Add Line</button>' : ''}
+                        </div>
                         <ol class="excel-side-instructions">
-                          ${st.instructions.map((ins, iIdx) => `<li>${esc(ins)}</li>`).join('')}
+                          ${st.instructions.map((ins, iIdx) => `
+                            <li style="margin-bottom:0.25rem;">
+                              <span class="editable-test-field ${S.isEditMode ? 'is-editable' : ''}" contenteditable="${S.isEditMode ? 'true' : 'false'}" onblur="onTestInstructionChange(${iIdx}, this.innerText)">${esc(ins)}</span>
+                              ${S.isEditMode ? `<button type="button" onclick="removeTestInstructionLine(${iIdx})" style="background:none;border:none;color:var(--status-absent);cursor:pointer;font-size:0.75rem;padding:0 0.25rem;vertical-align:middle;display:inline-flex;align-items:center;" title="Remove line">${window.getSvgIcon('close', 12)}</button>` : ''}
+                            </li>
+                          `).join('')}
                         </ol>
 
                         <div class="excel-side-sec-title" style="margin-top: 0.85rem;">Questions :</div>
                         <div class="excel-side-questions">
                           ${questions.map((q, idx) => `
-                            <div style="margin-bottom: 0.35rem;">
+                            <div style="margin-bottom: 0.35rem; display: flex; align-items: baseline; gap: 0.35rem;">
                               <strong>Q${q.num}:</strong> 
-                              <span>${esc(q.text)}</span> 
-                              <strong>(${q.max} Marks)</strong>
+                              <span class="editable-test-field ${S.isEditMode ? 'is-editable' : ''}" contenteditable="${S.isEditMode ? 'true' : 'false'}" onblur="onTestQuestionTextChange(${idx}, this.innerText)" style="flex:1;">${esc(q.text)}</span> 
+                              <strong id="test-q-side-max-${idx}">(${q.max} Marks)</strong>
                             </div>
                           `).join('')}
                         </div>
 
-                        <div class="sheet-note-red">
-                          NOTE : All marked as RED were absent.
+                        <div class="sheet-note-red editable-test-field ${S.isEditMode ? 'is-editable' : ''}" contenteditable="${S.isEditMode ? 'true' : 'false'}" onblur="onTestDetailChange('noteRed', this.innerText)">
+                          ${esc(testDetails.noteRed || 'NOTE : All marked as RED were absent.')}
                         </div>
 
                         <div class="sheet-signature-block">
@@ -2578,10 +2791,10 @@
 
           <tfoot>
             <tr>
-              <td colspan="${3 + questions.length}" class="excel-summary-lbl">
+              <td colspan="${5 + questions.length}" class="excel-summary-lbl">
                 Average of the class (Only present students)
               </td>
-              <td class="excel-summary-avg" id="test-class-avg" style="font-weight: 800; text-align: center;">
+              <td class="excel-summary-avg col-total" id="test-class-avg" style="font-weight: 800; text-align: center;">
                 ${presentAvg.toFixed(1)} / ${examMaxMarks}
               </td>
               <td class="excel-summary-tally-cell col-side-panel">
@@ -2597,6 +2810,7 @@
       `;
 
       container.innerHTML = tableHtml;
+      updateStickyHeaderOffsets(document.getElementById('table-test-marksheet'));
       updateColumnFocusSelectOptions();
       if (S.viewMode === 'overview' && S.autoFit) {
         setTimeout(() => fitSheetToScreen(false), 30);
@@ -2605,12 +2819,63 @@
       }
     }
 
+    function onTestDetailChange(key, value) {
+      if (!S.currentTestState) return;
+      if (!S.currentTestState.details) S.currentTestState.details = {};
+      S.currentTestState.details[key] = (value || '').trim();
+      saveCurrentTestCustomState();
+    }
+
+    function onTestInstructionChange(idx, value) {
+      if (!S.currentTestState || !S.currentTestState.instructions) return;
+      S.currentTestState.instructions[idx] = (value || '').trim();
+      saveCurrentTestCustomState();
+    }
+
+    function addTestInstructionLine() {
+      if (!S.currentTestState) return;
+      if (!S.currentTestState.instructions) S.currentTestState.instructions = [];
+      S.currentTestState.instructions.push('New instruction line.');
+      renderTestSheetTable();
+      saveCurrentTestCustomState();
+    }
+
+    function removeTestInstructionLine(idx) {
+      if (!S.currentTestState || !S.currentTestState.instructions) return;
+      S.currentTestState.instructions.splice(idx, 1);
+      renderTestSheetTable();
+      saveCurrentTestCustomState();
+    }
+
+    function onTestQuestionTextChange(idx, value) {
+      if (!S.currentTestState || !S.currentTestState.questions) return;
+      if (S.currentTestState.questions[idx]) {
+        S.currentTestState.questions[idx].text = (value || '').trim();
+        saveCurrentTestCustomState();
+      }
+    }
+
+    function saveCurrentTestCustomState() {
+      if (!S.currentTestState || !S.currentTestState.test) return;
+      const testId = S.currentTestState.test.id;
+      const customData = {
+        details: S.currentTestState.details,
+        instructions: S.currentTestState.instructions,
+        questions: S.currentTestState.questions
+      };
+      try {
+        localStorage.setItem(`test_sheet_custom_${S.groupId}_${testId}`, JSON.stringify(customData));
+      } catch (e) {}
+      triggerAutoSaveIndicator();
+    }
+
     function onTestQuestionMaxChange(qIdx, val) {
       if (!S.currentTestState) return;
       const q = S.currentTestState.questions[qIdx];
       if (!q) return;
-      q.max = Math.max(1, parseInt(val, 10) || 5);
+      q.max = Math.max(0.5, parseFloat(val) || 5);
       renderTestSheetTable();
+      saveCurrentTestCustomState();
       showToast(`Updated Q${q.num} maximum marks to ${q.max}!`, 'info');
       triggerAutoSaveIndicator();
     }
@@ -2624,7 +2889,8 @@
       if (st.is_absent) {
         st.total_marks = 0;
       } else {
-        st.total_marks = (st.question_scores || []).reduce((sum, v) => sum + (Number(v) || 0), 0);
+        const rawTot = (st.question_scores || []).reduce((sum, v) => sum + (Number(v) || 0), 0);
+        st.total_marks = Math.round(rawTot * 10) / 10;
       }
       renderTestSheetTable();
       triggerAutoSaveIndicator();
@@ -2641,7 +2907,8 @@
       if (valNum > qMax) valNum = qMax;
 
       st.question_scores[qIdx] = valNum;
-      st.total_marks = st.question_scores.reduce((sum, v) => sum + (Number(v) || 0), 0);
+      const rawTot = st.question_scores.reduce((sum, v) => sum + (Number(v) || 0), 0);
+      st.total_marks = Math.round(rawTot * 10) / 10;
 
       const totEl = document.getElementById(`test-total-${studentId}`);
       if (totEl) totEl.textContent = st.total_marks;
@@ -2656,29 +2923,446 @@
     }
 
     /* ══════════════════════════════════════════════════════════════
-       3. COURSEWORK & ASSIGNMENTS SHEET
+       ALL UNIT TESTS COMBINED LEDGER & UT AVG ENGINE
+       ══════════════════════════════════════════════════════════════ */
+    async function loadAllTestsCombinedData() {
+      const container = document.getElementById('test-table-container');
+      if (!container) return;
+
+      container.innerHTML = `<div style="padding:3rem 1rem;text-align:center;color:var(--text-muted)">Loading All Unit Tests Combined Sheet...</div>`;
+
+      if (!S.tests || !S.tests.length) {
+        const tRes = await apiFetch(`/teaching-groups/${S.groupId}/tests`);
+        if (tRes && tRes.success && Array.isArray(tRes.data)) {
+          S.tests = tRes.data;
+        }
+      }
+
+      let allTests = S.tests.length ? S.tests : [
+        { id: 1, title: 'Unit Test 1', name: '1', max_marks: 20 },
+        { id: 2, title: 'Unit Test 2', name: '2', max_marks: 20 },
+        { id: 3, title: 'Unit Test 3', name: '3', max_marks: 20 },
+        { id: 4, title: 'Unit Test 4', name: '4', max_marks: 50 }
+      ];
+
+      let cachedAllTests = null;
+      try {
+        const raw = localStorage.getItem(`all_tests_combined_${S.groupId}`);
+        if (raw) cachedAllTests = JSON.parse(raw);
+      } catch (e) {}
+
+      if (cachedAllTests && Array.isArray(cachedAllTests.tests) && cachedAllTests.tests.length === allTests.length) {
+        allTests = cachedAllTests.tests;
+      }
+
+      const sourceStudents = (S.evalData && S.evalData.students && S.evalData.students.length)
+        ? S.evalData.students
+        : (S.members.length ? S.members : Array.from({length: 10}, (_, i) => ({
+            student_id: i + 1,
+            class_roll_no: i + 1,
+            full_name: ['AARAV SHARMA','ADITI VERMA','AKASH PATEL','ANANYA GUPTA','ARJUN RAO','BHAVYA NAIR','CHIRAG JOSHI','DEEPIKA SINGH','ROHAN KULKARNI','SNEHA PATIL'][i],
+            official_enrollment_no: `2024IT00${i+1 < 10 ? '0' + (i+1) : (i+1)}`,
+            registration_no: `2410105400${i+1 < 10 ? '0' + (i+1) : (i+1)}`
+          })));
+
+      const utWeight = (cachedAllTests && cachedAllTests.ut_weight) || (S.evalData?.scheme?.exam_avg_max) || 20;
+
+      const roster = sourceStudents.map((s, idx) => {
+        let eScores = [];
+        let eAbsent = [];
+
+        if (cachedAllTests && Array.isArray(cachedAllTests.students)) {
+          const cSt = cachedAllTests.students.find(x => x.student_id === s.student_id);
+          if (cSt && Array.isArray(cSt.scores)) {
+            eScores = [...cSt.scores];
+            eAbsent = Array.isArray(cSt.absent) ? [...cSt.absent] : cSt.scores.map(v => v === 'AB');
+          }
+        }
+
+        if (!eScores.length) {
+          if (Array.isArray(s.exam_scores) && s.exam_scores.length >= allTests.length) {
+            eScores = s.exam_scores.slice(0, allTests.length);
+            eAbsent = (s.exam_absent || []).slice(0, allTests.length);
+          } else {
+            const defaultUT1 = [18, 16, 17, 18, 19, 20, 14, 15, 16, 17];
+            eScores = allTests.map((t, tIdx) => {
+              if (tIdx === 0) return defaultUT1[idx % defaultUT1.length];
+              return 0;
+            });
+            eAbsent = allTests.map(() => false);
+          }
+        }
+
+        const totalMarks = eScores.reduce((sum, sc, i) => {
+          if (eAbsent[i]) return sum;
+          return sum + (Number(sc) || 0);
+        }, 0);
+
+        const totalMax = allTests.reduce((sum, t) => sum + (Number(t.max_marks) || 20), 0);
+        const utAvg = totalMax > 0 ? Math.round((totalMarks / totalMax) * utWeight * 10) / 10 : 0;
+
+        return {
+          student_id: s.student_id,
+          class_roll_no: s.class_roll_no || (idx + 1),
+          official_enrollment_no: s.official_enrollment_no || `2024IT00${idx+1}`,
+          registration_no: s.registration_no || `2410105400${idx+1}`,
+          full_name: s.full_name || s.name || `Student ${idx + 1}`,
+          scores: eScores,
+          absent: eAbsent,
+          total_marks: totalMarks,
+          ut_avg: utAvg
+        };
+      });
+
+      S.allTestsCombinedData = {
+        tests: allTests,
+        students: roster,
+        ut_weight: utWeight
+      };
+
+      renderAllTestsCombinedTable();
+    }
+
+    function renderAllTestsCombinedTable() {
+      const container = document.getElementById('test-table-container');
+      const data = S.allTestsCombinedData;
+      if (!container || !data) return;
+
+      const allTests = data.tests;
+      const rawRoster = data.students;
+      const utWeight = Number(data.ut_weight) || 20;
+      const totalPossibleMarks = allTests.reduce((s, t) => s + (Number(t.max_marks) || 20), 0);
+
+      const deptCode = escapeHtml(S.group?.department_code || 'IT');
+      const subName = escapeHtml(S.group?.subject_name || 'Database Management Systems');
+      const yr = S.group?.year || 3;
+      const sem = S.group?.semester || 5;
+      const totalCols = 5 + allTests.length + 2;
+
+      const q = S.searchQuery;
+      let roster = rawRoster.filter(r => {
+        if (q) {
+          const name = (r.full_name || '').toLowerCase();
+          const roll = String(r.class_roll_no || '');
+          const enrl = (r.official_enrollment_no || '').toLowerCase();
+          const regNo = (r.registration_no || '').toLowerCase();
+          if (!name.includes(q) && !roll.includes(q) && !enrl.includes(q) && !regNo.includes(q)) return false;
+        }
+        return true;
+      });
+
+      roster = sortStudentsList(roster);
+      S.visibleStudentsCount = roster.length;
+
+      const tallyEl = document.getElementById('sheet-visible-tally');
+      if (tallyEl) tallyEl.textContent = `Showing ${roster.length} of ${rawRoster.length} students`;
+
+      updateInstitutionalBanner(
+        `Uttarakhand Government Institute of Polytechnic, Nainital | ${esc(S.group?.academic_year_label ? 'Internal Evaluation Sheet ' + S.group.academic_year_label : 'Internal Evaluation Sheet 2026 Session')}`,
+        `Department (${deptCode}) | All Unit Tests Marksheet & Evaluation Summary | Subject : ${subName}`,
+        `${deptCode || 'IT'} Year ${yr} | Semester ${sem}`
+      );
+
+      let tableHtml = `
+        <table class="excel-table sheet-table" id="table-all-tests-combined">
+          <thead>
+            <tr class="excel-hdr-blue row-1">
+              <th colspan="${totalCols}">
+                <h3>Government Polytechnic College — Information Technology Dept | ${esc(S.group?.academic_year_label || 'Internal Evaluation Sheet 2026 Session')}</h3>
+              </th>
+            </tr>
+            <tr class="excel-hdr-blue row-2">
+              <th colspan="${totalCols}">
+                Department (${deptCode}) | All Unit Tests Marksheet &amp; Evaluation Summary | Subject : ${subName}
+              </th>
+            </tr>
+            <tr class="excel-hdr-blue row-3">
+              <th colspan="${totalCols}">
+                Department of ${deptCode} Year ${yr} | Semester ${sem}
+              </th>
+            </tr>
+
+            <!-- Tan Header Row -->
+            <tr class="excel-hdr-tan">
+              <th class="col-sr" style="width: 50px;">SR. NO.</th>
+              <th class="col-roll" style="width: 85px;">ROLL NO.</th>
+              <th class="col-reg" style="width: 125px;">REG. NO.</th>
+              <th class="col-enroll" style="width: 125px;">ENROLLMENT NO.</th>
+              <th class="col-name" style="min-width: 200px;">STUDENT NAME</th>
+              ${allTests.map((t, i) => `<th class="col-test" title="${esc(t.title || 'Unit Test ' + (i+1))}">${esc(getTestShortHeader(t, i))}</th>`).join('')}
+              <th class="col-total" style="width: 90px; font-weight: 800;">Total Marks</th>
+              <th class="col-test-avg" style="width: 80px; font-weight: 800;">UT Avg</th>
+            </tr>
+
+            <!-- Dedicated Numbers Row for Unit Test Max Marks and UT Avg Weightage -->
+            <tr class="excel-hdr-numbers">
+              <th class="col-sr hdr-num-label">—</th>
+              <th class="col-roll hdr-num-label">—</th>
+              <th class="col-reg hdr-num-label">—</th>
+              <th class="col-enroll hdr-num-label">—</th>
+              <th class="col-name hdr-num-label" style="text-align:right;padding-right:0.6rem;">Max Marks &rarr;</th>
+              ${allTests.map((t, i) => `
+                <th class="col-test">
+                  <input type="number" 
+                         class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}" 
+                         value="${t.max_marks || 20}" 
+                         min="0.5" 
+                         max="100" 
+                         step="any" 
+                         ${S.isEditMode ? '' : 'readonly'}
+                         title="Unit Test ${i+1} Maximum Marks"
+                         onchange="onAllTestsExamColMaxChange(${i}, this.value)">
+                </th>
+              `).join('')}
+              <th class="col-total" style="text-align:center;">
+                <span class="excel-hdr-num-badge" id="all-tests-hdr-total-max">${totalPossibleMarks}</span>
+              </th>
+              <th class="col-test-avg" style="text-align:center;">
+                <input type="number" 
+                       class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}" 
+                       value="${utWeight}" 
+                       min="1" 
+                       max="100" 
+                       step="any" 
+                       ${S.isEditMode ? '' : 'readonly'}
+                       title="UT Average Weight (Marks)"
+                       onchange="onAllTestsWeightChange(this.value)">
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${roster.map((s, rIdx) => {
+              const testCells = allTests.map((t, tIdx) => {
+                const isAb = Boolean(s.absent?.[tIdx]);
+                const val = isAb ? 'AB' : (s.scores?.[tIdx] ?? 0);
+                return `
+                  <td class="col-test">
+                    <input type="text" 
+                           class="excel-cell-input sheet-cell-input ${S.isEditMode ? 'is-editable' : ''}" 
+                           id="all-tests-cell-${s.student_id}-${tIdx}"
+                           style="${isAb ? 'color: var(--status-absent) !important; font-weight: 800 !important; background: var(--status-absent-bg) !important;' : ''}"
+                           value="${val}" 
+                           ${S.isEditMode ? '' : 'readonly'}
+                           oninput="onAllTestsScoreChange(${s.student_id}, ${tIdx}, this.value, this)"
+                           onchange="onAllTestsScoreChange(${s.student_id}, ${tIdx}, this.value, this)">
+                  </td>
+                `;
+              }).join('');
+
+              return `
+                <tr id="all-tests-row-${s.student_id}">
+                  <td class="excel-cell-sr col-sr">${rIdx + 1}</td>
+                  <td class="cell-roll col-roll">${esc(s.class_roll_no || rIdx + 1)}</td>
+                  <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(s.registration_no || '—')}</td>
+                  <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(s.official_enrollment_no || '—')}</td>
+                  <td class="cell-student-name col-name">
+                    <span style="font-weight: 700; text-transform: uppercase;">${esc(s.full_name)}</span>
+                  </td>
+                  ${testCells}
+                  <td class="excel-cell-total col-total" style="font-weight: 800; text-align: center; background: var(--bg-surface-secondary);" id="all-tests-total-${s.student_id}">
+                    ${s.total_marks}
+                  </td>
+                  <td class="excel-cell-avg col-test-avg" style="font-weight: 800; color: var(--color-primary); text-align: center; background: var(--bg-surface-secondary);" id="all-tests-avg-${s.student_id}">
+                    ${Number(s.ut_avg).toFixed(1)}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="5" class="excel-summary-lbl">Class Average</td>
+              ${allTests.map((_, tIdx) => {
+                let colSum = 0;
+                let colPresent = 0;
+                roster.forEach(r => {
+                  if (!r.absent?.[tIdx]) {
+                    colSum += Number(r.scores?.[tIdx]) || 0;
+                    colPresent++;
+                  }
+                });
+                const colAvg = colPresent > 0 ? (colSum / colPresent).toFixed(1) : '0.0';
+                return `<td class="excel-summary-avg col-test" id="all-tests-foot-${tIdx}">${colAvg}</td>`;
+              }).join('')}
+              <td class="excel-summary-avg col-total" id="all-tests-foot-total">
+                ${(roster.reduce((sum, r) => sum + (Number(r.total_marks) || 0), 0) / (roster.length || 1)).toFixed(1)}
+              </td>
+              <td class="excel-summary-avg col-test-avg" id="all-tests-foot-avg" style="color:var(--color-primary);font-weight:800;">
+                ${(roster.reduce((sum, r) => sum + (Number(r.ut_avg) || 0), 0) / (roster.length || 1)).toFixed(1)}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+
+      container.innerHTML = tableHtml;
+      updateStickyHeaderOffsets(document.getElementById('table-all-tests-combined'));
+      if (S.viewMode === 'overview' && S.autoFit) {
+        setTimeout(() => fitSheetToScreen(false), 30);
+      } else if (S.viewMode === 'dynamic') {
+        setSheetZoom(1.0);
+      }
+    }
+
+    function onAllTestsScoreChange(studentId, testIdx, val, inputEl) {
+      if (!S.allTestsCombinedData) return;
+      const st = S.allTestsCombinedData.students.find(s => s.student_id === studentId);
+      if (!st) return;
+
+      const str = String(val).trim().toUpperCase();
+      if (str === 'AB' || str === 'A') {
+        st.absent[testIdx] = true;
+        st.scores[testIdx] = 0;
+        if (inputEl) {
+          inputEl.style.color = 'var(--status-absent)';
+          inputEl.style.fontWeight = '800';
+          inputEl.style.background = 'var(--status-absent-bg)';
+          inputEl.value = 'AB';
+        }
+      } else {
+        st.absent[testIdx] = false;
+        const tMax = S.allTestsCombinedData.tests[testIdx]?.max_marks || 20;
+        const num = Math.min(tMax, Math.max(0, parseFloat(val) || 0));
+        st.scores[testIdx] = num;
+        if (inputEl) {
+          inputEl.style.color = '';
+          inputEl.style.fontWeight = '';
+          inputEl.style.background = '';
+        }
+      }
+
+      const allTests = S.allTestsCombinedData.tests;
+      const utWeight = Number(S.allTestsCombinedData.ut_weight) || 20;
+      st.total_marks = st.scores.reduce((sum, sc, i) => {
+        if (st.absent[i]) return sum;
+        return sum + (Number(sc) || 0);
+      }, 0);
+      const totalPossible = allTests.reduce((sum, t) => sum + (Number(t.max_marks) || 20), 0);
+      st.ut_avg = totalPossible > 0 ? Math.round((st.total_marks / totalPossible) * utWeight * 10) / 10 : 0;
+
+      const totEl = document.getElementById(`all-tests-total-${studentId}`);
+      if (totEl) totEl.textContent = st.total_marks;
+      const avgEl = document.getElementById(`all-tests-avg-${studentId}`);
+      if (avgEl) avgEl.textContent = st.ut_avg.toFixed(1);
+
+      if (S.evalData && S.evalData.students) {
+        const evalSt = S.evalData.students.find(s => s.student_id === studentId);
+        if (evalSt && Array.isArray(evalSt.exam_scores)) {
+          evalSt.exam_scores[testIdx] = st.scores[testIdx];
+          evalSt.exam_absent[testIdx] = st.absent[testIdx];
+          recalculateEvalRowItem(evalSt, S.evalData.scheme, S.evalData.assignments, S.evalData.exams);
+          persistEvalDataLocal();
+        }
+      }
+
+      updateAllTestsClassAverages();
+      persistAllTestsCombinedLocal();
+      triggerAutoSaveIndicator();
+    }
+
+    function onAllTestsExamColMaxChange(testIdx, val) {
+      if (!S.allTestsCombinedData) return;
+      const num = Math.max(1, parseInt(val, 10) || 20);
+      if (S.allTestsCombinedData.tests[testIdx]) {
+        S.allTestsCombinedData.tests[testIdx].max_marks = num;
+      }
+      if (S.evalData && S.evalData.exams && S.evalData.exams[testIdx]) {
+        S.evalData.exams[testIdx].max_marks = num;
+      }
+      const allTests = S.allTestsCombinedData.tests;
+      const utWeight = Number(S.allTestsCombinedData.ut_weight) || 20;
+      const totalPossible = allTests.reduce((sum, t) => sum + (Number(t.max_marks) || 20), 0);
+      S.allTestsCombinedData.students.forEach(st => {
+        st.total_marks = st.scores.reduce((sum, sc, i) => st.absent[i] ? sum : sum + (Number(sc) || 0), 0);
+        st.ut_avg = totalPossible > 0 ? Math.round((st.total_marks / totalPossible) * utWeight * 10) / 10 : 0;
+      });
+      renderAllTestsCombinedTable();
+      persistAllTestsCombinedLocal();
+      showToast(`Updated Unit Test ${testIdx + 1} max marks to ${num}`, 'info');
+    }
+
+    function onAllTestsWeightChange(val) {
+      if (!S.allTestsCombinedData) return;
+      const num = Math.max(1, parseInt(val, 10) || 20);
+      S.allTestsCombinedData.ut_weight = num;
+      if (S.evalData && S.evalData.scheme) {
+        S.evalData.scheme.exam_avg_max = num;
+        const aWeight = Number(S.evalData.scheme.assign_avg_max || 15);
+        const assessTotal = (S.evalData.assessment_columns || []).reduce((sum, c) => sum + (Number(c.max) || 0), 0);
+        S.evalData.scheme.total_max = aWeight + num + assessTotal;
+      }
+      const allTests = S.allTestsCombinedData.tests;
+      const totalPossible = allTests.reduce((sum, t) => sum + (Number(t.max_marks) || 20), 0);
+      S.allTestsCombinedData.students.forEach(st => {
+        st.ut_avg = totalPossible > 0 ? Math.round((st.total_marks / totalPossible) * num * 10) / 10 : 0;
+      });
+      renderAllTestsCombinedTable();
+      persistAllTestsCombinedLocal();
+      showToast(`Updated UT Average weightage to ${num}`, 'info');
+    }
+
+    function updateAllTestsClassAverages() {
+      if (!S.allTestsCombinedData) return;
+      const roster = S.allTestsCombinedData.students || [];
+      const count = roster.length || 1;
+      const allTests = S.allTestsCombinedData.tests || [];
+
+      allTests.forEach((_, tIdx) => {
+        let colSum = 0;
+        let colPresent = 0;
+        roster.forEach(r => {
+          if (!r.absent?.[tIdx]) {
+            colSum += Number(r.scores?.[tIdx]) || 0;
+            colPresent++;
+          }
+        });
+        const colAvg = colPresent > 0 ? (colSum / colPresent).toFixed(1) : '0.0';
+        const el = document.getElementById(`all-tests-foot-${tIdx}`);
+        if (el) el.textContent = colAvg;
+      });
+
+      const totalAvg = (roster.reduce((sum, r) => sum + (Number(r.total_marks) || 0), 0) / count).toFixed(1);
+      const utGrandAvg = (roster.reduce((sum, r) => sum + (Number(r.ut_avg) || 0), 0) / count).toFixed(1);
+      const fTot = document.getElementById('all-tests-foot-total');
+      if (fTot) fTot.textContent = totalAvg;
+      const fAvg = document.getElementById('all-tests-foot-avg');
+      if (fAvg) fAvg.textContent = utGrandAvg;
+    }
+
+    function persistAllTestsCombinedLocal() {
+      if (!S.allTestsCombinedData) return;
+      try {
+        localStorage.setItem(`all_tests_combined_${S.groupId}`, JSON.stringify(S.allTestsCombinedData));
+      } catch (e) {}
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       3. THEORY COURSEWORK & ASSIGNMENTS SHEET (THEORY ONLY)
        ══════════════════════════════════════════════════════════════ */
     async function loadAssignmentsSheetData() {
       const container = document.getElementById('assignments-table-container');
       if (!container) return;
 
-      container.innerHTML = `<div style="padding:3rem 1rem;text-align:center;color:var(--text-muted)">Loading Assignments Marksheet...</div>`;
+      container.innerHTML = `<div style="padding:3rem 1rem;text-align:center;color:var(--text-muted)">Loading Assignment Marksheet...</div>`;
 
       if (!S.assignments || !S.assignments.length) {
         const aRes = await apiFetch(`/teaching-groups/${S.groupId}/assignments`);
-        if (aRes && aRes.success) S.assignments = aRes.data || [];
+        if (aRes && aRes.success) S.assignments = Array.isArray(aRes.data) ? aRes.data : [];
       }
 
-      if (!S.assignments.length) {
-        container.innerHTML = `
-          <div style="padding:3.5rem 1rem;text-align:center;color:var(--text-muted);">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:0.75rem;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path></svg>
-            <h4 style="font-size:1.1rem;font-weight:700;color:var(--text-main);margin-bottom:0.35rem;">No Assignments Created</h4>
-            <p style="font-size:0.84rem;max-width:440px;margin:0 auto 1.25rem;">Create coursework and assignments in the classroom to collect student submissions.</p>
-            <a href="/faculty/group-detail.html?id=${S.groupId}&tab=classwork" class="btn btn-primary btn-sm">+ Create Assignment in Classroom</a>
-          </div>
-        `;
-        return;
+      // Filter strictly for theory assignments (exclude any lab experiments or practicals)
+      S.theoryAssignments = (S.assignments || []).filter(a => !isPracticalCoursework(a));
+      S.practicalAssignments = (S.assignments || []).filter(a => isPracticalCoursework(a));
+
+      if (!S.theoryAssignments.length) {
+        // Provide standard theory coursework default placeholders if none created yet
+        S.theoryAssignments = [
+          { id: 'a1', title: 'A1: SQL Queries & Relational Algebra', name: 'Assignment 1', max_marks: 20 },
+          { id: 'a2', title: 'A2: Database Normalization (1NF to BCNF)', name: 'Assignment 2', max_marks: 20 },
+          { id: 'a3', title: 'A3: Transaction Management & Concurrency', name: 'Assignment 3', max_marks: 20 }
+        ];
       }
 
       renderAssignmentsSheetTable();
@@ -2688,7 +3372,7 @@
       const container = document.getElementById('assignments-table-container');
       if (!container) return;
 
-      const assignments = S.assignments || [];
+      const assignments = S.theoryAssignments || [];
       const rawRoster = S.members.length ? S.members : Array.from({length: 10}, (_, i) => ({
         student_id: i + 1,
         class_roll_no: i + 1,
@@ -2715,31 +3399,91 @@
       const tallyEl = document.getElementById('sheet-visible-tally');
       if (tallyEl) tallyEl.textContent = `Showing ${roster.length} of ${rawRoster.length} students`;
 
-      const deptCode = escapeHtml(S.group?.department_code || 'IT');
-      const subName = escapeHtml(S.group?.subject_name || 'Database Management Systems');
+      const deptCode = esc(S.group?.department_code || 'IT');
+      const subName = esc(S.group?.subject_name || 'Database Management Systems');
       const yr = S.group?.year || 3;
       const sem = S.group?.semester || 5;
-      const totalCols = 4 + assignments.length + 2;
+      const totalCols = 5 + assignments.length + 2;
       const maxPossible = assignments.reduce((s, a) => s + (Number(a.max_marks) || 20), 0);
 
-      // Update dedicated non-scrolling institutional header banner
+      // Dedicated non-scrolling institutional header banner
       updateInstitutionalBanner(
-        `Uttarakhand Government Institute of Polytechnic, Nainital | Coursework Register 2026-27 (Odd Semester)`,
-        `Department (${deptCode}) | Continuous Internal Coursework | Subject : ${subName}`,
+        `Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026 Session`,
+        `Department (${deptCode}) | Theory Coursework & Assignments | Subject : ${subName}`,
         `${deptCode || 'IT'} Year ${yr} | Semester ${sem}`
       );
+
+      // Compute initial column totals and class averages
+      const colTotals = assignments.map(() => 0);
+      let grandTotalSum = 0;
+
+      const bodyRows = roster.map((st, idx) => {
+        let sum = 0;
+        const aTds = assignments.map((a, aIdx) => {
+          const max = Number(a.max_marks) || 20;
+          const score = Math.max(0, Math.min(max, max - ((idx + aIdx) % 3)));
+          sum += score;
+          colTotals[aIdx] += score;
+          return `
+            <td class="col-assign">
+              <input type="number" 
+                     class="sheet-cell-input ${S.isEditMode ? 'is-editable' : ''}" 
+                     value="${score}" 
+                     min="0" 
+                     max="${max}" 
+                     step="any"
+                     ${S.isEditMode ? '' : 'readonly'}
+                     data-sid="${st.student_id}"
+                     data-type="assign-standalone"
+                     data-idx="${aIdx}"
+                     oninput="onAssignmentStandaloneScoreChange(${st.student_id})">
+            </td>
+          `;
+        }).join('');
+
+        grandTotalSum += sum;
+        const pct = maxPossible > 0 ? Math.round((sum / maxPossible) * 100) : 0;
+
+        return `
+          <tr id="assign-row-${st.student_id}">
+            <td class="excel-cell-sr col-sr">${idx + 1}</td>
+            <td class="cell-roll col-roll">${esc(st.class_roll_no || idx + 1)}</td>
+            <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.registration_no || '—')}</td>
+            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.official_enrollment_no || '—')}</td>
+            <td class="cell-student-name col-name">
+              <div class="dyn-student-cell">
+                <span class="dyn-student-name" style="font-weight:700;" title="${esc(st.full_name)}">${esc(st.full_name)}</span>
+              </div>
+            </td>
+            ${aTds}
+            <td class="excel-cell-total" style="font-weight:800;" id="assign-tot-${st.student_id}">${sum}</td>
+            <td class="col-total" style="font-weight:800;color:${pct < 50 ? 'var(--status-absent)' : 'var(--status-present)'};" id="assign-pct-${st.student_id}">
+              ${pct}%
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const rCount = roster.length || 1;
+      const classAvgTotal = (grandTotalSum / rCount).toFixed(1);
+      const classAvgPct = maxPossible > 0 ? Math.round((grandTotalSum / (rCount * maxPossible)) * 100) : 0;
+
+      const footerCols = assignments.map((_, i) => {
+        const colAvg = (colTotals[i] / rCount).toFixed(1);
+        return `<td class="col-assign excel-summary-avg" id="assign-col-avg-${i}">${colAvg}</td>`;
+      }).join('');
 
       let tableHtml = `
         <table class="excel-table sheet-table" id="table-assignments-marksheet">
           <thead>
             <tr class="excel-hdr-blue row-1">
               <th colspan="${totalCols}">
-                <h3>Government Polytechnic College — Information Technology Dept | Coursework Register 2026-27 (Odd Semester)</h3>
+                <h3>Government Polytechnic College — Information Technology Dept | ${esc(S.group?.academic_year_label || 'Internal Evaluation Sheet 2026 Session')}</h3>
               </th>
             </tr>
             <tr class="excel-hdr-blue row-2">
               <th colspan="${totalCols}">
-                Department (${deptCode}) | Continuous Internal Coursework | Subject : ${subName}
+                Department (${deptCode}) | Theory Coursework &amp; Assignments | Subject : ${subName}
               </th>
             </tr>
             <tr class="excel-hdr-blue row-3">
@@ -2748,31 +3492,34 @@
               </th>
             </tr>
 
-            <!-- Row 4: Tan Header (Clean - Max Marks Moved to Numbers Row; Uses short codes A1, A2) -->
+            <!-- Row 4: Tan Header -->
             <tr class="excel-hdr-tan">
               <th class="col-sr" style="width: 50px;">SR. NO.</th>
               <th class="col-roll" style="width: 85px;">ROLL NO.</th>
-              <th class="col-enroll" style="width: 120px;">ENROLLMENT NO.</th>
+              <th class="col-reg" style="width: 125px;">REG. NO.</th>
+              <th class="col-enroll" style="width: 125px;">ENROLLMENT NO.</th>
               <th class="col-name" style="min-width: 200px;">STUDENT NAME</th>
               ${assignments.map((a, i) => `<th class="col-assign" title="${esc(a.title || a.name || 'Assignment ' + (i+1))}">${esc(getAssignShortHeader(a, i))}</th>`).join('')}
               <th style="width: 90px;">Total Marks</th>
-              <th style="width: 80px;">Average %</th>
+              <th class="col-total" style="width: 80px;">Average %</th>
             </tr>
 
-            <!-- Row 5: Dedicated Numbers Row for Assignment Max Marks -->
+            <!-- Row 5: Numbers Row for Assignment Max Marks -->
             <tr class="excel-hdr-numbers">
               <th class="col-sr hdr-num-label">—</th>
               <th class="col-roll hdr-num-label">—</th>
+              <th class="col-reg hdr-num-label">—</th>
               <th class="col-enroll hdr-num-label">—</th>
-              <th class="col-name hdr-num-label" style="text-align:right;padding-right:0.6rem;">Max Marks ➔</th>
+              <th class="col-name hdr-num-label" style="text-align:right;padding-right:0.6rem;">Max Marks &rarr;</th>
               ${assignments.map((a, i) => `
                 <th class="col-assign">
                   <input type="number" 
-                         class="excel-hdr-num-input" 
+                         class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}" 
                          value="${a.max_marks || 20}" 
-                         min="1" 
+                         min="0.5" 
                          max="100" 
-                         step="1"
+                         step="any"
+                         ${S.isEditMode ? '' : 'readonly'}
                          title="${esc(a.title || a.name)} Max Marks"
                          onchange="onAssignmentColMaxChange(${i}, this.value)">
                 </th>
@@ -2780,59 +3527,29 @@
               <th style="text-align:center;">
                 <span class="excel-hdr-num-badge" id="assign-hdr-total-max">${maxPossible}</span>
               </th>
-              <th style="font-weight:800;color:var(--text-muted);font-size:0.75rem;">100%</th>
+              <th class="col-total" style="font-weight:800;color:var(--text-muted);font-size:0.75rem;">100%</th>
             </tr>
           </thead>
 
           <tbody>
-            ${roster.map((st, idx) => {
-              let sum = 0;
-              const aTds = assignments.map((a, aIdx) => {
-                const max = a.max_marks || 20;
-                const score = Math.max(12, max - (idx % 4));
-                sum += score;
-                return `
-                  <td class="col-assign">
-                    <input type="number" 
-                           class="sheet-cell-input" 
-                           value="${score}" 
-                           min="0" 
-                           max="${max}" 
-                           step="0.5"
-                           data-sid="${st.student_id}"
-                           data-type="assign-standalone"
-                           data-idx="${aIdx}"
-                           oninput="onAssignmentStandaloneScoreChange(${st.student_id})">
-                  </td>
-                `;
-              }).join('');
-
-              const pct = maxPossible > 0 ? Math.round((sum / maxPossible) * 100) : 0;
-
-              return `
-                <tr id="assign-row-${st.student_id}">
-                  <td class="excel-cell-sr col-sr">${idx + 1}</td>
-                  <td class="cell-roll col-roll">${esc(st.class_roll_no || idx + 1)}</td>
-                  <td class="col-enroll">${esc(st.official_enrollment_no || '—')}</td>
-                  <td class="cell-student-name col-name">
-                    <div class="dyn-student-cell">
-                      <span class="dyn-student-name" style="font-weight:700;" title="${esc(st.full_name)}">${esc(st.full_name)}</span>
-                      <span class="dyn-student-enroll" title="Enrollment: ${esc(st.official_enrollment_no || '—')}">${esc(st.official_enrollment_no || '—')}</span>
-                    </div>
-                  </td>
-                  ${aTds}
-                  <td class="excel-cell-total" style="font-weight:800;" id="assign-tot-${st.student_id}">${sum}</td>
-                  <td style="font-weight:800;color:${pct < 50 ? 'var(--status-absent)' : 'var(--status-present)'};" id="assign-pct-${st.student_id}">
-                    ${pct}%
-                  </td>
-                </tr>
-              `;
-            }).join('')}
+            ${bodyRows}
           </tbody>
+
+          <tfoot>
+            <tr class="excel-summary-row">
+              <td colspan="5" class="excel-summary-lbl" style="text-align:right;padding-right:1rem;font-weight:800;">
+                Class Average:
+              </td>
+              ${footerCols}
+              <td class="excel-summary-avg" id="assign-foot-total" style="font-weight:800;">${classAvgTotal}</td>
+              <td class="excel-summary-avg" id="assign-foot-pct" style="font-weight:800;color:var(--status-present);">${classAvgPct}%</td>
+            </tr>
+          </tfoot>
         </table>
       `;
 
       container.innerHTML = tableHtml;
+      updateStickyHeaderOffsets(document.getElementById('table-assignments-marksheet'));
       updateColumnFocusSelectOptions();
       if (S.viewMode === 'overview' && S.autoFit) {
         setTimeout(() => fitSheetToScreen(false), 30);
@@ -2842,10 +3559,10 @@
     }
 
     function onAssignmentColMaxChange(idx, val) {
-      if (!S.assignments || !S.assignments[idx]) return;
-      S.assignments[idx].max_marks = Math.max(1, parseInt(val, 10) || 20);
+      if (!S.theoryAssignments || !S.theoryAssignments[idx]) return;
+      S.theoryAssignments[idx].max_marks = Math.max(0.5, parseFloat(val) || 20);
       renderAssignmentsSheetTable();
-      showToast(`Updated assignment maximum marks to ${S.assignments[idx].max_marks}!`, 'info');
+      showToast(`Updated assignment maximum marks to ${S.theoryAssignments[idx].max_marks}!`, 'info');
       triggerAutoSaveIndicator();
     }
 
@@ -2857,7 +3574,7 @@
       let sum = 0;
       inputs.forEach(inp => sum += Number(inp.value) || 0);
 
-      const maxPossible = (S.assignments || []).reduce((s, a) => s + (Number(a.max_marks) || 20), 0);
+      const maxPossible = (S.theoryAssignments || []).reduce((s, a) => s + (Number(a.max_marks) || 20), 0);
       const pct = maxPossible > 0 ? Math.round((sum / maxPossible) * 100) : 0;
 
       const totEl = document.getElementById(`assign-tot-${studentId}`);
@@ -2867,7 +3584,332 @@
         pctEl.textContent = `${pct}%`;
         pctEl.style.color = pct < 50 ? 'var(--status-absent)' : 'var(--status-present)';
       }
+
+      // Update class averages in footer
+      updateAssignmentClassAverages();
       triggerAutoSaveIndicator();
+    }
+
+    function updateAssignmentClassAverages() {
+      const assignments = S.theoryAssignments || [];
+      const rows = document.querySelectorAll('#table-assignments-marksheet tbody tr');
+      const rCount = rows.length || 1;
+      const colSums = assignments.map(() => 0);
+      let grandSum = 0;
+
+      rows.forEach(r => {
+        const inps = r.querySelectorAll('input[data-type="assign-standalone"]');
+        inps.forEach((inp, idx) => {
+          colSums[idx] += Number(inp.value) || 0;
+        });
+        const tot = Number(r.querySelector('.excel-cell-total')?.textContent) || 0;
+        grandSum += tot;
+      });
+
+      assignments.forEach((_, i) => {
+        const el = document.getElementById(`assign-col-avg-${i}`);
+        if (el) el.textContent = (colSums[i] / rCount).toFixed(1);
+      });
+
+      const maxPossible = assignments.reduce((s, a) => s + (Number(a.max_marks) || 20), 0);
+      const fTot = document.getElementById('assign-foot-total');
+      if (fTot) fTot.textContent = (grandSum / rCount).toFixed(1);
+      const fPct = document.getElementById('assign-foot-pct');
+      if (fPct) {
+        const avgPct = maxPossible > 0 ? Math.round((grandSum / (rCount * maxPossible)) * 100) : 0;
+        fPct.textContent = `${avgPct}%`;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       4. PRACTICAL & LAB WORK MARKSHEET (SEPARATE DEDICATED SHEET)
+       ══════════════════════════════════════════════════════════════ */
+    async function loadPracticalsSheetData() {
+      const container = document.getElementById('practicals-table-container');
+      if (!container) return;
+
+      container.innerHTML = `<div style="padding:3rem 1rem;text-align:center;color:var(--text-muted)">Loading Practical &amp; Lab Work Marksheet...</div>`;
+
+      if (!S.assignments || !S.assignments.length) {
+        const aRes = await apiFetch(`/teaching-groups/${S.groupId}/assignments`);
+        if (aRes && aRes.success) S.assignments = Array.isArray(aRes.data) ? aRes.data : [];
+      }
+
+      // Filter strictly for practical experiments & lab coursework
+      S.practicalAssignments = (S.assignments || []).filter(a => isPracticalCoursework(a));
+      S.theoryAssignments = (S.assignments || []).filter(a => !isPracticalCoursework(a));
+
+      if (!S.practicalAssignments.length) {
+        // Default standard laboratory practicals if none created yet
+        S.practicalAssignments = [
+          { id: 'lab1', title: 'Lab 1: ER Modeling & Schema Design', name: 'Lab 1', max_marks: 25 },
+          { id: 'lab2', title: 'Lab 2: DDL Table Creation & Integrity Constraints', name: 'Lab 2', max_marks: 25 },
+          { id: 'lab3', title: 'Lab 3: DML Queries & Aggregations', name: 'Lab 3', max_marks: 25 },
+          { id: 'lab4', title: 'Lab 4: Joins, Nested Queries & Subqueries', name: 'Lab 4', max_marks: 25 },
+          { id: 'lab5', title: 'Lab 5: PL/SQL Procedures & Triggers', name: 'Lab 5', max_marks: 25 },
+          { id: 'lab6', title: 'Lab 6: Database Normalization & Indexing', name: 'Lab 6', max_marks: 30 }
+        ];
+      }
+
+      renderPracticalsSheetTable();
+    }
+
+    function renderPracticalsSheetTable() {
+      const container = document.getElementById('practicals-table-container');
+      if (!container) return;
+
+      const practicals = S.practicalAssignments || [];
+      const rawRoster = S.members.length ? S.members : Array.from({length: 10}, (_, i) => ({
+        student_id: i + 1,
+        class_roll_no: i + 1,
+        full_name: ['Aarav Sharma','Ananya Patel','Aditya Verma','Diya Gupta','Ishaan Singh','Kavya Joshi','Neha Rawat','Rohan Negi','Siddharth Bisht','Tanvi Bhatt'][i],
+        official_enrollment_no: `2024IT00${i+1}`,
+        registration_no: `2410105400${i+1}`
+      }));
+
+      const q = S.searchQuery;
+      let roster = rawRoster.filter(r => {
+        if (q) {
+          const name = (r.full_name || '').toLowerCase();
+          const roll = String(r.class_roll_no || '');
+          const enrl = (r.official_enrollment_no || '').toLowerCase();
+          const regNo = (r.registration_no || '').toLowerCase();
+          if (!name.includes(q) && !roll.includes(q) && !enrl.includes(q) && !regNo.includes(q)) return false;
+        }
+        return true;
+      });
+
+      roster = sortStudentsList(roster);
+      S.visibleStudentsCount = roster.length;
+
+      const tallyEl = document.getElementById('sheet-visible-tally');
+      if (tallyEl) tallyEl.textContent = `Showing ${roster.length} of ${rawRoster.length} students`;
+
+      const deptCode = esc(S.group?.department_code || 'IT');
+      const subName = esc(S.group?.subject_name || 'Database Management Systems');
+      const yr = S.group?.year || 3;
+      const sem = S.group?.semester || 5;
+      const totalCols = 5 + practicals.length + 2;
+      const maxPossible = practicals.reduce((s, p) => s + (Number(p.max_marks) || 25), 0);
+
+      // Dedicated non-scrolling institutional header banner for Practicals
+      updateInstitutionalBanner(
+        `Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026 Session`,
+        `Department (${deptCode}) | Laboratory & Practical Work Evaluation | Subject : ${subName}`,
+        `${deptCode || 'IT'} Year ${yr} | Semester ${sem}`
+      );
+
+      const colTotals = practicals.map(() => 0);
+      let grandTotalSum = 0;
+
+      const bodyRows = roster.map((st, idx) => {
+        let sum = 0;
+        const pTds = practicals.map((p, pIdx) => {
+          const max = Number(p.max_marks) || 25;
+          const score = Math.max(0, Math.min(max, max - ((idx * 2 + pIdx) % 4)));
+          sum += score;
+          colTotals[pIdx] += score;
+          return `
+            <td class="col-practical">
+              <input type="number" 
+                     class="sheet-cell-input ${S.isEditMode ? 'is-editable' : ''}" 
+                     value="${score}" 
+                     min="0" 
+                     max="${max}" 
+                     step="any"
+                     ${S.isEditMode ? '' : 'readonly'}
+                     data-sid="${st.student_id}"
+                     data-type="practical-standalone"
+                     data-idx="${pIdx}"
+                     oninput="onPracticalStandaloneScoreChange(${st.student_id})">
+            </td>
+          `;
+        }).join('');
+
+        grandTotalSum += sum;
+        const pct = maxPossible > 0 ? Math.round((sum / maxPossible) * 100) : 0;
+
+        return `
+          <tr id="practical-row-${st.student_id}">
+            <td class="excel-cell-sr col-sr">${idx + 1}</td>
+            <td class="cell-roll col-roll">${esc(st.class_roll_no || idx + 1)}</td>
+            <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.registration_no || '—')}</td>
+            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.official_enrollment_no || '—')}</td>
+            <td class="cell-student-name col-name">
+              <div class="dyn-student-cell">
+                <span class="dyn-student-name" style="font-weight:700;" title="${esc(st.full_name)}">${esc(st.full_name)}</span>
+              </div>
+            </td>
+            ${pTds}
+            <td class="excel-cell-total" style="font-weight:800;" id="practical-tot-${st.student_id}">${sum}</td>
+            <td class="col-total" style="font-weight:800;color:${pct < 50 ? 'var(--status-absent)' : 'var(--status-present)'};" id="practical-pct-${st.student_id}">
+              ${pct}%
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const rCount = roster.length || 1;
+      const classAvgTotal = (grandTotalSum / rCount).toFixed(1);
+      const classAvgPct = maxPossible > 0 ? Math.round((grandTotalSum / (rCount * maxPossible)) * 100) : 0;
+
+      const footerCols = practicals.map((_, i) => {
+        const colAvg = (colTotals[i] / rCount).toFixed(1);
+        return `<td class="col-practical excel-summary-avg" id="practical-col-avg-${i}">${colAvg}</td>`;
+      }).join('');
+
+      let tableHtml = `
+        <table class="excel-table sheet-table" id="table-practicals-marksheet">
+          <thead>
+            <tr class="excel-hdr-blue row-1">
+              <th colspan="${totalCols}">
+                <h3>Government Polytechnic College — Information Technology Dept | ${esc(S.group?.academic_year_label || 'Internal Evaluation Sheet 2026 Session')}</h3>
+              </th>
+            </tr>
+            <tr class="excel-hdr-blue row-2">
+              <th colspan="${totalCols}">
+                Department (${deptCode}) | Laboratory &amp; Practical Work Evaluation | Subject : ${subName}
+              </th>
+            </tr>
+            <tr class="excel-hdr-blue row-3">
+              <th colspan="${totalCols}">
+                Department of ${deptCode} Year ${yr} | Semester ${sem}
+              </th>
+            </tr>
+
+            <!-- Row 4: Tan Header -->
+            <tr class="excel-hdr-tan">
+              <th class="col-sr" style="width: 50px;">SR. NO.</th>
+              <th class="col-roll" style="width: 85px;">ROLL NO.</th>
+              <th class="col-reg" style="width: 125px;">REG. NO.</th>
+              <th class="col-enroll" style="width: 125px;">ENROLLMENT NO.</th>
+              <th class="col-name" style="min-width: 200px;">STUDENT NAME</th>
+              ${practicals.map((p, i) => `<th class="col-practical" title="${esc(p.title || p.name || 'Lab Experiment ' + (i+1))}">${esc(getPracticalShortHeader(p, i))}</th>`).join('')}
+              <th style="width: 90px;">Total Marks</th>
+              <th class="col-total" style="width: 80px;">Average %</th>
+            </tr>
+
+            <!-- Row 5: Numbers Row for Practical Max Marks -->
+            <tr class="excel-hdr-numbers">
+              <th class="col-sr hdr-num-label">—</th>
+              <th class="col-roll hdr-num-label">—</th>
+              <th class="col-reg hdr-num-label">—</th>
+              <th class="col-enroll hdr-num-label">—</th>
+              <th class="col-name hdr-num-label" style="text-align:right;padding-right:0.6rem;">Max Marks &rarr;</th>
+              ${practicals.map((p, i) => `
+                <th class="col-practical">
+                  <input type="number" 
+                         class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}" 
+                         value="${p.max_marks || 25}" 
+                         min="0.5" 
+                         max="100" 
+                         step="any"
+                         ${S.isEditMode ? '' : 'readonly'}
+                         title="${esc(p.title || p.name)} Max Marks"
+                         onchange="onPracticalColMaxChange(${i}, this.value)">
+                </th>
+              `).join('')}
+              <th style="text-align:center;">
+                <span class="excel-hdr-num-badge" id="practical-hdr-total-max">${maxPossible}</span>
+              </th>
+              <th class="col-total" style="font-weight:800;color:var(--text-muted);font-size:0.75rem;">100%</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${bodyRows}
+          </tbody>
+
+          <tfoot>
+            <tr class="excel-summary-row">
+              <td colspan="5" class="excel-summary-lbl" style="text-align:right;padding-right:1rem;font-weight:800;">
+                Class Average:
+              </td>
+              ${footerCols}
+              <td class="excel-summary-avg" id="practical-foot-total" style="font-weight:800;">${classAvgTotal}</td>
+              <td class="excel-summary-avg" id="practical-foot-pct" style="font-weight:800;color:var(--status-present);">${classAvgPct}%</td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+
+      container.innerHTML = tableHtml;
+      updateStickyHeaderOffsets(document.getElementById('table-practicals-marksheet'));
+      updateColumnFocusSelectOptions();
+      if (S.viewMode === 'overview' && S.autoFit) {
+        setTimeout(() => fitSheetToScreen(false), 30);
+      } else if (S.viewMode === 'dynamic') {
+        setSheetZoom(1.0);
+      }
+    }
+
+    function onPracticalColMaxChange(idx, val) {
+      if (!S.practicalAssignments || !S.practicalAssignments[idx]) return;
+      S.practicalAssignments[idx].max_marks = Math.max(0.5, parseFloat(val) || 25);
+      renderPracticalsSheetTable();
+      showToast(`Updated practical maximum marks to ${S.practicalAssignments[idx].max_marks}!`, 'info');
+      triggerAutoSaveIndicator();
+    }
+
+    function onPracticalStandaloneScoreChange(studentId) {
+      const row = document.getElementById(`practical-row-${studentId}`);
+      if (!row) return;
+
+      const inputs = row.querySelectorAll('input[data-type="practical-standalone"]');
+      let sum = 0;
+      inputs.forEach(inp => sum += Number(inp.value) || 0);
+
+      const maxPossible = (S.practicalAssignments || []).reduce((s, p) => s + (Number(p.max_marks) || 25), 0);
+      const pct = maxPossible > 0 ? Math.round((sum / maxPossible) * 100) : 0;
+
+      const totEl = document.getElementById(`practical-tot-${studentId}`);
+      if (totEl) totEl.textContent = sum;
+      const pctEl = document.getElementById(`practical-pct-${studentId}`);
+      if (pctEl) {
+        pctEl.textContent = `${pct}%`;
+        pctEl.style.color = pct < 50 ? 'var(--status-absent)' : 'var(--status-present)';
+      }
+
+      updatePracticalClassAverages();
+      triggerAutoSaveIndicator();
+    }
+
+    function updatePracticalClassAverages() {
+      const practicals = S.practicalAssignments || [];
+      const rows = document.querySelectorAll('#table-practicals-marksheet tbody tr');
+      const rCount = rows.length || 1;
+      const colSums = practicals.map(() => 0);
+      let grandSum = 0;
+
+      rows.forEach(r => {
+        const inps = r.querySelectorAll('input[data-type="practical-standalone"]');
+        inps.forEach((inp, idx) => {
+          colSums[idx] += Number(inp.value) || 0;
+        });
+        const tot = Number(r.querySelector('.excel-cell-total')?.textContent) || 0;
+        grandSum += tot;
+      });
+
+      practicals.forEach((_, i) => {
+        const el = document.getElementById(`practical-col-avg-${i}`);
+        if (el) el.textContent = (colSums[i] / rCount).toFixed(1);
+      });
+
+      const maxPossible = practicals.reduce((s, p) => s + (Number(p.max_marks) || 25), 0);
+      const fTot = document.getElementById('practical-foot-total');
+      if (fTot) fTot.textContent = (grandSum / rCount).toFixed(1);
+      const fPct = document.getElementById('practical-foot-pct');
+      if (fPct) {
+        const avgPct = maxPossible > 0 ? Math.round((grandSum / (rCount * maxPossible)) * 100) : 0;
+        fPct.textContent = `${avgPct}%`;
+      }
+    }
+
+    function persistPracticalsLocal() {
+      if (!S.practicalAssignments) return;
+      try {
+        localStorage.setItem(`practicals_data_${S.groupId}`, JSON.stringify(S.practicalAssignments));
+      } catch (e) {}
     }
 
     /* ══════════════════════════════════════════════════════════════
@@ -2920,7 +3962,7 @@
       const deptCode = esc(S.group?.department_code || 'IT');
       const subName = esc(S.group?.subject_name || 'Database Management Systems');
       const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      const totalCols = 4 + daysInMonth + 3;
+      const totalCols = 5 + daysInMonth + 3;
 
       // Update dedicated non-scrolling institutional header banner
       updateInstitutionalBanner(
@@ -2951,6 +3993,7 @@
             <tr class="excel-hdr-tan">
               <th class="col-sr" style="width: 45px;">SR.</th>
               <th class="col-roll" style="width: 75px;">ROLL</th>
+              <th class="col-reg" style="width: 120px;">REG. NO.</th>
               <th class="col-enroll" style="width: 120px;">ENROLLMENT</th>
               <th class="col-name" style="min-width: 180px;">STUDENT NAME</th>
               ${Array.from({length: daysInMonth}, (_, i) => `<th style="width:26px;font-size:0.7rem;padding:0.25rem 0.1rem;">${i+1}</th>`).join('')}
@@ -2991,11 +4034,11 @@
                 <tr>
                   <td class="excel-cell-sr col-sr">${idx + 1}</td>
                   <td class="cell-roll col-roll">${esc(st.class_roll_no || idx + 1)}</td>
-                  <td class="col-enroll">${esc(st.official_enrollment_no || '—')}</td>
+                  <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.registration_no || '—')}</td>
+                  <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.official_enrollment_no || '—')}</td>
                   <td class="cell-student-name col-name">
                     <div class="dyn-student-cell">
                       <span class="dyn-student-name" style="font-weight:700;" title="${esc(st.full_name)}">${esc(st.full_name)}</span>
-                      <span class="dyn-student-enroll" title="Enrollment: ${esc(st.official_enrollment_no || '—')}">${esc(st.official_enrollment_no || '—')}</span>
                     </div>
                   </td>
                   ${dayTds}
@@ -3330,13 +4373,23 @@
       let filename = 'Institutional_Evaluation_Sheet';
       let sheetTitle = 'Master Internal Evaluation Sheet';
       if (S.activeSheet === 'tests') {
-        activeTableId = 'table-test-marksheet';
-        filename = `Unit_Test_Marksheet_${S.currentTestId || 1}`;
-        sheetTitle = 'Class Test Marksheet';
+        if (S.currentTestViewMode === 'ALL') {
+          activeTableId = 'table-all-tests-combined';
+          filename = 'All_Unit_Tests_Combined_Marksheet';
+          sheetTitle = 'All Unit Tests Marksheet & Evaluation Summary';
+        } else {
+          activeTableId = 'table-test-marksheet';
+          filename = `Unit_Test_Marksheet_${S.currentTestId || 1}`;
+          sheetTitle = 'Class Test Marksheet';
+        }
       } else if (S.activeSheet === 'assignments') {
         activeTableId = 'table-assignments-marksheet';
         filename = 'Assignment_Coursework_Marksheet';
         sheetTitle = 'Coursework & Assignment Marksheet';
+      } else if (S.activeSheet === 'practicals') {
+        activeTableId = 'table-practicals-marksheet';
+        filename = 'Practical_and_Lab_Work_Marksheet';
+        sheetTitle = 'Practical & Lab Work Marksheet';
       }
 
       const table = document.getElementById(activeTableId);
@@ -3527,14 +4580,27 @@
         if (instInd) instInd.style.display = 'inline-flex';
         if (cohortInd) cohortInd.style.display = 'inline-flex';
 
-        if (S.activeSheet === 'evaluation') {
-          document.querySelectorAll('#table-master-evaluation input.excel-cell-input').forEach(inp => {
+        // Enable all score inputs, number row inputs, and toggle buttons across all sheets
+        const vp = document.getElementById('sheets-viewport');
+        if (vp) {
+          vp.querySelectorAll('input.excel-cell-input, input.sheet-cell-input, input.excel-hdr-num-input').forEach(inp => {
             inp.readOnly = false;
             inp.classList.add('is-editable');
           });
+          vp.querySelectorAll('.btn-sheet-att-toggle').forEach(b => {
+            b.disabled = false;
+          });
+          vp.querySelectorAll('.editable-test-field').forEach(f => {
+            f.setAttribute('contenteditable', 'true');
+            f.classList.add('is-editable');
+          });
         }
 
-        showToast('Edit Mode Enabled: Header rows and score cells editable. Click Save when done.', 'info');
+        if (S.activeSheet === 'tests' && S.currentTestViewMode !== 'ALL') {
+          renderTestSheetTable();
+        }
+
+        showToast('Edit Mode Enabled: Header rows, scores, and test details editable. Click Save when done.', 'info');
       } else {
         // Save Row 1 and Row 3 changes
         if (instEl) {
@@ -3562,12 +4628,32 @@
         if (instInd) instInd.style.display = 'none';
         if (cohortInd) cohortInd.style.display = 'none';
 
-        if (S.activeSheet === 'evaluation') {
-          document.querySelectorAll('#table-master-evaluation input.excel-cell-input').forEach(inp => {
+        // Disable all score inputs and number row inputs across all sheets
+        const vp = document.getElementById('sheets-viewport');
+        if (vp) {
+          vp.querySelectorAll('input.excel-cell-input, input.sheet-cell-input, input.excel-hdr-num-input').forEach(inp => {
             inp.readOnly = true;
             inp.classList.remove('is-editable');
           });
+          vp.querySelectorAll('.btn-sheet-att-toggle').forEach(b => {
+            b.disabled = true;
+          });
+          vp.querySelectorAll('.editable-test-field').forEach(f => {
+            f.setAttribute('contenteditable', 'false');
+            f.classList.remove('is-editable');
+          });
+        }
+
+        if (S.activeSheet === 'evaluation') {
           persistEvalDataLocal();
+        } else if (S.activeSheet === 'tests') {
+          if (S.currentTestViewMode === 'ALL') {
+            persistAllTestsCombinedLocal();
+          } else {
+            saveCurrentTestCustomState();
+          }
+        } else if (S.activeSheet === 'practicals') {
+          persistPracticalsLocal();
         }
 
         saveActiveSheetChanges();
@@ -3582,7 +4668,12 @@
             </svg>
           `;
         }
-        showToast('Saved header and sheet changes successfully!', 'success');
+
+        if (S.activeSheet === 'tests' && S.currentTestViewMode !== 'ALL') {
+          renderTestSheetTable();
+        }
+
+        showToast('Saved header, scores, and test details successfully!', 'success');
       }
     }
 
@@ -3600,7 +4691,7 @@
           const shortCode = getTestShortHeader(t, idx);
           const tName = t.title || t.name || 'Unit Test';
           return `
-            <option value="${t.id}" ${String(t.id) === String(S.currentTestId) ? 'selected' : ''}>
+            <option value="${t.id}" ${S.currentTestViewMode !== 'ALL' && String(t.id) === String(S.currentTestId) ? 'selected' : ''}>
               ${esc(shortCode)}: ${esc(tName)} (${t.max_marks || 20}M)
             </option>
           `;
@@ -3613,7 +4704,7 @@
           </select>
         `;
       } else if (S.activeSheet === 'assignments') {
-        const assignments = S.assignments || [];
+        const assignments = S.theoryAssignments || [];
         const aOptions = assignments.map((a, idx) => {
           const shortCode = getAssignShortHeader(a, idx);
           const aName = a.title || a.name || 'Assignment';
@@ -3630,6 +4721,24 @@
             ${aOptions}
           </select>
         `;
+      } else if (S.activeSheet === 'practicals') {
+        const practicals = S.practicalAssignments || [];
+        const pOptions = practicals.map((p, idx) => {
+          const shortCode = getPracticalShortHeader(p, idx);
+          const pName = p.title || p.name || 'Lab Experiment';
+          return `
+            <option value="${p.id}">
+              ${esc(shortCode)}: ${esc(pName)} (${p.max_marks || 25}M)
+            </option>
+          `;
+        }).join('');
+
+        container.innerHTML = `
+          <select class="subsheet-select-dropdown" id="subsheet-practical-select" onchange="switchPracticalSubsheet(this.value)" title="Practical &amp; Lab Work View">
+            <option value="ALL">All Lab Practicals Combined</option>
+            ${pOptions}
+          </select>
+        `;
       } else {
         const totalMax = (S.evalData && S.evalData.scheme && S.evalData.scheme.total_max) || 40;
         container.innerHTML = `
@@ -3641,11 +4750,21 @@
       }
     }
 
+    function switchPracticalSubsheet(val) {
+      if (val === 'ALL') {
+        switchSheetTab('practicals');
+      } else {
+        switchSheetTab('practicals');
+        showToast(`Viewing Lab Experiment ${val}`, 'info');
+      }
+    }
+
     function switchTestSubsheet(val) {
       if (val === 'ALL') {
         S.currentTestViewMode = 'ALL';
-        switchSheetTab('evaluation');
-        showToast('Viewing All Unit Tests Combined inside Master Evaluation sheet', 'info');
+        switchSheetTab('tests');
+        loadTestSheetData();
+        showToast('Viewing All Unit Tests Combined Ledger with Total and UT Avg', 'info');
       } else {
         S.currentTestViewMode = 'SINGLE';
         S.currentTestId = Number(val);
@@ -4098,4 +5217,17 @@
         window.location.href = '/login';
       }
     }
+
+    window.toggleAndroidProfileDrawer = toggleAndroidProfileDrawer;
+    window.handleLogout = handleLogout;
+    window.initSheetsStudio = initSheetsStudio;
+    window.onSwitchGroup = onSwitchGroup;
+    window.switchClassGroup = onSwitchGroup;
+    window.switchSheetTab = switchSheetTab;
+    window.switchSheetDropdown = switchSheetDropdown;
+    window.loadTeacherGroupsList = loadTeacherGroupsList;
+    window.loadGroupMetadata = loadGroupMetadata;
+    window.renderGroupSwitcherOptions = renderGroupSwitcherOptions;
+    window.renderEvaluationSheetTable = renderEvaluationSheetTable;
+    window.loadEvaluationSheetData = loadEvaluationSheetData;
 

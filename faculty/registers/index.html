@@ -23,14 +23,12 @@
       <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
-      <a href="/faculty/dashboard.html" class="gc-brand-link">
+      <a href="/faculty/dashboard.html" class="gc-brand-link" title="VidyaOS Academic Workspace">
         <div class="gc-brand-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
         </div>
-        <div class="gc-brand-title">Classroom</div>
-        <span class="gc-brand-sub">VidyaOS</span>
+        <div class="gc-brand-title">VidyaOS</div>
       </a>
-      <span class="gc-page-badge" id="dept-header-name">Attendance Registers</span>
     </div>
     <div class="gc-nav-right">
       <a href="/faculty/dashboard.html" class="gc-create-btn">
@@ -261,6 +259,14 @@
             <button type="button" class="btn btn-secondary btn-sm" onclick="openInternalEvaluationStudio()" title="Master Internal Evaluation Spreadsheet (UT + Assignments + Attendance + Presentation)" style="display:inline-flex;align-items:center;gap:0.35rem;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
               <span>Internal Evaluation Sheet</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm btn-export-register" onclick="openAttendanceExportModal()" title="Export Attendance Register (Excel, PDF, Word)" style="display:inline-flex;align-items:center;gap:0.35rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Export</span>
             </button>
             <button type="button" class="btn btn-secondary btn-sm print-action-btn" onclick="window.print()" title="Print physical inspection format" style="display:inline-flex;align-items:center;gap:0.35rem;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
@@ -1159,6 +1165,149 @@
 
     </div>
   </div>
+  <!-- ══════════════════════════════════════════════════════════════
+       ATTENDANCE EXPORT STUDIO MODAL (Modern & Ultra-Compact)
+       ══════════════════════════════════════════════════════════════ -->
+  <div id="modal-export-attendance" class="modal-backdrop" onclick="if(event.target===this)closeAttendanceExportModal()">
+    <div class="modal-card export-modal-card">
+      <!-- Modal Header -->
+      <div class="export-modal-header">
+        <div class="export-modal-header-left">
+          <svg class="export-modal-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <h2 class="export-modal-title">Export Attendance</h2>
+        </div>
+        <button type="button" class="export-modal-close" onclick="closeAttendanceExportModal()" title="Close">&times;</button>
+      </div>
+
+      <!-- Modal Body (Ultra-compact, all options visible without scroll) -->
+      <div class="export-modal-body">
+        <!-- 1. Document Format -->
+        <div class="export-section">
+          <div class="export-section-label">Format</div>
+          <div class="export-format-grid">
+            <label class="export-format-card active" id="card-format-xlsx" onclick="selectExportFormat('xlsx')">
+              <input type="radio" name="export-format" value="xlsx" checked>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="format-icon-xlsx">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="8" y1="13" x2="16" y2="13"></line>
+                <line x1="8" y1="17" x2="16" y2="17"></line>
+              </svg>
+              <span>Excel <small>.xlsx</small></span>
+            </label>
+
+            <label class="export-format-card" id="card-format-pdf" onclick="selectExportFormat('pdf')">
+              <input type="radio" name="export-format" value="pdf">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="format-icon-pdf">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>PDF <small>.pdf</small></span>
+            </label>
+
+            <label class="export-format-card" id="card-format-doc" onclick="selectExportFormat('doc')">
+              <input type="radio" name="export-format" value="doc">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="format-icon-doc">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span>Word <small>.doc</small></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 2. Time Scope & Period -->
+        <div class="export-section">
+          <div class="export-section-label">Time Scope</div>
+          <!-- Scope Selection Pills (5 Mutually Exclusive Modes) -->
+          <div class="export-scope-matrix">
+            <div class="export-scope-row-top">
+              <label class="export-range-pill active" id="label-range-all" onclick="handleExportRangeChange('all_months')">
+                <input type="radio" name="export-range" value="all_months" id="range-opt-all" checked>
+                <span>Full Semester</span>
+              </label>
+
+              <label class="export-range-pill" id="label-range-overview" onclick="handleExportRangeChange('overview_only')">
+                <input type="radio" name="export-range" value="overview_only" id="range-opt-overview">
+                <span>Summary (% Only)</span>
+              </label>
+            </div>
+
+            <div class="export-scope-row-sub">
+              <label class="export-range-pill" id="label-range-month" onclick="handleExportRangeChange('month')">
+                <input type="radio" name="export-range" value="month" id="range-opt-month">
+                <span>Specific Month</span>
+              </label>
+
+              <label class="export-range-pill" id="label-range-day" onclick="handleExportRangeChange('day')">
+                <input type="radio" name="export-range" value="day" id="range-opt-day">
+                <span>Specific Day</span>
+              </label>
+
+              <label class="export-range-pill" id="label-range-week" onclick="handleExportRangeChange('week')">
+                <input type="radio" name="export-range" value="week" id="range-opt-week">
+                <span>This Week</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Contextual Inputs (Only visible and accessible when Specific Month or Specific Day is chosen) -->
+          <div id="export-context-month-row" class="export-context-input-row" style="display: none;">
+            <span class="context-label">Select Month:</span>
+            <select id="export-month-select" class="export-inline-select">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <div id="export-context-day-row" class="export-context-input-row" style="display: none;">
+            <span class="context-label">Select Date:</span>
+            <input type="date" id="export-day-input" class="export-inline-date">
+          </div>
+
+          <!-- Live Scope Explainer -->
+          <div id="export-range-hint" class="export-range-hint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span id="export-range-hint-text"><b>Full Semester:</b> Complete Day 1–31 daily matrix for all months + final summary.</span>
+          </div>
+        </div>
+
+        <!-- 3. Component Scope -->
+        <div class="export-section">
+          <div class="export-section-label">Component</div>
+          <div class="export-scope-segmented">
+            <button type="button" class="export-scope-btn active" id="btn-scope-both" onclick="selectExportScope('BOTH')">Theory + Lab</button>
+            <button type="button" class="export-scope-btn" id="btn-scope-theory" onclick="selectExportScope('THEORY')">Theory Only</button>
+            <button type="button" class="export-scope-btn" id="btn-scope-practical" onclick="selectExportScope('PRACTICAL')">Lab Only</button>
+          </div>
+          <input type="hidden" id="export-scope-val" value="BOTH">
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="export-modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAttendanceExportModal()">Cancel</button>
+        <button type="button" id="btn-execute-export" class="btn btn-primary btn-sm btn-download-export" onclick="executeAttendanceExport()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span id="lbl-export-btn">Download Report</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="/faculty/registers/registers.js?v=20261003"></script>
 </body>
 </html>

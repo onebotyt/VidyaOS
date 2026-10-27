@@ -230,7 +230,7 @@ async function loadEnrolledClasses() {
     if (grid) {
       grid.innerHTML = `
         <div class="gc-empty-card">
-          <div class="gc-empty-icon" style="color:var(--status-absent);">✕</div>
+          <div class="gc-empty-icon" style="color:var(--status-absent);">${window.getSvgIcon('alert', 48)}</div>
           <h3 class="gc-empty-title">Error Loading Classes</h3>
           <p class="gc-empty-text">${escapeHtml(err.message || 'Unable to connect to server')}</p>
         </div>
@@ -783,7 +783,7 @@ async function openStudentStreamModal(groupId, groupName, teacherName) {
         if (container) {
           container.innerHTML = `
             <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
-              <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">📢</div>
+              <div style="margin-bottom: 0.5rem; color: var(--text-muted);">${window.getSvgIcon('megaphone', 36)}</div>
               <h4 style="margin: 0 0 0.25rem 0; color: var(--text-main); font-weight: 700;">No Announcements Yet</h4>
               <p style="margin: 0; font-size: 0.85rem;">Your professor has not posted announcements for this class yet.</p>
             </div>
@@ -804,7 +804,7 @@ async function openStudentStreamModal(groupId, groupName, teacherName) {
               ${post.attachment_path ? `
                 <div style="margin-top: 0.65rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color);">
                   <a href="${post.attachment_path}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem;">
-                    <span>📎</span> <span>${escapeHtml(post.attachment_name || 'Attachment')}</span>
+                    <span>${window.getSvgIcon('paperclip', 14)}</span> <span>${escapeHtml(post.attachment_name || 'Attachment')}</span>
                   </a>
                 </div>
               ` : ''}

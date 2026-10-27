@@ -48,12 +48,11 @@
       <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <a href="/faculty/dashboard.html" class="gc-brand-link" title="Classroom Dashboard">
+      <a href="/faculty/dashboard.html" class="gc-brand-link" title="VidyaOS Academic Workspace">
         <div class="gc-brand-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
         </div>
-        <div class="gc-brand-title">Classroom</div>
-        <span class="gc-brand-sub">VidyaOS</span>
+        <div class="gc-brand-title">VidyaOS</div>
       </a>
       <div class="gc-desktop-divider" aria-hidden="true"></div>
       <div class="gc-desktop-class-info" id="gc-desktop-class-info">
@@ -1004,27 +1003,39 @@
         <!-- Horizontal Stats Strip (Image 4 - PC) -->
         <div class="marks-stats-strip">
           <div class="marks-stat-item">
-            <div class="marks-stat-val" id="kpi-tests">0</div>
+            <div class="marks-stat-top">
+              <div class="marks-stat-icon-badge">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="m9 14 2 2 4-4"/></svg>
+              </div>
+              <div class="marks-stat-val" id="kpi-tests">0</div>
+            </div>
             <div class="marks-stat-lbl">Scheduled Exams</div>
           </div>
           <div class="marks-stat-item">
-            <div class="marks-stat-val" id="kpi-assignments">0</div>
-            <div class="marks-stat-lbl">Published Assignments</div>
+            <div class="marks-stat-top">
+              <div class="marks-stat-icon-badge">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </div>
+              <div class="marks-stat-val" id="kpi-assignments">0</div>
+            </div>
+            <div class="marks-stat-lbl">Assignments</div>
           </div>
           <div class="marks-stat-item">
-            <div class="marks-stat-val" id="kpi-students">0</div>
-            <div class="marks-stat-lbl">Enrolled Students</div>
+            <div class="marks-stat-top">
+              <div class="marks-stat-icon-badge">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/></svg>
+              </div>
+              <div class="marks-stat-val" id="kpi-practicals">0</div>
+            </div>
+            <div class="marks-stat-lbl">Lab Practicals</div>
           </div>
           <div class="marks-stat-item">
-            <div class="marks-stat-val" id="kpi-avg-score">&#8212;</div>
-            <div class="marks-stat-lbl">Avg. Score</div>
-          </div>
-          <div class="marks-stat-item">
-            <div class="marks-stat-val" id="kpi-assign-avg-score">&#8212;</div>
-            <div class="marks-stat-lbl">Assignments Avg.</div>
-          </div>
-          <div class="marks-stat-item">
-            <div class="marks-stat-val" id="kpi-pending">&#8212;</div>
+            <div class="marks-stat-top">
+              <div class="marks-stat-icon-badge marks-stat-icon-pending">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="marks-stat-val" id="kpi-pending">0</div>
+            </div>
             <div class="marks-stat-lbl">Pending Grading</div>
           </div>
         </div>
@@ -1032,23 +1043,27 @@
         <!-- Mobile Horizontal Mini Stats Ticker (Image 5 - Mobile) -->
         <div class="marks-mobile-stats-row">
           <div class="mobile-stat-col">
-            <div class="mobile-stat-num" id="mob-kpi-tests">0</div>
+            <div class="mobile-stat-num-wrap">
+              <svg class="mobile-stat-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="m9 14 2 2 4-4"/></svg>
+              <span class="mobile-stat-num" id="mob-kpi-tests">0</span>
+            </div>
             <div class="mobile-stat-sub">Tests</div>
           </div>
           <span class="mobile-stat-dot">&bull;</span>
           <div class="mobile-stat-col">
-            <div class="mobile-stat-num" id="mob-kpi-assignments">0</div>
-            <div class="mobile-stat-sub">Items</div>
+            <div class="mobile-stat-num-wrap">
+              <svg class="mobile-stat-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span class="mobile-stat-num" id="mob-kpi-assignments">0</span>
+            </div>
+            <div class="mobile-stat-sub">Assignments</div>
           </div>
           <span class="mobile-stat-dot">&bull;</span>
           <div class="mobile-stat-col">
-            <div class="mobile-stat-num" id="mob-kpi-students">0</div>
-            <div class="mobile-stat-sub">Enrolled</div>
-          </div>
-          <span class="mobile-stat-dot">&bull;</span>
-          <div class="mobile-stat-col">
-            <div class="mobile-stat-num" id="mob-kpi-avg">&#8212;</div>
-            <div class="mobile-stat-sub">Avg</div>
+            <div class="mobile-stat-num-wrap">
+              <svg class="mobile-stat-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/></svg>
+              <span class="mobile-stat-num" id="mob-kpi-practicals">0</span>
+            </div>
+            <div class="mobile-stat-sub">Practicals</div>
           </div>
         </div>
 
@@ -1056,49 +1071,79 @@
         <div class="marks-hdr-bar">
           <div>
             <div class="marks-hdr-title">Academic Marksheets &amp; Evaluation</div>
-            <div class="marks-hdr-sub">Grade and record marks for unit tests, class exams, and coursework assignments.</div>
+            <div class="marks-hdr-sub">Grade and record marks for unit tests, class exams, assignments, and practicals.</div>
           </div>
           <div class="marks-hdr-actions">
             <button class="btn btn-secondary" onclick="openSheetStudio()" style="display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem" title="Open full-page multi-sheet studio">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
               <span>Unified Sheets Studio</span>
             </button>
-            <button class="btn btn-secondary" onclick="openCreateAssignmentModal()" style="display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-              <span>+ New Assignment</span>
-            </button>
-            <button class="btn btn-primary btn-dark-action" onclick="openScheduleTestModal()" style="display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              <span>Schedule Test</span>
-            </button>
+            <div class="dropdown marks-create-dropdown" style="position:relative;">
+              <button type="button" class="btn btn-primary" id="btn-marks-create-main" onclick="toggleMarksCreateDropdown(event)" style="display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem;background:var(--color-primary);color:var(--text-white);">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>+ Create</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="dropdown-menu marks-create-dropdown-menu" id="marks-create-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);min-width:180px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);box-shadow:var(--shadow-md);z-index:100;padding:0.35rem 0;">
+                <button type="button" class="dropdown-item" onclick="openScheduleTestModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="m9 14 2 2 4-4"/></svg>
+                  <span>Class Test</span>
+                </button>
+                <button type="button" class="dropdown-item" onclick="openCreateAssignmentModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                  <span>Assignment</span>
+                </button>
+                <button type="button" class="dropdown-item" onclick="openCreatePracticalModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/></svg>
+                  <span>Lab Practical</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Filter Sub-Nav and Search Toolbar (Image 4) -->
+        <!-- Filter Sub-Nav and Search Toolbar (Image 4 & 5 Redesign) -->
         <div class="marks-filter-search-bar">
-          <div class="expand-filter-btns" style="margin:0;">
-            <button type="button" class="expand-filter-btn active" id="btn-marks-cat-all" onclick="filterMarksCategory('all')">
-              <span>All Work</span>
-              <span class="badge-count" id="badge-marks-all-count">0</span>
+          <div class="expand-filter-btns marks-compact-filter-grid" id="marks-filter-nav">
+            <button type="button" class="expand-filter-btn marks-filter-icon-btn active" id="btn-marks-cat-all" onclick="filterMarksCategory('all')">
+              <svg class="filter-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              <div class="filter-btn-text">
+                <span class="filter-btn-lbl">All</span>
+                <span class="badge-count" id="badge-marks-all-count">0</span>
+              </div>
             </button>
-            <button type="button" class="expand-filter-btn" id="btn-marks-cat-tests" onclick="filterMarksCategory('tests')">
-              <span>Class Tests</span>
-              <span class="badge-count" id="badge-marks-tests-count">0</span>
+            <button type="button" class="expand-filter-btn marks-filter-icon-btn" id="btn-marks-cat-tests" onclick="filterMarksCategory('tests')">
+              <svg class="filter-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="m9 14 2 2 4-4"/></svg>
+              <div class="filter-btn-text">
+                <span class="filter-btn-lbl">Tests</span>
+                <span class="badge-count" id="badge-marks-tests-count">0</span>
+              </div>
             </button>
-            <button type="button" class="expand-filter-btn" id="btn-marks-cat-assignments" onclick="filterMarksCategory('assignments')">
-              <span>Assignments</span>
-              <span class="badge-count" id="badge-marks-assign-count">0</span>
+            <button type="button" class="expand-filter-btn marks-filter-icon-btn" id="btn-marks-cat-assignments" onclick="filterMarksCategory('assignments')">
+              <svg class="filter-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <div class="filter-btn-text">
+                <span class="filter-btn-lbl">Assignments</span>
+                <span class="badge-count" id="badge-marks-assign-count">0</span>
+              </div>
+            </button>
+            <button type="button" class="expand-filter-btn marks-filter-icon-btn" id="btn-marks-cat-practicals" onclick="filterMarksCategory('practicals')">
+              <svg class="filter-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/></svg>
+              <div class="filter-btn-text">
+                <span class="filter-btn-lbl">Practicals</span>
+                <span class="badge-count" id="badge-marks-practicals-count">0</span>
+              </div>
             </button>
           </div>
           <div class="marks-search-wrapper">
-            <input type="text" id="marks-search-input" placeholder="Search tests or assignments&#8230;" oninput="filterAllMarks(this.value)">
+            <input type="text" id="marks-search-input" placeholder="Search tests, assignments, practicals&#8230;" oninput="filterAllMarks(this.value)">
           </div>
         </div>
 
-        <!-- Section 1: Class Tests (Image 4 on PC, Image 5 on Mobile) -->
-        <div class="marks-table-wrap" id="marks-tests-section">
-          <div class="marks-section-hdr">
+        <!-- Section 1: Class Tests (Collapsible) -->
+        <div class="marks-table-wrap collapsed" id="marks-tests-section">
+          <div class="marks-section-hdr collapsible-hdr" onclick="toggleMarksSection('tests')">
             <div class="marks-section-title-wrap">
+              <svg class="marks-sec-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               <span class="marks-sec-title">Class Test Schedule &amp; Results <span class="marks-sec-count-paren" id="badge-tests-count-paren">(0)</span></span>
               <span class="marks-sec-mobile-count" id="badge-tests-mobile-count">0 Tests</span>
             </div>
@@ -1133,11 +1178,12 @@
           </div>
         </div>
 
-        <!-- Section 2: Assignments & Coursework -->
-        <div class="marks-table-wrap" id="marks-assignments-section">
-          <div class="marks-section-hdr">
+        <!-- Section 2: Assignments (Collapsible) -->
+        <div class="marks-table-wrap collapsed" id="marks-assignments-section">
+          <div class="marks-section-hdr collapsible-hdr" onclick="toggleMarksSection('assignments')">
             <div class="marks-section-title-wrap">
-              <span class="marks-sec-title">Coursework &amp; Assignment Marksheets <span class="marks-sec-count-paren" id="badge-assign-count-paren">(0)</span></span>
+              <svg class="marks-sec-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span class="marks-sec-title" id="marks-assign-sec-title">Assignments <span class="marks-sec-count-paren" id="badge-assign-count-paren">(0)</span></span>
               <span class="marks-sec-mobile-count" id="badge-assign-mobile-count">0 Assignments</span>
             </div>
             <div class="marks-sec-right">
@@ -1157,18 +1203,56 @@
                   <th>DUE DATE</th>
                   <th>MAX MARKS</th>
                   <th>SUBMISSIONS</th>
-                  <th>GRADED</th>
                   <th style="text-align:right">ACTIONS</th>
                 </tr>
               </thead>
               <tbody id="marks-assignments-tbody">
-                <tr><td colspan="8" style="text-align:center;padding:2rem"><div class="shimmer" style="height:20px;width:300px;margin:0 auto"></div></td></tr>
+                <tr><td colspan="7" style="text-align:center;padding:2rem"><div class="shimmer" style="height:20px;width:300px;margin:0 auto"></div></td></tr>
               </tbody>
             </table>
           </div>
 
           <!-- Mobile Cards List (Image 5) -->
           <div class="marks-mobile-list" id="marks-assignments-mobile-list">
+            <div class="shimmer" style="height:70px;margin:0.5rem"></div>
+          </div>
+        </div>
+
+        <!-- Section 3: Lab Practicals (Collapsible) -->
+        <div class="marks-table-wrap collapsed" id="marks-practicals-section">
+          <div class="marks-section-hdr collapsible-hdr" onclick="toggleMarksSection('practicals')">
+            <div class="marks-section-title-wrap">
+              <svg class="marks-sec-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <span class="marks-sec-title" id="marks-practicals-sec-title">Lab Practicals <span class="marks-sec-count-paren" id="badge-practicals-count-paren">(0)</span></span>
+              <span class="marks-sec-mobile-count" id="badge-practicals-mobile-count">0 Practicals</span>
+            </div>
+            <div class="marks-sec-right">
+              <span class="marks-sec-help">Click &ldquo;Enter Marks&rdquo; to grade lab experiments, code journals, and practicals.</span>
+            </div>
+          </div>
+
+          <!-- Desktop Table (Image 4) -->
+          <div class="marks-desktop-table-container">
+            <table class="marks-table" id="marks-practicals-table">
+              <thead>
+                <tr>
+                  <th style="width:40px;text-align:center">#</th>
+                  <th>PRACTICAL TITLE</th>
+                  <th>TYPE</th>
+                  <th>DUE DATE</th>
+                  <th>MAX MARKS</th>
+                  <th>SUBMISSIONS</th>
+                  <th style="text-align:right">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="marks-practicals-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:2rem"><div class="shimmer" style="height:20px;width:300px;margin:0 auto"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Cards List (Image 5) -->
+          <div class="marks-mobile-list" id="marks-practicals-mobile-list">
             <div class="shimmer" style="height:70px;margin:0.5rem"></div>
           </div>
         </div>
@@ -1182,23 +1266,23 @@
       <div class="classroom-register-layout">
         <!-- Scoped Header Card (Zero subject switching - dedicated to this class) -->
         <div class="card classroom-reg-header-card" style="padding: 0.85rem 1.25rem; margin-bottom: 0.85rem; border: 1px solid var(--border-color); background: var(--bg-card);">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.65rem;">
-            <div>
-              <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+          <div class="classroom-reg-top-bar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; width: 100%;">
+            <div class="reg-title-wrap">
+              <div class="reg-badge-row" style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
                 <span class="reg-type-pill" style="font-size: 0.72rem; font-weight: 800; background: var(--color-primary-light); color: var(--color-primary); padding: 0.15rem 0.55rem; border-radius: var(--radius-pill);">ATTENDANCE MATRIX</span>
                 <span class="badge badge-present" id="class-reg-badge-official" style="font-size: 0.7rem;">Official Register</span>
                 <span class="badge badge-late" id="class-reg-badge-component" style="font-size: 0.7rem;">THEORY</span>
               </div>
-              <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-top: 0.25rem;" id="class-reg-title">
+              <div class="reg-title-text" style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-top: 0.15rem;" id="class-reg-title">
                 Attendance Matrix Ledger
               </div>
-              <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.1rem;" id="class-reg-subtitle">
+              <div class="reg-subtitle-text" style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.1rem;" id="class-reg-subtitle">
                 Subject attendance ledger and continuous evaluation
               </div>
             </div>
 
             <!-- Month Navigator & View Mode Controls -->
-            <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+            <div class="reg-month-nav-wrap" style="display: flex; align-items: center; gap: 0.45rem;">
               <!-- Mobile Compact vs Full Toggle (Disabled: Mobile is pure compact UI/UX) -->
               <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-mobile-mode" onclick="toggleMobileRegisterMode()" style="display:none !important;" title="Switch between Compact Daily view and Full 31-Day Ledger">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
@@ -1211,7 +1295,9 @@
                 </button>
                 <div style="position: relative; display: inline-flex; align-items: center;">
                   <button type="button" class="month-nav-display" id="btn-class-reg-month-picker" onclick="openClassRegMonthPicker()" title="Choose month" style="background: var(--bg-surface); color: var(--text-main); display:inline-flex; align-items:center; gap:0.35rem; font-weight:700; font-size:0.8rem; padding:0.22rem 0.6rem; border:none; border-radius:var(--radius-sm); cursor:pointer;">
-                    <span id="class-reg-current-month-display">October 2026</span>
+                    <span id="class-reg-current-month-display">
+                      <span class="month-full-name">October</span><span class="month-short-name" style="display:none;">Oct</span> <span class="month-year-num">2026</span>
+                    </span>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.7;"><polyline points="6 9 12 15 18 9"></polyline></svg>
                   </button>
                   <input type="month" id="hidden-class-reg-month-picker" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; opacity: 0; pointer-events: none; border: none; padding: 0; margin: 0;" tabindex="-1" onchange="changeClassRegisterMonth(this.value)">
@@ -1222,11 +1308,25 @@
                 <button type="button" class="month-nav-today" onclick="jumpToClassRegisterCurrentMonth()" title="Jump to current month">Today</button>
               </div>
 
-              <button type="button" class="btn btn-secondary btn-sm" onclick="printClassRegister()" title="Print physical inspection format" style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.76rem;padding:0.25rem 0.55rem;">
+              <button type="button" class="btn btn-secondary btn-sm btn-export-register" onclick="openAttendanceExportModal()" title="Export Attendance Register (Excel, PDF, Word)" style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.76rem;padding:0.25rem 0.55rem;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export</span>
+              </button>
+
+              <button type="button" class="btn btn-secondary btn-sm btn-print-register" onclick="printClassRegister()" title="Print physical inspection format" style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.76rem;padding:0.25rem 0.55rem;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                 <span>Print</span>
               </button>
             </div>
+          </div>
+
+          <!-- Dual Register Switcher (Theory vs Practical) -->
+          <div id="class-reg-scope-switcher-wrap" style="display:none;" class="reg-scope-switcher-container">
+            <div class="reg-scope-pill-group" id="class-reg-scope-pill-group"></div>
           </div>
         </div>
 
@@ -1243,18 +1343,20 @@
             <span title="Syncs selected date's RFID/biometric scans into this register with instant confirmation preview" style="cursor: help; font-size: 0.75rem; color: var(--text-muted); opacity: 0.85;">ⓘ</span>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 0.3rem;">
-              <label for="class-sync-date" style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted);">Date:</label>
+          <div class="esp-toolbar-actions" style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+            <div class="esp-date-wrap" style="display: flex; align-items: center; gap: 0.3rem;">
+              <label for="class-sync-date" class="esp-date-label" style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted);">Date:</label>
               <input type="date" id="class-sync-date" class="form-control" onchange="checkClassEspStatus();onSyncDateChange();" style="padding: 0.22rem 0.45rem; font-size: 0.8rem; height: 30px; width: 135px; border-radius: var(--radius-sm);">
             </div>
             <button id="btn-class-esp-sync" class="btn btn-primary btn-sm" onclick="triggerClassEspDaySync()" style="font-weight: 700; font-size: 0.78rem; padding: 0.25rem 0.65rem; height: 30px; display: inline-flex; align-items: center; gap: 0.35rem;" title="Fetch ESP scans and preview attendance">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-              <span>Sync ESP Scans</span>
+              <span class="esp-sync-full-text">Sync ESP Scans</span>
+              <span class="esp-sync-short-text" style="display:none;">Sync ESP</span>
             </button>
-            <button class="btn btn-secondary btn-sm" onclick="openClassRollCallModal()" style="font-size: 0.78rem; padding: 0.25rem 0.6rem; height: 30px; display:inline-flex; align-items:center; gap:0.35rem;" title="Conduct manual roll call, QR attendance, or 6-digit PIN">
+            <button class="btn btn-secondary btn-sm btn-roll-call" onclick="openClassRollCallModal()" style="font-size: 0.78rem; padding: 0.25rem 0.6rem; height: 30px; display:inline-flex; align-items:center; gap:0.35rem;" title="Conduct manual roll call, QR attendance, or 6-digit PIN">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              <span>Roll Call (Manual, QR &amp; PIN)</span>
+              <span class="roll-call-full-text">Roll Call (Manual, QR &amp; PIN)</span>
+              <span class="roll-call-short-text" style="display:none;">Roll Call</span>
             </button>
           </div>
         </div>
@@ -1319,48 +1421,58 @@
              VIEW B: COMPACT MOBILE ATTENDANCE MATRIX (Minimal, Single Class Default)
              ═══════════════════════════════════════════════════════════ -->
         <div class="mobile-compact-section">
-          <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem; border: 1px solid var(--border-color); background: var(--bg-card);">
-            <!-- Mobile Card Header with Date & P/A Legend (No Late) -->
-            <div style="padding: 0.65rem 0.85rem; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-size: 0.84rem; font-weight: 800; color: var(--text-main);">Daily Attendance Roster</div>
-                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 1px;">
+          <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 1.25rem; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: 0 4px 16px -3px hsla(0,0%,0%,0.07);">
+            <!-- Mobile Day Roster Header with Date, Remove Period Button, & Live P/A Stats -->
+            <div class="day-roster-bar">
+              <div class="day-roster-info">
+                <div class="day-roster-title">Daily Attendance Roster</div>
+                <div class="day-roster-date">
                   Date: <strong id="mobile-matrix-date-display" style="color:var(--color-primary);">Today</strong>
                 </div>
               </div>
-              <div style="display: flex; gap: 0.4rem; font-size: 0.72rem; align-items: center;">
-                <span class="pen-mark p" style="width:18px;height:18px;font-size:0.7rem;">P</span>
-                <span class="pen-mark a" style="width:18px;height:18px;font-size:0.7rem;">A</span>
-              </div>
-            </div>
-
-            <!-- Mobile Bulk Action Bar -->
-            <div id="mobile-bulk-bar" class="mobile-bulk-bar" style="display: none;">
-              <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <span class="bulk-count-badge" id="mobile-bulk-count" style="font-size:0.72rem;font-weight:700;">0 selected</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 0.35rem;">
-                <button type="button" class="btn-bulk-present" onclick="bulkMarkAttendance('PRESENT', true)" style="font-size:0.72rem;padding:0.2rem 0.45rem;">P</button>
-                <button type="button" class="btn-bulk-absent" onclick="bulkMarkAttendance('ABSENT', true)" style="font-size:0.72rem;padding:0.2rem 0.45rem;">A</button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="bulkMarkAttendance('CLEAR', true)" style="font-size:0.72rem;padding:0.2rem 0.45rem;">Clear</button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="deselectAllMobileStudents()" style="font-size:0.72rem;padding:0.2rem 0.4rem;">&#10005;</button>
-              </div>
-            </div>
-
-            <!-- Single Class Default with Add Class Button -->
-            <div class="mobile-period-bar">
-              <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">Classes:</span>
-                <div class="mobile-period-pills" id="mobile-period-pills-container">
-                  <span class="mobile-period-btn active" id="btn-period-single" style="cursor:default;">Class 1</span>
+              <div class="day-roster-right">
+                <button type="button" class="btn-roster-del-period" id="btn-mobile-del-class" onclick="confirmDeleteCurrentPeriod()" style="display:none;" title="Remove this period">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span id="btn-mobile-del-text">Remove P2</span>
+                </button>
+                <!-- Live Headcount Summary (P / A) -->
+                <div class="day-roster-counts">
+                  <span class="roster-count-item" title="Present Count Today">
+                    <span style="color:var(--status-present);font-weight:800;">P</span>
+                    <strong id="mobile-summary-p" style="color:var(--status-present);">0</strong>
+                  </span>
+                  <span class="roster-count-item" title="Absent Count Today">
+                    <span style="color:var(--status-absent);font-weight:800;">A</span>
+                    <strong id="mobile-summary-a" style="color:var(--status-absent);">0</strong>
+                  </span>
                 </div>
               </div>
-              <button type="button" class="mobile-add-class-btn" id="btn-mobile-add-class" onclick="addNewClassForDay()" title="Add another lecture period or lab class for today">
-                + Add Class
+            </div>
+
+
+            <!-- Sleek Horizontal Classes / Period Bar with Add Period Button -->
+            <div class="mobile-period-bar">
+              <div class="mobile-period-pills-wrap">
+                <div class="mobile-period-pills" id="mobile-period-pills-container">
+                  <button type="button" class="mobile-period-btn active" id="btn-period-single">P1</button>
+                </div>
+              </div>
+              <button type="button" class="mobile-add-class-btn" id="btn-mobile-add-class" onclick="openAddPeriodModal()" title="Add Theory, Practical, or Custom Period">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Period</span>
               </button>
             </div>
 
-            <!-- Ultra-compact Table: Checkbox | Roll | Name | Class 1 | Attended -->
+            <!-- Mobile Quick Search Filter -->
+            <div class="mobile-filter-strip">
+              <div class="mobile-search-box">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="mobile-student-search-input" class="mobile-search-input" placeholder="Quick search student by name or roll..." oninput="filterMobileStudents(this.value)">
+                <button type="button" id="mobile-search-clear-btn" class="mobile-search-clear" onclick="clearMobileStudentSearch()" style="display:none;" title="Clear search">&times;</button>
+              </div>
+            </div>
+
+            <!-- Ultra-compact Table: Checkbox | Roll | Name | Period(s) | Attended -->
             <div style="overflow-x: auto;">
               <table class="mobile-compact-table" id="mobile-compact-matrix-table">
                 <thead>
@@ -1579,6 +1691,149 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════
+       ATTENDANCE EXPORT STUDIO MODAL (Modern & Ultra-Compact)
+       ══════════════════════════════════════════════════════════════ -->
+  <div id="modal-export-attendance" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)closeAttendanceExportModal()">
+    <div class="modal-card export-modal-card">
+      <!-- Modal Header -->
+      <div class="export-modal-header">
+        <div class="export-modal-header-left">
+          <svg class="export-modal-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <h2 class="export-modal-title">Export Attendance</h2>
+        </div>
+        <button type="button" class="export-modal-close" onclick="closeAttendanceExportModal()" title="Close">&times;</button>
+      </div>
+
+      <!-- Modal Body (Ultra-compact, all options visible without scroll) -->
+      <div class="export-modal-body">
+        <!-- 1. Document Format -->
+        <div class="export-section">
+          <div class="export-section-label">Format</div>
+          <div class="export-format-grid">
+            <label class="export-format-card active" id="card-format-xlsx" onclick="selectExportFormat('xlsx')">
+              <input type="radio" name="export-format" value="xlsx" checked>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="format-icon-xlsx">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="8" y1="13" x2="16" y2="13"></line>
+                <line x1="8" y1="17" x2="16" y2="17"></line>
+              </svg>
+              <span>Excel <small>.xlsx</small></span>
+            </label>
+
+            <label class="export-format-card" id="card-format-pdf" onclick="selectExportFormat('pdf')">
+              <input type="radio" name="export-format" value="pdf">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="format-icon-pdf">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>PDF <small>.pdf</small></span>
+            </label>
+
+            <label class="export-format-card" id="card-format-doc" onclick="selectExportFormat('doc')">
+              <input type="radio" name="export-format" value="doc">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="format-icon-doc">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span>Word <small>.doc</small></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 2. Time Scope & Period -->
+        <div class="export-section">
+          <div class="export-section-label">Time Scope</div>
+          <!-- Scope Selection Pills (5 Mutually Exclusive Modes) -->
+          <div class="export-scope-matrix">
+            <div class="export-scope-row-top">
+              <label class="export-range-pill active" id="label-range-all" onclick="handleExportRangeChange('all_months')">
+                <input type="radio" name="export-range" value="all_months" id="range-opt-all" checked>
+                <span>Full Semester</span>
+              </label>
+
+              <label class="export-range-pill" id="label-range-overview" onclick="handleExportRangeChange('overview_only')">
+                <input type="radio" name="export-range" value="overview_only" id="range-opt-overview">
+                <span>Summary (% Only)</span>
+              </label>
+            </div>
+
+            <div class="export-scope-row-sub">
+              <label class="export-range-pill" id="label-range-month" onclick="handleExportRangeChange('month')">
+                <input type="radio" name="export-range" value="month" id="range-opt-month">
+                <span>Specific Month</span>
+              </label>
+
+              <label class="export-range-pill" id="label-range-day" onclick="handleExportRangeChange('day')">
+                <input type="radio" name="export-range" value="day" id="range-opt-day">
+                <span>Specific Day</span>
+              </label>
+
+              <label class="export-range-pill" id="label-range-week" onclick="handleExportRangeChange('week')">
+                <input type="radio" name="export-range" value="week" id="range-opt-week">
+                <span>This Week</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Contextual Inputs (Only visible and accessible when Specific Month or Specific Day is chosen) -->
+          <div id="export-context-month-row" class="export-context-input-row" style="display: none;">
+            <span class="context-label">Select Month:</span>
+            <select id="export-month-select" class="export-inline-select">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <div id="export-context-day-row" class="export-context-input-row" style="display: none;">
+            <span class="context-label">Select Date:</span>
+            <input type="date" id="export-day-input" class="export-inline-date">
+          </div>
+
+          <!-- Live Scope Explainer -->
+          <div id="export-range-hint" class="export-range-hint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span id="export-range-hint-text"><b>Full Semester:</b> Complete Day 1–31 daily matrix for all months + final summary.</span>
+          </div>
+        </div>
+
+        <!-- 3. Component Scope -->
+        <div class="export-section">
+          <div class="export-section-label">Component</div>
+          <div class="export-scope-segmented">
+            <button type="button" class="export-scope-btn active" id="btn-scope-both" onclick="selectExportScope('BOTH')">Theory + Lab</button>
+            <button type="button" class="export-scope-btn" id="btn-scope-theory" onclick="selectExportScope('THEORY')">Theory Only</button>
+            <button type="button" class="export-scope-btn" id="btn-scope-practical" onclick="selectExportScope('PRACTICAL')">Lab Only</button>
+          </div>
+          <input type="hidden" id="export-scope-val" value="BOTH">
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="export-modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAttendanceExportModal()">Cancel</button>
+        <button type="button" id="btn-execute-export" class="btn btn-primary btn-sm btn-download-export" onclick="executeAttendanceExport()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span id="lbl-export-btn">Download Report</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
        ESP32 SCANS CONFIRMATION MODAL WITH CHECKBOXES
        ══════════════════════════════════════════════════════════════ -->
   <div id="esp-confirm-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('esp-confirm-modal')">
@@ -1631,46 +1886,123 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════
-       ADD CLASS / PERIOD FOR DATE MODAL (Multi-Class in 1 Day)
+       ADD ATTENDANCE PERIOD / CLASS MODAL (Theory, Practical, Custom)
        ══════════════════════════════════════════════════════════════ -->
   <div id="add-session-modal" class="modal-backdrop" onclick="if(event.target===this)closeModal('add-session-modal')">
-    <div class="modal-card" style="max-width: 500px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-        <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin: 0;">Add Class Record for Date</h2>
-        <button onclick="closeModal('add-session-modal')" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+    <div class="modal-card">
+      <div class="modal-header-strip">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div>
+            <h2 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0; line-height: 1.2;">Add Attendance Period</h2>
+            <p style="font-size: 0.68rem; color: var(--text-muted); margin: 2px 0 0;">Create a Theory, Practical, or Custom named period</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-icon-btn" onclick="closeModal('add-session-modal')" aria-label="Close modal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
       <form id="add-session-form" onsubmit="createClassSession(event)">
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.35rem; color: var(--text-main);">Session Calendar Date</label>
-          <input type="date" id="sess-date" class="form-control" required style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main);">
+        <div class="modal-scroll-body">
+          <!-- Session Date -->
+          <div>
+            <label class="form-label" for="sess-date" style="font-size: 0.74rem; font-weight: 700; display: block; margin-bottom: 0.25rem; color: var(--text-main);">Session Date</label>
+            <input type="date" id="sess-date" class="form-control" required style="width: 100%; padding: 0.35rem 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main); font-size: 0.8rem; height: 34px;">
+            <!-- Existing Periods on this date (if any) with Remove option -->
+            <div id="modal-existing-periods-wrap" style="display:none; margin-top: 0.35rem; padding: 0.35rem 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+              <div style="font-size: 0.66rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.25rem;">Existing Periods on this date:</div>
+              <div id="modal-existing-periods-list" style="display: flex; flex-wrap: wrap; gap: 0.3rem;"></div>
+            </div>
+          </div>
+
+          <!-- Period Type Selection: Theory / Practical / Custom (Pure SVG Icons, Zero Emojis) -->
+          <div>
+            <label class="form-label" style="font-size: 0.74rem; font-weight: 700; display: block; margin-bottom: 0.3rem; color: var(--text-main);">Period Type</label>
+            <div class="period-type-selector">
+              <div class="period-type-card active" id="type-card-theory" onclick="selectPeriodTypePreset('THEORY')">
+                <div class="period-type-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </div>
+                <div class="period-type-title">Theory</div>
+                <div class="period-type-desc">Lecture</div>
+              </div>
+              <div class="period-type-card" id="type-card-practical" onclick="selectPeriodTypePreset('PRACTICAL')">
+                <div class="period-type-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.69 18.2A2 2 0 0 0 6.37 21h11.26a2 2 0 0 0 1.68-2.8L14 9.31V2"></path><line x1="8" y1="2" x2="16" y2="2"></line></svg>
+                </div>
+                <div class="period-type-title">Practical</div>
+                <div class="period-type-desc">Lab / Batch</div>
+              </div>
+              <div class="period-type-card" id="type-card-custom" onclick="selectPeriodTypePreset('CUSTOM')">
+                <div class="period-type-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </div>
+                <div class="period-type-title">Custom</div>
+                <div class="period-type-desc">Own Name</div>
+              </div>
+            </div>
+            <input type="hidden" id="sess-type" value="THEORY">
+          </div>
+
+          <!-- Period Name / Label (with Auto-Detected Slot Badge) -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+              <label class="form-label" for="sess-label" style="font-size: 0.74rem; font-weight: 700; margin: 0; color: var(--text-main);">Period Name / Label</label>
+              <span id="sess-auto-slot-badge" class="period-auto-slot-badge">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 10"></polyline></svg>
+                <span id="sess-auto-slot-text">Auto: Period 1</span>
+              </span>
+            </div>
+            <input type="text" id="sess-label" class="form-control" placeholder="e.g. Theory Class, Practical Lab, Tutorial..." required style="width: 100%; padding: 0.35rem 0.6rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main); font-size: 0.8rem; height: 34px;">
+            <input type="hidden" id="sess-period" value="1">
+          </div>
+
+          <!-- Quick Name Suggestion Chips -->
+          <div>
+            <div style="font-size: 0.66rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.25rem;">Quick Suggestions:</div>
+            <div class="period-suggestions-chips">
+              <button type="button" class="period-suggestion-chip" onclick="applyPeriodQuickName('Theory Lecture', 'THEORY')">Theory Lecture</button>
+              <button type="button" class="period-suggestion-chip" onclick="applyPeriodQuickName('Practical Lab', 'PRACTICAL')">Practical Lab</button>
+              <button type="button" class="period-suggestion-chip" onclick="applyPeriodQuickName('Lab Batch A', 'PRACTICAL')">Lab Batch A</button>
+              <button type="button" class="period-suggestion-chip" onclick="applyPeriodQuickName('Lab Batch B', 'PRACTICAL')">Lab Batch B</button>
+              <button type="button" class="period-suggestion-chip" onclick="applyPeriodQuickName('Tutorial Class', 'CUSTOM')">Tutorial</button>
+              <button type="button" class="period-suggestion-chip" onclick="applyPeriodQuickName('Remedial Class', 'CUSTOM')">Remedial</button>
+              <button type="button" class="period-suggestion-chip" onclick="applyPeriodQuickName('Viva / Seminar', 'CUSTOM')">Viva / Seminar</button>
+              <button type="button" class="period-suggestion-chip" onclick="applyPeriodQuickName('Extra Class', 'CUSTOM')">Extra Class</button>
+            </div>
+          </div>
+
+          <!-- Optional Time Slot (Collapsible) -->
+          <div class="period-time-collapse">
+            <button type="button" class="period-time-toggle-btn" onclick="togglePeriodTimeInputs()" id="btn-toggle-period-time">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="period-time-toggle-label">+ Add class timing (optional)</span>
+            </button>
+            <div id="period-time-fields" style="display: none; margin-top: 0.35rem;" class="period-time-fields-row">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0.4rem 0.55rem; background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+                <div>
+                  <label class="form-label" for="sess-start-time" style="font-size: 0.66rem; font-weight: 700; display: block; margin-bottom: 0.15rem; color: var(--text-muted);">Start Time</label>
+                  <input type="time" id="sess-start-time" class="form-control" style="width: 100%; padding: 0.2rem 0.4rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-main); font-size: 0.74rem; height: 28px;">
+                </div>
+                <div>
+                  <label class="form-label" for="sess-end-time" style="font-size: 0.66rem; font-weight: 700; display: block; margin-bottom: 0.15rem; color: var(--text-muted);">End Time</label>
+                  <input type="time" id="sess-end-time" class="form-control" style="width: 100%; padding: 0.2rem 0.4rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-main); font-size: 0.74rem; height: 28px;">
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.35rem; color: var(--text-main);">Class / Lecture Label</label>
-          <input type="text" id="sess-label" class="form-control" placeholder="e.g. Period 2: Advanced Relational Algebra" required style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main);">
-        </div>
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.35rem; color: var(--text-main);">Period / Lecture Slot</label>
-          <select id="sess-period" class="form-select" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main);">
-            <option value="1">Period 1 (Default Class)</option>
-            <option value="2" selected>Period 2 (2nd Class in Day)</option>
-            <option value="3">Period 3 (Extra Class)</option>
-            <option value="4">Period 4</option>
-            <option value="5">Period 5</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.35rem; color: var(--text-main);">Session Type</label>
-          <select id="sess-type" class="form-select" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main);">
-            <option value="THEORY" selected>Theory Lecture</option>
-            <option value="PRACTICAL">Practical Lab</option>
-            <option value="TUTORIAL">Tutorial</option>
-            <option value="EXTRA">Extra Class</option>
-          </select>
-        </div>
-        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('add-session-modal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Create Class Record</button>
+
+        <!-- Sticky Always-Visible Footer Strip (Direct child of form, outside scroll body) -->
+        <div class="modal-footer-strip">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('add-session-modal')" style="font-weight: 600; font-size: 0.76rem; padding: 0.35rem 0.85rem; height: 32px;">Cancel</button>
+          <button type="submit" id="btn-submit-add-period" class="btn btn-primary btn-sm" style="font-weight: 700; font-size: 0.76rem; padding: 0.35rem 1rem; height: 32px; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Create Period</span>
+          </button>
         </div>
       </form>
     </div>
@@ -2009,6 +2341,53 @@
     </div>
   </div>
 
+  <!-- DELETE TOPIC / UNIT CONFIRMATION CARD MODAL -->
+  <div class="modal-backdrop" id="modal-confirm-delete-unit" onclick="if(event.target===this)closeModal('modal-confirm-delete-unit')">
+    <div class="modal-card unit-delete-card" style="max-width: 440px; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg);">
+      <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border-color);">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="delete-icon-badge" style="width:36px;height:36px;border-radius:50%;background:var(--status-absent-bg);display:inline-flex;align-items:center;justify-content:center;color:var(--status-absent);flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin:0;font-size:1.05rem;font-weight:700;color:var(--text-main);">Delete Topic</h3>
+            <span style="font-size:0.78rem;color:var(--text-muted);">Remove unit organization</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeModal('modal-confirm-delete-unit')" aria-label="Close modal">&#10005;</button>
+      </div>
+
+      <div class="modal-body" style="padding:1.25rem;">
+        <p style="margin:0 0 1rem 0;font-size:0.92rem;color:var(--text-main);line-height:1.5;">
+          Are you sure you want to remove <strong id="delete-unit-display-name" style="color:var(--color-primary);font-weight:700;">Unit 1</strong>?
+        </p>
+        <div style="display:flex;align-items:flex-start;gap:0.65rem;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:0.75rem 0.9rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);flex-shrink:0;margin-top:2px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span style="font-size:0.82rem;color:var(--text-muted);line-height:1.45;">
+            Any existing assignments, lab practicals, or tests in this topic will safely be moved to <strong style="color:var(--text-main);">General Coursework</strong>. No student marks or files will be lost.
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display:flex;justify-content:flex-end;align-items:center;gap:0.65rem;padding:0.85rem 1.25rem;border-top:1px solid var(--border-color);background:var(--bg-surface);border-bottom-left-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg);">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-confirm-delete-unit')" style="padding:0.5rem 1rem;font-size:0.85rem;border-radius:var(--radius-md);">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-delete-unit" onclick="confirmExecuteDeleteUnit()" style="background:var(--status-absent);color:var(--text-white);padding:0.5rem 1.15rem;font-size:0.85rem;font-weight:700;border:none;border-radius:var(--radius-md);display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>Delete Topic</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="modal-schedule-test">
     <div class="modal-card" style="max-width:560px">
       <div class="modal-header">
@@ -2290,70 +2669,69 @@
     </div>
   </div>
 
-  <!-- Assignment Marks Entry Modal -->
+  <!-- Assignment Marks Entry Modal (Redesigned: PC Image 1 & Mobile Image 2) -->
   <div class="modal-backdrop" id="modal-enter-assignment-marks">
-    <div class="modal-card" style="max-width:1100px;width:95vw">
-      <div class="modal-header">
-        <div>
-          <h3 class="modal-title" id="assign-marks-modal-title" style="display:flex;align-items:center;gap:.45rem">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            <span>Enter Assignment Marks</span>
-          </h3>
-          <div id="assign-marks-modal-meta" style="font-size:.8rem;color:var(--text-muted);margin-top:.15rem"></div>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal('modal-enter-assignment-marks')">&#10005;</button>
-      </div>
-
-      <!-- Quick Action Toolbar: Search, Filters & Bulk Helpers -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.25rem;background:var(--bg-surface);border-bottom:1px solid var(--border-color);gap:.75rem;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
-          <input type="text" id="assign-marks-search" placeholder="Search student by name or roll&#8230;" style="padding:.35rem .65rem;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-main);font-size:.8rem;width:220px" oninput="filterAssignMarksModalRoster(this.value)">
-          <div class="expand-filter-btns" style="margin:0">
-            <button type="button" class="expand-filter-btn active" id="btn-am-filter-all" onclick="filterAssignModalStatus('all')">All (<span id="am-cnt-all">0</span>)</button>
-            <button type="button" class="expand-filter-btn" id="btn-am-filter-sub" onclick="filterAssignModalStatus('submitted')">Submitted (<span id="am-cnt-sub">0</span>)</button>
-            <button type="button" class="expand-filter-btn" id="btn-am-filter-unsub" onclick="filterAssignModalStatus('unsubmitted')">Not Submitted (<span id="am-cnt-unsub">0</span>)</button>
-            <button type="button" class="expand-filter-btn" id="btn-am-filter-ungraded" onclick="filterAssignModalStatus('ungraded')">Ungraded (<span id="am-cnt-ungraded">0</span>)</button>
+    <div class="modal-card am-modal-card">
+      <div class="am-modal-header">
+        <div class="am-header-left">
+          <button type="button" class="am-mob-back-btn" onclick="closeModal('modal-enter-assignment-marks')" aria-label="Back">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </button>
+          <div class="am-header-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+          </div>
+          <div class="am-header-title-box">
+            <h3 class="am-modal-title" id="assign-marks-modal-title">Enter Assignment Marks</h3>
+            <div class="am-modal-meta" id="assign-marks-modal-meta"></div>
           </div>
         </div>
+        <button type="button" class="am-pc-close-btn" onclick="closeModal('modal-enter-assignment-marks')" aria-label="Close">&#10005;</button>
+      </div>
 
-        <div style="display:flex;align-items:center;gap:.45rem;flex-wrap:wrap">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="bulkMarkAssignNotSubmittedAbsent()" style="font-size:.74rem;padding:.25rem .6rem;font-weight:600" title="Automatically set status to Absent (AB) for students who did not submit online">
-            Mark Unsubmitted as AB
-          </button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="bulkFillAssignMaxMarks()" style="font-size:.74rem;padding:.25rem .6rem;font-weight:600" title="Quick fill remaining ungraded students with maximum marks">
-            Fill Full Marks
-          </button>
+      <!-- Quick Action Toolbar: Compact Search & Wrapped Non-Overflow Filters -->
+      <div class="am-toolbar">
+        <div class="am-search-wrap">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="assign-marks-search" class="am-search-input" placeholder="Search student by name or roll&#8230;" oninput="filterAssignMarksModalRoster(this.value)">
+        </div>
+        <div class="am-filter-pills">
+          <button type="button" class="am-filter-pill active" id="btn-am-filter-all" onclick="filterAssignModalStatus('all')">All (<span id="am-cnt-all">0</span>)</button>
+          <button type="button" class="am-filter-pill" id="btn-am-filter-sub" onclick="filterAssignModalStatus('submitted')">Submitted (<span id="am-cnt-sub">0</span>)</button>
+          <button type="button" class="am-filter-pill" id="btn-am-filter-unsub" onclick="filterAssignModalStatus('unsubmitted')">Not Submitted (<span id="am-cnt-unsub">0</span>)</button>
+          <button type="button" class="am-filter-pill" id="btn-am-filter-ungraded" onclick="filterAssignModalStatus('ungraded')">Ungraded (<span id="am-cnt-ungraded">0</span>)</button>
         </div>
       </div>
 
-      <div class="modal-body" style="padding:0">
-        <div class="marks-scroll-container" style="max-height:60vh;overflow-y:auto">
-          <table class="marks-table" id="assign-marks-table">
-            <thead>
-              <tr>
-                <th style="width:45px;text-align:center">#</th>
-                <th style="width:75px">Roll No</th>
-                <th style="min-width:180px">Student Name</th>
-                <th style="width:160px">Submission</th>
-                <th style="width:130px;text-align:center">Marks Obtained</th>
-                <th style="width:70px;text-align:center">Absent</th>
-                <th style="min-width:180px">Remarks / Feedback</th>
-              </tr>
-            </thead>
-            <tbody id="assign-marks-entry-tbody"></tbody>
-          </table>
-        </div>
+      <div class="am-modal-body">
+        <!-- Desktop Table (Image 1: 4 columns strictly, NO #, NO Absent, NO Remarks) -->
+        <table class="am-table" id="assign-marks-table">
+          <thead>
+            <tr>
+              <th class="col-roll">Roll No</th>
+              <th class="col-name">Student Name</th>
+              <th class="col-sub">Submission</th>
+              <th class="col-marks">Marks Obtained</th>
+            </tr>
+          </thead>
+          <tbody id="assign-marks-entry-tbody"></tbody>
+        </table>
+
+        <!-- Mobile Cards List (Image 2) -->
+        <div class="am-mobile-list" id="assign-marks-mobile-list"></div>
       </div>
 
-      <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:.82rem;color:var(--text-muted)">
-          Maximum Marks: <strong id="assign-marks-footer-max" style="color:var(--color-primary);font-size:.95rem">100</strong> &bull; Graded: <strong id="assign-marks-footer-graded" style="color:var(--status-present)">0/0</strong>
+      <div class="am-modal-footer">
+        <div class="am-footer-stats">
+          <span class="am-stat-line">Maximum Marks: <strong id="assign-marks-footer-max" class="am-max-highlight">100</strong></span>
+          <span class="am-stat-sep">&bull;</span>
+          <span class="am-stat-line">Graded: <strong id="assign-marks-footer-graded" class="am-graded-highlight">0/0</strong></span>
         </div>
-        <div style="display:flex;gap:.65rem">
-          <button class="btn btn-secondary" onclick="closeModal('modal-enter-assignment-marks')">Cancel</button>
-          <button class="btn btn-primary" id="btn-save-assign-marks" onclick="saveAssignmentMarksEntry()" style="display:inline-flex;align-items:center;gap:0.4rem">
+        <div class="am-footer-actions">
+          <button type="button" class="am-cancel-btn" onclick="closeModal('modal-enter-assignment-marks')">Cancel</button>
+          <button type="button" class="am-save-btn" id="btn-save-assign-marks" onclick="saveAssignmentMarksEntry()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span>Save Assignment Marks</span>
+            <span class="am-save-text-pc">Save Assignment Marks</span>
+            <span class="am-save-text-mob">Save</span>
           </button>
         </div>
       </div>
@@ -2710,6 +3088,31 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       </span>
     </button>
+  </div>
+
+  <!-- Mobile Floating Bulk Attendance Action Dock -->
+  <div id="mobile-bulk-bar" class="mobile-bulk-bar mobile-bulk-floating-dock" style="display: none;">
+    <div class="bulk-dock-info">
+      <span class="bulk-dock-badge" title="Selected students">
+        <span id="mobile-bulk-count">0</span><span class="bulk-dock-sel-text"> sel</span>
+      </span>
+    </div>
+    <div class="bulk-dock-actions">
+      <button type="button" class="btn-dock-mark btn-dock-present" onclick="bulkMarkAttendance('PRESENT', true)" title="Mark all selected students Present">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span>Present</span>
+      </button>
+      <button type="button" class="btn-dock-mark btn-dock-absent" onclick="bulkMarkAttendance('ABSENT', true)" title="Mark all selected students Absent">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <span>Absent</span>
+      </button>
+      <button type="button" class="btn-dock-clear" onclick="bulkMarkAttendance('CLEAR', true)" title="Clear attendance for selected students">
+        <span>Clear</span>
+      </button>
+      <button type="button" class="btn-dock-dismiss" onclick="deselectAllMobileStudents()" title="Cancel selection" aria-label="Cancel selection">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════

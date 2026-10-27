@@ -29,14 +29,14 @@
         </svg>
       </button>
 
-      <a href="/student/dashboard.html" class="gc-brand-link" title="Student Dashboard">
+      <a href="/student/dashboard.html" class="gc-brand-link" title="VidyaOS Student Workspace">
         <div class="gc-brand-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
             <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
           </svg>
         </div>
-        <div class="gc-brand-title">Classroom</div>
+        <div class="gc-brand-title">VidyaOS</div>
       </a>
 
       <!-- To-do Breadcrumb -->
@@ -67,23 +67,23 @@
       <!-- Apps Launcher Dropdown -->
       <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
         <a href="/student/dashboard.html" class="app-item">
-          <div class="app-icon" style="background:var(--color-primary-light); color:var(--color-primary);">📚</div>
+          <div class="app-icon" data-icon="book" style="background:var(--color-primary-light); color:var(--color-primary);"></div>
           <span class="app-name">Classes</span>
         </a>
         <a href="/student/assignments.html" class="app-item">
-          <div class="app-icon" style="background:var(--color-primary-light); color:var(--color-primary);">📋</div>
+          <div class="app-icon" data-icon="assignment" style="background:var(--color-primary-light); color:var(--color-primary);"></div>
           <span class="app-name">To-do</span>
         </a>
         <a href="/student/attendance.html" class="app-item">
-          <div class="app-icon" style="background:var(--status-present-bg); color:var(--status-present);">📅</div>
+          <div class="app-icon" data-icon="calendar" style="background:var(--status-present-bg); color:var(--status-present);"></div>
           <span class="app-name">Attendance</span>
         </a>
         <a href="/student/timetable.html" class="app-item">
-          <div class="app-icon" style="background:var(--col-att-group-bg); color:var(--col-att-group-color);">🗓</div>
+          <div class="app-icon" data-icon="clock" style="background:var(--col-att-group-bg); color:var(--col-att-group-color);"></div>
           <span class="app-name">Timetable</span>
         </a>
         <a href="/student/profile.html" class="app-item">
-          <div class="app-icon" style="background:var(--chip-faculty-bg); color:var(--chip-faculty-color);">👤</div>
+          <div class="app-icon" data-icon="user" style="background:var(--chip-faculty-bg); color:var(--chip-faculty-color);"></div>
           <span class="app-name">Profile</span>
         </a>
       </div>
@@ -218,7 +218,7 @@
     <section class="todo-tab-pane" id="tab-pane-done">
       <div id="todo-list-done">
         <div class="todo-empty-state">
-          <div class="todo-empty-icon">⏳</div>
+          <div class="todo-empty-icon" data-icon="clock"></div>
           <div class="todo-empty-title">Loading completed work...</div>
         </div>
       </div>
@@ -227,6 +227,7 @@
   </main>
 
   <!-- Core Scripts -->
+  <script src="/js/icons.js?v=20261026"></script>
   <script src="/js/auth.js?v=20261023_02"></script>
   <script src="/js/api.js?v=20261023_02"></script>
   <script src="/student/assignments/assignments.js?v=20261023_02"></script>

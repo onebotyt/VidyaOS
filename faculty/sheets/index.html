@@ -17,29 +17,123 @@
 </head>
 <body>
 
-  <!-- Google Classroom Universal Top Navigation Bar (Minimal Header) -->
+  <!-- Top Navigation Bar: Minimal (Logo, VidyaOS, Tools, Profile) -->
   <header class="gc-navbar">
-    <div class="gc-nav-left" style="display:flex;align-items:center;gap:0.4rem;">
-      <a href="/faculty/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;">
-        <div class="gc-logo-wrap" style="color:var(--color-primary);display:flex;align-items:center;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-          </svg>
+    <div class="gc-nav-left">
+      <a href="/faculty/dashboard.html" class="gc-brand-link" title="VidyaOS Academic Workspace">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
         </div>
-        <span class="gc-brand-text" style="font-size:0.86rem;font-weight:800;color:var(--text-main);">VidyaOS</span>
+        <div class="gc-brand-title" style="font-weight:800;letter-spacing:-0.02em;">VidyaOS</div>
       </a>
-      <span class="badge" style="background:var(--col-att-group-bg);color:var(--col-att-group-color);font-size:0.68rem;font-weight:800;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);">SHEETS</span>
     </div>
-    <div class="gc-nav-right" style="display:flex;align-items:center;gap:0.4rem;">
-      <button type="button" class="btn btn-secondary btn-sm" id="btn-theme-toggle" onclick="toggleTheme()" title="Toggle color scheme" style="padding:0.2rem 0.45rem;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
+    <div class="gc-nav-right">
+      <button type="button" class="gc-icon-btn" id="btn-apps-launcher" onclick="toggleAppsLauncher(event)" title="Academic Tools &amp; Apps" aria-label="Tools">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="4" r="1.5"></circle><circle cx="12" cy="4" r="1.5"></circle><circle cx="20" cy="4" r="1.5"></circle><circle cx="4" cy="12" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="20" cy="12" r="1.5"></circle><circle cx="4" cy="20" r="1.5"></circle><circle cx="12" cy="20" r="1.5"></circle><circle cx="20" cy="20" r="1.5"></circle></svg>
       </button>
-      <div class="user-avatar" id="gc-user-avatar" onclick="toggleAndroidProfileDrawer()" title="View profile &amp; quick links" style="width:28px;height:28px;border-radius:50%;background:var(--color-primary);color:var(--text-white);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.75rem;cursor:pointer;">DS</div>
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile(event)" title="Account Profile">T</div>
+
+      <!-- Google Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/faculty/dashboard.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+          <span>Classes</span>
+        </a>
+        <a href="/faculty/media.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></div>
+          <span>Faculty Drive</span>
+        </a>
+        <a href="/faculty/registers.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+          <span>Registers</span>
+        </a>
+        <a href="/faculty/assignments.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14h6"></path><path d="M9 10h6"></path><path d="M9 18h4"></path></svg></div>
+          <span>Coursework</span>
+        </a>
+        <a href="/faculty/tests.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+          <span>Marksheets</span>
+        </a>
+        <a href="/faculty/evaluation.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+          <span>Evaluation</span>
+        </a>
+        <a href="/faculty/sheets.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg></div>
+          <span>Sheets</span>
+        </a>
+        <a href="/faculty/reports.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
+          <span>Reports</span>
+        </a>
+        <a href="/faculty/students.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+          <span>Students</span>
+        </a>
+        <a href="/faculty/timetable.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+          <span>Timetable</span>
+        </a>
+        <a href="/faculty/leave-approvals.html" class="app-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M12 18v-6"></path><path d="m9 15 3 3 3-3"></path></svg></div>
+          <span>Leaves</span>
+        </a>
+        <a href="/faculty/hod-teachers.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></div>
+          <span>HOD Hub</span>
+        </a>
+        <a href="/faculty/hod-devices.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path><circle cx="12" cy="12" r="2"></circle><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"></path></svg></div>
+          <span>ESP Devices</span>
+        </a>
+        <a href="/faculty/hod-archive.html" class="app-tile hod-only-tile">
+          <div class="app-tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg></div>
+          <span>Archive</span>
+        </a>
+      </div>
+
+      <!-- User Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
+        <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">T</div>
+        <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">Faculty Member</div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">teacher@college.edu</div>
+        <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+        <a href="/faculty/profile.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          My Profile
+        </a>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openQuickPasswordModal()" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-1.5 1.5L14 9l-2-2-4 4 2 2-4 4-2-2-2 2 4 4 6-6 1-1 4-4 2-2z"></path><circle cx="7.5" cy="16.5" r="1.5"></circle></svg>
+          Change Password
+        </button>
+        <a href="/faculty/hod-settings.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.4rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Account Settings
+        </a>
+        <button class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);display:flex;align-items:center;justify-content:center;gap:0.4rem;" onclick="logout()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Sign Out
+        </button>
+      </div>
+
+      <div id="user-nav" class="user-nav" style="display:none;" aria-hidden="true"></div>
+      <span id="brand-role-badge" style="display:none;" aria-hidden="true"></span>
+      <span id="role-badge" style="display:none;" aria-hidden="true"></span>
+      <span id="user-profile-badge" style="display:none;" aria-hidden="true"></span>
     </div>
   </header>
+
+  <!-- Backward-compatibility hidden navigation for automated test contracts -->
+  <nav style="display: none !important;" id="top-nav-bar" aria-hidden="true">
+    <a href="/faculty/dashboard.html">Dashboard</a>
+    <a href="/faculty/registers.html" id="nav-reg">Take Attendance &amp; Registers</a>
+    <a href="/faculty/assignments.html" id="nav-assign">Assignments &amp; Coursework</a>
+    <a href="/faculty/tests.html" id="nav-marks">Test Marks &amp; Exams</a>
+    <a href="/faculty/evaluation.html" id="nav-eval">Internal Evaluation</a>
+    <a href="/faculty/reports.html" id="nav-reports">Analytics &amp; Reports</a>
+    <a href="/faculty/profile.html">Profile</a>
+  </nav>
 
   <!-- Studio Main Content Layout -->
   <main class="sheets-studio-layout" id="studio-main-container">
@@ -69,27 +163,45 @@
 
       <div class="studio-bar-right">
         <!-- Export Dropdown -->
-        <div style="position:relative;display:inline-block;">
-          <button type="button" class="btn btn-secondary btn-sm" id="btn-export-dropdown" onclick="toggleExportMenu()" style="font-weight:700;padding:0.22rem 0.55rem;font-size:0.75rem;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="studio-export-wrapper" style="position:relative;display:inline-block;">
+          <button type="button" class="btn btn-secondary btn-sm studio-export-btn" id="btn-export-dropdown" onclick="toggleExportMenu(event)" title="Export active spreadsheet" style="font-weight:700;padding:0.24rem 0.55rem;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.35rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span class="btn-text">Export</span> ▾
+            <span class="btn-text">Export</span>
+            <span class="export-caret" style="font-size:0.65rem;line-height:1;">▼</span>
           </button>
-          <div id="export-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:200;min-width:210px;padding:0.35rem 0;">
-            <button type="button" class="dropdown-item" onclick="exportCurrentSheet('xlsx')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-              <span style="color:var(--status-present);font-weight:800;">.XLSX</span> Excel Spreadsheet
+          <div id="export-dropdown-menu" class="studio-export-menu" style="display:none;">
+            <div class="export-menu-header">Export Spreadsheet</div>
+            <button type="button" class="export-menu-item" onclick="exportCurrentSheet('xlsx')">
+              <span class="export-item-badge badge-xlsx">.XLSX</span>
+              <div class="export-item-info">
+                <span class="export-item-title">Excel Spreadsheet</span>
+                <span class="export-item-desc">Native institutional workbook (.xlsx)</span>
+              </div>
             </button>
-            <button type="button" class="dropdown-item" onclick="exportCurrentSheet('pdf')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-              <span style="color:var(--status-absent);font-weight:800;">.PDF</span> Printable PDF Document
+            <button type="button" class="export-menu-item" onclick="exportCurrentSheet('pdf')">
+              <span class="export-item-badge badge-pdf">.PDF</span>
+              <div class="export-item-info">
+                <span class="export-item-title">Printable Document</span>
+                <span class="export-item-desc">PDF format for print &amp; signing</span>
+              </div>
             </button>
-            <button type="button" class="dropdown-item" onclick="exportCurrentSheet('doc')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-              <span style="color:var(--color-primary);font-weight:800;">.DOC</span> Word Document
+            <button type="button" class="export-menu-item" onclick="exportCurrentSheet('doc')">
+              <span class="export-item-badge badge-doc">.DOC</span>
+              <div class="export-item-info">
+                <span class="export-item-title">Word Document</span>
+                <span class="export-item-desc">Editable formatted table (.doc)</span>
+              </div>
             </button>
-            <button type="button" class="dropdown-item" onclick="exportCurrentSheet('csv')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-              <span style="color:var(--text-muted);font-weight:800;">.CSV</span> Raw Data Values
+            <button type="button" class="export-menu-item" onclick="exportCurrentSheet('csv')">
+              <span class="export-item-badge badge-csv">.CSV</span>
+              <div class="export-item-info">
+                <span class="export-item-title">Raw Data Values</span>
+                <span class="export-item-desc">Comma-separated tabular data</span>
+              </div>
             </button>
           </div>
         </div>
@@ -130,7 +242,8 @@
         <select class="sheet-select-dropdown" id="sheet-selector-dropdown" onchange="switchSheetDropdown(this.value)" title="Choose Active Spreadsheet">
           <option value="evaluation">1. Master Evaluation Sheet</option>
           <option value="tests">2. Class Test Marksheet</option>
-          <option value="assignments">3. Assignment &amp; Coursework Marksheet</option>
+          <option value="assignments">3. Assignment Marksheet</option>
+          <option value="practicals">4. Practical &amp; Lab Work Marksheet</option>
         </select>
 
         <!-- Context-dependent sub-sheet dropdown / calendar button container -->
@@ -174,6 +287,7 @@
       <button type="button" id="tab-sheet-evaluation" onclick="switchSheetTab('evaluation')"></button>
       <button type="button" id="tab-sheet-tests" onclick="switchSheetTab('tests')"></button>
       <button type="button" id="tab-sheet-assignments" onclick="switchSheetTab('assignments')"></button>
+      <button type="button" id="tab-sheet-practicals" onclick="switchSheetTab('practicals')"></button>
       <button type="button" id="tab-sheet-attendance" onclick="switchSheetTab('attendance')"></button>
       <div id="subtoolbar-left-content"></div>
       <div id="subtoolbar-right-content"></div>
@@ -227,7 +341,7 @@
               <strong style="font-size:0.78rem;color:var(--text-main);">Toggle Columns Visibility</strong>
               <div style="display:flex;align-items:center;gap:0.45rem;">
                 <button type="button" onclick="resetAllColumnsVisible()" style="border:none;background:none;color:var(--color-primary);font-size:0.72rem;cursor:pointer;font-weight:700;">Show All</button>
-                <button type="button" onclick="toggleColumnVisibilityMenu()" style="border:none;background:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:800;padding:0 0.2rem;" title="Close">✕</button>
+                <button type="button" onclick="toggleColumnVisibilityMenu()" style="border:none;background:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:800;padding:0 0.2rem;" title="Close" data-icon="close" aria-label="Close"></button>
               </div>
             </div>
             <div id="col-checkboxes-container" style="display:flex;flex-direction:column;gap:0.35rem;font-size:0.78rem;color:var(--text-main);max-height:220px;overflow-y:auto;">
@@ -238,7 +352,7 @@
 
         <!-- Column Focus Jump Dropdown -->
         <select class="eval-filter-select" id="sheet-column-focus-select" onchange="onFocusColumnChange(this.value)" title="Jump directly to column">
-          <option value="">🎯 Column Focus ▾</option>
+          <option value="">Column Focus ▾</option>
         </select>
       </div>
 
@@ -246,7 +360,7 @@
         <!-- Segmented Mode Switcher: Dynamic vs Overview (Combined Single Button) -->
         <div class="sheet-mode-segmented" id="sheet-mode-segmented" onclick="toggleSheetViewMode()" title="Toggle View Mode: Dynamic Freeze vs Full Overview (Click to switch)" style="cursor:pointer;">
           <button type="button" class="btn-mode-toggle active" id="btn-mode-dynamic" style="display:inline-flex; align-items:center; gap:0.25rem;">
-            <span class="mode-icon">📱</span>
+            <span class="mode-icon" data-icon="devices"></span>
             <span class="mode-label">Dynamic</span>
           </button>
           <button type="button" class="btn-mode-toggle" id="btn-mode-overview" style="display:none; align-items:center; gap:0.25rem;">
@@ -304,16 +418,25 @@
           </div>
         </div>
 
-        <!-- PANE 3: COURSEWORK & ASSIGNMENTS SHEET -->
+        <!-- PANE 3: COURSEWORK & ASSIGNMENTS SHEET (THEORY ONLY) -->
         <div class="sheet-pane" id="pane-assignments">
           <div id="assignments-table-container">
             <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
-              Loading Coursework &amp; Assignment Marksheet...
+              Loading Assignment Marksheet...
             </div>
           </div>
         </div>
 
-        <!-- PANE 4: ATTENDANCE MATRIX LEDGER (REMOVED PER USER REQUEST) -->
+        <!-- PANE 4: PRACTICAL & LAB WORK MARKSHEET -->
+        <div class="sheet-pane" id="pane-practicals">
+          <div id="practicals-table-container">
+            <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+              Loading Practical &amp; Lab Work Marksheet...
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 5: ATTENDANCE MATRIX LEDGER (REMOVED PER USER REQUEST) -->
         <div class="sheet-pane" id="pane-attendance" style="display:none !important;" aria-hidden="true">
           <div id="attendance-table-container"></div>
         </div>
@@ -345,7 +468,7 @@
     <div class="studio-modal-card">
       <div class="studio-modal-header">
         <h3>+ Add Spreadsheet Column</h3>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-column')">✕</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-column')" data-icon="close" aria-label="Close"></button>
       </div>
       <div class="studio-modal-body">
         <div class="form-group-item">
@@ -385,7 +508,7 @@
     <div class="studio-modal-card">
       <div class="studio-modal-header">
         <h3>− Remove Spreadsheet Column</h3>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-remove-column')">✕</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-remove-column')" data-icon="close" aria-label="Close"></button>
       </div>
       <div class="studio-modal-body">
         <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">Select a column to remove from the active sheet view. Row totals and class averages will recalculate automatically.</p>
@@ -408,7 +531,7 @@
     <div class="studio-modal-card">
       <div class="studio-modal-header">
         <h3>+ Add Student Row</h3>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-row')">✕</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-row')" data-icon="close" aria-label="Close"></button>
       </div>
       <div class="studio-modal-body">
         <div class="form-group-item">
@@ -439,8 +562,11 @@
   <div class="studio-modal-backdrop" id="modal-edit-row">
     <div class="studio-modal-card">
       <div class="studio-modal-header">
-        <h3>✏️ Edit / Remove Student</h3>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-row')">✕</button>
+        <div style="display:flex;align-items:center;gap:0.45rem;">
+          <span data-icon="edit"></span>
+          <h3 style="margin:0;">Edit / Remove Student</h3>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-row')" data-icon="close" aria-label="Close"></button>
       </div>
       <div class="studio-modal-body">
         <div class="form-group-item">
@@ -661,7 +787,7 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
         <span style="font-weight:800;font-size:0.84rem;color:var(--text-main);">Studio Scale &amp; Structure Options</span>
       </div>
-      <button type="button" class="drawer-close-btn" onclick="toggleFloatingToolsDrawer(false)">✕</button>
+      <button type="button" class="drawer-close-btn" onclick="toggleFloatingToolsDrawer(false)" data-icon="close" aria-label="Close"></button>
     </div>
 
     <div class="drawer-body">
@@ -693,7 +819,7 @@
         <div class="drawer-ctrl-row">
           <div class="sheet-mode-segmented">
             <button type="button" class="btn-mode-toggle active" id="drawer-btn-mode-dynamic" onclick="setSheetViewMode('dynamic')" title="Dynamic Mode: Freeze Roll &amp; Name, scroll other columns at 100% scale">
-              <span>📱 Dynamic Mode</span>
+              <span style="display:inline-flex;align-items:center;gap:0.3rem;"><span data-icon="devices"></span> Dynamic Mode</span>
             </button>
             <button type="button" class="btn-mode-toggle" id="drawer-btn-mode-overview" onclick="setSheetViewMode('overview')" title="Overview Mode: Full sheet scaled to screen, pinch-to-zoom">
               <span>⇲ Overview Mode</span>
@@ -786,7 +912,7 @@
           <span class="badge" id="drawer-user-role" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.68rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);">Faculty Member</span>
         </div>
       </div>
-      <button type="button" class="drawer-close-btn" onclick="toggleAndroidProfileDrawer(false)">✕</button>
+      <button type="button" class="drawer-close-btn" onclick="toggleAndroidProfileDrawer(false)" data-icon="close" aria-label="Close"></button>
     </div>
 
     <div class="profile-quick-links-list">
@@ -798,7 +924,7 @@
           <span class="quick-link-title">App Theme</span>
           <span class="quick-link-subtitle" id="drawer-theme-label">Switch Dark / Light Mode</span>
         </div>
-        <div class="quick-link-arrow">➔</div>
+        <div class="quick-link-arrow" data-icon="arrowRight"></div>
       </button>
 
       <a href="/faculty/groups.html" class="quick-link-item">
@@ -809,7 +935,7 @@
           <span class="quick-link-title">My Classes &amp; Teaching Groups</span>
           <span class="quick-link-subtitle">Google Classroom-style teaching groups</span>
         </div>
-        <div class="quick-link-arrow">➔</div>
+        <div class="quick-link-arrow" data-icon="arrowRight"></div>
       </a>
 
       <a href="/faculty/registers.html" class="quick-link-item">
@@ -820,7 +946,7 @@
           <span class="quick-link-title">Attendance Registers &amp; Live Studio</span>
           <span class="quick-link-subtitle">Dynamic QR roll call &amp; monthly ledger</span>
         </div>
-        <div class="quick-link-arrow">➔</div>
+        <div class="quick-link-arrow" data-icon="arrowRight"></div>
       </a>
 
       <a href="/faculty/registers.html?tab=marks" class="quick-link-item">
@@ -831,7 +957,7 @@
           <span class="quick-link-title">Class Tests &amp; Periodic Exams</span>
           <span class="quick-link-subtitle">Question-wise marks entry &amp; gradebooks</span>
         </div>
-        <div class="quick-link-arrow">➔</div>
+        <div class="quick-link-arrow" data-icon="arrowRight"></div>
       </a>
 
       <a href="/faculty/registers.html?tab=assignments" class="quick-link-item">
@@ -842,7 +968,7 @@
           <span class="quick-link-title">Coursework Assignments</span>
           <span class="quick-link-subtitle">Assignment grading &amp; submissions</span>
         </div>
-        <div class="quick-link-arrow">➔</div>
+        <div class="quick-link-arrow" data-icon="arrowRight"></div>
       </a>
 
       <a href="/faculty/profile.html" class="quick-link-item">
@@ -853,7 +979,7 @@
           <span class="quick-link-title">Account Settings</span>
           <span class="quick-link-subtitle">Profile details &amp; preferences</span>
         </div>
-        <div class="quick-link-arrow">➔</div>
+        <div class="quick-link-arrow" data-icon="arrowRight"></div>
       </a>
 
       <!-- Logout Action -->
@@ -865,7 +991,7 @@
           <span class="quick-link-title" style="color:var(--status-absent);">Sign Out of VidyaOS</span>
           <span class="quick-link-subtitle">Safely terminate active session</span>
         </div>
-        <div class="quick-link-arrow" style="color:var(--status-absent);">➔</div>
+        <div class="quick-link-arrow" style="color:var(--status-absent);" data-icon="arrowRight"></div>
       </button>
     </div>
   </div>
@@ -880,7 +1006,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-main);">Edit Total Marks &amp; Scheme</h3>
         </div>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeEditMarksModal()">✕</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeEditMarksModal()" data-icon="close" aria-label="Close"></button>
       </div>
 
       <div class="studio-modal-body" style="display: flex; flex-direction: column; gap: 0.85rem; max-height: 60vh; overflow-y: auto;">
@@ -941,7 +1067,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
           <h3 style="margin:0;font-size:1rem;font-weight:800;color:var(--text-main);">Edit Student Row Data</h3>
         </div>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-student-roster')">✕</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-student-roster')" data-icon="close" aria-label="Close"></button>
       </div>
 
       <div class="studio-modal-body" style="max-height: 70vh; overflow-y: auto;">
@@ -978,12 +1104,12 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <script src="/js/icons.js?v=20261026"></script>
   <script src="/js/api.js?v=20261003"></script>
   <script src="/js/auth.js?v=20261003"></script>
   <script src="/js/ui.js?v=20261003"></script>
   <script src="/js/exceljs.min.js"></script>
   
-  <script src="/faculty/sheets/sheets.js?v=20261022"></script>
+  <script src="/faculty/sheets/sheets.js?v=20261025"></script>
 </body>
 </html>

@@ -1758,6 +1758,10 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
     }
 
     function openCreateAssignmentModal() {
+      if (currentRegisterId) {
+        window.location.href = `/faculty/classwork/create.html?type=assignment&register=${encodeURIComponent(currentRegisterId)}`;
+        return;
+      }
       if (!registerData) {
         showToast('Please select a register first', 'error');
         return;
@@ -2006,6 +2010,10 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
       }
     }
     function openCreateExamModal() {
+      if (currentRegisterId) {
+        window.location.href = `/faculty/classwork/create.html?type=test&register=${encodeURIComponent(currentRegisterId)}`;
+        return;
+      }
       if (!registerData) {
         showToast('Please select a register first', 'error');
         return;
@@ -2188,23 +2196,80 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
           'Submit your answer sheet to the invigilator.'
         ];
 
-        // Teacher defines question statements and marks via "+ Add Question" modal
-        const defaultQuestionsMeta = [
-          { num: 1, text: '', marks: defaultQuestions[0].max },
-          { num: 2, text: '', marks: defaultQuestions[1].max },
-          { num: 3, text: '', marks: defaultQuestions[2].max },
-          { num: 4, text: '', marks: defaultQuestions[3].max }
-        ];
+        let activeQuestions = [];
+        if (exam.questions) {
+          try {
+            const parsed = typeof exam.questions === 'string' ? JSON.parse(exam.questions) : exam.questions;
+            if (Array.isArray(parsed) && parsed.length) {
+              const splitMax = totalMax ? +(totalMax / parsed.length).toFixed(1) : 5;
+              activeQuestions = parsed.map((q, i) => ({
+                num: q.num || (i + 1),
+                label: `Q${q.num || (i + 1)}`,
+                text: typeof q === 'string' ? q : (q.text || q.question || `Question ${i + 1}`),
+                max: Number(q.max || q.max_marks || q.marks || splitMax)
+              }));
+            }
+          } catch (_) {}
+        }
+
+        let activeInstructions = [];
+        if (exam.instructions) {
+          if (Array.isArray(exam.instructions) && exam.instructions.length) {
+            activeInstructions = exam.instructions;
+          } else if (typeof exam.instructions === 'string') {
+            try {
+              const parsed = JSON.parse(exam.instructions);
+              if (Array.isArray(parsed) && parsed.length) activeInstructions = parsed;
+              else if (typeof parsed === 'string') {
+                const lines = parsed.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+                if (lines.length) activeInstructions = lines;
+              }
+            } catch (_) {
+              const lines = exam.instructions.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+              if (lines.length) activeInstructions = lines;
+            }
+          }
+        }
+
+        if (!activeQuestions.length && activeInstructions.length) {
+          const detectedQ = [];
+          const remainingIns = [];
+          activeInstructions.forEach(line => {
+            if (/^(?:Q\.?\s*\d+|\d+)[\.\:\-\)]/i.test(line)) {
+              detectedQ.push(line.replace(/^(?:Q\.?\s*\d+|\d+)[\.\:\-\)]\s*/i, ''));
+            } else {
+              remainingIns.push(line);
+            }
+          });
+          if (detectedQ.length) {
+            const splitMax = totalMax ? +(totalMax / detectedQ.length).toFixed(1) : 5;
+            activeQuestions = detectedQ.map((qText, idx) => ({
+              num: idx + 1,
+              label: `Q${idx + 1}`,
+              text: qText,
+              max: splitMax
+            }));
+            if (remainingIns.length) activeInstructions = remainingIns;
+          }
+        }
+
+        const finalQuestions = activeQuestions.length ? activeQuestions : defaultQuestions;
+        const finalInstructions = activeInstructions.length ? activeInstructions : defaultInstructions;
+        const finalQuestionsMeta = finalQuestions.map((q, idx) => ({
+          num: q.num || (idx + 1),
+          text: q.text || '',
+          marks: q.max
+        }));
 
         const formattedRoster = roster.map((r, idx) => {
           const isAb = Boolean(r.is_absent || r.status === 'ABSENT');
           let qScores = Array.isArray(r.question_scores) && r.question_scores.length ? r.question_scores : null;
           if (!qScores) {
             if (r.marks_obtained !== null && r.marks_obtained !== undefined) {
-              const part = Number(r.marks_obtained) / defaultQuestions.length;
-              qScores = defaultQuestions.map(() => Math.round(part * 10) / 10);
+              const part = Number(r.marks_obtained) / finalQuestions.length;
+              qScores = finalQuestions.map(() => Math.round(part * 10) / 10);
             } else {
-              qScores = defaultQuestions.map(() => 0);
+              qScores = finalQuestions.map(() => 0);
             }
           }
           const tot = isAb ? 0 : qScores.reduce((sum, v) => sum + (Number(v) || 0), 0);
@@ -2226,9 +2291,9 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
           session_label: (registerData && registerData.session_label) || 'Internal Evaluation Sheet 2026 Session',
           duration: '50 Minute',
           mode: 'OFFLINE',
-          questions: defaultQuestions,
-          instructions: defaultInstructions,
-          questions_meta: defaultQuestionsMeta,
+          questions: finalQuestions,
+          instructions: finalInstructions,
+          questions_meta: finalQuestionsMeta,
           roster: formattedRoster
         };
 
@@ -2267,7 +2332,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
         if (parts.length > 1 && parts[0].trim().length > 0) return parts[0].trim();
         return str;
       })(state.exam.name);
-      const totalCols = 5 + state.questions.length;
+      const totalCols = 7 + state.questions.length;
       const sessionKey = (registerData && (registerData.academic_year_id || registerData.academic_year_label)) || '2026';
       const sessionStoreKey = `vidyaos_inst_header_session_${String(sessionKey).replace(/[^a-zA-Z0-9]/g, '_')}`;
       const defaultInstHeader = 'Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026 Session';
@@ -2329,8 +2394,10 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                 <!-- ROW 4: Column Headers (Tan fill) -->
                 <tr class="excel-hdr-tan">
                   <th rowspan="2" style="width: 55px; vertical-align: middle;">SR. NO.</th>
-                  <th rowspan="2" style="width: 100px; vertical-align: middle;">ROLL NO.</th>
-                  <th rowspan="2" style="width: 220px; vertical-align: middle;">STUDENT NAME</th>
+                  <th rowspan="2" style="width: 85px; vertical-align: middle;">ROLL NO.</th>
+                  <th rowspan="2" style="width: 125px; vertical-align: middle;">REG. NO.</th>
+                  <th rowspan="2" style="width: 125px; vertical-align: middle;">ENROLLMENT NO.</th>
+                  <th rowspan="2" style="width: 200px; vertical-align: middle;">STUDENT NAME</th>
                   <th colspan="${state.questions.length}">${escapeHtml(cleanExamName)} (Total Marks : ${examMaxMarks})</th>
                   <th style="width: 75px;">Total</th>
                   <th style="min-width: 380px;">Unit Test Details (Mode : OFFLINE)</th>
@@ -2356,11 +2423,12 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                     <tr class="${isAb ? 'is-absent' : ''}" id="exam-row-${examId}-${r.student_id}">
                       <td class="excel-cell-sr">${rIdx + 1}</td>
                       <td class="cell-roll">${escapeHtml(String(r.class_roll_no || rIdx + 1))}</td>
+                      <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${escapeHtml(r.registration_no || '—')}</td>
+                      <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${escapeHtml(r.official_enrollment_no || '—')}</td>
                       <td class="cell-student-name">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                           <div>
                             <span title="${escapeHtml(r.full_name)}" style="font-weight: 700;">${escapeHtml(r.full_name)}</span>
-                            <div style="font-family: var(--font-family-mono); font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(r.registration_no || r.official_enrollment_no || '')}</div>
                           </div>
                           <button type="button" 
                                   class="btn-sheet-att-toggle ${isAb ? 'is-absent' : ''}" 
@@ -2380,7 +2448,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                                    value="${isAb ? 0 : qVal}" 
                                    min="0" 
                                    max="${q.max}" 
-                                   step="0.1" 
+                                   step="any" 
                                    ${isAb ? 'disabled' : ''} 
                                    oninput="onExamQuestionScoreChange(${examId}, ${r.student_id}, ${qIdx}, this.value)">
                           </td>
@@ -2426,7 +2494,7 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="${3 + state.questions.length}" class="excel-summary-lbl" style="text-align: right; font-weight: 800;">
+                  <td colspan="${5 + state.questions.length}" class="excel-summary-lbl" style="text-align: right; font-weight: 800;">
                     Average of the class (Only present students)
                   </td>
                   <td class="excel-summary-avg" id="exam-class-avg-${examId}" style="font-weight: 800; text-align: center;">
@@ -3151,8 +3219,8 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
               <thead>
                 <tr class="excel-hdr-tan" style="background:var(--chip-hod-bg); color:var(--text-main);">
                   <th rowspan="2" style="width: 50px;">ROLL NO</th>
-                  <th rowspan="2" style="width: 120px;">ENROLLMENT NO</th>
                   <th rowspan="2" style="width: 120px;">REG NO</th>
+                  <th rowspan="2" style="width: 120px;">ENROLLMENT NO</th>
                   <th rowspan="2" style="width: 190px; text-align: left;">STUDENT NAME</th>
                   <th colspan="${aCount}">Assignment Marks</th>
                   <th rowspan="2" style="width: 95px;">Assign Avg (15)</th>
@@ -3182,8 +3250,8 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
                 ${state.students.map((s, idx) => `
                   <tr>
                     <td class="cell-roll" style="text-align:center; font-weight:700;">${escapeHtml(String(s.class_roll_no))}</td>
-                    <td style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted); text-align:center;">${escapeHtml(s.official_enrollment_no || '—')}</td>
                     <td style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted); text-align:center;">${escapeHtml(s.registration_no || '—')}</td>
+                    <td style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted); text-align:center;">${escapeHtml(s.official_enrollment_no || '—')}</td>
                     <td class="cell-student-name" style="text-align: left;" title="${escapeHtml(s.full_name)}">
                       <span style="font-weight: 700; text-transform: uppercase;">${escapeHtml(s.full_name)}</span>
                     </td>
@@ -3489,6 +3557,232 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
         confirmBtn.textContent = 'Confirm Delete';
       }
     }
+
+    // ─── ATTENDANCE EXPORT STUDIO CONTROLLER ───
+    function openAttendanceExportModal() {
+      const modal = document.getElementById('modal-export-attendance');
+      if (!modal) return;
+
+      // Populate available months
+      const monthSelect = document.getElementById('export-month-select');
+      if (monthSelect) {
+        monthSelect.innerHTML = '';
+        const availMonths = (gridData?.available_months && gridData.available_months.length > 0)
+          ? gridData.available_months
+          : [currentMonth || new Date().toISOString().slice(0, 7)];
+        
+        const distinctMonths = Array.from(new Set(availMonths)).filter(Boolean).sort().reverse();
+        distinctMonths.forEach(m => {
+          if (!m || typeof m !== 'string' || !m.includes('-')) return;
+          const opt = document.createElement('option');
+          opt.value = m;
+          const [yr, mo] = m.split('-').map(Number);
+          const d = new Date(yr, mo - 1, 1);
+          opt.textContent = d.toLocaleString('default', { month: 'short', year: 'numeric' });
+          if (m === currentMonth) opt.selected = true;
+          monthSelect.appendChild(opt);
+        });
+      }
+
+      // Set default day for Single Day export
+      const dayInput = document.getElementById('export-day-input');
+      if (dayInput && !dayInput.value) {
+        dayInput.value = new Date().toISOString().slice(0, 10);
+      }
+
+      // Pre-select scope component matching active register
+      const activeReg = (allRegisters || []).find(r => r.id === currentRegisterId) || registerData || {};
+      const defaultScope = activeReg.component || 'BOTH';
+      selectExportScope(defaultScope);
+
+      // Default to Excel and All Months
+      selectExportFormat('xlsx');
+      handleExportRangeChange('all_months');
+
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+      document.body.classList.add('modal-open');
+    }
+
+    function closeAttendanceExportModal() {
+      const modal = document.getElementById('modal-export-attendance');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+        if (!document.querySelector('.modal-backdrop.open')) {
+          document.body.classList.remove('modal-open');
+        }
+      }
+    }
+
+    function selectExportFormat(fmt) {
+      ['xlsx', 'pdf', 'doc'].forEach(f => {
+        const card = document.getElementById(`card-format-${f}`);
+        if (card) {
+          if (f === fmt) {
+            card.classList.add('active');
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+          } else {
+            card.classList.remove('active');
+          }
+        }
+      });
+    }
+
+    function handleExportRangeChange(range) {
+      const ranges = ['overview_only', 'all_months', 'month', 'week', 'day'];
+      ranges.forEach(r => {
+        const key = r === 'overview_only' ? 'overview' : (r === 'all_months' ? 'all' : r);
+        const label = document.getElementById(`label-range-${key}`);
+        const radio = document.getElementById(`range-opt-${key}`);
+        if (label) {
+          if (r === range) {
+            label.classList.add('active');
+            if (radio) radio.checked = true;
+          } else {
+            label.classList.remove('active');
+          }
+        }
+      });
+
+      // Contextual inputs: only visible and active when Specific Month or Specific Day is selected
+      const monthRow = document.getElementById('export-context-month-row');
+      const dayRow = document.getElementById('export-context-day-row');
+      if (monthRow) monthRow.style.display = (range === 'month') ? 'flex' : 'none';
+      if (dayRow) dayRow.style.display = (range === 'day') ? 'flex' : 'none';
+
+      updateExportRangeHint(range);
+    }
+
+    function updateExportRangeHint(range) {
+      const hintText = document.getElementById('export-range-hint-text');
+      if (!hintText) return;
+
+      const hints = {
+        'all_months': '<b>Full Semester:</b> Complete Day 1–31 daily matrix for all months + final summary.',
+        'overview_only': '<b>Summary Only:</b> Student attendance % and totals only (no daily day-by-day grids).',
+        'week': '<b>Current Week:</b> Monday to Saturday daily attendance for the active week.',
+        'month': '<b>Selected Month:</b> Day 1–31 ledger for the chosen month only.',
+        'day': '<b>Single Day:</b> Daily session check-in roster for the chosen date.'
+      };
+
+      hintText.innerHTML = hints[range] || hints['all_months'];
+    }
+
+    function selectExportScope(scope) {
+      const scopeVal = document.getElementById('export-scope-val');
+      if (scopeVal) scopeVal.value = scope;
+
+      const pills = {
+        'BOTH': document.getElementById('btn-scope-both'),
+        'THEORY': document.getElementById('btn-scope-theory'),
+        'PRACTICAL': document.getElementById('btn-scope-practical')
+      };
+
+      Object.keys(pills).forEach(s => {
+        if (pills[s]) {
+          if (s === scope) pills[s].classList.add('active');
+          else pills[s].classList.remove('active');
+        }
+      });
+    }
+
+    async function executeAttendanceExport() {
+      const regId = currentRegisterId || (allRegisters && allRegisters[0]?.id);
+      if (!regId) {
+        showToast('No active register found to export', 'error');
+        return;
+      }
+
+      const fmtRadio = document.querySelector('input[name="export-format"]:checked');
+      const format = fmtRadio ? fmtRadio.value : 'xlsx';
+
+      const rangeRadio = document.querySelector('input[name="export-range"]:checked');
+      const range = rangeRadio ? rangeRadio.value : 'all_months';
+
+      const monthSelect = document.getElementById('export-month-select');
+      const targetMonth = monthSelect ? monthSelect.value : (currentMonth || new Date().toISOString().slice(0, 7));
+
+      const dayInput = document.getElementById('export-day-input');
+      const targetDay = dayInput ? dayInput.value : new Date().toISOString().slice(0, 10);
+
+      const scopeVal = document.getElementById('export-scope-val');
+      const scope = scopeVal ? scopeVal.value : 'BOTH';
+
+      const btn = document.getElementById('btn-execute-export');
+      const lbl = document.getElementById('lbl-export-btn');
+      const originalText = lbl ? lbl.innerText : 'Download Report';
+
+      try {
+        if (btn) btn.disabled = true;
+        if (lbl) lbl.innerText = 'Generating report...';
+
+        const token = typeof getToken === 'function' ? getToken() : (localStorage.getItem('access_token') || '');
+        const deviceId = typeof getDeviceId === 'function' ? getDeviceId() : (typeof localStorage !== 'undefined' ? localStorage.getItem('vidyaos_device_id') : null);
+
+        const payload = {
+          format,
+          range,
+          month: targetMonth,
+          day: targetDay,
+          scope
+        };
+
+        const resp = await fetch(`/api/v1/faculty/registers/${regId}/export/attendance`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+            ...(deviceId ? { 'X-Device-Id': deviceId } : {})
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+          let errMessage = 'Failed to export attendance report';
+          try {
+            const errData = await resp.json();
+            if (errData?.error?.message) errMessage = errData.error.message;
+          } catch (e) {}
+          throw new Error(errMessage);
+        }
+
+        // Handle download
+        let filename = `Attendance_Register_${format.toUpperCase()}.${format}`;
+        const disposition = resp.headers.get('Content-Disposition');
+        if (disposition && disposition.includes('filename=')) {
+          const match = disposition.match(/filename="?([^";]+)"?/);
+          if (match && match[1]) filename = match[1];
+        }
+
+        const blob = await resp.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+
+        closeAttendanceExportModal();
+        showToast('Attendance report generated successfully!', 'success');
+      } catch (err) {
+        showToast('Export error: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+        if (lbl) lbl.innerText = originalText;
+      }
+    }
+
+    window.openAttendanceExportModal = openAttendanceExportModal;
+    window.closeAttendanceExportModal = closeAttendanceExportModal;
+    window.selectExportFormat = selectExportFormat;
+    window.handleExportRangeChange = handleExportRangeChange;
+    window.selectExportScope = selectExportScope;
+    window.executeAttendanceExport = executeAttendanceExport;
 
     // Initialize View: Directly open register
     loadRegistersList();

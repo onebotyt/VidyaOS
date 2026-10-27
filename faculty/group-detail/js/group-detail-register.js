@@ -26,26 +26,50 @@
     gridData: null,
     currentMonth: null,
     selectedDate: new Date().toISOString().slice(0, 10),
-    mobilePeriod: 'ALL', // 'ALL' | 1 | 2
+    mobilePeriod: 'ALL', // 'ALL' | 1 | 2 | 3...
+    mobileSearchQuery: '',
     activePopoverStudentId: null,
     hasAddedSecondClass: false,
     selectedMatrixStudents: new Set(),
     selectedMobileStudents: new Set(),
+    groupRegisters: [],
     loading: false
   };
 
   async function loadClassRegister(month) {
     try {
       const S = getS();
-      let regId = S.group?.register_id || classRegState.registerId;
-      if (!regId) {
-        const listRes = await apiFetch('/api/v1/faculty/registers');
-        if (listRes && listRes.success && Array.isArray(listRes.data)) {
-          const found = listRes.data.find(r => r.group_id === Number(S.groupId) || r.subject_id === S.group?.subject_id);
-          if (found) regId = found.id;
-          else if (listRes.data.length > 0) regId = listRes.data[0].id;
+      const groupId = Number(S.groupId);
+
+      // Fetch all registers to find those linked to this group or subject
+      let groupRegisters = (Array.isArray(S.group?.registers) && S.group.registers.length > 0)
+        ? [...S.group.registers]
+        : [];
+
+      if (groupRegisters.length === 0) {
+        try {
+          const listRes = await apiFetch('/api/v1/faculty/registers');
+          if (listRes && listRes.success && Array.isArray(listRes.data)) {
+            groupRegisters = listRes.data.filter(r => (groupId && r.group_id === groupId) || (S.group?.subject_id && r.subject_id === S.group?.subject_id));
+          }
+        } catch (e) {
+          console.warn('Could not fetch registers list:', e);
         }
       }
+      classRegState.groupRegisters = groupRegisters;
+
+      let regId = classRegState.registerId;
+      if (!regId) {
+        if (S.group?.register_id) {
+          regId = S.group.register_id;
+        } else if (groupRegisters.length > 0) {
+          regId = groupRegisters[0].id;
+        }
+      }
+      if (groupRegisters.length > 0 && !groupRegisters.some(r => r.id === regId)) {
+        regId = groupRegisters[0].id;
+      }
+
       if (!regId) {
         const body = ById('class-matrix-body');
         if (body) body.innerHTML = `<tr><td style="text-align:center;padding:2rem;color:var(--text-muted)">No attendance register linked to this subject classroom.</td></tr>`;
@@ -62,6 +86,7 @@
 
         document.body.classList.remove('mobile-full-ledger');
         renderClassRegisterHeader();
+        renderRegisterScopeSwitcher();
         renderClassRegisterMatrix();
         renderMobileCompactMatrix();
         checkClassEspStatus();
@@ -71,6 +96,50 @@
     }
   }
 
+  function renderRegisterScopeSwitcher() {
+    const regs = classRegState.groupRegisters || [];
+    const activeRegId = classRegState.registerId;
+
+    const wrap = ById('class-reg-scope-switcher-wrap');
+    const container = ById('class-reg-scope-pill-group');
+
+    if (regs.length <= 1) {
+      if (wrap) wrap.style.display = 'none';
+      return;
+    }
+
+    if (wrap) wrap.style.display = 'flex';
+
+    const getScopeIcon = (scope) => {
+      const s = (scope || 'THEORY').toUpperCase();
+      if (s.includes('PRACT')) {
+        return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10 2v7.31L4.69 18.2A2 2 0 0 0 6.37 21h11.26a2 2 0 0 0 1.68-2.8L14 9.31V2"></path><line x1="8" y1="2" x2="16" y2="2"></line></svg>`;
+      }
+      return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`;
+    };
+
+    const buttonsHtml = regs.map(r => {
+      const isActive = r.id === activeRegId;
+      const isPract = (r.session_type_scope || '').toUpperCase().includes('PRACT');
+      const label = isPract ? 'Practical' : 'Theory';
+      return `
+        <button type="button" class="reg-scope-btn ${isActive ? 'active' : ''}" onclick="switchGroupRegister(${r.id})" title="${r.name || (isPract ? 'Practical Register' : 'Theory Register')}">
+          ${getScopeIcon(r.session_type_scope)}
+          <span>${label}</span>
+        </button>
+      `;
+    }).join('');
+
+    if (container) container.innerHTML = buttonsHtml;
+  }
+
+  async function switchGroupRegister(regId) {
+    if (!regId || classRegState.registerId === regId) return;
+    classRegState.registerId = regId;
+    classRegState.mobilePeriod = 'ALL';
+    await loadClassRegister(classRegState.currentMonth);
+  }
+
   function renderClassRegisterHeader() {
     const S = getS();
     const reg = classRegState.registerData || {};
@@ -78,7 +147,12 @@
     const esc = window.escapeHtml || (s => String(s == null ? '' : s));
 
     const titleEl = ById('class-reg-title');
-    if (titleEl) titleEl.textContent = (reg.name || grp.name || 'Subject') + ' — Attendance Matrix';
+    const rawTitle = reg.name || grp.name || 'Subject';
+    const shortName = reg.short_name || grp.short_name || reg.subject_code || grp.subject_code || (rawTitle.split(/[\s-]+/).map(w => w[0]).join('').toUpperCase().slice(0, 6));
+    if (titleEl) {
+      titleEl.innerHTML = `<span class="subject-full-title">${esc(rawTitle)}</span><span class="subject-short-title">${esc(shortName)}</span>`;
+      titleEl.title = rawTitle;
+    }
     
     const subEl = ById('class-reg-subtitle');
     if (subEl) {
@@ -98,7 +172,8 @@
     if (monthDisplay && classRegState.currentMonth) {
       const [y, m] = classRegState.currentMonth.split('-').map(Number);
       const mNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      monthDisplay.textContent = (mNames[m - 1] || '') + ' ' + y;
+      const mShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      monthDisplay.innerHTML = `<span class="month-full-name">${mNames[m - 1] || ''}</span><span class="month-short-name">${mShort[m - 1] || ''}</span> <span class="month-year-num">${y}</span>`;
     }
     const syncDate = ById('class-sync-date');
     if (syncDate && !syncDate.value) {
@@ -443,8 +518,6 @@
   function renderMobileCompactMatrix() {
     const tbody = ById('mobile-compact-tbody');
     const dateDisp = ById('mobile-matrix-date-display');
-    const thP1 = ById('m-th-p1');
-    const thP2 = ById('m-th-p2');
     const grid = classRegState.gridData;
     const esc = window.escapeHtml || (s => String(s == null ? '' : s));
     const targetDate = classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
@@ -465,67 +538,190 @@
       }
     }
 
-    // Check sessions for target date: Default is strictly 1 class
+    // Retrieve all sessions for target date (Default is strictly 1 class if none created)
     const finalized = grid.finalized_sessions || [];
-    const daySessions = finalized.filter(s => s.session_date === targetDate);
-    const sessionP1 = daySessions.find(s => (s.period_number || 1) === 1) || daySessions[0] || null;
-    const sessionP2 = daySessions.find(s => (s.period_number || 1) === 2) || (daySessions.length > 1 ? daySessions[1] : null);
+    let rawDaySessions = finalized.filter(s => s.session_date === targetDate);
+    rawDaySessions.sort((a, b) => (a.period_number || 1) - (b.period_number || 1));
 
-    const hasMultiClasses = daySessions.length > 1 || Boolean(classRegState.hasAddedSecondClass);
-    const periodFilter = classRegState.mobilePeriod || 'ALL';
-    const showP1 = (periodFilter === 'ALL' || periodFilter === 1);
-    const showP2 = hasMultiClasses && (periodFilter === 'ALL' || periodFilter === 2);
+    if (rawDaySessions.length === 0) {
+      rawDaySessions = [{
+        id: null,
+        session_date: targetDate,
+        period_number: 1,
+        label: 'Period 1',
+        session_type: classRegState.registerData?.session_type_scope || 'THEORY'
+      }];
+    }
 
-    // Update Class Controller Strip Pills
+    // Deduplicate by period_number so each period has a single distinct column & pill
+    const uniquePeriodsMap = new Map();
+    rawDaySessions.forEach(s => {
+      const p = s.period_number || 1;
+      if (!uniquePeriodsMap.has(p)) {
+        uniquePeriodsMap.set(p, s);
+      }
+    });
+    const daySessions = Array.from(uniquePeriodsMap.values());
+    daySessions.sort((a, b) => (a.period_number || 1) - (b.period_number || 1));
+
+    // Validate active period filter
+    if (classRegState.mobilePeriod !== 'ALL') {
+      const exists = daySessions.some(s => (s.period_number || 1) === classRegState.mobilePeriod);
+      if (!exists) {
+        classRegState.mobilePeriod = daySessions.length > 1 ? 'ALL' : (daySessions[0]?.period_number || 1);
+      }
+    }
+
+    // Update Class / Period Bar Pills (Pure text P1, P2, All - Compact and Clean)
     const pillsContainer = ById('mobile-period-pills-container');
     if (pillsContainer) {
-      if (!hasMultiClasses) {
-        pillsContainer.innerHTML = `<span class="mobile-period-btn active" style="cursor:default;font-weight:700;">Class 1</span>`;
-      } else {
+      if (daySessions.length <= 1) {
+        const s0 = daySessions[0];
+        const pNum = s0?.period_number || 1;
+        const displayLabel = s0?.label || (s0?.session_type === 'PRACTICAL' ? 'Practical Lab' : `Period ${pNum}`);
         pillsContainer.innerHTML = `
-          <button type="button" class="mobile-period-btn ${periodFilter === 'ALL' ? 'active' : ''}" onclick="setMobilePeriodFilter('ALL')">All</button>
-          <button type="button" class="mobile-period-btn ${periodFilter === 1 ? 'active' : ''}" onclick="setMobilePeriodFilter(1)">Class 1</button>
-          <button type="button" class="mobile-period-btn ${periodFilter === 2 ? 'active' : ''}" onclick="setMobilePeriodFilter(2)">Class 2</button>
+          <button type="button" class="mobile-period-btn active" onclick="setMobilePeriodFilter(${pNum})" title="${esc(displayLabel)}">
+            <span>P${pNum}</span>
+          </button>
         `;
+      } else {
+        let pillsHtml = `
+          <button type="button" class="mobile-period-btn ${classRegState.mobilePeriod === 'ALL' ? 'active' : ''}" onclick="setMobilePeriodFilter('ALL')" title="All Periods">
+            <span>All</span>
+          </button>
+        `;
+        daySessions.forEach(s => {
+          const pNum = s.period_number || 1;
+          const fullLabel = s.label || (s.session_type === 'PRACTICAL' ? 'Practical Lab' : `Period ${pNum}`);
+          pillsHtml += `
+            <button type="button" class="mobile-period-btn ${classRegState.mobilePeriod === pNum ? 'active' : ''}" onclick="setMobilePeriodFilter(${pNum})" title="Period ${pNum}: ${esc(fullLabel)}">
+              <span>P${pNum}</span>
+            </button>
+          `;
+        });
+        pillsContainer.innerHTML = pillsHtml;
+      }
+    }
+
+    // Update Remove Period Action Button (Only allowed for Period 2 and above, never Period 1)
+    const delBtn = ById('btn-mobile-del-class');
+    const delText = ById('btn-mobile-del-text');
+    if (delBtn) {
+      const currentPeriodNum = parseInt(classRegState.mobilePeriod, 10);
+      if (classRegState.mobilePeriod !== 'ALL' && currentPeriodNum > 1) {
+        const curSess = daySessions.find(s => (s.period_number || 1) === currentPeriodNum);
+        if (curSess && curSess.id) {
+          delBtn.style.display = 'inline-flex';
+          if (delText) delText.textContent = `Remove P${currentPeriodNum}`;
+          delBtn.onclick = () => confirmDeletePeriod(curSess.id, currentPeriodNum);
+        } else {
+          delBtn.style.display = 'none';
+        }
+      } else {
+        delBtn.style.display = 'none';
       }
     }
 
     const addClassBtn = ById('btn-mobile-add-class');
     if (addClassBtn) {
-      addClassBtn.textContent = hasMultiClasses ? '+ Add Period' : '+ Add Class';
+      addClassBtn.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>Add Period</span>
+      `;
     }
 
-    if (thP1) {
-      thP1.style.display = showP1 ? '' : 'none';
-      thP1.textContent = sessionP1 ? `Class 1` : 'Class 1';
-    }
-    if (thP2) {
-      thP2.style.display = showP2 ? '' : 'none';
-      thP2.textContent = sessionP2 ? `Class 2` : 'Class 2';
+    // Determine displayed sessions for columns
+    const displayedSessions = (classRegState.mobilePeriod === 'ALL')
+      ? daySessions
+      : daySessions.filter(s => (s.period_number || 1) === classRegState.mobilePeriod);
+    const effectiveSessions = displayedSessions.length > 0 ? displayedSessions : [daySessions[0]];
+
+    // Dynamic Thead Headers
+    const theadTr = ById('mobile-compact-thead-tr');
+    if (theadTr) {
+      let thCols = `
+        <th style="width: 28px; text-align: center; vertical-align: middle;">
+          <input type="checkbox" id="mobile-check-all" onchange="toggleSelectAllMobileStudents(this.checked)" title="Select all students">
+        </th>
+        <th style="width: 36px; text-align: center;">Roll</th>
+        <th style="text-align: left; padding-left: 0.5rem;">Student Name</th>
+      `;
+      effectiveSessions.forEach((s, idx) => {
+        const pNum = s.period_number || (idx + 1);
+        const colWidth = effectiveSessions.length > 2 ? '48px' : '54px';
+        const sType = (s.session_type || 'THEORY').toUpperCase();
+        const typeBadge = sType.startsWith('PRACT') ? 'LAB' : (sType.startsWith('TUT') ? 'TUT' : 'TH');
+        thCols += `
+          <th style="width: ${colWidth}; text-align: center; padding: 0.3rem 0.15rem;" title="Period ${pNum}: ${esc(s.label || '')} (${sType})">
+            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
+              <span style="font-weight: 800; font-size: 0.74rem; color: var(--text-main); line-height: 1;">P${pNum}</span>
+              ${s.id && pNum > 1 ? `
+                <button type="button" class="btn-period-del-mini" onclick="confirmDeletePeriod(${s.id}, ${pNum}, event)" title="Remove Period ${pNum}">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+              ` : ''}
+            </div>
+            <div style="font-size: 0.58rem; color: var(--color-primary); font-weight: 700; margin-top: 1px; letter-spacing: 0.02em;">${typeBadge}</div>
+          </th>
+        `;
+      });
+      thCols += `
+        <th id="m-th-attended" style="width: 52px; text-align: center;" title="Total classes attended this month">Attended</th>
+      `;
+      theadTr.innerHTML = thCols;
     }
 
-    let rowsHtml = grid.students.map((st, idx) => {
+    // Filter Students by Mobile Search Query
+    const q = (classRegState.mobileSearchQuery || '').trim().toLowerCase();
+    const studentsToRender = q ? grid.students.filter(st => {
+      const name = (st.full_name || '').toLowerCase();
+      const roll = String(st.class_roll_no != null ? st.class_roll_no : (st.roll_number || '')).toLowerCase();
+      const reg = String(st.registration_no || st.official_enrollment_no || '').toLowerCase();
+      return name.includes(q) || roll.includes(q) || reg.includes(q);
+    }) : grid.students;
+
+    if (!studentsToRender.length) {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="${effectiveSessions.length + 4}" style="text-align: center; padding: 2rem; color: var(--text-muted);">No students matching "${esc(q)}"</td></tr>`;
+      return;
+    }
+
+    let todayPCount = 0;
+    let todayACount = 0;
+
+    let rowsHtml = studentsToRender.map((st, idx) => {
       const marks = st.attendance_marks || {};
       const isTransferred = st.enrollment_status === 'TRANSFERRED';
       const isChecked = classRegState.selectedMobileStudents.has(st.student_id);
 
-      // Mark 1 (Class 1 / Period 1)
-      const p1Key = sessionP1 ? `sess_${sessionP1.id}` : targetDate;
-      const mark1 = marks[p1Key] || marks[targetDate] || null;
-      const mark1Status = typeof mark1 === 'string' ? mark1 : (mark1?.status || null);
-      let p1Char = '·';
-      let p1Cls = 'empty';
-      if (mark1Status === 'PRESENT') { p1Char = 'P'; p1Cls = 'p'; }
-      else if (mark1Status === 'ABSENT') { p1Char = 'A'; p1Cls = 'a'; }
+      let periodButtonsHtml = '';
+      effectiveSessions.forEach((s, sIdx) => {
+        const pNum = s.period_number || (sIdx + 1);
+        const pKey = s.id ? `sess_${s.id}` : (pNum > 1 ? `${targetDate}_${pNum}` : targetDate);
+        const markVal = marks[pKey] || (pNum === 1 ? marks[targetDate] : null) || null;
+        const markStatus = typeof markVal === 'string' ? markVal : (markVal?.status || null);
 
-      // Mark 2 (Class 2 / Period 2)
-      const p2Key = sessionP2 ? `sess_${sessionP2.id}` : `${targetDate}_2`;
-      const mark2 = marks[p2Key] || null;
-      const mark2Status = typeof mark2 === 'string' ? mark2 : (mark2?.status || null);
-      let p2Char = '·';
-      let p2Cls = 'empty';
-      if (mark2Status === 'PRESENT') { p2Char = 'P'; p2Cls = 'p'; }
-      else if (mark2Status === 'ABSENT') { p2Char = 'A'; p2Cls = 'a'; }
+        let pChar = '·';
+        let pCls = 'empty';
+        if (markStatus === 'PRESENT') {
+          pChar = 'P';
+          pCls = 'p';
+          todayPCount++;
+        } else if (markStatus === 'ABSENT') {
+          pChar = 'A';
+          pCls = 'a';
+          todayACount++;
+        }
+
+        periodButtonsHtml += `
+          <td style="text-align: center; padding: 0.25rem 0.2rem;">
+            <button type="button" class="mobile-pen-btn ${pCls}" id="m-btn-p${pNum}-${st.student_id}"
+                    onclick="toggleDigitalPen('${targetDate}', ${st.student_id}, this, ${pNum}, ${s.id || 'null'})"
+                    title="${esc(st.full_name)} (Period ${pNum}: ${esc(s.label || '')}). Tap to toggle: Present → Absent → Clear">
+              ${pChar}
+            </button>
+          </td>
+        `;
+      });
 
       const rollBadge = isTransferred ? `<span class="badge-transferred">T</span> ` : '';
       const cleanRoll = String(st.class_roll_no != null && String(st.class_roll_no) !== 'null' ? st.class_roll_no : (st.roll_number ? st.roll_number : (idx + 1))).replace(/^#/, '');
@@ -547,24 +743,7 @@
               ${idSubtitle}
             </div>
           </td>
-          ${showP1 ? `
-            <td style="text-align: center; padding: 0.25rem 0.35rem;">
-              <button type="button" class="mobile-pen-btn ${p1Cls}" id="m-btn-p1-${st.student_id}"
-                      onclick="toggleDigitalPen('${targetDate}', ${st.student_id}, this, 1, ${sessionP1?.id || 'null'})"
-                      title="Class 1: ${esc(st.full_name)}. Tap to toggle: Present → Absent → Clear">
-                ${p1Char}
-              </button>
-            </td>
-          ` : ''}
-          ${showP2 ? `
-            <td style="text-align: center; padding: 0.25rem 0.35rem;">
-              <button type="button" class="mobile-pen-btn ${p2Cls}" id="m-btn-p2-${st.student_id}"
-                      onclick="toggleDigitalPen('${targetDate}', ${st.student_id}, this, 2, ${sessionP2?.id || 'null'})"
-                      title="Class 2: ${esc(st.full_name)}. Tap to toggle: Present → Absent → Clear">
-                ${p2Char}
-              </button>
-            </td>
-          ` : ''}
+          ${periodButtonsHtml}
           <td style="text-align: center;">
             <span class="mobile-att-count" title="${st.total_attended || 0} classes attended">
               ${st.total_attended != null ? st.total_attended : 0}
@@ -575,10 +754,17 @@
     }).join('');
 
     if (tbody) tbody.innerHTML = rowsHtml;
+
+    // Update Live Headcount Summary in Mobile Header
+    const pSummary = ById('mobile-summary-p');
+    if (pSummary) pSummary.textContent = todayPCount;
+    const aSummary = ById('mobile-summary-a');
+    if (aSummary) aSummary.textContent = todayACount;
+
     updateMobileBulkBar();
   }
 
-  // ─── DIGITAL PEN INTERACTION (Tap to toggle: Present ➔ Absent ➔ Clear, No Late) ───
+  // ─── DIGITAL PEN INTERACTION (Tap to toggle: Present -> Absent -> Clear, No Late) ───
   async function toggleDigitalPen(date, studentId, el, periodNumber, sessionId) {
     if (!classRegState.registerId) return;
 
@@ -736,7 +922,7 @@
     if (!bar) return;
     if (size > 0) {
       bar.style.display = 'flex';
-      if (cnt) cnt.textContent = `${size} selected`;
+      if (cnt) cnt.textContent = String(size);
     } else {
       bar.style.display = 'none';
     }
@@ -784,28 +970,282 @@
     }
   }
 
-  // ─── ADD CLASS (DEFAULT 1 CLASS PER DAY) ───
+  // ─── ADD ATTENDANCE PERIOD (THEORY, PRACTICAL, OR CUSTOM) ───
   function addNewClassForDay() {
-    const regId = classRegState.registerId;
-    const targetDate = classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
-    if (!classRegState.hasAddedSecondClass) {
-      classRegState.hasAddedSecondClass = true;
-      toast('Added Class 2 for ' + targetDate);
-      renderMobileCompactMatrix();
-      if (regId) {
-        apiFetch(`/api/v1/faculty/registers/${regId}/sessions`, {
-          method: 'POST',
-          body: JSON.stringify({
-            session_date: targetDate,
-            label: 'Class 2 / Period 2',
-            session_type: 'THEORY',
-            period_number: 2
-          })
-        }).then(() => loadClassRegister(classRegState.currentMonth));
-      }
-    } else {
-      openAddSessionModal();
+    openAddPeriodModal();
+  }
+
+  function openAddPeriodModal(customDate) {
+    const reg = classRegState.registerData || {};
+    const targetDate = customDate || classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
+
+    const dateInp = ById('sess-date');
+    if (dateInp) {
+      dateInp.value = targetDate;
+      dateInp.onchange = () => updateModalAutoSlot();
     }
+
+    // Auto-calculate slot
+    updateModalAutoSlot(targetDate);
+
+    // Default preset based on register scope
+    const defaultType = (reg.session_type_scope === 'PRACTICAL') ? 'PRACTICAL' : 'THEORY';
+    selectPeriodTypePreset(defaultType);
+
+    // Reset optional time fields (collapsed by default)
+    const startTimeInp = ById('sess-start-time');
+    if (startTimeInp) startTimeInp.value = '';
+    const endTimeInp = ById('sess-end-time');
+    if (endTimeInp) endTimeInp.value = '';
+    const timeFields = ById('period-time-fields');
+    if (timeFields) timeFields.style.display = 'none';
+    const timeLabel = ById('period-time-toggle-label');
+    if (timeLabel) timeLabel.textContent = '+ Add class timing (optional)';
+
+    openModal('add-session-modal');
+  }
+
+  function openAddSessionModal() {
+    openAddPeriodModal();
+  }
+
+  function updateModalAutoSlot(optDate) {
+    const targetDate = optDate || ById('sess-date')?.value || classRegState.selectedDate || new Date().toISOString().slice(0, 10);
+    const grid = classRegState.gridData || {};
+    const finalized = grid.finalized_sessions || [];
+    const daySessions = finalized.filter(s => s.session_date === targetDate);
+    const maxPeriod = daySessions.reduce((max, s) => Math.max(max, s.period_number || 1), 0);
+    const nextSlot = Math.min(Math.max(daySessions.length + 1, maxPeriod + 1), 8);
+
+    const hiddenPeriod = ById('sess-period');
+    if (hiddenPeriod) hiddenPeriod.value = String(nextSlot);
+
+    const slotBadgeText = ById('sess-auto-slot-text');
+    if (slotBadgeText) slotBadgeText.textContent = `Auto: Period ${nextSlot}`;
+
+    const labelInp = ById('sess-label');
+    const type = ById('sess-type')?.value || 'THEORY';
+    if (labelInp && (labelInp.value.startsWith('Theory Class') || !labelInp.value.trim())) {
+      labelInp.value = nextSlot === 1 ? 'Theory Class' : `Theory Class (Period ${nextSlot})`;
+    }
+
+    const existWrap = ById('modal-existing-periods-wrap');
+    const existList = ById('modal-existing-periods-list');
+    if (existWrap && existList) {
+      if (daySessions.length > 0) {
+        existWrap.style.display = 'block';
+        existList.innerHTML = daySessions.map(s => {
+          const pNum = s.period_number || 1;
+          const sLabel = s.label || `Period ${pNum}`;
+          return `
+            <div style="display:inline-flex; align-items:center; gap:4px; padding:2px 6px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-xs, 4px); font-size:0.7rem; color:var(--text-main);">
+              <strong>P${pNum}</strong>: ${esc(sLabel)}
+              ${pNum > 1 ? `
+                <button type="button" class="btn-period-del-mini" onclick="confirmDeletePeriod(${s.id}, ${pNum}, event)" title="Remove Period ${pNum}" style="margin-left:3px;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      } else {
+        existWrap.style.display = 'none';
+        existList.innerHTML = '';
+      }
+    }
+  }
+
+  function togglePeriodTimeInputs() {
+    const fields = ById('period-time-fields');
+    const label = ById('period-time-toggle-label');
+    if (!fields) return;
+    if (fields.style.display === 'none') {
+      fields.style.display = 'block';
+      if (label) label.textContent = '– Hide class timing';
+      ById('sess-start-time')?.focus();
+    } else {
+      fields.style.display = 'none';
+      if (label) label.textContent = '+ Add class timing (optional)';
+    }
+  }
+
+  function selectPeriodTypePreset(type) {
+    const hiddenType = ById('sess-type');
+    if (hiddenType) hiddenType.value = (type === 'CUSTOM' ? 'THEORY' : type);
+
+    const cardTheory = ById('type-card-theory');
+    const cardPractical = ById('type-card-practical');
+    const cardCustom = ById('type-card-custom');
+    if (cardTheory) cardTheory.classList.toggle('active', type === 'THEORY');
+    if (cardPractical) cardPractical.classList.toggle('active', type === 'PRACTICAL');
+    if (cardCustom) cardCustom.classList.toggle('active', type === 'CUSTOM');
+
+    const slot = ById('sess-period')?.value || '1';
+    const labelInp = ById('sess-label');
+    if (labelInp) {
+      if (type === 'THEORY') {
+        labelInp.value = slot === '1' ? 'Theory Class' : `Theory Class (Period ${slot})`;
+      } else if (type === 'PRACTICAL') {
+        labelInp.value = `Practical Lab`;
+      } else if (type === 'CUSTOM') {
+        labelInp.value = '';
+        labelInp.placeholder = 'e.g. Tutorial, Remedial, Guest Lecture, Viva...';
+        setTimeout(() => labelInp.focus(), 80);
+      }
+    }
+  }
+
+  function applyPeriodQuickName(name, type) {
+    selectPeriodTypePreset(type);
+    const labelInp = ById('sess-label');
+    if (labelInp) {
+      labelInp.value = name;
+      labelInp.focus();
+    }
+  }
+
+  function onPeriodSlotChange(slot) {
+    const labelInp = ById('sess-label');
+    if (labelInp && (labelInp.value.startsWith('Theory Class') || !labelInp.value.trim())) {
+      labelInp.value = slot === '1' ? 'Theory Class' : `Theory Class (Period ${slot})`;
+    }
+  }
+
+  async function createClassSession(e) {
+    if (e) e.preventDefault();
+    const regId = classRegState.registerId;
+    if (!regId) {
+      toast('Register not loaded. Please try again.');
+      return;
+    }
+
+    const session_date = ById('sess-date')?.value;
+    const label = ById('sess-label')?.value?.trim();
+    let session_type = ById('sess-type')?.value || 'THEORY';
+    if (session_type === 'CUSTOM') session_type = 'THEORY';
+    const period_number = parseInt(ById('sess-period')?.value || '1', 10);
+    const startTimeVal = ById('sess-start-time')?.value;
+    const endTimeVal = ById('sess-end-time')?.value;
+
+    if (!session_date) {
+      toast('Please select a session date');
+      return;
+    }
+    if (!label) {
+      toast('Please enter a period title or name');
+      ById('sess-label')?.focus();
+      return;
+    }
+
+    const payload = {
+      session_date,
+      label,
+      session_type,
+      period_number
+    };
+    if (startTimeVal) payload.start_time = `${session_date} ${startTimeVal}:00`;
+    if (endTimeVal) payload.end_time = `${session_date} ${endTimeVal}:00`;
+
+    const submitBtn = ById('btn-submit-add-period');
+    const origHtml = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Creating...</span>';
+    }
+
+    try {
+      const res = await apiFetch(`/api/v1/faculty/registers/${regId}/sessions`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      if (res && res.success) {
+        toast(`Added ${label}!`);
+        closeModal('add-session-modal');
+        classRegState.mobilePeriod = period_number;
+        classRegState.selectedDate = session_date;
+        const syncDate = ById('class-sync-date');
+        if (syncDate) syncDate.value = session_date;
+        await loadClassRegister(classRegState.currentMonth);
+      } else {
+        toast(res?.error?.message || 'Failed to add class period');
+      }
+    } catch (err) {
+      toast('Error adding period: ' + err.message);
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origHtml;
+      }
+    }
+  }
+
+  async function confirmDeletePeriod(sessionId, periodNum, evt) {
+    if (evt && evt.stopPropagation) evt.stopPropagation();
+    const regId = classRegState.registerId || classRegState.registerData?.id;
+    if (!regId || !sessionId) {
+      toast('Cannot delete: session not found');
+      return;
+    }
+
+    const pNumber = parseInt(periodNum, 10) || 1;
+    if (pNumber <= 1) {
+      toast('Period 1 is the main class and cannot be removed');
+      return;
+    }
+
+    const dateStr = classRegState.selectedDate || 'this date';
+    const pLabel = `Period ${pNumber}`;
+    const msg = `Remove ${pLabel} for ${dateStr}?\n\nAll attendance records associated with this period will be deleted.`;
+    if (!confirm(msg)) return;
+
+    try {
+      const res = await apiFetch(`/api/v1/faculty/registers/${regId}/sessions/${sessionId}`, {
+        method: 'DELETE'
+      });
+      if (res && res.success) {
+        toast(`Removed ${pLabel}!`);
+        closeModal('add-session-modal');
+        classRegState.mobilePeriod = 1;
+        await loadClassRegister(classRegState.currentMonth);
+      } else {
+        toast(res?.error?.message || 'Failed to remove period');
+      }
+    } catch (err) {
+      toast('Error removing period: ' + err.message);
+    }
+  }
+
+  function confirmDeleteCurrentPeriod() {
+    const grid = classRegState.gridData || {};
+    const finalized = grid.finalized_sessions || [];
+    const dateStr = classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
+    const daySessions = finalized.filter(s => s.session_date === dateStr);
+    let target = null;
+    const currentPeriodNum = parseInt(classRegState.mobilePeriod, 10);
+    if (classRegState.mobilePeriod !== 'ALL' && currentPeriodNum > 1) {
+      target = daySessions.find(s => (s.period_number || 1) === currentPeriodNum);
+    }
+    if (target && target.id) {
+      confirmDeletePeriod(target.id, target.period_number || currentPeriodNum);
+    } else {
+      toast('Please select Period 2 or higher to remove');
+    }
+  }
+
+
+  function filterMobileStudents(query) {
+    classRegState.mobileSearchQuery = (query || '').trim().toLowerCase();
+    const clearBtn = ById('mobile-search-clear-btn');
+    if (clearBtn) {
+      clearBtn.style.display = classRegState.mobileSearchQuery ? 'inline-flex' : 'none';
+    }
+    renderMobileCompactMatrix();
+  }
+
+  function clearMobileStudentSearch() {
+    const inp = ById('mobile-student-search-input');
+    if (inp) inp.value = '';
+    filterMobileStudents('');
   }
 
   // ─── MULTI-CLASS FILTER ───
@@ -828,43 +1268,6 @@
       classRegState.selectedDate = syncDate;
       renderMobileCompactMatrix();
       checkClassEspStatus();
-    }
-  }
-
-  function openAddSessionModal() {
-    const dateInp = ById('sess-date');
-    if (dateInp) dateInp.value = classRegState.selectedDate || new Date().toISOString().slice(0, 10);
-    const labelInp = ById('sess-label');
-    if (labelInp) labelInp.value = 'Period 2: Extra / Practical Class';
-    const periodSelect = ById('sess-period');
-    if (periodSelect) periodSelect.value = '2';
-    openModal('add-session-modal');
-  }
-
-  async function createClassSession(e) {
-    if (e) e.preventDefault();
-    const regId = classRegState.registerId;
-    if (!regId) return;
-
-    const session_date = ById('sess-date')?.value;
-    const label = ById('sess-label')?.value?.trim();
-    const session_type = ById('sess-type')?.value || 'THEORY';
-    const period_number = parseInt(ById('sess-period')?.value || '2', 10);
-
-    try {
-      const res = await apiFetch(`/api/v1/faculty/registers/${regId}/sessions`, {
-        method: 'POST',
-        body: JSON.stringify({ session_date, label, session_type, period_number })
-      });
-      if (res && res.success) {
-        toast('Class session added for date!');
-        closeModal('add-session-modal');
-        loadClassRegister(classRegState.currentMonth);
-      } else {
-        toast(res?.error?.message || 'Failed to add class session');
-      }
-    } catch (err) {
-      toast('Error adding session: ' + err.message);
     }
   }
 
@@ -1310,6 +1713,229 @@
     }
   }
 
+  // ─── ATTENDANCE EXPORT STUDIO CONTROLLER ───
+  function openAttendanceExportModal() {
+    const modal = ById('modal-export-attendance');
+    if (!modal) return;
+
+    // Populate available months
+    const monthSelect = ById('export-month-select');
+    if (monthSelect) {
+      monthSelect.innerHTML = '';
+      const availMonths = (classRegState.gridData?.available_months && classRegState.gridData.available_months.length > 0)
+        ? classRegState.gridData.available_months
+        : [classRegState.currentMonth || new Date().toISOString().slice(0, 7)];
+      
+      const distinctMonths = Array.from(new Set(availMonths)).filter(Boolean).sort().reverse();
+      distinctMonths.forEach(m => {
+        if (!m || typeof m !== 'string' || !m.includes('-')) return;
+        const opt = document.createElement('option');
+        opt.value = m;
+        const [yr, mo] = m.split('-').map(Number);
+        const d = new Date(yr, mo - 1, 1);
+        opt.textContent = d.toLocaleString('default', { month: 'short', year: 'numeric' });
+        if (m === classRegState.currentMonth) opt.selected = true;
+        monthSelect.appendChild(opt);
+      });
+    }
+
+    // Set default day for Single Day export
+    const dayInput = ById('export-day-input');
+    if (dayInput && !dayInput.value) {
+      dayInput.value = new Date().toISOString().slice(0, 10);
+    }
+
+    // Pre-select scope component matching active register
+    const activeReg = (classRegState.groupRegisters || []).find(r => r.id === classRegState.registerId) || {};
+    const defaultScope = activeReg.component || 'BOTH';
+    selectExportScope(defaultScope);
+
+    // Default to Excel and All Months
+    selectExportFormat('xlsx');
+    handleExportRangeChange('all_months');
+
+    if (typeof openModal === 'function') {
+      openModal('modal-export-attendance');
+    } else {
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+    }
+  }
+
+  function closeAttendanceExportModal() {
+    if (typeof closeModal === 'function') {
+      closeModal('modal-export-attendance');
+    } else {
+      const modal = ById('modal-export-attendance');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+  }
+
+  function selectExportFormat(fmt) {
+    ['xlsx', 'pdf', 'doc'].forEach(f => {
+      const card = ById(`card-format-${f}`);
+      if (card) {
+        if (f === fmt) {
+          card.classList.add('active');
+          const radio = card.querySelector('input[type="radio"]');
+          if (radio) radio.checked = true;
+        } else {
+          card.classList.remove('active');
+        }
+      }
+    });
+  }
+
+  function handleExportRangeChange(range) {
+    const ranges = ['overview_only', 'all_months', 'month', 'week', 'day'];
+    ranges.forEach(r => {
+      const key = r === 'overview_only' ? 'overview' : (r === 'all_months' ? 'all' : r);
+      const label = ById(`label-range-${key}`);
+      const radio = ById(`range-opt-${key}`);
+      if (label) {
+        if (r === range) {
+          label.classList.add('active');
+          if (radio) radio.checked = true;
+        } else {
+          label.classList.remove('active');
+        }
+      }
+    });
+
+    // Contextual inputs: only visible and active when Specific Month or Specific Day is selected
+    const monthRow = ById('export-context-month-row');
+    const dayRow = ById('export-context-day-row');
+    if (monthRow) monthRow.style.display = (range === 'month') ? 'flex' : 'none';
+    if (dayRow) dayRow.style.display = (range === 'day') ? 'flex' : 'none';
+
+    updateExportRangeHint(range);
+  }
+
+  function updateExportRangeHint(range) {
+    const hintText = ById('export-range-hint-text');
+    if (!hintText) return;
+
+    const hints = {
+      'all_months': '<b>Full Semester:</b> Complete Day 1–31 daily matrix for all months + final summary.',
+      'overview_only': '<b>Summary Only:</b> Student attendance % and totals only (no daily day-by-day grids).',
+      'week': '<b>Current Week:</b> Monday to Saturday daily attendance for the active week.',
+      'month': '<b>Selected Month:</b> Day 1–31 ledger for the chosen month only.',
+      'day': '<b>Single Day:</b> Daily session check-in roster for the chosen date.'
+    };
+
+    hintText.innerHTML = hints[range] || hints['all_months'];
+  }
+
+  function selectExportScope(scope) {
+    const scopeVal = ById('export-scope-val');
+    if (scopeVal) scopeVal.value = scope;
+
+    const pills = {
+      'BOTH': ById('btn-scope-both'),
+      'THEORY': ById('btn-scope-theory'),
+      'PRACTICAL': ById('btn-scope-practical')
+    };
+
+    Object.keys(pills).forEach(s => {
+      if (pills[s]) {
+        if (s === scope) pills[s].classList.add('active');
+        else pills[s].classList.remove('active');
+      }
+    });
+  }
+
+  async function executeAttendanceExport() {
+    const regId = classRegState.registerId || (classRegState.groupRegisters && classRegState.groupRegisters[0]?.id) || (window.S && window.S.group && window.S.group.register_id);
+    if (!regId) {
+      toast('No active register found to export');
+      return;
+    }
+
+    const fmtRadio = document.querySelector('input[name="export-format"]:checked');
+    const format = fmtRadio ? fmtRadio.value : 'xlsx';
+
+    const rangeRadio = document.querySelector('input[name="export-range"]:checked');
+    const range = rangeRadio ? rangeRadio.value : 'all_months';
+
+    const monthSelect = ById('export-month-select');
+    const targetMonth = monthSelect ? monthSelect.value : (classRegState.currentMonth || new Date().toISOString().slice(0, 7));
+
+    const dayInput = ById('export-day-input');
+    const targetDay = dayInput ? dayInput.value : new Date().toISOString().slice(0, 10);
+
+    const scopeVal = ById('export-scope-val');
+    const scope = scopeVal ? scopeVal.value : 'BOTH';
+
+    const btn = ById('btn-execute-export');
+    const lbl = ById('lbl-export-btn');
+    const originalText = lbl ? lbl.innerText : 'Download Report';
+
+    try {
+      if (btn) btn.disabled = true;
+      if (lbl) lbl.innerText = 'Generating report...';
+
+      const token = typeof getToken === 'function' ? getToken() : (localStorage.getItem('access_token') || '');
+      const deviceId = typeof getDeviceId === 'function' ? getDeviceId() : (typeof localStorage !== 'undefined' ? localStorage.getItem('vidyaos_device_id') : null);
+
+      const payload = {
+        format,
+        range,
+        month: targetMonth,
+        day: targetDay,
+        scope
+      };
+
+      const resp = await fetch(`/api/v1/faculty/registers/${regId}/export/attendance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          ...(deviceId ? { 'X-Device-Id': deviceId } : {})
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+
+      if (!resp.ok) {
+        let errMessage = 'Failed to export attendance report';
+        try {
+          const errData = await resp.json();
+          if (errData?.error?.message) errMessage = errData.error.message;
+        } catch (e) {}
+        throw new Error(errMessage);
+      }
+
+      // Handle download
+      let filename = `Attendance_Register_${format.toUpperCase()}.${format}`;
+      const disposition = resp.headers.get('Content-Disposition');
+      if (disposition && disposition.includes('filename=')) {
+        const match = disposition.match(/filename="?([^";]+)"?/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      const blob = await resp.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      closeAttendanceExportModal();
+      toast('Attendance report generated successfully!');
+    } catch (err) {
+      toast('Export error: ' + (err.message || 'Unknown error'));
+    } finally {
+      if (btn) btn.disabled = false;
+      if (lbl) lbl.innerText = originalText;
+    }
+  }
+
   // ─── WINDOW EXPORTS ───
   window.classRegState = classRegState;
   window.loadClassRegister = loadClassRegister;
@@ -1328,11 +1954,20 @@
   window.updateMobileBulkBar = updateMobileBulkBar;
   window.bulkMarkAttendance = bulkMarkAttendance;
   window.addNewClassForDay = addNewClassForDay;
+  window.openAddPeriodModal = openAddPeriodModal;
+  window.selectPeriodTypePreset = selectPeriodTypePreset;
+  window.applyPeriodQuickName = applyPeriodQuickName;
+  window.onPeriodSlotChange = onPeriodSlotChange;
+  window.filterMobileStudents = filterMobileStudents;
+  window.clearMobileStudentSearch = clearMobileStudentSearch;
   window.setMobilePeriodFilter = setMobilePeriodFilter;
   window.toggleMobileRegisterMode = toggleMobileRegisterMode;
   window.onSyncDateChange = onSyncDateChange;
   window.openAddSessionModal = openAddSessionModal;
   window.createClassSession = createClassSession;
+  window.switchGroupRegister = switchGroupRegister;
+  window.togglePeriodTimeInputs = togglePeriodTimeInputs;
+  window.updateModalAutoSlot = updateModalAutoSlot;
   window.checkClassEspStatus = checkClassEspStatus;
   window.triggerClassEspDaySync = triggerClassEspDaySync;
   window.toggleAllEspCheckboxes = toggleAllEspCheckboxes;
@@ -1349,6 +1984,14 @@
   window.closeClassRollCallModal = closeClassRollCallModal;
   window.switchClassRollCallMode = switchClassRollCallMode;
   window.toggleRollCallStudent = toggleRollCallStudent;
+  window.confirmDeletePeriod = confirmDeletePeriod;
+  window.confirmDeleteCurrentPeriod = confirmDeleteCurrentPeriod;
+  window.openAttendanceExportModal = openAttendanceExportModal;
+  window.closeAttendanceExportModal = closeAttendanceExportModal;
+  window.selectExportFormat = selectExportFormat;
+  window.handleExportRangeChange = handleExportRangeChange;
+  window.selectExportScope = selectExportScope;
+  window.executeAttendanceExport = executeAttendanceExport;
 
 })();
 
