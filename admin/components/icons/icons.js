@@ -7,3 +7,4 @@
   script.src = '/admin/components/icons.js';
   document.head.appendChild(script);
 })();
+

@@ -65,3 +65,4 @@
 2. Never import `/css/layout.css` or `/css/components.css`.
 3. Load `/admin/components/icons.js` and `/admin/components/sidebar/sidebar.js`.
 4. Run `node backend/scripts/test-theme-support.js` to ensure zero hardcoded hex colors.
+

@@ -429,6 +429,12 @@ function closeSidebar() {
 }
 
 function _initSidebarState() {
+  if (typeof window !== 'undefined' && (
+    (window.location && window.location.pathname && window.location.pathname.toLowerCase().startsWith('/admin')) ||
+    Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page'))
+  )) {
+    return;
+  }
   const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer') || document.getElementById('gc-drawer');
   const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop') || document.getElementById('gc-drawer-backdrop');
 
@@ -970,6 +976,12 @@ function mountNavigationSystem(options = {}) {
   if (typeof document === 'undefined') return;
 
   const currentPath = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+
+  // 0. STRICT ADMIN PORTAL ISOLATION: Admin has dedicated modular components in /admin/components/
+  if (currentPath.startsWith('/admin') || Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page'))) {
+    return;
+  }
+
   const isPublicAuthPage = currentPath.includes('/login/') ||
     currentPath.startsWith('/login') ||
     currentPath.startsWith('/register') ||
