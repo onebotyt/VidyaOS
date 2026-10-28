@@ -393,6 +393,10 @@
   }
 
   function initAdminNav() {
+    // Dedicated modular admin components active; do not mount legacy nav
+    if (document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page')) {
+      return;
+    }
     if (typeof window.mountNavigationSystem === 'function') {
       window.mountNavigationSystem({ role: 'admin' });
       return;
