@@ -894,12 +894,45 @@ function _ensureUserProfilePopover(header, user, initial, displayName, email, po
   const popoverEmail = popover.querySelector('#popover-user-email');
   if (popoverEmail) popoverEmail.textContent = email;
 
+  const role = (user && user.role) ? String(user.role).toUpperCase() : '';
+  let profileHref = '/faculty/profile.html';
+  if (role === 'STUDENT' || window.location.pathname.includes('/student/')) {
+    profileHref = '/student/profile.html';
+  } else if (role === 'SYSTEM_ADMIN' || window.location.pathname.includes('/admin/')) {
+    profileHref = '/admin/profile.html';
+  }
+
+  // Ensure "My Profile" button exists
+  let profileLink = popover.querySelector('a[href*="profile.html"], a#popover-profile-link');
+  if (!profileLink) {
+    profileLink = document.createElement('a');
+    profileLink.id = 'popover-profile-link';
+    profileLink.href = profileHref;
+    profileLink.className = 'btn btn-secondary btn-sm';
+    profileLink.style.cssText = 'width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.35rem;';
+    profileLink.innerHTML = `<span style="display:inline-flex;align-items:center;">${getSvgIcon('user', 14)}</span><span>My Profile</span>`;
+
+    const divider = popover.querySelector('div[style*="height:1px"], .popover-divider');
+    const firstAction = popover.querySelector('a, button');
+    if (divider && divider.nextSibling) {
+      popover.insertBefore(profileLink, divider.nextSibling);
+    } else if (firstAction) {
+      popover.insertBefore(profileLink, firstAction);
+    } else {
+      popover.appendChild(profileLink);
+    }
+  }
+
   if (!popover.querySelector('#popover-avatar')) {
     popover.innerHTML = `
       <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">${initial}</div>
       <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">${displayName}</div>
       <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">${email}</div>
       <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
+      <a href="${profileHref}" class="btn btn-secondary btn-sm" id="popover-profile-link" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.35rem;">
+        <span style="display:inline-flex;align-items:center;">${getSvgIcon('user', 14)}</span>
+        <span>My Profile</span>
+      </a>
       <button type="button" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.35rem;" onclick="if(typeof toggleAppTheme==='function')toggleAppTheme()">
         <span style="display:inline-flex;align-items:center;">${getSvgIcon('moon', 14)}</span>
         <span>Toggle Appearance</span>

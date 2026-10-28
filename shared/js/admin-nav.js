@@ -276,6 +276,25 @@
     const popoverEmail = document.getElementById('popover-user-email');
     if (popoverEmail) popoverEmail.textContent = email;
 
+    const popover = document.getElementById('user-profile-popover');
+    if (popover && !popover.querySelector('a[href*="profile.html"]')) {
+      const profileLink = document.createElement('a');
+      profileLink.id = 'popover-profile-link';
+      profileLink.href = '/admin/profile.html';
+      profileLink.className = 'btn btn-secondary btn-sm';
+      profileLink.style.cssText = 'width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;display:flex;align-items:center;gap:0.35rem;';
+      profileLink.innerHTML = `<span style="display:inline-flex;align-items:center;">${ADMIN_ICONS.profile}</span><span>My Profile</span>`;
+      const divider = popover.querySelector('div[style*="height:1px"], .popover-divider');
+      const firstAction = popover.querySelector('a, button');
+      if (divider && divider.nextSibling) {
+        popover.insertBefore(profileLink, divider.nextSibling);
+      } else if (firstAction) {
+        popover.insertBefore(profileLink, firstAction);
+      } else {
+        popover.appendChild(profileLink);
+      }
+    }
+
     // Set role page badge in navbar
     const badgeEl = document.getElementById('admin-header-page-title') || document.querySelector('.gc-navbar .gc-page-badge');
     if (badgeEl) {

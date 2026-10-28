@@ -262,6 +262,44 @@
   display: flex !important;
 }
 
+.user-profile-popover .gc-user-avatar {
+  width: 56px;
+  height: 56px;
+  font-size: 1.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.user-profile-popover #popover-user-name,
+.user-profile-popover .popover-user-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.user-profile-popover #popover-user-email,
+.user-profile-popover .popover-user-email {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.85rem;
+  word-break: break-all;
+}
+
+.user-profile-popover .btn,
+.user-profile-popover a.btn,
+.user-profile-popover button.btn {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-sizing: border-box;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 /* Google Classroom Slide-out Drawer */
 .gc-drawer-backdrop {
   position: fixed;
@@ -932,11 +970,6 @@
   .sidebar-backdrop.open {
     opacity: 1 !important;
     pointer-events: auto !important;
-  }
-  .sidebar-backdrop {
-    display: none !important;
-    pointer-events: none !important;
-    opacity: 0 !important;
   }
 }
 
