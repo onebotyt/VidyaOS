@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard — College Attendance System</title>
+  <title>Admin Dashboard — VidyaOS Institutional Console</title>
   <meta name="description" content="Institutional Management Console — Configure academic structure, appoint Department Heads, and monitor institution-wide attendance.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,420 +14,390 @@
   <link rel="stylesheet" href="/css/components.css?v=20261028">
   <link rel="stylesheet" href="/css/admin-nav.css?v=20261028">
   <link rel="stylesheet" href="/css/nav.css?v=20261028">
-  <link rel="stylesheet" href="/admin/dashboard/dashboard.css?v=20261028">
+  <link rel="stylesheet" href="/admin/dashboard/dashboard.css?v=20261029">
+  <script>
+    /* Instant Zero-Layout-Shift check for desktop sidebar state */
+    (function () {
+      try {
+        if (localStorage.getItem('admin_sidebar_collapsed') === 'true' && window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) {}
+    })();
+  </script>
 </head>
-<body>
+<body class="admin-dashboard-page">
+  <div class="admin-app-layout" id="admin-app-layout">
+
     <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 1. ADMIN TOP NAVIGATION HEADER                                 -->
-  <!-- Fixed institutional top bar with drawer hamburger, brand logo, -->
-  <!-- apps launcher grid modal, theme toggle, and profile popover.  -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <header class="gc-navbar">
-    <div class="gc-nav-left">
-      <!-- Toggle Button: Opens/Closes the slide-out navigation drawer -->
-      <button type="button" class="gc-menu-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Main Menu" aria-label="Toggle navigation">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
-
-      <!-- Brand Logo and System Title -->
-      <a href="/admin/dashboard.html" class="gc-brand-link" title="VidyaOS Admin Workspace">
-        <div class="gc-brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
-        </div>
-        <div class="gc-brand-title">VidyaOS</div>
-      </a>
-
-      <!-- Current Page Badge -->
-      <span class="gc-page-badge" id="admin-header-page-title">Executive Dashboard</span>
-
-      <!-- Search Input Container -->
-      <div class="gc-search-box">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" id="admin-module-search" placeholder="Search modules..." aria-label="Search administration modules">
-      </div>
-    </div>
-
-    <div class="gc-nav-right">
-      <!-- Apps Launcher Button (Opens Quick Module Grid) -->
-      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher(event)" title="Admin Apps &amp; Modules">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
-      </button>
-
-      <!-- Dark/Light Theme Mode Toggle -->
-      <button type="button" class="gc-icon-btn" onclick="toggleAppTheme()" id="btn-theme-toggle" title="Toggle Theme">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-      </button>
-
-      <!-- Administrator Avatar Button -->
-      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile(event)" title="Account Profile">SA</div>
-
-      <!-- Quick Apps Launcher Dropdown Grid -->
-      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
-        <a href="/admin/dashboard.html" class="app-tile">
-          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg></div>
-          <span>Dashboard</span>
-        </a>
-        <a href="/admin/academic-structure.html" class="app-tile">
-          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></div>
-          <span>Academics</span>
-        </a>
-        <a href="/admin/faculty.html" class="app-tile">
-          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></div>
-          <span>HOD Hub</span>
-        </a>
-        <a href="/admin/reports.html" class="app-tile">
-          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
-          <span>Reports</span>
-        </a>
-        <a href="/admin/settings.html" class="app-tile">
-          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
-          <span>Settings</span>
-        </a>
-        <a href="/admin/audit-logs.html" class="app-tile">
-          <div class="app-tile-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-          <span>Audit Logs</span>
-        </a>
-      </div>
-
-      <!-- Administrator Profile Popover -->
-      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
-        <div class="gc-user-avatar" id="popover-avatar" style="width:56px;height:56px;font-size:1.35rem;margin-bottom:.5rem;">SA</div>
-        <div style="font-weight:700;font-size:.95rem;color:var(--text-main);" id="popover-user-name">Administrator</div>
-        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;" id="popover-user-email">admin@college.edu</div>
-        <div style="width:100%;height:1px;background:var(--border-color);margin-bottom:.85rem;"></div>
-        <a href="/admin/profile.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>My Profile
-        </a>
-        <a href="/admin/settings.html" class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.5rem;text-decoration:none;justify-content:center;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>System Settings
-        </a>
-        <button type="button" class="btn btn-sm" style="width:100%;background:var(--status-absent-bg);color:var(--status-absent);border:1px solid var(--status-absent);justify-content:center;" onclick="logout()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Sign Out
+    <!-- 1. MOBILE TOP HEADER (Visible on mobile <= 768px only)        -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <header class="mobile-top-header" id="mobile-top-header">
+      <div class="mobile-header-left">
+        <button type="button" class="mobile-hamburger-btn" id="mobile-sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Open Navigation Menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
       </div>
+      
+      <div class="mobile-header-center">
+        <a href="/admin/dashboard.html" class="mobile-brand-link">
+          <span class="mobile-brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+          </span>
+          <span class="mobile-brand-text">VidyaOS</span>
+        </a>
+      </div>
+
+      <div class="mobile-header-right">
+        <button type="button" class="mobile-header-icon-btn" onclick="toggleMobileSearch()" aria-label="Search modules">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="mobile-bell-badge">1</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Search Dropdown (Toggled via search icon) -->
+    <div class="mobile-search-dropdown" id="mobile-search-dropdown" style="display:none;">
+      <div class="mobile-search-input-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="admin-module-search-mobile" placeholder="Search modules..." aria-label="Search administration modules">
+        <button type="button" class="mobile-search-close" onclick="toggleMobileSearch(false)">✕</button>
+      </div>
     </div>
-  </header>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 2. ADMIN SIDE DRAWER NAVIGATION (#app-sidebar)                 -->
-  <!-- Slide-out institutional navigation drawer for desktop/mobile.  -->
-  <!-- Contains primary links to all 7 administrative core modules.   -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <aside id="app-sidebar" class="app-sidebar gc-drawer" aria-label="Admin Navigation">
-    <div class="gc-drawer-header">
-      <a href="/admin/dashboard.html" class="gc-brand-link" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;flex:1;min-width:0;">
-        <div class="gc-brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
-        </div>
-        <div style="display:flex;flex-direction:column;line-height:1.1;">
-          <span style="font-size:0.92rem;font-weight:800;color:var(--text-main);letter-spacing:-0.01em;">Admin Console</span>
-          <span style="font-size:0.62rem;font-weight:700;letter-spacing:0.06em;color:var(--color-primary);text-transform:uppercase;">VidyaOS</span>
-        </div>
-      </a>
-      <button type="button" class="gc-menu-btn" onclick="window.closeSidebar()" aria-label="Close menu" title="Close menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
-    </div>
-
-    <!-- Navigation links for administrative modules -->
-    <div class="gc-drawer-body">
-      <div class="gc-drawer-sec-title">Administrative Modules</div>
-      <a href="/admin/dashboard.html" class="gc-drawer-link active" onclick="if(window.innerWidth<=768)window.closeSidebar()">
-        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg></span>
-        <span>Dashboard</span>
-      </a>
-      <a href="/admin/academic-structure.html" class="gc-drawer-link" onclick="if(window.innerWidth<=768)window.closeSidebar()">
-        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></span>
-        <span>Academic Structure</span>
-      </a>
-      <a href="/admin/faculty.html" class="gc-drawer-link" onclick="if(window.innerWidth<=768)window.closeSidebar()">
-        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></span>
-        <span>HOD Management</span>
-      </a>
-      <a href="/admin/reports.html" class="gc-drawer-link" onclick="if(window.innerWidth<=768)window.closeSidebar()">
-        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></span>
-        <span>Reports &amp; Analytics</span>
-      </a>
-      <a href="/admin/settings.html" class="gc-drawer-link" onclick="if(window.innerWidth<=768)window.closeSidebar()">
-        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>
-        <span>System Settings</span>
-      </a>
-      <a href="/admin/audit-logs.html" class="gc-drawer-link" onclick="if(window.innerWidth<=768)window.closeSidebar()">
-        <span class="gc-drawer-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
-        <span>Audit Logs</span>
-      </a>
-    </div>
-
-    <!-- Drawer Footer: System Status and Logout -->
-    <div class="gc-drawer-footer">
-      <div class="gc-drawer-status-pill">
-        <span class="gc-drawer-dot"></span>
-        <span>VidyaOS &bull; Admin</span>
-      </div>
-      <button type="button" class="gc-drawer-logout-btn" onclick="logout()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-        <span>Sign Out</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- Drawer Backdrop Overlay: Click outside to dismiss drawer -->
-  <div id="sidebar-backdrop" class="gc-drawer-backdrop sidebar-backdrop" onclick="window.closeSidebar()"></div>
-
-  <main class="dashboard-container">
-
-    <!-- A. Welcome Hero Banner with Campus Vector Illustration -->
-    <section class="admin-welcome-hero" aria-label="Welcome Overview">
-      <div class="hero-left-content">
-        <div class="hero-icon-badge" aria-hidden="true">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
-        </div>
-        <div class="hero-text-wrap">
-          <h1 class="hero-title">Welcome, <span id="admin-hero-name">System Admin</span> 👋</h1>
-          <p class="hero-subtitle">Manage departments, faculty, students, and overall institution settings.</p>
-        </div>
-      </div>
-
-      <!-- Campus Architecture Vector Art -->
-      <div class="hero-illustration" aria-hidden="true">
-        <svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="28" cy="82" r="18" fill="var(--color-primary-light)" opacity="0.6"/>
-          <circle cx="48" cy="86" r="14" fill="var(--color-primary-light)" opacity="0.5"/>
-          <circle cx="295" cy="80" r="17" fill="var(--color-primary-light)" opacity="0.6"/>
-          <circle cx="316" cy="84" r="13" fill="var(--color-primary-light)" opacity="0.5"/>
-
-          <rect x="70" y="55" width="200" height="50" rx="3" fill="var(--color-primary-light)" opacity="0.45"/>
-          
-          <path d="M120 55 L170 24 L220 55 Z" fill="var(--color-primary)" opacity="0.85"/>
-          <circle cx="170" cy="38" r="6" fill="var(--bg-card)"/>
-
-          <rect x="135" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
-          <rect x="150" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
-          <rect x="165" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
-          <rect x="180" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
-          <rect x="195" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
-
-          <rect x="80" y="65" width="10" height="15" rx="5" fill="var(--color-primary)" opacity="0.75"/>
-          <rect x="98" y="65" width="10" height="15" rx="5" fill="var(--color-primary)" opacity="0.75"/>
-          <rect x="80" y="86" width="10" height="15" rx="2" fill="var(--color-primary)" opacity="0.75"/>
-          <rect x="98" y="86" width="10" height="15" rx="2" fill="var(--color-primary)" opacity="0.75"/>
-
-          <rect x="232" y="65" width="10" height="15" rx="5" fill="var(--color-primary)" opacity="0.75"/>
-          <rect x="250" y="65" width="10" height="15" rx="5" fill="var(--color-primary)" opacity="0.75"/>
-          <rect x="232" y="86" width="10" height="15" rx="2" fill="var(--color-primary)" opacity="0.75"/>
-          <rect x="250" y="86" width="10" height="15" rx="2" fill="var(--color-primary)" opacity="0.75"/>
-
-          <rect x="50" y="103" width="240" height="4" rx="2" fill="var(--color-primary)" opacity="0.8"/>
-        </svg>
-      </div>
-    </section>
-
-    <!-- B. Horizontal Real-Time KPI Grid (Faculty, Students, All-Time Enrolled) -->
-    <section class="stats-kpi-grid" aria-label="Institution Metrics">
-      <!-- 1. Total Faculty -->
-      <a href="/admin/faculty.html" class="kpi-card" title="View appointed teaching staff">
-        <div class="kpi-card-left">
-          <div class="kpi-icon-badge badge-faculty" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-          </div>
-          <div class="kpi-info-block">
-            <span class="kpi-label">Total Faculty</span>
-            <div id="stat-teachers" class="kpi-value">0</div>
-            <span class="kpi-sub">Appointed teaching staff</span>
-          </div>
-        </div>
-        <svg class="kpi-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-      </a>
-
-      <!-- 2. Total Students -->
-      <a href="/admin/academic-structure.html" class="kpi-card" title="View active cohort students">
-        <div class="kpi-card-left">
-          <div class="kpi-icon-badge badge-students" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
-          </div>
-          <div class="kpi-info-block">
-            <span class="kpi-label">Total Students</span>
-            <div id="stat-students" class="kpi-value">0</div>
-            <span class="kpi-sub">Active cohort profiles</span>
-          </div>
-        </div>
-        <svg class="kpi-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-      </a>
-
-      <!-- 3. Enrolled Total Students -->
-      <a href="/admin/academic-structure.html" class="kpi-card" title="View lifetime institution records">
-        <div class="kpi-card-left">
-          <div class="kpi-icon-badge badge-enrolled" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-          </div>
-          <div class="kpi-info-block">
-            <span class="kpi-label">Enrolled Total Students</span>
-            <div id="stat-enrolled-total" class="kpi-value">0</div>
-            <span class="kpi-sub">All-time lifetime records</span>
-          </div>
-        </div>
-        <svg class="kpi-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-      </a>
-    </section>
-
-    <!-- C. Core Governance Modules -->
-    <section class="modules-section" aria-label="Administration Modules">
-      <div class="modules-section-header">
-        <h2 class="modules-section-title">Core Administration Modules</h2>
-        <span class="modules-section-sub">5 Essential Modules &bull; Manage Your Institution</span>
-      </div>
-
-      <div class="modules-grid" id="admin-modules-container">
-        <!-- 1. HOD Governance -->
-        <article class="module-card" data-module-keywords="hod governance leadership heads department faculty appointments">
-          <div class="module-card-header">
-            <div class="module-header-left">
-              <div class="module-icon-badge badge-leadership-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              </div>
-              <span class="module-tag tag-leadership">LEADERSHIP</span>
-            </div>
-            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-title">HOD Governance</h3>
-            <p class="module-description">Appoint Heads of Department, transfer department leadership, approve pending candidate registrations, and toggle anti-spam self-registration gates.</p>
-          </div>
-
-          <a href="/admin/faculty.html" class="btn btn-module-action">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
-            <span>Manage Department Heads &rarr;</span>
-          </a>
-        </article>
-
-        <!-- 2. Reports & Analytics -->
-        <article class="module-card" data-module-keywords="reports analytics telemetry cohorts esp32 biometric attendance demographics">
-          <div class="module-card-header">
-            <div class="module-header-left">
-              <div class="module-icon-badge badge-telemetry-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              </div>
-              <span class="module-tag tag-telemetry">TELEMETRY &amp; COHORTS</span>
-            </div>
-            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-title">Reports &amp; Analytics</h3>
-            <p class="module-description">Department attendance summaries, ESP32 scan telemetry, student demographic distributions, biometric coverage, and on-demand cohort rosters.</p>
-          </div>
-
-          <a href="/admin/reports.html" class="btn btn-module-action">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-            <span>View Reports &amp; Analytics &rarr;</span>
-          </a>
-        </article>
-
-        <!-- 3. Academic Structure -->
-        <article class="module-card" data-module-keywords="academic structure curriculum master programs semesters divisions rollovers">
-          <div class="module-card-header">
-            <div class="module-header-left">
-              <div class="module-icon-badge badge-curriculum-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-              </div>
-              <span class="module-tag tag-curriculum">MASTER CURRICULUM</span>
-            </div>
-            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-title">Academic Structure</h3>
-            <p class="module-description">Configure institutional departments, degree programs, semesters, divisions, and automated academic session rollovers.</p>
-          </div>
-
-          <a href="/admin/academic-structure.html" class="btn btn-module-action">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-            <span>Open Academic Structure &rarr;</span>
-          </a>
-        </article>
-
-        <!-- 4. System Settings -->
-        <article class="module-card" data-module-keywords="system settings identity institution affiliation accreditation metadata configuration">
-          <div class="module-card-header">
-            <div class="module-header-left">
-              <div class="module-icon-badge badge-identity-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              </div>
-              <span class="module-tag tag-identity">INSTITUTIONAL IDENTITY</span>
-            </div>
-            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-title">System Settings</h3>
-            <p class="module-description">Official institution identity, college affiliation, accreditation codes, and institutional campus metadata.</p>
-          </div>
-
-          <a href="/admin/settings.html" class="btn btn-module-action">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            <span>Configure Settings &rarr;</span>
-          </a>
-        </article>
-
-        <!-- 5. Immutable Audit Trail -->
-        <article class="module-card" data-module-keywords="immutable audit trail security logs tamper evident approvals mutations">
-          <div class="module-card-header">
-            <div class="module-header-left">
-              <div class="module-icon-badge badge-security-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              </div>
-              <span class="module-tag tag-security">SECURITY TRAIL</span>
-            </div>
-            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-title">Immutable Audit Trail</h3>
-            <p class="module-description">Tamper-evident chronological record of all administrative actions, faculty approvals, security events, and database mutations.</p>
-          </div>
-
-          <a href="/admin/audit-logs.html" class="btn btn-module-action">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span>Inspect Audit Logs &rarr;</span>
-          </a>
-        </article>
-      </div>
-    </section>
-
-  </main>
 
     <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 3. ADMIN MOBILE BOTTOM NAVIGATION (.mobile-bottom-nav)         -->
-  <!-- Fixed bottom navigation bar for mobile / compact screens.      -->
-  <!-- Provides single-tap access to primary views + drawer toggle.  -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <nav class="mobile-bottom-nav" aria-label="Admin Mobile Navigation">
-    <div class="mobile-bottom-nav-inner">
-      <a href="/admin/dashboard.html" class="mobile-nav-item active">
-        <span class="mobile-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
-        <span class="mobile-nav-label">Home</span>
-      </a>
-      <a href="/admin/academic-structure.html" class="mobile-nav-item">
-        <span class="mobile-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></span>
-        <span class="mobile-nav-label">Structure</span>
-      </a>
-      <a href="/admin/faculty.html" class="mobile-nav-item">
-        <span class="mobile-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></span>
-        <span class="mobile-nav-label">Faculty</span>
-      </a>
-      <button type="button" class="mobile-nav-item" onclick="window.toggleSidebar()" aria-label="Open Navigation Menu">
-        <span class="mobile-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></span>
-        <span class="mobile-nav-label">Menu</span>
-      </button>
+    <!-- 2. REUSABLE UNIFIED SIDEBAR (#app-sidebar)                     -->
+    <!-- Supports:                                                      -->
+    <!-- - Desktop Expanded (250px)                                     -->
+    <!-- - Desktop Collapsed Rail (72px)                                -->
+    <!-- - Mobile Slide-out Drawer (280px)                              -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <aside id="app-sidebar" class="admin-sidebar" aria-label="Admin Navigation">
+      <!-- A. Rail Header (Desktop Collapsed only) -->
+      <div class="sidebar-rail-header" aria-hidden="true">
+        <a href="/admin/dashboard.html" class="rail-logo-link" title="VidyaOS Admin">
+          <svg class="rail-cube-logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 3L28 9.5L16 16L4 9.5L16 3Z" fill="var(--color-primary-light, hsl(215 90% 95%))"/>
+            <path d="M4 9.5L16 16V29L4 22.5V9.5Z" fill="var(--color-primary, hsl(217 91% 60%))"/>
+            <path d="M16 16L28 9.5V22.5L16 29V16Z" fill="var(--color-primary-hover, hsl(224 76% 48%))"/>
+          </svg>
+        </a>
+        <div class="rail-controls">
+          <button type="button" class="rail-menu-icon" onclick="toggleDesktopSidebar()" aria-label="Menu" title="Menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <button type="button" class="rail-expand-btn" onclick="toggleDesktopSidebar()" title="Expand sidebar" aria-label="Expand sidebar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- B. Expanded Header (Desktop Expanded & Mobile Drawer) -->
+      <div class="sidebar-expanded-header">
+        <div class="sidebar-header-left">
+          <span class="sidebar-header-menu-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </span>
+          <span class="sidebar-header-title">VidyaOS Console</span>
+        </div>
+        
+        <!-- Desktop Collapse Button (Pause || sitting in light-blue circle at right edge) -->
+        <button type="button" class="sidebar-desktop-collapse-btn" onclick="toggleDesktopSidebar()" title="Collapse sidebar" aria-label="Collapse sidebar">
+          <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="4" x2="8" y2="20"></line><line x1="16" y1="4" x2="16" y2="20"></line></svg>
+        </button>
+
+        <!-- Mobile Close Button (✕) sits at right edge on mobile drawer -->
+        <button type="button" class="sidebar-mobile-close-btn" onclick="closeSidebar()" title="Close menu" aria-label="Close menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- C. Navigation Items List -->
+      <nav class="sidebar-nav-body" aria-label="Admin Navigation Links">
+        <a href="/admin/dashboard.html" class="sidebar-nav-item active" data-tooltip="Dashboard" title="Dashboard">
+          <span class="sidebar-nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </span>
+          <span class="sidebar-nav-label">Dashboard</span>
+        </a>
+
+        <a href="/admin/academic-structure.html" class="sidebar-nav-item" data-tooltip="Academic Structure" title="Academic Structure" onclick="if(window.innerWidth<=768)closeSidebar()">
+          <span class="sidebar-nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+          </span>
+          <span class="sidebar-nav-label">Academic Structure</span>
+        </a>
+
+        <a href="/admin/faculty.html" class="sidebar-nav-item" data-tooltip="HOD Management" title="HOD Management" onclick="if(window.innerWidth<=768)closeSidebar()">
+          <span class="sidebar-nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </span>
+          <span class="sidebar-nav-label">HOD Management</span>
+        </a>
+
+        <a href="/admin/reports.html" class="sidebar-nav-item" data-tooltip="Reports & Analytics" title="Reports & Analytics" onclick="if(window.innerWidth<=768)closeSidebar()">
+          <span class="sidebar-nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+          </span>
+          <span class="sidebar-nav-label">Reports &amp; Analytics</span>
+        </a>
+
+        <a href="/admin/settings.html" class="sidebar-nav-item" data-tooltip="System Settings" title="System Settings" onclick="if(window.innerWidth<=768)closeSidebar()">
+          <span class="sidebar-nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </span>
+          <span class="sidebar-nav-label">System Settings</span>
+        </a>
+
+        <a href="/admin/audit-logs.html" class="sidebar-nav-item" data-tooltip="Audit Logs" title="Audit Logs" onclick="if(window.innerWidth<=768)closeSidebar()">
+          <span class="sidebar-nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </span>
+          <span class="sidebar-nav-label">Audit Logs</span>
+        </a>
+      </nav>
+
+      <!-- D. Sidebar Footer -->
+      <!-- 1. Expanded Footer (Desktop Expanded & Mobile Drawer) -->
+      <div class="sidebar-expanded-footer">
+        <div class="sidebar-brand-credit">VidyaOS &bull; Admin</div>
+        <button type="button" class="sidebar-signout-btn" onclick="logout()" title="Sign Out">Sign Out</button>
+      </div>
+
+      <!-- 2. Rail Footer (Desktop Collapsed Rail) -->
+      <div class="sidebar-rail-footer" aria-hidden="true">
+        <a href="/admin/profile.html" class="rail-footer-btn" title="Admin Profile" aria-label="Admin Profile">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </a>
+        <button type="button" class="rail-footer-btn rail-signout-btn" onclick="logout()" title="Sign Out" aria-label="Sign Out">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Backdrop Overlay: Click outside to dismiss drawer on mobile -->
+    <div id="sidebar-backdrop" class="gc-drawer-backdrop sidebar-backdrop" onclick="closeSidebar()"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- 3. MAIN CONTENT CONTAINER (.admin-main-wrap)                    -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="admin-main-wrap">
+      <main class="dashboard-container">
+
+        <!-- A. Welcome Hero Banner with Campus Vector Illustration -->
+        <section class="admin-welcome-hero" aria-label="Welcome Overview">
+          <div class="hero-left-content">
+            <div class="hero-icon-badge" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+            </div>
+            <div class="hero-text-wrap">
+              <h1 class="hero-title">Welcome, <span id="admin-hero-name">System Administrator</span> 👋</h1>
+              <p class="hero-subtitle">Manage departments, faculty, students, and overall institution settings.</p>
+            </div>
+          </div>
+
+          <!-- Campus Architecture Vector Art -->
+          <div class="hero-illustration" aria-hidden="true">
+            <svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="28" cy="82" r="18" fill="var(--color-primary-light)" opacity="0.6"/>
+              <circle cx="48" cy="86" r="14" fill="var(--color-primary-light)" opacity="0.5"/>
+              <circle cx="295" cy="80" r="17" fill="var(--color-primary-light)" opacity="0.6"/>
+              <circle cx="316" cy="84" r="13" fill="var(--color-primary-light)" opacity="0.5"/>
+
+              <rect x="70" y="55" width="200" height="50" rx="3" fill="var(--color-primary-light)" opacity="0.45"/>
+              <polygon points="170,25 60,55 280,55" fill="var(--color-primary)" opacity="0.85"/>
+              <rect x="160" y="8" width="20" height="18" rx="2" fill="var(--color-primary-light)"/>
+              <polygon points="170,2 155,10 185,10" fill="var(--color-primary)"/>
+
+              <line x1="170" y1="2" x2="170" y2="0" stroke="var(--text-main)" stroke-width="1.5"/>
+              <polygon points="170,0 182,3 170,6" fill="var(--color-primary)"/>
+
+              <rect x="85" y="65" width="16" height="24" rx="2" fill="var(--bg-card)" stroke="var(--border-color)" stroke-width="1.2"/>
+              <rect x="115" y="65" width="16" height="24" rx="2" fill="var(--bg-card)" stroke="var(--border-color)" stroke-width="1.2"/>
+              <rect x="145" y="65" width="16" height="24" rx="2" fill="var(--bg-card)" stroke="var(--border-color)" stroke-width="1.2"/>
+              <rect x="178" y="65" width="16" height="24" rx="2" fill="var(--bg-card)" stroke="var(--border-color)" stroke-width="1.2"/>
+              <rect x="208" y="65" width="16" height="24" rx="2" fill="var(--bg-card)" stroke="var(--border-color)" stroke-width="1.2"/>
+              <rect x="238" y="65" width="16" height="24" rx="2" fill="var(--bg-card)" stroke="var(--border-color)" stroke-width="1.2"/>
+
+              <path d="M158 105 V82 Q170 76 182 82 V105 Z" fill="var(--color-primary)" opacity="0.9"/>
+              <line x1="20" y1="105" x2="320" y2="105" stroke="var(--border-color)" stroke-width="2"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- B. Key Performance Indicators (KPI Cards) -->
+        <section class="admin-kpi-section" aria-label="Institutional KPI Metrics">
+          <div class="stats-kpi-grid">
+            <!-- 1. Total Faculty -->
+            <a href="/admin/faculty.html" class="kpi-card" id="kpi-card-teachers">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Faculty</span>
+                <svg class="kpi-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+              <div class="kpi-main">
+                <span class="kpi-value" id="stat-teachers">--</span>
+                <span class="kpi-subtitle">(appointed teaching staff)</span>
+              </div>
+            </a>
+
+            <!-- 2. Active Students -->
+            <a href="/admin/reports.html" class="kpi-card" id="kpi-card-students">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Students</span>
+                <svg class="kpi-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+              <div class="kpi-main">
+                <span class="kpi-value" id="stat-students">--</span>
+                <span class="kpi-subtitle">(Active cohort enrollment)</span>
+              </div>
+            </a>
+
+            <!-- 3. Enrolled Total Students -->
+            <a href="/admin/reports.html" class="kpi-card" id="kpi-card-enrolled">
+              <div class="kpi-top">
+                <span class="kpi-label">Enrolled Total Students</span>
+                <svg class="kpi-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+              <div class="kpi-main">
+                <span class="kpi-value" id="stat-enrolled-total">--</span>
+                <span class="kpi-subtitle">(All-time lifetime records)</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- C. Core Governance & Operations Modules Grid -->
+        <section class="admin-modules-section" aria-label="Governance Modules">
+          <div class="section-header-row">
+            <div>
+              <h2 class="section-title">Core Administration Modules</h2>
+              <p class="section-subtitle">5 Essential modules powering institutional governance, security, and curriculum structure.</p>
+            </div>
+            <!-- Quick Desktop Search Pill -->
+            <div class="desktop-module-search-wrap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="admin-module-search-desktop" placeholder="Search modules... (/ or Ctrl+K)" aria-label="Search administration modules">
+            </div>
+          </div>
+
+          <div class="modules-card-grid" id="admin-modules-container">
+            <!-- 1. HOD Management -->
+            <article class="module-card" data-module-keywords="hod faculty teachers appointment department leadership chair">
+              <div class="module-card-top">
+                <div class="module-tags-group">
+                  <span class="module-tag tag-security">SECURITY TRAIL</span>
+                  <span class="module-tag tag-leadership">LEADERSHIP</span>
+                </div>
+                <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+
+              <div class="module-card-body">
+                <h3 class="module-title">HOD Governance</h3>
+                <p class="module-description">Appoint Heads of Department, transfer department leadership, approve pending candidate registrations, and toggle anti-spam self-registration gates.</p>
+              </div>
+
+              <a href="/admin/faculty.html" class="btn btn-module-action">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+                <span>Manage Department Heads &rarr;</span>
+              </a>
+            </article>
+
+            <!-- 2. Reports & Analytics -->
+            <article class="module-card" data-module-keywords="reports analytics telemetry cohort logs attendance hardware esp32 scan">
+              <div class="module-card-top">
+                <div class="module-tags-group">
+                  <span class="module-tag tag-leadership">LEADERSHIP</span>
+                  <span class="module-tag tag-telemetry">TELEMETRY &amp; COHORTS</span>
+                </div>
+                <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+
+              <div class="module-card-body">
+                <h3 class="module-title">Reports &amp; Analytics</h3>
+                <p class="module-description">Department attendance summaries, ESP32 scan telemetry, student demographic distributions, biometric coverage, and on-demand cohort rosters.</p>
+              </div>
+
+              <a href="/admin/reports.html" class="btn btn-module-action">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                <span>View Reports &amp; Analytics &rarr;</span>
+              </a>
+            </article>
+
+            <!-- 3. Academic Structure -->
+            <article class="module-card" data-module-keywords="academic structure curriculum departments programs semesters divisions courses syllabus">
+              <div class="module-card-top">
+                <div class="module-tags-group">
+                  <span class="module-tag tag-curriculum">MASTER CURRICULUM</span>
+                </div>
+                <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+
+              <div class="module-card-body">
+                <h3 class="module-title">Academic Structure</h3>
+                <p class="module-description">Configure institutional departments, degree programs, semester tracks, divisions, and manage academic session rollover.</p>
+              </div>
+
+              <a href="/admin/academic-structure.html" class="btn btn-module-action">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg>
+                <span>Open Academic Structure &rarr;</span>
+              </a>
+            </article>
+
+            <!-- 4. System Settings -->
+            <article class="module-card" data-module-keywords="system settings identity email smtp backup hardware config institution timezone">
+              <div class="module-card-top">
+                <div class="module-tags-group">
+                  <span class="module-tag tag-identity">INSTITUTIONAL IDENTITY</span>
+                </div>
+                <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+
+              <div class="module-card-body">
+                <h3 class="module-title">System Settings</h3>
+                <p class="module-description">Institution identity, institutional attendance threshold policies, self-registration controls, ESP32 device sync keys, and automated backup schedules.</p>
+              </div>
+
+              <a href="/admin/settings.html" class="btn btn-module-action">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Configure Settings &rarr;</span>
+              </a>
+            </article>
+
+            <!-- 5. Audit Logs -->
+            <article class="module-card" data-module-keywords="audit logs events security trail history mutations actions records">
+              <div class="module-card-top">
+                <div class="module-tags-group">
+                  <span class="module-tag tag-security">SECURITY TRAIL</span>
+                </div>
+                <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+
+              <div class="module-card-body">
+                <h3 class="module-title">Immutable Audit Trail</h3>
+                <p class="module-description">Tamper-evident chronological record of all administrative actions, faculty approvals, security events, and database mutations.</p>
+              </div>
+
+              <a href="/admin/audit-logs.html" class="btn btn-module-action">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>Inspect Audit Logs &rarr;</span>
+              </a>
+            </article>
+          </div>
+        </section>
+
+      </main>
     </div>
-  </nav>
+
+  </div> <!-- /#admin-app-layout -->
 
   <script src="/js/api.js?v=20261028"></script>
   <script src="/js/auth.js?v=20261028"></script>
   <script src="/js/nav.js?v=20261028"></script>
   <script src="/js/admin-nav.js?v=20261028"></script>
   <script src="/js/ui.js?v=20261028"></script>
-  <script src="/admin/dashboard/dashboard.js?v=20261028"></script>
+  <script src="/admin/dashboard/dashboard.js?v=20261029"></script>
 </body>
 </html>
