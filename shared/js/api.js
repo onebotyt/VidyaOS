@@ -64,7 +64,13 @@ async function fetchApi(endpoint, options = {}) {
           }
         }
       }
-      throw data.error || { message: `Request failed with status ${response.status}` };
+      const errObj = (data && data.error) ? Object.assign(data.error, { status: response.status }) : {
+        message: (response.status === 502 || response.status === 504)
+          ? 'Cloud server is waking up from idle sleep (Render cold start). Retrying connection...'
+          : `Request failed with status ${response.status}`,
+        status: response.status
+      };
+      throw errObj;
     }
 
     return data;

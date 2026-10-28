@@ -276,6 +276,12 @@
     const popoverEmail = document.getElementById('popover-user-email');
     if (popoverEmail) popoverEmail.textContent = email;
 
+    // Set role page badge in navbar
+    const badgeEl = document.getElementById('admin-header-page-title') || document.querySelector('.gc-navbar .gc-page-badge');
+    if (badgeEl) {
+      badgeEl.textContent = 'ADMIN CONSOLE';
+    }
+
     // Enforce Minimal Universal Header Bar (Logo, VidyaOS, Tools, Profile)
     document.querySelectorAll('.gc-navbar .gc-brand-title').forEach(el => {
       el.textContent = 'VidyaOS';
@@ -311,7 +317,7 @@
             </div>
           </a>
           <button type="button" class="gc-menu-btn" onclick="window.closeSidebar()" aria-label="Close menu" title="Close menu">
-            ${ADMIN_ICONS.close}
+            ${ADMIN_ICONS.menu}
           </button>
         </div>
         <div class="gc-drawer-body">

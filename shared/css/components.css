@@ -1803,13 +1803,23 @@
     cursor: pointer !important;
   }
 
-  /* Remove duplicate brand header and inner three-lines/close buttons inside the sidebar */
+  /* Google Classroom drawer top header */
   .gc-drawer-header,
   .app-sidebar .gc-drawer-header,
   aside#app-sidebar .gc-drawer-header,
   aside#gc-drawer .gc-drawer-header,
   .gc-drawer > .gc-drawer-header {
-    display: none !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    padding: 0 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    background: var(--bg-card) !important;
   }
 
   /* Page content NEVER shifts sideways — remains 100% full width */
@@ -1841,12 +1851,33 @@
     transition: none !important;
   }
 
-  /* Desktop: Never dim the screen with modal backdrop */
+  /* Desktop Overlay Backdrop: dims screen when sidebar is opened */
   .gc-drawer-backdrop,
   .sidebar-backdrop {
-    display: none !important;
-    pointer-events: none !important;
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 1290 !important;
+    background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45)) !important;
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
     opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.24s ease !important;
+    display: block !important;
+  }
+
+  body.sidebar-open .gc-drawer-backdrop,
+  body.sidebar-open .sidebar-backdrop,
+  .gc-drawer-backdrop.active,
+  .gc-drawer-backdrop.open,
+  .sidebar-backdrop.active,
+  .sidebar-backdrop.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
 }
 
