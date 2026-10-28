@@ -91,30 +91,46 @@
   // Opens/closes the slide-out navigation drawer and synchronizes
   // body scrolling and backdrop visibility.
   // ─────────────────────────────────────────────────────────────
-  function toggleSidebar() {
-    const sidebar = document.getElementById('app-sidebar');
-    const backdrop = document.getElementById('sidebar-backdrop');
+  function toggleSidebar(forceState) {
+    const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer') || document.getElementById('gc-drawer');
+    const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop') || document.getElementById('gc-drawer-backdrop');
     if (!sidebar) return;
-    const isOpen = sidebar.classList.toggle('sidebar-open');
-    sidebar.classList.toggle('open', isOpen);
-    document.body.classList.toggle('sidebar-open', isOpen);
-    if (backdrop) {
-      backdrop.classList.toggle('active', isOpen);
-      backdrop.classList.toggle('open', isOpen);
+
+    const isDesktop = window.innerWidth >= 769;
+    const isCurrentlyOpen = isDesktop
+      ? !document.body.classList.contains('sidebar-closed') && (sidebar.classList.contains('sidebar-open') || sidebar.classList.contains('open'))
+      : (sidebar.classList.contains('sidebar-open') || sidebar.classList.contains('open'));
+
+    const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
+
+    if (shouldOpen) {
+      sidebar.classList.add('sidebar-open', 'open');
+      sidebar.classList.remove('sidebar-closed');
+      document.body.classList.add('sidebar-open');
+      document.body.classList.remove('sidebar-closed');
+      if (backdrop) {
+        backdrop.classList.add('active', 'open');
+      }
+    } else {
+      sidebar.classList.remove('sidebar-open', 'open');
+      sidebar.classList.add('sidebar-closed');
+      document.body.classList.remove('sidebar-open');
+      document.body.classList.add('sidebar-closed');
+      if (backdrop) {
+        backdrop.classList.remove('active', 'open');
+      }
     }
-    const btn = document.getElementById('sidebar-toggle-btn');
-    if (btn) btn.setAttribute('aria-pressed', isOpen ? 'true' : 'false');
+
+    try {
+      localStorage.setItem('sidebar_open', shouldOpen ? 'true' : 'false');
+    } catch (_) {}
+
+    const btn = document.getElementById('sidebar-toggle-btn') || document.getElementById('btn-menu-toggle');
+    if (btn) btn.setAttribute('aria-pressed', shouldOpen ? 'true' : 'false');
   }
 
   function closeSidebar() {
-    const sidebar = document.getElementById('app-sidebar');
-    const backdrop = document.getElementById('sidebar-backdrop');
-    if (!sidebar) return;
-    sidebar.classList.remove('sidebar-open', 'open');
-    document.body.classList.remove('sidebar-open');
-    if (backdrop) backdrop.classList.remove('active', 'open');
-    const btn = document.getElementById('sidebar-toggle-btn');
-    if (btn) btn.setAttribute('aria-pressed', 'false');
+    toggleSidebar(false);
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -277,7 +293,7 @@
     const linksHtml = ADMIN_MODULES.map(item => {
       const active = isRouteActive(item.href);
       return `
-        <a href="${item.href}" class="gc-drawer-link ${active ? 'active' : ''}" onclick="if(window.innerWidth<=768)window.closeSidebar()">
+        <a href="${item.href}" class="gc-drawer-link ${active ? 'active' : ''}" onclick="window.closeSidebar()">
           <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;">${item.icon}</span>
           <span>${safeAttr(item.label)}</span>
         </a>

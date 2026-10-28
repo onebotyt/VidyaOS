@@ -78,15 +78,20 @@ async function fetchApi(endpoint, options = {}) {
 
 async function attemptTokenRefresh() {
   try {
+    const refreshToken = localStorage.getItem('refresh_token');
     const res = await fetch(`${API_BASE}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include'
+      credentials: 'include',
+      body: JSON.stringify({ refresh_token: refreshToken, refreshToken })
     });
     if (!res.ok) return false;
     const data = await res.json();
-    if (data.success && data.data?.access_token) {
-      localStorage.setItem('access_token', data.data.access_token);
+    const newAccess = data.data?.access_token || data.data?.accessToken;
+    const newRefresh = data.data?.refresh_token || data.data?.refreshToken;
+    if (newAccess) {
+      localStorage.setItem('access_token', newAccess);
+      if (newRefresh) localStorage.setItem('refresh_token', newRefresh);
       return true;
     }
     return false;
@@ -109,4 +114,5 @@ if (typeof window !== 'undefined') {
   window.fetchApi = fetchApi;
   window.apiRequest = apiRequest;
   window.apiFetch = apiFetch;
+  window.attemptTokenRefresh = attemptTokenRefresh;
 }

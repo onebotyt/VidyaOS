@@ -150,7 +150,7 @@
           resetSubmitBtn();
           return;
         }
-        setAuthSession(res.data.access_token, res.data.user);
+        setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
         try { if (typeof showToast === 'function') showToast('Login successful! Redirecting…', 'success'); } catch(_) {}
         setTimeout(() => redirectAfterLogin(res.data.user), 350);
       }
@@ -218,7 +218,7 @@
         })
       });
       if (res.success) {
-        setAuthSession(res.data.access_token, res.data.user);
+        setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
         try { if (typeof showToast === 'function') showToast('Previous session disconnected. Signing in…', 'success'); } catch(_) {}
         setTimeout(() => redirectAfterLogin(res.data.user), 350);
       }
@@ -256,7 +256,7 @@
       }).then(x => x.json());
 
       if (r.success) {
-        setAuthSession(r.data.access_token, r.data.user);
+        setAuthSession(r.data.access_token, r.data.user, r.data.refresh_token);
         try { if (typeof showToast === 'function') showToast('Account activated! Welcome to VidyaOS.', 'success'); } catch(_) {}
         setTimeout(() => redirectAfterLogin(r.data.user), 600);
       } else {
@@ -298,7 +298,7 @@
     if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
       const { payload } = event.data;
       if (payload?.access_token) {
-        setAuthSession(payload.access_token, payload.user);
+        setAuthSession(payload.access_token, payload.user, payload.refresh_token);
         try { if (typeof showToast === 'function') showToast('Google login successful!', 'success'); } catch(_) {}
         setTimeout(() => redirectAfterLogin(payload.user), 400);
       }

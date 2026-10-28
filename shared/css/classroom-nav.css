@@ -19,18 +19,33 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 1rem !important;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
   box-shadow: var(--shadow-xs, var(--shadow-sm));
   box-sizing: border-box;
 }
 
 /* Explicitly hide obsolete secondary tags/buttons per minimal header design */
 .gc-navbar .gc-brand-sub,
-.gc-navbar .gc-page-badge,
 .gc-navbar .gc-create-btn {
   display: none !important;
+}
+
+.gc-navbar .gc-page-badge {
+  display: inline-flex !important;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: var(--color-primary-soft, var(--bg-surface));
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
+  text-transform: uppercase;
+  margin-left: 0.5rem;
+  line-height: 1;
 }
 
 /* Ensure hamburger menu toggle button is always accessible and visible */
@@ -119,9 +134,7 @@
   display: none !important;
 }
 
-.gc-page-badge {
-  display: none !important;
-}
+/* Page badge kept visible for clear role recognition */
 
 .gc-nav-right {
   display: flex;
@@ -745,36 +758,56 @@
    On PC, navigation is a permanent docked sidebar (NOT hamburger)
    ══════════════════════════════════════════════════════════════ */
 @media (min-width: 769px) {
-  /* Docked persistent sidebar on PC docks below top navbar (never covers header) */
+  /* Full-height slide-out drawer on PC with branded header */
   .app-sidebar,
   aside#app-sidebar,
   aside#gc-drawer,
   .gc-drawer {
     position: fixed !important;
-    top: 52px !important;
+    top: 0 !important;
     left: 0 !important;
     bottom: 0 !important;
-    width: 260px !important;
-    height: calc(100vh - 52px) !important;
-    transform: translateX(0) !important;
-    z-index: 950 !important;
+    width: 285px !important;
+    max-width: 85vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    transform: translateX(-100%) !important;
+    z-index: 1300 !important;
     box-shadow: none !important;
     border-right: 1px solid var(--border-color) !important;
     display: flex !important;
     flex-direction: column !important;
     background: var(--bg-card) !important;
-    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
   }
 
   body:has(.app-header) .app-sidebar,
   body:has(.app-header) aside#app-sidebar,
   body.has-app-header .app-sidebar,
   body.has-app-header aside#app-sidebar {
-    top: 60px !important;
-    height: calc(100vh - 60px) !important;
+    top: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
   }
 
-  /* When sidebar is closed on PC (via close button or toggle) */
+  /* When sidebar is open on PC: Slide OVER content */
+  body.sidebar-open .app-sidebar,
+  body.sidebar-open aside#app-sidebar,
+  body.sidebar-open aside#gc-drawer,
+  body.sidebar-open .gc-drawer,
+  .app-sidebar.sidebar-open,
+  .app-sidebar.open,
+  aside#app-sidebar.sidebar-open,
+  aside#app-sidebar.open,
+  aside#gc-drawer.sidebar-open,
+  aside#gc-drawer.open,
+  .gc-drawer.sidebar-open,
+  .gc-drawer.open {
+    transform: translateX(0) !important;
+    box-shadow: var(--shadow-xl), 0 0 0 1px var(--border-color) !important;
+  }
+
+  /* When sidebar is closed on PC (default state) */
   body.sidebar-closed .app-sidebar,
   body.sidebar-closed aside#app-sidebar,
   body.sidebar-closed aside#gc-drawer,
@@ -801,6 +834,8 @@
     max-width: 100vw !important;
     margin-left: 0 !important;
     z-index: 1000 !important;
+    background: var(--bg-card) !important;
+    box-shadow: var(--shadow-xs, var(--shadow-sm)) !important;
     box-sizing: border-box !important;
     transition: none !important;
   }
@@ -822,31 +857,40 @@
     cursor: pointer !important;
   }
 
-  /* Remove duplicate brand header and inner three-lines/close buttons inside the sidebar */
+  /* Google Classroom drawer top header */
   .gc-drawer-header,
   .app-sidebar .gc-drawer-header,
   aside#app-sidebar .gc-drawer-header,
   aside#gc-drawer .gc-drawer-header,
   .gc-drawer > .gc-drawer-header {
-    display: none !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    padding: 0 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    background: var(--bg-card) !important;
   }
 
-  /* Offset ONLY main page content to the right when sidebar is OPEN on PC */
+  /* Page content NEVER shifts sideways — remains 100% full width */
+  body main,
+  body .page-main-container,
+  body .container,
+  body .classroom-body,
+  body .classroom-banner,
+  body .student-classroom-container,
+  body .todo-container,
   body:not(.sidebar-closed) main,
   body:not(.sidebar-closed) .page-main-container,
   body:not(.sidebar-closed) .container,
   body:not(.sidebar-closed) .classroom-body,
   body:not(.sidebar-closed) .classroom-banner,
   body:not(.sidebar-closed) .student-classroom-container,
-  body:not(.sidebar-closed) .todo-container {
-    margin-left: 260px !important;
-    width: calc(100% - 260px) !important;
-    max-width: calc(100vw - 260px) !important;
-    box-sizing: border-box !important;
-    transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1), width 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  /* Expand main page content to full width when sidebar is CLOSED on PC */
+  body:not(.sidebar-closed) .todo-container,
   body.sidebar-closed main,
   body.sidebar-closed .page-main-container,
   body.sidebar-closed .container,
@@ -858,11 +902,37 @@
     width: 100% !important;
     max-width: 100vw !important;
     box-sizing: border-box !important;
-    transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1), width 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: none !important;
   }
 
-  /* Desktop: Never dim the screen with modal backdrop */
+  /* Desktop Overlay Backdrop: dims entire screen smoothly when sidebar is opened */
   .gc-drawer-backdrop,
+  .sidebar-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 1290 !important;
+    background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45)) !important;
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.24s ease !important;
+    display: block !important;
+  }
+
+  body.sidebar-open .gc-drawer-backdrop,
+  body.sidebar-open .sidebar-backdrop,
+  .gc-drawer-backdrop.active,
+  .gc-drawer-backdrop.open,
+  .sidebar-backdrop.active,
+  .sidebar-backdrop.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
   .sidebar-backdrop {
     display: none !important;
     pointer-events: none !important;
@@ -888,35 +958,28 @@
     align-items: center !important;
   }
 
-  /* Remove duplicate brand header inside sidebar on mobile */
-  .gc-drawer-header,
-  .app-sidebar .gc-drawer-header,
-  aside#app-sidebar .gc-drawer-header,
-  aside#gc-drawer .gc-drawer-header,
-  .gc-drawer > .gc-drawer-header {
-    display: none !important;
-  }
-
   .app-sidebar,
   aside#app-sidebar,
   aside#gc-drawer,
   .gc-drawer {
     position: fixed !important;
-    top: 52px !important;
+    top: 0 !important;
     left: 0 !important;
     bottom: 0 !important;
     width: min(290px, 86vw) !important;
-    height: calc(100vh - 52px) !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     transform: translateX(-100%) !important;
-    z-index: 950 !important;
+    z-index: 1300 !important;
     box-shadow: var(--shadow-xl) !important;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
   body:has(.app-header) .app-sidebar,
   body:has(.app-header) aside#app-sidebar {
-    top: 60px !important;
-    height: calc(100vh - 60px) !important;
+    top: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
   }
 
   .app-sidebar.sidebar-open,
@@ -946,8 +1009,19 @@
   .sidebar-backdrop.open,
   .sidebar-backdrop.active {
     position: fixed !important;
-    top: 52px !important;
+    inset: 0 !important;
+    top: 0 !important;
     left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45)) !important;
+    z-index: 1290 !important;
+  }
     right: 0 !important;
     bottom: 0 !important;
     height: calc(100vh - 52px) !important;

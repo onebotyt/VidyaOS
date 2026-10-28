@@ -1,7 +1,7 @@
-/* ══════════════════════════════════════════════════════════════
+﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PAGE STYLES: DASHBOARD
    frontend/faculty/dashboard/dashboard.css
-══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 .groups-hero {
       background: var(--bg-card);
@@ -510,7 +510,7 @@
       width: 38px;
       height: 38px;
       border-radius: var(--radius-md);
-      background: linear-gradient(135deg, hsl(142,70%,35%) 0%, hsl(160,75%,42%) 100%);
+      background: linear-gradient(135deg, var(--color-success, hsl(142,70%,35%)) 0%, var(--color-success-hover, hsl(160,75%,42%)) 100%);
       color: var(--text-white);
       display: flex;
       align-items: center;
@@ -1362,8 +1362,8 @@
       width: 38px;
       height: 38px;
       border-radius: var(--radius-md);
-      background: linear-gradient(135deg, hsl(142, 70%, 35%) 0%, hsl(160, 75%, 42%) 100%);
-      color: var(--text-white, hsl(0, 0%, 100%));
+      background: linear-gradient(135deg, var(--color-success, hsl(142,70%,35%)) 0%, var(--color-success-hover, hsl(160,75%,42%)) 100%);
+      color: var(--text-white);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1432,7 +1432,7 @@
       padding: 0.5rem 1rem;
       border-radius: 999px;
       background: var(--color-primary);
-      color: var(--text-white, hsl(0, 0%, 100%));
+      color: var(--text-white);
       border: none;
       font-size: 0.85rem;
       font-weight: 600;
@@ -1451,7 +1451,7 @@
       height: 38px;
       border-radius: 50%;
       background: var(--color-primary);
-      color: var(--text-white, hsl(0, 0%, 100%));
+      color: var(--text-white);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1531,7 +1531,7 @@
     .gc-drawer-backdrop {
       position: fixed;
       inset: 0;
-      background: hsl(0, 0%, 0% / 0.4);
+      background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45));
       z-index: 9990;
       opacity: 0;
       pointer-events: none;
@@ -1708,7 +1708,7 @@
       border-color: var(--color-primary);
     }
 
-    /* ─── SIMPLIFIED 1-CLICK DASHBOARD UI (HOD & TEACHERS) ─── */
+    /* â”€â”€â”€ SIMPLIFIED 1-CLICK DASHBOARD UI (HOD & TEACHERS) â”€â”€â”€ */
     .hod-one-click-cards-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1899,7 +1899,7 @@
       outline: none;
     }
 
-    /* ── Course File: 18 Document Cards Quick Access Panel ── */
+    /* â”€â”€ Course File: 18 Document Cards Quick Access Panel â”€â”€ */
     .cf-quick-panel {
       border-top: 2px solid var(--border-color);
     }
@@ -2025,7 +2025,7 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Document cards — 1-by-1 horizontal card layout */
+    /* Document cards â€” 1-by-1 horizontal card layout */
     .cf-doc-cards-grid {
       display: flex;
       flex-direction: column;
@@ -2199,9 +2199,9 @@
     }
     .cf-full-link:hover { text-decoration: underline; }
 
-/* ══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    STREAMLINED DETAILED CARDS & MOBILE POLISH
-   ══════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .gc-header-dots-btn {
   color: hsl(0 0% 100% / 0.85) !important;
 }
@@ -2216,10 +2216,10 @@ html, body {
   overflow-x: hidden;
 }
 
-/* ══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MOBILE & RESPONSIVE REFINEMENT (<= 768px)
-   Guaranteed Fit to Mobile Viewport — Zero Horizontal Zoom
-   ══════════════════════════════════════════════════════════════ */
+   Guaranteed Fit to Mobile Viewport â€” Zero Horizontal Zoom
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media (max-width: 768px) {
   html, body {
     width: 100% !important;
@@ -2431,3 +2431,4 @@ html, body {
     box-sizing: border-box !important;
   }
 }
+

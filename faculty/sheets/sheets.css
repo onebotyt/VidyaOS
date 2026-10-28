@@ -1796,8 +1796,8 @@
       }
       body {
         overflow: visible !important;
-        background: #ffffff !important;
-        color: #000000 !important;
+        background: var(--bg-card) !important;
+        color: var(--text-main) !important;
       }
       .gc-navbar,
       .studio-bar,
@@ -1845,38 +1845,38 @@
       }
       table.excel-table th,
       table.excel-table td {
-        border: 1px solid #94a3b8 !important;
+        border: 1px solid var(--border-color) !important;
         padding: 5px 6px !important;
         font-size: 8.5pt !important;
       }
       .excel-hdr-blue,
       tr.excel-hdr-blue th {
-        background-color: #e0f2fe !important;
-        color: #0369a1 !important;
+        background-color: var(--color-primary-light) !important;
+        color: var(--color-primary) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
       .excel-hdr-tan,
       tr.excel-hdr-tan th {
-        background-color: #fef3c7 !important;
-        color: #92400e !important;
+        background-color: var(--col-abs-group-bg) !important;
+        color: var(--status-absent) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
       .excel-hdr-sub,
       tr.excel-hdr-sub th {
-        background-color: #f8fafc !important;
-        color: #334155 !important;
+        background-color: var(--bg-surface-secondary) !important;
+        color: var(--text-muted) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
       .excel-summary-lbl {
-        background-color: #f1f5f9 !important;
+        background-color: var(--bg-surface) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
       .excel-summary-avg {
-        background-color: #e2e8f0 !important;
+        background-color: var(--border-color) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }

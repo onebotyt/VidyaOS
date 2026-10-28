@@ -1680,7 +1680,7 @@ body:not([data-active-tab="stream"]) #mobile-stream-actions,
 
 .export-scope-btn.active {
   background: var(--color-primary);
-  color: var(--text-white, #fff);
+  color: var(--text-white);
   font-weight: 700;
 }
 

@@ -245,7 +245,7 @@
     .gc-drawer-backdrop {
       position: fixed;
       inset: 0;
-      background: hsl(0, 0%, 0% / 0.4);
+      background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45));
       z-index: 9990;
       opacity: 0;
       pointer-events: none;

@@ -33,9 +33,10 @@
       transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1), width 0.24s cubic-bezier(0.16, 1, 0.3, 1);
     }
     body.sidebar-open .eval-main-layout {
-      margin-left: 260px !important;
-      width: calc(100% - 260px) !important;
-      max-width: calc(100% - 260px) !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
     }
     body:not(.sidebar-open) .eval-main-layout {
       margin-left: 0 !important;
@@ -1119,7 +1120,7 @@
     .gc-drawer-backdrop {
       position: fixed;
       inset: 0;
-      background: hsl(0, 0%, 0% / 0.4);
+      background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45));
       z-index: 9990;
       opacity: 0;
       pointer-events: none;

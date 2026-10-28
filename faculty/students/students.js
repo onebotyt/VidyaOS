@@ -200,9 +200,27 @@
       const grid = document.getElementById('teacher-grid');
       try {
         const res = await apiFetch(`${API}/teachers`);
-        allTeachers = res?.data || [];
+        const rawTeachers = res?.data || [];
+        // Strictly filter out any Admin account and isolate to same department only
+        allTeachers = rawTeachers.filter(t => {
+          const isSystemAdmin = t.user_id === 1 ||
+            t.role === 'SYSTEM_ADMIN' ||
+            (t.gmail && t.gmail.toLowerCase().includes('admin')) ||
+            (t.email && t.email.toLowerCase().includes('admin')) ||
+            (t.username && t.username.toLowerCase().includes('admin')) ||
+            (t.full_name && t.full_name.toLowerCase().includes('administrator')) ||
+            (t.full_name && t.full_name.toLowerCase() === 'admin');
+          if (isSystemAdmin) return false;
+
+          // Department isolation: if department_id is present, must match currentDeptId
+          if (currentDeptId && t.department_id && String(t.department_id) !== String(currentDeptId)) {
+            return false;
+          }
+          return true;
+        });
         renderTeachers(allTeachers);
-        document.getElementById('stat-teachers-count').textContent = allTeachers.length;
+        const countEl = document.getElementById('stat-teachers-count');
+        if (countEl) countEl.textContent = allTeachers.length;
       } catch (err) {
         console.error('Failed to load teachers:', err);
         grid.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--status-absent); grid-column: 1 / -1;">Failed to load faculty directory.</div>`;
@@ -226,7 +244,7 @@
 
         const isHodMember = Boolean(t.is_hod || t.user_id === currentUser?.user_id);
         const roleBadge = isHodMember
-          ? `<span class="badge" style="background: var(--chip-hod-bg); color: var(--color-primary); font-weight: 700;">Head of Department</span>`
+          ? `<span class="badge" style="background: var(--chip-hod-bg); color: var(--color-primary); font-weight: 700;">HOD</span>`
           : `<span class="badge" style="background: var(--bg-surface-secondary); color: var(--text-main); font-weight: 600;">Faculty Member</span>`;
 
         return `
@@ -237,23 +255,39 @@
                   <div class="tc-avatar">${initials}</div>
                   <div>
                     <div class="tc-name">${esc(t.full_name)}</div>
-                    ${t.employee_id ? `<div class="tc-empid">EMP: ${esc(t.employee_id)}</div>` : ''}
+                    ${t.employee_id ? `<div class="tc-empid">EMP #${esc(t.employee_id)}</div>` : ''}
                   </div>
                 </div>
                 <div>${roleBadge}</div>
               </div>
 
               <div class="tc-meta">
-                <div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> <span style="font-family: monospace; color: var(--text-main);">${esc(t.gmail || t.email)}</span></div>
-                ${t.phone ? `<div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> <span>${esc(t.phone)}</span></div>` : ''}
-                <div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--status-present);margin-right:6px;"></span> Account: <span style="font-weight: 600; color: var(--status-present);">${esc(t.status || 'ACTIVE')}</span></div>
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  <span style="font-family: var(--font-family-mono, monospace); color: var(--text-main);">${esc(t.gmail || t.email)}</span>
+                </div>
+                ${t.phone ? `
+                  <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <span>${esc(t.phone)}</span>
+                  </div>` : ''}
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--status-present);"></span>
+                  <span>Status: <strong style="color: var(--status-present);">${esc(t.status || 'ACTIVE')}</strong></span>
+                </div>
               </div>
             </div>
 
             ${isHod ? `
-              <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem; justify-content: flex-end;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="openResetModal(${t.id}, '${esc(t.full_name)}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5M18.5 4.5l2.5 2.5"></path></svg> Reset Password</button>
-                <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent);" onclick="openDeleteModal(${t.id}, '${esc(t.full_name)}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Remove</button>
+              <div class="tc-actions" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openResetModal(${t.id}, '${esc(t.full_name)}')" title="Reset faculty password">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5M18.5 4.5l2.5 2.5"></path></svg>
+                  <span>Reset</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent);" onclick="openDeleteModal(${t.id}, '${esc(t.full_name)}')" title="Remove faculty from department">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Remove</span>
+                </button>
               </div>
             ` : ''}
           </div>
@@ -548,14 +582,27 @@
     async function loadCohorts() {
       try {
         const res = await apiFetch('/faculty/cohorts');
-        allCohorts = res?.data || [];
+        const rawCohorts = res?.data || [];
+        
+        // Isolate to same department only & exclude admin pseudo-department
+        allCohorts = rawCohorts.filter(c => {
+          const deptNameLower = (c.department_name || '').toLowerCase();
+          const deptCodeLower = (c.department_code || '').toLowerCase();
+          if (deptNameLower.includes('admin') || deptCodeLower.includes('admin')) return false;
+
+          if (currentDeptId) {
+            return String(c.department_id) === String(currentDeptId);
+          }
+          return true;
+        });
+
         const select = document.getElementById('cohort-select');
         select.innerHTML = '<option value="">All Department Cohorts</option>';
 
         allCohorts.forEach(c => {
           const opt = document.createElement('option');
           opt.value = `${c.department_id}_${c.year}_${c.semester}`;
-          opt.textContent = `${c.department_name || 'Dept'} • Year ${c.year} Sem ${c.semester}`;
+          opt.textContent = `${c.department_code || c.department_name || 'Dept'} • Year ${c.year} Sem ${c.semester}`;
           opt.dataset.deptId = c.department_id;
           opt.dataset.year = c.year;
           opt.dataset.sem = c.semester;
@@ -720,13 +767,26 @@
         if (yr) queryParams.push(`year=${yr}`);
         if (sem) queryParams.push(`semester=${sem}`);
       }
+      if (currentDeptId) {
+        queryParams.push(`department_id=${currentDeptId}`);
+      }
 
       const qStr = queryParams.length ? '?' + queryParams.join('&') : '';
 
       try {
         const endpoint = isHod ? `${API}/students${qStr}` : `/students${qStr}`;
         const res = await apiFetch(endpoint);
-        allStudents = res?.data || [];
+        const rawStudents = res?.data || [];
+        // Strictly filter out any Admin account and isolate to same department only
+        allStudents = rawStudents.filter(s => {
+          if (s.user_id === 1 || s.full_name?.toLowerCase().includes('administrator') || (s.email && s.email.toLowerCase().includes('admin'))) {
+            return false;
+          }
+          if (currentDeptId && s.department_id && String(s.department_id) !== String(currentDeptId)) {
+            return false;
+          }
+          return true;
+        });
         renderStudents(allStudents);
       } catch (err) {
         console.error('Failed to load students:', err);

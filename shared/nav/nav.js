@@ -36,11 +36,10 @@ function _setSidebarState(open) {
 
 function _updateMenuToggleButtons(isOpen) {
   const hamburgerSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
-  const closeSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
 
   const btns = document.querySelectorAll('#sidebar-toggle-btn, #btn-menu-toggle, .gc-navbar .gc-menu-btn, .app-header .sidebar-toggle-btn');
   btns.forEach(btn => {
-    btn.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;">${isOpen ? closeSvg : hamburgerSvg}</span>`;
+    btn.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;">${hamburgerSvg}</span>`;
     btn.setAttribute('aria-label', isOpen ? 'Close navigation sidebar' : 'Open navigation sidebar');
     btn.setAttribute('title', isOpen ? 'Close Main Menu' : 'Main Menu');
     btn.setAttribute('aria-pressed', isOpen ? 'true' : 'false');
@@ -48,15 +47,18 @@ function _updateMenuToggleButtons(isOpen) {
 }
 
 function toggleSidebar(forceState) {
-  const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer') || document.getElementById('gc-drawer');
-  const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop') || document.getElementById('gc-drawer-backdrop');
+  let sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer') || document.getElementById('gc-drawer');
+  let backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop') || document.getElementById('gc-drawer-backdrop');
+  if (!sidebar) {
+    if (typeof mountNavigationSystem === 'function') {
+      mountNavigationSystem();
+      sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer') || document.getElementById('gc-drawer');
+      backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop') || document.getElementById('gc-drawer-backdrop');
+    }
+  }
   if (!sidebar) return;
 
-  const isDesktop = window.innerWidth >= 769;
-  const isCurrentlyOpen = isDesktop
-    ? !document.body.classList.contains('sidebar-closed')
-    : (sidebar.classList.contains('sidebar-open') || sidebar.classList.contains('open'));
-
+  const isCurrentlyOpen = sidebar.classList.contains('sidebar-open') || sidebar.classList.contains('open') || document.body.classList.contains('sidebar-open');
   const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
 
   if (shouldOpen) {
@@ -64,7 +66,7 @@ function toggleSidebar(forceState) {
     sidebar.classList.remove('sidebar-closed');
     document.body.classList.add('sidebar-open');
     document.body.classList.remove('sidebar-closed');
-    if (!isDesktop && backdrop) {
+    if (backdrop) {
       backdrop.classList.add('active', 'open');
     }
   } else {
@@ -86,25 +88,20 @@ function closeSidebar() {
 }
 
 function _initSidebarState() {
-  const isDesktop = window.innerWidth >= 769;
   const sidebar = document.getElementById('app-sidebar') || document.getElementById('classroom-drawer') || document.getElementById('gc-drawer');
-  const isSidebarClosed = _getSidebarState() === false;
-  const shouldBeOpen = isDesktop ? !isSidebarClosed : false;
+  const backdrop = document.getElementById('sidebar-backdrop') || document.getElementById('classroom-drawer-backdrop') || document.getElementById('gc-drawer-backdrop');
 
+  // Overlay slide-out navigation starts closed by default across all pages
   if (sidebar) {
-    if (shouldBeOpen) {
-      sidebar.classList.add('sidebar-open', 'open');
-      sidebar.classList.remove('sidebar-closed');
-      document.body.classList.add('sidebar-open');
-      document.body.classList.remove('sidebar-closed');
-    } else {
-      sidebar.classList.remove('sidebar-open', 'open');
-      sidebar.classList.add('sidebar-closed');
-      document.body.classList.remove('sidebar-open');
-      document.body.classList.add('sidebar-closed');
+    sidebar.classList.remove('sidebar-open', 'open');
+    sidebar.classList.add('sidebar-closed');
+    document.body.classList.remove('sidebar-open');
+    document.body.classList.add('sidebar-closed');
+    if (backdrop) {
+      backdrop.classList.remove('active', 'open');
     }
   }
-  _updateMenuToggleButtons(shouldBeOpen);
+  _updateMenuToggleButtons(false);
 }
 
 // ─────────────────────────────────────────────────────────
@@ -175,6 +172,14 @@ if (typeof window !== 'undefined') {
       closeAppsLauncher();
     }
     if (!e.target.closest('#user-profile-popover') && !e.target.closest('#gc-user-avatar') && !e.target.closest('[onclick*="toggleUserProfile"]') && !e.target.closest('#btn-user-avatar')) {
+      closeUserProfile();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeSidebar();
+      closeAppsLauncher();
       closeUserProfile();
     }
   });
@@ -448,8 +453,6 @@ const NAVIGATION_PROFILES = {
         label: 'Academic Management',
         items: [
           { href: '/faculty/registers.html', icon: 'book', label: 'Attendance Registers', id: 'nav-reg' },
-          { href: '/faculty/assignments.html', icon: 'assignment', label: 'Coursework & Assignments', id: 'nav-assign' },
-          { href: '/faculty/tests.html', icon: 'test', label: 'Class Tests & Marksheets', id: 'nav-marks' },
           { href: '/faculty/evaluation.html', icon: 'trendingUp', label: 'Internal Evaluation', id: 'nav-eval' },
           { href: '/faculty/reports.html', icon: 'reports', label: 'Department Analytics', id: 'nav-reports' },
           { href: '/faculty/media.html', icon: 'folder', label: 'Faculty Drive & Vault', id: 'nav-drive' },
@@ -507,8 +510,6 @@ const NAVIGATION_PROFILES = {
         label: 'Academic Tools',
         items: [
           { href: '/faculty/registers.html', icon: 'book', label: 'Attendance Registers', id: 'nav-reg' },
-          { href: '/faculty/assignments.html', icon: 'assignment', label: 'Coursework & Assignments', id: 'nav-assign' },
-          { href: '/faculty/tests.html', icon: 'test', label: 'Class Tests & Marksheets', id: 'nav-marks' },
           { href: '/faculty/evaluation.html', icon: 'trendingUp', label: 'Internal Evaluation', id: 'nav-eval' },
           { href: '/faculty/students.html', icon: 'students', label: 'Faculty & Students', id: 'nav-students-item', hasBadge: true },
           { href: '/faculty/reports.html', icon: 'reports', label: 'Reports & Analytics', id: 'nav-reports' },
@@ -623,10 +624,14 @@ function mountNavigationSystem(options = {}) {
     return;
   }
 
-  const user = typeof window.getCurrentUser === 'function' ? window.getCurrentUser() : null;
+  let user = typeof window.getCurrentUser === 'function' ? window.getCurrentUser() : null;
   if (!user) {
-    document.body.setAttribute('data-nav-ready', '1');
-    return;
+    if (currentPath.includes('/admin/')) {
+      user = { full_name: 'Administrator', username: 'admin', roles: ['SYSTEM_ADMIN'] };
+    } else {
+      document.body.setAttribute('data-nav-ready', '1');
+      return;
+    }
   }
 
   const roleKey = options.role || resolveNavigationRole(user, currentPath);
@@ -646,7 +651,10 @@ function mountNavigationSystem(options = {}) {
   // 3. SIDEBAR (#app-sidebar)
   _ensureSidebar(profile, user, portalLabel);
 
-  // 4. MOBILE BOTTOM NAV (.mobile-bottom-nav)
+  // 4. APP WORKSPACE WRAPPER (#app-workspace)
+  _ensureWorkspace();
+
+  // 5. MOBILE BOTTOM NAV (.mobile-bottom-nav)
   _ensureMobileBottomNav(profile, currentPath);
 
   // 5. Navigation progress bar & View Transitions wiring
@@ -737,7 +745,12 @@ function _ensureNavProgress() {
 // ─────────────────────────────────────────────────────────
 
 function _ensureHeader(profile, user, initial, displayName, email, portalLabel) {
-  let header = document.querySelector('.gc-navbar, .app-header');
+  if (window.DISABLE_HEADER) return;
+  let header = document.querySelector('.gc-navbar, .app-header, .cw-gclass-nav');
+  if (header && header.classList.contains('cw-gclass-nav')) {
+    // Dedicated editor header already active (e.g. classwork create)
+    return;
+  }
   
   if (!header) {
     const headerHtml = `
@@ -767,20 +780,53 @@ function _ensureHeader(profile, user, initial, displayName, email, portalLabel) 
     header = document.querySelector('.gc-navbar');
   }
 
-  // Ensure toggle button in left wrap
-  if (!document.getElementById('sidebar-toggle-btn') && !document.getElementById('btn-menu-toggle')) {
-    const toggleBtn = document.createElement('button');
-    toggleBtn.id = 'sidebar-toggle-btn';
-    toggleBtn.className = 'sidebar-toggle-btn gc-menu-btn';
-    toggleBtn.type = 'button';
-    toggleBtn.onclick = toggleSidebar;
-    toggleBtn.setAttribute('aria-label', 'Toggle navigation');
-    toggleBtn.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;">${getSvgIcon('menu', 18)}</span>`;
-
-    const leftWrap = header.querySelector('.gc-nav-left, .header-left');
-    if (leftWrap) {
+  // Ensure toggle button & role badge in left wrap
+  const leftWrap = header.querySelector('.gc-nav-left, .header-left');
+  if (leftWrap) {
+    let toggleBtn = document.getElementById('sidebar-toggle-btn') || document.getElementById('btn-menu-toggle') || leftWrap.querySelector('.gc-menu-btn');
+    if (!toggleBtn) {
+      toggleBtn = document.createElement('button');
+      toggleBtn.id = 'sidebar-toggle-btn';
+      toggleBtn.className = 'sidebar-toggle-btn gc-menu-btn';
+      toggleBtn.type = 'button';
+      toggleBtn.onclick = toggleSidebar;
+      toggleBtn.setAttribute('aria-label', 'Toggle navigation');
       leftWrap.insertBefore(toggleBtn, leftWrap.firstChild);
     }
+    toggleBtn.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;">${getSvgIcon('menu', 18)}</span>`;
+    toggleBtn.onclick = toggleSidebar;
+
+    // Ensure Page Badge is present and updated
+    let badge = leftWrap.querySelector('.gc-page-badge, #app-header-page-title');
+    if (!badge && profile.pageBadge) {
+      badge = document.createElement('span');
+      badge.className = `gc-page-badge ${profile.badgeClass || ''}`;
+      badge.id = 'app-header-page-title';
+      badge.textContent = profile.pageBadge;
+      leftWrap.appendChild(badge);
+    } else if (badge && profile.pageBadge) {
+      badge.className = `gc-page-badge ${profile.badgeClass || ''}`;
+      badge.textContent = profile.pageBadge;
+      badge.style.display = 'inline-flex';
+    }
+  }
+
+  // Ensure 9-dot apps button & theme button in right wrap
+  const navRight = header.querySelector('.gc-nav-right, .header-right') || header;
+  const appsBtn = navRight.querySelector('#btn-apps-launcher, .gc-icon-btn[onclick*="toggleAppsLauncher"]');
+  if (appsBtn) {
+    appsBtn.id = 'btn-apps-launcher';
+    appsBtn.innerHTML = getSvgIcon('apps', 18);
+    appsBtn.setAttribute('title', 'Apps & Modules');
+    appsBtn.setAttribute('aria-label', 'Apps Launcher');
+    appsBtn.setAttribute('onclick', 'toggleAppsLauncher(event)');
+  }
+
+  const themeBtn = navRight.querySelector('#btn-theme-toggle, .gc-icon-btn[onclick*="toggleTheme"], .gc-icon-btn[onclick*="toggleAppTheme"]');
+  if (themeBtn) {
+    themeBtn.id = 'btn-theme-toggle';
+    themeBtn.setAttribute('onclick', 'if(typeof toggleAppTheme==="function")toggleAppTheme();else if(typeof toggleTheme==="function")toggleTheme();');
+    themeBtn.innerHTML = getSvgIcon('moon', 18);
   }
 
   // Update Avatar
@@ -866,59 +912,81 @@ function _ensureSidebar(profile, user, portalLabel) {
 
   let sidebar = document.getElementById('app-sidebar');
 
-  if (!sidebar) {
-    function buildLinks(sections) {
-      return sections.map((section, idx) => {
-        let customHtml = section.customContent || '';
-        const links = (section.items || []).map(item => {
-          const hrefLower = (item.href || '').toLowerCase();
-          const itemBase = hrefLower.replace('.html', '').replace('/index', '');
-          const pathBase = currentPath.replace('.html', '').replace('/index', '').replace(/\/$/, '');
-          const isActive = (hrefLower.includes('?') ? currentUrl === hrefLower : (currentPath === hrefLower || pathBase === itemBase))
-            || (item.href.endsWith('dashboard.html') && (currentPath.endsWith('/') || currentPath.includes('dashboard') || currentPath.includes('groups.html')));
+  function buildLinks(sections) {
+    return sections.map((section, idx) => {
+      let customHtml = section.customContent || '';
+      const links = (section.items || []).map(item => {
+        const hrefLower = (item.href || '').toLowerCase();
+        const itemBase = hrefLower.replace('.html', '').replace('/index', '');
+        const pathBase = currentPath.replace('.html', '').replace('/index', '').replace(/\/$/, '');
+        const isActive = (hrefLower.includes('?') ? currentUrl === hrefLower : (currentPath === hrefLower || pathBase === itemBase))
+          || (item.href.endsWith('dashboard.html') && (currentPath.endsWith('/') || currentPath.includes('dashboard') || currentPath.includes('groups.html')));
 
-          return `
-            <a href="${item.href}" ${item.id ? `id="${item.id}"` : ''}
-               class="sidebar-item gc-drawer-link ${isActive ? 'active' : ''}"
-               onclick="if(window.innerWidth<=768)closeSidebar()" style="position:relative;">
-              <span class="sidebar-item-icon" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0;">${getSvgIcon(item.icon, 18)}</span>
-              <span>${item.label}</span>
-              ${item.hasBadge ? `<span id="${item.id}-badge" style="display:none;position:absolute;right:0.65rem;top:50%;transform:translateY(-50%);background:var(--status-absent);color:var(--text-white, hsl(0, 0%, 100%));border-radius:9999px;min-width:18px;height:18px;font-size:0.65rem;font-weight:700;align-items:center;justify-content:center;padding:0 5px;"></span>` : ''}
-            </a>`;
-        }).join('');
-        const dividerHtml = idx > 0 ? '<div class="gc-drawer-divider"></div>' : '';
-        const labelHtml = section.label ? `<div class="sidebar-section-label gc-drawer-sec-title">${section.label}</div>` : '';
-        return `${dividerHtml}${labelHtml}${customHtml}${links}`;
+        return `
+          <a href="${item.href}" ${item.id ? `id="${item.id}"` : ''}
+             class="sidebar-item gc-drawer-link ${isActive ? 'active' : ''}"
+             onclick="closeSidebar()" style="position:relative;">
+            <span class="sidebar-item-icon" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0;">${getSvgIcon(item.icon, 18)}</span>
+            <span>${item.label}</span>
+            ${item.hasBadge ? `<span id="${item.id}-badge" style="display:none;position:absolute;right:0.65rem;top:50%;transform:translateY(-50%);background:var(--status-absent);color:var(--text-white, hsl(0, 0%, 100%));border-radius:9999px;min-width:18px;height:18px;font-size:0.65rem;font-weight:700;align-items:center;justify-content:center;padding:0 5px;"></span>` : ''}
+          </a>`;
       }).join('');
-    }
+      const dividerHtml = idx > 0 ? '<div class="gc-drawer-divider"></div>' : '';
+      const labelHtml = section.label ? `<div class="sidebar-section-label gc-drawer-sec-title">${section.label}</div>` : '';
+      return `${dividerHtml}${labelHtml}${customHtml}${links}`;
+    }).join('');
+  }
 
-    const safePortalLabel = String(portalLabel || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const safePortalLabel = String(portalLabel || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+  const sidebarInnerHtml = `
+    <!-- Google Classroom Drawer Header -->
+    <div class="gc-drawer-header">
+      <button type="button" class="gc-menu-btn" onclick="closeSidebar()" title="Close Main Menu" aria-label="Close navigation">
+        <span style="display:inline-flex;align-items:center;justify-content:center;">${getSvgIcon('menu', 18)}</span>
+      </button>
+      <a href="${profile.homeUrl}" class="gc-brand-link" title="VidyaOS ${safePortalLabel}">
+        <div class="gc-brand-icon">${getSvgIcon('gradCap', 22)}</div>
+        <div class="gc-brand-title">VidyaOS</div>
+      </a>
+    </div>
+
+    <!-- Scoped Navigation Links -->
+    <div class="gc-drawer-body sidebar-links">
+      ${buildLinks(profile.sections || [])}
+    </div>
+
+    <!-- Institutional Footer Tier -->
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-row">
+        <div class="sidebar-system-pill">
+          <span class="sidebar-system-dot"></span>
+          <span>VidyaOS &bull; ${safePortalLabel}</span>
+        </div>
+        <button type="button" class="sidebar-logout-btn" onclick="if(typeof logout==='function')logout()" title="Sign out of system">
+          <span style="display:inline-flex;align-items:center;">${getSvgIcon('logout', 16)}</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  if (!sidebar) {
     const sidebarHtml = `
       <aside id="app-sidebar" class="app-sidebar gc-drawer" aria-label="Site Navigation">
-        <!-- Scoped Navigation Links -->
-        <div class="gc-drawer-body sidebar-links">
-          ${buildLinks(profile.sections || [])}
-        </div>
-
-        <!-- Institutional Footer Tier -->
-        <div class="sidebar-footer">
-          <div class="sidebar-footer-row">
-            <div class="sidebar-system-pill">
-              <span class="sidebar-system-dot"></span>
-              <span>VidyaOS &bull; ${safePortalLabel}</span>
-            </div>
-            <button type="button" class="sidebar-logout-btn" onclick="if(typeof logout==='function')logout()" title="Sign out of system">
-              <span style="display:inline-flex;align-items:center;">${getSvgIcon('logout', 16)}</span>
-              <span>Logout</span>
-            </button>
-          </div>
-        </div>
+        ${sidebarInnerHtml}
       </aside>
       <div id="sidebar-backdrop" class="sidebar-backdrop gc-drawer-backdrop" onclick="closeSidebar()"></div>
     `;
-
     document.body.insertAdjacentHTML('afterbegin', sidebarHtml);
+    document.body.classList.add('has-sidebar');
+  } else if (!sidebar.querySelector('.sidebar-footer') || !sidebar.querySelector('.sidebar-item-icon')) {
+    // Upgrade existing skeleton to rich SVG icons & institutional footer
+    sidebar.className = 'app-sidebar gc-drawer';
+    sidebar.innerHTML = sidebarInnerHtml;
+    if (!document.getElementById('sidebar-backdrop')) {
+      document.body.insertAdjacentHTML('beforeend', '<div id="sidebar-backdrop" class="sidebar-backdrop gc-drawer-backdrop" onclick="closeSidebar()"></div>');
+    }
     document.body.classList.add('has-sidebar');
   }
 
@@ -930,6 +998,11 @@ function _ensureSidebar(profile, user, portalLabel) {
 // ─────────────────────────────────────────────────────────
 
 function _ensureMobileBottomNav(profile, currentPath) {
+  if (window.DISABLE_BOTTOM_NAV) {
+    let existing = document.querySelector('.mobile-bottom-nav');
+    if (existing) existing.remove();
+    return;
+  }
   let existing = document.querySelector('.mobile-bottom-nav');
   if (existing) existing.remove();
 
@@ -965,6 +1038,24 @@ function _ensureMobileBottomNav(profile, currentPath) {
     </nav>
   `;
   document.body.insertAdjacentHTML('beforeend', navHtml);
+}
+
+// ─────────────────────────────────────────────────────────
+// APP WORKSPACE WRAPPER INJECTION
+// ─────────────────────────────────────────────────────────
+
+function _ensureWorkspace() {
+  let workspace = document.getElementById('app-workspace');
+  if (!workspace) {
+    const main = document.querySelector('body > main, body > .main-content, body > .page-container');
+    if (main && !main.classList.contains('app-workspace') && main.id !== 'app-workspace') {
+      workspace = document.createElement('div');
+      workspace.id = 'app-workspace';
+      workspace.className = 'app-workspace';
+      main.parentNode.insertBefore(workspace, main);
+      workspace.appendChild(main);
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────────────
@@ -1009,6 +1100,24 @@ function updateDrawerThemeLabel() {}
 
 // Global Exports
 if (typeof window !== 'undefined') {
+  if (typeof window.handleLogout !== 'function') {
+    window.handleLogout = function () {
+      if (typeof window.logout === 'function') {
+        window.logout();
+      } else if (typeof logout === 'function') {
+        logout();
+      } else {
+        try {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+        } catch (_) {}
+        window.location.href = '/index.html';
+      }
+    };
+  }
+  if (typeof window.logout !== 'function') {
+    window.logout = window.handleLogout;
+  }
   window.NAVIGATION_PROFILES = NAVIGATION_PROFILES;
   window.resolveNavigationRole = resolveNavigationRole;
   window.mountNavigationSystem = mountNavigationSystem;

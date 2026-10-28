@@ -166,8 +166,8 @@
     margin: 8mm;
   }
   body {
-    background: #ffffff !important;
-    color: #000000 !important;
+    background: var(--bg-card) !important;
+    color: var(--text-main) !important;
     overflow: visible !important;
   }
   .gc-navbar,
@@ -204,21 +204,21 @@
   }
   table.excel-table th,
   table.excel-table td {
-    border: 1px solid #94a3b8 !important;
+    border: 1px solid var(--border-color) !important;
     padding: 4px 6px !important;
     font-size: 8.5pt !important;
   }
   .excel-hdr-blue,
   tr.excel-hdr-blue th {
-    background-color: #e0f2fe !important;
-    color: #0369a1 !important;
+    background-color: var(--color-primary-light) !important;
+    color: var(--color-primary) !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
   .excel-hdr-tan,
   tr.excel-hdr-tan th {
-    background-color: #fef3c7 !important;
-    color: #92400e !important;
+    background-color: var(--col-abs-group-bg) !important;
+    color: var(--status-absent) !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }

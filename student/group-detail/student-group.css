@@ -913,7 +913,7 @@ body.viewing-work-details #student-work-details-view {
 .gc-drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: hsla(0, 0%, 0%, 0.4);
+  background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45));
   z-index: 10000;
   opacity: 0;
   visibility: hidden;
