@@ -57,6 +57,31 @@ guardRoute(['STUDENT']);
         document.getElementById('profile-username').value = s.official_enrollment_no || s.username || '';
         document.getElementById('profile-email').value = s.email || '';
 
+        // Demographic & KYC Dossier Fields
+        if (document.getElementById('profile-father-name')) document.getElementById('profile-father-name').value = s.father_name || '';
+        if (document.getElementById('profile-mother-name')) document.getElementById('profile-mother-name').value = s.mother_name || '';
+        if (document.getElementById('profile-dob')) document.getElementById('profile-dob').value = s.dob || '';
+        if (document.getElementById('profile-gender')) document.getElementById('profile-gender').value = s.gender || '';
+        if (document.getElementById('profile-category')) document.getElementById('profile-category').value = s.category || '';
+        if (document.getElementById('profile-aadhar')) document.getElementById('profile-aadhar').value = s.aadhar_number || '';
+        if (document.getElementById('profile-phone')) document.getElementById('profile-phone').value = s.phone || s.student_phone || '';
+        if (document.getElementById('profile-address')) document.getElementById('profile-address').value = s.address || '';
+
+        // Completion status badge
+        const compBadge = document.getElementById('profile-completion-badge');
+        if (compBadge) {
+          const isComplete = Boolean(s.profile_completed || (
+            s.address && s.aadhar_number && s.father_name && s.mother_name && s.dob && s.gender && s.category
+          ));
+          if (isComplete) {
+            compBadge.className = 'std-badge regular';
+            compBadge.innerText = 'Status: Complete & Verified';
+          } else {
+            compBadge.className = 'std-badge defaulter';
+            compBadge.innerText = 'Status: Incomplete Dossier';
+          }
+        }
+
         // 2. Attendance Health Stats
         const stats = s.attendance_stats;
         const standingBadge = document.getElementById('hero-standing-badge');
@@ -190,6 +215,102 @@ guardRoute(['STUDENT']);
         btn.disabled = false;
       }
     });
+
+    // Demographics & KYC Form Submission
+    const demoForm = document.getElementById('demographics-form');
+    if (demoForm) {
+      demoForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const feedback = document.getElementById('demographics-feedback');
+        if (feedback) feedback.style.display = 'none';
+
+        const father_name = document.getElementById('profile-father-name')?.value.trim();
+        const mother_name = document.getElementById('profile-mother-name')?.value.trim();
+        const dob = document.getElementById('profile-dob')?.value;
+        const gender = document.getElementById('profile-gender')?.value;
+        const category = document.getElementById('profile-category')?.value;
+        const aadhar_number = document.getElementById('profile-aadhar')?.value.trim();
+        const phone = document.getElementById('profile-phone')?.value.trim();
+        const address = document.getElementById('profile-address')?.value.trim();
+        const saveBtn = document.getElementById('save-demographics-btn');
+
+        if (!father_name || !mother_name || !dob || !gender || !category || !aadhar_number || !address) {
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.background = 'var(--status-absent-bg)';
+            feedback.style.color = 'var(--status-absent)';
+            feedback.innerText = 'Please complete all required demographic fields marked with *.';
+          }
+          return;
+        }
+
+        try {
+          if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = 'Saving Details...';
+          }
+
+          const res = await fetchApi('/students/me', {
+            method: 'PUT',
+            body: JSON.stringify({
+              father_name,
+              mother_name,
+              dob,
+              gender,
+              category,
+              aadhar_number,
+              phone: phone || null,
+              address
+            })
+          });
+
+          if (res && res.success) {
+            if (typeof showToast === 'function') {
+              showToast('Demographic dossier saved successfully!', 'success');
+            }
+            if (feedback) {
+              feedback.style.display = 'block';
+              feedback.style.background = 'var(--status-present-bg)';
+              feedback.style.color = 'var(--status-present)';
+              feedback.innerText = '✓ Demographic details successfully updated and verified.';
+            }
+            loadStudentProfile();
+          } else {
+            if (feedback) {
+              feedback.style.display = 'block';
+              feedback.style.background = 'var(--status-absent-bg)';
+              feedback.style.color = 'var(--status-absent)';
+              feedback.innerText = res?.error?.message || 'Failed to save demographic details.';
+            }
+          }
+        } catch (err) {
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.background = 'var(--status-absent-bg)';
+            feedback.style.color = 'var(--status-absent)';
+            feedback.innerText = err.message || 'Network error saving demographic details.';
+          }
+        } finally {
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Save Demographic Details';
+          }
+        }
+      });
+    }
+
+    // Check URL parameters for ?complete=1
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('complete') === '1' || urlParams.get('complete') === 'true') {
+      setTimeout(() => {
+        const demoCard = document.getElementById('demographics-card');
+        if (demoCard) {
+          demoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          demoCard.style.outline = '2px solid var(--color-primary)';
+          setTimeout(() => { demoCard.style.outline = 'none'; }, 2500);
+        }
+      }, 400);
+    }
 
     loadStudentProfile();
 

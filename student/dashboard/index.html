@@ -600,6 +600,91 @@
     </button>
   </div>
 
+  <!-- MODAL: COMPLETE STUDENT PROFILE POPUP (FIRST LOGIN / INCOMPLETE PROFILE) -->
+  <div id="complete-profile-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)closeCompleteProfileModal()">
+    <div class="modal-card" style="max-width: 580px; max-height: 92vh; display: flex; flex-direction: column;" onclick="event.stopPropagation()">
+      <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:1rem 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--text-main);">Complete Your Student Profile</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Required for official records &amp; exam eligibility</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" onclick="closeCompleteProfileModal()" aria-label="Close" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted);">&times;</button>
+      </div>
+
+      <form id="popup-profile-form" onsubmit="handlePopupProfileSubmit(event)" style="display: flex; flex-direction: column; overflow: hidden; margin: 0;">
+        <div class="modal-body" style="padding: 1.25rem; overflow-y: auto; flex: 1;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.84rem; color: var(--text-main); line-height: 1.45;">
+            Welcome to VidyaOS! Please complete your institutional demographic details below. These are recorded once for institutional dossiers and academic verification.
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;" for="pop-father-name">Father's Full Name <span style="color: var(--status-absent);">*</span></label>
+              <input type="text" id="pop-father-name" class="form-control" placeholder="e.g. Rajesh Sharma" required>
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;" for="pop-mother-name">Mother's Full Name <span style="color: var(--status-absent);">*</span></label>
+              <input type="text" id="pop-mother-name" class="form-control" placeholder="e.g. Sunita Sharma" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;" for="pop-dob">Date of Birth <span style="color: var(--status-absent);">*</span></label>
+              <input type="date" id="pop-dob" class="form-control" required>
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;" for="pop-gender">Gender <span style="color: var(--status-absent);">*</span></label>
+              <select id="pop-gender" class="form-control" required>
+                <option value="">— Select —</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;" for="pop-category">Category <span style="color: var(--status-absent);">*</span></label>
+              <select id="pop-category" class="form-control" required>
+                <option value="">— Select —</option>
+                <option value="General">General</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+                <option value="EWS">EWS</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;" for="pop-aadhar">Aadhar Number (12 Digits) <span style="color: var(--status-absent);">*</span></label>
+            <input type="text" id="pop-aadhar" class="form-control" placeholder="e.g. 1234 5678 9012" maxlength="14" required>
+          </div>
+
+          <div style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;" for="pop-address">Permanent / Residential Address <span style="color: var(--status-absent);">*</span></label>
+            <textarea id="pop-address" class="form-control" rows="2" placeholder="Full residential street address, city, state &amp; PIN" required></textarea>
+          </div>
+
+          <div id="pop-profile-error" style="display: none; padding: 0.65rem; border-radius: var(--radius-sm); background: var(--status-absent-bg); color: var(--status-absent); font-size: 0.82rem; margin-top: 0.5rem; border: 1px solid var(--status-absent);"></div>
+        </div>
+
+        <div class="modal-footer" style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <a href="/student/profile.html" class="btn btn-ghost btn-sm" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none;">View Full Dossier →</a>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeCompleteProfileModal()">Remind Me Later</button>
+            <button type="submit" id="pop-submit-btn" class="btn btn-primary btn-sm" style="font-weight: 700;">Save &amp; Complete Profile</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="/js/api.js?v=20261028"></script>
   <script src="/js/auth.js?v=20261028"></script>
   <script src="/js/nav.js?v=20261028"></script>
