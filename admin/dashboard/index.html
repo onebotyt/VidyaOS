@@ -39,6 +39,12 @@
 
       <!-- Current Page Badge -->
       <span class="gc-page-badge" id="admin-header-page-title">Executive Dashboard</span>
+
+      <!-- Search Input Container -->
+      <div class="gc-search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="admin-module-search" placeholder="Search modules..." aria-label="Search administration modules">
+      </div>
     </div>
 
     <div class="gc-nav-right">
@@ -170,121 +176,224 @@
 
   <main class="dashboard-container">
 
-    <!-- Real-Time Institutional KPI Grid (Total Faculty, Total Students, Enrolled Total Students) -->
-    <div class="stats-kpi-grid">
-      <!-- 1. Total Faculty -->
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label"><span class="kpi-label-full">Total Faculty</span><span class="kpi-label-short">Faculty</span></span>
-          <span class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+    <!-- A. Welcome Hero Banner with Campus Vector Illustration -->
+    <section class="admin-welcome-hero" aria-label="Welcome Overview">
+      <div class="hero-left-content">
+        <div class="hero-icon-badge" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
         </div>
-        <div id="stat-teachers" class="kpi-value">0</div>
-        <div class="kpi-sub"><span class="kpi-sub-full">Appointed teaching staff</span><span class="kpi-sub-short">Instructors</span></div>
+        <div class="hero-text-wrap">
+          <h1 class="hero-title">Welcome, <span id="admin-hero-name">System Admin</span> 👋</h1>
+          <p class="hero-subtitle">Manage departments, faculty, students, and overall institution settings.</p>
+        </div>
       </div>
+
+      <!-- Campus Architecture Vector Art -->
+      <div class="hero-illustration" aria-hidden="true">
+        <svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="82" r="18" fill="var(--color-primary-light)" opacity="0.6"/>
+          <circle cx="48" cy="86" r="14" fill="var(--color-primary-light)" opacity="0.5"/>
+          <circle cx="295" cy="80" r="17" fill="var(--color-primary-light)" opacity="0.6"/>
+          <circle cx="316" cy="84" r="13" fill="var(--color-primary-light)" opacity="0.5"/>
+
+          <rect x="70" y="55" width="200" height="50" rx="3" fill="var(--color-primary-light)" opacity="0.45"/>
+          
+          <path d="M120 55 L170 24 L220 55 Z" fill="var(--color-primary)" opacity="0.85"/>
+          <circle cx="170" cy="38" r="6" fill="var(--bg-card)"/>
+
+          <rect x="135" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
+          <rect x="150" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
+          <rect x="165" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
+          <rect x="180" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
+          <rect x="195" y="55" width="6" height="48" fill="var(--color-primary)" opacity="0.9"/>
+
+          <rect x="80" y="65" width="10" height="15" rx="5" fill="var(--color-primary)" opacity="0.75"/>
+          <rect x="98" y="65" width="10" height="15" rx="5" fill="var(--color-primary)" opacity="0.75"/>
+          <rect x="80" y="86" width="10" height="15" rx="2" fill="var(--color-primary)" opacity="0.75"/>
+          <rect x="98" y="86" width="10" height="15" rx="2" fill="var(--color-primary)" opacity="0.75"/>
+
+          <rect x="232" y="65" width="10" height="15" rx="5" fill="var(--color-primary)" opacity="0.75"/>
+          <rect x="250" y="65" width="10" height="15" rx="5" fill="var(--color-primary)" opacity="0.75"/>
+          <rect x="232" y="86" width="10" height="15" rx="2" fill="var(--color-primary)" opacity="0.75"/>
+          <rect x="250" y="86" width="10" height="15" rx="2" fill="var(--color-primary)" opacity="0.75"/>
+
+          <rect x="50" y="103" width="240" height="4" rx="2" fill="var(--color-primary)" opacity="0.8"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- B. Horizontal Real-Time KPI Grid (Faculty, Students, All-Time Enrolled) -->
+    <section class="stats-kpi-grid" aria-label="Institution Metrics">
+      <!-- 1. Total Faculty -->
+      <a href="/admin/faculty.html" class="kpi-card" title="View appointed teaching staff">
+        <div class="kpi-card-left">
+          <div class="kpi-icon-badge badge-faculty" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <div class="kpi-info-block">
+            <span class="kpi-label">Total Faculty</span>
+            <div id="stat-teachers" class="kpi-value">0</div>
+            <span class="kpi-sub">Appointed teaching staff</span>
+          </div>
+        </div>
+        <svg class="kpi-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
 
       <!-- 2. Total Students -->
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label"><span class="kpi-label-full">Total Students</span><span class="kpi-label-short">Students</span></span>
-          <span class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></span>
-        </div>
-        <div id="stat-students" class="kpi-value">0</div>
-        <div class="kpi-sub"><span class="kpi-sub-full">Active cohort profiles</span><span class="kpi-sub-short">Active cohort</span></div>
-      </div>
-
-      <!-- 3. Enrolled Total Students (All-time system records) -->
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label"><span class="kpi-label-full">Enrolled Total Students</span><span class="kpi-label-short">All-Time</span></span>
-          <span class="kpi-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></span>
-        </div>
-        <div id="stat-enrolled-total" class="kpi-value" style="color: var(--color-primary);">0</div>
-        <div class="kpi-sub" title="All-time system record including alumni and graduates"><span class="kpi-sub-full">All-time lifetime records</span><span class="kpi-sub-short">Ever registered</span></div>
-      </div>
-    </div>
-
-    <!-- Core Governance Modules -->
-    <div class="modules-section-header">
-      <h2 class="modules-section-title">Core Administration Modules</h2>
-      <span class="modules-section-sub">6 Essential Modules &bull; Minimal &amp; Purpose-Built</span>
-    </div>
-
-    <div class="modules-grid">
-      <!-- 1. HOD Governance -->
-      <div class="module-card">
-        <div class="module-card-top">
-          <div class="module-badge-row">
-            <span class="badge badge-late">Leadership</span>
-            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">01</span>
+      <a href="/admin/academic-structure.html" class="kpi-card" title="View active cohort students">
+        <div class="kpi-card-left">
+          <div class="kpi-icon-badge badge-students" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
           </div>
-          <h3 class="module-title"><span style="display:inline-flex;align-items:center;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>HOD Governance</h3>
-          <p class="module-description">Appoint Heads of Department, transfer department leadership, approve pending candidate registrations, and toggle anti-spam self-registration gates.</p>
+          <div class="kpi-info-block">
+            <span class="kpi-label">Total Students</span>
+            <div id="stat-students" class="kpi-value">0</div>
+            <span class="kpi-sub">Active cohort profiles</span>
+          </div>
         </div>
-        <a href="/admin/faculty.html" class="btn btn-primary btn-sm" style="font-weight: 700; width: 100%;">
-          Manage Department Heads →
-        </a>
+        <svg class="kpi-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+
+      <!-- 3. Enrolled Total Students -->
+      <a href="/admin/academic-structure.html" class="kpi-card" title="View lifetime institution records">
+        <div class="kpi-card-left">
+          <div class="kpi-icon-badge badge-enrolled" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          </div>
+          <div class="kpi-info-block">
+            <span class="kpi-label">Enrolled Total Students</span>
+            <div id="stat-enrolled-total" class="kpi-value">0</div>
+            <span class="kpi-sub">All-time lifetime records</span>
+          </div>
+        </div>
+        <svg class="kpi-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+    </section>
+
+    <!-- C. Core Governance Modules -->
+    <section class="modules-section" aria-label="Administration Modules">
+      <div class="modules-section-header">
+        <h2 class="modules-section-title">Core Administration Modules</h2>
+        <span class="modules-section-sub">5 Essential Modules &bull; Manage Your Institution</span>
       </div>
 
-      <!-- 2. Reports & Analytics -->
-      <div class="module-card">
-        <div class="module-card-top">
-          <div class="module-badge-row">
-            <span class="badge badge-present">Telemetry &amp; Cohorts</span>
-            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">02</span>
+      <div class="modules-grid" id="admin-modules-container">
+        <!-- 1. HOD Governance -->
+        <article class="module-card" data-module-keywords="hod governance leadership heads department faculty appointments">
+          <div class="module-card-header">
+            <div class="module-header-left">
+              <div class="module-icon-badge badge-leadership-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </div>
+              <span class="module-tag tag-leadership">LEADERSHIP</span>
+            </div>
+            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
-          <h3 class="module-title"><span style="display:inline-flex;align-items:center;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></span>Reports &amp; Analytics</h3>
-          <p class="module-description">Department attendance summaries, ESP32 scan telemetry, student demographic distributions, biometric coverage, and on-demand cohort rosters.</p>
-        </div>
-        <a href="/admin/reports.html" class="btn btn-primary btn-sm" style="font-weight: 700; width: 100%;">
-          View Reports &amp; Analytics →
-        </a>
-      </div>
 
-      <!-- 4. Academic Structure (Preprogrammed Master Curriculum) -->
-      <div class="module-card">
-        <div class="module-card-top">
-          <div class="module-badge-row">
-            <span class="badge badge-present">Master Curriculum</span>
-            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">04</span>
+          <div class="module-card-body">
+            <h3 class="module-title">HOD Governance</h3>
+            <p class="module-description">Appoint Heads of Department, transfer department leadership, approve pending candidate registrations, and toggle anti-spam self-registration gates.</p>
           </div>
-          <h3 class="module-title"><span style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg></span> Academic Structure</h3>
-          <p class="module-description">Configure institutional departments, degree programs, semesters, divisions, and automated academic session rollovers.</p>
-        </div>
-        <a href="/admin/academic-structure.html" class="btn btn-primary btn-sm" style="font-weight: 700; width: 100%;">
-          Open Academic Structure →
-        </a>
-      </div>
 
-      <!-- 5. System Settings -->
-      <div class="module-card">
-        <div class="module-card-top">
-          <div class="module-badge-row">
-            <span class="badge badge-present">Institutional Identity</span>
-            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">05</span>
-          </div>
-          <h3 class="module-title"><span style="display:inline-flex;align-items:center;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>System Settings</h3>
-          <p class="module-description">Official institution identity, college affiliation, accreditation codes, and institutional campus metadata.</p>
-        </div>
-        <a href="/admin/settings.html" class="btn btn-primary btn-sm" style="font-weight: 700; width: 100%;">
-          Configure Settings →
-        </a>
-      </div>
+          <a href="/admin/faculty.html" class="btn btn-module-action">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+            <span>Manage Department Heads &rarr;</span>
+          </a>
+        </article>
 
-      <!-- 6. Audit Logs -->
-      <div class="module-card">
-        <div class="module-card-top">
-          <div class="module-badge-row">
-            <span class="badge badge-late">Security Trail</span>
-            <span style="font-size: 0.78rem; font-family: var(--font-family-mono); color: var(--text-muted);">06</span>
+        <!-- 2. Reports & Analytics -->
+        <article class="module-card" data-module-keywords="reports analytics telemetry cohorts esp32 biometric attendance demographics">
+          <div class="module-card-header">
+            <div class="module-header-left">
+              <div class="module-icon-badge badge-telemetry-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              </div>
+              <span class="module-tag tag-telemetry">TELEMETRY &amp; COHORTS</span>
+            </div>
+            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
-          <h3 class="module-title"><span style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span> Immutable Audit Trail</h3>
-          <p class="module-description">Tamper-evident chronological record of all administrative actions, faculty approvals, security events, and database mutations.</p>
-        </div>
-        <a href="/admin/audit-logs.html" class="btn btn-primary btn-sm" style="font-weight: 700; width: 100%;">
-          Inspect Audit Logs →
-        </a>
+
+          <div class="module-card-body">
+            <h3 class="module-title">Reports &amp; Analytics</h3>
+            <p class="module-description">Department attendance summaries, ESP32 scan telemetry, student demographic distributions, biometric coverage, and on-demand cohort rosters.</p>
+          </div>
+
+          <a href="/admin/reports.html" class="btn btn-module-action">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+            <span>View Reports &amp; Analytics &rarr;</span>
+          </a>
+        </article>
+
+        <!-- 3. Academic Structure -->
+        <article class="module-card" data-module-keywords="academic structure curriculum master programs semesters divisions rollovers">
+          <div class="module-card-header">
+            <div class="module-header-left">
+              <div class="module-icon-badge badge-curriculum-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              </div>
+              <span class="module-tag tag-curriculum">MASTER CURRICULUM</span>
+            </div>
+            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+
+          <div class="module-card-body">
+            <h3 class="module-title">Academic Structure</h3>
+            <p class="module-description">Configure institutional departments, degree programs, semesters, divisions, and automated academic session rollovers.</p>
+          </div>
+
+          <a href="/admin/academic-structure.html" class="btn btn-module-action">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+            <span>Open Academic Structure &rarr;</span>
+          </a>
+        </article>
+
+        <!-- 4. System Settings -->
+        <article class="module-card" data-module-keywords="system settings identity institution affiliation accreditation metadata configuration">
+          <div class="module-card-header">
+            <div class="module-header-left">
+              <div class="module-icon-badge badge-identity-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
+              <span class="module-tag tag-identity">INSTITUTIONAL IDENTITY</span>
+            </div>
+            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+
+          <div class="module-card-body">
+            <h3 class="module-title">System Settings</h3>
+            <p class="module-description">Official institution identity, college affiliation, accreditation codes, and institutional campus metadata.</p>
+          </div>
+
+          <a href="/admin/settings.html" class="btn btn-module-action">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>Configure Settings &rarr;</span>
+          </a>
+        </article>
+
+        <!-- 5. Immutable Audit Trail -->
+        <article class="module-card" data-module-keywords="immutable audit trail security logs tamper evident approvals mutations">
+          <div class="module-card-header">
+            <div class="module-header-left">
+              <div class="module-icon-badge badge-security-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
+              <span class="module-tag tag-security">SECURITY TRAIL</span>
+            </div>
+            <svg class="module-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+
+          <div class="module-card-body">
+            <h3 class="module-title">Immutable Audit Trail</h3>
+            <p class="module-description">Tamper-evident chronological record of all administrative actions, faculty approvals, security events, and database mutations.</p>
+          </div>
+
+          <a href="/admin/audit-logs.html" class="btn btn-module-action">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Inspect Audit Logs &rarr;</span>
+          </a>
+        </article>
       </div>
-    </div>
+    </section>
 
   </main>
 

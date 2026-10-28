@@ -1,143 +1,407 @@
 /* ══════════════════════════════════════════════════════════════
-   PAGE STYLES: DASHBOARD
+   PAGE STYLES: ADMIN DASHBOARD (EXECUTIVE CONSOLE)
    frontend/admin/dashboard/dashboard.css
-   100% Theme Tokenized (Zero Hardcoded Hex Colors)
-   Fully Optimized for Desktop, Tablet, and Mobile Screens
+   100% Theme Tokenized — Zero Hardcoded Hex Colors
+   Pixel-Accurate Implementation of Executive Design Mockup
 ══════════════════════════════════════════════════════════════ */
 
+/* ── 1. Top Navbar Enhancements (Search, Notifications, Profile) ── */
+.gc-navbar {
+  height: 64px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.gc-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  max-width: 480px;
+}
+
+.gc-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--bg-surface, var(--bg-primary));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full, 9999px);
+  padding: 0.45rem 1rem;
+  width: 100%;
+  max-width: 380px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.gc-search-box:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light, hsl(215 90% 95% / 0.5));
+  background: var(--bg-card);
+}
+
+.gc-search-box svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.gc-search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  width: 100%;
+}
+
+.gc-search-box input::placeholder {
+  color: var(--text-muted);
+}
+
+.gc-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.gc-bell-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gc-bell-btn:hover {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--text-muted);
+}
+
+.notification-dot {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-absent, hsl(0 80% 55%));
+  border: 1.5px solid var(--bg-card);
+}
+
+.gc-admin-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.25rem 0.65rem 0.25rem 0.25rem;
+  border-radius: var(--radius-full, 9999px);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.gc-admin-profile-pill:hover {
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+}
+
+.gc-admin-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
+.gc-admin-details {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.gc-admin-name {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.gc-admin-role {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.gc-admin-chevron {
+  color: var(--text-muted);
+  margin-left: 0.15rem;
+  transition: transform 0.2s ease;
+}
+
+/* ── 2. Dashboard Container ── */
 .dashboard-container {
-  padding-top: 1.5rem;
+  padding-top: 1.75rem;
   padding-bottom: 3.5rem;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
   box-sizing: border-box;
 }
 
-/* ── 1. Real-Time Institutional KPI Grid (Always 1 Single Row of 3 Cards) ── */
+/* ── 3. Welcome Hero Banner ── */
+.admin-welcome-hero {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-surface) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-left-content {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  z-index: 1;
+}
+
+.hero-icon-badge {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px var(--color-primary-light, hsl(215 90% 90% / 0.5));
+}
+
+.hero-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.hero-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.hero-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.hero-illustration {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  max-width: 320px;
+  opacity: 0.92;
+  user-select: none;
+  pointer-events: none;
+}
+
+.hero-illustration svg {
+  width: 100%;
+  height: auto;
+  max-height: 100px;
+}
+
+/* ── 4. Horizontal Real-Time KPI Cards ── */
 .stats-kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
-  margin-bottom: 2rem;
+  margin-bottom: 2.25rem;
 }
 
 .kpi-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg, 16px);
   padding: 1.25rem 1.4rem;
   box-shadow: var(--shadow-sm);
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: space-between;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-  position: relative;
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
   box-sizing: border-box;
-  min-width: 0;
 }
 
 .kpi-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
 }
 
-.kpi-header {
+.kpi-card-left {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.4rem;
-  gap: 0.35rem;
+  gap: 1rem;
+  min-width: 0;
 }
 
-.kpi-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.kpi-label-short,
-.kpi-sub-short {
-  display: none;
-}
-
-.kpi-label-full,
-.kpi-sub-full {
-  display: inline;
-}
-
-.kpi-icon {
-  font-size: 1.15rem;
-  color: var(--text-muted);
-  display: inline-flex;
+.kpi-icon-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.kpi-card:hover .kpi-icon-badge {
+  transform: scale(1.05);
+}
+
+/* KPI Badge Variants */
+.badge-faculty {
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  color: var(--color-primary);
+}
+
+.badge-students {
+  background: var(--status-present-bg, hsl(145 75% 95%));
+  color: var(--status-present, hsl(145 65% 40%));
+}
+
+.badge-enrolled {
+  background: var(--status-excused-bg, hsl(270 80% 96%));
+  color: var(--status-excused, hsl(270 70% 50%));
+}
+
+.kpi-info-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kpi-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kpi-value {
-  font-size: 2.2rem;
+  font-size: 1.95rem;
   font-weight: 800;
   color: var(--text-main);
   line-height: 1.1;
-  margin: 0.2rem 0;
-  font-family: var(--font-family-mono);
+  font-family: var(--font-family-mono, monospace);
+  margin-bottom: 0.25rem;
 }
 
 .kpi-sub {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ── 2. Governance Modules Grid ── */
+.kpi-chevron {
+  color: var(--border-color);
+  flex-shrink: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.kpi-card:hover .kpi-chevron {
+  color: var(--color-primary);
+  transform: translateX(3px);
+}
+
+/* ── 5. Core Administration Modules Section ── */
 .modules-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.15rem;
+  margin-bottom: 1.25rem;
 }
 
 .modules-section-title {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: var(--text-main);
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .modules-section-sub {
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   color: var(--text-muted);
   font-weight: 600;
 }
 
 .modules-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.35rem;
   margin-bottom: 2.5rem;
 }
 
 .module-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 1.4rem;
+  border-radius: var(--radius-lg, 16px);
+  padding: 1.5rem;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   box-sizing: border-box;
+  position: relative;
 }
 
 .module-card:hover {
@@ -146,149 +410,227 @@
   transform: translateY(-2px);
 }
 
-.module-card-top {
-  margin-bottom: 1.25rem;
+.module-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
-.module-badge-row {
+.module-header-left {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.65rem;
+  gap: 0.75rem;
+}
+
+.module-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Thematic Module Icon Badges */
+.badge-leadership-icon {
+  background: var(--status-late-bg, hsl(38 92% 95%));
+  color: var(--status-late, hsl(38 90% 45%));
+}
+
+.badge-telemetry-icon {
+  background: var(--status-present-bg, hsl(145 75% 95%));
+  color: var(--status-present, hsl(145 65% 40%));
+}
+
+.badge-curriculum-icon {
+  background: var(--status-excused-bg, hsl(270 80% 96%));
+  color: var(--status-excused, hsl(270 70% 50%));
+}
+
+.badge-identity-icon {
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  color: var(--color-primary);
+}
+
+.badge-security-icon {
+  background: var(--status-absent-bg, hsl(0 80% 96%));
+  color: var(--status-absent, hsl(0 75% 55%));
+}
+
+/* Category Pill Tags */
+.module-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-full, 9999px);
+  display: inline-block;
+}
+
+.tag-leadership {
+  background: var(--status-late-bg, hsl(38 92% 95%));
+  color: var(--status-late, hsl(38 90% 45%));
+}
+
+.tag-telemetry {
+  background: var(--status-present-bg, hsl(145 75% 95%));
+  color: var(--status-present, hsl(145 65% 40%));
+}
+
+.tag-curriculum {
+  background: var(--status-excused-bg, hsl(270 80% 96%));
+  color: var(--status-excused, hsl(270 70% 50%));
+}
+
+.tag-identity {
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  color: var(--color-primary);
+}
+
+.tag-security {
+  background: var(--status-absent-bg, hsl(0 80% 96%));
+  color: var(--status-absent, hsl(0 75% 55%));
+}
+
+.module-card-chevron {
+  color: var(--border-color);
+  flex-shrink: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.module-card:hover .module-card-chevron {
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+.module-card-body {
+  margin-bottom: 1.35rem;
 }
 
 .module-title {
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
   color: var(--text-main);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  margin: 0 0 0.45rem 0;
+  letter-spacing: -0.01em;
 }
 
 .module-description {
   color: var(--text-muted);
-  font-size: 0.84rem;
-  line-height: 1.45;
-  margin: 0.4rem 0 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
 }
 
-.module-card .btn {
-  min-height: 40px;
+/* Full-Width Vibrant Primary Action Button */
+.btn-module-action {
+  width: 100%;
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.72rem 1.15rem;
+  font-weight: 700;
+  font-size: 0.88rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.55rem;
+  text-decoration: none;
+  box-shadow: 0 2px 4px var(--color-primary-light, hsl(215 90% 85% / 0.5));
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  box-sizing: border-box;
 }
 
-/* ── 3. Responsive Screen Adaptations ── */
+.btn-module-action:hover {
+  background: var(--color-primary-hover, hsl(215 85% 42%));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px var(--color-primary-light, hsl(215 90% 75% / 0.5));
+  color: var(--text-white, hsl(0 0% 100%));
+}
+
+.btn-module-action svg {
+  flex-shrink: 0;
+}
+
+/* ── 6. Responsive Adaptations ── */
+@media (max-width: 1100px) {
+  .modules-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-illustration {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
+  .gc-navbar {
+    padding: 0 1rem;
+  }
+
+  .gc-search-box {
+    max-width: 220px;
+  }
+
+  .gc-admin-details,
+  .gc-admin-chevron {
+    display: none;
+  }
+
   .dashboard-container {
     padding-top: 1rem;
-    padding-left: 0.85rem;
-    padding-right: 0.85rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   }
 
+  .admin-welcome-hero {
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-icon-badge {
+    width: 48px;
+    height: 48px;
+  }
+
+  .hero-icon-badge svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .hero-title {
+    font-size: 1.25rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.82rem;
+  }
+
   .stats-kpi-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.65rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    margin-bottom: 1.75rem;
   }
 
   .kpi-card {
-    padding: 0.85rem 0.75rem;
-  }
-
-  .kpi-label {
-    font-size: 0.68rem;
-  }
-
-  .kpi-value {
-    font-size: 1.6rem;
-  }
-
-  .kpi-sub {
-    font-size: 0.68rem;
+    padding: 1rem 1.15rem;
   }
 
   .modules-grid {
     grid-template-columns: 1fr;
-    gap: 0.85rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .module-card {
-    padding: 1.15rem;
-  }
-
-  .module-title {
-    font-size: 1rem;
-  }
-
-  .module-description {
-    font-size: 0.82rem;
-  }
-
-  .module-card .btn {
-    min-height: 42px;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 520px) {
-  .stats-kpi-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.45rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .kpi-card {
-    padding: 0.7rem 0.45rem;
-    border-radius: var(--radius-sm);
-  }
-
-  .kpi-label {
-    font-size: 0.64rem;
-    letter-spacing: 0;
-  }
-
-  .kpi-label-short,
-  .kpi-sub-short {
-    display: inline;
-  }
-
-  .kpi-label-full,
-  .kpi-sub-full {
-    display: none;
-  }
-
-  .kpi-icon svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .kpi-value {
-    font-size: 1.35rem;
-    margin: 0.1rem 0;
-  }
-
-  .kpi-sub {
-    font-size: 0.58rem;
+    gap: 1rem;
   }
 
   .modules-section-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.2rem;
-    margin-bottom: 0.85rem;
-  }
-
-  .modules-section-title {
-    font-size: 1.05rem;
-  }
-
-  .modules-section-sub {
-    font-size: 0.74rem;
+    gap: 0.25rem;
   }
 }
