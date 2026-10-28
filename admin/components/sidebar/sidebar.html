@@ -1,0 +1,139 @@
+<!--
+  ══════════════════════════════════════════════════════════════
+  VIDYAOS ADMIN REUSABLE SIDEBAR COMPONENT (sidebar.html)
+  Location: /admin/components/sidebar/sidebar.html
+  100% Theme Tokenized — Zero Hardcoded Hex Colors
+  ══════════════════════════════════════════════════════════════
+-->
+
+<!-- 1. Mobile Top Header Bar (<= 768px only) -->
+<header class="mobile-top-header" id="mobile-top-header">
+  <div class="mobile-header-left">
+    <button type="button" class="mobile-hamburger-btn" id="mobile-sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Open Navigation Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </div>
+  
+  <div class="mobile-header-center">
+    <a href="/admin/dashboard.html" class="mobile-brand-link">
+      <span class="mobile-brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+      </span>
+      <span class="mobile-brand-text">VidyaOS</span>
+    </a>
+  </div>
+
+  <div class="mobile-header-right">
+    <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+      <span class="mobile-bell-badge">1</span>
+    </button>
+  </div>
+</header>
+
+<!-- 2. Dual-State Sidebar (#app-sidebar) -->
+<aside id="app-sidebar" class="admin-sidebar" aria-label="Admin Navigation">
+  <!-- A. Header for Desktop Collapsed (Mini-Rail: 72px) -->
+  <div class="sidebar-rail-header" aria-hidden="true">
+    <a href="/admin/dashboard.html" class="rail-logo-link" title="VidyaOS Admin">
+      <svg class="rail-cube-logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 3L28 9.5L16 16L4 9.5L16 3Z" fill="var(--color-primary-light, hsl(215 90% 95%))"/>
+        <path d="M4 9.5L16 16V29L4 22.5V9.5Z" fill="var(--color-primary, hsl(217 91% 60%))"/>
+        <path d="M16 16L28 9.5V22.5L16 29V16Z" fill="var(--color-primary-hover, hsl(224 76% 48%))"/>
+      </svg>
+    </a>
+    <div class="rail-controls">
+      <button type="button" class="rail-menu-icon" onclick="toggleDesktopSidebar()" aria-label="Menu" title="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <button type="button" class="rail-expand-btn" onclick="toggleDesktopSidebar()" title="Expand sidebar" aria-label="Expand sidebar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- B. Header for Expanded Sidebar (Desktop Expanded & Mobile Drawer) -->
+  <div class="sidebar-expanded-header">
+    <div class="sidebar-header-left">
+      <span class="sidebar-header-menu-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </span>
+      <span class="sidebar-header-title">VidyaOS Console</span>
+    </div>
+    
+    <!-- Desktop Circular Collapse Button (Pause || sitting in light-blue circle at right edge) -->
+    <button type="button" class="sidebar-desktop-collapse-btn" onclick="toggleDesktopSidebar()" title="Collapse sidebar" aria-label="Collapse sidebar">
+      <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="4" x2="8" y2="20"></line><line x1="16" y1="4" x2="16" y2="20"></line></svg>
+    </button>
+
+    <!-- Mobile Close Button (✕) sits at right edge on mobile drawer -->
+    <button type="button" class="sidebar-mobile-close-btn" onclick="closeSidebar()" title="Close menu" aria-label="Close menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+
+  <!-- C. Navigation Items List -->
+  <nav class="sidebar-nav-body" aria-label="Admin Navigation Links">
+    <a href="/admin/dashboard.html" class="sidebar-nav-item active" data-tooltip="Dashboard" title="Dashboard">
+      <span class="sidebar-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </span>
+      <span class="sidebar-nav-label">Dashboard</span>
+    </a>
+
+    <a href="/admin/academic-structure.html" class="sidebar-nav-item" data-tooltip="Academic Structure" title="Academic Structure" onclick="if(window.innerWidth<=768)closeSidebar()">
+      <span class="sidebar-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+      </span>
+      <span class="sidebar-nav-label">Academic Structure</span>
+    </a>
+
+    <a href="/admin/faculty.html" class="sidebar-nav-item" data-tooltip="HOD Management" title="HOD Management" onclick="if(window.innerWidth<=768)closeSidebar()">
+      <span class="sidebar-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </span>
+      <span class="sidebar-nav-label">HOD Management</span>
+    </a>
+
+    <a href="/admin/reports.html" class="sidebar-nav-item" data-tooltip="Reports & Analytics" title="Reports & Analytics" onclick="if(window.innerWidth<=768)closeSidebar()">
+      <span class="sidebar-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+      </span>
+      <span class="sidebar-nav-label">Reports &amp; Analytics</span>
+    </a>
+
+    <a href="/admin/settings.html" class="sidebar-nav-item" data-tooltip="System Settings" title="System Settings" onclick="if(window.innerWidth<=768)closeSidebar()">
+      <span class="sidebar-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </span>
+      <span class="sidebar-nav-label">System Settings</span>
+    </a>
+
+    <a href="/admin/audit-logs.html" class="sidebar-nav-item" data-tooltip="Audit Logs" title="Audit Logs" onclick="if(window.innerWidth<=768)closeSidebar()">
+      <span class="sidebar-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </span>
+      <span class="sidebar-nav-label">Audit Logs</span>
+    </a>
+  </nav>
+
+  <!-- D. Sidebar Footer -->
+  <!-- 1. Expanded Footer (Desktop Expanded & Mobile Drawer) -->
+  <div class="sidebar-expanded-footer">
+    <div class="sidebar-brand-credit">VidyaOS &bull; Admin</div>
+    <button type="button" class="sidebar-signout-btn" onclick="logout()" title="Sign Out">Sign Out</button>
+  </div>
+
+  <!-- 2. Rail Footer (Desktop Collapsed Rail) -->
+  <div class="sidebar-rail-footer" aria-hidden="true">
+    <a href="/admin/profile.html" class="rail-footer-btn" title="Admin Profile" aria-label="Admin Profile">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    </a>
+    <button type="button" class="rail-footer-btn rail-signout-btn" onclick="logout()" title="Sign Out" aria-label="Sign Out">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- 3. Drawer Backdrop Overlay -->
+<div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeSidebar()"></div>

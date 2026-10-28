@@ -654,6 +654,12 @@ function mountNavigationSystem(options = {}) {
 
   const portalLabel = typeof profile.portalLabel === 'function' ? profile.portalLabel(user) : profile.portalLabel;
 
+  // If page uses the dedicated dual-state admin sidebar layout, skip injecting legacy header or sidebar
+  if (window.DISABLE_NAV || window.DISABLE_HEADER || document.querySelector('.admin-sidebar, .admin-app-layout')) {
+    document.body.setAttribute('data-nav-ready', '1');
+    return;
+  }
+
   // 2. HEADER (.gc-navbar)
   _ensureHeader(profile, user, initial, displayName, email, portalLabel);
 

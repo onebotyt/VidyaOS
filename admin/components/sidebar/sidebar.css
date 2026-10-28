@@ -1,0 +1,610 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS ADMIN DUAL-STATE SIDEBAR COMPONENT (sidebar.css)
+ * Location: /admin/components/sidebar/sidebar.css
+ * 
+ * - Desktop Expanded (250px): Hamburger + VidyaOS Console + Pause || collapse button
+ * - Desktop Collapsed (72px): 3D isometric cube logo + Icon-only Mini-Rail
+ * - Mobile Drawer (280px): Off-canvas slide-out sheet + Dimmed backdrop
+ * - 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * ══════════════════════════════════════════════════════════════
+ */
+
+/* ── 1. Top Mobile Header Bar (<= 768px only) ── */
+.mobile-top-header {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-top-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 1rem;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    box-sizing: border-box;
+  }
+
+  .mobile-header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-hamburger-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: var(--text-main);
+    color: var(--bg-card);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .mobile-hamburger-btn:active {
+    opacity: 0.85;
+  }
+
+  .mobile-header-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-brand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+  }
+
+  .mobile-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .mobile-header-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s ease;
+  }
+
+  .mobile-header-icon-btn:hover {
+    background: var(--bg-surface);
+  }
+
+  .mobile-bell-btn .mobile-bell-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 14px;
+    height: 14px;
+    background: var(--status-absent);
+    color: var(--bg-card);
+    border-radius: 50%;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+}
+
+/* ── 2. Unified Admin Sidebar (.admin-sidebar) ── */
+.admin-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  background: var(--bg-card) !important;
+  border-right: 1px solid var(--border-color) !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  user-select: none;
+  transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Desktop Sidebar Sizing & Transitions (>= 769px) */
+@media (min-width: 769px) {
+  /* A. Expanded Sidebar (Default: 250px) */
+  .admin-sidebar {
+    width: 250px !important;
+    transform: none !important;
+  }
+
+  .admin-main-wrap {
+    margin-left: 250px !important;
+    transition: margin-left 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .sidebar-rail-header,
+  .sidebar-rail-footer {
+    display: none !important;
+  }
+
+  .sidebar-expanded-header {
+    height: 64px;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.15rem;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .sidebar-header-menu-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+  }
+
+  .sidebar-header-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+  }
+
+  /* Desktop circular toggle button with pause || */
+  .sidebar-desktop-collapse-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border: none;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .sidebar-desktop-collapse-btn:hover {
+    background: var(--border-color);
+  }
+
+  .sidebar-mobile-close-btn {
+    display: none !important;
+  }
+
+  /* Active Navigation Item on Desktop Expanded: Solid Blue Pill */
+  .sidebar-nav-item.active {
+    background: var(--color-primary) !important;
+    color: var(--bg-card) !important;
+    font-weight: 600;
+  }
+
+  .sidebar-nav-item.active .sidebar-nav-icon svg {
+    stroke: var(--bg-card) !important;
+  }
+
+  .sidebar-expanded-footer {
+    padding: 1.25rem 1.15rem;
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.35rem;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .sidebar-brand-credit {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .sidebar-signout-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    transition: color 0.15s ease;
+  }
+
+  .sidebar-signout-btn:hover {
+    color: var(--status-absent);
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     B. Desktop Collapsed State (Mini-Rail: 72px)
+     When .sidebar-collapsed is active
+     ───────────────────────────────────────────────────────────── */
+  .admin-app-layout.sidebar-collapsed .admin-sidebar,
+  body.sidebar-collapsed .admin-sidebar,
+  html.sidebar-collapsed .admin-sidebar {
+    width: 72px !important;
+    transform: none !important;
+  }
+
+  .admin-app-layout.sidebar-collapsed .admin-main-wrap,
+  body.sidebar-collapsed .admin-main-wrap,
+  html.sidebar-collapsed .admin-main-wrap {
+    margin-left: 72px !important;
+  }
+
+  .admin-app-layout.sidebar-collapsed .sidebar-expanded-header,
+  .admin-app-layout.sidebar-collapsed .sidebar-expanded-footer,
+  body.sidebar-collapsed .sidebar-expanded-header,
+  body.sidebar-collapsed .sidebar-expanded-footer,
+  html.sidebar-collapsed .sidebar-expanded-header,
+  html.sidebar-collapsed .sidebar-expanded-footer {
+    display: none !important;
+  }
+
+  .admin-app-layout.sidebar-collapsed .sidebar-rail-header,
+  .admin-app-layout.sidebar-collapsed .sidebar-rail-footer,
+  body.sidebar-collapsed .sidebar-rail-header,
+  body.sidebar-collapsed .sidebar-rail-footer,
+  html.sidebar-collapsed .sidebar-rail-header,
+  html.sidebar-collapsed .sidebar-rail-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* Collapsed Rail Header */
+  .sidebar-rail-header {
+    padding: 1.15rem 0 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .rail-logo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+
+  .rail-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+
+  .rail-menu-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .rail-expand-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  .rail-expand-btn:hover {
+    transform: scale(1.08);
+  }
+
+  /* Collapsed Rail Nav Items (Centered Icons Only) */
+  .admin-app-layout.sidebar-collapsed .sidebar-nav-body,
+  body.sidebar-collapsed .sidebar-nav-body,
+  html.sidebar-collapsed .sidebar-nav-body {
+    padding: 0.5rem 0;
+    align-items: center;
+  }
+
+  .admin-app-layout.sidebar-collapsed .sidebar-nav-item,
+  body.sidebar-collapsed .sidebar-nav-item,
+  html.sidebar-collapsed .sidebar-nav-item {
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    margin: 0.3rem auto !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+  }
+
+  .admin-app-layout.sidebar-collapsed .sidebar-nav-label,
+  body.sidebar-collapsed .sidebar-nav-label,
+  html.sidebar-collapsed .sidebar-nav-label {
+    display: none !important;
+  }
+
+  /* Collapsed Active Item: Solid Blue Circle/Squircle */
+  .admin-app-layout.sidebar-collapsed .sidebar-nav-item.active,
+  body.sidebar-collapsed .sidebar-nav-item.active,
+  html.sidebar-collapsed .sidebar-nav-item.active {
+    background: var(--color-primary) !important;
+    color: var(--bg-card) !important;
+    border-radius: 14px !important;
+  }
+
+  .admin-app-layout.sidebar-collapsed .sidebar-nav-item.active .sidebar-nav-icon svg,
+  body.sidebar-collapsed .sidebar-nav-item.active .sidebar-nav-icon svg,
+  html.sidebar-collapsed .sidebar-nav-item.active .sidebar-nav-icon svg {
+    stroke: var(--bg-card) !important;
+  }
+
+  /* Collapsed Rail Footer */
+  .sidebar-rail-footer {
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .rail-footer-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    text-decoration: none;
+  }
+
+  .rail-footer-btn:hover {
+    background: var(--bg-surface);
+    color: var(--color-primary);
+  }
+
+  .rail-signout-btn:hover {
+    color: var(--status-absent);
+  }
+}
+
+/* ── 3. Mobile Drawer Behavior (<= 768px) ── */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    width: 280px !important;
+    max-width: 82vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    transform: translateX(-100%) !important;
+    box-shadow: var(--shadow-xl);
+  }
+
+  .admin-sidebar.sidebar-open,
+  .admin-sidebar.open {
+    transform: translateX(0) !important;
+  }
+
+  .admin-main-wrap {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .sidebar-rail-header,
+  .sidebar-rail-footer {
+    display: none !important;
+  }
+
+  .sidebar-expanded-header {
+    height: 60px;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .sidebar-header-menu-icon {
+    display: inline-flex;
+    color: var(--text-main);
+  }
+
+  .sidebar-header-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .sidebar-desktop-collapse-btn {
+    display: none !important;
+  }
+
+  .sidebar-mobile-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.15s ease;
+  }
+
+  .sidebar-mobile-close-btn:hover {
+    background: var(--bg-surface);
+    color: var(--text-main);
+  }
+
+  /* Active item on Mobile Drawer: Soft Blue Rounded Pill */
+  .sidebar-nav-item.active {
+    background: var(--color-primary-light) !important;
+    color: var(--color-primary) !important;
+    font-weight: 600;
+    border-radius: 12px !important;
+  }
+
+  .sidebar-nav-item.active .sidebar-nav-icon svg {
+    stroke: var(--color-primary) !important;
+  }
+
+  .sidebar-expanded-footer {
+    padding: 1.25rem;
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.4rem;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .sidebar-brand-credit {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .sidebar-signout-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    padding: 0.2rem 0;
+  }
+
+  .sidebar-signout-btn:hover {
+    color: var(--status-absent);
+  }
+}
+
+/* ── 4. Common Sidebar Navigation Body Styles ── */
+.sidebar-nav-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  box-sizing: border-box;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 1rem;
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.sidebar-nav-item:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+
+.sidebar-nav-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-nav-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+
+.sidebar-nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Drawer Backdrop Overlay */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: hsla(0, 0%, 0%, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 990;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.sidebar-backdrop.active,
+.sidebar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
