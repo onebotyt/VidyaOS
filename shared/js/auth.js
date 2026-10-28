@@ -977,6 +977,13 @@ function mountNavigationSystem(options = {}) {
     currentPath === '/' ||
     currentPath === '/index.html';
 
+  const isIsolatedPage = window.DISABLE_NAV === true ||
+    window.DISABLE_NAVIGATION === true ||
+    window.DISABLE_HEADER === true ||
+    currentPath.includes('/classwork/create') ||
+    Boolean(document.querySelector('.cw-gclass-nav')) ||
+    Boolean(document.body && document.body.classList.contains('cw-create-body'));
+
   // 1. Clean up any conflicting legacy DOM elements
   const staleElements = [
     '#universal-bottom-nav',
@@ -990,8 +997,13 @@ function mountNavigationSystem(options = {}) {
     document.querySelectorAll(selector).forEach(el => el.remove());
   });
 
-  if (isPublicAuthPage) {
+  if (isPublicAuthPage || isIsolatedPage) {
     document.body.classList.remove('has-bottom-nav', 'has-sidebar');
+    if (typeof document.body.setAttribute === 'function') {
+      document.body.setAttribute('data-nav-ready', '1');
+    }
+    const injectedNav = document.querySelectorAll('.gc-navbar, #app-sidebar, #sidebar-backdrop, .mobile-bottom-nav');
+    injectedNav.forEach(el => el.remove());
     return;
   }
 
@@ -1112,6 +1124,8 @@ function _ensureNavProgress() {
 }
 
 function _ensureHeader(profile, user, initial, displayName, email, portalLabel) {
+  if (window.DISABLE_HEADER || window.DISABLE_NAV || window.DISABLE_NAVIGATION) return;
+  if (document.querySelector('.cw-gclass-nav') || (document.body && document.body.classList.contains('cw-create-body'))) return;
 
   let header = document.querySelector('.gc-navbar, .app-header');
 
@@ -1251,6 +1265,9 @@ function _ensureUserProfilePopover(header, user, initial, displayName, email, po
 }
 
 function _ensureSidebar(profile, user, portalLabel) {
+  if (window.DISABLE_SIDEBAR || window.DISABLE_NAV || window.DISABLE_NAVIGATION) return;
+  if (document.querySelector('.cw-gclass-nav') || (document.body && document.body.classList.contains('cw-create-body'))) return;
+
   const currentPath = window.location.pathname.toLowerCase();
   const currentUrl = (window.location.pathname + window.location.search).toLowerCase();
 
@@ -1328,6 +1345,13 @@ function _ensureSidebar(profile, user, portalLabel) {
 }
 
 function _ensureMobileBottomNav(profile, currentPath) {
+  if (window.DISABLE_BOTTOM_NAV || window.DISABLE_NAV || window.DISABLE_NAVIGATION) {
+    const existing = document.querySelector('.mobile-bottom-nav');
+    if (existing) existing.remove();
+    return;
+  }
+  if (document.querySelector('.cw-gclass-nav') || (document.body && document.body.classList.contains('cw-create-body'))) return;
+
   let existing = document.querySelector('.mobile-bottom-nav');
   if (existing) existing.remove();
 
