@@ -1055,14 +1055,6 @@
     background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45)) !important;
     z-index: 1290 !important;
   }
-    right: 0 !important;
-    bottom: 0 !important;
-    height: calc(100vh - 52px) !important;
-    display: block !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    z-index: 940 !important;
-  }
 
   body:has(.app-header) .sidebar-backdrop.open,
   body:has(.app-header) .sidebar-backdrop.active {
