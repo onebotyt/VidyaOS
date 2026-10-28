@@ -628,7 +628,7 @@ function mountNavigationSystem(options = {}) {
   if (isPublicAuthPage || isIsolatedPage) {
     document.body.classList.remove('has-bottom-nav', 'has-sidebar');
     document.body.setAttribute('data-nav-ready', '1');
-    const injectedNav = document.querySelectorAll('.gc-navbar, #app-sidebar, #sidebar-backdrop, .mobile-bottom-nav');
+    const injectedNav = document.querySelectorAll('.gc-navbar, #app-sidebar:not(.admin-sidebar), #sidebar-backdrop:not(.sidebar-backdrop), .mobile-bottom-nav');
     injectedNav.forEach(el => el.remove());
     return;
   }

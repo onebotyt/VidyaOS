@@ -15,10 +15,7 @@
   <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
   <link rel="stylesheet" href="/admin/dashboard/dashboard.css?v=20261029">
   <script>
-    /* Prevent legacy nav.js injection and restore saved desktop rail state instantly */
-    window.DISABLE_NAV = true;
-    window.DISABLE_HEADER = true;
-    window.DISABLE_SIDEBAR = true;
+    /* Restore saved desktop sidebar collapsed rail state instantly before paint */
     (function () {
       try {
         if (localStorage.getItem('admin_sidebar_collapsed') === 'true' && window.innerWidth >= 769) {
@@ -380,7 +377,6 @@
 
   <script src="/js/api.js?v=20261029"></script>
   <script src="/js/auth.js?v=20261029"></script>
-  <script src="/js/nav.js?v=20261029"></script>
   <script src="/js/ui.js?v=20261029"></script>
   <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
   <script src="/admin/dashboard/dashboard.js?v=20261029"></script>
