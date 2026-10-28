@@ -33,11 +33,12 @@ guardRoute(['TEACHER']);
           document.getElementById('hero-empid').innerText = profileData.employee_id || '—';
           document.getElementById('hero-dept').innerText = profileData.department_name || 'Department of Information Technology';
 
-          // Avatar initials
-          const nameParts = fullName.trim().split(/\s+/);
+          // Avatar initials (strip honorifics so Dr. Rajesh Sharma => RS)
+          const cleanName = fullName.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
+          const nameParts = cleanName.split(/\s+/).filter(Boolean);
           const initials = nameParts.length >= 2 
             ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
-            : fullName.slice(0, 2).toUpperCase();
+            : (cleanName.slice(0, 2).toUpperCase() || 'FA');
           document.getElementById('hero-avatar').innerText = initials;
 
           // Dynamic badges
@@ -70,8 +71,8 @@ guardRoute(['TEACHER']);
           const btn = document.getElementById('btn-google-action');
           if (profileData.google_linked) {
             badge.className = 'badge badge-present';
-            badge.innerText = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected';
-            statGoogle.innerText = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected';
+            badge.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected</span>';
+            statGoogle.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected</span>';
             statGoogle.style.color = '#16a34a';
             btn.className = 'btn btn-secondary btn-sm';
             btn.innerText = 'Re-link Google';
@@ -81,7 +82,7 @@ guardRoute(['TEACHER']);
             statGoogle.innerText = 'Not Linked';
             statGoogle.style.color = '#dc2626';
             btn.className = 'btn btn-primary btn-sm';
-            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> Connect Google Account';
+            btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg><span>Connect Google Account</span></span>';
           }
 
           // 4. Teaching allocations table

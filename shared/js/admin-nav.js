@@ -336,7 +336,7 @@
             </div>
           </a>
           <button type="button" class="gc-menu-btn" onclick="window.closeSidebar()" aria-label="Close menu" title="Close menu">
-            ${ADMIN_ICONS.menu}
+            ${ADMIN_ICONS.close}
           </button>
         </div>
         <div class="gc-drawer-body">

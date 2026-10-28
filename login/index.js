@@ -64,19 +64,31 @@
 
   /* ── Background Server Wake-Up Pre-Warming (Cloud Cold-Start Prevention) ── */
   (function wakeUpServerPreWarm() {
-    try {
-      fetch('/api/v1/health', { cache: 'no-store' }).catch(() => {});
-      fetch('https://vidyaos-backend.onrender.com/api/v1/health', { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
-    } catch (_) {}
+    function pingHealth() {
+      try {
+        fetch('/api/v1/health', { cache: 'no-store' }).catch(() => {});
+        fetch('https://vidyaos-backend.onrender.com/api/v1/health', { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+      } catch (_) {}
+    }
+    // Ping immediately on load
+    pingHealth();
+    // Maintain keep-alive while login page remains open
+    setInterval(pingHealth, 120000); // every 2 minutes
   })();
 
   /* ── Cold-Start Retry Engine (Handles Render 15-min idle sleep gracefully) ── */
-  async function executeLoginWithRetry(payload, maxAttempts = 6) {
+  async function executeLoginWithRetry(payload, maxAttempts = 15) {
     const text = document.getElementById('submit-text');
+    const sb = document.getElementById('status-alert-banner');
+    const titleEl = document.getElementById('status-alert-title');
+    const bodyEl = document.getElementById('status-alert-body');
+    const linkEl = document.getElementById('status-alert-link');
+
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         if (attempt > 1) {
-          if (text) text.textContent = `Waking up server (${attempt}/${maxAttempts})...`;
+          const elapsed = (attempt - 1) * 3;
+          if (text) text.textContent = `Server waking up (${elapsed}s)...`;
           fetch('https://vidyaos-backend.onrender.com/api/v1/health', { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
         }
         const res = await fetchApi('/auth/login', {
@@ -84,6 +96,7 @@
           suppressToast: true,
           body: JSON.stringify(payload)
         });
+        if (sb) sb.style.display = 'none';
         return res;
       } catch (err) {
         const isColdStart =
@@ -100,18 +113,15 @@
           ));
 
         if (isColdStart && attempt < maxAttempts) {
-          if (text) text.textContent = `Waking cloud server (${attempt}/${maxAttempts})...`;
-          const sb = document.getElementById('status-alert-banner');
+          const elapsed = attempt * 3;
+          if (text) text.textContent = `Server waking up (${elapsed}s)...`;
           if (sb) {
-            const titleEl = document.getElementById('status-alert-title');
-            const bodyEl = document.getElementById('status-alert-body');
-            const linkEl = document.getElementById('status-alert-link');
-            if (titleEl) titleEl.textContent = 'Server Waking Up';
-            if (bodyEl) bodyEl.textContent = 'The institutional cloud backend is spinning up from idle sleep (Render instance). Reconnecting automatically...';
+            if (titleEl) titleEl.textContent = '⚡ Cloud Server Spinning Up';
+            if (bodyEl) bodyEl.textContent = `The institutional backend on Render is waking from idle sleep (~30-45s cold start). Connecting automatically (attempt ${attempt}/${maxAttempts})...`;
             if (linkEl) linkEl.style.display = 'none';
             sb.style.display = 'block';
           }
-          await new Promise(r => setTimeout(r, 3500));
+          await new Promise(r => setTimeout(r, 3000));
           continue;
         }
         throw err;

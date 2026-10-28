@@ -64,12 +64,13 @@ async function fetchApi(endpoint, options = {}) {
           }
         }
       }
-      const errObj = (data && data.error) ? Object.assign(data.error, { status: response.status }) : {
-        message: (response.status === 502 || response.status === 504)
-          ? 'Cloud server is waking up from idle sleep (Render cold start). Retrying connection...'
-          : `Request failed with status ${response.status}`,
-        status: response.status
-      };
+      const isSleep = response.status === 502 || response.status === 503 || response.status === 504;
+      const defaultMsg = isSleep
+        ? 'Cloud server is waking up from idle sleep (Render instance). Reconnecting...'
+        : `Request failed with status ${response.status}`;
+      const errObj = (data && data.error)
+        ? Object.assign(data.error, { status: response.status, message: data.error.message || defaultMsg })
+        : { message: defaultMsg, status: response.status };
       throw errObj;
     }
 
