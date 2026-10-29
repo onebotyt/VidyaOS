@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Reports & Analytics — College Attendance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261028">
+  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
+  
+  <link rel="stylesheet" href="/faculty/reports/reports.css?v=20261028">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+</head>
+<body>
+    
+    <div class="faculty-app-layout" id="faculty-app-layout">
+    <div class="faculty-main-wrap">
+      <!-- Top Header Bar (Clean Admin-Parity Architecture) -->
+      <header class="faculty-top-header admin-top-header" id="faculty-header" aria-label="Faculty Header Bar">
+        <div class="header-left">
+          <span class="header-dept-pill" id="dept-header-name" style="display:none;"></span>
+        </div>
+        <div class="header-right">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn" onclick="toggleAppTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleUserProfile(event)" aria-haspopup="true" aria-expanded="false" title="Account Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">FA</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Dropdown Profile Menu -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" id="dropdown-avatar-circle" aria-hidden="true">FA</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name" id="dropdown-full-name">Faculty Member</span>
+                <span class="dropdown-email" id="dropdown-email">faculty@college.edu</span>
+                <span class="dropdown-role-pill" id="dropdown-role-pill">Faculty Member</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/faculty/profile.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/faculty/timetable.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Weekly Timetable</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 1100px;">
+    <div class="page-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-title">Attendance Reports & Analytics</h1>
+        <p class="page-subtitle">Unified insights: semester attendance metrics, class attendance trends, and hardware scan logs</p>
+      </div>
+      <a href="/faculty/dashboard.html" class="btn btn-secondary btn-sm"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Dashboard</a>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+      <button id="tab-analytics-btn" class="btn btn-primary btn-sm" onclick="switchTab('analytics')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Attendance Analytics & Trends
+      </button>
+      <button id="tab-esp32-btn" class="btn btn-secondary btn-sm" onclick="switchTab('esp32')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg> ESP32 Hardware Scans Log
+      </button>
+    </div>
+
+    <!-- TAB 1: ATTENDANCE ANALYTICS & TRENDS -->
+    <div id="tab-analytics-panel">
+      <!-- KPI Cards -->
+      <div class="kpi-row" id="kpi-row">
+        <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Overall Attendance</div></div>
+        <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Classes Conducted</div></div>
+        <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Students Below 75%</div></div>
+        <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Active Registers</div></div>
+      </div>
+
+      <!-- Class Attendance Breakdown -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">Attendance % by Subject / Class</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Visual progress towards the mandatory 75% compliance threshold</p>
+          </div>
+          <span class="badge badge-present">Threshold: 75%</span>
+        </div>
+        <div id="class-bars">
+          <div style="text-align:center; padding: 2rem; color: var(--text-muted);">Loading subject attendance metrics...</div>
+        </div>
+      </div>
+
+      <!-- 14-Day Trend Chart -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">14-Day Attendance Trend</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Day-by-day aggregate attendance percentage across all your conducted sessions</p>
+          </div>
+        </div>
+        <div class="trend-container" id="trend-row">
+          <div style="color:var(--text-muted); text-align:center; padding:2rem; width:100%;">Loading 14-day trend...</div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+          <span>Older Sessions</span>
+          <span>Today</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ESP32 SCANS AUDIT -->
+    <div id="tab-esp32-panel" style="display: none;">
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 1rem 1.25rem; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 700; margin: 0;">ESP32 Biometric Hardware Scans Log</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Live audit trail of raw biometric touches received from IoT classroom terminals</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadEsp32Scans()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Refresh Scans</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="table" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th style="width: 170px;">Scan Timestamp</th>
+                <th>Student Name</th>
+                <th style="width: 140px;">Enrollment No</th>
+                <th style="width: 150px;">Device UID</th>
+                <th>Terminal Location</th>
+                <th style="width: 120px; text-align: right;">Presence Status</th>
+              </tr>
+            </thead>
+            <tbody id="esp32-tbody">
+              <tr><td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Loading raw ESP32 scans...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+  </main>
+  <script src="/js/api.js?v=20261029"></script>
+  <script src="/js/auth.js?v=20261029"></script>
+  <script src="/faculty/components/icons.js?v=20261029"></script>
+  <script src="/faculty/components/faculty-ui.js?v=20261029"></script>
+  <script src="/faculty/components/header/header.js?v=20261029"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
+  
+      </div>
+  </div>
+
+  <script src="/faculty/reports/reports.js?v=20261028"></script>
+</body>
+</html>

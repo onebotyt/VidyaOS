@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports &amp; Analytics &mdash; Admin Console</title>
+  <meta name="description" content="Institutional department attendance summaries, presence trends, and ESP32 biometric device telemetry.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261028">
+  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/admin/reports/reports.css?v=20261028">
+</head>
+<body>
+  <div class="admin-app-layout" id="admin-app-layout">
+
+    <!-- Navigation & Dual-State Sidebar rendered by /admin/components/sidebar/sidebar.js -->
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- MAIN CONTENT CONTAINER (.admin-main-wrap)                      -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="admin-main-wrap">
+
+      <!-- 1. TOP HEADER BAR (Clean: Only Theme Button & Round Profile Avatar) -->
+      <header class="admin-top-header" id="admin-top-header" aria-label="Admin Header Bar">
+        <div class="header-right">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn"
+            onclick="toggleDashboardTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleAdminProfileMenu(event)"
+            aria-haspopup="true" aria-expanded="false" title="System Administrator Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">SA</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Profile Dropdown Popover -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" aria-hidden="true">SA</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name">System Administrator</span>
+                <span class="dropdown-email">admin@college.edu</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/admin/profile.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/admin/settings.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+              <span>System Settings</span>
+            </a>
+            <a href="/admin/audit-logs.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>Audit Trail &amp; Logs</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- top-nav-bar fallback for test suites / backward compatibility -->
+      <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
+<main class="container" style="padding-top: 1rem; padding-bottom: 4.5rem;">
+    <!-- Page Header -->
+    <div class="page-header no-print stud-page-header" style="margin-bottom: 1rem;">
+      <div class="stud-header-text">
+        <h1 class="page-title stud-title" id="page-main-title">Reports &amp; Analytics</h1>
+        <p class="page-subtitle stud-subtitle" id="page-main-subtitle">Biometric attendance &amp; device telemetry</p>
+      </div>
+
+      <!-- Action buttons -->
+      <div id="attendance-header-actions" class="report-header-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadDeptReport(true)" title="Refresh Telemetry" style="display:inline-flex;align-items:center;gap:0.35rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Refresh</span>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-export-excel" onclick="exportReport()" title="Export Analytical Excel Workbook (.xlsx)" style="display:inline-flex;align-items:center;gap:0.35rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Export Excel</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. COLLAPSIBLE HIGH-DENSITY FILTER TOOLBAR                 -->
+    <!-- Compact single-row primary bar with collapsible filter panel -->
+    <div class="report-filter-bar no-print">
+      <!-- Main Row: Instant Search + Filter Toggle + Reset -->
+      <div class="filter-main-row">
+        <div class="search-input-wrap">
+          <span class="search-icon-prefix">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input type="text" id="report-search" class="form-control form-control-sm" placeholder="Search cohorts, depts..." oninput="applySearchFilter()" aria-label="Search cohorts">
+          <button type="button" onclick="clearSearchInput()" id="clear-search-btn" class="clear-search-icon" title="Clear search" aria-label="Clear search">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="filter-main-actions">
+          <button type="button" id="btn-toggle-filters" class="filter-toggle-btn" onclick="toggleFilterDrawer()" aria-expanded="false" title="Toggle detailed filters">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span class="filter-toggle-text">Filters</span>
+            <span id="filter-active-count" class="filter-active-pill" style="display: none;">0</span>
+            <svg class="filter-chevron-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
+          <button type="button" id="btn-reset-filters" class="filter-reset-icon-btn" onclick="resetFilters()" title="Reset all filters" aria-label="Reset all filters">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Collapsible Secondary Filters Drawer Panel -->
+      <div id="filter-drawer-panel" class="filter-drawer-panel">
+        <div class="filter-drawer-grid">
+          <div class="filter-drawer-item group-dept">
+            <label class="filter-mini-label" for="report-dept">Department</label>
+            <select id="report-dept" class="form-select form-control-sm" onchange="onDeptSelectChange(); updateFilterBadge();">
+              <option value="">All Departments (Institutional)</option>
+            </select>
+          </div>
+
+          <div class="filter-drawer-item group-date">
+            <label class="filter-mini-label" for="report-date-preset">Date Range</label>
+            <select id="report-date-preset" class="form-select form-control-sm" onchange="loadDeptReport(); updateFilterBadge();">
+              <option value="all">All Recorded Scans</option>
+              <option value="today">Today Only</option>
+              <option value="7days">Last 7 Days</option>
+              <option value="30days">Last 30 Days</option>
+            </select>
+          </div>
+
+          <div class="filter-drawer-item group-year">
+            <label class="filter-mini-label" for="report-year">Year</label>
+            <select id="report-year" class="form-select form-control-sm" onchange="loadDeptReport(); updateFilterBadge();">
+              <option value="">All Years</option>
+              <option value="1">Year 1</option>
+              <option value="2">Year 2</option>
+              <option value="3">Year 3</option>
+            </select>
+          </div>
+
+          <div class="filter-drawer-item group-sem">
+            <label class="filter-mini-label" for="report-sem">Semester</label>
+            <select id="report-sem" class="form-select form-control-sm" onchange="loadDeptReport(); updateFilterBadge();">
+              <option value="">All Semesters</option>
+              <option value="1">Sem 1</option>
+              <option value="2">Sem 2</option>
+              <option value="3">Sem 3</option>
+              <option value="4">Sem 4</option>
+              <option value="5">Sem 5</option>
+              <option value="6">Sem 6</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MINIMAL 4-METRIC TELEMETRY BOARD                         -->
+    <div class="analysis-board" id="kpi-board">
+      <!-- Metric 1: Total Scans -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: var(--color-primary-light); color: var(--color-primary);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Total Scans</div>
+          <div class="kpi-val" id="kpi-scans">0</div>
+        </div>
+      </div>
+
+      <!-- Metric 2: Unique Students -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: var(--status-present-bg); color: var(--status-present);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Unique Students</div>
+          <div class="kpi-val" id="kpi-students" style="color: var(--status-present);">0</div>
+        </div>
+      </div>
+
+      <!-- Metric 3: Active Terminals -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: var(--color-primary-light); color: var(--color-primary);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-lbl-row">
+            <span class="kpi-lbl">Terminals</span>
+            <span class="kpi-live-pill"><span class="kpi-live-dot"></span>Online</span>
+          </div>
+          <div class="kpi-val" id="kpi-terminals" style="color: var(--color-primary);">0</div>
+        </div>
+      </div>
+
+      <!-- Metric 4: Today's Scans -->
+      <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: var(--status-late-bg); color: var(--status-late);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Today's Scans</div>
+          <div class="kpi-val" id="kpi-today" style="color: var(--status-late);">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. UPGRADED VISUAL ANALYTICS (CHART.JS)                        -->
+    <!-- Mobile Segmented Switcher + Dual Canvas Visualizations        -->
+    <!-- Mobile Chart Switcher Pills (visible <= 768px) -->
+    <div class="report-chart-switcher no-print" id="report-chart-switcher">
+      <button type="button" class="chart-tab-btn active" id="btn-chart-trend" onclick="switchReportChart('trend')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Daily Activity</span>
+      </button>
+      <button type="button" class="chart-tab-btn" id="btn-chart-cohort" onclick="switchReportChart('cohort')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+        <span>Cohort Share</span>
+      </button>
+    </div>
+
+    <div class="charts-section no-print">
+      <div class="chart-card main-trend-card" id="chart-card-trend">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Daily Attendance Scan Volume &amp; Presence</h2>
+            <p class="chart-subtitle">Daily biometric activity timeline with unique attendees</p>
+          </div>
+          <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+            <span id="trend-peak-badge" class="chart-stat-chip">Peak: &mdash;</span>
+            <span id="trend-days-badge" class="chart-stat-chip accent">Active: &mdash;</span>
+            <span class="esp-badge"><span class="esp-pulse"></span> LIVE</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="chart-daily-trend"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card cohort-dist-card" id="chart-card-cohort">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Cohort Presence Share</h2>
+            <p class="chart-subtitle">Distribution across academic cohorts</p>
+          </div>
+          <span id="cohort-dist-count-badge" class="badge badge-present">0 Cohorts</span>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="chart-cohort-breakdown"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. DEPARTMENT ATTENDANCE SUMMARY TABLE & MOBILE CARDS          -->
+    <div class="table-container">
+      <div class="table-header-bar">
+        <div>
+          <h3 class="table-title">Department Attendance Summary</h3>
+          <p class="table-subtitle">Aggregated cohort attendance rates, student turnout percentages, and active hardware terminals.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          <span id="record-count-badge" class="badge badge-present">0 Cohorts</span>
+          <span id="avg-turnout-badge" class="badge" style="background: var(--status-present-bg); color: var(--status-present); font-weight: 700;">Avg Turnout: &mdash;</span>
+        </div>
+      </div>
+
+      <!-- Desktop & Tablet Table Scroll Wrapper -->
+      <div id="table-wrap" class="table-scroll-wrapper">
+        <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading department attendance summary...
+        </div>
+      </div>
+
+      <!-- Mobile High-Density Card Stack (<= 768px) -->
+      <div id="cohort-mobile-cards-wrap" class="cohort-mobile-cards-wrap"></div>
+    </div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  
+    </div> <!-- /.admin-main-wrap -->
+  </div> <!-- /#admin-app-layout -->
+
+
+  <script src="/js/api.js?v=20261028"></script>
+  <script src="/js/auth.js?v=20261028"></script>
+  <script src="/admin/components/icons.js?v=20261029"></script>
+  <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
+  <script src="/admin/components/header/header.js?v=20261029"></script>
+  <script src="/admin/components/admin-ui.js?v=20261029"></script>
+  <script src="/admin/reports/reports.js?v=20261028"></script>
+</body>
+</html>

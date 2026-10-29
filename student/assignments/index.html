@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>To-do — Student Portal | VidyaOS Classroom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261028">
+  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/css/layout.css?v=20261028">
+  <link rel="stylesheet" href="/css/components.css?v=20261028">
+  <link rel="stylesheet" href="/css/classroom-nav.css?v=20261028">
+  <link rel="stylesheet" href="/css/nav.css?v=20261028">
+  <link rel="stylesheet" href="/student/assignments/assignments.css?v=20261028">
+</head>
+<body class="classroom-page">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       GOOGLE CLASSROOM TOP NAVBAR
+       ═══════════════════════════════════════════════════════════ -->
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <button type="button" class="gc-menu-btn" id="btn-menu-toggle" onclick="toggleStudentDrawer()" title="Main Menu" aria-label="Toggle Navigation Drawer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="/student/dashboard.html" class="gc-brand-link" title="VidyaOS Student Workspace">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </div>
+        <div class="gc-brand-title">VidyaOS</div>
+      </a>
+
+      <!-- To-do Breadcrumb -->
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-left:0.35rem;">
+        <span style="color:var(--text-muted); font-size:0.85rem;">›</span>
+        <span style="font-weight:700; font-size:0.92rem; color:var(--text-main);">To-do</span>
+      </div>
+    </div>
+
+    <div class="gc-nav-right">
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher()" title="Student Academic Modules" aria-label="Apps Launcher">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      </button>
+
+      <button type="button" class="gc-icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile()" title="Student Account">ST</div>
+
+      <!-- Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/student/dashboard.html" class="app-item">
+          <div class="app-icon" data-icon="book" style="background:var(--color-primary-light); color:var(--color-primary);"></div>
+          <span class="app-name">Classes</span>
+        </a>
+        <a href="/student/assignments.html" class="app-item">
+          <div class="app-icon" data-icon="assignment" style="background:var(--color-primary-light); color:var(--color-primary);"></div>
+          <span class="app-name">To-do</span>
+        </a>
+        <a href="/student/attendance.html" class="app-item">
+          <div class="app-icon" data-icon="calendar" style="background:var(--status-present-bg); color:var(--status-present);"></div>
+          <span class="app-name">Attendance</span>
+        </a>
+        <a href="/student/timetable.html" class="app-item">
+          <div class="app-icon" data-icon="clock" style="background:var(--col-att-group-bg); color:var(--col-att-group-color);"></div>
+          <span class="app-name">Timetable</span>
+        </a>
+        <a href="/student/profile.html" class="app-item">
+          <div class="app-icon" data-icon="user" style="background:var(--chip-faculty-bg); color:var(--chip-faculty-color);"></div>
+          <span class="app-name">Profile</span>
+        </a>
+      </div>
+
+      <!-- Student Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
+        <div class="popover-avatar" id="popover-avatar">ST</div>
+        <div class="popover-name" id="popover-user-name">Student Member</div>
+        <div class="popover-email" id="popover-user-email">student@college.edu</div>
+        <div id="popover-reg-badge" style="margin-bottom:0.75rem;"></div>
+        <div class="popover-divider"></div>
+        <a href="/student/profile.html" class="popover-btn" style="text-decoration:none; justify-content:center;">View Dossier</a>
+        <button type="button" class="popover-btn" onclick="logout()" style="color:var(--status-absent);">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       GOOGLE CLASSROOM SLIDE-OUT LEFT NAVIGATION DRAWER
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="gc-drawer-backdrop" id="gc-drawer-backdrop" onclick="toggleStudentDrawer(false)"></div>
+  <aside class="gc-drawer" id="gc-drawer" aria-label="Navigation Drawer">
+    <div class="gc-drawer-header">
+      <div class="gc-brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+        </svg>
+      </div>
+      <div class="gc-brand-title">VidyaOS Classroom</div>
+    </div>
+
+    <nav class="gc-drawer-nav">
+      <a href="/student/dashboard.html" class="gc-drawer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Classes Hub</span>
+      </a>
+
+      <a href="/student/assignments.html" class="gc-drawer-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        <span>To-do</span>
+      </a>
+
+      <a href="/student/attendance.html" class="gc-drawer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>Attendance &amp; Calendar</span>
+      </a>
+
+      <a href="/student/timetable.html" class="gc-drawer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span>Timetable &amp; Schedule</span>
+      </a>
+
+      <a href="/student/leave.html" class="gc-drawer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        <span>Leaves</span>
+      </a>
+
+      <a href="/student/profile.html" class="gc-drawer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path></svg>
+        <span>Student Dossier</span>
+      </a>
+
+      <div class="gc-drawer-section-label">ENROLLED CLASSES</div>
+      <div id="drawer-classes-list">
+        <div style="padding: 0.5rem 1.5rem; font-size: 0.8rem; color: var(--text-muted);">Loading classes...</div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN TO-DO HUB WORKSPACE
+       ═══════════════════════════════════════════════════════════ -->
+  <main class="todo-container">
+
+    <!-- Hero Header with Class Filter Dropdown -->
+    <section class="todo-hero-bar">
+      <div class="todo-hero-left">
+        <h1>
+          <span>To-do</span>
+        </h1>
+        <p>Review upcoming coursework, missing assignments, and turned-in grades across your classes.</p>
+      </div>
+
+      <div class="todo-filter-wrap">
+        <label for="todo-class-filter" style="font-size:0.82rem; font-weight:600; color:var(--text-muted);">Class:</label>
+        <select id="todo-class-filter" class="todo-class-select" onchange="handleClassFilterChange(this.value)">
+          <option value="ALL">All classes</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Material Design Tabs Nav -->
+    <nav class="todo-tabs-nav" id="todo-tabs-nav">
+      <button type="button" class="todo-tab-btn active" id="tab-btn-assigned" onclick="switchTodoTab('assigned')">
+        <span>Assigned</span>
+        <span class="todo-tab-badge" id="badge-assigned">0</span>
+      </button>
+
+      <button type="button" class="todo-tab-btn" id="tab-btn-missing" onclick="switchTodoTab('missing')">
+        <span>Missing</span>
+        <span class="todo-tab-badge" id="badge-missing">0</span>
+      </button>
+
+      <button type="button" class="todo-tab-btn" id="tab-btn-done" onclick="switchTodoTab('done')">
+        <span>Done</span>
+        <span class="todo-tab-badge" id="badge-done">0</span>
+      </button>
+    </nav>
+
+    <!-- Tab Pane 1: Assigned -->
+    <section class="todo-tab-pane active" id="tab-pane-assigned">
+      <div id="todo-list-assigned">
+        <div class="todo-empty-state">
+          <div class="todo-empty-icon">⏳</div>
+          <div class="todo-empty-title">Loading assigned coursework...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Pane 2: Missing -->
+    <section class="todo-tab-pane" id="tab-pane-missing">
+      <div id="todo-list-missing">
+        <div class="todo-empty-state">
+          <div class="todo-empty-icon">⏳</div>
+          <div class="todo-empty-title">Loading missing work...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Pane 3: Done -->
+    <section class="todo-tab-pane" id="tab-pane-done">
+      <div id="todo-list-done">
+        <div class="todo-empty-state">
+          <div class="todo-empty-icon" data-icon="clock"></div>
+          <div class="todo-empty-title">Loading completed work...</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Core Scripts -->
+  <script src="/js/icons.js?v=20261026"></script>
+  <script src="/js/auth.js?v=20261028"></script>
+  <script src="/js/nav.js?v=20261028"></script>
+  <script src="/js/api.js?v=20261028"></script>
+  <script src="/student/assignments/assignments.js?v=20261028"></script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institution Settings — Admin Console</title>
+  <meta name="description" content="Configure official institution identity, college affiliation, accreditation codes, and campus metadata.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261028">
+  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+  <link rel="stylesheet" href="/admin/settings/settings.css?v=20261028">
+</head>
+<body>
+  <div class="admin-app-layout" id="admin-app-layout">
+
+    <!-- Navigation & Dual-State Sidebar rendered by /admin/components/sidebar/sidebar.js -->
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- MAIN CONTENT CONTAINER (.admin-main-wrap)                      -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="admin-main-wrap">
+
+      <!-- 1. TOP HEADER BAR (Clean: Only Theme Button & Round Profile Avatar) -->
+      <header class="admin-top-header" id="admin-top-header" aria-label="Admin Header Bar">
+        <div class="header-right">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn"
+            onclick="toggleDashboardTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleAdminProfileMenu(event)"
+            aria-haspopup="true" aria-expanded="false" title="System Administrator Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">SA</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Profile Dropdown Popover -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" aria-hidden="true">SA</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name">System Administrator</span>
+                <span class="dropdown-email">admin@college.edu</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/admin/profile.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/admin/settings.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+              <span>System Settings</span>
+            </a>
+            <a href="/admin/audit-logs.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>Audit Trail &amp; Logs</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- top-nav-bar fallback for test suites / backward compatibility -->
+      <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
+<main class="container settings-main">
+    <div class="settings-container">
+
+      <!-- Minimal Page Header -->
+      <div class="settings-page-header">
+        <div class="settings-header-text">
+          <h1 class="page-title">Institution Settings</h1>
+          <p class="page-subtitle">Campus identity and official examination board accreditation</p>
+        </div>
+        <div class="settings-header-actions">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="loadSettings(true)" title="Reload from database">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <span>Reload</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Focused Settings Card -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+            <span>Institutional Identity</span>
+          </div>
+        </div>
+
+        <div class="settings-card-body">
+          <form id="identity-form">
+
+            <div class="settings-form-grid">
+              <!-- Field 1: Name -->
+              <div class="form-group">
+                <label class="form-label-strong" for="setting-inst-name">
+                  Institution Name <span class="required-star">*</span>
+                </label>
+                <input type="text" id="setting-inst-name" class="form-control"
+                  placeholder="e.g. Government Polytechnic College"
+                  required autocomplete="off">
+              </div>
+
+              <!-- Field 2: Code -->
+              <div class="form-group">
+                <label class="form-label-strong" for="setting-inst-code">
+                  College Code <span class="required-star">*</span>
+                </label>
+                <input type="text" id="setting-inst-code" class="form-control"
+                  placeholder="e.g. GP-UBTER-101"
+                  required autocomplete="off">
+              </div>
+
+              <!-- Field 3: Affiliation -->
+              <div class="form-group">
+                <label class="form-label-strong" for="setting-affiliating-body">
+                  Affiliating Board / Directorate
+                </label>
+                <input type="text" id="setting-affiliating-body" class="form-control"
+                  placeholder="e.g. UBTER / IRDT Uttarakhand"
+                  autocomplete="off">
+              </div>
+
+              <!-- Field 4: Location -->
+              <div class="form-group">
+                <label class="form-label-strong" for="setting-location">
+                  Campus Region / Headquarters
+                </label>
+                <input type="text" id="setting-location" class="form-control"
+                  placeholder="e.g. Uttarakhand, India"
+                  autocomplete="off">
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="settings-card-actions">
+              <button type="button" class="btn btn-secondary" onclick="resetToOfficialDefaults()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span>Reset Defaults</span>
+              </button>
+              <button type="submit" id="save-settings-btn" class="btn btn-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                <span>Save Changes</span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+    
+    </div> <!-- /.admin-main-wrap -->
+  </div> <!-- /#admin-app-layout -->
+
+
+  <script src="/js/api.js?v=20261028"></script>
+  <script src="/js/auth.js?v=20261028"></script>
+  <script src="/admin/components/icons.js?v=20261029"></script>
+  <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
+  <script src="/admin/components/header/header.js?v=20261029"></script>
+  <script src="/admin/components/admin-ui.js?v=20261029"></script>
+  <script src="/admin/settings/settings.js?v=20261028"></script>
+</body>
+</html>

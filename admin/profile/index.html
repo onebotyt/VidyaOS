@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Profile &amp; Security — VidyaOS Admin Console</title>
+  <meta name="description" content="Manage your profile information, link institutional Google accounts, and update your master password.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261029">
+  <link rel="stylesheet" href="/css/variables.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+  <link rel="stylesheet" href="/admin/profile/profile.css?v=20261029">
+</head>
+<body>
+  <div class="admin-app-layout" id="admin-app-layout">
+
+    <!-- Navigation & Dual-State Sidebar rendered by /admin/components/sidebar/sidebar.js -->
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- MAIN CONTENT CONTAINER (.admin-main-wrap)                      -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="admin-main-wrap">
+
+      <!-- 1. TOP HEADER BAR (Clean: Only Theme Button & Round Profile Avatar) -->
+      <header class="admin-top-header" id="admin-top-header" aria-label="Admin Header Bar">
+        <div class="header-right">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn"
+            onclick="toggleDashboardTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleAdminProfileMenu(event)"
+            aria-haspopup="true" aria-expanded="false" title="System Administrator Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">A</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Profile Dropdown Popover -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" id="dropdown-avatar-circle" aria-hidden="true">A</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name">admin@gmail.com</span>
+                <span class="dropdown-email">admin@gmail.com</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/admin/profile.html" class="profile-dropdown-item active">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/admin/settings.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+              <span>System Settings</span>
+            </a>
+            <a href="/admin/audit-logs.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>Audit Trail &amp; Logs</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- top-nav-bar fallback for test suites / backward compatibility -->
+      <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- PROFILE CONTENT CONTAINER                                      -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <main class="container profile-container">
+
+        <!-- 1. Top Header Banner -->
+        <div class="profile-top-banner">
+          <div class="profile-top-banner-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+          <div class="profile-top-banner-text">
+            <h1 class="profile-top-title">Administrator Profile &amp; Security</h1>
+            <p class="profile-top-subtitle">Manage your profile information and update your password to keep your institutional account secure.</p>
+          </div>
+        </div>
+
+        <!-- 2. Profile Hero Card (Accurate to Reference Image) -->
+        <section class="profile-hero-card" aria-label="Administrator Profile Overview">
+          <div class="profile-hero-left">
+            <!-- Big Circular Avatar with Online dot and Camera Overlay -->
+            <div class="profile-avatar-container">
+              <div class="profile-avatar-circle" id="profile-hero-avatar">
+                <span id="profile-avatar-initial">A</span>
+                <img id="profile-avatar-img" style="display:none;" alt="Admin Avatar">
+              </div>
+              <span class="profile-online-badge" title="Active Institutional Master Session"></span>
+              <!-- Profile Image Add Option Button -->
+              <button type="button" class="profile-camera-btn" id="btn-camera-upload" onclick="triggerPhotoUpload()" title="Upload or Change Profile Photo" aria-label="Change profile photo">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </button>
+              <input type="file" id="profile-photo-input" accept="image/*" style="display:none;" onchange="handlePhotoSelected(event)">
+            </div>
+
+            <!-- Profile Metadata -->
+            <div class="profile-hero-meta">
+              <h2 class="profile-hero-name" id="hero-display-name">admin@gmail.com</h2>
+              <div class="profile-hero-campus" id="hero-campus-name">VidyaOS Institutional Campus</div>
+              <div class="profile-hero-email-row">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <span id="hero-display-email">admin@gmail.com</span>
+              </div>
+              <div class="profile-hero-badges">
+                <span class="profile-badge badge-superuser">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                  INSTITUTIONAL SUPERUSER
+                </span>
+                <span class="profile-badge badge-authority">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/>
+                  </svg>
+                  FULL MASTER AUTHORITY
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Institutional Neoclassical Campus Building Graphic (matching reference image) -->
+          <div class="profile-hero-illustration" aria-hidden="true">
+            <svg width="290" height="130" viewBox="0 0 290 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="skyGrad" x1="0" y1="0" x2="290" y2="130" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#e0f2fe" stop-opacity="0.6"/>
+                  <stop offset="1" stop-color="#bae6fd" stop-opacity="0.2"/>
+                </linearGradient>
+                <linearGradient id="roofGrad" x1="145" y1="20" x2="145" y2="65" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#3b82f6"/>
+                  <stop offset="1" stop-color="#1d4ed8"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Soft background cloud/hill -->
+              <ellipse cx="145" cy="115" rx="140" ry="25" fill="url(#skyGrad)"/>
+              
+              <!-- Left Landscaping Tree -->
+              <circle cx="28" cy="98" r="14" fill="#a7f3d0"/>
+              <circle cx="36" cy="92" r="16" fill="#6ee7b7"/>
+              <rect x="33" y="105" width="4" height="18" rx="2" fill="#92400e" opacity="0.6"/>
+
+              <!-- Right Landscaping Tree -->
+              <circle cx="262" cy="98" r="14" fill="#a7f3d0"/>
+              <circle cx="254" cy="92" r="16" fill="#6ee7b7"/>
+              <rect x="256" y="105" width="4" height="18" rx="2" fill="#92400e" opacity="0.6"/>
+
+              <!-- Small foreground shrubs -->
+              <ellipse cx="62" cy="118" rx="9" ry="6" fill="#34d399"/>
+              <ellipse cx="228" cy="118" rx="9" ry="6" fill="#34d399"/>
+
+              <!-- Main Campus Building Body -->
+              <rect x="75" y="65" width="140" height="52" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+
+              <!-- Triangular Central Pediment / Roof -->
+              <polygon points="145 28 200 65 90 65" fill="url(#roofGrad)"/>
+
+              <!-- Cupola & Flagpole on Roof -->
+              <rect x="141" y="16" width="8" height="13" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2"/>
+              <polygon points="145 10 151 16 139 16" fill="#2563eb"/>
+              <line x1="145" y1="10" x2="145" y2="2" stroke="#64748b" stroke-width="1.2"/>
+              <polygon points="145 2 153 5 145 8" fill="#3b82f6"/>
+
+              <!-- Clock / Insignia on Pediment -->
+              <circle cx="145" cy="50" r="5.5" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.2"/>
+              <circle cx="145" cy="50" r="1.5" fill="#1d4ed8"/>
+
+              <!-- Neoclassical Columns -->
+              <rect x="110" y="65" width="6" height="52" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+              <rect x="130" y="65" width="6" height="52" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+              <rect x="154" y="65" width="6" height="52" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+              <rect x="174" y="65" width="6" height="52" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+              <!-- Main Arched Entrance Door -->
+              <path d="M138 117V94C138 90.134 141.134 87 145 87C148.866 87 152 90.134 152 94V117H138Z" fill="#3b82f6" fill-opacity="0.35" stroke="#3b82f6" stroke-width="1.2"/>
+
+              <!-- Symmetrical Windows Left Wing -->
+              <rect x="85" y="74" width="14" height="14" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+              <line x1="92" y1="74" x2="92" y2="88" stroke="#93c5fd" stroke-width="0.8"/>
+              <line x1="85" y1="81" x2="99" y2="81" stroke="#93c5fd" stroke-width="0.8"/>
+              <rect x="85" y="96" width="14" height="14" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+              <line x1="92" y1="96" x2="92" y2="110" stroke="#93c5fd" stroke-width="0.8"/>
+              <line x1="85" y1="103" x2="99" y2="103" stroke="#93c5fd" stroke-width="0.8"/>
+
+              <!-- Symmetrical Windows Right Wing -->
+              <rect x="191" y="74" width="14" height="14" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+              <line x1="198" y1="74" x2="198" y2="88" stroke="#93c5fd" stroke-width="0.8"/>
+              <line x1="191" y1="81" x2="205" y2="81" stroke="#93c5fd" stroke-width="0.8"/>
+              <rect x="191" y="96" width="14" height="14" rx="2" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+              <line x1="198" y1="96" x2="198" y2="110" stroke="#93c5fd" stroke-width="0.8"/>
+              <line x1="191" y1="103" x2="205" y2="103" stroke="#93c5fd" stroke-width="0.8"/>
+
+              <!-- Steps at Foundation Base -->
+              <rect x="70" y="117" width="150" height="3" fill="#cbd5e1"/>
+              <rect x="66" y="120" width="158" height="3" fill="#94a3b8"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- 3. Google One-Click Login & Linking Card -->
+        <section class="profile-card profile-google-card" aria-label="Google One-Click Authentication">
+          <div class="google-card-header">
+            <div class="google-card-header-left">
+              <div class="google-logo-wrap" aria-hidden="true">
+                <!-- Official Google 4-color G -->
+                <svg width="22" height="22" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+              </div>
+              <div class="google-card-title-wrap">
+                <h3 class="google-card-title">Google One-Click Sign-In</h3>
+                <p class="google-card-desc">Link your institutional Google account for instantaneous 1-click authentication.</p>
+              </div>
+            </div>
+
+            <div class="google-card-status" id="google-link-status">
+              <span class="google-status-pill linked" id="google-status-pill">
+                <span class="google-dot"></span> <span id="google-status-text">Linked: admin@gmail.com</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="google-card-actions">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-google-link" onclick="handleGoogleLinkingToggle()">
+              <span id="google-btn-icon" style="display:inline-flex;align-items:center;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              </span>
+              <span id="google-link-btn-text">Disconnect Google Account</span>
+            </button>
+            <span class="google-security-notice">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Encrypted institutional OAuth 2.0 PKCE protocol
+            </span>
+          </div>
+        </section>
+
+        <!-- 4. Governance & Telemetry Ribbon -->
+        <div class="profile-telemetry-ribbon" aria-label="Governance Status Ribbon">
+          <div class="profile-telemetry-pill">
+            <span class="telemetry-title">Departments</span>
+            <span class="telemetry-val" id="stat-dept">—</span>
+            <span class="telemetry-sub">Academic programs</span>
+          </div>
+          <div class="profile-telemetry-pill">
+            <span class="telemetry-title">Faculty</span>
+            <span class="telemetry-val" id="stat-teachers">—</span>
+            <span class="telemetry-sub">Teaching staff</span>
+          </div>
+          <div class="profile-telemetry-pill">
+            <span class="telemetry-title">Students</span>
+            <span class="telemetry-val" id="stat-students">—</span>
+            <span class="telemetry-sub">Active enrolled</span>
+          </div>
+          <div class="profile-telemetry-pill">
+            <span class="telemetry-title">Registers</span>
+            <span class="telemetry-val" id="stat-registers">—</span>
+            <span class="telemetry-sub">Digital ledgers</span>
+          </div>
+          <div class="profile-telemetry-pill">
+            <span class="telemetry-title">ESP32 Terminals</span>
+            <span class="telemetry-val" id="stat-devices" style="color: var(--status-present);">—</span>
+            <span class="telemetry-sub">Hardware slots</span>
+          </div>
+        </div>
+
+        <!-- 5. Forms Grid: Identity & Password Management -->
+        <div class="profile-forms-grid">
+
+          <!-- Card 1: Administrator Identity -->
+          <div class="profile-card">
+            <h3 class="profile-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Administrator Identity &amp; Photo
+            </h3>
+
+            <!-- Photo Manager Strip -->
+            <div class="avatar-manager-strip">
+              <div class="avatar-preview-thumb" id="avatar-preview-thumb">
+                <span id="avatar-preview-initial">A</span>
+                <img id="avatar-preview-img" style="display:none;" alt="Avatar Preview">
+              </div>
+              <div class="avatar-actions-wrap">
+                <div class="avatar-actions-btns">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="triggerPhotoUpload()">
+                    Upload Photo
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-remove-photo" onclick="removeProfilePhoto()" style="color: var(--status-absent);">
+                    Remove
+                  </button>
+                </div>
+                <span class="avatar-hint">JPG, PNG, or WebP up to 4MB</span>
+              </div>
+            </div>
+
+            <form id="admin-profile-form">
+              <div class="form-group">
+                <label class="form-label" for="admin-username">Admin Username</label>
+                <input type="text" id="admin-username" class="form-control" required style="font-family: var(--font-family-mono); font-weight: 700;">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="admin-email">Institutional Admin Email</label>
+                <input type="email" id="admin-email" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Role Classification</label>
+                <input type="text" class="form-control" value="SYSTEM_ADMIN (Full Master Authority)" disabled style="background: var(--bg-surface); color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                <button type="submit" id="save-admin-btn" class="btn btn-primary" style="font-weight: 700;">
+                  Update Profile
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Card 2: Password Management -->
+          <div class="profile-card">
+            <h3 class="profile-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Master Password Management
+            </h3>
+
+            <form id="admin-pass-form">
+              <div class="form-group">
+                <label class="form-label" for="admin-current-pass">Current Master Password</label>
+                <div class="password-wrap">
+                  <input type="password" id="admin-current-pass" class="form-control" required placeholder="••••••••">
+                  <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-current-pass', this)" aria-label="Toggle password view">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="admin-new-pass">New Password (min 8 chars)</label>
+                <div class="password-wrap">
+                  <input type="password" id="admin-new-pass" class="form-control" required minlength="8" placeholder="••••••••">
+                  <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-new-pass', this)" aria-label="Toggle password view">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="admin-confirm-pass">Confirm New Password</label>
+                <div class="password-wrap">
+                  <input type="password" id="admin-confirm-pass" class="form-control" required minlength="8" placeholder="••••••••">
+                  <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('admin-confirm-pass', this)" aria-label="Toggle password view">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                <button type="submit" id="save-pass-btn" class="btn btn-secondary" style="font-weight: 700;">
+                  Change Password
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+      </main>
+
+    </div> <!-- /.admin-main-wrap -->
+  </div> <!-- /#admin-app-layout -->
+
+  <script src="/js/api.js?v=20261029"></script>
+  <script src="/js/auth.js?v=20261029"></script>
+  <script src="/admin/components/icons.js?v=20261029"></script>
+  <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
+  <script src="/admin/components/header/header.js?v=20261029"></script>
+  <script src="/admin/components/admin-ui.js?v=20261029"></script>
+  <script src="/admin/profile/profile.js?v=20261029"></script>
+</body>
+</html>
