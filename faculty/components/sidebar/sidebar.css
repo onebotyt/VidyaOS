@@ -1,0 +1,992 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS FACULTY DUAL-STATE SIDEBAR & MOBILE HEADER (sidebar.css)
+ * Location: /frontend/faculty/components/sidebar/sidebar.css
+ * 
+ * 1. Desktop Rail (72px collapsed) & Floating Overlay Drawer (260px)
+ * 2. Zero Layout Shift: Page content stays permanently at margin-left: 72px
+ * 3. Hamburger Flyout Model: Menu opens OVER the page with soft backdrop
+ * 4. Only Expand Arrow in Rail (three lines removed)
+ * 5. 3D Tactile Squircles & Clean Vector Navigation
+ * 6. Mobile Drawer (280px slideout) & Mobile Top Header (56px)
+ * 7. 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * ══════════════════════════════════════════════════════════════
+ */
+
+/* ── 1. Root Layout ── */
+.faculty-app-layout {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-app);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* ── 2. Unified Sidebar (#vidya-faculty-sidebar / .faculty-sidebar) ── */
+#vidya-faculty-sidebar,
+#faculty-sidebar,
+#app-sidebar.faculty-sidebar,
+.faculty-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: var(--bg-card) !important;
+  border-right: 1px solid var(--border-color) !important;
+  z-index: 10000 !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  user-select: none;
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* ── 3. Desktop Styles (>= 769px) ── */
+@media (min-width: 769px) {
+
+  /* 
+   * ZERO CONTENT LAYOUT SHIFT INVARIANT:
+   * .faculty-main-wrap sits PERMANENTLY at margin-left: 72px!
+   * Opening the menu bar NEVER adjusts or shrinks page content.
+   */
+  .faculty-main-wrap,
+  .admin-main-wrap {
+    margin-left: 72px !important;
+    width: calc(100% - 72px) !important;
+    max-width: calc(100% - 72px) !important;
+    min-height: 100vh !important;
+    box-sizing: border-box !important;
+    transition: none !important;
+    position: relative;
+    z-index: 1;
+    overflow-x: hidden !important;
+  }
+
+  /* Support pages without .faculty-main-wrap container */
+  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>main,
+  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>.container,
+  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>#faculty-header,
+  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>.faculty-top-header {
+    margin-left: 72px !important;
+    width: calc(100% - 72px) !important;
+    max-width: calc(100% - 72px) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 
+   * Default Desktop State: Collapsed 72px Mini-Rail
+   */
+  #vidya-faculty-sidebar:not(.desktop-open),
+  #faculty-sidebar:not(.desktop-open),
+  #app-sidebar.faculty-sidebar:not(.desktop-open),
+  .faculty-sidebar:not(.desktop-open) {
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    transform: none !important;
+    box-shadow: none !important;
+    transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
+  }
+
+  /* When collapsed (default): show rail header & rail footer */
+  .faculty-sidebar:not(.desktop-open) .sidebar-rail-header,
+  .faculty-app-layout.sidebar-collapsed .sidebar-rail-header,
+  html.sidebar-collapsed .sidebar-rail-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .faculty-sidebar:not(.desktop-open) .sidebar-rail-footer,
+  .faculty-app-layout.sidebar-collapsed .sidebar-rail-footer,
+  html.sidebar-collapsed .sidebar-rail-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* When collapsed (default): hide expanded headers & footers */
+  .faculty-sidebar:not(.desktop-open) .sidebar-expanded-header,
+  .faculty-sidebar:not(.desktop-open) .sidebar-expanded-footer,
+  .faculty-app-layout.sidebar-collapsed .sidebar-expanded-header,
+  .faculty-app-layout.sidebar-collapsed .sidebar-expanded-footer,
+  html.sidebar-collapsed .sidebar-expanded-header,
+  html.sidebar-collapsed .sidebar-expanded-footer {
+    display: none !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     Desktop Collapsed Rail Components (72px)
+     ───────────────────────────────────────────────────────────── */
+  .sidebar-rail-header {
+    height: 64px;
+    width: 72px;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border-color);
+    box-sizing: border-box;
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 10002 !important;
+  }
+
+  .rail-brand-row {
+    width: 72px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 10003 !important;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  /* Exact horizontal geometry: width 46px, margin 0 13px = center precisely at x = 36px */
+  .rail-logo-link {
+    width: 46px;
+    height: 46px;
+    margin: 0 13px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  .rail-logo-link:hover {
+    transform: scale(1.08) rotate(2deg);
+  }
+
+  .rail-cube-logo {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 2px 6px hsl(217 91% 60% / 0.35));
+    display: block;
+  }
+
+  /* Circular 3D Expand Arrow Button */
+  .rail-expand-btn {
+    position: absolute !important;
+    left: 55px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10010 !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    border-radius: 50% !important;
+    background: var(--bg-card) !important;
+    color: var(--color-primary) !important;
+    border: 2px solid var(--color-primary) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    padding: 0 !important;
+    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.35), 0 2px 4px hsl(0 0% 0% / 0.12) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .rail-expand-btn:hover {
+    background: var(--color-primary) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    border-color: var(--color-primary-hover) !important;
+    transform: translateY(-50%) scale(1.12) !important;
+    box-shadow: 0 6px 20px hsl(217 91% 60% / 0.5) !important;
+  }
+
+  .rail-expand-btn:hover svg {
+    stroke: var(--text-white, hsl(0 0% 100%)) !important;
+  }
+
+  /* Unified Navigation Body (Zero scrollbar invariant) */
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-body,
+  .faculty-app-layout.sidebar-collapsed .sidebar-nav-body,
+  html.sidebar-collapsed .sidebar-nav-body {
+    padding: 0.65rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    overflow: visible !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-nav-body {
+    padding: 0.65rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .faculty-sidebar .sidebar-nav-body::-webkit-scrollbar,
+  .sidebar-nav-body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Section header for HOD items */
+  .sidebar-section-header {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0.75rem 1.25rem 0.35rem;
+    white-space: nowrap;
+    opacity: 0.85;
+  }
+
+  .faculty-sidebar:not(.desktop-open) .sidebar-section-header {
+    display: none !important;
+  }
+
+  /* ── Universal Navigation Item ── */
+  .sidebar-nav-item {
+    box-sizing: border-box;
+    display: flex;
+    position: relative;
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+
+  /* ── Desktop Collapsed Rail Mode: 3D Tactile Squircle Box (Matching Admin Parity) ── */
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-item,
+  #faculty-sidebar:not(.desktop-open) .sidebar-nav-item,
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item,
+  .faculty-app-layout.sidebar-collapsed .sidebar-nav-item,
+  html.sidebar-collapsed .sidebar-nav-item {
+    width: 56px !important;
+    height: 52px !important;
+    min-width: 56px !important;
+    min-height: 52px !important;
+    margin: 0.15rem auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 4px 2px !important;
+    border-radius: 12px !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 4px hsl(0 0% 0% / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.7) !important;
+    color: var(--text-muted) !important;
+    gap: 2px !important;
+    overflow: visible !important;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-icon,
+  #faculty-sidebar:not(.desktop-open) .sidebar-nav-icon,
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-icon,
+  .faculty-app-layout.sidebar-collapsed .sidebar-nav-icon,
+  html.sidebar-collapsed .sidebar-nav-icon {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
+    min-height: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-icon svg,
+  #faculty-sidebar:not(.desktop-open) .sidebar-nav-icon svg,
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-icon svg,
+  .faculty-app-layout.sidebar-collapsed .sidebar-nav-icon svg,
+  html.sidebar-collapsed .sidebar-nav-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: currentColor !important;
+    display: block !important;
+  }
+
+  /* Short name shown below icon in small collapsed navbar */
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
+  #faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
+  .faculty-app-layout.sidebar-collapsed .sidebar-nav-short-label,
+  html.sidebar-collapsed .sidebar-nav-short-label {
+    display: block !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    text-align: center !important;
+    line-height: 1 !important;
+    color: inherit !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 52px !important;
+    margin-top: 1px !important;
+    pointer-events: none !important;
+  }
+
+  /* Full label hidden in collapsed rail */
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
+  #faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
+  .faculty-app-layout.sidebar-collapsed .sidebar-nav-label,
+  html.sidebar-collapsed .sidebar-nav-label {
+    display: none !important;
+  }
+
+  /* Hover state on 3D squircle rail */
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-item:hover:not(.active),
+  #faculty-sidebar:not(.desktop-open) .sidebar-nav-item:hover:not(.active),
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item:hover:not(.active),
+  .faculty-app-layout.sidebar-collapsed .sidebar-nav-item:hover:not(.active),
+  html.sidebar-collapsed .sidebar-nav-item:hover:not(.active) {
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
+    border-color: var(--color-primary-light) !important;
+    color: var(--color-primary) !important;
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 4px 10px hsl(217 91% 60% / 0.16) !important;
+  }
+
+  /* Active 3D squircle pill on collapsed rail */
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active,
+  #faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active,
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active,
+  .faculty-app-layout.sidebar-collapsed .sidebar-nav-item.active,
+  html.sidebar-collapsed .sidebar-nav-item.active {
+    background: linear-gradient(145deg, hsl(217 91% 62%), hsl(224 76% 48%)) !important;
+    border: 1px solid hsl(217 91% 54%) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.42), inset 0 1px 1px hsl(0 0% 100% / 0.5), inset 0 -2px 3px hsl(224 76% 36% / 0.45) !important;
+    transform: none !important;
+  }
+
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-icon svg,
+  #faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-icon svg,
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-icon svg {
+    stroke: var(--text-white, hsl(0 0% 100%)) !important;
+    filter: drop-shadow(0 1px 2px hsl(224 76% 30% / 0.45)) !important;
+  }
+
+  /* ── Desktop Expanded Flyout Drawer: Horizontal capsule row ── */
+  .faculty-sidebar.desktop-open .sidebar-nav-item {
+    width: 234px !important;
+    height: 46px !important;
+    margin: 0.2rem 13px !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0 0.85rem !important;
+    gap: 0.75rem !important;
+    border-radius: 12px !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 4px hsl(0 0% 0% / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.7) !important;
+    color: var(--text-muted) !important;
+    overflow: hidden !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-nav-icon {
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-nav-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: currentColor !important;
+    display: block !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-nav-short-label {
+    display: none !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-nav-label {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    color: inherit !important;
+    pointer-events: auto !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-nav-item:hover:not(.active) {
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
+    border-color: var(--color-primary-light) !important;
+    color: var(--color-primary) !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-nav-item.active {
+    background: linear-gradient(145deg, hsl(217 91% 62%), hsl(224 76% 48%)) !important;
+    border: 1px solid hsl(217 91% 54%) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.42) !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-nav-item.active .sidebar-nav-icon svg {
+    stroke: var(--text-white, hsl(0 0% 100%)) !important;
+    filter: drop-shadow(0 1px 2px hsl(224 76% 30% / 0.45));
+  }
+
+/* ─────────────────────────────────────────────────────────────
+     Desktop Floating Overlay Drawer (260px)
+     ───────────────────────────────────────────────────────────── */
+#vidya-faculty-sidebar.desktop-open,
+#faculty-sidebar.desktop-open,
+.faculty-sidebar.desktop-open {
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  box-shadow: 12px 0 36px hsl(0 0% 0% / 0.22), 0 0 0 1px var(--border-color) !important;
+  transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
+}
+
+.faculty-sidebar.desktop-open .sidebar-rail-header,
+.faculty-sidebar.desktop-open .sidebar-rail-footer {
+  display: none !important;
+}
+
+.faculty-sidebar.desktop-open .sidebar-expanded-header {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 1rem 0 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.sidebar-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.sidebar-header-cube-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-header-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.sidebar-desktop-collapse-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.sidebar-desktop-collapse-btn:hover {
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  border-color: var(--color-primary);
+}
+
+.sidebar-mobile-close-btn {
+  display: none !important;
+}
+
+/* Expanded Footer: User Profile Card & Sign Out */
+.faculty-sidebar.desktop-open .sidebar-expanded-footer {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem 13px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  margin-top: auto;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.sidebar-user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+}
+
+.sidebar-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--text-white, hsl(0 0% 100%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sidebar-user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sidebar-user-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-signout-card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--status-absent-bg, hsl(0 80% 95%));
+  border: 1px solid var(--status-absent, hsl(0 84% 60%));
+  color: var(--status-absent, hsl(0 84% 60%));
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.sidebar-signout-card-btn:hover {
+  background: var(--status-absent, hsl(0 84% 60%));
+  color: var(--text-white, hsl(0 0% 100%));
+}
+
+/* Rail Footer (Mini 72px mode) */
+.sidebar-rail-footer {
+  margin-top: auto;
+  padding: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.rail-footer-btn {
+  width: 56px !important;
+  height: 48px !important;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.16s ease;
+  gap: 2px !important;
+  padding: 2px !important;
+  box-shadow: none !important;
+}
+
+.rail-footer-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.rail-footer-btn .rail-user-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.rail-signout-btn {
+  color: var(--status-absent, hsl(0 84% 60%)) !important;
+}
+
+.rail-signout-btn:hover {
+  background: var(--status-absent-bg, hsl(0 84% 96%)) !important;
+  color: var(--status-absent, hsl(0 84% 60%)) !important;
+}
+
+/* Desktop Flyout Backdrop */
+.sidebar-backdrop,
+.faculty-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: hsl(0 0% 0% / 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.sidebar-backdrop.active,
+.sidebar-backdrop.open,
+.faculty-sidebar-backdrop.active,
+.faculty-sidebar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-top-header {
+  display: none !important;
+}
+}
+
+/* ── 4. Mobile Styles (<= 768px) ── */
+@media (max-width: 768px) {
+
+  .faculty-main-wrap,
+  .admin-main-wrap {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .mobile-top-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    z-index: 9998;
+    box-sizing: border-box;
+  }
+
+  .mobile-header-left,
+  .mobile-header-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-hamburger-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .mobile-brand-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .mobile-brand-icon {
+    color: var(--color-primary);
+  }
+
+  .mobile-header-icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .mobile-bell-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: var(--status-absent, hsl(0 84% 60%));
+    color: var(--text-white, hsl(0 0% 100%));
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Mobile Drawer Sliding Behavior */
+  #vidya-faculty-sidebar,
+  #faculty-sidebar,
+  #app-sidebar.faculty-sidebar,
+  .faculty-sidebar {
+    width: 280px !important;
+    max-width: 85vw !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: none !important;
+    border-right: 1px solid var(--border-color) !important;
+  }
+
+  #vidya-faculty-sidebar.open,
+  #vidya-faculty-sidebar.sidebar-open,
+  #faculty-sidebar.open,
+  #faculty-sidebar.sidebar-open,
+  .faculty-sidebar.open,
+  .faculty-sidebar.sidebar-open {
+    transform: translateX(0) !important;
+    box-shadow: 16px 0 40px hsl(0 0% 0% / 0.35) !important;
+  }
+
+  .sidebar-rail-header,
+  .sidebar-rail-footer {
+    display: none !important;
+  }
+
+  .sidebar-expanded-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+
+  .sidebar-desktop-collapse-btn {
+    display: none !important;
+  }
+
+  .sidebar-mobile-close-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .sidebar-nav-body {
+    padding: 0.75rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    overflow-y: auto;
+  }
+
+  .sidebar-nav-item {
+    margin: 0 !important;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    text-decoration: none;
+  }
+
+  .sidebar-nav-label {
+    opacity: 1 !important;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .sidebar-expanded-footer {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 0.85rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+  }
+
+  .sidebar-backdrop,
+  .faculty-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: hsl(0 0% 0% / 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+
+  .sidebar-backdrop.active,
+  .sidebar-backdrop.open,
+  .faculty-sidebar-backdrop.active,
+  .faculty-sidebar-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* ── 5. Instant High-Speed CSS Tooltips (Zero Native Title Delay) ── */
+@media (min-width: 769px) {
+
+  .faculty-sidebar [data-tooltip] {
+    position: relative;
+  }
+
+  /* Tooltip Container */
+  .faculty-app-layout.sidebar-collapsed .faculty-sidebar [data-tooltip]::after,
+  body.sidebar-collapsed .faculty-sidebar [data-tooltip]::after,
+  html.sidebar-collapsed .faculty-sidebar [data-tooltip]::after,
+  .faculty-sidebar:not(.desktop-open) [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 14px);
+    top: 50%;
+    background: var(--text-main);
+    color: var(--bg-card);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    font-family: inherit;
+    line-height: 1;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px hsl(0 0% 0% / 0.18), 0 0 0 1px var(--border-color);
+    border: 1px solid var(--border-color);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%) translateX(-4px);
+    transition: opacity 0.14s ease, transform 0.14s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.14s;
+    z-index: 100050 !important;
+  }
+
+  /* Tooltip Arrow Caret */
+  .faculty-app-layout.sidebar-collapsed .faculty-sidebar [data-tooltip]::before,
+  body.sidebar-collapsed .faculty-sidebar [data-tooltip]::before,
+  html.sidebar-collapsed .faculty-sidebar [data-tooltip]::before,
+  .faculty-sidebar:not(.desktop-open) [data-tooltip]::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 8px);
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 6px solid var(--text-main);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%) translateX(-4px);
+    transition: opacity 0.14s ease, transform 0.14s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.14s;
+    z-index: 100051 !important;
+  }
+
+  /* Reveal on Hover */
+  .faculty-app-layout.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::after,
+  body.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::after,
+  html.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::after,
+  .faculty-sidebar:not(.desktop-open) [data-tooltip]:hover::after {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(-50%) translateX(0) !important;
+  }
+
+  .faculty-app-layout.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::before,
+  body.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::before,
+  html.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::before,
+  .faculty-sidebar:not(.desktop-open) [data-tooltip]:hover::before {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(-50%) translateX(0) !important;
+  }
+
+  .faculty-sidebar.desktop-open [data-tooltip]::after,
+  .faculty-sidebar.desktop-open [data-tooltip]::before,
+  .faculty-sidebar.open [data-tooltip]::after,
+  .faculty-sidebar.open [data-tooltip]::before {
+    display: none !important;
+  }
+}

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Leave Requests — Faculty Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261029">
+  <link rel="stylesheet" href="/css/variables.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
+  
+  <link rel="stylesheet" href="/faculty/leave-approvals/leave-approvals.css?v=20261029">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+</head>
+<body class="page-layout">
+    
+  <div class="faculty-app-layout" id="faculty-app-layout">
+    <div class="faculty-main-wrap">
+      <!-- Top Header Bar (Clean Admin-Parity Architecture) -->
+      <header class="faculty-top-header admin-top-header" id="faculty-header" aria-label="Faculty Header Bar">
+        <div class="header-left">
+          <span class="header-dept-pill" id="dept-header-name" style="display:none;"></span>
+        </div>
+        <div class="header-right">
+          <!-- Apps Launcher -->
+          <button type="button" class="header-icon-btn" onclick="toggleAppsLauncher(event)" id="btn-apps-launcher" title="Academic Apps &amp; Modules" aria-label="Apps Launcher">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            </svg>
+          </button>
+
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn" onclick="toggleAppTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleUserProfile(event)" aria-haspopup="true" aria-expanded="false" title="Account Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">FA</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Dropdown Profile Menu -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" id="dropdown-avatar-circle" aria-hidden="true">FA</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name" id="dropdown-full-name">Faculty Member</span>
+                <span class="dropdown-email" id="dropdown-email">faculty@college.edu</span>
+                <span class="dropdown-role-pill" id="dropdown-role-pill">Faculty Member</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/faculty/profile.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/faculty/timetable.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Weekly Timetable</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Workspace Container -->
+      <main class="container leave-page-container">
+        <!-- 1. Breadcrumbs -->
+        <nav class="leave-breadcrumb" aria-label="Breadcrumb">
+          <a href="/faculty/dashboard.html" class="leave-crumb-link">
+            <svg class="leave-home-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Home</span>
+          </a>
+          <span class="leave-crumb-sep">›</span>
+          <span class="leave-crumb-muted">Leave</span>
+          <span class="leave-crumb-sep">›</span>
+          <span class="leave-crumb-current">Leave Requests</span>
+        </nav>
+
+        <!-- 2. Hero Card Banner -->
+        <section class="leave-hero-banner" aria-label="Leave Management Banner">
+          <div class="leave-hero-content">
+            <div class="leave-hero-badge">LEAVE MANAGEMENT</div>
+            <h1 class="leave-hero-title">Leave Requests</h1>
+            <p class="leave-hero-subtitle">Approve or reject student leave applications for your classes.</p>
+          </div>
+
+          <!-- Hero Center Illustration Graphic -->
+          <div class="leave-hero-graphic" aria-hidden="true">
+            <svg class="leave-hero-svg" width="140" height="90" viewBox="0 0 160 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Soft Foliage Plant -->
+              <path d="M25 80C22 65 28 50 38 42C39 55 35 70 25 80Z" fill="hsl(215 90% 88%)" />
+              <path d="M30 80C34 68 44 58 52 54C49 66 42 76 30 80Z" fill="hsl(215 85% 80%)" />
+              <!-- Document Sheet -->
+              <rect x="45" y="15" width="70" height="75" rx="10" fill="hsl(0 0% 100%)" stroke="hsl(215 80% 85%)" stroke-width="2.5" />
+              <line x1="58" y1="32" x2="90" y2="32" stroke="hsl(217 91% 60%)" stroke-width="3" stroke-linecap="round" />
+              <line x1="58" y1="44" x2="82" y2="44" stroke="hsl(215 60% 80%)" stroke-width="2.5" stroke-linecap="round" />
+              <line x1="58" y1="56" x2="72" y2="56" stroke="hsl(215 60% 80%)" stroke-width="2.5" stroke-linecap="round" />
+              <!-- Floating Clock Badge -->
+              <circle cx="102" cy="65" r="18" fill="hsl(0 0% 100%)" stroke="hsl(217 91% 60%)" stroke-width="3" />
+              <polyline points="102 55 102 65 110 65" stroke="hsl(217 91% 60%)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+
+          <!-- Right Floating Department Card -->
+          <div class="leave-dept-card">
+            <div class="leave-dept-icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
+              </svg>
+            </div>
+            <div class="leave-dept-info">
+              <span class="leave-dept-label">Department</span>
+              <span class="leave-dept-name" id="leave-dept-name">Information Technology</span>
+              <span class="leave-dept-meta" id="leave-dept-meta">Faculty ID: F002 | Role: HOD</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Segmented Filter Tabs & Search Controls Bar -->
+        <section class="leave-controls-bar" aria-label="Filter and Search Controls">
+          <div class="leave-tabs-cluster" role="tablist">
+            <!-- Tab: Pending -->
+            <button type="button" class="leave-tab-btn active" data-status="PENDING" onclick="filterByStatus('PENDING')" role="tab" aria-selected="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>Pending</span>
+              <span class="leave-tab-counter" id="badge-pending">3</span>
+            </button>
+
+            <!-- Tab: Approved -->
+            <button type="button" class="leave-tab-btn" data-status="APPROVED" onclick="filterByStatus('APPROVED')" role="tab" aria-selected="false">
+              <svg class="tab-icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Approved</span>
+              <span class="leave-tab-counter" id="badge-approved">12</span>
+            </button>
+
+            <!-- Tab: Rejected -->
+            <button type="button" class="leave-tab-btn" data-status="REJECTED" onclick="filterByStatus('REJECTED')" role="tab" aria-selected="false">
+              <svg class="tab-icon-cross" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span>Rejected</span>
+              <span class="leave-tab-counter" id="badge-rejected">4</span>
+            </button>
+
+            <!-- Tab: All -->
+            <button type="button" class="leave-tab-btn" data-status="" onclick="filterByStatus('')" role="tab" aria-selected="false">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>All</span>
+            </button>
+          </div>
+
+          <div class="leave-search-filter-cluster">
+            <div class="leave-search-field">
+              <svg class="leave-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="leave-search-input" class="leave-search-input" placeholder="Search by student name, roll no..." oninput="handleSearch(this.value)">
+            </div>
+            <button type="button" class="leave-filter-action-btn" onclick="toggleAdvancedFilter()" title="Filter options">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              <span>Filter</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 4. Leave Applications Table Card -->
+        <section class="leave-table-card" aria-label="Student Leave Applications Directory">
+          <div class="leave-table-responsive">
+            <table class="leave-data-table" id="leave-data-table">
+              <thead>
+                <tr>
+                  <th class="th-cb"><input type="checkbox" id="leave-select-all" aria-label="Select all rows" onchange="toggleSelectAll(this)"></th>
+                  <th class="th-student">Student</th>
+                  <th class="th-class">Class / Semester</th>
+                  <th class="th-type">Type</th>
+                  <th class="th-dates">From – To</th>
+                  <th class="th-days">Days</th>
+                  <th class="th-reason">Reason</th>
+                  <th class="th-status">Status</th>
+                  <th class="th-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leave-table-tbody">
+                <tr>
+                  <td colspan="9" class="leave-loading-cell">
+                    <div class="leave-spinner-wrap">
+                      <div class="leave-spinner"></div>
+                      <span>Loading leave requests...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Card Footer: Showing Count & Pagination -->
+          <div class="leave-card-footer">
+            <div class="leave-counter-label" id="leave-counter-label">Showing 0 requests</div>
+            <div class="leave-pagination-wrap" id="leave-pagination-wrap">
+              <button type="button" class="leave-page-nav-btn" id="page-prev-btn" onclick="prevPage()" disabled aria-label="Previous Page">‹</button>
+              <button type="button" class="leave-page-num-btn active" id="page-num-btn">1</button>
+              <button type="button" class="leave-page-nav-btn" id="page-next-btn" onclick="nextPage()" disabled aria-label="Next Page">›</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Rejection Note Modal -->
+  <div class="leave-modal-backdrop" id="leave-rejection-modal" style="display:none;" aria-hidden="true">
+    <div class="leave-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-reject-title">
+      <div class="leave-modal-header">
+        <h3 id="modal-reject-title" class="leave-modal-title">Reject Leave Application</h3>
+        <button type="button" class="leave-modal-close-btn" onclick="closeRejectModal()">&times;</button>
+      </div>
+      <div class="leave-modal-body">
+        <p class="leave-modal-desc">Please provide an optional reason or remark for rejecting this leave application.</p>
+        <textarea id="rejection-note-input" class="leave-modal-textarea" rows="3" placeholder="e.g. Insufficient documentation, overlaps with exams..."></textarea>
+      </div>
+      <div class="leave-modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-reject-btn" onclick="confirmReject()">Confirm Rejection</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard Scripts -->
+  <script src="/js/api.js?v=20261029"></script>
+  <script src="/js/auth.js?v=20261029"></script>
+  <script src="/faculty/components/icons.js?v=20261029"></script>
+  <script src="/faculty/components/faculty-ui.js?v=20261029"></script>
+  <script src="/faculty/components/header/header.js?v=20261029"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
+  <script src="/faculty/leave-approvals/leave-approvals.js?v=20261029"></script>
+</body>
+</html>

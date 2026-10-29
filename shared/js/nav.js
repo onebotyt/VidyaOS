@@ -89,8 +89,8 @@ function closeSidebar() {
 
 function _initSidebarState() {
   if (typeof window !== 'undefined' && (
-    (window.location && window.location.pathname && window.location.pathname.toLowerCase().startsWith('/admin')) ||
-    Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page'))
+    (window.location && window.location.pathname && (window.location.pathname.toLowerCase().startsWith('/admin') || window.location.pathname.toLowerCase().startsWith('/faculty'))) ||
+    Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page, .faculty-sidebar, .faculty-app-layout, .faculty-dashboard-page'))
   )) {
     return;
   }
@@ -605,8 +605,9 @@ function mountNavigationSystem(options = {}) {
 
   const currentPath = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
 
-  // 0. STRICT ADMIN PORTAL ISOLATION: Admin has dedicated modular components in /admin/components/
-  if (currentPath.startsWith('/admin') || Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page'))) {
+  // 0. STRICT ADMIN & FACULTY PORTAL ISOLATION: Dedicated modular components in /admin/components/ & /faculty/components/
+  if (currentPath.startsWith('/admin') || Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page')) ||
+      currentPath.startsWith('/faculty') || Boolean(document.querySelector('.faculty-sidebar, .faculty-app-layout, .faculty-dashboard-page'))) {
     return;
   }
 

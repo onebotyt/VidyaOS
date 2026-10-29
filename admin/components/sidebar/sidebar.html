@@ -1,129 +1,287 @@
 <!--
   ══════════════════════════════════════════════════════════════
-  VIDYAOS ADMIN UNIFIED NAVIGATION COMPONENT (sidebar.html)
+  VIDYAOS ADMIN DUAL-STATE SIDEBAR & MOBILE TOPBAR (sidebar.html)
   Location: /admin/components/sidebar/sidebar.html
   100% Theme Tokenized — Zero Hardcoded Hex Colors
   ══════════════════════════════════════════════════════════════
 -->
 
-<!-- 1. STICKY TOP NAVIGATION BAR (Visible across PC and Mobile) -->
-<header class="admin-top-navbar" id="admin-top-navbar">
-  <div class="admin-nav-left">
-    <button type="button" class="admin-hamburger-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation Menu" title="Main Menu (Ctrl+B)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<!-- 1. MOBILE TOP HEADER (Visible on mobile <= 768px only; hidden on desktop) -->
+<header class="mobile-top-header" id="mobile-top-header">
+  <div class="mobile-header-left">
+    <button type="button" class="mobile-hamburger-btn" id="mobile-sidebar-toggle-btn" onclick="toggleSidebar()"
+      aria-label="Open Navigation Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
         <line x1="3" y1="12" x2="21" y2="12"></line>
         <line x1="3" y1="6" x2="21" y2="6"></line>
         <line x1="3" y1="18" x2="21" y2="18"></line>
       </svg>
     </button>
-    <a href="/admin/dashboard.html" class="admin-brand-link">
-      <span class="admin-brand-icon">
-        <svg class="admin-cube-icon" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M16 3L28 9.5L16 16L4 9.5L16 3Z" fill="var(--color-primary-light, hsl(215 90% 95%))"/>
-          <path d="M4 9.5L16 16V29L4 22.5V9.5Z" fill="var(--color-primary, hsl(217 91% 60%))"/>
-          <path d="M16 16L28 9.5V22.5L16 29V16Z" fill="var(--color-primary-hover, hsl(224 76% 48%))"/>
+  </div>
+
+  <div class="mobile-header-center">
+    <a href="/admin/dashboard.html" class="mobile-brand-link">
+      <span class="mobile-brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
         </svg>
       </span>
-      <span class="admin-brand-title">VidyaOS</span>
-      <span class="admin-brand-badge">ADMIN CONSOLE</span>
+      <span class="mobile-brand-text">VidyaOS</span>
     </a>
   </div>
 
-  <div class="admin-nav-right">
-    <!-- Theme Switcher Toggle -->
-    <button type="button" class="admin-nav-icon-btn" id="admin-theme-btn" onclick="toggleAdminTheme()" aria-label="Toggle Theme" title="Toggle Light/Dark Theme">
-      <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
-    </button>
-
-    <!-- Notifications Feedback -->
-    <button type="button" class="admin-nav-icon-btn admin-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications" title="Notifications">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <div class="mobile-header-right">
+    <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)"
+      aria-label="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
       </svg>
-      <span class="admin-bell-badge">1</span>
+      <span class="mobile-bell-badge">1</span>
     </button>
-
-    <!-- System Administrator Avatar Badge -->
-    <div class="admin-avatar-btn" id="admin-avatar-badge" title="System Administrator">
-      <span class="admin-avatar-initials">SA</span>
-    </div>
   </div>
 </header>
 
-<!-- 2. OVERLAY FLYOUT HAMBURGER DRAWER (#app-sidebar) -->
+<!-- 2. REUSABLE DUAL-STATE SIDEBAR (#app-sidebar) -->
 <aside id="app-sidebar" class="admin-sidebar" aria-label="Admin Navigation">
-  <div class="sidebar-drawer-header">
-    <div class="sidebar-drawer-title-group">
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M16 3L28 9.5L16 16L4 9.5L16 3Z" fill="var(--color-primary-light, hsl(215 90% 95%))"/>
-        <path d="M4 9.5L16 16V29L4 22.5V9.5Z" fill="var(--color-primary, hsl(217 91% 60%))"/>
-        <path d="M16 16L28 9.5V22.5L16 29V16Z" fill="var(--color-primary-hover, hsl(224 76% 48%))"/>
-      </svg>
-      <span class="sidebar-drawer-title">VidyaOS Console</span>
+  <!-- A. Rail Header (Desktop Collapsed 72px Rail only) -->
+  <div class="sidebar-rail-header" aria-hidden="true">
+    <div class="rail-brand-row">
+      <a href="/admin/dashboard.html" class="rail-logo-link" data-tooltip="VidyaOS Dashboard"
+        aria-label="VidyaOS Dashboard">
+        <svg class="rail-cube-logo" width="32" height="32" viewBox="0 0 32 32" fill="none"
+          xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M16 3L28 9.5L16 16L4 9.5L16 3Z" fill="var(--color-primary-light, hsl(215 90% 95%))"
+            stroke="var(--color-primary)" stroke-width="0.8" stroke-linejoin="round" />
+          <path d="M4 9.5L16 16V29L4 22.5V9.5Z" fill="var(--color-primary, hsl(217 91% 60%))"
+            stroke="var(--color-primary-hover)" stroke-width="0.8" stroke-linejoin="round" />
+          <path d="M16 16L28 9.5V22.5L16 29V16Z" fill="var(--color-primary-hover, hsl(224 76% 48%))"
+            stroke="var(--color-primary-hover)" stroke-width="0.8" stroke-linejoin="round" />
+          <path d="M16 16L16 28" stroke="hsl(0 0% 100% / 0.35)" stroke-width="1.2" stroke-linecap="round" />
+          <path d="M16 16L27 10" stroke="hsl(0 0% 100% / 0.28)" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+      </a>
+      <!-- Fast Expand Arrow button right on side of logo -->
+      <button type="button" class="rail-expand-btn" onclick="toggleDesktopSidebar()" data-tooltip="Expand Menu"
+        aria-label="Open Navigation Menu">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
     </div>
-    <button type="button" class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Close navigation" title="Close Menu (Esc)">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  </div>
+
+  <!-- B. Expanded Header (Desktop Expanded Flyout Drawer & Mobile Drawer) -->
+  <div class="sidebar-expanded-header">
+    <div class="sidebar-header-left">
+      <span class="sidebar-header-cube-icon" aria-hidden="true">
+        <svg class="header-cube-logo" width="24" height="24" viewBox="0 0 32 32" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 3L28 9.5L16 16L4 9.5L16 3Z" fill="var(--color-primary-light, hsl(215 90% 95%))" />
+          <path d="M4 9.5L16 16V29L4 22.5V9.5Z" fill="var(--color-primary, hsl(217 91% 60%))" />
+          <path d="M16 16L28 9.5V22.5L16 29V16Z" fill="var(--color-primary-hover, hsl(224 76% 48%))" />
+        </svg>
+      </span>
+      <span class="sidebar-header-title">VidyaOS Console</span>
+    </div>
+
+    <!-- Desktop Collapse Button: Chevron Left Arrow < -->
+    <button type="button" class="sidebar-desktop-collapse-btn" onclick="toggleDesktopSidebar()"
+      title="Collapse navigation" aria-label="Collapse navigation">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Mobile Close Button: ✕ -->
+    <button type="button" class="sidebar-mobile-close-btn" onclick="closeSidebar()" title="Close menu"
+      aria-label="Close menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
   </div>
 
-  <nav class="sidebar-nav-body" aria-label="Admin Modules">
-    <a href="/admin/dashboard.html" class="sidebar-nav-item active" data-nav="dashboard">
+  <!-- C. 3D Tactile Navigation Items List -->
+  <nav class="sidebar-nav-body" aria-label="Admin Navigation Links">
+    <a href="/admin/dashboard.html" class="sidebar-nav-item active" data-nav="dashboard" data-tooltip="Dashboard"
+      aria-label="Dashboard">
       <span class="sidebar-nav-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 21 7 12 12 3 7" fill="currentColor" fill-opacity="0.3" stroke="currentColor"
+            stroke-width="1.8" stroke-linejoin="round" />
+          <polygon points="3 7 12 12 12 21 3 16" fill="currentColor" fill-opacity="0.15" stroke="currentColor"
+            stroke-width="1.8" stroke-linejoin="round" />
+          <polygon points="12 12 21 7 21 16 12 21" fill="currentColor" fill-opacity="0.45" stroke="currentColor"
+            stroke-width="1.8" stroke-linejoin="round" />
+          <polygon points="12 14 16 11.7 16 17.5 12 19.8" fill="currentColor" fill-opacity="0.75" stroke="none" />
+          <polyline points="8 14.5 8 18.5 12 20.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+        </svg>
       </span>
       <span class="sidebar-nav-label">Dashboard</span>
     </a>
 
-    <a href="/admin/academic-structure.html" class="sidebar-nav-item" data-nav="academics">
+    <a href="/admin/academic-structure.html" class="sidebar-nav-item" data-nav="academics"
+      data-tooltip="Academic Structure" aria-label="Academic Structure"
+      onclick="if(window.innerWidth<=768)closeSidebar()">
       <span class="sidebar-nav-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 19 6 12 10 5 6" fill="currentColor" fill-opacity="0.35" stroke="currentColor"
+            stroke-width="1.8" stroke-linejoin="round" />
+          <polyline points="5 6 5 8.5 12 12.5 19 8.5 19 6" fill="currentColor" fill-opacity="0.2" stroke="currentColor"
+            stroke-width="1.8" stroke-linejoin="round" />
+          <polyline points="3 10.5 12 15.5 21 10.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          <polyline points="3 10.5 3 13.5 12 18.5 21 13.5 21 10.5" fill="currentColor" fill-opacity="0.3"
+            stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          <polyline points="2 15.5 12 21 22 15.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+        </svg>
       </span>
       <span class="sidebar-nav-label">Academic Structure</span>
     </a>
 
-    <a href="/admin/faculty.html" class="sidebar-nav-item" data-nav="faculty">
+    <a href="/admin/faculty.html" class="sidebar-nav-item" data-nav="faculty" data-tooltip="HOD Management"
+      aria-label="HOD Management" onclick="if(window.innerWidth<=768)closeSidebar()">
       <span class="sidebar-nav-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 2L20 5.5V11C20 16.5 16.5 20.5 12 22C7.5 20.5 4 16.5 4 11V5.5L12 2Z" fill="currentColor"
+            fill-opacity="0.18" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          <path d="M12 2L20 5.5V11C20 16.5 16.5 20.5 12 22V2Z" fill="currentColor" fill-opacity="0.28" stroke="none" />
+          <line x1="12" y1="2" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" />
+          <circle cx="12" cy="8.5" r="2.5" fill="currentColor" fill-opacity="0.5" stroke="currentColor"
+            stroke-width="1.3" />
+          <path d="M8 15.5C8 13.2 9.8 12 12 12C14.2 12 16 13.2 16 15.5" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" />
+        </svg>
       </span>
       <span class="sidebar-nav-label">HOD Management</span>
     </a>
 
-    <a href="/admin/reports.html" class="sidebar-nav-item" data-nav="reports">
+    <a href="/admin/reports.html" class="sidebar-nav-item" data-nav="reports" data-tooltip="Reports & Analytics"
+      aria-label="Reports & Analytics" onclick="if(window.innerWidth<=768)closeSidebar()">
       <span class="sidebar-nav-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="4 15 7.5 13 7.5 19 4 21" fill="currentColor" fill-opacity="0.2" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+          <polygon points="7.5 13 10 14.5 10 20.5 7.5 19" fill="currentColor" fill-opacity="0.45" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+          <polygon points="4 15 6.5 13.5 10 14.5 7.5 16" fill="currentColor" fill-opacity="0.3" />
+          <polygon points="9.5 11 13 9 13 19 9.5 21" fill="currentColor" fill-opacity="0.25" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+          <polygon points="13 9 15.5 10.5 15.5 20.5 13 19" fill="currentColor" fill-opacity="0.5" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+          <polygon points="9.5 11 12 9.5 15.5 10.5 13 12" fill="currentColor" fill-opacity="0.35" />
+          <polygon points="15 6 18.5 4 18.5 19 15 21" fill="currentColor" fill-opacity="0.3" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+          <polygon points="18.5 4 21 5.5 21 20.5 18.5 19" fill="currentColor" fill-opacity="0.6" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+          <polygon points="15 6 17.5 4.5 21 5.5 18.5 7" fill="currentColor" fill-opacity="0.4" />
+          <polyline points="3 13 9 8 14 11 21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <polyline points="16 3 21 3 21 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
       </span>
-      <span class="sidebar-nav-label">Reports & Analytics</span>
+      <span class="sidebar-nav-label">Reports &amp; Analytics</span>
     </a>
 
-    <a href="/admin/settings.html" class="sidebar-nav-item" data-nav="settings">
+    <a href="/admin/settings.html" class="sidebar-nav-item" data-nav="settings" data-tooltip="System Settings"
+      aria-label="System Settings" onclick="if(window.innerWidth<=768)closeSidebar()">
       <span class="sidebar-nav-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <ellipse cx="12" cy="10" rx="7.5" ry="4" fill="currentColor" fill-opacity="0.22" stroke="currentColor"
+            stroke-width="1.8" />
+          <path d="M4.5 10V14C4.5 16.2 7.8 18 12 18C16.2 18 19.5 16.2 19.5 14V10" fill="currentColor"
+            fill-opacity="0.45" stroke="currentColor" stroke-width="1.8" />
+          <path d="M12 4.5V2M12 15.5V18M5 7L2.5 6M19 13L21.5 14M5 13L2.5 14M19 7L21.5 6" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" />
+          <ellipse cx="12" cy="10" rx="2.8" ry="1.5" fill="currentColor" fill-opacity="0.8" stroke="currentColor"
+            stroke-width="1.2" />
+        </svg>
       </span>
       <span class="sidebar-nav-label">System Settings</span>
     </a>
 
-    <a href="/admin/audit-logs.html" class="sidebar-nav-item" data-nav="audit">
+    <a href="/admin/audit-logs.html" class="sidebar-nav-item" data-nav="audit" data-tooltip="Audit Logs"
+      aria-label="Audit Logs" onclick="if(window.innerWidth<=768)closeSidebar()">
       <span class="sidebar-nav-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="5 4 15 2 20 5.5 10 7.5" fill="currentColor" fill-opacity="0.3" stroke="currentColor"
+            stroke-width="1.8" stroke-linejoin="round" />
+          <polygon points="10 7.5 20 5.5 20 17.5 10 19.5" fill="currentColor" fill-opacity="0.5" stroke="currentColor"
+            stroke-width="1.8" stroke-linejoin="round" />
+          <polygon points="5 4 10 7.5 10 19.5 5 16" fill="currentColor" fill-opacity="0.2" stroke="currentColor"
+            stroke-width="1.8" stroke-linejoin="round" />
+          <line x1="12" y1="10.5" x2="18" y2="9.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          <line x1="12" y1="13.5" x2="18" y2="12.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          <line x1="12" y1="16.5" x2="16" y2="15.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+        </svg>
       </span>
       <span class="sidebar-nav-label">Audit Logs</span>
     </a>
   </nav>
 
-  <div class="sidebar-drawer-footer">
-    <span class="sidebar-brand-credit">VidyaOS • Admin</span>
-    <button type="button" class="sidebar-signout-btn" onclick="handleLogout()" title="Sign Out">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+  <!-- D. Sidebar Footers -->
+  <!-- 1. Expanded Footer (Fixed User Session Card & Sign Out Button) -->
+  <div class="sidebar-expanded-footer">
+    <div class="sidebar-user-card">
+      <div class="sidebar-user-avatar" aria-hidden="true">
+        <span>SA</span>
+      </div>
+      <div class="sidebar-user-meta">
+        <span class="sidebar-user-name">System Administrator</span>
+        <span class="sidebar-user-sub">VidyaOS Console</span>
+      </div>
+    </div>
+    <button type="button" class="sidebar-signout-card-btn" onclick="logout()" title="Sign Out" aria-label="Sign Out">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
       <span>Sign Out</span>
+    </button>
+  </div>
+
+  <!-- 2. Rail Footer (Desktop Collapsed Rail) -->
+  <div class="sidebar-rail-footer" aria-hidden="true">
+    <a href="/admin/profile.html" class="rail-footer-btn" data-tooltip="Admin Profile" aria-label="Admin Profile">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="7.5" r="3.5" fill="currentColor" fill-opacity="0.28" stroke="currentColor"
+          stroke-width="1.8" />
+        <path d="M4.5 19.5C4.5 15.5 8 14 12 14C16 14 19.5 15.5 19.5 19.5" fill="currentColor" fill-opacity="0.2"
+          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        <ellipse cx="12" cy="19.5" rx="7.5" ry="2" fill="currentColor" fill-opacity="0.38" />
+      </svg>
+    </a>
+    <button type="button" class="rail-footer-btn rail-signout-btn" onclick="logout()" data-tooltip="Sign Out"
+      aria-label="Sign Out">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="4 3 13 5 13 21 4 19" fill="currentColor" fill-opacity="0.22" stroke="currentColor"
+          stroke-width="1.8" stroke-linejoin="round" />
+        <polyline points="13 5 18 5 18 19 13 19" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+        <line x1="10" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        <polyline points="18 8 22 12 18 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
     </button>
   </div>
 </aside>
 
-<!-- 3. DARKENED BACKDROP OVERLAY -->
-<div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeSidebar()" aria-hidden="true"></div>
+<!-- Backdrop Overlay for Desktop Flyout & Mobile Drawer -->
+<div id="sidebar-backdrop" class="gc-drawer-backdrop sidebar-backdrop" onclick="toggleDesktopSidebar()"></div>

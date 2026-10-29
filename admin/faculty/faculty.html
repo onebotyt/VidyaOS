@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOD Management — Admin Console</title>
+  <meta name="description" content="Manage Heads of Department — create HOD accounts and assign them to departments.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261028">
+  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="/admin/faculty/faculty.css?v=20261028">
+</head>
+<body>
+  <div class="admin-app-layout" id="admin-app-layout">
+
+    <!-- Navigation & Dual-State Sidebar rendered by /admin/components/sidebar/sidebar.js -->
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- MAIN CONTENT CONTAINER (.admin-main-wrap)                      -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="admin-main-wrap">
+
+      <!-- 1. TOP HEADER BAR (Clean: Only Theme Button & Round Profile Avatar) -->
+      <header class="admin-top-header" id="admin-top-header" aria-label="Admin Header Bar">
+        <div class="header-right">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn"
+            onclick="toggleDashboardTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleAdminProfileMenu(event)"
+            aria-haspopup="true" aria-expanded="false" title="System Administrator Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">SA</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Profile Dropdown Popover -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" aria-hidden="true">SA</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name">System Administrator</span>
+                <span class="dropdown-email">admin@college.edu</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/admin/profile.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/admin/settings.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+              <span>System Settings</span>
+            </a>
+            <a href="/admin/audit-logs.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>Audit Trail &amp; Logs</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- top-nav-bar fallback for test suites / backward compatibility -->
+      <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
+<main class="container" style="padding-top: 1.5rem; padding-bottom: 5rem;">
+    <div class="fac-page-header">
+      <div class="fac-page-header-text">
+        <h1>HOD Leadership</h1>
+        <p>Department head leadership roster, administrative appointments, and department authority.</p>
+      </div>
+      <button class="btn btn-primary fac-create-btn" id="create-hod-btn" onclick="openCreateModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Create HOD</span>
+      </button>
+    </div>
+
+    <!-- Registration Anti-Spam Gate Control Strip -->
+    <div class="fac-gates-strip" id="admin-reg-gates-card">
+      <div class="fac-gates-strip-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>Registration Gates:</span>
+      </div>
+      <div class="fac-gates-strip-rows">
+        <button type="button" id="btn-toggle-hod-gate" class="fac-gate-pill-btn" onclick="toggleAdminGate('HOD')" title="Toggle HOD Self-Registration">
+          <span class="fac-gate-pill-tag">HOD</span>
+          <span id="hod-gate-icon" style="display:inline-flex;align-items:center;"></span>
+          <span id="hod-gate-label">Loading...</span>
+        </button>
+        <button type="button" id="btn-toggle-common-gate" class="fac-gate-pill-btn" onclick="toggleAdminGate('COMMON_FACULTY')" title="Toggle Common Faculty Self-Registration">
+          <span class="fac-gate-pill-tag">Common</span>
+          <span id="common-gate-icon" style="display:inline-flex;align-items:center;"></span>
+          <span id="common-gate-label">Loading...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Common Faculty Manager Command Strip -->
+    <div class="fac-section-card" id="common-faculty-mgr-card">
+      <div class="fac-card-head">
+        <div class="fac-card-head-left">
+          <span class="fac-card-head-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg></span>
+          <div class="fac-card-head-text">
+            <h2>Common Faculty Manager</h2>
+            <p>Oversees cross-department faculty teaching shared courses.</p>
+          </div>
+        </div>
+      </div>
+      <div class="fac-card-body" id="common-mgr-content">
+        <div style="color: var(--text-muted); font-size: 0.85rem;">Loading Common Faculty Manager details...</div>
+      </div>
+    </div>
+
+    <!-- Pending HOD Registrations Queue -->
+    <div class="fac-section-card" id="pending-hods-card">
+      <div class="fac-card-head">
+        <div class="fac-card-head-left">
+          <span class="fac-card-head-icon" style="color: var(--status-late);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+          <div class="fac-card-head-text">
+            <h2>Pending HOD Registrations</h2>
+            <p>Prospective Heads of Department awaiting Admin approval to assume department leadership.</p>
+          </div>
+        </div>
+        <div id="pending-hods-badge" class="fac-pending-badge">0 Pending</div>
+      </div>
+      <div class="fac-card-body" id="pending-hods-wrap">
+        <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem;">Loading pending HOD registrations...</div>
+      </div>
+    </div>
+
+    <!-- HOD List -->
+    <div class="fac-section-card" id="hod-list-card">
+      <div class="fac-card-head">
+        <div class="fac-card-head-left">
+          <span class="fac-card-head-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+          <div class="fac-card-head-text">
+            <h2>All HOD Accounts</h2>
+            <p>HODs appointed to departments. Each HOD administers their department independently.</p>
+          </div>
+        </div>
+        <div id="hod-count-badge" class="fac-hod-badge">0 HODs</div>
+      </div>
+      <!-- Desktop table (hidden < 640px via CSS) -->
+      <div id="hod-table-wrap" style="overflow-x: auto;">
+        <div class="fac-empty-state">
+          <div class="fac-empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div>
+          <p class="fac-empty-state-title">Loading HOD accounts...</p>
+        </div>
+      </div>
+      <!-- Mobile card stack (hidden ≥ 640px via CSS) -->
+      <div id="hod-mobile-cards-wrap" class="hod-mobile-cards-wrap" style="padding: 1rem;">
+        <div class="fac-empty-state">
+          <div class="fac-empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div>
+          <p class="fac-empty-state-title">Loading HOD accounts...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CREATE / APPOINT HOD MODAL -->
+  <div id="create-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+        <div>
+          <h2 id="modal-title-hod" style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Appoint Head of Department</h2>
+          <p id="modal-sub-hod" style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Search faculty by Gmail to assign HOD powers.</p>
+        </div>
+        <button type="button" onclick="closeCreateModal()" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Mode Selector Pills -->
+      <div style="display: flex; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.2rem; margin-bottom: 0.75rem; gap: 0.25rem;">
+        <button type="button" id="tab-btn-search" onclick="setHODModalMode('search')" style="flex: 1; font-weight: 600; font-size: 0.8rem; border-radius: var(--radius-sm); border: none; background: var(--color-primary); color: var(--text-white); cursor: pointer; padding: 0.4rem 0.5rem; transition: all 0.2s;">
+          Search Existing Faculty
+        </button>
+        <button type="button" id="tab-btn-create" onclick="setHODModalMode('create')" style="flex: 1; font-weight: 600; font-size: 0.8rem; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-muted); cursor: pointer; padding: 0.4rem 0.5rem; transition: all 0.2s;">
+          Create New Account
+        </button>
+      </div>
+
+      <!-- SECTION 1: SEARCH & APPOINT EXISTING FACULTY -->
+      <div id="section-search-faculty">
+        <div class="form-group" style="margin-bottom: 0.65rem;">
+          <label class="form-label" for="search-faculty-email">Faculty Institutional Gmail <span style="color: var(--status-absent);">*</span></label>
+          <div style="display: flex; gap: 0.45rem;">
+            <input type="email" id="search-faculty-email" class="form-control" placeholder="e.g. teacher@college.edu" onkeydown="if(event.key==='Enter'){event.preventDefault();searchFacultyByEmail();}">
+            <button type="button" class="btn btn-secondary" id="btn-search-faculty" onclick="searchFacultyByEmail()" style="white-space: nowrap; font-weight: 600; padding: 0.45rem 0.75rem;">Find</button>
+          </div>
+        </div>
+
+        <div id="search-status-box" style="display: none; font-size: 0.8rem; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); margin-bottom: 0.65rem;"></div>
+
+        <!-- Found Faculty Details Card -->
+        <div id="found-faculty-card" style="display: none; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.65rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.5rem;">
+            <div id="found-avatar" style="width: 34px; height: 34px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;">F</div>
+            <div style="flex: 1; min-width: 0;">
+              <div id="found-name" style="font-weight: 700; font-size: 0.9rem; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</div>
+              <div id="found-gmail" style="font-size: 0.76rem; color: var(--color-primary); font-family: var(--font-family-mono, monospace);">—</div>
+            </div>
+            <div id="found-status-badge" class="badge badge-present" style="font-size: 0.7rem;">Active Faculty</div>
+          </div>
+
+          <div style="font-size: 0.78rem; line-height: 1.5; border-top: 1px dashed var(--border-color); padding-top: 0.4rem; margin-bottom: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.15rem;">
+              <span style="color: var(--text-muted);">Current Dept:</span>
+              <strong id="found-dept" style="color: var(--text-main);">—</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; gap: 0.5rem;">
+              <span style="color: var(--text-muted); white-space: nowrap;">Active Roles:</span>
+              <strong id="found-roles" style="color: var(--color-primary); text-align: right;">—</strong>
+            </div>
+          </div>
+
+          <div style="background: var(--status-present-bg); border: 1px solid var(--status-present); border-radius: var(--radius-sm); padding: 0.45rem 0.65rem; font-size: 0.74rem; color: var(--text-main); display: flex; gap: 0.35rem; align-items: flex-start;">
+            <span style="display:inline-flex;align-items:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
+            <span><strong>Combined Powers:</strong> Retains all active teaching registers, cohorts &amp; coursework.</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0.65rem;">
+          <label class="form-label" for="assign-existing-dept">Department to Lead as HOD <span style="color: var(--status-absent);">*</span></label>
+          <select id="assign-existing-dept" class="form-control" required>
+            <option value="">— Select Department —</option>
+          </select>
+        </div>
+
+        <div id="assign-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.65rem; font-size: 0.8rem; color: var(--status-absent);"></div>
+
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.85rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeCreateModal()">Cancel</button>
+          <button type="button" id="btn-submit-assign" class="btn btn-primary btn-sm" onclick="submitAssignExistingHOD()" disabled>Appoint as HOD</button>
+        </div>
+      </div>
+
+      <!-- SECTION 2: CREATE BRAND NEW HOD ACCOUNT -->
+      <div id="section-create-new" style="display: none;">
+        <form id="create-hod-form" onsubmit="submitCreateHOD(event)">
+          <div class="form-group" style="margin-bottom: 0.65rem;">
+            <label class="form-label" for="hod-dept">Department <span style="color: var(--status-absent);">*</span></label>
+            <select id="hod-dept" class="form-control">
+              <option value="">— Select Department —</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.65rem;">
+            <label class="form-label" for="hod-name">Full Name <span style="color: var(--status-absent);">*</span></label>
+            <input type="text" id="hod-name" class="form-control" placeholder="Dr. Girdhar Dhami">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.65rem;">
+            <label class="form-label" for="hod-email">Institutional Gmail (Login ID) <span style="color: var(--status-absent);">*</span></label>
+            <input type="email" id="hod-email" class="form-control" placeholder="hod.it@gmail.com">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.65rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="hod-password">Initial Password <span style="color: var(--status-absent);">*</span></label>
+              <input type="text" id="hod-password" class="form-control" placeholder="Password@123" value="Password@123">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="hod-phone">Phone Number</label>
+              <input type="tel" id="hod-phone" class="form-control" placeholder="9876543210">
+            </div>
+          </div>
+
+          <div id="create-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-top: 0.5rem; font-size: 0.8rem; color: var(--status-absent);"></div>
+
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.85rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeCreateModal()">Cancel</button>
+            <button type="submit" id="create-submit-btn" class="btn btn-primary btn-sm">Create HOD Account</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CREDENTIALS / CONFIRMATION SLIP MODAL -->
+  <div id="cred-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto; text-align: center;">
+      <div style="width: 56px; height: 56px; background: var(--status-present-bg); color: var(--status-present); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      <h2 id="cred-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">HOD Account Ready!</h2>
+      <p id="cred-sub" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        HOD role has been granted successfully.
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; text-align: left; margin-bottom: 1.25rem; font-family: var(--font-family-mono); font-size: 0.85rem;">
+        <div style="margin-bottom: 0.5rem;"><span style="color: var(--text-muted); font-family: var(--font-family-sans);">Name:</span><strong id="slip-name" style="float: right; font-family: var(--font-family-sans);"></strong></div>
+        <div style="margin-bottom: 0.5rem;"><span style="color: var(--text-muted); font-family: var(--font-family-sans);">Department:</span><strong id="slip-dept" style="float: right; font-family: var(--font-family-sans); color: var(--status-present);"></strong></div>
+        <div style="margin-bottom: 0.5rem;"><span style="color: var(--text-muted); font-family: var(--font-family-sans);">Login ID (Gmail):</span><strong id="slip-gmail" style="color: var(--color-primary); float: right;"></strong></div>
+        <div id="slip-temp-row"><span style="color: var(--text-muted); font-family: var(--font-family-sans);">Temp Password:</span><strong id="slip-temp" style="color: var(--status-absent); font-size: 1.1rem; float: right; letter-spacing: 0.1em;"></strong></div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button type="button" id="slip-copy-btn" class="btn btn-secondary" onclick="copyCredentials()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy Details</span></button>
+        <button type="button" class="btn btn-primary" onclick="closeCredModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REASSIGN DEPARTMENT MODAL (2-STEP) -->
+  <div id="reassign-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; box-sizing: border-box; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Reassign HOD Department</h2>
+        <button type="button" onclick="closeReassignModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- 2-Step Progress Indicator -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; background: var(--bg-surface); padding: 0.4rem 0.65rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 600;">
+        <div id="reassign-stepper-1" style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-primary);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span>
+          <span>Select Dept</span>
+        </div>
+        <div style="color: var(--text-muted);">&rarr;</div>
+        <div id="reassign-stepper-2" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span>
+          <span>Review &amp; Transfer</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Select Target Department -->
+      <div id="reassign-step-1">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1.1rem; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Faculty Member</div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;" id="reassign-hod-name"></div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Current Dept</div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--color-primary);" id="reassign-current-dept">—</div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0.5rem;">
+          <label class="form-label" style="font-weight: 600;">New Target Department <span style="color: var(--status-absent);">*</span></label>
+          <select id="reassign-dept" class="form-control" onchange="clearReassignStep1Error()">
+            <option value="">— Select Department —</option>
+          </select>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            Select the new department this faculty will be transferred to lead as HOD.
+          </div>
+        </div>
+
+        <div id="reassign-step1-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.6rem 0.75rem; margin-top: 0.75rem; font-size: 0.8rem; color: var(--status-absent);"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeReassignModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" id="reassign-step1-btn" onclick="goToReassignStep2()">Next: Review Transfer &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Transfer Impact & Governance Confirmation -->
+      <div id="reassign-step-2" style="display: none;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1rem;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Transfer Route Overview</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+            <div style="flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.55rem; text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">Relinquishing</div>
+              <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem;" id="reassign-preview-from">—</div>
+            </div>
+            <div style="font-size: 1.2rem; color: var(--color-primary);">&rarr;</div>
+            <div style="flex: 1; background: var(--bg-card); border: 1px solid var(--color-primary); border-radius: var(--radius-sm); padding: 0.55rem; text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--color-primary); font-weight: 600;">Assuming HOD</div>
+              <div style="font-weight: 700; color: var(--color-primary); font-size: 0.85rem;" id="reassign-preview-to">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.8rem; margin-bottom: 1rem; font-size: 0.8rem; line-height: 1.45;">
+          <div style="display: flex; align-items: flex-start; gap: 0.4rem; margin-bottom: 0.5rem;">
+            <span style="color: var(--status-present); display:inline-flex; align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
+            <div><strong>Branch Data 100% Intact:</strong> Student rosters, attendance matrix, coursework, and marks in <span id="reassign-protect-dept" style="font-weight: 600;"></span> stay safely preserved under the department.</div>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 0.4rem;">
+            <span style="color: var(--color-primary); display:inline-flex; align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
+            <div><strong>Leadership Transfer:</strong> Previous department leadership will become <strong>UNASSIGNED</strong>. <span id="reassign-preview-name" style="font-weight: 600;"></span> will assume active HOD leadership of the target department.</div>
+          </div>
+        </div>
+
+        <div id="reassign-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: space-between; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="goToReassignStep1()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Step 1</button>
+          <button type="button" class="btn btn-primary" id="reassign-submit-btn" onclick="submitReassign()">Confirm Reassignment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESET PASSWORD MODAL (2-STEP) -->
+  <div id="reset-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 480px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; box-sizing: border-box; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Reset Faculty Password</h2>
+        <button type="button" onclick="closeResetModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- 2-Step Progress Indicator -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; background: var(--bg-surface); padding: 0.4rem 0.65rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 600;">
+        <div id="reset-stepper-1" style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-primary);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span>
+          <span>Set Password</span>
+        </div>
+        <div style="color: var(--text-muted);">&rarr;</div>
+        <div id="reset-stepper-2" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span>
+          <span>Security Review</span>
+        </div>
+      </div>
+
+      <form id="reset-form" onsubmit="handleResetFormSubmit(event)">
+        <!-- STEP 1: Enter & Confirm Password -->
+        <div id="reset-step-1">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1.1rem; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Target Faculty</div>
+              <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;" id="reset-name"></div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Login ID</div>
+              <div style="font-size: 0.8rem; font-family: monospace; color: var(--color-primary);" id="reset-gmail">—</div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" style="margin: 0; font-weight: 600;">New Password <span style="color: var(--status-absent);">*</span></label>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="generateRandomResetPassword()" style="font-size: 0.75rem; padding: 0.15rem 0.5rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6"></path><path d="M15.5 7.5l3 3L22 7l-3-3"></path></svg> <span>Suggest Secure</span></button>
+            </div>
+            <div style="position: relative;">
+              <input type="password" id="reset-password" class="form-control" placeholder="Min 6 chars (e.g. Password@123)" value="Password@123" required style="padding-right: 2.5rem;" oninput="clearResetStep1Error()">
+              <button type="button" onclick="togglePassVisibility('reset-password', this)" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.9rem;" title="Show/Hide"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label class="form-label" style="font-weight: 600;">Confirm New Password <span style="color: var(--status-absent);">*</span></label>
+            <div style="position: relative;">
+              <input type="password" id="reset-password-confirm" class="form-control" placeholder="Re-type new password" value="Password@123" required style="padding-right: 2.5rem;" oninput="clearResetStep1Error()">
+              <button type="button" onclick="togglePassVisibility('reset-password-confirm', this)" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.9rem;" title="Show/Hide"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+            </div>
+          </div>
+
+          <div id="reset-step1-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-top: 0.5rem; font-size: 0.8rem; color: var(--status-absent);"></div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" id="reset-step1-btn" onclick="goToResetStep2()">Next: Review &amp; Confirm &rarr;</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Security Review & Session Notice -->
+        <div id="reset-step-2" style="display: none;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1rem;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.6rem;">Target Account &amp; Password Preview</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="color: var(--text-muted); font-size: 0.85rem;">Account:</span>
+              <strong style="color: var(--text-main); font-size: 0.85rem;" id="reset-preview-user">—</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.45rem; border-top: 1px dashed var(--border-color);">
+              <span style="color: var(--text-muted); font-size: 0.85rem;">New Password:</span>
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span id="reset-preview-pass" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; color: var(--color-primary); letter-spacing: 0.08em;">••••••••</span>
+                <button type="button" id="reset-preview-eye-btn" onclick="toggleResetPassPreview()" class="btn btn-secondary btn-sm" style="padding: 0.15rem 0.45rem; font-size: 0.75rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> <span>Reveal</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem; font-size: 0.8rem; color: var(--status-absent); line-height: 1.45;">
+            <div style="font-weight: 700; margin-bottom: 0.25rem;">Active Sessions Invalidation Notice</div>
+            <div style="color: var(--text-main);">Confirming this reset will immediately terminate all active sessions for this account across all devices. The faculty member must use this new password on next login.</div>
+          </div>
+
+          <div id="reset-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: space-between; margin-top: 1.25rem;">
+            <button type="button" class="btn btn-secondary" onclick="goToResetStep1()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Edit</button>
+            <button type="submit" class="btn btn-primary" id="reset-btn">Confirm &amp; Reset Password</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DELETE HOD MODAL (2-STEP) -->
+  <div id="delete-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 500px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; box-sizing: border-box; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--status-absent);">Remove HOD Role</h2>
+        <button type="button" onclick="closeDeleteModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- 2-Step Progress Indicator -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; background: var(--bg-surface); padding: 0.4rem 0.65rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 600;">
+        <div id="delete-stepper-1" style="display: flex; align-items: center; gap: 0.35rem; color: var(--status-absent);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--status-absent); color: var(--text-white); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span>
+          <span>Impact Assessment</span>
+        </div>
+        <div style="color: var(--text-muted);">&rarr;</div>
+        <div id="delete-stepper-2" style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted);">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span>
+          <span>Safeguard Confirmation</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Impact Assessment & Institutional Guarantees -->
+      <div id="delete-step-1">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1rem 0;">
+          Review institutional safeguards before removing <strong id="delete-hod-name" style="color: var(--text-main);"></strong> from HOD leadership:
+        </p>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Assigned Department</div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;" id="delete-dept-name">—</div>
+          </div>
+          <span class="badge badge-warning" id="delete-dept-status">Active HOD</span>
+        </div>
+
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.8rem; color: var(--text-main);">
+          <div style="font-weight: 700; color: var(--status-present); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span style="display:inline-flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span><span>Branch Data is 100% Protected</span>
+          </div>
+          <p style="margin: 0 0 0.65rem 0; color: var(--text-muted); line-height: 1.45;">
+            All student enrollments, subjects, attendance registers, and marks remain <strong>intact under the department</strong>. Department status switches to <strong>UNASSIGNED</strong> and will automatically link to the next appointed HOD.
+          </p>
+
+          <div style="font-weight: 700; color: var(--color-primary); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span style="display:inline-flex;align-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span>Teaching Roles Retained</span>
+          </div>
+          <p style="margin: 0; color: var(--text-muted); line-height: 1.45;">
+            If this faculty member holds Class Teacher or Subject Teacher roles, only their HOD assignment is revoked. Their teaching account, class rosters, and gradebooks remain active.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" id="delete-step1-btn" style="background: var(--status-absent); border-color: var(--status-absent);" onclick="goToDeleteStep2()">Proceed to Safeguard Confirmation &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Typed Safeguard Verification -->
+      <div id="delete-step-2" style="display: none; text-align: center;">
+        <div style="color:var(--status-absent); margin-bottom:0.35rem; display:flex; justify-content:center;"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--status-absent); margin: 0 0 0.5rem 0;">Confirm Removal Safeguard</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.45;">
+          To permanently remove <strong id="delete-step2-name" style="color: var(--text-main);"></strong> from the HOD position, type <code style="background: var(--status-absent-bg); color: var(--status-absent); padding: 0.15rem 0.45rem; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.9rem;">DELETE</code> in the field below to unlock the button:
+        </p>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <input type="text" id="delete-confirm-input" class="form-control" placeholder="Type DELETE to confirm" autocomplete="off" oninput="checkDeleteConfirmation()" style="text-align: center; font-size: 1rem; font-weight: 700; letter-spacing: 0.08em; border-color: var(--border-color);">
+        </div>
+
+        <div id="delete-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--status-absent); text-align: left;"></div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: space-between; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="goToDeleteStep1()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back to Step 1</button>
+          <button type="button" id="delete-btn" class="btn btn-primary" style="background: var(--status-absent); border-color: var(--status-absent); opacity: 0.45; cursor: not-allowed;" disabled onclick="submitDeleteHOD()">Permanently Remove HOD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPROVE HOD CONFIRMATION MODAL -->
+  <div id="approve-hod-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 520px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Approve HOD Registration</h2>
+        <button type="button" onclick="closeApproveHodModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+      <div id="approve-hod-body">
+        <!-- Populated dynamically -->
+      </div>
+      <div id="approve-hod-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-top: 0.75rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeApproveHodModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-approve-hod" onclick="confirmApproveHod()">Confirm &amp; Activate HOD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPOINT COMMON FACULTY MANAGER MODAL -->
+  <div id="appoint-common-mgr-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 500px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Appoint Common Faculty Manager</h2>
+        <button type="button" onclick="closeAppointCommonMgrModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Select an active faculty member to appoint as Common Faculty Manager. They will review and approve common (cross-department) faculty registration requests.
+      </p>
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label class="form-label" style="font-weight: 600;">Select Faculty Member <span style="color: var(--status-absent);">*</span></label>
+        <select id="common-mgr-teacher-select" class="form-control">
+          <option value="">— Select an active faculty member —</option>
+        </select>
+      </div>
+      <div id="appoint-common-mgr-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-top: 0.75rem; font-size: 0.82rem; color: var(--status-absent);"></div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeAppointCommonMgrModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-common-mgr" onclick="submitAppointCommonMgr()">Save Appointment</button>
+      </div>
+    </div>
+  </div>
+
+    
+    </div> <!-- /.admin-main-wrap -->
+  </div> <!-- /#admin-app-layout -->
+
+
+  <script src="/js/api.js?v=20261028"></script>
+  <script src="/js/auth.js?v=20261028"></script>
+  <script src="/admin/components/icons.js?v=20261029"></script>
+  <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
+  <script src="/admin/components/header/header.js?v=20261029"></script>
+  <script src="/admin/components/admin-ui.js?v=20261029"></script>
+  
+  <script src="/admin/faculty/faculty.js?v=20261028"></script>
+</body>
+</html>

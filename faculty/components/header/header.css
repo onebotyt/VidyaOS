@@ -1,0 +1,362 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS FACULTY TOP HEADER STYLES (header.css)
+ * Location: /frontend/faculty/components/header/header.css
+ * 
+ * 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * Upgraded to match Admin Header: Right-aligned minimal toolbar,
+ * smooth theme toggle, and interactive round profile avatar
+ * ══════════════════════════════════════════════════════════════
+ */
+
+.faculty-top-header,
+.gc-navbar.admin-top-header,
+.admin-top-header {
+  height: 60px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Clean toolbar with optional left context */
+  padding: 0 1.75rem;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+  user-select: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-dept-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 768px) {
+  .faculty-top-header,
+  .gc-navbar.admin-top-header,
+  .admin-top-header {
+    display: none !important;
+    /* Mobile uses .mobile-top-header mounted by sidebar.js */
+  }
+}
+
+/* ── Right Section: Apps Launcher, Theme Toggle & Round Profile Avatar ── */
+.header-right,
+.gc-nav-right {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  margin-left: auto !important;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.header-icon-btn,
+.gc-icon-btn {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  transition: all 0.18s ease;
+}
+
+.header-icon-btn:hover,
+.gc-icon-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
+  border-color: var(--color-primary-light, var(--color-primary));
+  transform: translateY(-1px);
+}
+
+/* ── Round User Profile Avatar Trigger ── */
+.header-profile-round-btn,
+.gc-user-avatar {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 50% !important;
+  border: 2px solid var(--border-color);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--text-white, hsl(0 0% 100%));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  outline: none;
+  box-shadow: 0 2px 8px hsl(217 91% 60% / 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.header-profile-round-btn:hover,
+.header-profile-round-btn[aria-expanded="true"],
+.gc-user-avatar:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 14px hsl(217 91% 60% / 0.4);
+}
+
+.user-avatar-initials {
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-white, hsl(0 0% 100%));
+}
+
+.avatar-online-dot {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 9px;
+  height: 9px;
+  background: var(--status-present, hsl(142 71% 45%));
+  border: 2px solid var(--bg-card);
+  border-radius: 50%;
+}
+
+/* Invisible Hover Bridge: Bridges the 8px gap between trigger and popover */
+.header-profile-round-btn::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 140px;
+  height: 16px;
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* ── Interactive Profile Dropdown Popover ── */
+.header-profile-dropdown,
+.user-profile-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 260px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px hsl(0 0% 0% / 0.2), 0 0 0 1px var(--border-color);
+  padding: 0.85rem;
+  box-sizing: border-box;
+  display: none;
+  flex-direction: column;
+  z-index: 10050;
+  animation: headerMenuSlideIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.header-profile-dropdown.show,
+.user-profile-popover.show {
+  display: flex !important;
+}
+
+@keyframes headerMenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-dropdown-user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.65rem 0.75rem;
+}
+
+.dropdown-avatar-circle {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--text-white, hsl(0 0% 100%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px hsl(217 91% 60% / 0.3);
+}
+
+.dropdown-user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dropdown-full-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-email {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-role-pill {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-top: 3px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.profile-dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.4rem 0;
+  width: 100%;
+}
+
+.profile-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.profile-dropdown-item:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+.profile-dropdown-item svg {
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.profile-dropdown-item:hover svg {
+  color: var(--color-primary);
+}
+
+.dropdown-logout-btn {
+  color: var(--status-absent, hsl(0 84% 60%)) !important;
+}
+
+.dropdown-logout-btn:hover {
+  background: var(--status-absent-bg, hsl(0 80% 95%)) !important;
+  color: var(--status-absent, hsl(0 84% 60%)) !important;
+}
+
+.dropdown-logout-btn svg {
+  color: var(--status-absent, hsl(0 84% 60%)) !important;
+}
+
+/* ── Academic Apps Launcher Dropdown Grid ── */
+.apps-launcher-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 48px;
+  width: 320px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 16px 40px hsl(0 0% 0% / 0.22), 0 0 0 1px var(--border-color);
+  padding: 1rem;
+  box-sizing: border-box;
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  z-index: 10050;
+  animation: headerMenuSlideIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.app-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem 0.35rem;
+  border-radius: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.18s ease;
+}
+
+.app-tile:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  border-color: var(--color-primary-light, var(--color-primary));
+  color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px hsl(0 0% 0% / 0.08);
+}
+
+.app-tile-icon {
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hod-only-tile {
+  border-style: dashed;
+}

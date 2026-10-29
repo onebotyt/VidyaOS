@@ -337,10 +337,13 @@ function guardRoute(options = []) {
     }
   } catch (_) { }
 
-  try {
-    mountNavigationSystem();
-  } catch (err) {
-    console.error('Error in mountNavigationSystem:', err);
+  const currentPath = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+  if (!currentPath.startsWith('/admin') && !currentPath.startsWith('/faculty') && !currentPath.includes('/faculty/')) {
+    try {
+      mountNavigationSystem();
+    } catch (err) {
+      console.error('Error in mountNavigationSystem:', err);
+    }
   }
 
   return true;
@@ -977,8 +980,11 @@ function mountNavigationSystem(options = {}) {
 
   const currentPath = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
 
-  // 0. STRICT ADMIN PORTAL ISOLATION: Admin has dedicated modular components in /admin/components/
-  if (currentPath.startsWith('/admin') || Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page'))) {
+  // 0. STRICT ADMIN & FACULTY PORTAL ISOLATION: Both portals have dedicated modular components in /admin/components/ and /faculty/components/
+  if (currentPath.startsWith('/admin') ||
+      currentPath.startsWith('/faculty') ||
+      currentPath.includes('/faculty/') ||
+      Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page, .faculty-sidebar, .faculty-app-layout, .vidya-faculty-sidebar, .faculty-top-header'))) {
     return;
   }
 
@@ -2053,6 +2059,8 @@ document.addEventListener('click', (e) => {
 // All navigation is handled deterministically by mountNavigationSystem()
 // ─────────────────────────────────────────────────────────
 function loadUniversalNavigation() {
+  const p = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+  if (p.startsWith('/admin') || p.startsWith('/faculty') || p.includes('/faculty/')) return;
   if (typeof mountNavigationSystem === 'function') {
     mountNavigationSystem();
   }
@@ -2081,14 +2089,17 @@ if (typeof window !== 'undefined') {
 // Auto-initialize theme & sync session on script execution
 if (typeof document !== 'undefined') {
   initAppTheme();
+  const p = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+  const isIsolated = p.startsWith('/admin') || p.startsWith('/faculty') || p.includes('/faculty/');
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       syncCurrentUser();
-      mountNavigationSystem();
+      if (!isIsolated) mountNavigationSystem();
     });
   } else {
     syncCurrentUser();
-    mountNavigationSystem();
+    if (!isIsolated) mountNavigationSystem();
   }
 }
 

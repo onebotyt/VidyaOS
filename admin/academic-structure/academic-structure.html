@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Departments &amp; Branches — Admin Console</title>
+  <meta name="description" content="Manage academic departments, degree branches, and appointed HODs in one unified console.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261028">
+  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+  <link rel="stylesheet" href="/admin/academic-structure/academic-structure.css?v=20261028">
+</head>
+<body>
+  <div class="admin-app-layout" id="admin-app-layout">
+
+    <!-- Navigation & Dual-State Sidebar rendered by /admin/components/sidebar/sidebar.js -->
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- MAIN CONTENT CONTAINER (.admin-main-wrap)                      -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="admin-main-wrap">
+
+      <!-- 1. TOP HEADER BAR (Clean: Only Theme Button & Round Profile Avatar) -->
+      <header class="admin-top-header" id="admin-top-header" aria-label="Admin Header Bar">
+        <div class="header-right">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn"
+            onclick="toggleDashboardTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleAdminProfileMenu(event)"
+            aria-haspopup="true" aria-expanded="false" title="System Administrator Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">SA</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Profile Dropdown Popover -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" aria-hidden="true">SA</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name">System Administrator</span>
+                <span class="dropdown-email">admin@college.edu</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/admin/profile.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/admin/settings.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+              <span>System Settings</span>
+            </a>
+            <a href="/admin/audit-logs.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>Audit Trail &amp; Logs</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- top-nav-bar fallback for test suites / backward compatibility -->
+      <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
+<main class="container page-main-container">
+    <!-- Page Header (Minimal & Modern) -->
+    <div class="page-header academic-header">
+      <div class="academic-header-title-wrap">
+        <h1 class="page-title">Academic Structure</h1>
+        <p class="page-subtitle">Departments, programs &amp; appointed HOD leadership</p>
+      </div>
+      <div class="academic-header-actions">
+        <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm academic-back-btn" title="Back to Dashboard">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <span>Dashboard</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Minimal High-Density Telemetry Ribbon (Session Status + Live Counts) -->
+    <!-- Controller hook: loadSessionStatus -->
+    <div class="structure-telemetry-strip">
+      <div class="telemetry-session-cell">
+        <div class="telemetry-session-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </div>
+        <div class="telemetry-session-content">
+          <div class="telemetry-session-headline">
+            <span id="session-active-label" class="telemetry-session-title">Loading Session...</span>
+            <span id="session-dates-label" class="telemetry-session-dates"></span>
+            <span class="telemetry-session-badge">FULLY AUTONOMOUS • ZERO MAINTENANCE</span>
+          </div>
+          <div id="session-rollover-text" class="telemetry-rollover-desc">Calculating automatic calendar rollover...</div>
+          <span id="stat-session-term" style="display: none;">Odd Semester</span>
+        </div>
+      </div>
+
+      <div class="telemetry-kpi-group">
+        <div class="telemetry-kpi-pill">
+          <span class="telemetry-kpi-label">Departments</span>
+          <span id="stat-dept-count" class="telemetry-kpi-value">0</span>
+        </div>
+        <div class="telemetry-kpi-pill">
+          <span class="telemetry-kpi-label">HODs</span>
+          <span id="stat-hod-count" class="telemetry-kpi-value">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Departments & Programs Catalog Card -->
+    <div class="catalog-card">
+      <div class="catalog-card-header">
+        <div class="catalog-title-wrap">
+          <h2 class="catalog-title">
+            <span>Departments &amp; Programs</span>
+            <span id="catalog-count-badge" class="badge catalog-count-badge">0 Programs</span>
+          </h2>
+        </div>
+        <div class="catalog-toolbar">
+          <div class="search-input-wrap">
+            <span class="search-input-icon" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+            <input type="text" id="dept-search" class="form-control" placeholder="Search by code or name..." oninput="renderDepartments()" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <!-- Table / Mobile Cards Scroll Wrapper -->
+      <div class="table-scroll-wrapper">
+        <table class="table academic-table">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Code</th>
+              <th>Department / Program Name</th>
+              <th>Current Appointed HOD</th>
+              <th style="width: 120px; text-align: center;">Status</th>
+              <th style="width: 160px; text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dept-tbody">
+            <tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading academic catalog...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Department & Branch Edit Modal -->
+  <div id="dept-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <div>
+          <h2 id="dept-modal-title" style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Edit Department</h2>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Update institutional academic division details.</p>
+        </div>
+        <button type="button" onclick="closeDeptModal()" style="font-size: 1.4rem; background: none; border: none; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
+      </div>
+      <form id="dept-form" onsubmit="saveDepartment(event)">
+        <input type="hidden" id="dept-id">
+        <div class="form-group">
+          <label class="form-label" for="dept-code">
+            Department / Branch Code <span style="color: var(--status-absent);">*</span>
+          </label>
+          <input type="text" id="dept-code" class="form-control" placeholder="e.g. IT, CE, ME, CL, EE" required style="text-transform: uppercase; font-family: var(--font-family-mono); font-weight: 700; font-size: 1rem; letter-spacing: 1px;">
+          <span style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
+            Unique identifier used across registers and attendance.
+          </span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dept-name">
+            Department / Program Full Name <span style="color: var(--status-absent);">*</span>
+          </label>
+          <input type="text" id="dept-name" class="form-control" placeholder="e.g. Information Technology" required style="font-weight: 500;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dept-duration">Degree / Program Duration</label>
+          <select id="dept-duration" class="form-select">
+            <option value="3" selected>3 Years (Standard Diploma)</option>
+            <option value="2">2 Years (D.Pharm / Lateral Entry)</option>
+            <option value="1">1 Year (Certificate)</option>
+          </select>
+        </div>
+        <div class="form-group" id="dept-status-group" style="display: none;">
+          <label class="form-label" for="dept-status">Operational Status</label>
+          <select id="dept-status" class="form-select">
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
+          </select>
+        </div>
+        <div id="dept-modal-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); color: var(--status-absent); padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-top: 0.5rem;"></div>
+        <div style="display: flex; gap: 0.6rem; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+          <div>
+            <button type="button" id="dept-delete-btn" class="btn-danger-soft" style="display: none;" onclick="deleteCurrentDeptFromModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> <span>Delete</span>
+            </button>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeDeptModal()">Cancel</button>
+            <button type="submit" id="dept-submit-btn" class="btn btn-primary">Save Department</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom In-App Delete / Archive Confirmation Modal (Zero Native Browser Prompts) -->
+  <div id="delete-confirm-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 440px; text-align: center; padding: 1.5rem 1.25rem;">
+      <div id="delete-modal-icon" style="width: 48px; height: 48px; border-radius: 50%; background: var(--status-absent-bg); color: var(--status-absent); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 0.85rem auto; display: flex; align-items: center; justify-content: center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></div>
+      <h3 id="delete-modal-title" style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">
+        Delete Department?
+      </h3>
+      <p id="delete-modal-msg" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
+        Department: <strong id="delete-modal-dept-name" style="color: var(--text-main);"></strong>
+      </p>
+      
+      <!-- Step 1: Pre-deletion Archive notice (when not archived) -->
+      <div id="delete-modal-archive-notice" style="display: none; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; text-align: left; font-size: 0.8rem; line-height: 1.45; margin-bottom: 1rem;">
+        <div style="font-weight: 700; color: var(--status-late); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg> <span>Mandatory Pre-Deletion Archive</span>
+        </div>
+        <p style="margin: 0; color: var(--text-muted);">
+          To protect student records and prevent accidental 1-click loss, this branch must be <strong>Archived</strong> before it can be deleted. Archiving preserves attendance logs and closes active registers.
+        </p>
+      </div>
+
+      <!-- Step 2: Typed confirmation input (when already archived) -->
+      <div id="delete-modal-type-confirm" style="display: none; text-align: left; margin-bottom: 1rem;">
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 0.35rem;">
+          Type <span id="delete-modal-confirm-target" style="color: var(--status-absent); font-family: monospace; font-weight: 700;"></span> to confirm permanent deletion:
+        </label>
+        <input type="text" id="delete-modal-code-input" class="form-control" placeholder="Type department code here" oninput="handleDeleteCodeInput(this.value)" autocomplete="off" style="font-family: monospace; letter-spacing: 0.05em;">
+      </div>
+
+      <!-- Dynamic error/warning box -->
+      <div id="delete-modal-warning" style="display: none; background: var(--status-late-bg); border: 1px solid var(--status-late); color: var(--text-main); padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); font-size: 0.8rem; line-height: 1.4; text-align: left; margin-bottom: 1rem;">
+      </div>
+
+      <div style="display: flex; gap: 0.6rem; justify-content: center; margin-top: 0.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()" style="flex: 1; justify-content: center;">
+          Cancel
+        </button>
+        <button type="button" id="delete-modal-confirm-btn" class="btn-danger" onclick="executeDeleteDepartment()" style="flex: 1; justify-content: center;">
+          <span id="delete-modal-btn-icon" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span><span id="delete-modal-btn-label">Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;"></div>
+
+    
+    </div> <!-- /.admin-main-wrap -->
+  </div> <!-- /#admin-app-layout -->
+
+
+  <script src="/js/api.js?v=20261028"></script>
+  <script src="/js/auth.js?v=20261028"></script>
+  <script src="/admin/components/icons.js?v=20261029"></script>
+  <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
+  <script src="/admin/components/header/header.js?v=20261029"></script>
+  <script src="/admin/components/admin-ui.js?v=20261029"></script>
+  <script src="/admin/academic-structure/academic-structure.js?v=20261028"></script>
+</body>
+</html>

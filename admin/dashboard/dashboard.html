@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — VidyaOS Institutional Console</title>
+  <meta name="description"
+    content="Institutional Management Console — Configure academic structure, monitor real-time campus attendance, and manage faculty & students.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261029">
+  <link rel="stylesheet" href="/css/variables.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/admin/dashboard/dashboard.css?v=20261029">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+</head>
+
+<body class="admin-dashboard-page">
+  <div class="admin-app-layout" id="admin-app-layout">
+
+    <!-- Navigation & Dual-State Sidebar rendered by /admin/components/sidebar/sidebar.js -->
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- MAIN CONTENT CONTAINER (.admin-main-wrap)                      -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <div class="admin-main-wrap">
+
+      <!-- 1. TOP HEADER BAR (Clean: Only Theme Button & Round Profile Avatar) -->
+      <header class="admin-top-header" id="admin-top-header" aria-label="Admin Header Bar">
+        <div class="header-right">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn"
+            onclick="toggleDashboardTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleAdminProfileMenu(event)"
+            aria-haspopup="true" aria-expanded="false" title="System Administrator Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">SA</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Profile Dropdown Popover -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" aria-hidden="true">SA</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name">System Administrator</span>
+                <span class="dropdown-email">admin@college.edu</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/admin/profile.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/admin/settings.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>System Settings</span>
+            </a>
+            <a href="/admin/audit-logs.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>Audit Trail &amp; Logs</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 2. MAIN DASHBOARD CONTENT AREA -->
+      <main class="dashboard-container">
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- A. HERO BANNER & INSTITUTIONAL SHOWCASE                    -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section class="admin-welcome-hero" aria-label="Welcome Overview">
+          <div class="hero-left-content">
+            <h1 class="hero-title">Welcome back, <span id="admin-hero-name">System Administrator</span></h1>
+            <p class="hero-subtitle">Manage your college, monitor academic activities, track attendance, and keep
+              everything running smoothly.</p>
+
+            <div class="hero-live-badges">
+              <span class="hero-badge date-badge" id="hero-live-date">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span id="live-date-text">Thursday, 29 October 2026</span>
+              </span>
+              <span class="hero-badge time-badge" id="hero-live-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span id="live-time-text">3:55 AM</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Institutional Identity Card with Authentic Nainital Campus Photo -->
+          <div class="hero-campus-card" aria-label="Institution Profile">
+            <div class="campus-card-content">
+              <div class="campus-card-header">
+                <div class="campus-building-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
+                  </svg>
+                </div>
+                <div class="campus-card-title-group">
+                  <h2 class="campus-name">Government Polytechnic Nainital</h2>
+                  <span class="campus-motto">Knowledge &bull; Skills &bull; Better Tomorrow</span>
+                </div>
+              </div>
+              <div class="campus-quote-badge">
+                <span>&ldquo;Education creates opportunities.&rdquo;</span>
+              </div>
+            </div>
+            <div class="campus-image-wrap" aria-hidden="true">
+              <img src="/admin/dashboard/campus-nainital.jpg" alt="Government Polytechnic Nainital Campus"
+                class="campus-photo">
+              <div class="campus-photo-overlay"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- B. 3 CORE ADMINISTRATIVE KPI CARDS (Absent & Present removed) -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section class="kpi-metrics-section" aria-label="Key Performance Indicators">
+          <div class="kpi-cards-grid kpi-3-cards">
+            <!-- 1. Total Students -->
+            <article class="kpi-card card-students">
+              <div class="kpi-card-header">
+                <div class="kpi-icon-squircle icon-blue" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <span class="kpi-trend-pill trend-up">+12% &uarr;</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">Total Students</span>
+                <span class="kpi-value" id="stat-students">248</span>
+                <span class="kpi-subtext">Active enrolled students</span>
+              </div>
+            </article>
+
+            <!-- 2. Total Faculty -->
+            <article class="kpi-card card-faculty">
+              <div class="kpi-card-header">
+                <div class="kpi-icon-squircle icon-green" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <polyline points="17 11 19 13 23 9"></polyline>
+                  </svg>
+                </div>
+                <span class="kpi-trend-pill trend-up">+2% &uarr;</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">Total Faculty</span>
+                <span class="kpi-value" id="stat-teachers">18</span>
+                <span class="kpi-subtext">Teaching &amp; non-teaching staff</span>
+              </div>
+            </article>
+
+            <!-- 3. Departments -->
+            <article class="kpi-card card-departments">
+              <div class="kpi-card-header">
+                <div class="kpi-icon-squircle icon-purple" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                    <line x1="9" y1="22" x2="9" y2="22.01"></line>
+                    <line x1="15" y1="22" x2="15" y2="22.01"></line>
+                    <line x1="9" y1="6" x2="9" y2="6.01"></line>
+                    <line x1="15" y1="6" x2="15" y2="6.01"></line>
+                    <line x1="9" y1="10" x2="9" y2="10.01"></line>
+                    <line x1="15" y1="10" x2="15" y2="10.01"></line>
+                    <line x1="9" y1="14" x2="9" y2="14.01"></line>
+                    <line x1="15" y1="14" x2="15" y2="14.01"></line>
+                    <line x1="9" y1="18" x2="9" y2="18.01"></line>
+                    <line x1="15" y1="18" x2="15" y2="18.01"></line>
+                  </svg>
+                </div>
+                <span class="kpi-trend-pill trend-purple">Active</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">Departments</span>
+                <span class="kpi-value" id="stat-departments">6</span>
+                <span class="kpi-subtext">Active departments</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- C. ATTENDANCE OVERVIEW & QUICK ACTIONS (Moved Up & Side-by-Side) -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <section class="main-telemetry-actions-section" aria-label="Campus Telemetry & Quick Actions">
+          <div class="telemetry-actions-grid">
+
+            <!-- Panel 1: Today's Attendance Overview (Donut Chart + Department Bars) -->
+            <article class="dashboard-panel panel-attendance-overview">
+              <div class="panel-header">
+                <h3 class="panel-title">Today's Attendance Overview</h3>
+                <div class="panel-header-action">
+                  <select class="department-filter-select" id="overview-dept-filter" aria-label="Filter Department">
+                    <option value="ALL">All Departments</option>
+                    <option value="IT">Information Tech (IT)</option>
+                    <option value="CE">Civil Engineering (CE)</option>
+                    <option value="EE">Electrical Engineering (EE)</option>
+                    <option value="ME">Mechanical Engineering (ME)</option>
+                    <option value="EC">Electronics (EC)</option>
+                    <option value="AP">Applied Sciences (AP)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="panel-body attendance-overview-body">
+                <!-- Left Pane: Donut Metric -->
+                <div class="attendance-donut-pane">
+                  <div class="donut-chart-wrap">
+                    <div class="donut-svg-container">
+                      <svg class="donut-svg" viewBox="0 0 120 120">
+                        <!-- Base track -->
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="var(--bg-surface)" stroke-width="14"/>
+                        <!-- Absent segment (red: 21%) -->
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="var(--status-absent)" stroke-width="14" stroke-dasharray="301.6" stroke-dashoffset="63.3" transform="rotate(-90 60 60)"/>
+                        <!-- Present segment (green: 79%) -->
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="var(--status-present)" stroke-width="14" stroke-dasharray="301.6" stroke-dashoffset="63.3" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+                      </svg>
+                      <div class="donut-center-label">
+                        <span class="donut-pct">79%</span>
+                        <span class="donut-sub">Present</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="overview-total-subtext">
+                    <span>Institutional Roster</span>
+                    <span class="enrolled-count-chip">248 Enrolled</span>
+                  </div>
+                </div>
+
+                <!-- Center Hairline Divider -->
+                <div class="attendance-pane-divider" aria-hidden="true"></div>
+
+                <!-- Right Pane: Department Comparison Bar Chart (Full Space Responsive Grid) -->
+                <div class="attendance-dept-pane">
+                  <div class="dept-pane-header">
+                    <span class="dept-pane-title">Department Breakdown</span>
+                    <span class="dept-avg-badge">Campus Avg: <strong>78.7%</strong></span>
+                  </div>
+                  <div class="dept-bars-container">
+                    <div class="dept-bar-col">
+                      <span class="dept-bar-pct">82%</span>
+                      <div class="dept-bar-track">
+                        <div class="dept-bar-fill" style="height: 82%;"></div>
+                      </div>
+                      <span class="dept-bar-code">IT</span>
+                    </div>
+                    <div class="dept-bar-col">
+                      <span class="dept-bar-pct">76%</span>
+                      <div class="dept-bar-track">
+                        <div class="dept-bar-fill" style="height: 76%;"></div>
+                      </div>
+                      <span class="dept-bar-code">CE</span>
+                    </div>
+                    <div class="dept-bar-col">
+                      <span class="dept-bar-pct">80%</span>
+                      <div class="dept-bar-track">
+                        <div class="dept-bar-fill" style="height: 80%;"></div>
+                      </div>
+                      <span class="dept-bar-code">EE</span>
+                    </div>
+                    <div class="dept-bar-col">
+                      <span class="dept-bar-pct">71%</span>
+                      <div class="dept-bar-track">
+                        <div class="dept-bar-fill" style="height: 71%;"></div>
+                      </div>
+                      <span class="dept-bar-code">ME</span>
+                    </div>
+                    <div class="dept-bar-col">
+                      <span class="dept-bar-pct">85%</span>
+                      <div class="dept-bar-track">
+                        <div class="dept-bar-fill" style="height: 85%;"></div>
+                      </div>
+                      <span class="dept-bar-code">EC</span>
+                    </div>
+                    <div class="dept-bar-col">
+                      <span class="dept-bar-pct">78%</span>
+                      <div class="dept-bar-track">
+                        <div class="dept-bar-fill" style="height: 78%;"></div>
+                      </div>
+                      <span class="dept-bar-code">AP</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Panel 2: Quick Actions (Moved Up into Primary Focus) -->
+            <article class="dashboard-panel panel-quick-actions">
+              <div class="panel-header">
+                <h3 class="panel-title">Quick Actions</h3>
+                <span class="panel-badge-info">6 Direct Portals</span>
+              </div>
+
+              <div class="panel-body quick-actions-panel-body">
+                <div class="quick-actions-panel-grid">
+                  <!-- 1. Manage Students -->
+                  <a href="/admin/academic-structure.html?tab=students" class="quick-action-card">
+                    <div class="action-icon-squircle icon-blue" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Manage Students</h4>
+                      <p class="action-card-sub">Add, edit, and view student records</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 2. Manage Faculty -->
+                  <a href="/admin/faculty.html" class="quick-action-card">
+                    <div class="action-icon-squircle icon-green" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <polyline points="17 11 19 13 23 9"></polyline>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Manage Faculty</h4>
+                      <p class="action-card-sub">View faculty details and assign subjects</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 3. Mark Attendance -->
+                  <a href="/faculty/registers.html" class="quick-action-card">
+                    <div class="action-icon-squircle icon-amber" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <polyline points="9 16 12 19 19 12"></polyline>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Mark Attendance</h4>
+                      <p class="action-card-sub">Take and manage class attendance</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 4. Create Notice -->
+                  <a href="#notice" class="quick-action-card" onclick="openCreateNoticeModal(event)">
+                    <div class="action-icon-squircle icon-purple" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Create Notice</h4>
+                      <p class="action-card-sub">Publish important announcements</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 5. Schedule Event -->
+                  <a href="#event" class="quick-action-card" onclick="openScheduleEventModal(event)">
+                    <div class="action-icon-squircle icon-pink" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Schedule Event</h4>
+                      <p class="action-card-sub">Create and manage college events</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 6. View Reports -->
+                  <a href="/admin/reports.html" class="quick-action-card">
+                    <div class="action-icon-squircle icon-blue-alt" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">View Reports</h4>
+                      <p class="action-card-sub">Attendance, performance and more</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+  </div> <!-- /#admin-app-layout -->
+
+  <script src="/js/api.js?v=20261029"></script>
+  <script src="/js/auth.js?v=20261029"></script>
+  <script src="/admin/components/icons.js?v=20261029"></script>
+  <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
+  <script src="/admin/components/header/header.js?v=20261029"></script>
+  <script src="/admin/components/admin-ui.js?v=20261029"></script>
+  <script src="/admin/dashboard/dashboard.js?v=20261029"></script>
+</body>
+
+</html>

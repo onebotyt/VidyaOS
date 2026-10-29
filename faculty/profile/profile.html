@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Profile & Academic Credentials — Faculty Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261029">
+  <link rel="stylesheet" href="/css/variables.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
+
+  <link rel="stylesheet" href="/faculty/profile/profile.css?v=20261028">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+</head>
+
+<body>
+
+  <div class="faculty-app-layout" id="faculty-app-layout">
+    <div class="faculty-main-wrap">
+      <!-- Top Header Bar (Clean Admin-Parity Architecture) -->
+      <header class="faculty-top-header admin-top-header" id="faculty-header" aria-label="Faculty Header Bar">
+        <div class="header-left">
+          <span class="header-dept-pill" id="dept-header-name" style="display:none;"></span>
+        </div>
+        <div class="header-right">
+          <!-- Apps Launcher -->
+          <button type="button" class="header-icon-btn" onclick="toggleAppsLauncher(event)" id="btn-apps-launcher" title="Academic Apps &amp; Modules" aria-label="Apps Launcher">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            </svg>
+          </button>
+
+          <!-- Theme Toggle Button -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn" onclick="toggleAppTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Round User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn gc-user-avatar" id="header-user-profile" onclick="toggleUserProfile(event)" aria-haspopup="true" aria-expanded="false" title="Account Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">FA</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Apps Launcher Dropdown -->
+          <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;" role="menu"></div>
+
+          <!-- Dropdown Profile Menu -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" id="dropdown-avatar-circle" aria-hidden="true">FA</div>
+              <div class="dropdown-user-meta">
+                <span class="dropdown-full-name" id="dropdown-full-name">Faculty Member</span>
+                <span class="dropdown-email" id="dropdown-email">faculty@college.edu</span>
+                <span class="dropdown-role-pill" id="dropdown-role-pill">Faculty Member</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/faculty/profile.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/faculty/timetable.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Weekly Timetable</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 960px;">
+    <!-- HERO PROFILE HEADER -->
+    <div class="profile-hero">
+      <div class="profile-hero-content">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="hero-avatar">AV</div>
+          <div class="profile-beacon" title="Active Faculty Session"></div>
+        </div>
+
+        <div class="profile-meta" style="flex: 1;">
+          <h1 id="hero-name">Prof. Amit Verma</h1>
+          <div class="profile-subtitle">
+            <span id="hero-dept">Department of Information Technology</span>
+            <span>•</span>
+            <span id="hero-empid" style="font-family: var(--font-family-mono); font-weight: 700;">EMP-IT-001</span>
+          </div>
+
+          <div class="profile-role-chips" id="hero-badges">
+            <span class="role-chip verified"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg> Institutional Account</span>
+            <span class="role-chip subject"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg> Subject Faculty</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4-CARD TEACHING METRIC STRIP -->
+    <div class="profile-stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-title">Active Registers</div>
+        <div class="stat-card-val" id="stat-registers">—</div>
+        <div class="stat-card-sub">Teaching subjects assigned</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-title">Students in Scope</div>
+        <div class="stat-card-val" id="stat-students">—</div>
+        <div class="stat-card-sub">Enrolled cohort roster</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-title">Assigned Department</div>
+        <div class="stat-card-val" id="stat-dept" style="font-size: 1.15rem;">—</div>
+        <div class="stat-card-sub" id="stat-dept-code">Academic Unit</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-title">Google 1-Click Status</div>
+        <div class="stat-card-val" id="stat-google" style="font-size: 1.1rem; color: #16a34a;">Checking...</div>
+        <div class="stat-card-sub">Single Sign-On Security</div>
+      </div>
+    </div>
+
+    <!-- GOOGLE 1-CLICK AUTHENTICATION CARD -->
+    <div class="card" style="margin-bottom: 1.75rem; border-left: 5px solid #4285F4;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24">
+              <path fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+              <path fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+            </svg>
+            <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Google 1-Click Sign-In</h2>
+            <span id="google-status-badge" class="badge badge-late">Checking...</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; max-width: 540px;">
+            Link your institutional Google account to log into the faculty portal with a single click.
+            <strong>Google account email must match your registered institutional Gmail address.</strong>
+          </p>
+        </div>
+
+        <div>
+          <button type="button" id="btn-google-action" class="btn btn-primary btn-sm" onclick="handleGoogleLinkAction()"
+            style="display:inline-flex;align-items:center;gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <span>Connect Google Account</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEACHING COURSE ALLOCATIONS LEDGER -->
+    <div class="card" style="margin-bottom: 1.75rem; padding: 1.5rem;">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0;"><svg width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg> Academic Course Allocations</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Official teaching registers and
+            subject responsibility assignments</p>
+        </div>
+        <a href="/faculty/registers.html" class="btn btn-secondary btn-sm" style="font-size: 0.78rem;">Open Digital
+          Registers <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg></a>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="table" style="font-size: 0.85rem;">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Role / Scope</th>
+              <th>Subject / Course</th>
+              <th>Department / Program</th>
+              <th style="text-align: center; width: 100px;">Term</th>
+              <th style="text-align: center; width: 110px;">Type</th>
+            </tr>
+          </thead>
+          <tbody id="assignments-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading teaching
+                allocations...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EDITABLE INSTRUCTOR DETAILS -->
+    <div class="card" style="margin-bottom: 1.75rem; padding: 2rem;">
+      <h2
+        style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg> Instructor Details
+      </h2>
+
+      <form id="profile-form">
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label">Employee ID</label>
+            <input type="text" id="prof-empid" class="form-control" readonly
+              style="background: var(--bg-surface); font-family: var(--font-family-mono); font-weight: 700;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prof-name">Full Name</label>
+            <input type="text" id="prof-name" class="form-control" required style="font-weight: 600;">
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label" for="prof-email">Institutional Gmail (Login ID)</label>
+            <input type="email" id="prof-email" class="form-control" required>
+            <span style="font-size: 0.75rem; color: var(--status-absent); display: block; margin-top: 0.25rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                </path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg> Changing this email resets Google 1-click single sign-on connection.
+            </span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prof-phone">Phone Number</label>
+            <input type="tel" id="prof-phone" class="form-control" placeholder="+91 98765 43210">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+          <button type="submit" id="save-prof-btn" class="btn btn-primary" style="font-weight: 700;">Update
+            Profile</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- CHANGE PASSWORD FORM WITH TOGGLE -->
+    <div class="card" style="padding: 2rem;">
+      <h2
+        style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg> Security & Password Management
+      </h2>
+
+      <form id="password-form">
+        <div class="form-group">
+          <label class="form-label" for="pass-current">Current Password</label>
+          <div class="password-wrap">
+            <input type="password" id="pass-current" class="form-control" required placeholder="••••••••">
+            <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('pass-current', this)"
+              aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg></button>
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="form-group">
+            <label class="form-label" for="pass-new">New Password (min 8 chars)</label>
+            <div class="password-wrap">
+              <input type="password" id="pass-new" class="form-control" required minlength="8" placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('pass-new', this)"
+                aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg></button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pass-confirm">Confirm New Password</label>
+            <div class="password-wrap">
+              <input type="password" id="pass-confirm" class="form-control" required minlength="8"
+                placeholder="••••••••">
+              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('pass-confirm', this)"
+                aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg></button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+          <button type="submit" id="save-pass-btn" class="btn btn-secondary" style="font-weight: 700;">Update
+            Password</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+      </div>
+  </div>
+
+  <script src="/js/api.js?v=20261029"></script>
+  <script src="/js/auth.js?v=20261029"></script>
+  <script src="/faculty/components/icons.js?v=20261029"></script>
+  <script src="/faculty/components/faculty-ui.js?v=20261029"></script>
+  <script src="/faculty/components/header/header.js?v=20261029"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
+
+  <!-- OFFICIAL GOOGLE SIGN-IN CARD MODAL -->
+  <div id="google-signin-modal" class="google-modal-overlay" style="display: none;"
+    onclick="if(event.target===this)closeGoogleCard()">
+    <div class="google-card" role="dialog" aria-labelledby="google-modal-title">
+      <button type="button" class="google-card-close" onclick="closeGoogleCard()"
+        aria-label="Close Google link dialog"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg></button>
+
+      <div class="google-card-header">
+        <div class="google-logo-icon">
+          <svg viewBox="0 0 48 48" width="32" height="32">
+            <path fill="#EA4335"
+              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+            <path fill="#4285F4"
+              d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+            <path fill="#FBBC05"
+              d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z" />
+            <path fill="#34A853"
+              d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+          </svg>
+        </div>
+        <h2 id="google-modal-title" class="google-card-title">Connect Google Account</h2>
+        <div id="google-modal-subtitle" class="google-card-subtitle">Choose your Google account to link</div>
+        <div class="google-card-app">to your College Faculty profile</div>
+      </div>
+
+      <div id="google-card-error" class="google-card-alert"></div>
+
+      <div id="google-accounts-view">
+        <ul id="google-account-list" class="google-account-list"></ul>
+
+        <div class="google-use-another" onclick="showGoogleEmailInput()">
+          <span style="display:inline-flex;align-items:center;color:var(--text-muted);"><svg width="14" height="14"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg></span>
+          <span>Use another account</span>
+        </div>
+      </div>
+
+      <div id="google-input-view" style="display: none;" class="google-card-input-panel">
+        <div style="font-size: 0.875rem; margin-bottom: 0.5rem; color: #202124; font-weight: 500;">
+          Enter Google account email:
+        </div>
+        <input type="email" id="google-manual-email" class="google-input-field" placeholder="Email or phone">
+
+        <div class="google-card-actions">
+          <button type="button" class="google-btn-text" onclick="showGoogleAccountList()">Back</button>
+          <button type="button" class="google-btn-blue" onclick="submitProfileGoogleEmail()">Link Account</button>
+        </div>
+      </div>
+
+      <div id="google-loading-view" style="display: none; padding: 2.5rem; text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 0.75rem; display: inline-block;"><svg width="14" height="14"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg></div>
+        <div style="font-size: 0.95rem; font-weight: 500; color: #202124;">Connecting Google Account...</div>
+        <div style="font-size: 0.8rem; color: #5f6368; margin-top: 0.25rem;">Verifying email identity with database
+        </div>
+      </div>
+
+      <div class="google-card-footer">
+        Google will confirm your email identity to enable 1-click login for College Attendance System.
+      </div>
+    </div>
+  </div>
+  <script src="/faculty/profile/profile.js?v=20261028"></script>
+</body>
+
+</html>

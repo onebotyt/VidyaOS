@@ -1,327 +1,837 @@
-/* ══════════════════════════════════════════════════════════════
-   PAGE STYLES: LEAVE-APPROVALS
-   frontend/faculty/leave-approvals/leave-approvals.css
-══════════════════════════════════════════════════════════════ */
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS FACULTY LEAVE REQUESTS STYLES (leave-approvals.css)
+ * Location: /frontend/faculty/leave-approvals/leave-approvals.css
+ * 
+ * 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * Modern, responsive institutional design matching executive mockup:
+ * - Breadcrumb navigation
+ * - Gradient Hero banner with vector graphic & Department Card
+ * - Segmented filter tabs with live counters
+ * - Instant search and filter toolbar
+ * - Rich student table with colored avatars, category pills, & action buttons
+ * - Pagination footer
+ * ══════════════════════════════════════════════════════════════
+ */
 
-.filter-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
-    .filter-tab {
-      padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid var(--border-color);
-      background: var(--bg-card); cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
-    }
-    .filter-tab.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
-    .leave-card {
-      display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
-      padding: 1.1rem 1.3rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg);
-      background: var(--bg-card); margin-bottom: 0.85rem; flex-wrap: wrap;
-    }
-    .leave-name { font-weight: 700; font-size: 1rem; }
-    .leave-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; }
-    .leave-reason { font-size: 0.9rem; margin-top: 0.5rem; }
-    .leave-actions { display: flex; gap: 0.5rem; }
-    .status-pill {
-      font-size: 0.72rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 999px;
-    }
-    .status-pill.PENDING { background: var(--status-pending-bg); color: var(--status-pending); }
-    .status-pill.APPROVED { background: var(--status-present-bg); color: var(--status-present); }
-    .status-pill.REJECTED { background: var(--status-absent-bg); color: var(--status-absent); }
+/* ── 1. Page Container ── */
+.leave-page-container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 1.5rem 1.75rem 3rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
 
-/* Universal Google Classroom Top Nav & Drawer Invariants (Zero-FOUC) */
-    .gc-navbar {
-      height: 64px;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 1.25rem;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: var(--shadow-xs, var(--shadow-sm));
-      box-sizing: border-box;
-    }
-    .gc-nav-left {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      min-width: 0;
-    }
-    .gc-menu-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: var(--text-main);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      transition: background 0.15s ease;
-      flex-shrink: 0;
-    }
-    .gc-menu-btn:hover {
-      background: var(--bg-surface-hover, var(--bg-surface));
-    }
-    .gc-brand-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.65rem;
-      text-decoration: none;
-      color: var(--text-main);
-      flex-shrink: 0;
-    }
-    .gc-brand-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, hsl(142, 70%, 35%) 0%, hsl(160, 75%, 42%) 100%);
-      color: var(--text-white, hsl(0, 0%, 100%));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.35rem;
-      box-shadow: var(--shadow-sm);
-      flex-shrink: 0;
-    }
-    .gc-brand-title {
-      font-size: 1.28rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-main);
-      white-space: nowrap;
-    }
-    .gc-brand-sub {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin-left: 0.2rem;
-      padding: 0.15rem 0.45rem;
-      border-radius: 999px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      white-space: nowrap;
-    }
-    .gc-page-badge {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--color-primary);
-      background: var(--color-primary-light, var(--bg-surface));
-      padding: 0.25rem 0.65rem;
-      border-radius: 999px;
-      border: 1px solid var(--border-color);
-      margin-left: 0.5rem;
-      white-space: nowrap;
-    }
-    .gc-nav-right {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      position: relative;
-      flex-shrink: 0;
-    }
-    .gc-icon-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: var(--text-main);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.15rem;
-      transition: background 0.15s ease;
-      flex-shrink: 0;
-    }
-    .gc-icon-btn:hover {
-      background: var(--bg-surface-hover, var(--bg-surface));
-    }
-    .gc-create-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      background: var(--color-primary);
-      color: var(--text-white, hsl(0, 0%, 100%));
-      border: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-      text-decoration: none;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-    .gc-create-btn:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
-    .gc-user-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: var(--color-primary);
-      color: var(--text-white, hsl(0, 0%, 100%));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: 2px solid var(--border-color);
-      transition: transform 0.15s;
-      flex-shrink: 0;
-    }
-    .gc-user-avatar:hover {
-      transform: scale(1.05);
-    }
-    .apps-launcher-dropdown {
-      position: absolute;
-      top: 54px;
-      right: 48px;
-      width: 310px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 1rem;
-      box-shadow: var(--shadow-lg);
-      display: none;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.65rem;
-      z-index: 1010;
-      max-height: 460px;
-      overflow-y: auto;
-      box-sizing: border-box;
-    }
-    .apps-launcher-dropdown.open {
-      display: grid !important;
-    }
-    .app-tile {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.65rem 0.25rem;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      color: var(--text-main);
-      font-size: 0.74rem;
-      font-weight: 600;
-      text-align: center;
-      transition: background 0.15s ease, color 0.15s ease;
-    }
-    .app-tile:hover {
-      background: var(--bg-surface);
-      color: var(--color-primary);
-    }
-    .app-tile-icon {
-      font-size: 1.5rem;
-      line-height: 1;
-    }
-    .user-profile-popover {
-      position: absolute;
-      top: 54px;
-      right: 0;
-      width: 270px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem;
-      box-shadow: var(--shadow-lg);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      z-index: 1010;
-      box-sizing: border-box;
-    }
-    .user-profile-popover.open {
-      display: flex !important;
-    }
-    .gc-drawer-backdrop {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-overlay, hsla(0, 0%, 0%, 0.45));
-      z-index: 9990;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .gc-drawer-backdrop.open,
-    .gc-drawer-backdrop.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .gc-drawer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 290px;
-      background: var(--bg-card);
-      border-right: 1px solid var(--border-color);
-      z-index: 9995;
-      transform: translateX(-100%);
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow-lg);
-      box-sizing: border-box;
-    }
-    .gc-drawer.open,
-    .gc-drawer.sidebar-open {
-      transform: translateX(0);
-    }
-    .gc-drawer-header {
-      height: 64px;
-      padding: 0 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      border-bottom: 1px solid var(--border-color);
-      box-sizing: border-box;
-    }
-    .gc-drawer-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0.75rem 0;
-    }
-    .gc-drawer-link {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-      padding: 0.7rem 1.5rem;
-      color: var(--text-main);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border-radius: 0 999px 999px 0;
-      margin-right: 0.75rem;
-      transition: all 0.15s ease;
-    }
-    .gc-drawer-link:hover {
-      background: var(--bg-surface);
-      color: var(--color-primary);
-    }
-    .gc-drawer-link.active {
-      background: var(--color-primary-light, var(--bg-surface));
-      color: var(--color-primary);
-    }
-    .gc-drawer-divider {
-      height: 1px;
-      background: var(--border-color);
-      margin: 0.6rem 0;
-    }
-    .gc-drawer-sec-title {
-      padding: 0.6rem 1.5rem 0.35rem;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-    }
+@media (max-width: 768px) {
+  .leave-page-container {
+    padding: 1rem 1rem 2rem;
+    gap: 1rem;
+  }
+}
 
+/* ── 2. Breadcrumbs ── */
+.leave-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.leave-crumb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.16s ease;
+}
+
+.leave-crumb-link:hover {
+  opacity: 0.85;
+}
+
+.leave-home-icon {
+  color: var(--color-primary);
+}
+
+.leave-crumb-sep {
+  color: var(--border-color);
+  font-size: 0.9rem;
+}
+
+.leave-crumb-muted {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.leave-crumb-current {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* ── 3. Hero Card Banner ── */
+.leave-hero-banner {
+  background: linear-gradient(135deg, hsl(210 100% 97%), hsl(215 90% 98%));
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px hsl(217 91% 60% / 0.05);
+  gap: 1.5rem;
+}
+
+[data-theme='dark'] .leave-hero-banner {
+  background: linear-gradient(135deg, hsl(220 30% 15%), hsl(220 25% 12%));
+  border-color: hsl(220 20% 24%);
+}
+
+.leave-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-width: 480px;
+  z-index: 2;
+}
+
+.leave-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.leave-hero-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.leave-hero-subtitle {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Center Vector Illustration Graphic */
+.leave-hero-graphic {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.85;
+  z-index: 1;
+}
+
+[data-theme='dark'] .leave-hero-graphic {
+  opacity: 0.35;
+}
+
+/* Right Floating Department Card */
+.leave-dept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  box-shadow: 0 4px 14px hsl(0 0% 0% / 0.06);
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.leave-dept-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.leave-dept-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.leave-dept-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.leave-dept-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.leave-dept-meta {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+@media (max-width: 900px) {
+  .leave-hero-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .leave-hero-graphic {
+    display: none;
+  }
+  .leave-dept-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* ── 4. Segmented Filter Tabs & Search Controls Bar ── */
+.leave-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.leave-tabs-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.leave-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px hsl(0 0% 0% / 0.04);
+}
+
+.leave-tab-btn:hover:not(.active) {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  border-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.leave-tab-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  box-shadow: 0 4px 14px hsl(217 91% 60% / 0.35);
+}
+
+.leave-tab-btn.active svg {
+  stroke: var(--text-white, hsl(0 0% 100%)) !important;
+}
+
+.leave-tab-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.leave-tab-btn.active .leave-tab-counter {
+  background: var(--text-white, hsl(0 0% 100%));
+  color: var(--color-primary);
+}
+
+.tab-icon-check {
+  color: var(--status-present, hsl(142 71% 45%));
+}
+
+.tab-icon-cross {
+  color: var(--status-absent, hsl(0 84% 60%));
+}
+
+.leave-search-filter-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.leave-search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.leave-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.leave-search-input {
+  width: 260px;
+  height: 40px;
+  padding: 0 1rem 0 2.4rem;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.86rem;
+  outline: none;
+  transition: all 0.18s ease;
+  box-sizing: border-box;
+}
+
+.leave-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px hsl(217 91% 60% / 0.15);
+}
+
+.leave-filter-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 40px;
+  padding: 0 1rem;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.leave-filter-action-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
+  border-color: var(--color-primary-light);
+}
+
+@media (max-width: 768px) {
+  .leave-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .leave-search-filter-cluster {
+    width: 100%;
+  }
+  .leave-search-field {
+    flex: 1;
+  }
+  .leave-search-input {
+    width: 100%;
+  }
+}
+
+/* ── 5. Leave Applications Table Card ── */
+.leave-table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 2px 10px hsl(0 0% 0% / 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.leave-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.leave-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.leave-data-table thead tr {
+  background: var(--table-th-bg, var(--bg-surface));
+  border-bottom: 1px solid var(--border-color);
+}
+
+.leave-data-table th {
+  padding: 0.85rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.leave-data-table tbody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.14s ease;
+}
+
+.leave-data-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.leave-data-table tbody tr:hover {
+  background: var(--table-hover, var(--bg-surface-hover, hsl(210 50% 98%)));
+}
+
+[data-theme='dark'] .leave-data-table tbody tr:hover {
+  background: hsl(220 20% 16%);
+}
+
+.leave-data-table td {
+  padding: 1rem 1rem;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+/* Table Column Widths & Alignments */
+.th-cb, .td-cb {
+  width: 44px;
+  text-align: center;
+  padding-left: 1.25rem !important;
+}
+
+.th-days, .td-days {
+  text-align: center;
+  font-weight: 700;
+}
+
+.th-actions, .td-actions {
+  text-align: right;
+  padding-right: 1.25rem !important;
+  white-space: nowrap;
+}
+
+/* Student Cell with Round Avatar & Meta */
+.student-cell-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.student-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Avatar soft color variants */
+.avatar-blue {
+  background: hsl(215 90% 93%);
+  color: hsl(217 91% 45%);
+}
+
+.avatar-pink {
+  background: hsl(300 70% 94%);
+  color: hsl(300 70% 45%);
+}
+
+.avatar-green {
+  background: hsl(142 70% 92%);
+  color: hsl(142 70% 30%);
+}
+
+.avatar-orange {
+  background: hsl(35 90% 92%);
+  color: hsl(30 85% 40%);
+}
+
+.student-cell-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.student-name-text {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+}
+
+.student-roll-text {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
+}
+
+/* Class / Semester Cell */
+.class-cell-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.class-sem-text {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.class-sec-text {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+/* Leave Category / Type Pills */
+.leave-type-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.type-medical {
+  background: hsl(0 85% 95%);
+  color: hsl(0 75% 50%);
+}
+
+.type-personal {
+  background: hsl(270 85% 96%);
+  color: hsl(270 70% 55%);
+}
+
+.type-emergency {
+  background: hsl(38 95% 93%);
+  color: hsl(32 90% 40%);
+}
+
+.type-academic {
+  background: hsl(215 90% 94%);
+  color: hsl(217 91% 45%);
+}
+
+/* Dates Cell */
+.date-range-wrap {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.84rem;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.date-from-text {
+  font-weight: 600;
+}
+
+.date-to-text {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 1px;
+}
+
+/* Reason Cell */
+.reason-text {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+/* Status Badges */
+.leave-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-badge-pending {
+  background: hsl(210 100% 95%);
+  color: hsl(217 91% 55%);
+}
+
+.status-badge-approved {
+  background: hsl(142 75% 94%);
+  color: hsl(142 70% 35%);
+}
+
+.status-badge-rejected {
+  background: hsl(0 85% 95%);
+  color: hsl(0 75% 45%);
+}
+
+/* Action Square Buttons */
+.leave-action-buttons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.leave-btn-approve,
+.leave-btn-reject {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  padding: 0;
+}
+
+.leave-btn-approve {
+  background: var(--status-present-bg, hsl(142 75% 94%));
+  color: var(--status-present, hsl(142 71% 45%));
+}
+
+.leave-btn-approve:hover {
+  background: var(--status-present, hsl(142 71% 45%));
+  color: var(--text-white, hsl(0 0% 100%));
+  transform: scale(1.08);
+}
+
+.leave-btn-reject {
+  background: var(--status-absent-bg, hsl(0 85% 95%));
+  color: var(--status-absent, hsl(0 84% 60%));
+}
+
+.leave-btn-reject:hover {
+  background: var(--status-absent, hsl(0 84% 60%));
+  color: var(--text-white, hsl(0 0% 100%));
+  transform: scale(1.08);
+}
+
+.leave-reviewed-tag {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Loading & Empty State Cell */
+.leave-loading-cell,
+.leave-empty-cell {
+  text-align: center;
+  padding: 3.5rem 1rem !important;
+  color: var(--text-muted);
+}
+
+.leave-spinner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.leave-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: leaveSpin 0.75s infinite linear;
+}
+
+@keyframes leaveSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── 6. Table Card Footer (Counter & Pagination) ── */
+.leave-card-footer {
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leave-counter-label {
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.leave-pagination-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.leave-page-nav-btn,
+.leave-page-num-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.leave-page-nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.leave-page-num-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+}
+
+/* ── 7. Rejection Note Modal ── */
+.leave-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: hsl(0 0% 0% / 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.leave-modal-dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 16px 40px hsl(0 0% 0% / 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.leave-modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leave-modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.leave-modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.leave-modal-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.leave-modal-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.leave-modal-textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  padding: 0.65rem;
+  font-family: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.leave-modal-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px hsl(217 91% 60% / 0.15);
+}
+
+.leave-modal-footer {
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  background: var(--bg-surface);
+}

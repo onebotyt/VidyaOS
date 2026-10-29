@@ -1,0 +1,264 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS ADMIN TOP HEADER STYLES (header.css)
+ * Location: /frontend/admin/components/header/header.css
+ * 
+ * 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * Functional, clean institutional top bar with context indicators
+ * ══════════════════════════════════════════════════════════════
+ */
+
+.admin-top-header {
+  height: 60px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Clean, right-aligned toolbar */
+  padding: 0 1.75rem;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 10;
+  user-select: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .admin-top-header {
+    display: none !important;
+    /* Mobile uses .mobile-top-header */
+  }
+}
+
+/* ── Right Section: Theme Toggle & Round Profile Avatar ── */
+.header-right {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  margin-left: auto !important;
+  gap: 0.85rem;
+  position: relative;
+}
+
+.header-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  transition: all 0.18s ease;
+}
+
+.header-icon-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
+  border-color: var(--color-primary-light);
+  transform: translateY(-1px);
+}
+
+/* ── Round User Profile Avatar Trigger ── */
+.header-profile-round-btn {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--text-white, hsl(0 0% 100%));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  outline: none;
+  box-shadow: 0 2px 8px hsl(217 91% 60% / 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.header-profile-round-btn:hover,
+.header-profile-round-btn[aria-expanded="true"] {
+  border-color: var(--color-primary);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 14px hsl(217 91% 60% / 0.4);
+}
+
+.user-avatar-initials {
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--text-white, hsl(0 0% 100%));
+  user-select: none;
+}
+
+.avatar-online-dot {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--status-present);
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 0 0 1px hsl(0 0% 0% / 0.1);
+}
+
+/* ── Rich Profile Dropdown Menu ── */
+.header-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px hsl(0 0% 0% / 0.14);
+  padding: 0.6rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 1000;
+  animation: dropdownSlideIn 0.16s ease forwards;
+}
+
+/* Invisible bridge so mouse moving from button to dropdown never loses hover */
+.header-profile-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -14px;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: transparent;
+}
+
+/* Appear on hover over avatar button, on hover over dropdown card, or when .open */
+.header-profile-round-btn:hover ~ .header-profile-dropdown,
+.header-profile-dropdown:hover,
+.header-profile-dropdown.open {
+  display: flex !important;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-dropdown-user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--bg-surface);
+  border-radius: 10px;
+}
+
+.dropdown-avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dropdown-user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.dropdown-full-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-email {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.35rem 0;
+}
+
+.profile-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-decoration: none;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.profile-dropdown-item svg {
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.profile-dropdown-item:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
+}
+
+.profile-dropdown-item:hover svg {
+  color: var(--color-primary);
+}
+
+.profile-dropdown-item.dropdown-logout-btn {
+  color: var(--status-absent);
+}
+
+.profile-dropdown-item.dropdown-logout-btn svg {
+  color: var(--status-absent);
+}
+
+.profile-dropdown-item.dropdown-logout-btn:hover {
+  background: var(--status-absent-bg);
+}
