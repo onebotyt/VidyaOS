@@ -7,15 +7,15 @@
 
 /* ── Redirect if already logged in ── */
   (function checkExistingSession() {
-    const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token') || sessionStorage.getItem('authToken');
+    const token = localStorage.getItem('access_token') || localStorage.getItem('authToken') || localStorage.getItem('auth_token') || sessionStorage.getItem('authToken');
     if (!token) return;
     try {
-      const u = JSON.parse(localStorage.getItem('currentUser') || localStorage.getItem('auth_user') || 'null');
+      const u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('currentUser') || localStorage.getItem('auth_user') || 'null');
       if (!u) return;
       const roles = u.roles || [];
-      if (roles.includes('SYSTEM_ADMIN'))  { window.location.replace('/admin/dashboard.html');     return; }
-      if (roles.includes('STUDENT'))       { window.location.replace('/student/dashboard.html');   return; }
-      window.location.replace('/faculty/dashboard.html');
+      if (roles.includes('SYSTEM_ADMIN'))  { window.location.replace('/admin/dashboard');     return; }
+      if (roles.includes('STUDENT'))       { window.location.replace('/student/dashboard');   return; }
+      window.location.replace('/faculty/dashboard');
     } catch (_) {}
   })();
 
@@ -165,9 +165,9 @@
   /* ── Post-login redirect ── */
   function redirectAfterLogin(user) {
     const roles = user.roles || [];
-    if (roles.includes('SYSTEM_ADMIN'))  { window.location.href = '/admin/dashboard.html';   return; }
-    if (roles.includes('STUDENT'))       { window.location.href = '/student/dashboard.html'; return; }
-    window.location.href = '/faculty/dashboard.html';
+    if (roles.includes('SYSTEM_ADMIN'))  { window.location.href = '/admin/dashboard';   return; }
+    if (roles.includes('STUDENT'))       { window.location.href = '/student/dashboard'; return; }
+    window.location.href = '/faculty/dashboard';
   }
 
   /* ── Form reset helper ── */

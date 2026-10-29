@@ -41,6 +41,10 @@ if (typeof window !== 'undefined') {
 function setAuthSession(token, user) {
   localStorage.setItem('access_token', token);
   localStorage.setItem('user', JSON.stringify(user));
+  try {
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  } catch (_) { }
 }
 if (typeof window !== 'undefined') {
   window.setAuthSession = setAuthSession;
@@ -259,11 +263,11 @@ function guardRoute(options = []) {
         showToast('Access Denied: You do not have permission to view this portal.', 'error');
       }
       if (user.roles?.includes('STUDENT')) {
-        window.location.href = '/student/dashboard.html';
+        window.location.href = '/student/dashboard';
       } else if (user.roles?.includes('TEACHER')) {
-        window.location.href = '/faculty/dashboard.html';
+        window.location.href = '/faculty/dashboard';
       } else if (user.roles?.includes('SYSTEM_ADMIN')) {
-        window.location.href = '/admin/dashboard.html';
+        window.location.href = '/admin/dashboard';
       } else {
         window.location.href = '/index.html';
       }
@@ -279,7 +283,7 @@ function guardRoute(options = []) {
           sessionStorage.setItem('flash_toast', JSON.stringify({ message: 'Access Denied: Head of Department (HOD) authorization required.', type: 'error' }));
         }
       } catch (_) { }
-      window.location.href = '/faculty/dashboard.html';
+      window.location.href = '/faculty/dashboard';
       return false;
     }
   }
@@ -293,7 +297,7 @@ function guardRoute(options = []) {
           sessionStorage.setItem('flash_toast', JSON.stringify({ message: 'Access Denied: Department faculty authorization required.', type: 'error' }));
         }
       } catch (_) { }
-      window.location.href = '/faculty/dashboard.html';
+      window.location.href = '/faculty/dashboard';
       return false;
     }
   }
@@ -306,7 +310,7 @@ function guardRoute(options = []) {
           sessionStorage.setItem('flash_toast', JSON.stringify({ message: 'No subjects have been assigned to you yet.', type: 'info' }));
         }
       } catch (_) { }
-      window.location.href = '/faculty/dashboard.html';
+      window.location.href = '/faculty/dashboard';
       return false;
     }
   }
@@ -319,7 +323,7 @@ function guardRoute(options = []) {
           sessionStorage.setItem('flash_toast', JSON.stringify({ message: 'Access Denied: Common Faculty Manager authorization required.', type: 'error' }));
         }
       } catch (_) { }
-      window.location.href = '/faculty/dashboard.html';
+      window.location.href = '/faculty/dashboard';
       return false;
     }
   }
