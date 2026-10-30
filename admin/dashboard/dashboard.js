@@ -18,7 +18,7 @@ if (typeof guardRoute === 'function') {
 }
 
 /**
- * 2. Live Dynamic Clock & Calendar Formatter (from Image 3)
+ * 2. Live Dynamic Clock & Calendar Formatter (Matching Mobile Reference: Fri, 30 Oct 2026 | 6:52 PM)
  */
 function startLiveDateTime() {
   const elDate = document.getElementById('live-date-text');
@@ -27,11 +27,11 @@ function startLiveDateTime() {
   function update() {
     const now = new Date();
 
-    // Format: Tuesday, 28 October 2026
-    const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    // Format: Fri, 30 Oct 2026
+    const optionsDate = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
     const dateStr = now.toLocaleDateString('en-GB', optionsDate);
 
-    // Format: 12:15 PM
+    // Format: 6:52 PM
     const optionsTime = { hour: 'numeric', minute: '2-digit', hour12: true };
     const timeStr = now.toLocaleTimeString('en-US', optionsTime);
 
@@ -40,7 +40,7 @@ function startLiveDateTime() {
   }
 
   update();
-  setInterval(update, 30000); // Update every 30s
+  setInterval(update, 1000); // 1-second dynamic clock
 }
 
 let adminStatsData = null;
@@ -92,24 +92,44 @@ function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
   const presentCircle = document.getElementById('donut-present-circle');
   const absentCircle = document.getElementById('donut-absent-circle');
   const campusAvgBadge = document.getElementById('campus-avg-badge');
+  const mobileFraction = document.getElementById('mobile-att-fraction');
+  const mobileProgress = document.getElementById('mobile-att-progressbar-fill');
 
   let pct = 0;
   let hasRecords = false;
+  let presentCount = 0;
+  let denomCount = 0;
+
+  const totalStudents = Number(d.total_enrolled_students ?? d.total_students ?? 0);
 
   if (filterDeptCode === 'ALL') {
     const att = d.today_attendance || {};
     hasRecords = Boolean(att.has_records && att.total_records > 0);
     pct = hasRecords ? Math.round(att.attendance_pct) : 0;
+    presentCount = Number(att.present_count ?? att.present ?? 0);
+    denomCount = Number(att.total_records ?? totalStudents);
   } else {
     const dept = (d.department_breakdown || []).find(x => x.code === filterDeptCode);
     if (dept && dept.total_records > 0) {
       hasRecords = true;
       pct = Math.round(dept.attendance_pct);
+      presentCount = Number(dept.present_count ?? 0);
+      denomCount = Number(dept.total_records ?? dept.student_count ?? 0);
+    } else if (dept) {
+      denomCount = Number(dept.student_count ?? 0);
     }
   }
 
   if (donutPct) {
     donutPct.innerText = hasRecords ? `${pct}%` : '0%';
+  }
+
+  if (mobileFraction) {
+    mobileFraction.innerText = `${presentCount} / ${denomCount}`;
+  }
+
+  if (mobileProgress) {
+    mobileProgress.style.width = `${pct}%`;
   }
 
   const circumference = 301.6;
@@ -203,7 +223,7 @@ function populateUserIdentity() {
   const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
   if (!user) return;
 
-  const displayName = user.full_name || user.name || user.username || 'Admin';
+  const displayName = user.full_name || user.name || user.username || 'System Administrator';
 
   const elHero = document.getElementById('admin-hero-name');
   if (elHero) elHero.textContent = displayName;
@@ -212,13 +232,15 @@ function populateUserIdentity() {
   if (elHeaderName) elHeaderName.textContent = displayName;
 
   const elInitials = document.getElementById('header-user-initials');
-  if (elInitials) {
-    const parts = displayName.trim().split(/\s+/);
-    const initials = parts.length >= 2
-      ? (parts[0][0] + parts[1][0]).toUpperCase()
-      : displayName.slice(0, 2).toUpperCase();
-    elInitials.textContent = initials || 'SA';
-  }
+  const elMobileInitials = document.getElementById('mobile-user-initials');
+
+  const parts = displayName.trim().split(/\s+/);
+  const initials = parts.length >= 2
+    ? (parts[0][0] + parts[1][0]).toUpperCase()
+    : displayName.slice(0, 2).toUpperCase();
+
+  if (elInitials) elInitials.textContent = initials || 'SA';
+  if (elMobileInitials) elMobileInitials.textContent = initials ? initials[0] : 'A';
 }
 
 /**

@@ -238,16 +238,17 @@
       const bellSvg = getIcon('bell', { width: 18, height: 18, stroke: 2 });
 
       const mobileHeaderHtml = `
-        <header class="mobile-top-header" id="mobile-top-header">
+        <header class="mobile-top-header" id="mobile-top-header" aria-label="Mobile App Header">
           <div class="mobile-header-left">
             <button type="button" class="mobile-hamburger-btn" id="mobile-sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Open Navigation Menu">
               ${menuSvg}
             </button>
-          </div>
-          <div class="mobile-header-center">
-            <a href="/admin/dashboard.html" class="mobile-brand-link">
+            <a href="/admin/dashboard.html" class="mobile-brand-block">
               <span class="mobile-brand-icon">${instSvg}</span>
-              <span class="mobile-brand-text">VidyaOS</span>
+              <div class="mobile-brand-meta">
+                <span class="mobile-brand-name"><span class="brand-vidya">Vidya</span><span class="brand-os">OS</span></span>
+                <span class="mobile-brand-sub">UBTER Nainital</span>
+              </div>
             </a>
           </div>
           <div class="mobile-header-right">
@@ -255,6 +256,10 @@
               ${bellSvg}
               <span class="mobile-bell-badge">1</span>
             </button>
+            <a href="/admin/profile.html" class="mobile-user-avatar-btn" id="mobile-user-profile" aria-label="Admin Profile">
+              <span class="mobile-avatar-initials" id="mobile-user-initials">A</span>
+              <span class="avatar-online-dot"></span>
+            </a>
           </div>
         </header>
       `;

@@ -101,7 +101,7 @@ if (typeof guardRoute === 'function') {
   window.removeProfilePhoto = function () {
     try {
       localStorage.removeItem('vidya_admin_avatar');
-    } catch (_) {}
+    } catch (_) { }
 
     const fileInput = document.getElementById('profile-photo-input');
     if (fileInput) fileInput.value = '';
@@ -223,7 +223,7 @@ if (typeof guardRoute === 'function') {
 
     try {
       localStorage.setItem('vidya_admin_google_linked', nextState ? 'true' : 'false');
-    } catch (_) {}
+    } catch (_) { }
 
     renderGoogleStatus(nextState);
 
@@ -255,7 +255,7 @@ if (typeof guardRoute === 'function') {
     if (!user) {
       try {
         user = JSON.parse(localStorage.getItem('user') || 'null');
-      } catch (_) {}
+      } catch (_) { }
     }
 
     if (!user) {
@@ -294,7 +294,7 @@ if (typeof guardRoute === 'function') {
     let savedPhoto = null;
     try {
       savedPhoto = localStorage.getItem('vidya_admin_avatar');
-    } catch (_) {}
+    } catch (_) { }
     applyAvatarDisplay(savedPhoto, initial);
 
     // Render Google Linking Status
@@ -376,7 +376,7 @@ if (typeof guardRoute === 'function') {
               u.username = username;
               u.email = email;
               localStorage.setItem('user', JSON.stringify(u));
-            } catch (_) {}
+            } catch (_) { }
           }
 
           renderAdminProfile(currentAdminUser || { username, email });
@@ -480,7 +480,7 @@ if (typeof guardRoute === 'function') {
           const isEnv = Boolean(admin.is_env_admin);
           const name = admin.full_name || 'System Administrator';
           const empId = admin.employee_id ? `<span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-family-mono); margin-left: 0.4rem;">(${admin.employee_id})</span>` : '';
-          
+
           let sourceBadge = '';
           if (isEnv) {
             sourceBadge = `<span class="admin-badge admin-badge-env" title="Synchronized from Render ADMIN_EMAIL environment variable">Render Env Bootstrap</span>`;

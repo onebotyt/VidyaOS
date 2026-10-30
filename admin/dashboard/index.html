@@ -40,7 +40,44 @@
     <!-- ══════════════════════════════════════════════════════════════ -->
     <div class="admin-main-wrap">
 
-      <!-- 1. TOP HEADER BAR (Clean: Only Theme Button & Round Profile Avatar) -->
+      <!-- 0. TOP MOBILE APP BAR (Appears on <= 768px matching mobile app reference) -->
+      <header class="mobile-top-header" id="mobile-top-header" aria-label="Mobile App Header">
+        <div class="mobile-header-left">
+          <button type="button" class="mobile-hamburger-btn" id="mobile-sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Open Navigation Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <a href="/admin/dashboard.html" class="mobile-brand-block">
+            <span class="mobile-brand-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
+              </svg>
+            </span>
+            <div class="mobile-brand-meta">
+              <span class="mobile-brand-name"><span class="brand-vidya">Vidya</span><span class="brand-os">OS</span></span>
+              <span class="mobile-brand-sub">UBTER Nainital</span>
+            </div>
+          </a>
+        </div>
+        <div class="mobile-header-right">
+          <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="mobile-bell-badge">1</span>
+          </button>
+          <a href="/admin/profile.html" class="mobile-user-avatar-btn" id="mobile-user-profile" aria-label="Admin Profile">
+            <span class="mobile-avatar-initials" id="mobile-user-initials">A</span>
+            <span class="avatar-online-dot"></span>
+          </a>
+        </div>
+      </header>
+
+      <!-- 1. TOP HEADER BAR (Clean Desktop: Only Theme Button & Round Profile Avatar) -->
       <header class="admin-top-header" id="admin-top-header" aria-label="Admin Header Bar">
         <div class="header-right">
           <!-- Theme Toggle Button -->
@@ -117,12 +154,12 @@
         <!-- ══════════════════════════════════════════════════════════ -->
         <section class="admin-welcome-hero" aria-label="Welcome Overview">
           <div class="hero-left-content">
-            <h1 class="hero-title">Welcome back, <span id="admin-hero-name">System Administrator</span></h1>
+            <h1 class="hero-title">Welcome back,<br><span id="admin-hero-name">System Administrator</span></h1>
             <p class="hero-subtitle">Manage your college, monitor academic activities, track attendance, and keep
               everything running smoothly.</p>
 
             <div class="hero-live-badges">
-              <span class="hero-badge date-badge" id="hero-live-date">
+              <span class="hero-badge live-combined-badge" id="hero-live-datetime">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -130,21 +167,20 @@
                   <line x1="8" y1="2" x2="8" y2="6"></line>
                   <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
-                <span id="live-date-text">Thursday, 29 October 2026</span>
-              </span>
-              <span class="hero-badge time-badge" id="hero-live-time">
+                <span id="live-date-text">Fri, 30 Oct 2026</span>
+                <span class="badge-separator">|</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <span id="live-time-text">3:55 AM</span>
+                <span id="live-time-text">6:52 PM</span>
               </span>
             </div>
           </div>
 
-          <!-- Institutional Identity Card with Authentic Nainital Campus Photo -->
-          <div class="hero-campus-card" aria-label="Institution Profile">
+          <!-- Desktop Campus Card (Shown on Desktop >= 769px) -->
+          <div class="hero-campus-card desktop-campus-card" aria-label="Institution Profile">
             <div class="campus-card-content">
               <div class="campus-card-header">
                 <div class="campus-building-icon" aria-hidden="true">
@@ -168,10 +204,48 @@
               <div class="campus-photo-overlay"></div>
             </div>
           </div>
+
+          <!-- Mobile Hero Photo (Shown on Mobile <= 768px beside welcome text) -->
+          <div class="hero-mobile-photo-wrap" aria-hidden="true">
+            <img src="/admin/dashboard/campus-nainital.jpg" alt="Government Polytechnic Nainital Campus"
+              class="hero-mobile-photo">
+          </div>
+        </section>
+
+        <!-- Institutional Showcase Card (Floating below hero on mobile) -->
+        <section class="mobile-institution-card" aria-label="Institutional Identity">
+          <div class="inst-card-left">
+            <div class="inst-building-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
+              </svg>
+            </div>
+            <div class="inst-card-meta">
+              <h2 class="inst-name">Government Polytechnic Nainital</h2>
+              <span class="inst-motto">Knowledge &bull; Skills &bull; Better Tomorrow</span>
+            </div>
+          </div>
+          <div class="inst-card-right">
+            <div class="inst-mountains-watermark" aria-hidden="true">
+              <svg viewBox="0 0 80 32" class="mountain-vector">
+                <path d="M0 32 L20 12 L35 24 L52 4 L68 20 L80 32 Z" fill="currentColor" fill-opacity="0.12"/>
+                <path d="M12 32 L28 16 L44 28 L60 8 L74 22 L80 32 Z" fill="currentColor" fill-opacity="0.2"/>
+              </svg>
+            </div>
+            <div class="inst-location-tag">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>Uttarakhand</span>
+            </div>
+          </div>
         </section>
 
         <!-- ══════════════════════════════════════════════════════════ -->
-        <!-- B. 3 CORE ADMINISTRATIVE KPI CARDS (Absent & Present removed) -->
+        <!-- B. 3 CORE ADMINISTRATIVE KPI CARDS (3 in 1 Row)            -->
         <!-- ══════════════════════════════════════════════════════════ -->
         <section class="kpi-metrics-section" aria-label="Key Performance Indicators">
           <div class="kpi-cards-grid kpi-3-cards">
@@ -187,10 +261,9 @@
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                   </svg>
                 </div>
-                <span class="kpi-trend-pill trend-purple">Enrolled</span>
+                <span class="kpi-label-top">Total Students</span>
               </div>
               <div class="kpi-card-body">
-                <span class="kpi-label">Total Students</span>
                 <span class="kpi-value" id="stat-students">0</span>
                 <span class="kpi-subtext">Active enrolled students</span>
               </div>
@@ -207,10 +280,9 @@
                     <polyline points="17 11 19 13 23 9"></polyline>
                   </svg>
                 </div>
-                <span class="kpi-trend-pill trend-green">Faculty</span>
+                <span class="kpi-label-top">Total Faculty</span>
               </div>
               <div class="kpi-card-body">
-                <span class="kpi-label">Total Faculty</span>
                 <span class="kpi-value" id="stat-teachers">0</span>
                 <span class="kpi-subtext">Teaching &amp; non-teaching staff</span>
               </div>
@@ -235,10 +307,9 @@
                     <line x1="15" y1="18" x2="15" y2="18.01"></line>
                   </svg>
                 </div>
-                <span class="kpi-trend-pill trend-purple">Active</span>
+                <span class="kpi-label-top">Departments</span>
               </div>
               <div class="kpi-card-body">
-                <span class="kpi-label">Departments</span>
                 <span class="kpi-value" id="stat-departments">0</span>
                 <span class="kpi-subtext">Active departments</span>
               </div>
@@ -247,15 +318,22 @@
         </section>
 
         <!-- ══════════════════════════════════════════════════════════ -->
-        <!-- C. ATTENDANCE OVERVIEW & QUICK ACTIONS (Moved Up & Side-by-Side) -->
+        <!-- C. ATTENDANCE OVERVIEW & QUICK ACTIONS                     -->
         <!-- ══════════════════════════════════════════════════════════ -->
         <section class="main-telemetry-actions-section" aria-label="Campus Telemetry & Quick Actions">
           <div class="telemetry-actions-grid">
 
-            <!-- Panel 1: Today's Attendance Overview (Donut Chart + Department Bars) -->
+            <!-- Panel 1: Today's Attendance Overview -->
             <article class="dashboard-panel panel-attendance-overview">
               <div class="panel-header">
-                <h3 class="panel-title">Today's Attendance Overview</h3>
+                <div class="panel-header-title-group">
+                  <svg class="panel-header-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                  <h3 class="panel-title">Today's Attendance Overview</h3>
+                </div>
                 <div class="panel-header-action">
                   <select class="department-filter-select" id="overview-dept-filter" aria-label="Filter Department">
                     <option value="ALL">All Departments</option>
@@ -282,7 +360,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="overview-total-subtext">
+                  <div class="overview-total-subtext desktop-only-showcase">
                     <span>Institutional Roster</span>
                     <span class="enrolled-count-chip" id="overview-enrolled-chip">0 Enrolled</span>
                   </div>
@@ -291,8 +369,19 @@
                 <!-- Center Hairline Divider -->
                 <div class="attendance-pane-divider" aria-hidden="true"></div>
 
-                <!-- Right Pane: Department Comparison Bar Chart (Full Space Responsive Grid) -->
-                <div class="attendance-dept-pane">
+                <!-- Right Pane for Mobile: Big Stat + Students Present + Progress Bar -->
+                <div class="attendance-mobile-stat-pane mobile-only-showcase">
+                  <div class="mobile-stat-numbers">
+                    <span class="mobile-stat-fraction" id="mobile-att-fraction">0 / 0</span>
+                    <span class="mobile-stat-label">Students Present</span>
+                  </div>
+                  <div class="mobile-att-progress-track">
+                    <div class="mobile-att-progress-fill" id="mobile-att-progressbar-fill" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <!-- Right Pane for Desktop: Department Comparison Bar Chart -->
+                <div class="attendance-dept-pane desktop-only-showcase">
                   <div class="dept-pane-header">
                     <span class="dept-pane-title">Department Breakdown</span>
                     <span class="dept-avg-badge" id="campus-avg-badge">Campus Avg: <strong>0%</strong></span>
@@ -306,20 +395,57 @@
               </div>
             </article>
 
-            <!-- Panel 2: Quick Actions (Moved Up into Primary Focus) -->
+            <!-- Panel 2: Quick Actions (6 Direct Portals matching Mobile Reference) -->
             <article class="dashboard-panel panel-quick-actions">
               <div class="panel-header">
-                <h3 class="panel-title">Quick Actions</h3>
-                <span class="panel-badge-info">6 Direct Portals</span>
+                <div class="panel-header-title-group">
+                  <svg class="panel-header-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <h3 class="panel-title">Quick Actions</h3>
+                </div>
+                <span class="panel-badge-info">6 Links</span>
               </div>
 
               <div class="panel-body quick-actions-panel-body">
                 <div class="quick-actions-panel-grid">
-                  <!-- 1. Manage Students -->
-                  <a href="/admin/academic-structure.html?tab=students" class="quick-action-card">
+                  <!-- 1. Home -->
+                  <a href="/admin/dashboard.html" class="quick-action-card">
                     <div class="action-icon-squircle icon-blue" aria-hidden="true">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Home</h4>
+                      <p class="action-card-sub">Quick return to main home</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 2. Academic Structure -->
+                  <a href="/admin/academic-structure.html" class="quick-action-card">
+                    <div class="action-icon-squircle icon-green" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Academic Structure</h4>
+                      <p class="action-card-sub">Manage departments, courses &amp; all sections</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 3. HOD Leadership -->
+                  <a href="/admin/faculty.html" class="quick-action-card">
+                    <div class="action-icon-squircle icon-purple" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -327,96 +453,53 @@
                       </svg>
                     </div>
                     <div class="action-card-text">
-                      <h4 class="action-card-title">Manage Students</h4>
-                      <p class="action-card-sub">Add, edit, and view student records</p>
+                      <h4 class="action-card-title">HOD Leadership</h4>
+                      <p class="action-card-sub">Oversee HOD and staff credentials</p>
                     </div>
                     <span class="action-arrow">&rsaquo;</span>
                   </a>
 
-                  <!-- 2. Manage Faculty -->
-                  <a href="/admin/faculty.html" class="quick-action-card">
-                    <div class="action-icon-squircle icon-green" aria-hidden="true">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="8.5" cy="7" r="4"></circle>
-                        <polyline points="17 11 19 13 23 9"></polyline>
-                      </svg>
-                    </div>
-                    <div class="action-card-text">
-                      <h4 class="action-card-title">Manage Faculty</h4>
-                      <p class="action-card-sub">View faculty details and assign subjects</p>
-                    </div>
-                    <span class="action-arrow">&rsaquo;</span>
-                  </a>
-
-                  <!-- 3. Mark Attendance -->
-                  <a href="/faculty/registers.html" class="quick-action-card">
-                    <div class="action-icon-squircle icon-amber" aria-hidden="true">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                        <polyline points="9 16 12 19 19 12"></polyline>
-                      </svg>
-                    </div>
-                    <div class="action-card-text">
-                      <h4 class="action-card-title">Mark Attendance</h4>
-                      <p class="action-card-sub">Take and manage class attendance</p>
-                    </div>
-                    <span class="action-arrow">&rsaquo;</span>
-                  </a>
-
-                  <!-- 4. Create Notice -->
-                  <a href="#notice" class="quick-action-card" onclick="openCreateNoticeModal(event)">
-                    <div class="action-icon-squircle icon-purple" aria-hidden="true">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                      </svg>
-                    </div>
-                    <div class="action-card-text">
-                      <h4 class="action-card-title">Create Notice</h4>
-                      <p class="action-card-sub">Publish important announcements</p>
-                    </div>
-                    <span class="action-arrow">&rsaquo;</span>
-                  </a>
-
-                  <!-- 5. Schedule Event -->
-                  <a href="#event" class="quick-action-card" onclick="openScheduleEventModal(event)">
-                    <div class="action-icon-squircle icon-pink" aria-hidden="true">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                      </svg>
-                    </div>
-                    <div class="action-card-text">
-                      <h4 class="action-card-title">Schedule Event</h4>
-                      <p class="action-card-sub">Create and manage college events</p>
-                    </div>
-                    <span class="action-arrow">&rsaquo;</span>
-                  </a>
-
-                  <!-- 6. View Reports -->
+                  <!-- 4. Reports & Analytics -->
                   <a href="/admin/reports.html" class="quick-action-card">
-                    <div class="action-icon-squircle icon-blue-alt" aria-hidden="true">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                        <polyline points="17 6 23 6 23 12"></polyline>
+                    <div class="action-icon-squircle icon-amber" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
                       </svg>
                     </div>
                     <div class="action-card-text">
-                      <h4 class="action-card-title">View Reports</h4>
-                      <p class="action-card-sub">Attendance, performance and more</p>
+                      <h4 class="action-card-title">Reports &amp; Analytics</h4>
+                      <p class="action-card-sub">View attendance and academic reports</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 5. Institutional Audit Logs -->
+                  <a href="/admin/audit-logs.html" class="quick-action-card">
+                    <div class="action-icon-squircle icon-red" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Institutional Audit Logs</h4>
+                      <p class="action-card-sub">Track system activity logs</p>
+                    </div>
+                    <span class="action-arrow">&rsaquo;</span>
+                  </a>
+
+                  <!-- 6. Institution Settings -->
+                  <a href="/admin/settings.html" class="quick-action-card">
+                    <div class="action-icon-squircle icon-slate" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                      </svg>
+                    </div>
+                    <div class="action-card-text">
+                      <h4 class="action-card-title">Institution Settings</h4>
+                      <p class="action-card-sub">Configure system settings</p>
                     </div>
                     <span class="action-arrow">&rsaquo;</span>
                   </a>
@@ -428,6 +511,43 @@
         </section>
 
       </main>
+
+      <!-- 3. FIXED MOBILE BOTTOM NAVIGATION DOCK (Appears on <= 768px) -->
+      <nav class="mobile-bottom-dock" id="mobile-bottom-dock" aria-label="Mobile Bottom Navigation">
+        <a href="/admin/dashboard.html" class="bottom-dock-tab active" aria-label="Home Dashboard">
+          <svg class="dock-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span class="dock-label">Home</span>
+          <span class="dock-active-indicator"></span>
+        </a>
+        <a href="/admin/faculty.html" class="bottom-dock-tab" aria-label="HOD Leadership">
+          <svg class="dock-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span class="dock-label">HOD Leadership</span>
+        </a>
+        <a href="/admin/academic-structure.html" class="bottom-dock-tab" aria-label="Academic Structure">
+          <svg class="dock-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          <span class="dock-label">Academic Structure</span>
+        </a>
+        <a href="/admin/profile.html" class="bottom-dock-tab" aria-label="Admin Profile">
+          <svg class="dock-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span class="dock-label">Profile</span>
+        </a>
+      </nav>
+
     </div>
 
   </div> <!-- /#admin-app-layout -->
