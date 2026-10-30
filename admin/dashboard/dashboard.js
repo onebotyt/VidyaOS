@@ -240,7 +240,7 @@ function populateUserIdentity() {
     : displayName.slice(0, 2).toUpperCase();
 
   if (elInitials) elInitials.textContent = initials || 'SA';
-  if (elMobileInitials) elMobileInitials.textContent = initials ? initials[0] : 'A';
+  if (elMobileInitials) elMobileInitials.textContent = (user.username === 'admin' || !user.full_name) ? 'A' : (initials ? initials[0] : 'A');
 }
 
 /**

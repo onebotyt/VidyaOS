@@ -247,7 +247,7 @@
               <span class="mobile-brand-icon">${instSvg}</span>
               <div class="mobile-brand-meta">
                 <span class="mobile-brand-name"><span class="brand-vidya">Vidya</span><span class="brand-os">OS</span></span>
-                <span class="mobile-brand-sub">UBTER Nainital</span>
+                <span class="mobile-brand-sub">UGIP Nainital</span>
               </div>
             </a>
           </div>

@@ -857,6 +857,14 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
 /* ── 5. Mobile Layout & Drawer Styles (<= 768px) ── */
 @media (max-width: 768px) {
 
+  /* Hide short labels on mobile completely (show only full clean labels) */
+  .sidebar-nav-short-label {
+    display: none !important;
+  }
+  .sidebar-nav-label {
+    display: block !important;
+  }
+
   /* Mobile Top Header (Sticky: 58px Navy Navbar matching Reference) */
   .mobile-top-header {
     height: 58px;
