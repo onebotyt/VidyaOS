@@ -159,14 +159,31 @@ async function syncCurrentUser() {
 
 function handleSessionRevocation(reason = 'session_transferred') {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('user');
+  const authKeys = [
+    'access_token',
+    'refresh_token',
+    'authToken',
+    'auth_token',
+    'token',
+    'user',
+    'currentUser',
+    'auth_user',
+    'user_profile',
+    'user_roles',
+    'role',
+    'roles',
+    'session_id'
+  ];
+  authKeys.forEach(k => {
+    try { localStorage.removeItem(k); } catch (_) {}
+  });
   try {
+    sessionStorage.clear();
     sessionStorage.setItem('vidya_logout_notice', reason === 'session_expired'
       ? 'Your session expired due to inactivity. Please sign in again.'
       : 'Your session has ended because this account was logged into from another device or signed out.');
   } catch (_) { }
-  window.location.href = `/login/index.html?reason=${encodeURIComponent(reason)}`;
+  window.location.replace(`/login/index.html?reason=${encodeURIComponent(reason)}`);
 }
 
 let _heartbeatTimer = null;
@@ -203,25 +220,78 @@ function startSessionHeartbeat() {
 
 function logout() {
   const token = getAuthToken();
-  const deviceId = getDeviceId();
-  if (token) {
-    fetch('/api/v1/auth/logout', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'X-Device-Id': deviceId
-      },
-      body: JSON.stringify({ device_id: deviceId })
-    }).catch(() => { });
-  }
+  const refreshToken = localStorage.getItem('refresh_token');
+  const deviceId = typeof getDeviceId === 'function' ? getDeviceId() : null;
+
+  // 1. Invalidate session on backend
+  try {
+    if (token || refreshToken) {
+      const payload = {
+        device_id: deviceId || '',
+        refresh_token: refreshToken || ''
+      };
+      fetch('/api/v1/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json',
+          'X-Device-Id': deviceId || ''
+        },
+        body: JSON.stringify(payload),
+        keepalive: true,
+        credentials: 'include'
+      }).catch(() => {});
+    }
+  } catch (_) {}
+
+  // 2. Clear timers
   if (_heartbeatTimer) {
     clearInterval(_heartbeatTimer);
     _heartbeatTimer = null;
   }
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('user');
-  window.location.href = '/index.html';
+  if (typeof window !== 'undefined' && window.__notificationPollInterval) {
+    clearInterval(window.__notificationPollInterval);
+    window.__notificationPollInterval = null;
+  }
+
+  // 3. Purge all tokens and cached user data from localStorage
+  const authKeys = [
+    'access_token',
+    'refresh_token',
+    'authToken',
+    'auth_token',
+    'token',
+    'user',
+    'currentUser',
+    'auth_user',
+    'user_profile',
+    'user_roles',
+    'role',
+    'roles',
+    'session_id',
+    'vidya_logout_notice'
+  ];
+  authKeys.forEach(k => {
+    try { localStorage.removeItem(k); } catch (_) {}
+  });
+
+  // 4. Purge sessionStorage completely
+  try { sessionStorage.clear(); } catch (_) {}
+
+  // 5. Expire client-side cookies
+  try {
+    document.cookie.split(";").forEach(c => {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+  } catch (_) {}
+
+  // 6. Set marker so login page does not auto-redirect
+  try {
+    sessionStorage.setItem('vidya_logged_out_flag', '1');
+  } catch (_) {}
+
+  // 7. Clean redirect to login page
+  window.location.replace('/login');
 }
 
 /**
@@ -2083,6 +2153,8 @@ function updateDrawerThemeLabel() {
 if (typeof window !== 'undefined') {
   window.logout = logout;
   window.handleLogout = logout;
+  window.facultyLogout = logout;
+  window.adminLogout = logout;
   window.mountNavigationSystem = mountNavigationSystem;
   window.loadUniversalNavigation = loadUniversalNavigation;
   window.toggleAndroidProfileDrawer = toggleAndroidProfileDrawer;

@@ -40,8 +40,10 @@ async function fetchApi(endpoint, options = {}) {
             return;
           }
           localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
           localStorage.removeItem('user');
-          window.location.href = '/login/index.html?reason=session_transferred';
+          try { sessionStorage.clear(); } catch (_) {}
+          window.location.replace('/login/index.html?reason=session_transferred');
           return;
         }
         if (!endpoint.includes('/auth/')) {
@@ -58,8 +60,10 @@ async function fetchApi(endpoint, options = {}) {
               return;
             }
             localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             localStorage.removeItem('user');
-            window.location.href = '/login/index.html?reason=session_expired';
+            try { sessionStorage.clear(); } catch (_) {}
+            window.location.replace('/login/index.html?reason=session_expired');
             return;
           }
         }

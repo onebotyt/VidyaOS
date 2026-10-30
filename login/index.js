@@ -7,10 +7,43 @@
 
 /* ── Redirect if already logged in ── */
   (function checkExistingSession() {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('authToken') || localStorage.getItem('auth_token') || sessionStorage.getItem('authToken');
-    if (!token) return;
+    // If user explicitly logged out or has a logout reason parameter, NEVER auto-redirect
     try {
-      const u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('currentUser') || localStorage.getItem('auth_user') || 'null');
+      const params = new URLSearchParams(window.location.search);
+      if (sessionStorage.getItem('vidya_logged_out_flag') || params.has('reason') || params.has('logged_out')) {
+        sessionStorage.removeItem('vidya_logged_out_flag');
+        return;
+      }
+    } catch (_) {}
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      // Clean up any stale partial user state
+      try {
+        localStorage.removeItem('user');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('auth_user');
+      } catch (_) {}
+      return;
+    }
+
+    // Client-side JWT expiration check: prevents bounce loop & flickering
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1]));
+        if (payload.exp && (payload.exp * 1000) <= Date.now()) {
+          // Token is expired! Purge and do not auto-redirect
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('user');
+          return;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || 'null');
       if (!u) return;
       const roles = u.roles || [];
       if (roles.includes('SYSTEM_ADMIN'))  { window.location.replace('/admin/dashboard');     return; }

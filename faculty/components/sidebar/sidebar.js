@@ -238,12 +238,29 @@
   function facultyLogout() {
     if (typeof window.logout === 'function') {
       window.logout();
-    } else {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('auth_user');
-      window.location.href = '/login.html';
+      return;
     }
+    const token = localStorage.getItem('access_token');
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (token || refreshToken) {
+      try {
+        fetch('/api/v1/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ refresh_token: refreshToken || '' }),
+          keepalive: true,
+          credentials: 'include'
+        }).catch(() => {});
+      } catch (_) {}
+    }
+    const keys = ['access_token', 'refresh_token', 'authToken', 'auth_token', 'token', 'user', 'currentUser', 'auth_user', 'user_profile', 'user_roles', 'role', 'roles', 'session_id'];
+    keys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
+    try { sessionStorage.clear(); } catch (_) {}
+    try { sessionStorage.setItem('vidya_logged_out_flag', '1'); } catch (_) {}
+    window.location.replace('/login');
   }
 
   /**

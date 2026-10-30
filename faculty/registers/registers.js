@@ -128,11 +128,11 @@ guardRoute({ roles: ['TEACHER'], requireSubjects: true });
       }
 
       const navAssign = document.getElementById('nav-assign');
-      if (navAssign) navAssign.href = `/faculty/assignments.html?id=${registerId}`;
+      if (navAssign) navAssign.href = `/faculty/registers.html?id=${registerId}&tab=assignments`;
       const navMarks = document.getElementById('nav-marks');
-      if (navMarks) navMarks.href = `/faculty/tests.html?id=${registerId}`;
+      if (navMarks) navMarks.href = `/faculty/registers.html?id=${registerId}&tab=marks`;
       const navEval = document.getElementById('nav-eval');
-      if (navEval) navEval.href = `/faculty/evaluation.html?id=${registerId}`;
+      if (navEval) navEval.href = `/faculty/registers.html?id=${registerId}&tab=marks`;
 
       await loadRegisterDetail();
       updateRegisterScopeBadges();

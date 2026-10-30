@@ -3,8 +3,20 @@
  * PAGE LOGIC: REGISTER
  * frontend/login/register/register.js
  * Consolidated Institutional Multi-Role Self-Registration Portal
+ * Self-contained: zero external JS dependencies
  * ══════════════════════════════════════════════════════════════
  */
+
+/* ── Utility: HTML escape (inlined — no shared/js/ui.js dependency) ── */
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 /* ── Theme init ── */
 (function() {
