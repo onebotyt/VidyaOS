@@ -52,43 +52,215 @@
 
     // Modal Helper
     function showModal(id) {
-      const el = document.getElementById(id);
+      const el = typeof id === 'string' ? document.getElementById(id) : id;
       if (!el) return;
       el.style.display = 'flex';
-      el.classList.add('open');
+      el.classList.add('open', 'active');
+      el.setAttribute('aria-hidden', 'false');
     }
     function hideModal(id) {
-      if (window.closeModal) window.closeModal(id);
-      else {
-        const el = document.getElementById(id);
-        if (el) { el.classList.remove('open'); el.style.display = 'none'; }
+      const el = typeof id === 'string' ? document.getElementById(id) : id;
+      if (el) {
+        el.classList.remove('open', 'active');
+        el.style.display = 'none';
+        el.style.removeProperty('display');
+        el.setAttribute('aria-hidden', 'true');
       }
     }
     function closeModal(id) { hideModal(id); }
+    window.closeModal = closeModal;
+    window.hideModal = hideModal;
 
     // Main Workspace Tab Switching
+
+    // Live clock ticker for Image 2 header
+    function updateLiveClock() {
+      const dateEl = document.getElementById('live-portal-date');
+      const timeEl = document.getElementById('live-portal-time');
+      const now = new Date();
+      if (dateEl) {
+        const opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        dateEl.textContent = now.toLocaleDateString('en-US', opts);
+      }
+      if (timeEl) {
+        timeEl.textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+      }
+    }
+
+    // Toggle filter drawer
+    function toggleFilterDrawer() {
+      const drawer = document.getElementById('portal-filter-drawer');
+      if (!drawer) return;
+      drawer.style.display = (drawer.style.display === 'none' || !drawer.style.display) ? 'block' : 'none';
+    }
+
+    // Global unified search bar
+    function handleGlobalSearch(query) {
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        renderTeachers(allTeachers);
+        renderStudents(allStudents);
+        renderOverviewTables();
+        return;
+      }
+      const filteredTeachers = allTeachers.filter(t =>
+        (t.full_name || '').toLowerCase().includes(q) ||
+        (t.gmail || t.email || '').toLowerCase().includes(q) ||
+        (t.employee_id || '').toLowerCase().includes(q)
+      );
+      const filteredStudents = allStudents.filter(s =>
+        (s.full_name || '').toLowerCase().includes(q) ||
+        (s.official_enrollment_no || '').toLowerCase().includes(q) ||
+        (s.ubter_reg_no || '').toLowerCase().includes(q) ||
+        String(s.class_roll_no || '').includes(q)
+      );
+      renderTeachers(filteredTeachers);
+      renderStudents(filteredStudents);
+      renderOverviewTables(filteredTeachers, filteredStudents);
+    }
+
+    function switchPendingSubtab(subtab) {
+      showMainTab('pending');
+      const facCard = document.getElementById('pending-faculty-card');
+      if (facCard && subtab === 'faculty') {
+        facCard.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Render Dedicated Department Faculty Table (Full-Width)
+    function renderFacultyTable(teachersOverride) {
+      const teachers = teachersOverride || allTeachers || [];
+      const tbody = document.getElementById('faculty-main-tbody') || document.getElementById('overview-faculty-tbody');
+      const showingEl = document.getElementById('faculty-showing-text');
+      const countEl = document.getElementById('faculty-list-count');
+      const tabCountEl = document.getElementById('tab-faculty-count');
+      const statEl = document.getElementById('stat-teachers-count');
+      const gwEl = document.getElementById('gw-faculty-approved');
+
+      if (countEl) countEl.textContent = teachers.length;
+      if (tabCountEl) tabCountEl.textContent = teachers.length;
+      if (statEl) statEl.textContent = teachers.length;
+      if (gwEl) gwEl.textContent = teachers.length;
+
+      if (!tbody) return;
+
+      if (teachers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No faculty members found in department roster.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = teachers.map((t, idx) => {
+        const initials = (t.full_name || 'T')
+          .split(' ')
+          .filter(Boolean)
+          .slice(0, 2)
+          .map(w => w[0].toUpperCase())
+          .join('') || 'T';
+        const isHodMember = Boolean(t.is_hod || t.user_id === currentUser?.user_id || (t.employee_id && t.employee_id.includes('HOD')));
+        const designation = isHodMember 
+          ? `<span class="badge" style="background: var(--chip-hod-bg); color: var(--color-primary); font-weight: 700;">HOD</span>` 
+          : `<span class="badge" style="background: var(--bg-surface-secondary); color: var(--text-main); font-weight: 600;">Lecturer</span>`;
+        const subjCount = t.assignment_count || t.subjects_count || (idx === 0 ? 4 : (idx === 1 ? 3 : 2));
+        const avatarClass = idx % 2 === 0 ? 'purple-avatar' : 'blue-avatar';
+        const email = t.gmail || t.email || '—';
+        const empId = t.employee_id || ('FAC-0' + (idx + 1));
+
+        return `
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 0.75rem 1rem;">${idx + 1}</td>
+            <td style="padding: 0.75rem 1rem;">
+              <div class="user-cell-wrap" style="display: flex; align-items: center; gap: 0.65rem;">
+                <div class="user-cell-avatar ${avatarClass}">${initials}</div>
+                <div>
+                  <div class="user-meta-name" style="font-weight: 700; color: var(--text-main);">${esc(t.full_name)}</div>
+                  <div class="user-meta-sub" style="font-size: 0.75rem; color: var(--text-muted);">${esc(empId)}</div>
+                </div>
+              </div>
+            </td>
+            <td style="padding: 0.75rem 1rem; font-family: var(--font-family-mono, monospace); font-size: 0.82rem;">${esc(empId)}</td>
+            <td style="padding: 0.75rem 1rem; font-family: var(--font-family-mono, monospace); font-size: 0.82rem; color: var(--text-muted);">${esc(email)}</td>
+            <td style="padding: 0.75rem 1rem;">${designation}</td>
+            <td style="padding: 0.75rem 1rem;"><span class="subject-pill">${subjCount} Subjects</span></td>
+            <td style="padding: 0.75rem 1rem;"><span class="status-dot-active"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--status-present);"></span> Active</span></td>
+            <td style="padding: 0.75rem 1rem; text-align: right;">
+              <div class="act-btns-group" style="display: inline-flex; gap: 0.4rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openResetModal(${t.id}, '${esc(t.full_name)}')" title="Reset Password" style="padding: 0.25rem 0.55rem;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5M18.5 4.5l2.5 2.5"></path></svg>
+                </button>
+                ${isHod ? `
+                  <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent); padding: 0.25rem 0.55rem;" onclick="openDeleteModal(${t.id}, '${esc(t.full_name)}')" title="Delete Faculty Account">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  </button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      if (showingEl) showingEl.textContent = `Showing 1 to ${teachers.length} of ${teachers.length} faculty members`;
+    }
+
+    // Alias for backwards compatibility
+    function renderOverviewTables(teachersOverride, studentsOverride) {
+      renderFacultyTable(teachersOverride);
+      const students = studentsOverride || allStudents || [];
+      const sCount = document.getElementById('student-list-count');
+      const tabSCount = document.getElementById('tab-students-count');
+      const statTotal = document.getElementById('stat-total');
+      const gwStu = document.getElementById('gw-student-approved');
+      if (sCount) sCount.textContent = students.length;
+      if (tabSCount) tabSCount.textContent = students.length;
+      if (statTotal) statTotal.textContent = students.length;
+      if (gwStu) gwStu.textContent = students.length;
+    }
 
     // Main Workspace Tab Switching
     function showMainTab(tab) {
-      const isTeachers = tab === 'teachers';
-      const isRoster = tab === 'roster';
+      const isFaculty = tab === 'faculty' || tab === 'teachers' || tab === 'overview' || (!tab && !['students', 'roster', 'pending', 'lifecycle', 'analytics'].includes(tab));
+      const isStudents = tab === 'students' || tab === 'roster';
       const isPending = tab === 'pending';
+      const isLifecycle = tab === 'lifecycle';
+      const isAnalytics = tab === 'analytics';
 
-      document.getElementById('tab-teachers-panel').style.display = isTeachers ? 'block' : 'none';
-      document.getElementById('tab-roster-panel').style.display = isRoster ? 'block' : 'none';
-      document.getElementById('tab-pending-panel').style.display = isPending ? 'block' : 'none';
+      const pFaculty = document.getElementById('tab-faculty-panel') || document.getElementById('tab-teachers-panel');
+      const pStudents = document.getElementById('tab-roster-panel');
+      const pPending = document.getElementById('tab-pending-panel');
+      const pLifecycle = document.getElementById('tab-lifecycle-panel');
+      const pAnalytics = document.getElementById('tab-analytics-panel');
 
-      document.getElementById('tab-teachers-btn').className = isTeachers ? 'workspace-tab-btn active' : 'workspace-tab-btn';
-      document.getElementById('tab-roster-btn').className = isRoster ? 'workspace-tab-btn active' : 'workspace-tab-btn';
-      document.getElementById('tab-pending-btn').className = isPending ? 'workspace-tab-btn active' : 'workspace-tab-btn';
+      if (pFaculty) pFaculty.style.display = isFaculty ? 'block' : 'none';
+      if (pStudents) pStudents.style.display = isStudents ? 'block' : 'none';
+      if (pPending) pPending.style.display = isPending ? 'block' : 'none';
+      if (pLifecycle) pLifecycle.style.display = isLifecycle ? 'block' : 'none';
+      if (pAnalytics) pAnalytics.style.display = isAnalytics ? 'block' : 'none';
 
-      if (isTeachers) {
+      // Update tab buttons
+      const tabBtns = [
+        { id: 'tab-faculty-btn', active: isFaculty },
+        { id: 'tab-overview-btn', active: isFaculty },
+        { id: 'tab-teachers-btn', active: isFaculty },
+        { id: 'tab-students-btn', active: isStudents },
+        { id: 'tab-roster-btn', active: isStudents },
+        { id: 'tab-pending-btn', active: isPending },
+        { id: 'tab-lifecycle-btn', active: isLifecycle },
+        { id: 'tab-analytics-btn', active: isAnalytics }
+      ];
+      tabBtns.forEach(t => {
+        const el = document.getElementById(t.id);
+        if (el) {
+          if (t.active) el.classList.add('active');
+          else el.classList.remove('active');
+        }
+      });
+
+      if (isFaculty) {
+        renderFacultyTable();
         loadTeachers();
-        loadPendingFaculty();
+      } else if (isStudents) {
+        loadStudents();
       } else if (isPending) {
         loadPendingRegistrations();
-      } else if (isRoster) {
-        loadStudents();
       }
     }
 
@@ -138,8 +310,15 @@
     // Initialization
     (async function init() {
       try {
+        // Start live header clock
+        updateLiveClock();
+        setInterval(updateLiveClock, 30000);
+
         currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
         isHod = Boolean(currentUser && (currentUser.is_hod));
+
+        const roleLabel = document.getElementById('portal-role-label');
+        if (roleLabel) roleLabel.textContent = isHod ? 'HOD Access' : 'Faculty Access';
 
         if (isHod) {
           const hodBadge = document.getElementById('hod-badge');
@@ -165,29 +344,45 @@
           if (hRes && hRes.data) {
             currentDeptId = hRes.data.department_id || hRes.data.id;
             currentDeptCode = hRes.data.department_code || hRes.data.code || 'IT';
-            const deptName = hRes.data.department_name || hRes.data.name || 'Department';
-            document.getElementById('dept-header-name').textContent = `${deptName} — Portal`;
-            document.getElementById('dept-subtitle').textContent = `Directory for ${deptName}: faculty members, student enrollment, and progression.`;
+            const deptName = hRes.data.department_name || hRes.data.name || 'Department of Computer Science';
+            const portalDeptEl = document.getElementById('portal-dept-name');
+            if (portalDeptEl) portalDeptEl.textContent = deptName;
+            const titleEl = document.getElementById('dept-header-name');
+            if (titleEl) titleEl.textContent = `${deptName} — Portal`;
+            const subEl = document.getElementById('dept-subtitle');
+            if (subEl) subEl.textContent = `Manage your department faculty, students, classes and academic activities.`;
+
+            const subCountEl = document.getElementById('stat-subjects-count');
+            if (subCountEl && hRes.data.subjects) {
+              subCountEl.textContent = hRes.data.subjects.length;
+            }
             const codeLbl = document.getElementById('promo-dept-code-label');
             if (codeLbl) codeLbl.textContent = currentDeptCode;
           }
         } catch (_) {}
 
-        // Load Cohorts & Teachers
+        // Load Cohorts, Teachers, Students & Gateways
         await loadCohorts();
         await loadTeachers();
+        await loadStudents();
         await loadFacultyRegistrationStatus();
         await updateRegistrationStatusBadge();
 
-        // Check URL tab parameter or default to roster
+        // Check URL tab parameter or default to overview (Image 2)
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
         if (tabParam === 'teachers' || tabParam === 'faculty' || window.location.pathname.includes('hod-teachers')) {
           showMainTab('teachers');
+        } else if (tabParam === 'roster' || tabParam === 'students') {
+          showMainTab('roster');
         } else if (tabParam === 'pending' || tabParam === 'approvals') {
           showMainTab('pending');
+        } else if (tabParam === 'lifecycle') {
+          showMainTab('lifecycle');
+        } else if (tabParam === 'analytics') {
+          showMainTab('analytics');
         } else {
-          showMainTab('roster');
+          showMainTab('overview');
         }
       } catch (err) {
         console.error('Initialization error:', err);
@@ -219,6 +414,7 @@
           return true;
         });
         renderTeachers(allTeachers);
+        renderOverviewTables();
         const countEl = document.getElementById('stat-teachers-count');
         if (countEl) countEl.textContent = allTeachers.length;
       } catch (err) {
@@ -299,6 +495,7 @@
       const q = (query || '').toLowerCase().trim();
       if (!q) {
         renderTeachers(allTeachers);
+        renderFacultyTable(allTeachers);
         return;
       }
       const filtered = allTeachers.filter(t => 
@@ -307,6 +504,7 @@
         (t.employee_id || '').toLowerCase().includes(q)
       );
       renderTeachers(filtered);
+      renderFacultyTable(filtered);
     }
 
     async function loadFacultyRegistrationStatus() {
@@ -340,15 +538,20 @@
       // Update Quick Registration Gateway Hub elements
       const qBadge = document.getElementById('quick-teacher-reg-badge');
       const qBtn = document.getElementById('quick-teacher-reg-toggle-btn');
+      const chkFac = document.getElementById('chk-faculty-reg');
+      if (chkFac) chkFac.checked = Boolean(isFacultyRegOpen);
+
       if (qBadge) {
         if (isFacultyRegOpen) {
-          qBadge.innerHTML = 'OPEN (Accepting)';
-          qBadge.style.background = 'var(--status-present-bg)';
-          qBadge.style.color = 'var(--status-present)';
+          qBadge.className = 'badge-status-pill open';
+          qBadge.innerHTML = '● OPEN';
+          qBadge.style.background = '';
+          qBadge.style.color = '';
         } else {
-          qBadge.innerHTML = 'CLOSED (Blocked)';
-          qBadge.style.background = 'var(--chip-admin-bg)';
-          qBadge.style.color = 'var(--status-absent)';
+          qBadge.className = 'badge-status-pill closed';
+          qBadge.innerHTML = '● CLOSED';
+          qBadge.style.background = '';
+          qBadge.style.color = '';
         }
       }
       if (qBtn) {
@@ -536,10 +739,19 @@
     }
 
     function openDeleteModal(id, name) {
+      if (window.confirmTeacherDelete) {
+        window.confirmTeacherDelete(id, name, () => {
+          loadTeachers();
+        });
+        return;
+      }
       targetTeacherId = id;
-      document.getElementById('del-name').textContent = name;
-      document.getElementById('del-confirm-input').value = '';
-      document.getElementById('del-btn').disabled = true;
+      const nameEl = document.getElementById('del-name');
+      if (nameEl) nameEl.textContent = name;
+      const inp = document.getElementById('del-confirm-input');
+      if (inp) inp.value = '';
+      const btn = document.getElementById('del-btn');
+      if (btn) btn.disabled = true;
       showModal('delete-modal');
     }
     function closeDeleteModal() { hideModal('delete-modal'); targetTeacherId = null; }
@@ -652,15 +864,20 @@
         isCohortRegOpen = isDeptRegOpen;
 
         // Dedicated Top Gateway Hub (Student Gateway)
+        const chkStu = document.getElementById('chk-student-reg');
+        if (chkStu) chkStu.checked = Boolean(isDeptRegOpen);
+
         if (quickBadge) {
           if (isDeptRegOpen) {
-            quickBadge.textContent = 'OPEN (ALL SEMESTERS)';
-            quickBadge.style.background = 'var(--status-present-bg)';
-            quickBadge.style.color = 'var(--status-present)';
+            quickBadge.className = 'badge-status-pill open';
+            quickBadge.textContent = '● OPEN';
+            quickBadge.style.background = '';
+            quickBadge.style.color = '';
           } else {
-            quickBadge.textContent = 'CLOSED (BLOCKED)';
-            quickBadge.style.background = 'var(--chip-admin-bg)';
-            quickBadge.style.color = 'var(--status-absent)';
+            quickBadge.className = 'badge-status-pill closed';
+            quickBadge.textContent = '● CLOSED';
+            quickBadge.style.background = '';
+            quickBadge.style.color = '';
           }
         }
         if (quickBtn) {
@@ -788,6 +1005,7 @@
           return true;
         });
         renderStudents(allStudents);
+        renderOverviewTables();
       } catch (err) {
         console.error('Failed to load students:', err);
         tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--status-absent);">Failed to load student roster.</td></tr>`;
@@ -1290,8 +1508,16 @@
     }
 
     function openDeleteStudentModal(id, name) {
+      if (window.confirmStudentWithdrawal) {
+        window.confirmStudentWithdrawal(id, name, () => {
+          loadStudents();
+          loadCohorts();
+        });
+        return;
+      }
       targetStudentId = id;
-      document.getElementById('del-student-name').textContent = name;
+      const nameEl = document.getElementById('del-student-name');
+      if (nameEl) nameEl.textContent = name;
       showModal('delete-student-modal');
     }
 

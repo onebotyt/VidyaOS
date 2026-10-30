@@ -98,6 +98,7 @@
     if (!modal) return;
     modal.classList.remove('open', 'active');
     modal.setAttribute('aria-hidden', 'true');
+    modal.style.display = 'none';
   }
 
   /**

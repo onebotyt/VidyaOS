@@ -1,0 +1,198 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS DEPARTMENT HERO & INSTITUTION SHOWCASE COMPONENT
+ * Location: /faculty/components/dept-hero/dept-hero.css
+ * 100% Theme Token Compliant — Zero Hardcoded Hex Colors
+ * ══════════════════════════════════════════════════════════════
+ */
+
+.dept-hero-component {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .dept-hero-component {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 1. Left Card: Department Info & Live Badges ── */
+.dept-hero-left {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem 1.6rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dept-hero-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  width: fit-content;
+}
+
+.dept-hero-title {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  margin: 0 0 0.35rem 0;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.dept-hero-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem 0;
+  line-height: 1.45;
+}
+
+.dept-hero-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.dept-hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
+}
+
+.dept-hero-pill svg {
+  color: var(--color-primary);
+}
+
+/* ── 2. Right Card: Institution Profile with Campus Photo ── */
+.dept-hero-campus-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  min-height: 120px;
+}
+
+.dept-hero-campus-content {
+  flex: 1;
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  z-index: 2;
+}
+
+.dept-hero-campus-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dept-hero-campus-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dept-hero-campus-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.dept-hero-campus-motto {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  display: block;
+}
+
+.dept-hero-campus-quote {
+  display: inline-block;
+  margin-top: 0.85rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-style: italic;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
+  width: fit-content;
+}
+
+.dept-hero-campus-img-wrap {
+  width: 190px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .dept-hero-campus-img-wrap {
+    display: none;
+  }
+}
+
+.dept-hero-campus-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 35%;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.dept-hero-campus-card:hover .dept-hero-campus-img {
+  transform: scale(1.04);
+}
+
+.dept-hero-campus-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--bg-card) 0%, transparent 45%);
+}
+
+[data-theme='dark'] .dept-hero-campus-overlay {
+  background: linear-gradient(to right, var(--bg-card) 0%, transparent 60%);
+}
+
