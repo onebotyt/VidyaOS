@@ -452,6 +452,208 @@ if (typeof guardRoute === 'function') {
     }
   }
 
+  // ══════════════════════════════════════════════════════════════
+  // 6. Institutional Administrators & Authority Delegation
+  // ══════════════════════════════════════════════════════════════
+
+  let pendingDeleteAdminId = null;
+
+  window.loadAdministrators = async function () {
+    const tbody = document.getElementById('admin-roster-tbody');
+    if (!tbody) return;
+
+    try {
+      const res = await fetchApi('/admin/administrators');
+      if (res && res.success && Array.isArray(res.data)) {
+        if (res.data.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">
+                No administrator records found.
+              </td>
+            </tr>`;
+          return;
+        }
+
+        tbody.innerHTML = res.data.map(admin => {
+          const isCurrent = Boolean(admin.is_current);
+          const isEnv = Boolean(admin.is_env_admin);
+          const name = admin.full_name || 'System Administrator';
+          const empId = admin.employee_id ? `<span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-family-mono); margin-left: 0.4rem;">(${admin.employee_id})</span>` : '';
+          
+          let sourceBadge = '';
+          if (isEnv) {
+            sourceBadge = `<span class="admin-badge admin-badge-env" title="Synchronized from Render ADMIN_EMAIL environment variable">Render Env Bootstrap</span>`;
+          } else {
+            sourceBadge = `<span class="admin-badge admin-badge-db" title="Created permanently in institutional database">Database Admin</span>`;
+          }
+
+          let actionContent = '';
+          if (isCurrent) {
+            actionContent = `<span class="admin-badge admin-badge-current" style="font-size: 0.72rem;">(You - Active Session)</span>`;
+          } else {
+            actionContent = `
+              <button type="button" class="btn btn-sm btn-danger" onclick="promptDeleteAdmin(${admin.id}, '${admin.email.replace(/'/g, "\\'")}')" style="background: var(--color-danger, var(--danger-color)); color: var(--text-inverse); font-size: 0.75rem; padding: 0.25rem 0.6rem; font-weight: 600;">
+                Delete
+              </button>`;
+          }
+
+          return `
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.75rem; font-weight: 600; color: var(--text-main);">
+                ${name}${empId}
+              </td>
+              <td style="padding: 0.75rem; font-family: var(--font-family-mono); font-size: 0.8rem; color: var(--text-muted);">
+                ${admin.email || admin.username || '—'}
+              </td>
+              <td style="padding: 0.75rem;">
+                ${sourceBadge}
+              </td>
+              <td style="padding: 0.75rem;">
+                <span class="admin-badge admin-badge-active">ACTIVE</span>
+              </td>
+              <td style="padding: 0.75rem; text-align: right;">
+                ${actionContent}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 1.5rem; color: var(--color-danger);">
+              Failed to load administrators.
+            </td>
+          </tr>`;
+      }
+    } catch (err) {
+      console.error('Failed to load administrators:', err);
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 1.5rem; color: var(--color-danger);">
+            ${err.message || 'Error loading administrators'}
+          </td>
+        </tr>`;
+    }
+  };
+
+  window.openCreateAdminModal = function () {
+    const modal = document.getElementById('create-admin-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+      const input = document.getElementById('new-admin-name');
+      if (input) setTimeout(() => input.focus(), 50);
+    }
+  };
+
+  window.closeCreateAdminModal = function () {
+    const modal = document.getElementById('create-admin-modal');
+    if (modal) {
+      modal.style.display = 'none';
+      const form = document.getElementById('create-admin-form');
+      if (form) form.reset();
+    }
+  };
+
+  window.handleCreateAdministrator = async function (e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit-new-admin');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+    }
+
+    const payload = {
+      full_name: document.getElementById('new-admin-name')?.value?.trim(),
+      email: document.getElementById('new-admin-email')?.value?.trim(),
+      password: document.getElementById('new-admin-pass')?.value,
+      employee_id: document.getElementById('new-admin-empid')?.value?.trim(),
+      phone: document.getElementById('new-admin-phone')?.value?.trim()
+    };
+
+    try {
+      const res = await fetchApi('/admin/administrators', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      if (res && res.success) {
+        if (typeof showToast === 'function') {
+          showToast('Administrator created successfully in database!', 'success');
+        }
+        closeCreateAdminModal();
+        await window.loadAdministrators();
+      } else {
+        if (typeof showToast === 'function') {
+          showToast(res?.error?.message || 'Failed to create administrator', 'error');
+        }
+      }
+    } catch (err) {
+      if (typeof showToast === 'function') {
+        showToast(err.message || 'Failed to create administrator', 'error');
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Create Administrator';
+      }
+    }
+  };
+
+  window.promptDeleteAdmin = function (adminId, adminEmail) {
+    pendingDeleteAdminId = adminId;
+    const modal = document.getElementById('delete-admin-modal');
+    const desc = document.getElementById('delete-admin-modal-desc');
+    if (desc) {
+      desc.textContent = `Are you sure you want to delete administrator "${adminEmail}"? All administrative privileges will be revoked immediately.`;
+    }
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  };
+
+  window.closeDeleteAdminModal = function () {
+    pendingDeleteAdminId = null;
+    const modal = document.getElementById('delete-admin-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  };
+
+  const confirmDelBtn = document.getElementById('confirm-delete-admin-btn');
+  if (confirmDelBtn) {
+    confirmDelBtn.addEventListener('click', async () => {
+      if (!pendingDeleteAdminId) return;
+      confirmDelBtn.disabled = true;
+      confirmDelBtn.textContent = 'Deleting...';
+
+      try {
+        const res = await fetchApi(`/admin/administrators/${pendingDeleteAdminId}`, {
+          method: 'DELETE'
+        });
+
+        if (res && res.success) {
+          if (typeof showToast === 'function') {
+            showToast('Administrator removed successfully!', 'success');
+          }
+          closeDeleteAdminModal();
+          await window.loadAdministrators();
+        } else {
+          if (typeof showToast === 'function') {
+            showToast(res?.error?.message || 'Failed to delete administrator', 'error');
+          }
+        }
+      } catch (err) {
+        if (typeof showToast === 'function') {
+          showToast(err.message || 'Failed to delete administrator', 'error');
+        }
+      } finally {
+        confirmDelBtn.disabled = false;
+        confirmDelBtn.textContent = 'Confirm Delete';
+      }
+    });
+  }
+
   // Self-Initialization
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
@@ -459,11 +661,13 @@ if (typeof guardRoute === 'function') {
         initFormHandlers();
         await loadAdminProfile();
         await loadGovernanceMetrics();
+        await window.loadAdministrators();
       });
     } else {
       initFormHandlers();
       loadAdminProfile();
       loadGovernanceMetrics();
+      window.loadAdministrators();
     }
   }
 })();

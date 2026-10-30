@@ -519,3 +519,76 @@
   font-size: 0.72rem;
   color: var(--text-muted);
 }
+
+/* ── 6. Institutional Administrators & Modal Styles ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay, var(--color-overlay-dark, rgba(0, 0, 0, 0.5)));
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-backdrop.open,
+.modal-backdrop[style*="display: flex"] {
+  display: flex !important;
+}
+
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  width: 100%;
+  max-width: 480px;
+  padding: 1.4rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: adminModalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes adminModalSlideIn {
+  from { transform: translateY(10px) scale(0.97); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-badge-active {
+  background: var(--bg-success-subtle, var(--success-bg));
+  color: var(--color-success, var(--success-color));
+  border: 1px solid var(--border-success-subtle, var(--border-color));
+}
+
+.admin-badge-env {
+  background: var(--bg-warning-subtle, var(--warning-bg));
+  color: var(--color-warning, var(--warning-color));
+  border: 1px solid var(--border-warning-subtle, var(--border-color));
+}
+
+.admin-badge-db {
+  background: var(--bg-info-subtle, var(--primary-light));
+  color: var(--color-primary, var(--primary-color));
+  border: 1px solid var(--border-info-subtle, var(--border-color));
+}
+
+.admin-badge-current {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
