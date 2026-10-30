@@ -187,11 +187,11 @@
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                   </svg>
                 </div>
-                <span class="kpi-trend-pill trend-up">+12% &uarr;</span>
+                <span class="kpi-trend-pill trend-purple">Enrolled</span>
               </div>
               <div class="kpi-card-body">
                 <span class="kpi-label">Total Students</span>
-                <span class="kpi-value" id="stat-students">248</span>
+                <span class="kpi-value" id="stat-students">0</span>
                 <span class="kpi-subtext">Active enrolled students</span>
               </div>
             </article>
@@ -207,11 +207,11 @@
                     <polyline points="17 11 19 13 23 9"></polyline>
                   </svg>
                 </div>
-                <span class="kpi-trend-pill trend-up">+2% &uarr;</span>
+                <span class="kpi-trend-pill trend-green">Faculty</span>
               </div>
               <div class="kpi-card-body">
                 <span class="kpi-label">Total Faculty</span>
-                <span class="kpi-value" id="stat-teachers">18</span>
+                <span class="kpi-value" id="stat-teachers">0</span>
                 <span class="kpi-subtext">Teaching &amp; non-teaching staff</span>
               </div>
             </article>
@@ -239,7 +239,7 @@
               </div>
               <div class="kpi-card-body">
                 <span class="kpi-label">Departments</span>
-                <span class="kpi-value" id="stat-departments">6</span>
+                <span class="kpi-value" id="stat-departments">0</span>
                 <span class="kpi-subtext">Active departments</span>
               </div>
             </article>
@@ -259,12 +259,6 @@
                 <div class="panel-header-action">
                   <select class="department-filter-select" id="overview-dept-filter" aria-label="Filter Department">
                     <option value="ALL">All Departments</option>
-                    <option value="IT">Information Tech (IT)</option>
-                    <option value="CE">Civil Engineering (CE)</option>
-                    <option value="EE">Electrical Engineering (EE)</option>
-                    <option value="ME">Mechanical Engineering (ME)</option>
-                    <option value="EC">Electronics (EC)</option>
-                    <option value="AP">Applied Sciences (AP)</option>
                   </select>
                 </div>
               </div>
@@ -277,20 +271,20 @@
                       <svg class="donut-svg" viewBox="0 0 120 120">
                         <!-- Base track -->
                         <circle cx="60" cy="60" r="48" fill="none" stroke="var(--bg-surface)" stroke-width="14"/>
-                        <!-- Absent segment (red: 21%) -->
-                        <circle cx="60" cy="60" r="48" fill="none" stroke="var(--status-absent)" stroke-width="14" stroke-dasharray="301.6" stroke-dashoffset="63.3" transform="rotate(-90 60 60)"/>
-                        <!-- Present segment (green: 79%) -->
-                        <circle cx="60" cy="60" r="48" fill="none" stroke="var(--status-present)" stroke-width="14" stroke-dasharray="301.6" stroke-dashoffset="63.3" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+                        <!-- Absent segment -->
+                        <circle id="donut-absent-circle" cx="60" cy="60" r="48" fill="none" stroke="var(--status-absent)" stroke-width="14" stroke-dasharray="301.6" stroke-dashoffset="301.6" transform="rotate(-90 60 60)"/>
+                        <!-- Present segment -->
+                        <circle id="donut-present-circle" cx="60" cy="60" r="48" fill="none" stroke="var(--status-present)" stroke-width="14" stroke-dasharray="301.6" stroke-dashoffset="301.6" stroke-linecap="round" transform="rotate(-90 60 60)"/>
                       </svg>
                       <div class="donut-center-label">
-                        <span class="donut-pct">79%</span>
+                        <span class="donut-pct" id="donut-pct-text">0%</span>
                         <span class="donut-sub">Present</span>
                       </div>
                     </div>
                   </div>
                   <div class="overview-total-subtext">
                     <span>Institutional Roster</span>
-                    <span class="enrolled-count-chip">248 Enrolled</span>
+                    <span class="enrolled-count-chip" id="overview-enrolled-chip">0 Enrolled</span>
                   </div>
                 </div>
 
@@ -301,50 +295,11 @@
                 <div class="attendance-dept-pane">
                   <div class="dept-pane-header">
                     <span class="dept-pane-title">Department Breakdown</span>
-                    <span class="dept-avg-badge">Campus Avg: <strong>78.7%</strong></span>
+                    <span class="dept-avg-badge" id="campus-avg-badge">Campus Avg: <strong>0%</strong></span>
                   </div>
-                  <div class="dept-bars-container">
-                    <div class="dept-bar-col">
-                      <span class="dept-bar-pct">82%</span>
-                      <div class="dept-bar-track">
-                        <div class="dept-bar-fill" style="height: 82%;"></div>
-                      </div>
-                      <span class="dept-bar-code">IT</span>
-                    </div>
-                    <div class="dept-bar-col">
-                      <span class="dept-bar-pct">76%</span>
-                      <div class="dept-bar-track">
-                        <div class="dept-bar-fill" style="height: 76%;"></div>
-                      </div>
-                      <span class="dept-bar-code">CE</span>
-                    </div>
-                    <div class="dept-bar-col">
-                      <span class="dept-bar-pct">80%</span>
-                      <div class="dept-bar-track">
-                        <div class="dept-bar-fill" style="height: 80%;"></div>
-                      </div>
-                      <span class="dept-bar-code">EE</span>
-                    </div>
-                    <div class="dept-bar-col">
-                      <span class="dept-bar-pct">71%</span>
-                      <div class="dept-bar-track">
-                        <div class="dept-bar-fill" style="height: 71%;"></div>
-                      </div>
-                      <span class="dept-bar-code">ME</span>
-                    </div>
-                    <div class="dept-bar-col">
-                      <span class="dept-bar-pct">85%</span>
-                      <div class="dept-bar-track">
-                        <div class="dept-bar-fill" style="height: 85%;"></div>
-                      </div>
-                      <span class="dept-bar-code">EC</span>
-                    </div>
-                    <div class="dept-bar-col">
-                      <span class="dept-bar-pct">78%</span>
-                      <div class="dept-bar-track">
-                        <div class="dept-bar-fill" style="height: 78%;"></div>
-                      </div>
-                      <span class="dept-bar-code">AP</span>
+                  <div class="dept-bars-container" id="dept-bars-container">
+                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1.5rem 0;">
+                      Loading departments...
                     </div>
                   </div>
                 </div>

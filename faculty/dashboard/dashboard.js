@@ -309,21 +309,21 @@
         const switcherDept = document.getElementById('hod-switcher-dept-name');
 
         if (titleEl) {
-          const deptName = d.department_name || 'Department of Computer Science';
+          const deptName = d.department_name || d.department?.name || state.currentUser?.department_name || 'Department Administration';
           titleEl.innerText = `${deptName} 💻`;
         }
         if (subEl) {
           subEl.innerText = 'Manage your faculty, students, classes, subjects, and attendance, and keep your department running smoothly.';
         }
-        if (cardDeptName) cardDeptName.innerText = d.department_name || 'Department Administration';
-        if (switcherDept && d.department_name) switcherDept.innerText = d.department_name;
+        if (cardDeptName) cardDeptName.innerText = d.department_name || d.department?.name || state.currentUser?.department_name || 'Department Administration';
+        if (switcherDept && (d.department_name || d.department?.name)) switcherDept.innerText = d.department_name || d.department?.name;
         if (cardDeptMeta) {
           const facultyId = state.currentUser?.employee_id || (state.currentUser?.id ? `F${String(state.currentUser.id).padStart(3, '0')}` : 'F001');
           const roleTitle = state.currentUser?.is_hod ? 'HOD' : 'Faculty';
           cardDeptMeta.innerText = `Faculty ID: ${facultyId} | Role: ${roleTitle}`;
         }
 
-        // 4 Primary Department KPIs (Matching Image 1)
+        // 4 Primary Department KPIs (Real Database Metrics)
         const kpiTeachers = document.getElementById('kpi-dept-teachers');
         const kpiStudents = document.getElementById('kpi-dept-students');
         const kpiSubjects = document.getElementById('kpi-dept-subjects');
@@ -332,10 +332,15 @@
         const kpiAttBadge = document.getElementById('kpi-dept-att-badge');
         const kpiDevices = document.getElementById('kpi-dept-devices');
 
-        if (kpiTeachers) kpiTeachers.innerText = d.total_teachers ?? 4;
-        if (kpiStudents) kpiStudents.innerText = d.total_students ?? 142;
-        if (kpiSubjects) kpiSubjects.innerText = d.total_subjects ?? 18;
-        if (kpiRegisters) kpiRegisters.innerText = d.active_registers ?? 12;
+        const teachersVal = d.total_teachers ?? d.counts?.teachers ?? 0;
+        const studentsVal = d.total_students ?? d.counts?.students ?? 0;
+        const subjectsVal = d.total_subjects ?? d.counts?.subjects ?? 0;
+        const registersVal = d.active_registers ?? d.counts?.active_registers ?? 0;
+
+        if (kpiTeachers) kpiTeachers.innerText = Number(teachersVal).toLocaleString();
+        if (kpiStudents) kpiStudents.innerText = Number(studentsVal).toLocaleString();
+        if (kpiSubjects) kpiSubjects.innerText = Number(subjectsVal).toLocaleString();
+        if (kpiRegisters) kpiRegisters.innerText = Number(registersVal).toLocaleString();
         if (kpiAttPct) kpiAttPct.innerText = d.avg_attendance_pct != null ? `${d.avg_attendance_pct}%` : '—';
         if (kpiDevices) {
           kpiDevices.innerText = `${d.devices_online || 0} / ${d.devices_total || 0}`;

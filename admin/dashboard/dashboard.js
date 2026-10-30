@@ -43,6 +43,8 @@ function startLiveDateTime() {
   setInterval(update, 30000); // Update every 30s
 }
 
+let adminStatsData = null;
+
 /**
  * 3. Load Real-Time Institutional Statistics (/api/v1/admin/stats)
  */
@@ -51,33 +53,147 @@ async function loadAdminStats() {
     const res = await fetchApi('/admin/stats');
     if (res && res.success && res.data) {
       const d = res.data;
+      adminStatsData = d;
+
       const elTeachers = document.getElementById('stat-teachers');
       const elStudents = document.getElementById('stat-students');
       const elDepts = document.getElementById('stat-departments');
 
-      const totalStudents = Number(d.total_enrolled_students || d.total_students || 248);
-      const totalTeachers = Number(d.total_teachers || 18);
-      const totalDepartments = Number(d.total_departments || 6);
+      const totalStudents = Number(d.total_enrolled_students ?? d.total_students ?? 0);
+      const totalTeachers = Number(d.total_teachers ?? 0);
+      const totalDepartments = Number(d.total_departments ?? 0);
 
       if (elTeachers) elTeachers.innerText = totalTeachers.toLocaleString();
       if (elStudents) elStudents.innerText = totalStudents.toLocaleString();
       if (elDepts) elDepts.innerText = totalDepartments.toLocaleString();
 
-      // Attendance Ratio Calculation
-      const elPresent = document.getElementById('stat-present-count');
-      const elAbsent = document.getElementById('stat-absent-count');
-
-      // If live session data is present, compute; otherwise preserve realistic institutional defaults
-      if (d.today_sessions && d.today_sessions > 0) {
-        const estPresent = Math.round(totalStudents * 0.79);
-        const estAbsent = totalStudents - estPresent;
-        if (elPresent) elPresent.innerText = estPresent.toLocaleString();
-        if (elAbsent) elAbsent.innerText = estAbsent.toLocaleString();
+      // Enrolled chip
+      const elEnrolledChip = document.getElementById('overview-enrolled-chip');
+      if (elEnrolledChip) {
+        elEnrolledChip.innerText = `${totalStudents.toLocaleString()} Enrolled`;
       }
+
+      // Today attendance & Donut
+      renderAttendanceDonut(d);
+
+      // Render Department Breakdown bars
+      renderDepartmentBars(d);
+
+      // Populate department filter dropdown
+      populateDepartmentFilter(d);
     }
   } catch (err) {
-    console.warn('[AdminDashboard] Failed to load real-time stats (using demo fallbacks):', err);
+    console.warn('[AdminDashboard] Failed to load real-time stats:', err);
   }
+}
+
+function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
+  const donutPct = document.getElementById('donut-pct-text');
+  const presentCircle = document.getElementById('donut-present-circle');
+  const absentCircle = document.getElementById('donut-absent-circle');
+  const campusAvgBadge = document.getElementById('campus-avg-badge');
+
+  let pct = 0;
+  let hasRecords = false;
+
+  if (filterDeptCode === 'ALL') {
+    const att = d.today_attendance || {};
+    hasRecords = Boolean(att.has_records && att.total_records > 0);
+    pct = hasRecords ? Math.round(att.attendance_pct) : 0;
+  } else {
+    const dept = (d.department_breakdown || []).find(x => x.code === filterDeptCode);
+    if (dept && dept.total_records > 0) {
+      hasRecords = true;
+      pct = Math.round(dept.attendance_pct);
+    }
+  }
+
+  if (donutPct) {
+    donutPct.innerText = hasRecords ? `${pct}%` : '0%';
+  }
+
+  const circumference = 301.6;
+  if (hasRecords) {
+    const presentOffset = circumference * (1 - pct / 100);
+    if (presentCircle) {
+      presentCircle.style.strokeDashoffset = presentOffset;
+      presentCircle.style.display = pct > 0 ? 'block' : 'none';
+    }
+    if (absentCircle) {
+      absentCircle.style.strokeDashoffset = '0';
+      absentCircle.style.display = pct < 100 ? 'block' : 'none';
+    }
+  } else {
+    if (presentCircle) presentCircle.style.strokeDashoffset = circumference;
+    if (absentCircle) absentCircle.style.strokeDashoffset = circumference;
+  }
+
+  if (campusAvgBadge) {
+    const avgVal = (d.today_attendance && d.today_attendance.total_records > 0)
+      ? `${Math.round(d.today_attendance.attendance_pct)}%`
+      : '0%';
+    campusAvgBadge.innerHTML = `Campus Avg: <strong>${avgVal}</strong>`;
+  }
+}
+
+function renderDepartmentBars(d) {
+  const container = document.getElementById('dept-bars-container');
+  if (!container) return;
+
+  const depts = d.department_breakdown || [];
+  if (depts.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1.5rem 0;">
+        No active departments configured.
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = depts.map(dept => {
+    const hasScans = dept.total_records > 0;
+    const pct = hasScans ? Math.round(dept.attendance_pct) : 0;
+    const height = Math.max(pct, 4);
+    const pctLabel = hasScans ? `${pct}%` : '0%';
+
+    return `
+      <div class="dept-bar-col" title="${escapeHtml(dept.name)}: ${dept.student_count} enrolled, ${dept.present_count}/${dept.total_records} marked today">
+        <span class="dept-bar-pct">${pctLabel}</span>
+        <div class="dept-bar-track">
+          <div class="dept-bar-fill" style="height: ${hasScans ? height : 0}%;"></div>
+        </div>
+        <span class="dept-bar-code">${escapeHtml(dept.code || '')}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function populateDepartmentFilter(d) {
+  const select = document.getElementById('overview-dept-filter');
+  if (!select) return;
+
+  const depts = d.department_breakdown || [];
+  const currentVal = select.value || 'ALL';
+
+  select.innerHTML = `<option value="ALL">All Departments</option>` + depts.map(dept => `
+    <option value="${escapeHtml(dept.code)}">${escapeHtml(dept.name)} (${escapeHtml(dept.code)})</option>
+  `).join('');
+
+  select.value = currentVal;
+  select.onchange = () => {
+    if (adminStatsData) {
+      renderAttendanceDonut(adminStatsData, select.value);
+    }
+  };
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 /**

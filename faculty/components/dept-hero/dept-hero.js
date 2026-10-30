@@ -67,7 +67,7 @@
   function renderTemplate(config) {
     const isHod = config.isHod;
     const roleBadgeText = isHod ? 'HOD Access' : 'Faculty Access';
-    const deptName = config.departmentName || 'Department of Computer Science';
+    const deptName = config.departmentName || 'Academic Department';
     const eyebrow = config.eyebrow || 'DEPARTMENT PORTAL';
     const subtitle = config.subtitle || 'Manage your department faculty, students, classes and academic activities.';
     const instName = config.instName || 'Government Polytechnic Nainital';
@@ -216,7 +216,7 @@
     let deptName = options.departmentName || container.getAttribute('data-department') || '';
     if (!deptName && user.department_name) deptName = user.department_name;
     if (!deptName && user.department) deptName = user.department;
-    if (!deptName) deptName = 'Department of Computer Science';
+    if (!deptName) deptName = 'Academic Department';
 
     const config = {
       eyebrow: options.eyebrow || container.getAttribute('data-eyebrow') || 'DEPARTMENT PORTAL',
