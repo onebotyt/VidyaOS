@@ -415,6 +415,18 @@
       "destination": "/faculty/course-file/index.html"
     },
     {
+      "source": "/faculty/theory-classes",
+      "destination": "/faculty/theory-classes/index.html"
+    },
+    {
+      "source": "/faculty/theory-classes/",
+      "destination": "/faculty/theory-classes/index.html"
+    },
+    {
+      "source": "/faculty/theory-classes.html",
+      "destination": "/faculty/theory-classes/index.html"
+    },
+    {
       "source": "/faculty/groups",
       "destination": "/faculty/dashboard/index.html"
     },

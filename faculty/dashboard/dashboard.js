@@ -846,6 +846,9 @@ function renderGroups() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
               </button>
               <div class="gc-menu-dropdown gc-menu-header" id="card-menu-header-${g.id}">
+                <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="gc-menu-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> <span>Theory Classes (7 Records)</span>
+                </a>
                 <a href="/faculty/course-file.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="gc-menu-item">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> <span>Open NBA Course File</span>
                 </a>
@@ -954,7 +957,26 @@ function renderGroups() {
           </a>
         </div>
 
-        <!-- 5. Collapsible Course File (NBA/NAAC) Footer Bar -->
+        <!-- 5. Theory Classes Academic Dossier Entry -->
+        <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-theory-classes-bar" title="Open Theory Classes Academic Dossier (7 Records)">
+          <div class="card-cf-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Theory Classes</span>
+          </div>
+          <div class="card-cf-right">
+            <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <!-- 6. Collapsible Course File (NBA/NAAC) Footer Bar -->
         <div class="card-cf-footer-bar" onclick="toggleCfPanel(${g.id})" role="button" tabindex="0" title="Toggle NBA Course File Documents">
           <div class="card-cf-left">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">

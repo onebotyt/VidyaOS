@@ -4755,3 +4755,26 @@ body {
 .card-cf-chevron.is-open {
   transform: rotate(180deg);
 }
+
+.card-theory-classes-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.card-theory-classes-bar:hover {
+  background: var(--bg-surface-secondary);
+}
+
+.card-theory-classes-bar .card-cf-left svg {
+  color: var(--color-primary);
+}
+
+.card-theory-classes-bar .card-cf-right svg {
+  color: var(--text-muted);
+}
