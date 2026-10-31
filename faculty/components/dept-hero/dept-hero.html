@@ -1,71 +1,39 @@
 <!--
-  ══════════════════════════════════════════════════════════════
-  VIDYAOS REUSABLE DEPARTMENT HERO COMPONENT (dept-hero.html)
+  VIDYAOS UNIFIED INSTITUTIONAL HERO COMPONENT (dept-hero.html)
   Location: /faculty/components/dept-hero/dept-hero.html
   100% Theme Token Compliant — Zero Hardcoded Hex Colors
-  ══════════════════════════════════════════════════════════════
 -->
-<section class="dept-hero-component" aria-label="Department Overview & Institutional Showcase">
-  <!-- Left Header Card -->
-  <div class="dept-hero-left">
-    <div>
-      <span class="dept-hero-eyebrow" id="dept-hero-eyebrow">DEPARTMENT PORTAL</span>
-      <h1 class="dept-hero-title" id="dept-hero-title">
-        <span id="dept-hero-dept-name">Department of Computer Science</span> 💻
-      </h1>
-      <p class="dept-hero-subtitle" id="dept-hero-subtitle">
-        Manage your department faculty, students, classes and academic activities.
-      </p>
+<section class="dept-hero-component" aria-label="Institutional Campus Showcase & Faculty Command Header">
+  <!-- Left Side: College Identity & Page Meta -->
+  <div class="hero-left-col">
+    <!-- College Circular Logo -->
+    <div class="hero-logo-circle-wrap" aria-hidden="true">
+      <img id="hero-inst-logo" src="/images/college-logo.svg" alt="College Logo" class="hero-inst-logo-img"
+        onerror="this.onerror=null;this.src='/images/college-logo.svg';">
     </div>
-    <div class="dept-hero-pills">
-      <span class="dept-hero-pill" id="dept-hero-date-pill">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
-        <span id="dept-hero-live-date">Thursday, 29 October 2026</span>
-      </span>
-      <span class="dept-hero-pill" id="dept-hero-time-pill">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        <span id="dept-hero-live-time">3:56 AM</span>
-      </span>
-      <span class="dept-hero-pill" id="dept-hero-access-pill">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-        </svg>
-        <span id="dept-hero-role-label">HOD Access</span>
-      </span>
+
+    <!-- College Name & Subtitle -->
+    <div class="hero-inst-text-block">
+      <h2 class="hero-inst-name" id="hero-inst-name">Government Polytechnic Nainital</h2>
+      <p class="hero-inst-tagline" id="hero-inst-tagline">Uttarakhand | Completely Adhered to NBA Guidelines</p>
+    </div>
+
+    <!-- Vertical Divider -->
+    <div class="hero-vertical-divider" aria-hidden="true"></div>
+
+    <!-- Page Title & Subtitle -->
+    <div class="hero-page-text-block">
+      <h1 class="hero-page-title" id="hero-page-title">Faculty Dashboard</h1>
+      <p class="hero-page-subtitle" id="hero-page-subtitle">Manage your classes, attendance, students and more.</p>
     </div>
   </div>
 
-  <!-- Right Institution Showcase Card -->
-  <div class="dept-hero-campus-card" aria-label="Institution Profile">
-    <div class="dept-hero-campus-content">
-      <div class="dept-hero-campus-header">
-        <div class="dept-hero-campus-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
-          </svg>
-        </div>
-        <div>
-          <h2 class="dept-hero-campus-name" id="dept-hero-inst-name">Government Polytechnic Nainital</h2>
-          <span class="dept-hero-campus-motto">Knowledge &bull; Skills &bull; Better Tomorrow</span>
-        </div>
-      </div>
-      <div class="dept-hero-campus-quote">
-        <span>&ldquo;Education creates opportunities.&rdquo;</span>
-      </div>
-    </div>
-    <div class="dept-hero-campus-img-wrap" aria-hidden="true">
-      <img src="/admin/dashboard/campus-nainital.jpg" alt="Government Polytechnic Nainital Campus"
-        class="dept-hero-campus-img" onerror="this.onerror=null;this.src='/images/campus-nainital.jpg';">
-      <div class="dept-hero-campus-overlay"></div>
+  <!-- Right Side: Panoramic College Campus Building Photo -->
+  <div class="hero-right-col" aria-hidden="true">
+    <div class="hero-campus-photo-wrap">
+      <img id="hero-campus-img" src="/admin/dashboard/campus-nainital.jpg" alt="Government Polytechnic Nainital Campus"
+        class="hero-campus-photo" onerror="this.onerror=null;this.src='/images/campus-nainital.jpg';">
+      <div class="hero-campus-photo-overlay"></div>
     </div>
   </div>
 </section>
-

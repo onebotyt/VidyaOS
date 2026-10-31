@@ -148,6 +148,16 @@
                   required autocomplete="off">
               </div>
 
+              <!-- Field 1b: Tagline / Accreditation Subtitle -->
+              <div class="form-group">
+                <label class="form-label-strong" for="setting-inst-tagline">
+                  Institution Subtitle / Accreditation Tagline
+                </label>
+                <input type="text" id="setting-inst-tagline" class="form-control"
+                  placeholder="e.g. Uttarakhand | Completely Adhered to NBA Guidelines"
+                  autocomplete="off">
+              </div>
+
               <!-- Field 2: Code -->
               <div class="form-group">
                 <label class="form-label-strong" for="setting-inst-code">
@@ -176,6 +186,89 @@
                 <input type="text" id="setting-location" class="form-control"
                   placeholder="e.g. Uttarakhand, India"
                   autocomplete="off">
+              </div>
+            </div>
+
+            <!-- Visual Identity: College Logo & Campus Showcase Image -->
+            <div class="branding-settings-section" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span>College Logo & Campus Banner</span>
+              </h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.15rem;">
+                Upload official college emblem and campus building photo. These dynamically appear across Teacher Classes header, Faculty Dashboard, and Institutional Portals.
+              </p>
+
+              <div class="branding-upload-grid">
+                <!-- 1. College Logo Upload Box -->
+                <div class="branding-card">
+                  <span class="branding-card-title">1. College Official Logo</span>
+                  <div class="branding-preview-row">
+                    <div class="branding-logo-circle-wrap">
+                      <img id="preview-logo-img" src="/images/college-logo.svg" alt="College Logo" onerror="this.onerror=null;this.src='/images/college-logo.svg';">
+                    </div>
+                    <div class="branding-actions-col">
+                      <input type="file" id="upload-logo-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="handleLogoFileSelect(event)">
+                      <input type="hidden" id="setting-inst-logo-url" value="/images/college-logo.svg">
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('upload-logo-file').click()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>Upload Logo</span>
+                      </button>
+                      <button type="button" class="btn btn-link btn-xs" onclick="resetDefaultLogo()" style="color:var(--text-muted);font-size:0.75rem;">
+                        Reset Default
+                      </button>
+                    </div>
+                  </div>
+                  <span class="branding-hint">Recommended: Transparent PNG or SVG (Square 1:1, up to 5MB)</span>
+                </div>
+
+                <!-- 2. College Campus Image Upload Box -->
+                <div class="branding-card">
+                  <span class="branding-card-title">2. Campus Building Photo (Panoramic)</span>
+                  <div class="branding-preview-row">
+                    <div class="branding-banner-pano-wrap">
+                      <img id="preview-banner-img" src="/admin/dashboard/campus-nainital.jpg" alt="Campus Building" onerror="this.onerror=null;this.src='/admin/dashboard/campus-nainital.jpg';">
+                    </div>
+                    <div class="branding-actions-col">
+                      <input type="file" id="upload-banner-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleBannerFileSelect(event)">
+                      <input type="hidden" id="setting-inst-banner-url" value="/admin/dashboard/campus-nainital.jpg">
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('upload-banner-file').click()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>Upload Campus Image</span>
+                      </button>
+                      <button type="button" class="btn btn-link btn-xs" onclick="resetDefaultBanner()" style="color:var(--text-muted);font-size:0.75rem;">
+                        Reset Default
+                      </button>
+                    </div>
+                  </div>
+                  <span class="branding-hint">Recommended: Landscape photo of college building (16:9 ratio, up to 10MB)</span>
+                </div>
+              </div>
+
+              <!-- 3. Live Banner Preview Bar Mockup -->
+              <div style="margin-top: 1.25rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.45rem;">
+                  Live Hero Header Preview (Real-time Showcase)
+                </span>
+                <div class="branding-mockup-banner">
+                  <div class="mockup-banner-left">
+                    <div class="mockup-logo-circle">
+                      <img id="mockup-logo-img" src="/images/college-logo.svg" alt="Logo">
+                    </div>
+                    <div>
+                      <div class="mockup-inst-name" id="mockup-inst-name">Government Polytechnic Nainital</div>
+                      <div class="mockup-inst-tagline" id="mockup-inst-tagline">Uttarakhand | Completely Adhered to NBA Guidelines</div>
+                    </div>
+                    <div class="mockup-v-divider"></div>
+                    <div>
+                      <div class="mockup-dash-title">Faculty Dashboard</div>
+                      <div class="mockup-dash-subtitle">Manage your classes, attendance, students and more.</div>
+                    </div>
+                  </div>
+                  <div class="mockup-banner-right">
+                    <img id="mockup-banner-img" src="/admin/dashboard/campus-nainital.jpg" alt="Campus">
+                  </div>
+                </div>
               </div>
             </div>
 

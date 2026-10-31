@@ -2294,3 +2294,142 @@ html, body {
     box-sizing: border-box !important;
   }
 }
+
+/* ═════════════════════════════════════════════════════════════════
+   MODERN 5 KPI STATS METRIC ROW (TEACHER CLASSES VIEW)
+   100% Theme Token Compliant (Zero Hardcoded Hex Colors)
+   ═════════════════════════════════════════════════════════════════ */
+.teacher-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.35rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.teacher-kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1.15rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  box-sizing: border-box;
+}
+
+.teacher-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.teacher-kpi-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.teacher-kpi-icon.icon-blue {
+  background: var(--color-primary-light, hsl(220 90% 56% / 0.12));
+  color: var(--color-primary, hsl(220 90% 56%));
+}
+
+.teacher-kpi-icon.icon-green {
+  background: var(--status-present-light, hsl(152 76% 40% / 0.12));
+  color: var(--status-present, hsl(152 76% 40%));
+}
+
+.teacher-kpi-icon.icon-purple {
+  background: hsl(265 89% 66% / 0.12);
+  color: hsl(265 89% 66%);
+}
+
+.teacher-kpi-icon.icon-amber {
+  background: var(--status-late-light, hsl(38 92% 50% / 0.12));
+  color: var(--status-late, hsl(38 92% 50%));
+}
+
+.teacher-kpi-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.teacher-kpi-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.teacher-kpi-val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.teacher-kpi-val-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.teacher-kpi-trend {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--status-present, hsl(152 76% 40%));
+  background: var(--status-present-light, hsl(152 76% 40% / 0.12));
+  padding: 1px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.teacher-kpi-date {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.teacher-kpi-time {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+  .teacher-kpi-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .teacher-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .teacher-kpi-row {
+    grid-template-columns: 1fr;
+  }
+}

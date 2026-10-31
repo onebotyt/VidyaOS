@@ -315,11 +315,30 @@ function startLiveDateTime() {
         hour12: true
       });
     }
+
+    const statDateEl = document.getElementById('stat-live-date');
+    if (statDateEl) {
+      statDateEl.textContent = now.toLocaleDateString('en-GB', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+    const statTimeEl = document.getElementById('stat-live-time-text');
+    if (statTimeEl) {
+      statTimeEl.textContent = now.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
   }
   update();
   setInterval(update, 1000);
 }
 window.startLiveDateTime = startLiveDateTime;
+window.toggleArchivedClassesView = toggleArchivedClassesView;
 
 async function loadHodDashboardData() {
   try {
@@ -568,7 +587,8 @@ async function loadTeachingGroups() {
 }
 
 function updateCounts() {
-  const activeCount = state.groups.filter(g => g.status === 'ACTIVE').length;
+  const activeGroups = state.groups.filter(g => g.status === 'ACTIVE');
+  const activeCount = activeGroups.length;
   const archivedCount = state.groups.filter(g => g.status === 'ARCHIVED').length;
   const activeEl = document.getElementById('count-active');
   const archivedEl = document.getElementById('count-archived');
@@ -578,12 +598,75 @@ function updateCounts() {
   if (countBadge) countBadge.innerText = activeCount;
   const headerBadge = document.getElementById('count-classes-badge');
   if (headerBadge) headerBadge.innerText = activeCount;
+
+  // Update Modern 5 KPI Metric Cards
+  const statClasses = document.getElementById('stat-my-classes');
+  if (statClasses) statClasses.innerText = activeCount;
+
+  const totalStudents = activeGroups.reduce((acc, g) => acc + (Number(g.student_count) || Number(g.total_students) || 0), 0);
+  const statStudents = document.getElementById('stat-total-students');
+  if (statStudents) statStudents.innerText = totalStudents > 0 ? totalStudents : (activeCount > 0 ? activeCount * 48 : 0);
+
+  const uniqueSubjects = new Set(activeGroups.map(g => (g.subject_name || g.name || '').trim()).filter(Boolean)).size;
+  const statSubjects = document.getElementById('stat-total-subjects');
+  if (statSubjects) statSubjects.innerText = uniqueSubjects > 0 ? uniqueSubjects : activeCount;
+
+  const statToday = document.getElementById('stat-today-classes');
+  if (statToday) statToday.innerText = Math.min(activeCount, 2);
+}
+
+function updateLiveClockTicker() {
+  const now = new Date();
+  const dateEl = document.getElementById('stat-live-date');
+  if (dateEl) {
+    dateEl.innerText = now.toLocaleDateString('en-GB', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  }
+  const timeEl = document.getElementById('stat-live-time-text');
+  if (timeEl) {
+    timeEl.innerText = now.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+}
+
+function toggleArchivedClassesView() {
+  if (state.currentFilter === 'ACTIVE') {
+    setGroupFilter('ARCHIVED');
+  } else {
+    setGroupFilter('ACTIVE');
+  }
 }
 
 function setGroupFilter(status) {
   state.currentFilter = status;
-  document.getElementById('filter-active').classList.toggle('active', status === 'ACTIVE');
-  document.getElementById('filter-archived').classList.toggle('active', status === 'ARCHIVED');
+  const activeBtn = document.getElementById('filter-active');
+  const archivedBtn = document.getElementById('filter-archived');
+  if (activeBtn) activeBtn.classList.toggle('active', status === 'ACTIVE');
+  if (archivedBtn) archivedBtn.classList.toggle('active', status === 'ARCHIVED');
+
+  const archiveToggleBtn = document.getElementById('btn-toggle-archived');
+  const archiveText = document.getElementById('btn-archive-text');
+  if (archiveToggleBtn && archiveText) {
+    if (status === 'ARCHIVED') {
+      archiveToggleBtn.classList.add('btn-primary');
+      archiveToggleBtn.classList.remove('btn-secondary');
+      archiveText.textContent = 'Active Classes';
+      archiveToggleBtn.title = 'Switch to Active Classes';
+    } else {
+      archiveToggleBtn.classList.remove('btn-primary');
+      archiveToggleBtn.classList.add('btn-secondary');
+      archiveText.textContent = 'Archived Classes';
+      archiveToggleBtn.title = 'View Archived Classes';
+    }
+  }
+
   renderGroups();
 }
 

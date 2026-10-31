@@ -487,11 +487,103 @@
 
         <!-- Teaching Classes View (Google Classroom Workspace) -->
         <div id="teaching-classes-view" style="display: block;">
+          <!-- 1. Top Reusable Institutional Hero Showcase Banner -->
+          <div id="dept-hero-container" class="dept-hero-mount" data-title="Faculty Dashboard" data-subtitle="Manage your classes, attendance, students and more."></div>
+
+          <!-- 2. Modern 5 KPI Stats Metric Cards Row (Matching Design) -->
+          <section class="teacher-kpi-row" aria-label="Faculty Academic Metrics">
+            <!-- Card 1: My Classes -->
+            <div class="teacher-kpi-card">
+              <div class="teacher-kpi-icon icon-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <div class="teacher-kpi-body">
+                <span class="teacher-kpi-label">My Classes</span>
+                <span class="teacher-kpi-val" id="stat-my-classes">0</span>
+              </div>
+            </div>
+
+            <!-- Card 2: Total Students -->
+            <div class="teacher-kpi-card">
+              <div class="teacher-kpi-icon icon-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <polyline points="16 11 18 13 22 9"></polyline>
+                </svg>
+              </div>
+              <div class="teacher-kpi-body">
+                <span class="teacher-kpi-label">Total Students</span>
+                <div class="teacher-kpi-val-row">
+                  <span class="teacher-kpi-val" id="stat-total-students">0</span>
+                  <span class="teacher-kpi-trend" id="stat-students-trend">&uarr; +12%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Subjects -->
+            <div class="teacher-kpi-card">
+              <div class="teacher-kpi-icon icon-purple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+              </div>
+              <div class="teacher-kpi-body">
+                <span class="teacher-kpi-label">Subjects</span>
+                <span class="teacher-kpi-val" id="stat-total-subjects">0</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Today's Classes -->
+            <div class="teacher-kpi-card">
+              <div class="teacher-kpi-icon icon-amber">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <div class="teacher-kpi-body">
+                <span class="teacher-kpi-label">Today's Classes</span>
+                <span class="teacher-kpi-val" id="stat-today-classes">0</span>
+              </div>
+            </div>
+
+            <!-- Card 5: Date & Live Time -->
+            <div class="teacher-kpi-card card-datetime">
+              <div class="teacher-kpi-icon icon-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <div class="teacher-kpi-body">
+                <span class="teacher-kpi-date" id="stat-live-date">Thursday, 29 Oct 2026</span>
+                <span class="teacher-kpi-time" id="stat-live-time">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span id="stat-live-time-text">3:56 AM</span>
+                </span>
+              </div>
+            </div>
+          </section>
+
           <!-- Clean Classes Section Header & Controls -->
           <div class="classes-simple-header">
             <div class="classes-header-left">
               <h2 class="classes-main-title">
-                <span>Subject Classes</span>
+                <span>My Classes</span>
                 <span class="classes-count-badge" id="count-classes-badge">0</span>
               </h2>
               <div class="classes-header-actions">
@@ -499,17 +591,16 @@
                   title="Create a new class">
                   <span style="font-size:1.1rem;line-height:1">&#43;</span> <span>Create Class</span>
                 </button>
-                <button id="btn-my-students-roster" type="button" class="btn btn-secondary btn-sm"
-                  onclick="openTeacherStudentsModal()"
-                  title="View full details of all students under your classes in 1-click">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                <button id="btn-toggle-archived" type="button" class="btn btn-secondary btn-sm"
+                  onclick="toggleArchivedClassesView()"
+                  title="View Archived Classes">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                    <rect x="1" y="3" width="22" height="5"></rect>
+                    <line x1="10" y1="12" x2="14" y2="12"></line>
                   </svg>
-                  <span>Students Roster</span>
+                  <span id="btn-archive-text">Archived Classes</span>
                 </button>
                 <button id="btn-broadcast-notice" class="btn btn-secondary btn-sm" onclick="openBroadcastNoticeModal()"
                   title="Post notice to all classes">
@@ -2167,15 +2258,15 @@
     </div>
 
     <!-- Standard Scripts -->
-    <script src="/js/api.js?v=20261031_v5"></script>
-    <script src="/js/auth.js?v=20261031_v5"></script>
-    <script src="/js/ui.js?v=20261031_v5"></script>
-    <script src="/faculty/components/icons.js?v=20261031_v5"></script>
-    <script src="/faculty/components/faculty-ui.js?v=20261031_v5"></script>
-    <script src="/faculty/components/header/header.js?v=20261031_v5"></script>
-    <script src="/faculty/components/sidebar/sidebar.js?v=20261031_v5"></script>
-    <script src="/faculty/components/dept-hero/dept-hero.js?v=20261031_v5"></script>
-    <script src="/faculty/dashboard/dashboard.js?v=20261031_v5"></script>
+    <script src="/js/api.js?v=20261031_v6"></script>
+    <script src="/js/auth.js?v=20261031_v6"></script>
+    <script src="/js/ui.js?v=20261031_v6"></script>
+    <script src="/faculty/components/icons.js?v=20261031_v6"></script>
+    <script src="/faculty/components/faculty-ui.js?v=20261031_v6"></script>
+    <script src="/faculty/components/header/header.js?v=20261031_v6"></script>
+    <script src="/faculty/components/sidebar/sidebar.js?v=20261031_v6"></script>
+    <script src="/faculty/components/dept-hero/dept-hero.js?v=20261031_v6"></script>
+    <script src="/faculty/dashboard/dashboard.js?v=20261031_v6"></script>
 </body>
 
 </html>
