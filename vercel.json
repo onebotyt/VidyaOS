@@ -22,7 +22,6 @@
       "source": "/shared/:path*",
       "destination": "/shared/:path*"
     },
-
     {
       "source": "/login",
       "destination": "/login/index.html"
@@ -75,7 +74,6 @@
       "source": "/login/faculty-register",
       "destination": "/login/register/index.html?role=faculty"
     },
-
     {
       "source": "/admin",
       "destination": "/admin/academic-structure/index.html"
@@ -112,13 +110,36 @@
       "source": "/admin/departments.html",
       "destination": "/admin/academic-structure/index.html?tab=departments"
     },
-
     {
       "source": "/faculty",
       "destination": "/faculty/dashboard/index.html"
     },
     {
       "source": "/faculty/",
+      "destination": "/faculty/dashboard/index.html"
+    },
+    {
+      "source": "/faculty/dashboard",
+      "destination": "/faculty/dashboard/index.html"
+    },
+    {
+      "source": "/faculty/dashboard/",
+      "destination": "/faculty/dashboard/index.html"
+    },
+    {
+      "source": "/faculty/dashboard.html",
+      "destination": "/faculty/dashboard/index.html"
+    },
+    {
+      "source": "/faculty/classes",
+      "destination": "/faculty/dashboard/index.html"
+    },
+    {
+      "source": "/faculty/classes/",
+      "destination": "/faculty/dashboard/index.html"
+    },
+    {
+      "source": "/faculty/classes.html",
       "destination": "/faculty/dashboard/index.html"
     },
     {
@@ -217,7 +238,6 @@
       "source": "/faculty/common-teachers",
       "destination": "/faculty/dashboard/index.html"
     },
-
     {
       "source": "/student",
       "destination": "/student/dashboard/index.html"
@@ -250,7 +270,6 @@
       "source": "/student/todo.html",
       "destination": "/student/assignments/index.html"
     },
-
     {
       "source": "/faculty/dashboard",
       "destination": "/faculty/dashboard/index.html"
@@ -397,15 +416,15 @@
     },
     {
       "source": "/faculty/groups",
-      "destination": "/faculty/groups/index.html"
+      "destination": "/faculty/dashboard/index.html"
     },
     {
       "source": "/faculty/groups/",
-      "destination": "/faculty/groups/index.html"
+      "destination": "/faculty/dashboard/index.html"
     },
     {
       "source": "/faculty/groups.html",
-      "destination": "/faculty/groups/index.html"
+      "destination": "/faculty/dashboard/index.html"
     },
     {
       "source": "/faculty/group-detail",
@@ -419,7 +438,6 @@
       "source": "/faculty/group-detail.html",
       "destination": "/faculty/group-detail/index.html"
     },
-
     {
       "source": "/admin/dashboard",
       "destination": "/admin/dashboard/index.html"
@@ -504,7 +522,6 @@
       "source": "/admin/profile.html",
       "destination": "/admin/profile/index.html"
     },
-
     {
       "source": "/student/dashboard",
       "destination": "/student/dashboard/index.html"
@@ -601,7 +618,6 @@
       "source": "/student/group-detail.html",
       "destination": "/faculty/group-detail/index.html"
     },
-
     {
       "source": "/:section/:page.css",
       "destination": "/:section/:page/:page.css"
@@ -610,7 +626,6 @@
       "source": "/:section/:page.js",
       "destination": "/:section/:page/:page.js"
     },
-
     {
       "source": "/:section(admin|faculty|student)/:page([a-zA-Z0-9_-]+)",
       "destination": "/:section/:page/index.html"

@@ -179,6 +179,7 @@
       const hasAssignedSubjects = Boolean(state.currentUser?.has_assigned_subjects);
 
       const switcherBar = document.getElementById('hod-view-switcher-bar');
+      const btnClasses = document.getElementById('btn-tab-classes');
       const countBadge = document.getElementById('badge-teaching-count');
       if (countBadge) {
         countBadge.innerText = activeGroups.length;
@@ -2406,6 +2407,9 @@
         document.querySelectorAll('.gc-menu-dropdown.open').forEach(el => el.classList.remove('open'));
       }
     });
+
+    window.openModal = openModal;
+    window.closeModal = closeModal;
 
     init();
 

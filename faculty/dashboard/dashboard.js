@@ -142,6 +142,9 @@ async function init() {
   state.userDepartmentId = state.currentUser?.department_id || null;
   state.isCommonFaculty = !state.userDepartmentId;
 
+  // Immediately apply dashboard mode synchronously so correct tab/view is shown without delay
+  try { updateDashboardMode(); } catch (e) { console.warn(e); }
+
   // Populate User Avatar and Profile Popover
   if (state.currentUser) {
     const name = state.currentUser.full_name || state.currentUser.name || 'Faculty Member';
@@ -207,8 +210,10 @@ function updateDashboardMode() {
     btnDept.style.display = isHOD ? '' : 'none';
   }
 
-  // Show switcher bar if HOD or if user has active teaching groups
-  if (switcherBar) switcherBar.style.display = 'flex';
+  // Switcher bar is ONLY shown if user is HOD/admin! For non-HOD teachers, hide switcher bar completely
+  if (switcherBar) {
+    switcherBar.style.display = isHOD ? 'flex' : 'none';
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const queryTab = urlParams.get('tab');
@@ -226,6 +231,8 @@ function updateDashboardMode() {
         tabToOpen = savedTab;
       }
     } catch (_) { }
+  } else {
+    tabToOpen = 'CLASSES';
   }
   switchDashboardTab(tabToOpen);
 }
