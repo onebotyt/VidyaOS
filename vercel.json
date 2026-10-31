@@ -427,6 +427,18 @@
       "destination": "/faculty/theory-classes/index.html"
     },
     {
+      "source": "/faculty/lab-classes",
+      "destination": "/faculty/lab-classes/index.html"
+    },
+    {
+      "source": "/faculty/lab-classes/",
+      "destination": "/faculty/lab-classes/index.html"
+    },
+    {
+      "source": "/faculty/lab-classes.html",
+      "destination": "/faculty/lab-classes/index.html"
+    },
+    {
       "source": "/faculty/groups",
       "destination": "/faculty/dashboard/index.html"
     },

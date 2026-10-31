@@ -828,7 +828,8 @@ function renderGroups() {
     const roomCode = g.room_no || g.room || (101 + (idx % 10));
     const attPct = g.avg_attendance_pct != null ? Math.round(g.avg_attendance_pct) : (idx === 0 ? 85 : (idx === 1 ? 78 : 92));
     const memberCount = (g.member_count != null && g.member_count > 0) ? g.member_count : (idx === 0 ? 62 : 48);
-    const ringColor = attPct >= 80 ? '#10b981' : (attPct >= 70 ? '#f59e0b' : '#ef4444');
+    const ringColor = attPct >= 80 ? 'var(--status-present, #10b981)' : (attPct >= 70 ? 'var(--status-late, #f59e0b)' : 'var(--status-absent, #ef4444)');
+    const isPractical = (g.component || '').toUpperCase() === 'PRACTICAL' || (g.name || '').toLowerCase().includes('lab') || (g.subject_name || '').toLowerCase().includes('lab');
 
     return `
       <div class="gc-class-card ${isArchived ? 'is-archived' : ''}" style="--card-accent: ${cardAccent};">
@@ -848,6 +849,9 @@ function renderGroups() {
               <div class="gc-menu-dropdown gc-menu-header" id="card-menu-header-${g.id}">
                 <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="gc-menu-item">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> <span>Theory Classes (7 Records)</span>
+                </a>
+                <a href="/faculty/lab-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="gc-menu-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path><path d="M8.5 2h7"></path><path d="M14 9.3h-4"></path></svg> <span>Laboratory Classes (7 Records)</span>
                 </a>
                 <a href="/faculty/course-file.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="gc-menu-item">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> <span>Open NBA Course File</span>
@@ -957,24 +961,43 @@ function renderGroups() {
           </a>
         </div>
 
-        <!-- 5. Theory Classes Academic Dossier Entry -->
-        <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-theory-classes-bar" title="Open Theory Classes Academic Dossier (7 Records)">
-          <div class="card-cf-left">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
-            <span>Theory Classes</span>
-          </div>
-          <div class="card-cf-right">
-            <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </a>
+        <!-- 5. Academic Compliance Dossier Entry (Theory or Laboratory based on class component) -->
+        ${isPractical ? `
+          <a href="/faculty/lab-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-lab-classes-bar" title="Open Laboratory Classes Academic Dossier (7 Records)">
+            <div class="card-cf-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
+                <path d="M8.5 2h7"></path>
+                <path d="M14 9.3h-4"></path>
+              </svg>
+              <span>Laboratory Classes</span>
+            </div>
+            <div class="card-cf-right">
+              <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </a>
+        ` : `
+          <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-theory-classes-bar" title="Open Theory Classes Academic Dossier (7 Records)">
+            <div class="card-cf-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>Theory Classes</span>
+            </div>
+            <div class="card-cf-right">
+              <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </a>
+        `}
 
         <!-- 6. Collapsible Course File (NBA/NAAC) Footer Bar -->
         <div class="card-cf-footer-bar" onclick="toggleCfPanel(${g.id})" role="button" tabindex="0" title="Toggle NBA Course File Documents">

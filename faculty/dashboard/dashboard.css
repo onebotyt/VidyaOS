@@ -4756,7 +4756,8 @@ body {
   transform: rotate(180deg);
 }
 
-.card-theory-classes-bar {
+.card-theory-classes-bar,
+.card-lab-classes-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4767,14 +4768,17 @@ body {
   transition: background 0.15s ease;
 }
 
-.card-theory-classes-bar:hover {
+.card-theory-classes-bar:hover,
+.card-lab-classes-bar:hover {
   background: var(--bg-surface-secondary);
 }
 
-.card-theory-classes-bar .card-cf-left svg {
+.card-theory-classes-bar .card-cf-left svg,
+.card-lab-classes-bar .card-cf-left svg {
   color: var(--color-primary);
 }
 
-.card-theory-classes-bar .card-cf-right svg {
+.card-theory-classes-bar .card-cf-right svg,
+.card-lab-classes-bar .card-cf-right svg {
   color: var(--text-muted);
 }
