@@ -224,9 +224,6 @@ try {
                 <th>HOD</th>
                 <th>Department</th>
                 <th>Gmail (Login ID)</th>
-                <th>Status</th>
-                <th>Google</th>
-                <th>Since</th>
                 <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
@@ -250,17 +247,6 @@ try {
                       : `<span style="color: var(--text-muted); font-size: 0.8rem;">Unassigned</span>`}
                   </td>
                   <td style="font-family: monospace; font-size: 0.85rem; color: var(--color-primary);">${escHtml(h.gmail || '')}</td>
-                  <td>
-                    ${h.must_change_password
-                      ? `<span class="badge badge-warning">Pending Login</span>`
-                      : `<span class="badge badge-present">Active</span>`}
-                  </td>
-                  <td>
-                    ${h.google_linked
-                      ? `<span style="color: var(--status-present); font-size: 0.8rem; display:inline-flex; align-items:center; gap:0.25rem;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Linked</span></span>`
-                      : `<span style="color: var(--text-muted); font-size: 0.8rem;">Not linked</span>`}
-                  </td>
-                  <td style="font-size: 0.8rem; color: var(--text-muted);">${fmtDate(h.created_at)}</td>
                   <td style="text-align: right;">
                     <div class="kebab-menu-container" id="kebab-${h.teacher_id}">
                       <button type="button" class="kebab-btn" aria-haspopup="true" aria-expanded="false" title="Actions" onclick="toggleHodKebab(event, 'kebab-${h.teacher_id}')">
@@ -271,6 +257,10 @@ try {
                         </svg>
                       </button>
                       <div class="kebab-dropdown">
+                        <button type="button" class="kebab-item" onclick="openHodDetailModal(${h.teacher_id}); closeAllKebabs();">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                          <span>View Details</span>
+                        </button>
                         <button type="button" class="kebab-item" onclick="openReassignModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
                           <span>Reassign Dept</span>
@@ -300,9 +290,6 @@ try {
           const deptBadge = h.department_name
             ? `<span class="hod-dept-tag">${escHtml(h.department_name)}</span>`
             : `<span class="hod-dept-unassigned">Unassigned</span>`;
-          const statusBadge = h.must_change_password
-            ? `<span class="badge badge-warning" style="font-size:0.68rem; padding:0.1rem 0.4rem;">Pending Login</span>`
-            : `<span class="badge badge-present" style="font-size:0.68rem; padding:0.1rem 0.4rem;">Active</span>`;
           return `
             <div class="hod-mobile-card">
               <div class="hod-mobile-card-header">
@@ -314,37 +301,37 @@ try {
                     ${h.employee_id ? `<span class="hod-empid-tag">${escHtml(h.employee_id)}</span>` : ''}
                   </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
-                  ${statusBadge}
-                  <div class="kebab-menu-container" id="kebab-m-${h.teacher_id}">
-                    <button type="button" class="kebab-btn" aria-haspopup="true" aria-expanded="false" title="Actions" onclick="toggleHodKebab(event, 'kebab-m-${h.teacher_id}')">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="1.5"></circle>
-                        <circle cx="12" cy="5" r="1.5"></circle>
-                        <circle cx="12" cy="19" r="1.5"></circle>
-                      </svg>
+                <div class="kebab-menu-container" id="kebab-m-${h.teacher_id}" style="margin-left: auto;">
+                  <button type="button" class="kebab-btn" aria-haspopup="true" aria-expanded="false" title="Actions" onclick="toggleHodKebab(event, 'kebab-m-${h.teacher_id}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="1.5"></circle>
+                      <circle cx="12" cy="5" r="1.5"></circle>
+                      <circle cx="12" cy="19" r="1.5"></circle>
+                    </svg>
+                  </button>
+                  <div class="kebab-dropdown">
+                    <button type="button" class="kebab-item" onclick="openHodDetailModal(${h.teacher_id}); closeAllKebabs();">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <span>View Details</span>
                     </button>
-                    <div class="kebab-dropdown">
-                      <button type="button" class="kebab-item" onclick="openReassignModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
-                        <span>Reassign Dept</span>
-                      </button>
-                      <button type="button" class="kebab-item" onclick="openResetModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <span>Reset Password</span>
-                      </button>
-                      <div class="kebab-divider"></div>
-                      <button type="button" class="kebab-item danger" onclick="openDeleteModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        <span>Delete</span>
-                      </button>
-                    </div>
+                    <button type="button" class="kebab-item" onclick="openReassignModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                      <span>Reassign Dept</span>
+                    </button>
+                    <button type="button" class="kebab-item" onclick="openResetModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      <span>Reset Password</span>
+                    </button>
+                    <div class="kebab-divider"></div>
+                    <button type="button" class="kebab-item danger" onclick="openDeleteModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      <span>Delete</span>
+                    </button>
                   </div>
                 </div>
               </div>
               <div class="hod-mobile-contact">
                 <span class="hod-mobile-gmail">${escHtml(h.gmail || '—')}</span>
-                <span class="hod-mobile-date">Joined ${fmtDate(h.created_at)}</span>
               </div>
             </div>`;
         }).join('');
@@ -1360,6 +1347,104 @@ try {
         if (btn) btn.setAttribute('aria-expanded', 'false');
       });
     }
+
+    // ─── View Full HOD Information Modal ─────────────────────
+    function openHodDetailModal(teacherId) {
+      const h = hodData.find(x => x.teacher_id === teacherId);
+      if (!h) return;
+
+      let modal = document.getElementById('hod-detail-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'hod-detail-modal';
+        modal.className = 'modal-backdrop';
+        modal.style.display = 'none';
+        modal.innerHTML = `
+          <div class="modal-card" style="max-width: 480px; width: 92%; margin: auto; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">HOD Full Information</h2>
+              <button type="button" onclick="closeHodDetailModal()" style="font-size: 1.4rem; color: var(--text-muted); background: none; border: none; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            <div id="hod-detail-content"></div>
+            <div style="display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" onclick="closeHodDetailModal()">Close</button>
+              <button type="button" class="btn btn-primary" id="hod-detail-reassign-btn">Reassign Dept</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      const initial = (h.full_name || 'H').charAt(0).toUpperCase();
+      const statusBadge = h.must_change_password
+        ? `<span class="badge badge-warning">Pending Login</span>`
+        : `<span class="badge badge-present">Active</span>`;
+      const googleDisplay = h.google_linked
+        ? `<span style="color: var(--status-present); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>Linked</span>`
+        : `<span style="color: var(--text-muted);">Not linked</span>`;
+
+      const content = document.getElementById('hod-detail-content');
+      if (content) {
+        content.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--bg-surface); border-radius: var(--radius-md, 8px); border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-primary-light); color: var(--color-primary); font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              ${initial}
+            </div>
+            <div style="min-width: 0; flex: 1;">
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); line-height: 1.2;">${escHtml(h.full_name)}</div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.3rem; flex-wrap: wrap;">
+                ${h.employee_id ? `<span style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace; background: var(--bg-card); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">${escHtml(h.employee_id)}</span>` : ''}
+                <span style="font-size: 0.78rem; font-weight: 600; color: var(--color-primary); background: var(--color-primary-light); padding: 2px 8px; border-radius: 4px;">${escHtml(h.department_name || 'Unassigned')}</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm, 6px);">
+              <span style="font-size: 0.82rem; color: var(--text-muted);">Department</span>
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">${escHtml(h.department_name || 'Unassigned')}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm, 6px);">
+              <span style="font-size: 0.82rem; color: var(--text-muted);">Institutional Gmail</span>
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-primary); font-family: monospace;">${escHtml(h.gmail || '—')}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm, 6px);">
+              <span style="font-size: 0.82rem; color: var(--text-muted);">Account Status</span>
+              <div>${statusBadge}</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm, 6px);">
+              <span style="font-size: 0.82rem; color: var(--text-muted);">Google Account</span>
+              <div>${googleDisplay}</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm, 6px);">
+              <span style="font-size: 0.82rem; color: var(--text-muted);">Phone Number</span>
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">${escHtml(h.phone || 'Not specified')}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm, 6px);">
+              <span style="font-size: 0.82rem; color: var(--text-muted);">Appointed Since</span>
+              <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">${fmtDate(h.created_at)}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      const reassignBtn = document.getElementById('hod-detail-reassign-btn');
+      if (reassignBtn) {
+        reassignBtn.onclick = function() {
+          closeHodDetailModal();
+          openReassignModal(h.teacher_id, h.full_name);
+        };
+      }
+
+      openModal('hod-detail-modal');
+    }
+
+    function closeHodDetailModal() {
+      closeModal('hod-detail-modal');
+    }
+
+    window.openHodDetailModal = openHodDetailModal;
+    window.closeHodDetailModal = closeHodDetailModal;
 
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.kebab-menu-container')) {

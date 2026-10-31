@@ -26,6 +26,7 @@
     chevronLeft: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>`,
     menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`,
     close: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+    home: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`,
     dashboard: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5" fill="currentColor" fill-opacity="0.25"/><rect x="13.5" y="3" width="7.5" height="4.5" rx="1.5" fill="currentColor" fill-opacity="0.12"/><rect x="13.5" y="10.5" width="7.5" height="10.5" rx="1.5" fill="currentColor" fill-opacity="0.25"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" fill="currentColor" fill-opacity="0.12"/></svg>`,
     academicStructure: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 3 21 7.5 12 12 3 7.5" fill="currentColor" fill-opacity="0.25"/><path d="M4 11.5L12 16L20 11.5" fill="none"/><path d="M4 11.5V13.5L12 18L20 13.5V11.5" fill="currentColor" fill-opacity="0.15"/><path d="M4 16L12 20.5L20 16" fill="none"/></svg>`,
     hodManagement: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5L19.5 5.5V11C19.5 16 16 19.8 12 21.5C8 19.8 4.5 16 4.5 11V5.5L12 2.5Z" fill="currentColor" fill-opacity="0.15"/><circle cx="12" cy="9" r="2.5" fill="currentColor" fill-opacity="0.5"/><path d="M8.5 15.5C8.5 13.5 10 12.2 12 12.2C14 12.2 15.5 13.5 15.5 15.5" stroke="currentColor" stroke-width="1.8"/></svg>`,
@@ -46,6 +47,14 @@
     { key: 'reports', label: 'Reports & Analytics', shortLabel: 'Reports', href: '/admin/reports.html', icon: 'reports' },
     { key: 'settings', label: 'System Settings', shortLabel: 'Settings', href: '/admin/settings.html', icon: 'settings' },
     { key: 'audit', label: 'Audit Logs', shortLabel: 'Audit', href: '/admin/audit-logs.html', icon: 'audit' }
+  ];
+
+  // Mobile Bottom Navigation Tabs (Matches Mobile App Reference)
+  const ADMIN_MOBILE_TABS = [
+    { key: 'dashboard', label: 'Home', href: '/admin/dashboard.html', icon: 'home' },
+    { key: 'faculty', label: 'HOD Leadership', href: '/admin/faculty.html', icon: 'hodManagement' },
+    { key: 'academics', label: 'Academic Structure', href: '/admin/academic-structure.html', icon: 'academicStructure' },
+    { key: 'profile', label: 'Profile', href: '/admin/profile.html', icon: 'user' }
   ];
 
   /**
@@ -222,7 +231,34 @@
   }
 
   /**
-   * 6. Dynamic Component Mounting Engine
+   * 6. User Identity Synchronization (Avatar Initials & Names)
+   */
+  function syncMobileUserIdentity() {
+    try {
+      const user = (typeof window.getCurrentUser === 'function')
+        ? window.getCurrentUser()
+        : JSON.parse(localStorage.getItem('user') || 'null');
+      if (!user) return;
+      const name = user.full_name || user.name || user.username || 'Admin';
+      const cleanName = name.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
+      const parts = cleanName.split(/\s+/).filter(Boolean);
+      const initials = parts.length > 1
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : (cleanName.slice(0, 2).toUpperCase() || 'A');
+
+      const el = document.getElementById('mobile-user-initials');
+      if (el) el.textContent = initials;
+      const railInitials = document.querySelector('.rail-user-circle');
+      if (railInitials) railInitials.textContent = initials;
+      const sidebarAvatarSpan = document.querySelector('.sidebar-user-avatar span');
+      if (sidebarAvatarSpan) sidebarAvatarSpan.textContent = initials;
+      const sidebarUserName = document.querySelector('.sidebar-user-name');
+      if (sidebarUserName) sidebarUserName.textContent = name;
+    } catch (_) {}
+  }
+
+  /**
+   * 7. Dynamic Component Mounting Engine
    */
   function mountAdminNavigation() {
     if (typeof document === 'undefined') return;
@@ -286,7 +322,7 @@
         const itemSvg = getIcon(item.icon, { width: 20, height: 20, stroke: 1.8 });
 
         return `
-          <a href="${item.href}" class="sidebar-nav-item${activeCls}" data-nav="${item.key}" data-tooltip="${item.label}" aria-label="${item.label}">
+          <a href="${item.href}" class="sidebar-nav-item${activeCls}" data-nav="${item.key}" data-tooltip="${item.label}" aria-label="${item.label}" onclick="if(window.innerWidth<=768)closeSidebar()">
             <span class="sidebar-nav-icon">${itemSvg}</span>
             <span class="sidebar-nav-short-label">${item.shortLabel || item.label}</span>
             <span class="sidebar-nav-label">${item.label}</span>
@@ -385,6 +421,49 @@
         item.classList.remove('active');
       }
     });
+
+    // ── D. Mount Mobile Bottom Navbar (<= 768px only) if missing ──
+    if (!document.querySelector('.mobile-bottom-nav')) {
+      const bottomNavItemsHtml = ADMIN_MOBILE_TABS.map(tab => {
+        let isActive = false;
+        if (tab.key === 'dashboard') {
+          isActive = (currentPath === '/admin' || currentPath === '/admin/' || currentPath.includes('/admin/dashboard') || currentPath.endsWith('/admin/index.html'));
+        } else if (tab.key === 'faculty') {
+          isActive = (currentPath.includes('/admin/faculty') || currentPath.includes('/faculty.html'));
+        } else if (tab.key === 'academics') {
+          isActive = (currentPath.includes('/admin/academic-structure') || currentPath.includes('/academic-structure.html') || currentPath.includes('/admin/structure'));
+        } else if (tab.key === 'profile') {
+          isActive = (currentPath.includes('/admin/profile') || currentPath.includes('/profile.html'));
+        }
+
+        const activeCls = isActive ? ' active' : '';
+        const tabSvg = getIcon(tab.icon, { width: 20, height: 20, stroke: 1.9 });
+
+        return `
+          <a href="${tab.href}" class="mobile-nav-item${activeCls}" data-tab="${tab.key}" aria-label="${tab.label}">
+            <span class="mobile-nav-icon">${tabSvg}</span>
+            <span class="mobile-nav-label">${tab.label}</span>
+            <span class="mobile-nav-indicator"></span>
+          </a>
+        `;
+      }).join('');
+
+      const bottomNavHtml = `
+        <nav class="mobile-bottom-nav" aria-label="Admin Mobile Navigation">
+          <div class="mobile-bottom-nav-inner">
+            ${bottomNavItemsHtml}
+          </div>
+        </nav>
+      `;
+
+      if (layout) {
+        layout.insertAdjacentHTML('beforeend', bottomNavHtml);
+      } else {
+        document.body.insertAdjacentHTML('beforeend', bottomNavHtml);
+      }
+    }
+
+    syncMobileUserIdentity();
 
     // Tooltips are handled cleanly via high-performance CSS pseudo-elements (0 latency)
   }
