@@ -1,0 +1,24 @@
+# VidyaOS Standalone Frontend Code Ownership Policy
+# Replace @dev1_username and @dev2_username with your teammates' actual GitHub usernames.
+
+* @onebotyt
+
+# Root config & documentation
+/server.js   @onebotyt
+/package.json @onebotyt
+/*.md        @onebotyt
+/.github/    @onebotyt
+
+# Developer 1: Admin Components
+/admin/components/   @onebotyt @dev1_username
+/admin/components/** @onebotyt @dev1_username
+
+# Developer 2: Faculty & Student Components
+/faculty/components/   @onebotyt @dev2_username
+/faculty/components/** @onebotyt @dev2_username
+/student/components/   @onebotyt @dev2_username
+/student/components/** @onebotyt @dev2_username
+
+# Shared UI Primitives (Both Developers)
+/components/   @onebotyt @dev1_username @dev2_username
+/components/** @onebotyt @dev1_username @dev2_username
