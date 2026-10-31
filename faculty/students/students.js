@@ -1008,7 +1008,7 @@
         renderOverviewTables();
       } catch (err) {
         console.error('Failed to load students:', err);
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--status-absent);">Failed to load student roster.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--status-absent);">Failed to load student roster.</td></tr>`;
       }
     }
 
@@ -1027,7 +1027,7 @@
       if (countLabel) countLabel.textContent = `Showing ${totalStudents} students`;
 
       if (totalStudents === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No students found matching current filters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No students found matching current filters.</td></tr>`;
         return;
       }
 
@@ -1035,14 +1035,6 @@
         const rollDisplay = s.class_roll_no ? `<span style="font-weight: 700; color: var(--color-primary);">${s.class_roll_no}</span>` : '<span style="color: var(--text-muted);">—</span>';
         const ubterDisplay = s.ubter_reg_no ? `<span style="font-family: monospace; font-size: 0.85rem;">${esc(s.ubter_reg_no)}</span>` : '<span style="color: var(--text-muted);">—</span>';
         const enrollDisplay = `<span style="font-family: monospace; font-weight: 600; color: var(--text-main); font-size: 0.85rem;">${esc(s.official_enrollment_no)}</span>`;
-        const bioDisplay = s.biometric_slot ? `<span class="badge" style="background: var(--bg-surface-secondary); color: var(--text-main);">Slot #${s.biometric_slot}</span>` : '<span style="color: var(--text-muted); font-size: 0.8rem;">Unassigned</span>';
-        const googleDisplay = s.google_linked ? `<span title="Google Linked" style="color: var(--color-primary); font-weight: 700;">Linked</span>` : '<span style="color: var(--text-muted);">No</span>';
-        
-        const statusBadge = (s.status === 'DETAINED')
-          ? `<span class="badge" style="background: var(--status-absent-bg); color: var(--status-absent); font-weight: 700;">DETAINED</span>`
-          : (s.status === 'COMPLETED' || s.status === 'GRADUATED'
-              ? `<span class="badge" style="background: var(--chip-hod-bg); color: var(--color-primary); font-weight: 700;">ALUMNI</span>`
-              : `<span class="badge" style="background: var(--status-present-bg); color: var(--status-present); font-weight: 700;">ENROLLED</span>`);
 
         return `
           <tr style="border-bottom: 1px solid var(--border-color);">
@@ -1055,9 +1047,6 @@
               </a>
             </td>
             <td style="padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--text-muted);">Y${s.year || 1} • Sem ${s.semester || 1}</td>
-            <td style="padding: 0.75rem 1rem;">${bioDisplay}</td>
-            <td style="padding: 0.75rem 1rem;">${statusBadge}</td>
-            <td style="padding: 0.75rem 1rem; font-size: 0.85rem;">${googleDisplay}</td>
             <td style="padding: 0.75rem 1rem; text-align: right;">
               <div style="display: inline-flex; gap: 0.35rem; align-items: center;">
                 <button type="button" class="btn btn-secondary btn-sm" onclick="openStudentDossier(${s.id})" title="View Student Academic Dossier &amp; Vault" style="font-weight: 600; font-size: 0.8rem; padding: 0.25rem 0.6rem;">
