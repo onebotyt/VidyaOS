@@ -133,7 +133,6 @@
   // Load Laboratory Class Dossier Data
   async function loadLabClassDossier() {
     if (!state.currentGroupId && !state.currentSubjectId) {
-      // Fallback: If no group specified in URL, fetch teacher's first active class (prefer practical/lab)
       try {
         const groupsRes = await apiFetch('/teaching-groups?status=ACTIVE');
         if (groupsRes && groupsRes.success && groupsRes.data?.length > 0) {
@@ -361,12 +360,71 @@
         `;
       }
 
-      // Action Buttons
-      let actionButtonsHtml = '';
-      if (item.can_upload) {
-        actionButtonsHtml += `
-          <button type="button" class="btn btn-primary btn-sm" onclick="openUploadModal('${item.key}')" title="Upload official signed PDF record">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      // Inline Document Info if Uploaded
+      let docInfoHtml = '';
+      if (doc) {
+        docInfoHtml = `
+          <div class="cf-card-status-box">
+            <div class="cf-doc-info-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary); flex-shrink:0;">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              <span class="cf-doc-filename" title="${escapeHtml(doc.file_name)}">${escapeHtml(doc.title || doc.file_name)}</span>
+            </div>
+            <span class="cf-doc-meta">${formatBytes(doc.file_size)} • ${formatDate(doc.created_at || doc.uploaded_at)}</span>
+          </div>
+        `;
+      }
+
+      // Action Buttons Row (EVERY item allows teacher to upload PDF)
+      let actionsHtml = '';
+
+      if (item.key === 'lab_attendance') {
+        const regParam = state.currentRegisterId ? `?id=${state.currentRegisterId}` : '';
+        actionsHtml = `
+          <a href="/faculty/registers.html${regParam}" class="cf-card-btn primary" title="View 31-day practical attendance matrix">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg>
+            <span>View Register</span>
+          </a>
+          <button type="button" class="cf-card-btn" onclick="openDirectUploadModal('${item.key}', '${escapeHtml(item.title)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>${doc ? 'Replace PDF' : 'Upload Signed PDF'}</span>
+          </button>
+        `;
+      } else if (item.key === 'continuous_lab_assessment') {
+        const regParam = state.currentRegisterId ? `?id=${state.currentRegisterId}&tab=assignments` : '?tab=assignments';
+        actionsHtml = `
+          <a href="/faculty/registers.html${regParam}" class="cf-card-btn primary" title="View lab continuous coursework & grading">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Lab Marks</span>
+          </a>
+          <button type="button" class="cf-card-btn" onclick="openDirectUploadModal('${item.key}', '${escapeHtml(item.title)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>${doc ? 'Replace PDF' : 'Upload PDF'}</span>
+          </button>
+        `;
+      } else {
+        // Standard PDF Upload items (#2, #3, #4, #6, #7)
+        actionsHtml = `
+          <button type="button" class="cf-card-btn primary" onclick="openDirectUploadModal('${item.key}', '${escapeHtml(item.title)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -376,31 +434,18 @@
         `;
       }
 
-      if (item.action_url) {
-        actionButtonsHtml += `
-          <a href="${item.action_url}" class="btn btn-outline btn-sm" title="${item.action_label || 'View in System'}">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      // If document is uploaded, append View and Delete buttons
+      if (doc) {
+        actionsHtml += `
+          <a href="${doc.file_path}" target="_blank" class="cf-card-btn" title="View uploaded PDF">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
-            <span>${item.action_label || 'View in System'}</span>
-          </a>
-        `;
-      }
-
-      if (doc) {
-        actionButtonsHtml += `
-          <a href="${doc.file_path}" target="_blank" class="btn btn-secondary btn-sm" title="View uploaded PDF document">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
             <span>View PDF</span>
           </a>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="deleteDocument(${doc.id}, '${item.key}')" title="Delete document" style="color:var(--status-absent);">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="cf-card-btn danger" onclick="deleteUploadedDocument('${item.key}')" title="Delete document">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
@@ -409,25 +454,20 @@
       }
 
       return `
-        <div class="cf-doc-row" id="item-row-${item.key}">
-          <div class="cf-doc-left">
-            <div class="cf-doc-num ${isComplete ? 'completed' : ''}">${item.num}</div>
-            <div class="cf-doc-info">
-              <div class="cf-doc-label-row">
-                <span class="cf-doc-title">${escapeHtml(item.title)}</span>
+        <div class="cf-artifact-card ${isComplete ? 'is-complete' : ''}" data-key="${item.key}" data-category="${item.category}">
+          <div class="cf-card-main-content">
+            <span class="cf-card-num">#${item.num}</span>
+            <div class="cf-card-header-info">
+              <div class="cf-card-title-row">
+                <span class="cf-card-title">${escapeHtml(item.title)}</span>
                 ${statusBadgeHtml}
               </div>
-              <div class="cf-doc-desc">${escapeHtml(item.desc)}</div>
-              ${doc ? `
-                <div style="font-size:0.73rem; color:var(--text-muted); margin-top:2px;">
-                  Uploaded by <strong>${escapeHtml(doc.uploaded_by_name || 'Faculty')}</strong> on ${formatDate(doc.uploaded_at || doc.created_at)}
-                  ${doc.notes ? ` • Note: ${escapeHtml(doc.notes)}` : ''}
-                </div>
-              ` : ''}
+              <div style="font-size:0.76rem;color:var(--text-muted);">${escapeHtml(item.desc)}</div>
+              ${docInfoHtml}
             </div>
           </div>
-          <div class="cf-doc-right">
-            ${actionButtonsHtml}
+          <div class="cf-card-actions">
+            ${actionsHtml}
           </div>
         </div>
       `;
@@ -435,243 +475,268 @@
   }
 
   // Filter Categories
-  window.setCategoryFilter = function (cat) {
+  window.setCategoryFilter = function (cat, btnEl) {
     state.currentCategory = cat;
-    document.querySelectorAll('.cf-filter-pill').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+    document.querySelectorAll('.cf-tab-pill').forEach(btn => {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-selected', 'false');
     });
+    if (btnEl) {
+      btnEl.classList.add('active');
+      btnEl.setAttribute('aria-selected', 'true');
+    }
     renderArtifactCards();
   };
 
-  // Search Filter
-  window.filterRecords = function () {
-    const input = document.getElementById('search-records');
-    state.searchQuery = (input?.value || '').trim();
+  // Search Documents Filter
+  window.onSearchDocuments = function (val) {
+    state.searchQuery = (val || '').trim();
     renderArtifactCards();
   };
 
-  // Upload Modal Functions
-  window.openUploadModal = function (itemKey) {
-    const item = state.labClassData?.items?.find(i => i.key === itemKey);
-    if (!item) return;
-
+  // Upload Modal Handlers
+  window.openDirectUploadModal = function (itemKey, itemTitle) {
     state.activeItemKeyForUpload = itemKey;
     state.selectedUploadFile = null;
 
-    const modal = document.getElementById('upload-doc-modal');
-    const titleEl = document.getElementById('modal-upload-title');
-    const inputEl = document.getElementById('file-upload-input');
-    const previewEl = document.getElementById('dropzone-preview');
-    const notesEl = document.getElementById('upload-notes');
-    const btnSubmit = document.getElementById('btn-submit-upload');
+    const overlay = document.getElementById('upload-modal-overlay');
+    const itemNameEl = document.getElementById('modal-upload-item-name');
+    const titleInput = document.getElementById('doc-title-input');
+    const notesInput = document.getElementById('doc-notes-input');
+    const fileInput = document.getElementById('file-input-element');
+    const previewBox = document.getElementById('file-preview-info');
 
-    if (titleEl) titleEl.innerText = `Upload ${item.title}`;
-    if (inputEl) inputEl.value = '';
-    if (previewEl) previewEl.style.display = 'none';
-    if (notesEl) notesEl.value = '';
-    if (btnSubmit) btnSubmit.disabled = true;
+    if (itemNameEl) itemNameEl.innerText = itemTitle || itemKey;
+    if (titleInput) titleInput.value = itemTitle || '';
+    if (notesInput) notesInput.value = '';
+    if (fileInput) fileInput.value = '';
+    if (previewBox) previewBox.style.display = 'none';
 
-    if (modal) modal.style.display = 'flex';
+    if (overlay) overlay.style.display = 'flex';
   };
 
   window.closeUploadModal = function () {
-    const modal = document.getElementById('upload-doc-modal');
-    if (modal) modal.style.display = 'none';
+    const overlay = document.getElementById('upload-modal-overlay');
+    if (overlay) overlay.style.display = 'none';
     state.selectedUploadFile = null;
     state.activeItemKeyForUpload = null;
   };
 
-  window.handleFileSelect = function (e) {
-    const files = e.target.files;
-    if (files && files[0]) {
-      processSelectedFile(files[0]);
+  window.closeModalOnOverlay = function (e, id) {
+    if (e.target.id === id) {
+      document.getElementById(id).style.display = 'none';
     }
   };
 
-  function processSelectedFile(file) {
-    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-      showToast('Please select a valid PDF file.', 'warning');
+  window.triggerFileInput = function () {
+    const input = document.getElementById('file-input-element');
+    if (input) input.click();
+  };
+
+  window.handleDragOver = function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = document.getElementById('file-dropzone');
+    if (dropzone) dropzone.classList.add('drag-active');
+  };
+
+  window.handleDragLeave = function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = document.getElementById('file-dropzone');
+    if (dropzone) dropzone.classList.remove('drag-active');
+  };
+
+  window.handleFileDrop = function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = document.getElementById('file-dropzone');
+    if (dropzone) dropzone.classList.remove('drag-active');
+
+    if (e.dataTransfer?.files?.length > 0) {
+      handleFileSelected(e.dataTransfer.files);
+    }
+  };
+
+  window.handleFileSelected = function (files) {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+
+    if (ext !== '.pdf') {
+      showToast('Only PDF documents are allowed for Laboratory Classes records.', 'warning');
       return;
     }
-    if (file.size > 25 * 1024 * 1024) {
-      showToast('File size exceeds maximum institutional limit of 25MB.', 'warning');
+    if (file.size > 100 * 1024 * 1024) {
+      showToast('File size exceeds the 100 MB limit.', 'warning');
       return;
     }
 
     state.selectedUploadFile = file;
-    const previewEl = document.getElementById('dropzone-preview');
-    const nameEl = document.getElementById('preview-file-name');
-    const sizeEl = document.getElementById('preview-file-size');
-    const btnSubmit = document.getElementById('btn-submit-upload');
 
+    const previewBox = document.getElementById('file-preview-info');
+    const nameEl = document.getElementById('preview-filename');
+    const sizeEl = document.getElementById('preview-filesize');
+
+    if (previewBox) previewBox.style.display = 'inline-flex';
     if (nameEl) nameEl.innerText = file.name;
-    if (sizeEl) sizeEl.innerText = `(${formatBytes(file.size)})`;
-    if (previewEl) previewEl.style.display = 'inline-flex';
-    if (btnSubmit) btnSubmit.disabled = false;
-  }
-
-  window.removeSelectedFile = function () {
-    state.selectedUploadFile = null;
-    const inputEl = document.getElementById('file-upload-input');
-    const previewEl = document.getElementById('dropzone-preview');
-    const btnSubmit = document.getElementById('btn-submit-upload');
-
-    if (inputEl) inputEl.value = '';
-    if (previewEl) previewEl.style.display = 'none';
-    if (btnSubmit) btnSubmit.disabled = true;
+    if (sizeEl) sizeEl.innerText = formatBytes(file.size);
   };
 
-  // Submit Upload
-  window.submitUpload = async function () {
-    if (!state.selectedUploadFile || !state.activeItemKeyForUpload || !state.labClassData) {
-      showToast('Please select a PDF file to upload.', 'warning');
+  window.removeSelectedFile = function (e) {
+    if (e) e.stopPropagation();
+    state.selectedUploadFile = null;
+    const fileInput = document.getElementById('file-input-element');
+    const previewBox = document.getElementById('file-preview-info');
+    if (fileInput) fileInput.value = '';
+    if (previewBox) previewBox.style.display = 'none';
+  };
+
+  // Submit Document Upload
+  window.submitDocumentUpload = async function (e) {
+    e.preventDefault();
+    if (!state.labClassData?.lab_class?.id) {
+      showToast('No active laboratory class session found', 'error');
+      return;
+    }
+    if (!state.selectedUploadFile) {
+      showToast('Please select a PDF file to upload', 'warning');
       return;
     }
 
-    const labClassId = state.labClassData.lab_class.id;
-    const btnSubmit = document.getElementById('btn-submit-upload');
-    if (btnSubmit) {
-      btnSubmit.disabled = true;
-      btnSubmit.innerText = 'Uploading...';
+    const lcId = state.labClassData.lab_class.id;
+    const itemKey = state.activeItemKeyForUpload;
+    const titleVal = document.getElementById('doc-title-input')?.value?.trim();
+    const notesVal = document.getElementById('doc-notes-input')?.value?.trim();
+    const submitBtn = document.getElementById('btn-submit-upload');
+
+    const formData = new FormData();
+    formData.append('file', state.selectedUploadFile);
+    formData.append('item_key', itemKey);
+    if (titleVal) formData.append('title', titleVal);
+    if (notesVal) formData.append('notes', notesVal);
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Uploading...';
     }
 
     try {
-      const formData = new FormData();
-      formData.append('file', state.selectedUploadFile);
-      formData.append('lab_class_id', labClassId);
-      formData.append('item_key', state.activeItemKeyForUpload);
-      formData.append('notes', document.getElementById('upload-notes')?.value || '');
-
-      const token = localStorage.getItem('access_token') || localStorage.getItem('token') || '';
-      const r = await fetch('/api/v1/lab-classes/upload', {
+      const res = await apiFetch(`/lab-classes/${lcId}/documents`, {
         method: 'POST',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
         body: formData
       });
 
-      const res = await r.json().catch(() => ({}));
       if (res && res.success) {
-        showToast('Document uploaded successfully!', 'success');
+        showToast('Laboratory document uploaded successfully!', 'success');
         closeUploadModal();
         await loadLabClassDossier();
       } else {
-        showToast(res?.error?.message || 'Failed to upload document', 'error');
+        showToast(res?.error?.message || 'Upload failed', 'error');
       }
     } catch (err) {
-      console.error('Upload error:', err);
-      showToast('Error uploading document file.', 'error');
+      console.error('Upload submission error:', err);
+      showToast('Error uploading document', 'error');
     } finally {
-      if (btnSubmit) {
-        btnSubmit.disabled = false;
-        btnSubmit.innerText = 'Upload Document';
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Upload Document</span>
+        `;
       }
     }
   };
 
   // Delete Document
-  window.deleteDocument = async function (docId, itemKey) {
-    if (!confirm('Are you sure you want to remove this uploaded document record?')) return;
+  window.deleteUploadedDocument = async function (itemKey) {
+    if (!confirm('Are you sure you want to delete this uploaded PDF?')) return;
+    const lcId = state.labClassData?.lab_class?.id;
+    if (!lcId) return;
+
     try {
-      const res = await apiFetch(`/lab-classes/documents/${docId}`, { method: 'DELETE' });
+      const res = await apiFetch(`/lab-classes/${lcId}/documents/${itemKey}`, {
+        method: 'DELETE'
+      });
       if (res && res.success) {
-        showToast('Document removed successfully.', 'info');
+        showToast('Document removed successfully', 'success');
         await loadLabClassDossier();
       } else {
-        showToast(res?.error?.message || 'Failed to remove document', 'error');
+        showToast(res?.error?.message || 'Failed to delete document', 'error');
       }
     } catch (err) {
       console.error('Delete error:', err);
-      showToast('Error deleting document.', 'error');
+      showToast('Error deleting document', 'error');
     }
   };
 
-  // HOD Audit Modal
+  // HOD Audit Modal Handlers
   window.openHodAuditModal = function () {
-    const modal = document.getElementById('hod-audit-modal');
-    const tc = state.labClassData?.lab_class;
-    if (!modal || !tc) return;
-
-    const statusSel = document.getElementById('audit-status-select');
-    const remarksInput = document.getElementById('audit-remarks-input');
-
-    if (statusSel) statusSel.value = tc.status || 'AUDITED';
-    if (remarksInput) remarksInput.value = tc.hod_remarks || '';
-
-    modal.style.display = 'flex';
+    const overlay = document.getElementById('hod-audit-modal-overlay');
+    if (overlay) overlay.style.display = 'flex';
   };
 
   window.closeHodAuditModal = function () {
-    const modal = document.getElementById('hod-audit-modal');
-    if (modal) modal.style.display = 'none';
+    const overlay = document.getElementById('hod-audit-modal-overlay');
+    if (overlay) overlay.style.display = 'none';
   };
 
-  window.submitHodAudit = async function () {
-    const tc = state.labClassData?.lab_class;
-    if (!tc) return;
+  window.submitHodAudit = async function (e) {
+    e.preventDefault();
+    const lcId = state.labClassData?.lab_class?.id;
+    if (!lcId) return;
 
-    const statusSel = document.getElementById('audit-status-select');
-    const remarksInput = document.getElementById('audit-remarks-input');
-    const btnSubmit = document.getElementById('btn-submit-audit');
-
-    if (btnSubmit) {
-      btnSubmit.disabled = true;
-      btnSubmit.innerText = 'Submitting...';
-    }
+    const statusVal = document.querySelector('input[name="audit_status"]:checked')?.value || 'APPROVED';
+    const remarksVal = document.getElementById('audit-remarks-input')?.value?.trim();
 
     try {
-      const res = await apiFetch(`/lab-classes/${tc.id}/audit`, {
-        method: 'PUT',
-        body: {
-          status: statusSel?.value || 'AUDITED',
-          hod_remarks: remarksInput?.value || ''
-        }
+      const res = await apiFetch(`/lab-classes/${lcId}/audit`, {
+        method: 'POST',
+        body: { status: statusVal, remarks: remarksVal }
       });
-
       if (res && res.success) {
-        showToast('Audit remarks saved successfully!', 'success');
+        showToast('Audit review saved successfully', 'success');
         closeHodAuditModal();
         await loadLabClassDossier();
       } else {
-        showToast(res?.error?.message || 'Failed to save audit remarks', 'error');
+        showToast(res?.error?.message || 'Failed to save audit review', 'error');
       }
     } catch (err) {
-      console.error('Audit submit error:', err);
-      showToast('Error saving audit remarks.', 'error');
-    } finally {
-      if (btnSubmit) {
-        btnSubmit.disabled = false;
-        btnSubmit.innerText = 'Submit Audit Verification';
-      }
+      console.error('Audit submission error:', err);
+      showToast('Error saving audit review', 'error');
     }
   };
 
-  // Print Institutional Laboratory Class Index Sheet
+  // Print Laboratory Dossier Index & Cover Sheet
   window.printLabDossierIndex = function () {
-    if (!state.labClassData) return;
-    const g = state.labClassData.group;
-    const tc = state.labClassData.lab_class;
-    const items = state.labClassData.items || [];
+    const data = state.labClassData;
+    if (!data) return;
 
-    const printWin = window.open('', '_blank', 'width=900,height=750');
+    const g = data.group;
+    const lc = data.lab_class;
+    const items = data.items || [];
+
+    const printWin = window.open('', '_blank');
     if (!printWin) {
-      alert('Please allow popups to print the dossier index.');
+      window.print();
       return;
     }
 
     const rowsHtml = items.map(i => {
-      const isDone = i.is_completed;
       const doc = i.document;
+      const statusText = doc ? `Uploaded (${formatBytes(doc.file_size)}, v${doc.version})` : (i.has_system_data ? 'Live DB Synced' : 'Pending');
       return `
         <tr>
-          <td style="text-align:center;font-weight:700;padding:8px;border:1px solid #cbd5e1;">#${i.num}</td>
-          <td style="font-weight:600;padding:8px;border:1px solid #cbd5e1;">${escapeHtml(i.title)}</td>
-          <td style="padding:8px;border:1px solid #cbd5e1;font-size:12px;color:#475569;">${escapeHtml(i.desc)}</td>
-          <td style="text-align:center;padding:8px;border:1px solid #cbd5e1;font-weight:700;color:${isDone ? '#166534' : '#991b1b'};">
-            ${isDone ? 'COMPLETE' : 'PENDING'}
-          </td>
-          <td style="padding:8px;border:1px solid #cbd5e1;font-size:11px;color:#64748b;">
-            ${doc ? `File: ${escapeHtml(doc.original_filename)} (${formatBytes(doc.file_size)})` : (i.has_system_data ? 'Live DB Synced' : 'Action Required')}
-          </td>
+          <td style="text-align:center;font-weight:bold;padding:8px;border:1px solid #cbd5e1;">#${i.num}</td>
+          <td style="padding:8px;border:1px solid #cbd5e1;font-weight:600;">${escapeHtml(i.title)}</td>
+          <td style="padding:8px;border:1px solid #cbd5e1;">${escapeHtml(i.category.toUpperCase())}</td>
+          <td style="padding:8px;border:1px solid #cbd5e1;">${statusText}</td>
+          <td style="padding:8px;border:1px solid #cbd5e1;">${doc ? escapeHtml(doc.file_name) : '--'}</td>
+          <td style="text-align:center;padding:8px;border:1px solid #cbd5e1;">${doc ? 'Verified' : ''}</td>
         </tr>
       `;
     }).join('');
@@ -710,7 +775,7 @@
           <div><strong>Semester &amp; Branch:</strong> Sem ${g.semester || '--'} • ${escapeHtml(g.department_name || 'Engineering')}</div>
           <div><strong>Faculty In-Charge:</strong> ${escapeHtml(g.teacher_name || 'Faculty Member')}</div>
           <div><strong>Component:</strong> PRACTICAL / LABORATORY</div>
-          <div><strong>Compliance Readiness:</strong> ${tc.completed_items || 0} / ${tc.total_items || 7} Records (${tc.completion_pct || 0}%)</div>
+          <div><strong>Compliance Readiness:</strong> ${lc.completed_items || 0} / ${lc.total_items || 7} Records (${lc.completion_pct || 0}%)</div>
         </div>
 
         <table>
@@ -718,9 +783,10 @@
             <tr>
               <th style="width:40px;text-align:center;">#</th>
               <th style="width:230px;">Mandatory Record Title</th>
-              <th>Description &amp; Purpose</th>
-              <th style="width:90px;text-align:center;">Status</th>
-              <th style="width:190px;">Verification Artifact</th>
+              <th>Category</th>
+              <th style="width:140px;">Status</th>
+              <th style="width:180px;">Artifact Document</th>
+              <th style="width:80px;text-align:center;">Audit</th>
             </tr>
           </thead>
           <tbody>
@@ -744,4 +810,3 @@
   };
 
 })();
-
