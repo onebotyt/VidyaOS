@@ -961,43 +961,42 @@ function renderGroups() {
           </a>
         </div>
 
-        <!-- 5. Academic Compliance Dossier Entry (Theory or Laboratory based on class component) -->
-        ${isPractical ? `
-          <a href="/faculty/lab-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-lab-classes-bar" title="Open Laboratory Classes Academic Dossier (7 Records)">
-            <div class="card-cf-left">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
-                <path d="M8.5 2h7"></path>
-                <path d="M14 9.3h-4"></path>
-              </svg>
-              <span>Laboratory Classes</span>
-            </div>
-            <div class="card-cf-right">
-              <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </div>
-          </a>
-        ` : `
-          <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-theory-classes-bar" title="Open Theory Classes Academic Dossier (7 Records)">
-            <div class="card-cf-left">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-              </svg>
-              <span>Theory Classes</span>
-            </div>
-            <div class="card-cf-right">
-              <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </div>
-          </a>
-        `}
+        <!-- 5. Theory Classes Academic Dossier Entry -->
+        <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-theory-classes-bar" title="Open Theory Classes Academic Dossier (7 Records)">
+          <div class="card-cf-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Theory Classes</span>
+          </div>
+          <div class="card-cf-right">
+            <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <!-- 6. Laboratory Classes Academic Dossier Entry -->
+        <a href="/faculty/lab-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-lab-classes-bar" title="Open Laboratory Classes Academic Dossier (7 Records)">
+          <div class="card-cf-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
+              <path d="M8.5 2h7"></path>
+              <path d="M14 9.3h-4"></path>
+            </svg>
+            <span>Laboratory Classes</span>
+          </div>
+          <div class="card-cf-right">
+            <span class="card-cf-count" style="background:var(--status-present-bg, rgba(16,185,129,0.12));color:var(--status-present, #10b981);font-weight:700;">7 Records</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </a>
 
         <!-- 6. Collapsible Course File (NBA/NAAC) Footer Bar -->
         <div class="card-cf-footer-bar" onclick="toggleCfPanel(${g.id})" role="button" tabindex="0" title="Toggle NBA Course File Documents">

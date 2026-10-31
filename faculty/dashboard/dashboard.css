@@ -4773,9 +4773,12 @@ body {
   background: var(--bg-surface-secondary);
 }
 
-.card-theory-classes-bar .card-cf-left svg,
-.card-lab-classes-bar .card-cf-left svg {
+.card-theory-classes-bar .card-cf-left svg {
   color: var(--color-primary);
+}
+
+.card-lab-classes-bar .card-cf-left svg {
+  color: var(--status-present, #10b981);
 }
 
 .card-theory-classes-bar .card-cf-right svg,
