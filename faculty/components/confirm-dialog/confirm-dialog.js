@@ -205,11 +205,36 @@
    * Helper: Student Withdrawal Confirmation
    */
   function confirmStudentWithdrawal(studentId, studentName, onCompleted) {
+    if (window.VidyaDeleteModal) {
+      window.VidyaDeleteModal.open({
+        title: 'Student Withdrawal / Left College?',
+        itemName: studentName,
+        message: `Withdraw <strong>${studentName}</strong> from department roster?<br><span style="font-size:0.82rem;color:var(--text-muted);display:block;margin-top:0.4rem;">Class roll numbers for their cohort will automatically re-index sequentially without gaps.</span>`,
+        confirmButtonText: 'Confirm Withdrawal',
+        confirmKeyword: 'DELETE',
+        onConfirm: async () => {
+          const res = await (window.apiFetch || fetch)(`/hod/students/${studentId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = res.json ? await res.json() : res;
+          if (window.showToast) {
+            window.showToast(`Student ${studentName} withdrawn successfully.`, 'info');
+          }
+          if (typeof onCompleted === 'function') {
+            onCompleted(data);
+          }
+        }
+      });
+      return;
+    }
+
     showConfirmDialog({
       title: 'Student Withdrawal / Left College?',
       message: `Withdraw <strong>${studentName}</strong> from department roster?<br><span style="font-size:0.82rem;color:var(--text-muted);display:block;margin-top:0.4rem;">Class roll numbers for their cohort will automatically re-index sequentially without gaps.</span>`,
       confirmText: 'Confirm Withdrawal',
       variant: 'danger',
+      requireInput: 'DELETE',
       onConfirm: async () => {
         const res = await (window.apiFetch || fetch)(`/hod/students/${studentId}`, {
           method: 'DELETE',
@@ -230,6 +255,30 @@
    * Helper: Faculty / Teacher Account Deletion
    */
   function confirmTeacherDelete(teacherId, teacherName, onCompleted) {
+    if (window.VidyaDeleteModal) {
+      window.VidyaDeleteModal.open({
+        title: 'Delete Faculty Account?',
+        itemName: teacherName,
+        message: `Permanently delete faculty record for <strong>${teacherName}</strong>?<br><span style="font-size:0.82rem;color:var(--text-muted);display:block;margin-top:0.4rem;">All assigned course registers and class associations will be unlinked.</span>`,
+        confirmButtonText: 'Permanently Delete',
+        confirmKeyword: 'DELETE',
+        onConfirm: async () => {
+          const res = await (window.apiFetch || fetch)(`/hod/teachers/${teacherId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = res.json ? await res.json() : res;
+          if (window.showToast) {
+            window.showToast(`Faculty account for ${teacherName} deleted.`, 'info');
+          }
+          if (typeof onCompleted === 'function') {
+            onCompleted(data);
+          }
+        }
+      });
+      return;
+    }
+
     showConfirmDialog({
       title: 'Delete Faculty Account?',
       message: `Permanently delete faculty record for <strong>${teacherName}</strong>?<br><span style="font-size:0.82rem;color:var(--text-muted);display:block;margin-top:0.4rem;">All assigned course registers and class associations will be unlinked.</span>`,

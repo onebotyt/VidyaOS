@@ -1,0 +1,82 @@
+<!-- 
+  ══════════════════════════════════════════════════════════════
+  VIDYAOS REUSABLE DELETE CONFIRMATION MODAL TEMPLATE (delete-modal.html)
+  Standalone reference markup for the Delete Modal component.
+  Dynamically injected and managed by delete-modal.js.
+  ══════════════════════════════════════════════════════════════
+-->
+<div id="vidya-delete-modal-root" class="v-delete-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="v-delete-card" onclick="event.stopPropagation()">
+    <!-- Header -->
+    <div class="v-delete-header">
+      <div class="v-delete-header-left">
+        <div class="v-delete-icon-badge" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </div>
+        <div class="v-delete-title-group">
+          <h3 class="v-delete-title" id="v-delete-title">Confirm Deletion</h3>
+          <p class="v-delete-subtitle" id="v-delete-subtitle">Irreversible system action</p>
+        </div>
+      </div>
+      <button type="button" class="v-delete-close-btn" id="v-delete-close-btn" aria-label="Close dialog">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="v-delete-body">
+      <div class="v-delete-callout">
+        <div class="v-delete-target-pill">
+          <span class="v-delete-target-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </span>
+          <span id="v-delete-item-name">Selected Item</span>
+        </div>
+        <p class="v-delete-warning-text" id="v-delete-message">
+          Are you sure you want to delete this record? This action cannot be undone.
+        </p>
+      </div>
+
+      <div class="v-delete-input-group">
+        <label class="v-delete-label" for="v-delete-confirmation-input">
+          To verify, type <strong class="v-delete-keyword-tag" id="v-delete-keyword-display">DELETE</strong> below:
+        </label>
+        <div class="v-delete-input-wrapper">
+          <input type="text"
+            class="v-delete-input"
+            id="v-delete-confirmation-input"
+            placeholder="Type DELETE to confirm"
+            autocomplete="off"
+            spellcheck="false">
+          <span class="v-delete-input-status-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
+        </div>
+        <span class="v-delete-feedback" id="v-delete-feedback">Please enter the confirmation text</span>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="v-delete-footer">
+      <button type="button" class="v-delete-btn v-delete-btn-cancel" id="v-delete-cancel-btn">
+        Cancel
+      </button>
+      <button type="button" class="v-delete-btn v-delete-btn-danger" id="v-delete-confirm-btn" disabled>
+        <span id="v-delete-confirm-btn-text">Permanently Delete</span>
+      </button>
+    </div>
+  </div>
+</div>

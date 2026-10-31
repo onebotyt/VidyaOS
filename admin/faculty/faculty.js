@@ -939,10 +939,27 @@ try {
     function openDeleteModal(teacherId, name) {
       deleteTargetId = teacherId;
       currentDeleteHod = hodData.find(h => h.teacher_id === teacherId);
+      const deptName = currentDeleteHod ? (currentDeleteHod.department_name || 'Unassigned') : 'Unassigned';
+
+      if (window.VidyaDeleteModal) {
+        window.VidyaDeleteModal.open({
+          title: 'Delete HOD Account',
+          itemName: `${name} (${deptName})`,
+          message: `Permanently delete Head of Department account for <strong>${name}</strong>? All departmental administrative associations will be revoked. This cannot be undone.`,
+          confirmKeyword: 'DELETE',
+          confirmButtonText: 'Permanently Delete HOD',
+          onConfirm: async () => {
+            const r = await apiFetch(`${API}/admin/hods/${teacherId}`, { method: 'DELETE' });
+            showToast(r.message || 'HOD account deleted successfully.', 'success');
+            await loadHODs();
+          }
+        });
+        return;
+      }
 
       document.getElementById('delete-hod-name').textContent = name;
       document.getElementById('delete-step2-name').textContent = name;
-      document.getElementById('delete-dept-name').textContent = currentDeleteHod ? (currentDeleteHod.department_name || 'Unassigned') : 'Unassigned';
+      document.getElementById('delete-dept-name').textContent = deptName;
       document.getElementById('delete-confirm-input').value = '';
       document.getElementById('delete-error').style.display = 'none';
 
