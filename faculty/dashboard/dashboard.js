@@ -8,16 +8,22 @@
 // Guard route for Faculty
 guardRoute({ requireRoles: ['TEACHER'] });
 
-function escapeHtml(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+if (typeof window.escapeHtml !== 'function') {
+  window.escapeHtml = function (str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  };
 }
-const esc = escapeHtml;
+if (typeof window.esc !== 'function') {
+  window.esc = window.escapeHtml;
+}
+var esc = window.esc || window.escapeHtml;
+var escapeHtml = window.escapeHtml;
 
 // ── NBA/NAAC Course File: 18 Document Definitions ──────────
 const CF_DOCS = [
@@ -1315,6 +1321,7 @@ async function submitCreateGroup(e) {
     btn.innerText = 'Create Teaching Group';
   }
 }
+window.submitCreateGroup = submitCreateGroup;
 
 // ----------------------------------------------------
 // POST-CREATE ENROLL DEPARTMENT STUDENTS MODAL
