@@ -220,13 +220,13 @@
           body: JSON.stringify({ refresh_token: refreshToken || '' }),
           keepalive: true,
           credentials: 'include'
-        }).catch(() => {});
-      } catch (_) {}
+        }).catch(() => { });
+      } catch (_) { }
     }
     const keys = ['access_token', 'refresh_token', 'authToken', 'auth_token', 'token', 'user', 'currentUser', 'auth_user', 'user_profile', 'user_roles', 'role', 'roles', 'session_id'];
-    keys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
-    try { sessionStorage.clear(); } catch (_) {}
-    try { sessionStorage.setItem('vidya_logged_out_flag', '1'); } catch (_) {}
+    keys.forEach(k => { try { localStorage.removeItem(k); } catch (_) { } });
+    try { sessionStorage.clear(); } catch (_) { }
+    try { sessionStorage.setItem('vidya_logged_out_flag', '1'); } catch (_) { }
     window.location.replace('/login');
   }
 
@@ -254,7 +254,7 @@
       if (sidebarAvatarSpan) sidebarAvatarSpan.textContent = initials;
       const sidebarUserName = document.querySelector('.sidebar-user-name');
       if (sidebarUserName) sidebarUserName.textContent = name;
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /**

@@ -182,10 +182,10 @@ async function init() {
   }
 }
 
-let currentDashboardTab = 'DEPT';
+let currentDashboardTab = 'CLASSES';
 
 function updateDashboardMode() {
-  const isHOD = Boolean(state.currentUser?.is_hod);
+  const isHOD = Boolean(state.currentUser?.is_hod || state.currentUser?.roles?.includes('HOD') || state.currentUser?.roles?.includes('SYSTEM_ADMIN'));
   const activeGroups = state.groups.filter(g => g.status === 'ACTIVE');
 
   const switcherBar = document.getElementById('hod-view-switcher-bar');
@@ -202,15 +202,24 @@ function updateDashboardMode() {
     greetName.innerText = `Welcome, ${state.currentUser.full_name || title} 👋`;
   }
 
-  // Always show switcher bar on faculty dashboard so user can toggle between Command Center and Classes
+  const btnDept = document.getElementById('btn-tab-dept');
+  if (btnDept) {
+    btnDept.style.display = isHOD ? '' : 'none';
+  }
+
+  // Show switcher bar if HOD or if user has active teaching groups
   if (switcherBar) switcherBar.style.display = 'flex';
 
   const urlParams = new URLSearchParams(window.location.search);
   const queryTab = urlParams.get('tab');
-  let tabToOpen = 'DEPT';
+  let tabToOpen = isHOD ? 'DEPT' : 'CLASSES';
   if (queryTab) {
-    tabToOpen = queryTab.toLowerCase() === 'classes' ? 'CLASSES' : 'DEPT';
-  } else {
+    if (queryTab.toLowerCase() === 'dept' && isHOD) {
+      tabToOpen = 'DEPT';
+    } else {
+      tabToOpen = 'CLASSES';
+    }
+  } else if (isHOD) {
     try {
       const savedTab = localStorage.getItem('hod_dashboard_tab');
       if (savedTab === 'CLASSES' || savedTab === 'DEPT') {
@@ -222,6 +231,10 @@ function updateDashboardMode() {
 }
 
 function switchDashboardTab(tab) {
+  const isHOD = Boolean(state.currentUser?.is_hod || state.currentUser?.roles?.includes('HOD') || state.currentUser?.roles?.includes('SYSTEM_ADMIN'));
+  if (tab === 'DEPT' && !isHOD) {
+    tab = 'CLASSES';
+  }
   currentDashboardTab = tab;
   try {
     localStorage.setItem('hod_dashboard_tab', tab);
@@ -238,7 +251,7 @@ function switchDashboardTab(tab) {
   const teachingView = document.getElementById('teaching-classes-view');
   const deptView = document.getElementById('hod-dept-command-center');
 
-  if (tab === 'DEPT') {
+  if (tab === 'DEPT' && isHOD) {
     if (btnClasses) {
       btnClasses.classList.remove('active');
       btnClasses.setAttribute('aria-selected', 'false');
@@ -2545,6 +2558,33 @@ document.addEventListener('keydown', (e) => {
     document.querySelectorAll('.gc-menu-dropdown.open').forEach(el => el.classList.remove('open'));
   }
 });
+
+// Modal Helpers
+function openModal(idOrEl) {
+  const modal = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
+    document.body.classList.add('modal-open');
+    const firstInput = modal.querySelector('input:not([disabled]), select:not([disabled]), button:not([disabled])');
+    if (firstInput) setTimeout(() => firstInput.focus(), 50);
+  }
+}
+
+function closeModal(idOrEl) {
+  const modal = idOrEl ? (typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl) : document.querySelector('.modal-backdrop.open, .modal.open');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+    modal.style.opacity = '';
+    modal.style.pointerEvents = '';
+    if (!document.querySelector('.modal-backdrop.open, .modal.open')) {
+      document.body.classList.remove('modal-open');
+    }
+  }
+}
 
 // Expose modal helpers globally
 window.openModal = openModal;
