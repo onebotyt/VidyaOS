@@ -130,19 +130,49 @@ try {
     async function loadDepartments() {
       try {
         const r = await apiFetch(`${API}/admin/hierarchy`);
-        departments = r.data.departments || [];
+        let list = [];
+        if (Array.isArray(r.data)) {
+          list = r.data;
+        } else if (r.data && Array.isArray(r.data.departments)) {
+          list = r.data.departments;
+        } else if (Array.isArray(r.departments)) {
+          list = r.departments;
+        } else if (Array.isArray(r)) {
+          list = r;
+        }
+
+        // Secondary fallback to /auth/departments if empty
+        if (!list || list.length === 0) {
+          try {
+            const authR = await apiFetch(`${API}/auth/departments`);
+            if (Array.isArray(authR.data)) list = authR.data;
+            else if (authR.data && Array.isArray(authR.data.departments)) list = authR.data.departments;
+            else if (Array.isArray(authR)) list = authR;
+          } catch (_) {}
+        }
+
+        departments = list || [];
         populateDeptDropdown('hod-dept');
         populateDeptDropdown('assign-existing-dept');
         populateDeptDropdown('reassign-dept');
       } catch (e) {
-        console.error('Failed to load departments:', e);
+        console.error('Failed to load departments from hierarchy, trying fallback:', e);
+        try {
+          const authR = await apiFetch(`${API}/auth/departments`);
+          departments = Array.isArray(authR.data) ? authR.data : [];
+          populateDeptDropdown('hod-dept');
+          populateDeptDropdown('assign-existing-dept');
+          populateDeptDropdown('reassign-dept');
+        } catch (_) {}
       }
     }
 
     function populateDeptDropdown(selectId) {
       const sel = document.getElementById(selectId);
+      if (!sel) return;
       const current = sel.value;
       sel.innerHTML = '<option value="">— Select Department —</option>';
+      if (!departments || departments.length === 0) return;
       departments.forEach(d => {
         const opt = document.createElement('option');
         opt.value = d.id;
@@ -306,6 +336,14 @@ try {
 
       document.getElementById('create-hod-form').reset();
       document.getElementById('create-error').style.display = 'none';
+
+      if (!departments || departments.length === 0) {
+        loadDepartments();
+      } else {
+        populateDeptDropdown('hod-dept');
+        populateDeptDropdown('assign-existing-dept');
+      }
+
       showModal('create-modal');
     }
     function closeCreateModal() { hideModal('create-modal'); }
@@ -335,6 +373,13 @@ try {
         secCreate.style.display = 'block';
         document.getElementById('modal-title-hod').textContent = 'Create New HOD Account';
         document.getElementById('modal-sub-hod').textContent = 'Creates a brand-new teacher account and appoints them as HOD for a department.';
+      }
+
+      if (departments && departments.length > 0) {
+        populateDeptDropdown('hod-dept');
+        populateDeptDropdown('assign-existing-dept');
+      } else {
+        loadDepartments();
       }
     }
 
@@ -559,6 +604,12 @@ try {
       document.getElementById('reassign-dept').value = '';
       clearReassignStep1Error();
       document.getElementById('reassign-error').style.display = 'none';
+
+      if (!departments || departments.length === 0) {
+        loadDepartments().then(() => populateDeptDropdown('reassign-dept'));
+      } else {
+        populateDeptDropdown('reassign-dept');
+      }
 
       setReassignStep(1);
       showModal('reassign-modal');
