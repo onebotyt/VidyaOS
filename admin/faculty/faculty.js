@@ -227,7 +227,7 @@ try {
                 <th>Status</th>
                 <th>Google</th>
                 <th>Since</th>
-                <th>Actions</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody id="hod-tbody">
@@ -261,11 +261,30 @@ try {
                       : `<span style="color: var(--text-muted); font-size: 0.8rem;">Not linked</span>`}
                   </td>
                   <td style="font-size: 0.8rem; color: var(--text-muted);">${fmtDate(h.created_at)}</td>
-                  <td>
-                    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                      <button class="btn btn-secondary btn-sm" onclick="openReassignModal(${h.teacher_id}, '${escHtml(h.full_name)}')">Reassign Dept</button>
-                      <button class="btn btn-secondary btn-sm" onclick="openResetModal(${h.teacher_id}, '${escHtml(h.full_name)}')">Reset Pwd</button>
-                      <button class="btn btn-secondary btn-sm" style="color: var(--status-absent); border-color: var(--status-absent);" onclick="openDeleteModal(${h.teacher_id}, '${escHtml(h.full_name)}')">Delete</button>
+                  <td style="text-align: right;">
+                    <div class="kebab-menu-container" id="kebab-${h.teacher_id}">
+                      <button type="button" class="kebab-btn" aria-haspopup="true" aria-expanded="false" title="Actions" onclick="toggleHodKebab(event, 'kebab-${h.teacher_id}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="1.5"></circle>
+                          <circle cx="12" cy="5" r="1.5"></circle>
+                          <circle cx="12" cy="19" r="1.5"></circle>
+                        </svg>
+                      </button>
+                      <div class="kebab-dropdown">
+                        <button type="button" class="kebab-item" onclick="openReassignModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                          <span>Reassign Dept</span>
+                        </button>
+                        <button type="button" class="kebab-item" onclick="openResetModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                          <span>Reset Password</span>
+                        </button>
+                        <div class="kebab-divider"></div>
+                        <button type="button" class="kebab-item danger" onclick="openDeleteModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -295,25 +314,37 @@ try {
                     ${h.employee_id ? `<span class="hod-empid-tag">${escHtml(h.employee_id)}</span>` : ''}
                   </div>
                 </div>
-                ${statusBadge}
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
+                  ${statusBadge}
+                  <div class="kebab-menu-container" id="kebab-m-${h.teacher_id}">
+                    <button type="button" class="kebab-btn" aria-haspopup="true" aria-expanded="false" title="Actions" onclick="toggleHodKebab(event, 'kebab-m-${h.teacher_id}')">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1.5"></circle>
+                        <circle cx="12" cy="5" r="1.5"></circle>
+                        <circle cx="12" cy="19" r="1.5"></circle>
+                      </svg>
+                    </button>
+                    <div class="kebab-dropdown">
+                      <button type="button" class="kebab-item" onclick="openReassignModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                        <span>Reassign Dept</span>
+                      </button>
+                      <button type="button" class="kebab-item" onclick="openResetModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span>Reset Password</span>
+                      </button>
+                      <div class="kebab-divider"></div>
+                      <button type="button" class="kebab-item danger" onclick="openDeleteModal(${h.teacher_id}, '${escHtml(h.full_name)}'); closeAllKebabs();">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="hod-mobile-contact">
                 <span class="hod-mobile-gmail">${escHtml(h.gmail || '—')}</span>
                 <span class="hod-mobile-date">Joined ${fmtDate(h.created_at)}</span>
-              </div>
-              <div class="hod-mobile-actions">
-                <button class="btn btn-secondary btn-sm" onclick="openReassignModal(${h.teacher_id}, '${escHtml(h.full_name)}')">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
-                  <span>Reassign</span>
-                </button>
-                <button class="btn btn-secondary btn-sm" onclick="openResetModal(${h.teacher_id}, '${escHtml(h.full_name)}')">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <span>Reset Pwd</span>
-                </button>
-                <button class="btn btn-secondary btn-sm fac-btn-delete" onclick="openDeleteModal(${h.teacher_id}, '${escHtml(h.full_name)}')">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                  <span>Delete</span>
-                </button>
               </div>
             </div>`;
         }).join('');
@@ -1288,4 +1319,40 @@ try {
         showToast(err.message || 'Failed to remove manager.', 'error');
       }
     }
+
+    // ─── 3-Dot Kebab Action Menu Helper ───────────────────────
+    function toggleHodKebab(event, containerId) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const container = document.getElementById(containerId);
+      const isOpen = container ? container.classList.contains('open') : false;
+      closeAllKebabs();
+      if (container && !isOpen) {
+        container.classList.add('open');
+        const btn = container.querySelector('.kebab-btn');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function closeAllKebabs() {
+      document.querySelectorAll('.kebab-menu-container.open').forEach(el => {
+        el.classList.remove('open');
+        const btn = el.querySelector('.kebab-btn');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.kebab-menu-container')) {
+        closeAllKebabs();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAllKebabs();
+      }
+    });
 

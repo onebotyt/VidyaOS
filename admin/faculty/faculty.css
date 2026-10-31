@@ -611,3 +611,122 @@
   }
 }
 
+/* -------------------------------------------------------------
+   3-DOT KEBAB ACTIONS DROPDOWN (DESKTOP & MOBILE)
+   ------------------------------------------------------------- */
+#hod-table-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  min-height: 240px;
+  padding-bottom: 2.5rem;
+}
+
+.kebab-menu-container {
+  position: relative;
+  display: inline-block;
+  text-align: left;
+}
+
+.kebab-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+  padding: 0;
+  user-select: none;
+}
+
+.kebab-btn:hover,
+.kebab-btn:focus-visible,
+.kebab-menu-container.open .kebab-btn {
+  background: var(--bg-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  outline: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.kebab-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--bg-card);
+  min-width: 175px;
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  z-index: 1050;
+  display: none;
+  flex-direction: column;
+  padding: 6px 0;
+  animation: kebabFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kebab-menu-container.open .kebab-dropdown {
+  display: flex;
+}
+
+@keyframes kebabFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.kebab-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--text-main);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+  white-space: nowrap;
+}
+
+.kebab-item svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: color 0.12s ease;
+}
+
+.kebab-item:hover {
+  background: var(--bg-surface-hover);
+  color: var(--color-primary);
+}
+
+.kebab-item:hover svg {
+  color: var(--color-primary);
+}
+
+.kebab-item.danger {
+  color: var(--status-absent);
+}
+
+.kebab-item.danger svg {
+  color: var(--status-absent);
+}
+
+.kebab-item.danger:hover {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+.kebab-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
