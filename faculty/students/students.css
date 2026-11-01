@@ -908,3 +908,10 @@
   color: var(--text-main);
   border: 1px solid var(--border-color);
 }
+
+/* ── Role-Based Actions Visibility (Head of Department Only) ── */
+body:not(.is-hod) .th-faculty-actions,
+body:not(.is-hod) .td-faculty-actions,
+body:not(.is-hod) #btn-add-teacher {
+  display: none !important;
+}

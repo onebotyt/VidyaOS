@@ -142,10 +142,16 @@
       if (statEl) statEl.textContent = teachers.length;
       if (gwEl) gwEl.textContent = teachers.length;
 
+            // Toggle Actions column header: visible only for HOD
+      const actionsHeaders = document.querySelectorAll('.th-faculty-actions');
+      actionsHeaders.forEach(th => {
+        th.style.display = isHod ? '' : 'none';
+      });
+
       if (!tbody) return;
 
       if (teachers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No faculty members found in department roster.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${isHod ? 8 : 7}" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No faculty members found in department roster.</td></tr>`;
         return;
       }
 
@@ -156,7 +162,18 @@
           .slice(0, 2)
           .map(w => w[0].toUpperCase())
           .join('') || 'T';
-        const isHodMember = Boolean(t.is_hod || t.user_id === currentUser?.user_id || (t.employee_id && t.employee_id.includes('HOD')));
+
+        const isSelf = Boolean(
+          currentUser && (
+            (currentUser.teacher_id && Number(t.id) === Number(currentUser.teacher_id)) ||
+            (currentUser.id && Number(t.user_id) === Number(currentUser.id)) ||
+            (currentUser.user_id && Number(t.user_id) === Number(currentUser.user_id)) ||
+            (currentUser.email && t.email && currentUser.email.toLowerCase() === t.email.toLowerCase()) ||
+            (currentUser.email && t.gmail && currentUser.email.toLowerCase() === t.gmail.toLowerCase())
+          )
+        );
+
+        const isHodMember = Boolean(t.is_hod || (t.employee_id && t.employee_id.includes('HOD')));
         const designation = isHodMember 
           ? `<span class="badge" style="background: var(--chip-hod-bg); color: var(--color-primary); font-weight: 700;">HOD</span>` 
           : `<span class="badge" style="background: var(--bg-surface-secondary); color: var(--text-main); font-weight: 600;">Lecturer</span>`;
@@ -164,6 +181,35 @@
         const avatarClass = idx % 2 === 0 ? 'purple-avatar' : 'blue-avatar';
         const email = t.gmail || t.email || '—';
         const empId = t.employee_id || ('FAC-0' + (idx + 1));
+
+        let actionsTd = '';
+        if (isHod) {
+          let actButtons = '';
+          if (isSelf) {
+            actButtons = `
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openSelfPasswordModal()" title="Change My Password" style="padding: 0.25rem 0.55rem; color: var(--color-primary); display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5"></path></svg>
+                <span style="font-size: 0.75rem; font-weight: 600;">Change Password</span>
+              </button>
+            `;
+          } else {
+            actButtons = `
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openResetModal(${t.id}, '${esc(t.full_name)}')" title="Reset Password" style="padding: 0.25rem 0.55rem;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5"></path></svg>
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent); padding: 0.25rem 0.55rem;" onclick="openDeleteModal(${t.id}, '${esc(t.full_name)}')" title="Delete Faculty Account">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            `;
+          }
+          actionsTd = `
+            <td class="td-faculty-actions" style="padding: 0.75rem 1rem; text-align: right;">
+              <div class="act-btns-group" style="display: inline-flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                ${actButtons}
+              </div>
+            </td>
+          `;
+        }
 
         return `
           <tr style="border-bottom: 1px solid var(--border-color);">
@@ -182,18 +228,7 @@
             <td style="padding: 0.75rem 1rem;">${designation}</td>
             <td style="padding: 0.75rem 1rem;"><span class="subject-pill">${subjCount} Subjects</span></td>
             <td style="padding: 0.75rem 1rem;"><span class="status-dot-active"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--status-present);"></span> Active</span></td>
-            <td style="padding: 0.75rem 1rem; text-align: right;">
-              <div class="act-btns-group" style="display: inline-flex; gap: 0.4rem; justify-content: flex-end;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="openResetModal(${t.id}, '${esc(t.full_name)}')" title="Reset Password" style="padding: 0.25rem 0.55rem;">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5M18.5 4.5l2.5 2.5"></path></svg>
-                </button>
-                ${isHod ? `
-                  <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent); padding: 0.25rem 0.55rem;" onclick="openDeleteModal(${t.id}, '${esc(t.full_name)}')" title="Delete Faculty Account">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                  </button>
-                ` : ''}
-              </div>
-            </td>
+            ${actionsTd}
           </tr>
         `;
       }).join('');
@@ -315,7 +350,15 @@
         setInterval(updateLiveClock, 30000);
 
         currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-        isHod = Boolean(currentUser && (currentUser.is_hod));
+        isHod = Boolean(currentUser && (currentUser.is_hod || currentUser.role === 'HOD' || currentUser.roles?.includes('HOD') || currentUser.roles?.includes('SYSTEM_ADMIN')));
+
+        if (isHod) {
+          document.body.classList.add('is-hod');
+          document.body.classList.remove('is-faculty');
+        } else {
+          document.body.classList.remove('is-hod');
+          document.body.classList.add('is-faculty');
+        }
 
         const roleLabel = document.getElementById('portal-role-label');
         if (roleLabel) roleLabel.textContent = isHod ? 'HOD Access' : 'Faculty Access';
@@ -334,6 +377,10 @@
             if (el) el.style.display = 'inline-flex';
           });
         } else {
+          ['btn-add-teacher', 'btn-add-student', 'btn-bulk-csv', 'btn-promotion', 'btn-reindex-roll', 'btn-archive-link'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+          });
           const notice = document.getElementById('faculty-provision-notice');
           if (notice) notice.style.display = 'inline-block';
         }
@@ -474,10 +521,17 @@
               </div>
             </div>
 
-            ${isHod ? `
+            ${Boolean(currentUser && ((currentUser.teacher_id && Number(t.id) === Number(currentUser.teacher_id)) || (currentUser.id && Number(t.user_id) === Number(currentUser.id)) || (currentUser.user_id && Number(t.user_id) === Number(currentUser.user_id)) || (currentUser.email && (t.email || t.gmail) && currentUser.email.toLowerCase() === (t.email || t.gmail).toLowerCase()))) ? `
+              <div class="tc-actions" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openSelfPasswordModal()" title="Change My Password" style="color: var(--color-primary); display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5M18.5 4.5l2.5 2.5"></path></svg>
+                  <span>Change Password</span>
+                </button>
+              </div>
+            ` : (isHod ? `
               <div class="tc-actions" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                 <button type="button" class="btn btn-secondary btn-sm" onclick="openResetModal(${t.id}, '${esc(t.full_name)}')" title="Reset faculty password">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5M18.5 4.5l2.5 2.5"></path></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="M21 2l-9.6 9.6M15.5 7.5l2.5 2.5"></path></svg>
                   <span>Reset</span>
                 </button>
                 <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent);" onclick="openDeleteModal(${t.id}, '${esc(t.full_name)}')" title="Remove faculty from department">
@@ -485,7 +539,7 @@
                   <span>Remove</span>
                 </button>
               </div>
-            ` : ''}
+            ` : '')}
           </div>
         `;
       }).join('');
@@ -707,6 +761,70 @@
       } finally {
         btn.disabled = false;
         btn.textContent = 'Create Teacher Account';
+      }
+    }
+
+    function openSelfPasswordModal() {
+      const form = document.getElementById('self-password-form');
+      if (form) form.reset();
+      const err = document.getElementById('self-password-error');
+      if (err) { err.textContent = ''; err.style.display = 'none'; }
+      showModal('self-password-modal');
+    }
+    function closeSelfPasswordModal() {
+      hideModal('self-password-modal');
+    }
+
+    async function submitSelfPassword(e) {
+      e.preventDefault();
+      const btn = document.getElementById('self-pass-btn');
+      const errDiv = document.getElementById('self-password-error');
+      const current_password = document.getElementById('self-curr-pass').value;
+      const new_password = document.getElementById('self-new-pass').value;
+      const confirm_password = document.getElementById('self-confirm-pass').value;
+
+      if (errDiv) { errDiv.textContent = ''; errDiv.style.display = 'none'; }
+
+      if (new_password !== confirm_password) {
+        if (errDiv) {
+          errDiv.textContent = 'New passwords do not match.';
+          errDiv.style.display = 'block';
+        } else {
+          showToast('New passwords do not match.', 'error');
+        }
+        return;
+      }
+
+      if (new_password.length < 8) {
+        if (errDiv) {
+          errDiv.textContent = 'New password must be at least 8 characters.';
+          errDiv.style.display = 'block';
+        } else {
+          showToast('New password must be at least 8 characters.', 'error');
+        }
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Updating...';
+
+      try {
+        await apiFetch('/auth/change-password', {
+          method: 'POST',
+          body: JSON.stringify({ current_password, new_password })
+        });
+        showToast('Your password has been changed successfully!', 'success');
+        closeSelfPasswordModal();
+      } catch (err) {
+        if (errDiv) {
+          errDiv.textContent = err.message || 'Failed to update password. Please check your current password.';
+          errDiv.style.display = 'block';
+        } else {
+          showToast(err.message || 'Failed to update password.', 'error');
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Update Password';
       }
     }
 
@@ -1613,3 +1731,7 @@
       }
     }
 
+
+window.openSelfPasswordModal = openSelfPasswordModal;
+window.closeSelfPasswordModal = closeSelfPasswordModal;
+window.submitSelfPassword = submitSelfPassword;
