@@ -1021,17 +1021,70 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     border: 2px solid var(--bg-card);
   }
 
-  /* Mobile Drawer Sidebar */
+  /* Mobile Drawer Sidebar (50% Width per user specification) */
+  #vidya-admin-sidebar,
+  #app-sidebar.admin-sidebar,
   .admin-sidebar {
-    width: 280px;
-    transform: translateX(-100%);
-    box-shadow: var(--shadow-xl);
-    z-index: 10000;
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    height: 100dvh !important;
+    width: 50% !important;
+    min-width: 0 !important;
+    max-width: 50% !important;
+    transform: translateX(-100%) !important;
+    box-shadow: var(--shadow-xl) !important;
+    z-index: 10000 !important;
+    background: var(--bg-card) !important;
+    border-right: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
   }
 
+  #vidya-admin-sidebar.sidebar-open,
+  #vidya-admin-sidebar.open,
   .admin-sidebar.sidebar-open,
   .admin-sidebar.open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
+  }
+
+  /* Full-bleed Backdrop Overlay covering the other 50% screen */
+  #sidebar-backdrop,
+  .sidebar-backdrop,
+  .gc-drawer-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    z-index: 9999 !important;
+    background: hsl(0 0% 0% / 0.42) !important;
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+    transition: opacity 0.2s ease !important;
+  }
+
+  #sidebar-backdrop:not(.active):not(.open),
+  .sidebar-backdrop:not(.active):not(.open),
+  .gc-drawer-backdrop:not(.active):not(.open) {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  #sidebar-backdrop.active,
+  #sidebar-backdrop.open,
+  .sidebar-backdrop.active,
+  .sidebar-backdrop.open,
+  .gc-drawer-backdrop.active,
+  .gc-drawer-backdrop.open {
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
   }
 
   .admin-main-wrap {
@@ -1048,24 +1101,36 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   }
 
   .sidebar-expanded-header {
-    height: 60px;
-    display: flex;
+    height: 56px;
+    display: flex !important;
     align-items: center;
     justify-content: space-between;
-    padding: 0 1.15rem;
+    padding: 0 0.65rem;
     border-bottom: 1px solid var(--border-color);
+    box-sizing: border-box;
+    flex-shrink: 0;
   }
 
   .sidebar-header-left {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .sidebar-header-cube-icon svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
   }
 
   .sidebar-header-title {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     font-weight: 700;
     color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .sidebar-desktop-collapse-btn {
@@ -1073,9 +1138,9 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   }
 
   .sidebar-mobile-close-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
     background: var(--bg-surface);
     color: var(--text-main);
@@ -1084,27 +1149,31 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     justify-content: center;
     cursor: pointer;
     padding: 0;
+    flex-shrink: 0;
   }
 
   .sidebar-nav-body {
     flex: 1;
     overflow-y: auto;
-    padding: 0.75rem 0.5rem;
+    padding: 0.45rem 0.3rem;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.2rem;
   }
 
   .sidebar-nav-item {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
-    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+    padding: 0.55rem 0.55rem;
     color: var(--text-main);
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 500;
-    border-radius: 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .sidebar-nav-item.active {
@@ -1117,24 +1186,86 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     stroke: var(--text-white, hsl(0 0% 100%)) !important;
   }
 
+  .sidebar-nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .sidebar-nav-label {
+    display: block !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.8rem;
+  }
+
   .sidebar-expanded-footer {
-    padding: 1.25rem 1rem;
+    padding: 0.65rem 0.5rem;
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.3rem;
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  .sidebar-user-card {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .sidebar-user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--text-white, hsl(0 0% 100%));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .sidebar-user-meta {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    border-top: 1px solid var(--border-color);
+    min-width: 0;
+    line-height: 1.2;
+  }
+
+  .sidebar-user-name {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .sidebar-brand-credit {
-    font-size: 0.76rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .sidebar-signout-btn {
     background: transparent;
     border: none;
     color: var(--text-muted);
-    font-size: 0.84rem;
+    font-size: 0.75rem;
     text-align: left;
     padding: 0;
     cursor: pointer;

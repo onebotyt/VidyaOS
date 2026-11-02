@@ -119,6 +119,10 @@
    * The page content (.admin-main-wrap) remains fixed at margin-left: 72px without any layout shift.
    */
   function toggleDesktopSidebar() {
+    if (window.innerWidth <= 768) {
+      toggleSidebar();
+      return;
+    }
     const layout = document.getElementById('admin-app-layout') || document.body;
     const sidebar = getSidebar();
     const backdrop = document.getElementById('sidebar-backdrop');
@@ -194,6 +198,14 @@
       const layout = document.getElementById('admin-app-layout');
       if (layout) layout.classList.add('sidebar-collapsed');
     }
+  }
+
+  function handleBackdropClick(e) {
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+    closeSidebar();
   }
 
   /**
@@ -400,7 +412,7 @@
         </aside>
 
         <!-- Backdrop Overlay for Desktop Flyout & Mobile Drawer -->
-        <div id="sidebar-backdrop" class="gc-drawer-backdrop sidebar-backdrop" onclick="toggleDesktopSidebar()"></div>
+        <div id="sidebar-backdrop" class="gc-drawer-backdrop sidebar-backdrop" onclick="handleBackdropClick(event)"></div>
       `;
 
       // Insert sidebar immediately before .admin-main-wrap or append
@@ -499,11 +511,41 @@
     }
   });
 
+  // Handle tap or click anywhere outside the sidebar to close it immediately
+  function handleOutsideSidebarTap(e) {
+    const sidebar = getSidebar();
+    if (!sidebar) return;
+
+    const isMobileOpen = sidebar.classList.contains('open') || sidebar.classList.contains('sidebar-open');
+    const isDesktopOpen = sidebar.classList.contains('desktop-open');
+
+    if (!isMobileOpen && !isDesktopOpen) return;
+
+    // If click/tap is inside the sidebar itself, allow normal interaction
+    if (sidebar.contains(e.target)) return;
+
+    // If click/tap is on the toggle triggers, let their click handlers handle it
+    const mobileToggleBtn = document.getElementById('mobile-sidebar-toggle-btn');
+    if (mobileToggleBtn && (mobileToggleBtn === e.target || mobileToggleBtn.contains(e.target))) return;
+
+    const railExpandBtn = document.querySelector('.rail-expand-btn');
+    if (railExpandBtn && (railExpandBtn === e.target || railExpandBtn.contains(e.target))) return;
+
+    // User clicked outside the open sidebar: close it immediately
+    closeSidebar();
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('pointerdown', handleOutsideSidebarTap, true);
+    document.addEventListener('touchstart', handleOutsideSidebarTap, { passive: true, capture: true });
+  }
+
   // Attach methods to window for inline onclick handlers & outside access
   win.toggleSidebar = toggleSidebar;
   win.openSidebar = openSidebar;
   win.closeSidebar = closeSidebar;
   win.toggleDesktopSidebar = toggleDesktopSidebar;
+  win.handleBackdropClick = handleBackdropClick;
   win.toggleNotifications = toggleNotifications;
   win.adminLogout = adminLogout;
   win.mountAdminNavigation = mountAdminNavigation;
