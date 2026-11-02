@@ -865,11 +865,11 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     display: block !important;
   }
 
-  /* Mobile Top Header (Sticky: 58px Navy Navbar matching Reference) */
+  /* Mobile Top Header (Sticky: 58px Clean Navbar matching Reference) */
   .mobile-top-header {
     height: 58px;
-    background: hsl(222 47% 11%);
-    border-bottom: 1px solid hsl(217 33% 20%);
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
     left: 0;
@@ -882,6 +882,7 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     padding: 0 0.85rem;
     box-sizing: border-box;
     user-select: none;
+    box-shadow: var(--shadow-sm);
   }
 
   .mobile-header-left {
@@ -894,21 +895,22 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   .mobile-hamburger-btn {
     width: 36px;
     height: 36px;
-    border-radius: 8px;
-    border: 1px solid hsl(217 33% 24%);
-    background: hsl(217 33% 16%);
-    color: var(--text-white, hsl(0 0% 100%));
+    border-radius: var(--radius-sm, 6px);
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-main);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     padding: 0;
     flex-shrink: 0;
-    transition: background 0.15s ease;
+    transition: all 0.15s ease;
   }
 
   .mobile-hamburger-btn:hover {
-    background: hsl(217 33% 22%);
+    background: var(--bg-surface-hover);
+    border-color: var(--border-focus);
   }
 
   .mobile-brand-block {
@@ -919,8 +921,7 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     min-width: 0;
   }
 
-  .mobile-brand-icon {
-    color: var(--text-white, hsl(0 0% 100%));
+  .mobile-brand-cube {
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
@@ -937,60 +938,59 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     font-size: 1rem;
     font-weight: 800;
     letter-spacing: -0.015em;
-  }
-
-  .brand-vidya {
-    color: var(--text-white, hsl(0 0% 100%));
-  }
-
-  .brand-os {
-    color: hsl(217 91% 60%);
+    color: var(--text-main);
   }
 
   .mobile-brand-sub {
-    font-size: 0.64rem;
-    font-weight: 500;
-    color: hsl(215 20% 75%);
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-muted);
     letter-spacing: 0.01em;
   }
 
   .mobile-header-right {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.5rem;
     flex-shrink: 0;
   }
 
-  .mobile-header-icon-btn.mobile-bell-btn {
+  .mobile-header-icon-btn {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px solid hsl(217 33% 24%);
-    background: hsl(217 33% 16%);
-    color: var(--text-white, hsl(0 0% 100%));
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-main);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     position: relative;
     padding: 0;
+    transition: all 0.15s ease;
+  }
+
+  .mobile-header-icon-btn:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-focus);
   }
 
   .mobile-bell-badge {
     position: absolute;
     top: -2px;
     right: -2px;
-    width: 15px;
-    height: 15px;
-    background: var(--status-absent, hsl(0 84% 60%));
-    color: var(--text-white, hsl(0 0% 100%));
+    width: 16px;
+    height: 16px;
+    background: var(--status-absent);
+    color: var(--text-white);
     border-radius: 50%;
-    font-size: 0.62rem;
+    font-size: 0.64rem;
     font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid hsl(222 47% 11%);
+    border: 2px solid var(--bg-card);
     line-height: 1;
   }
 
@@ -998,16 +998,16 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: hsl(270 70% 55%);
-    color: var(--text-white, hsl(0 0% 100%));
+    background: var(--color-primary);
+    color: var(--text-white);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 800;
     position: relative;
-    box-shadow: 0 1px 4px hsl(0 0% 0% / 0.25);
+    box-shadow: var(--shadow-sm);
   }
 
   .mobile-user-avatar-btn .avatar-online-dot {
@@ -1017,8 +1017,8 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--status-present, hsl(142 71% 45%));
-    border: 2px solid hsl(222 47% 11%);
+    background: var(--status-present);
+    border: 2px solid var(--bg-card);
   }
 
   /* Mobile Drawer Sidebar */

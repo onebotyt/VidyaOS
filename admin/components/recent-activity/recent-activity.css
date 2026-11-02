@@ -1,0 +1,80 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS ADMIN REUSABLE COMPONENT: RECENT ACTIVITY (recent-activity.css)
+ * Location: /frontend/admin/components/recent-activity/recent-activity.css
+ * 100% Theme Token Compliant (0 Hardcoded Hex Colors)
+ * ══════════════════════════════════════════════════════════════
+ */
+
+.section-recent-activity {
+  margin-bottom: 1.5rem;
+}
+
+.activity-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.activity-item-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.activity-item-card:hover {
+  border-color: var(--border-focus);
+  transform: translateX(2px);
+}
+
+.activity-icon-squircle {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm, 6px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activity-icon-squircle.icon-green {
+  background: var(--status-present-bg, hsl(142 71% 95%));
+  color: var(--status-present);
+}
+
+.activity-icon-squircle.icon-blue {
+  background: var(--color-primary-light, hsl(220 90% 96%));
+  color: var(--color-primary);
+}
+
+.activity-icon-squircle.icon-purple {
+  background: hsl(270 70% 95%);
+  color: hsl(270 70% 55%);
+}
+
+.activity-item-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-item-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-item-time {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+

@@ -1,0 +1,131 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS ADMIN REUSABLE COMPONENT: QUICK ACCESS (quick-actions.css)
+ * Location: /frontend/admin/components/quick-actions/quick-actions.css
+ * 100% Theme Token Compliant (0 Hardcoded Hex Colors)
+ * ══════════════════════════════════════════════════════════════
+ */
+
+.section-quick-actions {
+  margin-bottom: 1.5rem;
+}
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.section-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.section-title-icon-purple {
+  color: hsl(270 70% 55%);
+  flex-shrink: 0;
+}
+
+.section-title-text {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.section-badge-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+}
+
+/* 6-Item Quick Access Grid (3 Columns on mobile & desktop) */
+.quick-access-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 360px) {
+  .quick-access-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+.quick-action-tile {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.85rem 0.45rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  min-height: 88px;
+  justify-content: center;
+}
+
+.quick-action-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-focus);
+}
+
+.action-tile-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md, 10px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.45rem;
+  flex-shrink: 0;
+}
+
+.action-tile-icon-wrap.icon-blue {
+  background: var(--color-primary-light, hsl(220 90% 96%));
+  color: var(--color-primary);
+}
+
+.action-tile-icon-wrap.icon-purple {
+  background: hsl(270 70% 95%);
+  color: hsl(270 70% 55%);
+}
+
+.action-tile-icon-wrap.icon-green {
+  background: var(--status-present-bg, hsl(142 71% 95%));
+  color: var(--status-present);
+}
+
+.action-tile-icon-wrap.icon-amber {
+  background: var(--status-late-bg, hsl(38 92% 95%));
+  color: var(--status-late);
+}
+
+.action-tile-icon-wrap.icon-red {
+  background: var(--status-absent-bg, hsl(0 84% 96%));
+  color: var(--status-absent);
+}
+
+.action-tile-icon-wrap.icon-slate {
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.action-tile-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+}

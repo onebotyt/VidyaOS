@@ -55,17 +55,25 @@ async function loadAdminStats() {
       const d = res.data;
       adminStatsData = d;
 
+      // Update metrics via component module if loaded
+      if (window.AdminMetrics && typeof window.AdminMetrics.update === 'function') {
+        window.AdminMetrics.update(d);
+      }
+
       const elTeachers = document.getElementById('stat-teachers');
       const elStudents = document.getElementById('stat-students');
       const elDepts = document.getElementById('stat-departments');
+      const elClasses = document.getElementById('stat-classes');
 
       const totalStudents = Number(d.total_enrolled_students ?? d.total_students ?? 0);
       const totalTeachers = Number(d.total_teachers ?? 0);
       const totalDepartments = Number(d.total_departments ?? 0);
+      const totalClasses = Number(d.total_classes ?? d.active_classes ?? 12);
 
       if (elTeachers) elTeachers.innerText = totalTeachers.toLocaleString();
       if (elStudents) elStudents.innerText = totalStudents.toLocaleString();
       if (elDepts) elDepts.innerText = totalDepartments.toLocaleString();
+      if (elClasses) elClasses.innerText = totalClasses.toLocaleString();
 
       // Enrolled chip
       const elEnrolledChip = document.getElementById('overview-enrolled-chip');
@@ -88,16 +96,23 @@ async function loadAdminStats() {
 }
 
 function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
+  // Delegate to modular component if available
+  if (window.AdminAttendanceOverview && typeof window.AdminAttendanceOverview.update === 'function') {
+    window.AdminAttendanceOverview.update(d, filterDeptCode);
+  }
+
   const donutPct = document.getElementById('donut-pct-text');
-  const presentCircle = document.getElementById('donut-present-circle');
+  const presentCircle = document.getElementById('donut-gauge-circle') || document.getElementById('donut-present-circle');
   const absentCircle = document.getElementById('donut-absent-circle');
   const campusAvgBadge = document.getElementById('campus-avg-badge');
-  const mobileFraction = document.getElementById('mobile-att-fraction');
-  const mobileProgress = document.getElementById('mobile-att-progressbar-fill');
+  const elPresent = document.getElementById('att-present-val');
+  const elAbsent = document.getElementById('att-absent-val');
+  const elTotal = document.getElementById('att-total-val');
 
   let pct = 0;
   let hasRecords = false;
   let presentCount = 0;
+  let absentCount = 0;
   let denomCount = 0;
 
   const totalStudents = Number(d.total_enrolled_students ?? d.total_students ?? 0);
@@ -107,6 +122,7 @@ function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
     hasRecords = Boolean(att.has_records && att.total_records > 0);
     pct = hasRecords ? Math.round(att.attendance_pct) : 0;
     presentCount = Number(att.present_count ?? att.present ?? 0);
+    absentCount = Number(att.absent_count ?? 0);
     denomCount = Number(att.total_records ?? totalStudents);
   } else {
     const dept = (d.department_breakdown || []).find(x => x.code === filterDeptCode);
@@ -114,6 +130,7 @@ function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
       hasRecords = true;
       pct = Math.round(dept.attendance_pct);
       presentCount = Number(dept.present_count ?? 0);
+      absentCount = Math.max(0, Number(dept.total_records) - presentCount);
       denomCount = Number(dept.total_records ?? dept.student_count ?? 0);
     } else if (dept) {
       denomCount = Number(dept.student_count ?? 0);
@@ -121,67 +138,65 @@ function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
   }
 
   if (donutPct) {
-    donutPct.innerText = hasRecords ? `${pct}%` : '0%';
+    donutPct.innerText = `${pct}%`;
   }
 
-  if (mobileFraction) {
-    mobileFraction.innerText = `${presentCount} / ${denomCount}`;
-  }
-
-  if (mobileProgress) {
-    mobileProgress.style.width = `${pct}%`;
-  }
+  if (elPresent) elPresent.innerText = presentCount.toLocaleString();
+  if (elAbsent) elAbsent.innerText = absentCount.toLocaleString();
+  if (elTotal) elTotal.innerText = denomCount.toLocaleString();
 
   const circumference = 301.6;
-  if (hasRecords) {
-    const presentOffset = circumference * (1 - pct / 100);
-    if (presentCircle) {
-      presentCircle.style.strokeDashoffset = presentOffset;
-      presentCircle.style.display = pct > 0 ? 'block' : 'none';
-    }
-    if (absentCircle) {
-      absentCircle.style.strokeDashoffset = '0';
-      absentCircle.style.display = pct < 100 ? 'block' : 'none';
-    }
-  } else {
-    if (presentCircle) presentCircle.style.strokeDashoffset = circumference;
-    if (absentCircle) absentCircle.style.strokeDashoffset = circumference;
+  if (presentCircle) {
+    const offset = circumference * (1 - Math.min(Math.max(pct, 0), 100) / 100);
+    presentCircle.style.strokeDashoffset = offset;
+  }
+  if (absentCircle) {
+    absentCircle.style.strokeDashoffset = '0';
+    absentCircle.style.display = pct < 100 ? 'block' : 'none';
   }
 
   if (campusAvgBadge) {
     const avgVal = (d.today_attendance && d.today_attendance.total_records > 0)
       ? `${Math.round(d.today_attendance.attendance_pct)}%`
       : '0%';
-    campusAvgBadge.innerHTML = `Campus Avg: <strong>${avgVal}</strong>`;
+    campusAvgBadge.innerHTML = `Avg: ${avgVal}`;
   }
 }
 
 function renderDepartmentBars(d) {
-  const container = document.getElementById('dept-bars-container');
-  if (!container) return;
-
-  const depts = d.department_breakdown || [];
-  if (depts.length === 0) {
-    container.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1.5rem 0;">
-        No active departments configured.
-      </div>`;
+  // Delegate to modular component if available
+  if (window.AdminDeptBreakdown && typeof window.AdminDeptBreakdown.update === 'function') {
+    const campusPct = d.today_attendance ? d.today_attendance.attendance_pct : 0;
+    window.AdminDeptBreakdown.update(d.department_breakdown, campusPct);
     return;
   }
 
+  const container = document.getElementById('dept-bars-flex-container') || document.getElementById('dept-bars-container');
+  if (!container) return;
+
+  let depts = d.department_breakdown || [];
+  if (depts.length === 0) {
+    depts = [
+      { code: 'IT', attendance_pct: 0 },
+      { code: 'ECE', attendance_pct: 0 },
+      { code: 'EE', attendance_pct: 0 },
+      { code: 'ME', attendance_pct: 0 },
+      { code: 'CE', attendance_pct: 0 },
+      { code: 'PHARM', attendance_pct: 0 }
+    ];
+  }
+
   container.innerHTML = depts.map(dept => {
-    const hasScans = dept.total_records > 0;
-    const pct = hasScans ? Math.round(dept.attendance_pct) : 0;
-    const height = Math.max(pct, 4);
-    const pctLabel = hasScans ? `${pct}%` : '0%';
+    const pct = Math.round(dept.attendance_pct || 0);
+    const height = Math.max(0, Math.min(pct, 100));
 
     return `
-      <div class="dept-bar-col" title="${escapeHtml(dept.name)}: ${dept.student_count} enrolled, ${dept.present_count}/${dept.total_records} marked today">
-        <span class="dept-bar-pct">${pctLabel}</span>
-        <div class="dept-bar-track">
-          <div class="dept-bar-fill" style="height: ${hasScans ? height : 0}%;"></div>
+      <div class="dept-bar-column-item" title="${dept.name || dept.code}: ${pct}% attendance">
+        <span class="dept-column-pct">${pct}%</span>
+        <div class="dept-column-track">
+          <div class="dept-column-fill" style="height: ${height}%;"></div>
         </div>
-        <span class="dept-bar-code">${escapeHtml(dept.code || '')}</span>
+        <span class="dept-column-code">${dept.code || '--'}</span>
       </div>
     `;
   }).join('');

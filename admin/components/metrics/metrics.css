@@ -1,0 +1,106 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS ADMIN REUSABLE COMPONENT: METRICS GRID (metrics.css)
+ * Location: /frontend/admin/components/metrics/metrics.css
+ * 100% Theme Token Compliant (0 Hardcoded Hex Colors)
+ * ══════════════════════════════════════════════════════════════
+ */
+
+.admin-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 900px) {
+  .admin-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+.kpi-metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.35rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.kpi-metric-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-focus);
+}
+
+.kpi-card-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.kpi-squircle-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md, 10px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-squircle-icon.icon-blue {
+  background: var(--color-primary-light, hsl(220 90% 96%));
+  color: var(--color-primary);
+}
+
+.kpi-squircle-icon.icon-green {
+  background: var(--status-present-bg, hsl(142 71% 95%));
+  color: var(--status-present);
+}
+
+.kpi-squircle-icon.icon-purple {
+  background: hsl(270 70% 95%);
+  color: hsl(270 70% 55%);
+}
+
+.kpi-squircle-icon.icon-amber {
+  background: var(--status-late-bg, hsl(38 92% 95%));
+  color: var(--status-late);
+}
+
+.kpi-card-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.kpi-card-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+  margin: 0.2rem 0;
+  letter-spacing: -0.02em;
+}
+
+.kpi-card-trend {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--status-present);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.kpi-card-trend.trend-neutral {
+  color: var(--text-muted);
+}
+

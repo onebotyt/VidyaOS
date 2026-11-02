@@ -36,6 +36,7 @@
     user: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill="currentColor" fill-opacity="0.15"/><circle cx="12" cy="7" r="4" fill="currentColor" fill-opacity="0.25"/></svg>`,
     logout: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
     bell: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`,
+    search: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
     institution: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>`
   };
 
@@ -49,12 +50,13 @@
     { key: 'audit', label: 'Audit Logs', shortLabel: 'Audit', href: '/admin/audit-logs.html', icon: 'audit' }
   ];
 
-  // Mobile Bottom Navigation Tabs (Matches Mobile App Reference)
+  // Mobile Bottom Navigation Tabs (5 Canonical Tabs Matching Mobile App Reference)
   const ADMIN_MOBILE_TABS = [
     { key: 'dashboard', label: 'Home', href: '/admin/dashboard.html', icon: 'home' },
-    { key: 'faculty', label: 'HOD Leadership', href: '/admin/faculty.html', icon: 'hodManagement' },
-    { key: 'academics', label: 'Academic Structure', href: '/admin/academic-structure.html', icon: 'academicStructure' },
-    { key: 'profile', label: 'Profile', href: '/admin/profile.html', icon: 'user' }
+    { key: 'academics', label: 'Structure', href: '/admin/academic-structure.html', icon: 'academicStructure' },
+    { key: 'faculty', label: 'HOD', href: '/admin/faculty.html', icon: 'hodManagement' },
+    { key: 'reports', label: 'Reports', href: '/admin/reports.html', icon: 'reports' },
+    { key: 'settings', label: 'Settings', href: '/admin/settings.html', icon: 'settings' }
   ];
 
   /**
@@ -269,9 +271,10 @@
 
     // ── A. Mount Mobile Top Header (<= 768px only) if missing ──
     if (!document.getElementById('mobile-top-header')) {
-      const menuSvg = getIcon('menu', { width: 20, height: 20, stroke: 2.2 });
-      const instSvg = getIcon('institution', { width: 18, height: 18, stroke: 2 });
-      const bellSvg = getIcon('bell', { width: 18, height: 18, stroke: 2 });
+      const menuSvg = getIcon('menu', { width: 22, height: 22, stroke: 2.2 });
+      const cubeSvgHeader = getIcon('cube', { width: 30, height: 30 });
+      const searchSvg = getIcon('search', { width: 19, height: 19, stroke: 2.2 });
+      const bellSvg = getIcon('bell', { width: 19, height: 19, stroke: 2 });
 
       const mobileHeaderHtml = `
         <header class="mobile-top-header" id="mobile-top-header" aria-label="Mobile App Header">
@@ -280,20 +283,23 @@
               ${menuSvg}
             </button>
             <a href="/admin/dashboard.html" class="mobile-brand-block">
-              <span class="mobile-brand-icon">${instSvg}</span>
+              <span class="mobile-brand-cube">${cubeSvgHeader}</span>
               <div class="mobile-brand-meta">
-                <span class="mobile-brand-name"><span class="brand-vidya">Vidya</span><span class="brand-os">OS</span></span>
-                <span class="mobile-brand-sub">UGIP Nainital</span>
+                <span class="mobile-brand-name">VidyaOS</span>
+                <span class="mobile-brand-sub">Admin Portal</span>
               </div>
             </a>
           </div>
           <div class="mobile-header-right">
-            <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications">
-              ${bellSvg}
-              <span class="mobile-bell-badge">1</span>
+            <button type="button" class="mobile-header-icon-btn mobile-search-btn" onclick="openAdminSearchModal()" aria-label="Search" title="Search Portal">
+              ${searchSvg}
             </button>
-            <a href="/admin/profile.html" class="mobile-user-avatar-btn" id="mobile-user-profile" aria-label="Admin Profile">
-              <span class="mobile-avatar-initials" id="mobile-user-initials">A</span>
+            <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications" title="Notifications">
+              ${bellSvg}
+              <span class="mobile-bell-badge">3</span>
+            </button>
+            <a href="/admin/profile.html" class="mobile-user-avatar-btn" id="mobile-user-profile" aria-label="Admin Profile" title="Admin Profile">
+              <span class="mobile-avatar-initials" id="mobile-user-initials">SA</span>
               <span class="avatar-online-dot"></span>
             </a>
           </div>
@@ -428,12 +434,14 @@
         let isActive = false;
         if (tab.key === 'dashboard') {
           isActive = (currentPath === '/admin' || currentPath === '/admin/' || currentPath.includes('/admin/dashboard') || currentPath.endsWith('/admin/index.html'));
-        } else if (tab.key === 'faculty') {
-          isActive = (currentPath.includes('/admin/faculty') || currentPath.includes('/faculty.html'));
         } else if (tab.key === 'academics') {
           isActive = (currentPath.includes('/admin/academic-structure') || currentPath.includes('/academic-structure.html') || currentPath.includes('/admin/structure'));
-        } else if (tab.key === 'profile') {
-          isActive = (currentPath.includes('/admin/profile') || currentPath.includes('/profile.html'));
+        } else if (tab.key === 'faculty') {
+          isActive = (currentPath.includes('/admin/faculty') || currentPath.includes('/faculty.html'));
+        } else if (tab.key === 'reports') {
+          isActive = (currentPath.includes('/admin/reports') || currentPath.includes('/reports.html'));
+        } else if (tab.key === 'settings') {
+          isActive = (currentPath.includes('/admin/settings') || currentPath.includes('/settings.html'));
         }
 
         const activeCls = isActive ? ' active' : '';
@@ -500,6 +508,12 @@
   window.toggleNotifications = toggleNotifications;
   window.adminLogout = adminLogout;
   window.mountAdminNavigation = mountAdminNavigation;
+  window.openAdminSearchModal = function () {
+    const term = prompt('Search Admin Portal (Department, Faculty, Settings):');
+    if (term && term.trim()) {
+      window.location.href = `/admin/academic-structure.html?search=${encodeURIComponent(term.trim())}`;
+    }
+  };
 
   // Mount components when DOM is loaded
   if (typeof document !== 'undefined') {

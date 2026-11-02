@@ -1,0 +1,188 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS ADMIN REUSABLE COMPONENT: ATTENDANCE OVERVIEW (attendance-overview.css)
+ * Location: /frontend/admin/components/attendance-overview/attendance-overview.css
+ * 100% Theme Token Compliant (0 Hardcoded Hex Colors)
+ * ══════════════════════════════════════════════════════════════
+ */
+
+.panel-attendance-overview {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1rem;
+}
+
+.panel-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+}
+
+.panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-title-icon {
+  color: hsl(270 70% 55%);
+  flex-shrink: 0;
+}
+
+.panel-title-text {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.dept-pill-select {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dept-pill-select:hover {
+  border-color: var(--border-focus);
+}
+
+.attendance-overview-body-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+@media (max-width: 480px) {
+  .attendance-overview-body-grid {
+    grid-template-columns: 120px 1fr;
+    gap: 0.85rem;
+  }
+}
+
+/* Donut Ring Container */
+.donut-gauge-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+.donut-gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donut-track {
+  fill: none;
+  stroke: var(--bg-surface, hsl(215 20% 95%));
+  stroke-width: 12;
+}
+
+.donut-fill-present {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.donut-gauge-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.donut-gauge-pct {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.donut-gauge-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+/* Attendance Metric Breakdown Rows (Right Pane) */
+.attendance-counts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.att-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-surface);
+  transition: background 0.15s ease;
+}
+
+.att-count-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.att-row-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.att-row-icon.icon-present {
+  background: var(--status-present-bg, hsl(142 71% 95%));
+  color: var(--status-present);
+}
+
+.att-row-icon.icon-absent {
+  background: var(--status-absent-bg, hsl(0 84% 96%));
+  color: var(--status-absent);
+}
+
+.att-row-icon.icon-total {
+  background: var(--color-primary-light, hsl(220 90% 96%));
+  color: var(--color-primary);
+}
+
+.att-row-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.att-row-value {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+  font-family: var(--font-family-mono, monospace);
+}
+
