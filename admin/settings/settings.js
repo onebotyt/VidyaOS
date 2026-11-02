@@ -96,22 +96,71 @@ function updateLivePreview() {
   if (el) el.addEventListener('input', updateLivePreview);
 });
 
+// Client-side canvas downscaler to prevent huge multi-megabyte payloads from phone camera uploads
+function downscaleImage(file, maxWidth, maxHeight, quality = 0.85) {
+  return new Promise((resolve) => {
+    if (!file) return resolve({ dataUrl: '', blob: null });
+    if (file.type === 'image/svg+xml') {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve({ dataUrl: e.target.result, blob: file });
+      reader.onerror = () => resolve({ dataUrl: '', blob: file });
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxWidth || height > maxHeight) {
+        const ratio = Math.min(maxWidth / width, maxHeight / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, width);
+      canvas.height = Math.max(1, height);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+      const dataUrl = canvas.toDataURL(mimeType, quality);
+      canvas.toBlob((blob) => {
+        resolve({ dataUrl, blob: blob || file });
+      }, mimeType, quality);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      const reader = new FileReader();
+      reader.onload = (e) => resolve({ dataUrl: e.target.result, blob: file });
+      reader.onerror = () => resolve({ dataUrl: '', blob: file });
+      reader.readAsDataURL(file);
+    };
+    img.src = url;
+  });
+}
+
 // Logo File Handler
 async function handleLogoFileSelect(event) {
   const file = event.target?.files?.[0];
   if (!file) return;
 
-  // Client-side quick preview via FileReader
-  const reader = new FileReader();
-  reader.onload = async function (e) {
-    const dataUrl = e.target.result;
+  const btn = document.getElementById('save-settings-btn');
+  if (btn) btn.disabled = true;
+
+  try {
+    const { dataUrl, blob } = await downscaleImage(file, 512, 512, 0.88);
     document.getElementById('setting-inst-logo-url').value = dataUrl;
     updateImagePreviews(dataUrl, document.getElementById('setting-inst-banner-url')?.value);
 
     // Also attempt server upload
-    await uploadBrandingAsset(file, 'logo');
-  };
-  reader.readAsDataURL(file);
+    await uploadBrandingAsset(blob || file, 'logo');
+  } catch (err) {
+    console.warn('Logo process error:', err);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 // Banner File Handler
@@ -119,45 +168,48 @@ async function handleBannerFileSelect(event) {
   const file = event.target?.files?.[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = async function (e) {
-    const dataUrl = e.target.result;
+  const btn = document.getElementById('save-settings-btn');
+  if (btn) btn.disabled = true;
+
+  try {
+    const { dataUrl, blob } = await downscaleImage(file, 1600, 600, 0.82);
     document.getElementById('setting-inst-banner-url').value = dataUrl;
     updateImagePreviews(document.getElementById('setting-inst-logo-url')?.value, dataUrl);
 
     // Also attempt server upload
-    await uploadBrandingAsset(file, 'banner');
-  };
-  reader.readAsDataURL(file);
+    await uploadBrandingAsset(blob || file, 'banner');
+  } catch (err) {
+    console.warn('Banner process error:', err);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 // Upload file to backend /api/v1/admin/branding/upload
-async function uploadBrandingAsset(file, type) {
+async function uploadBrandingAsset(fileOrBlob, type) {
   try {
     const formData = new FormData();
-    formData.append('file', file);
+    const filename = type === 'logo' ? 'college_logo.png' : 'campus_banner.jpg';
+    formData.append('file', fileOrBlob, filename);
     formData.append('type', type);
 
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    const res = await fetch('/api/v1/admin/branding/upload', {
+    const res = await fetchApi('/admin/branding/upload', {
       method: 'POST',
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       body: formData
     });
 
-    const data = await res.json();
-    if (data.success && data.data?.url) {
+    if (res && res.success && res.data?.url) {
       if (type === 'logo') {
-        document.getElementById('setting-inst-logo-url').value = data.data.url;
+        document.getElementById('setting-inst-logo-url').value = res.data.url;
       } else {
-        document.getElementById('setting-inst-banner-url').value = data.data.url;
+        document.getElementById('setting-inst-banner-url').value = res.data.url;
       }
       if (typeof showToast === 'function') {
-        showToast(`${type === 'banner' ? 'Campus banner' : 'College logo'} uploaded!`, 'success');
+        showToast(`${type === 'banner' ? 'Campus banner' : 'College logo'} uploaded and saved!`, 'success');
       }
     }
   } catch (err) {
-    console.warn('Local preview preserved, server upload skipped:', err.message);
+    console.warn('Server upload fallback active:', err.message);
   }
 }
 

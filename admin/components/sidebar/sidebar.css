@@ -815,8 +815,10 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
 }
 
 /* Hide mobile header completely on desktop */
-.mobile-top-header {
-  display: none !important;
+@media (min-width: 769px) {
+  .mobile-top-header {
+    display: none !important;
+  }
 }
 
 
@@ -874,7 +876,7 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     right: 0;
     width: 100%;
     z-index: 999;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: space-between;
     padding: 0 0.85rem;
