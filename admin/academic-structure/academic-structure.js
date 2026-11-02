@@ -145,34 +145,50 @@ guardRoute(['SYSTEM_ADMIN']);
 
         return `
           <tr class="dept-row-card">
-            <td class="td-mobile-header">
-              <div style="display: flex; align-items: center; gap: 0.45rem; min-width: 0; flex: 1;">
-                <span class="code-badge">${esc(d.code)}</span>
-                <span class="d-mobile-only" style="font-weight: 700; font-size: 0.88rem; color: var(--text-main); display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden;">
-                  <span style="display:inline-flex;align-items:center;flex-shrink:0;">${deptIcon}</span>
-                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(d.name)}</span>
-                </span>
+            <!-- Mobile Optimized Card View (<= 768px) -->
+            <td class="td-mobile-card d-mobile-only">
+              <div class="dept-mobile-card-inner">
+                <div class="dept-mobile-code-col">
+                  <span class="code-badge-pill">${esc(d.code)}</span>
+                </div>
+                <div class="dept-mobile-info-col">
+                  <div class="dept-mobile-title-row">
+                    <span class="dept-mobile-icon">${deptIcon}</span>
+                    <span class="dept-mobile-name">${esc(d.name)}</span>
+                  </div>
+                  <div class="dept-mobile-meta-text">${progDuration} Years • ${progLabel}</div>
+                  <div class="dept-mobile-hod-row">${hodDisplay}</div>
+                  <div class="dept-mobile-status-row">${statusBadge}</div>
+                </div>
+                <div class="dept-mobile-action-col">
+                  <button type="button" class="btn-icon-square" onclick="editDepartment(${d.id})" title="Edit ${esc(d.name)}" aria-label="Edit Department">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <span class="d-mobile-only" style="flex-shrink: 0;">${statusBadge}</span>
             </td>
-            <td class="td-mobile-title d-desktop-only">
+
+            <!-- Desktop Table Cells (>= 769px) -->
+            <td class="td-desktop-code d-desktop-only">
+              <span class="code-badge">${esc(d.code)}</span>
+            </td>
+            <td class="td-desktop-title d-desktop-only">
               <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
                 <span style="font-size: 1.05rem;">${deptIcon}</span>
                 <span>${esc(d.name)}</span>
               </div>
               <div style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.1rem;">${progDuration} Years • ${progLabel}</div>
             </td>
-            <td class="td-mobile-hod">
-              <div class="d-mobile-only" style="display: flex; justify-content: space-between; align-items: center; gap: 0.4rem; width: 100%;">
-                <span style="font-size: 0.73rem; color: var(--text-muted); font-weight: 500;">${progDuration} Yrs • ${progLabel}</span>
-                <span>${hodDisplay}</span>
-              </div>
-              <div class="d-desktop-only">${hodDisplay}</div>
+            <td class="td-desktop-hod d-desktop-only">
+              ${hodDisplay}
             </td>
-            <td class="d-desktop-only" style="text-align: center;">
+            <td class="td-desktop-status d-desktop-only" style="text-align: center;">
               ${statusBadge}
             </td>
-            <td class="td-mobile-actions">
+            <td class="td-desktop-actions d-desktop-only">
               ${isHardcoded
                 ? `<div class="row-actions-group">
                     <button class="btn btn-secondary btn-sm" onclick="editDepartment(${d.id})" style="padding: 0.25rem 0.55rem; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;">

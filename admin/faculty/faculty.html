@@ -11,8 +11,9 @@
   <link rel="stylesheet" href="/css/reset.css?v=20261028">
   <link rel="stylesheet" href="/css/variables.css?v=20261028">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261102">
   <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/page-header/page-header.css?v=20261102">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -110,13 +111,33 @@
       <!-- top-nav-bar fallback for test suites / backward compatibility -->
       <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
 <main class="container" style="padding-top: 1.5rem; padding-bottom: 5rem;">
-    <div class="fac-page-header">
-      <div class="fac-page-header-text">
-        <h1>HOD Leadership</h1>
-        <p>Department head leadership roster, administrative appointments, and department authority.</p>
+    <!-- Reusable Page Header Component -->
+    <section class="admin-page-header" aria-label="HOD Leadership">
+      <div class="admin-header-main-row">
+        <div class="admin-header-squircle-icon icon-blue" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.5L19.5 5.5V11C19.5 16 16 19.8 12 21.5C8 19.8 4.5 16 4.5 11V5.5L12 2.5Z" fill="currentColor" fill-opacity="0.15"/>
+            <circle cx="12" cy="9" r="2.5" fill="currentColor" fill-opacity="0.5"/>
+            <path d="M8.5 15.5C8.5 13.5 10 12.2 12 12.2C14 12.2 15.5 13.5 15.5 15.5" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+        </div>
+        <div class="admin-header-title-col">
+          <h1 class="admin-header-title">HOD Leadership</h1>
+          <p class="admin-header-subtitle">Department head appointments, administrative roster, and department authority.</p>
+        </div>
       </div>
-      <button class="btn btn-primary fac-create-btn" id="create-hod-btn" onclick="openCreateModal()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <div class="admin-header-actions-row d-desktop-only">
+        <button class="btn btn-primary fac-create-btn" id="create-hod-btn-desktop" onclick="openCreateModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Create HOD</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Mobile Full-Width Primary Action (Matching Image 2) -->
+    <div class="fac-mobile-create-row d-mobile-only" style="margin-bottom: 0.85rem; width: 100%;">
+      <button class="btn btn-primary fac-create-btn" id="create-hod-btn" onclick="openCreateModal()" style="width: 100%; justify-content: center; padding: 0.75rem 1rem; font-size: 0.95rem; font-weight: 700; border-radius: var(--radius-md, 10px);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         <span>Create HOD</span>
       </button>
     </div>

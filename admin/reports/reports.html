@@ -11,8 +11,10 @@
   <link rel="stylesheet" href="/css/reset.css?v=20261028">
   <link rel="stylesheet" href="/css/variables.css?v=20261028">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261102">
   <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/page-header/page-header.css?v=20261102">
+  <link rel="stylesheet" href="/admin/components/metrics/metrics.css?v=20261102">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -110,25 +112,36 @@
       <!-- top-nav-bar fallback for test suites / backward compatibility -->
       <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
 <main class="container" style="padding-top: 1rem; padding-bottom: 4.5rem;">
-    <!-- Page Header -->
-    <div class="page-header no-print stud-page-header" style="margin-bottom: 1rem;">
-      <div class="stud-header-text">
-        <h1 class="page-title stud-title" id="page-main-title">Reports &amp; Analytics</h1>
-        <p class="page-subtitle stud-subtitle" id="page-main-subtitle">Biometric attendance &amp; device telemetry</p>
+    <!-- Reusable Page Header Component -->
+    <section class="admin-page-header" aria-label="Reports &amp; Analytics">
+      <div class="admin-header-main-row">
+        <div class="admin-header-squircle-icon icon-blue" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="14" width="3.5" height="7" rx="1" fill="currentColor" fill-opacity="0.25"/>
+            <rect x="10.25" y="9.5" width="3.5" height="11.5" rx="1" fill="currentColor" fill-opacity="0.35"/>
+            <rect x="16.5" y="5" width="3.5" height="16" rx="1" fill="currentColor" fill-opacity="0.45"/>
+            <polyline points="4 9 10 4 19.5 4" stroke="currentColor" stroke-width="2"/>
+            <polyline points="16 2 20 4 16 6" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="admin-header-title-col">
+          <h1 class="admin-header-title" id="page-main-title">Reports &amp; Analytics</h1>
+          <p class="admin-header-subtitle" id="page-main-subtitle">Monitor attendance, academic performance, and institutional activity.</p>
+        </div>
       </div>
 
       <!-- Action buttons -->
-      <div id="attendance-header-actions" class="report-header-actions">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="loadDeptReport(true)" title="Refresh Telemetry" style="display:inline-flex;align-items:center;gap:0.35rem;">
+      <div id="attendance-header-actions" class="admin-header-actions-row">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadDeptReport(true)" title="Refresh Telemetry">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           <span>Refresh</span>
         </button>
-        <button type="button" class="btn btn-primary btn-sm" id="btn-export-excel" onclick="exportReport()" title="Export Analytical Excel Workbook (.xlsx)" style="display:inline-flex;align-items:center;gap:0.35rem;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <span>Export Excel</span>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-export-excel" onclick="exportReport()" title="Export Report">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Export Report</span>
         </button>
       </div>
-    </div>
+    </section>
 
     <!-- 1. COLLAPSIBLE HIGH-DENSITY FILTER TOOLBAR                 -->
     <!-- Compact single-row primary bar with collapsible filter panel -->
@@ -205,8 +218,8 @@
       </div>
     </div>
 
-    <!-- 2. MINIMAL 4-METRIC TELEMETRY BOARD                         -->
-    <div class="analysis-board" id="kpi-board">
+    <!-- 2. MINIMAL 4-METRIC TELEMETRY BOARD (Desktop) -->
+    <div class="analysis-board d-desktop-only" id="kpi-board">
       <!-- Metric 1: Total Scans -->
       <div class="kpi-card">
         <div class="kpi-icon-box" style="background: var(--color-primary-light); color: var(--color-primary);">
@@ -255,6 +268,75 @@
       </div>
     </div>
 
+    <!-- Mobile 4-Metric KPI Grid (Matching Image 3 Reference) -->
+    <section class="admin-metrics-grid d-mobile-only" aria-label="Key Performance Indicators" style="margin-bottom: 0.85rem;">
+      <article class="kpi-metric-card" id="rep-stat-card-students">
+        <div class="kpi-card-header-row">
+          <div class="kpi-squircle-icon icon-blue" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <span class="kpi-card-title">Total Students</span>
+        </div>
+        <div class="kpi-card-value" id="rep-stat-students">5,842</div>
+        <div class="kpi-card-trend"><span style="color:var(--status-present);">&uarr; +2.4%</span></div>
+      </article>
+
+      <article class="kpi-metric-card" id="rep-stat-card-faculty">
+        <div class="kpi-card-header-row">
+          <div class="kpi-squircle-icon icon-green" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+          </div>
+          <span class="kpi-card-title">Total Faculty</span>
+        </div>
+        <div class="kpi-card-value" id="rep-stat-teachers">142</div>
+        <div class="kpi-card-trend"><span style="color:var(--status-present);">&uarr; +1.4%</span></div>
+      </article>
+
+      <article class="kpi-metric-card" id="rep-stat-card-departments">
+        <div class="kpi-card-header-row">
+          <div class="kpi-squircle-icon icon-purple" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+              <line x1="9" y1="22" x2="9" y2="22.01"></line>
+              <line x1="15" y1="22" x2="15" y2="22.01"></line>
+              <line x1="9" y1="6" x2="9" y2="6.01"></line>
+              <line x1="15" y1="6" x2="15" y2="6.01"></line>
+              <line x1="9" y1="10" x2="9" y2="10.01"></line>
+              <line x1="15" y1="10" x2="15" y2="10.01"></line>
+              <line x1="9" y1="14" x2="9" y2="14.01"></line>
+              <line x1="15" y1="14" x2="15" y2="14.01"></line>
+            </svg>
+          </div>
+          <span class="kpi-card-title">Departments</span>
+        </div>
+        <div class="kpi-card-value" id="rep-stat-departments">6</div>
+        <div class="kpi-card-trend"><span>&uarr; 0% vs last month</span></div>
+      </article>
+
+      <article class="kpi-metric-card" id="rep-stat-card-classes">
+        <div class="kpi-card-header-row">
+          <div class="kpi-squircle-icon icon-amber" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <span class="kpi-card-title">Active Classes</span>
+        </div>
+        <div class="kpi-card-value" id="rep-stat-classes">48</div>
+        <div class="kpi-card-trend"><span>&uarr; 0% vs last month</span></div>
+      </article>
+    </section>
+
     <!-- 3. UPGRADED VISUAL ANALYTICS (CHART.JS)                        -->
     <!-- Mobile Segmented Switcher + Dual Canvas Visualizations        -->
     <!-- Mobile Chart Switcher Pills (visible <= 768px) -->
@@ -300,6 +382,64 @@
         </div>
       </div>
     </div>
+
+    <!-- Mobile Key Insights & Quick Reports Strip (Image 3 Reference) -->
+    <section class="reports-insights-section d-mobile-only" aria-label="Key Insights" style="margin-bottom: 0.85rem;">
+      <div class="insight-pill-card">
+        <div class="insight-icon-circle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+        </div>
+        <div class="insight-content-col">
+          <div class="insight-headline">
+            <span class="insight-arrow-up">&uarr;</span>
+            <span class="insight-headline-text">Attendance Improved</span>
+          </div>
+          <p class="insight-subtext">Overall attendance increased by 2.4% compared to last week.</p>
+        </div>
+      </div>
+
+      <div class="quick-reports-panel">
+        <div class="quick-reports-header">
+          <div class="quick-reports-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <span>Reports</span>
+          </div>
+          <a href="#table-wrap" class="quick-reports-link">View All &rarr;</a>
+        </div>
+        <div class="quick-reports-strip">
+          <div class="quick-report-tile" onclick="document.getElementById('report-date-preset').value='today'; loadDeptReport();">
+            <div class="tile-icon-squircle icon-blue">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <span class="tile-label">Daily Attendance</span>
+          </div>
+          <div class="quick-report-tile" onclick="document.getElementById('btn-toggle-filters').click();">
+            <div class="tile-icon-squircle icon-purple">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <span class="tile-label">Student-wise</span>
+          </div>
+          <div class="quick-report-tile" onclick="document.getElementById('btn-toggle-filters').click();">
+            <div class="tile-icon-squircle icon-blue">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+            </div>
+            <span class="tile-label">Department-wise</span>
+          </div>
+          <div class="quick-report-tile" onclick="document.getElementById('report-date-preset').value='30days'; loadDeptReport();">
+            <div class="tile-icon-squircle icon-green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <span class="tile-label">Semester Report</span>
+          </div>
+          <div class="quick-report-tile" onclick="toggleFilterDrawer(true)">
+            <div class="tile-icon-squircle icon-pink">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            </div>
+            <span class="tile-label">Custom Report</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- 4. DEPARTMENT ATTENDANCE SUMMARY TABLE & MOBILE CARDS          -->
     <div class="table-container">

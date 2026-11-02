@@ -11,8 +11,9 @@
   <link rel="stylesheet" href="/css/reset.css?v=20261028">
   <link rel="stylesheet" href="/css/variables.css?v=20261028">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261102">
   <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/page-header/page-header.css?v=20261102">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -109,46 +110,75 @@
       <!-- top-nav-bar fallback for test suites / backward compatibility -->
       <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
 <main class="container page-main-container">
-    <!-- Page Header (Minimal & Modern) -->
-    <div class="page-header academic-header">
-      <div class="academic-header-title-wrap">
-        <h1 class="page-title">Academic Structure</h1>
-        <p class="page-subtitle">Departments, programs &amp; appointed HOD leadership</p>
+    <!-- Reusable Page Header Component -->
+    <section class="admin-page-header" aria-label="Academic Structure">
+      <div class="admin-header-main-row">
+        <div class="admin-header-squircle-icon icon-blue" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 19 6 12 10 5 6" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <polyline points="5 6 5 8.5 12 12.5 19 8.5 19 6" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <polyline points="3 10.5 12 15.5 21 10.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <polyline points="3 10.5 3 13.5 12 18.5 21 13.5 21 10.5" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <polyline points="2 15.5 12 21 22 15.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="admin-header-title-col">
+          <h1 class="admin-header-title">Academic Structure</h1>
+          <p class="admin-header-subtitle">Departments, programs &amp; appointed HOD leadership</p>
+        </div>
       </div>
-      <div class="academic-header-actions">
+      <div class="admin-header-actions-row">
         <a href="/admin/dashboard.html" class="btn btn-secondary btn-sm academic-back-btn" title="Back to Dashboard">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           <span>Dashboard</span>
         </a>
       </div>
+    </section>
+
+    <!-- Academic Session Status Card (Matching Mobile Mockup) -->
+    <div class="academic-session-card">
+      <div class="session-card-left-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <div class="session-card-body">
+        <div class="session-card-title-row">
+          <span id="session-active-label" class="session-card-title">2026–27 (Odd Semester)</span>
+          <span id="session-dates-label" class="session-date-pill">2026-07-01 to 2027-06-30</span>
+        </div>
+        <div class="session-status-pill-wrap">
+          <span class="session-autonomous-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            FULLY AUTONOMOUS MAINTENANCE
+          </span>
+        </div>
+        <div id="session-rollover-text" class="session-rollover-text">Automatic Calendar Rollover: Advances to 2026–27 (Even Semester) on 2027-07-01.</div>
+        <span id="stat-session-term" style="display: none;">Odd Semester</span>
+      </div>
     </div>
 
-    <!-- Minimal High-Density Telemetry Ribbon (Session Status + Live Counts) -->
-    <!-- Controller hook: loadSessionStatus -->
-    <div class="structure-telemetry-strip">
-      <div class="telemetry-session-cell">
-        <div class="telemetry-session-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+    <!-- 2 Stat Cards Grid -->
+    <div class="academic-stat-grid">
+      <div class="academic-stat-card">
+        <div class="stat-card-icon icon-blue" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
         </div>
-        <div class="telemetry-session-content">
-          <div class="telemetry-session-headline">
-            <span id="session-active-label" class="telemetry-session-title">Loading Session...</span>
-            <span id="session-dates-label" class="telemetry-session-dates"></span>
-            <span class="telemetry-session-badge">FULLY AUTONOMOUS • ZERO MAINTENANCE</span>
-          </div>
-          <div id="session-rollover-text" class="telemetry-rollover-desc">Calculating automatic calendar rollover...</div>
-          <span id="stat-session-term" style="display: none;">Odd Semester</span>
+        <div class="stat-card-content">
+          <span class="stat-card-label">Departments</span>
+          <span id="stat-dept-count" class="stat-card-value">6</span>
         </div>
       </div>
-
-      <div class="telemetry-kpi-group">
-        <div class="telemetry-kpi-pill">
-          <span class="telemetry-kpi-label">Departments</span>
-          <span id="stat-dept-count" class="telemetry-kpi-value">0</span>
+      <div class="academic-stat-card">
+        <div class="stat-card-icon icon-blue" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
         </div>
-        <div class="telemetry-kpi-pill">
-          <span class="telemetry-kpi-label">HODs</span>
-          <span id="stat-hod-count" class="telemetry-kpi-value">0</span>
+        <div class="stat-card-content">
+          <span class="stat-card-label">HODs</span>
+          <span id="stat-hod-count" class="stat-card-value">1 / 6</span>
         </div>
       </div>
     </div>

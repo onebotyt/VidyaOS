@@ -85,6 +85,22 @@ async function init() {
     console.error('Failed to load departments:', err);
   }
 
+  // Load institutional stats for mobile 4-KPI metric cards (Image 3)
+  try {
+    const statsRes = await fetchApi('/admin/stats');
+    if (statsRes && statsRes.success && statsRes.data) {
+      const s = statsRes.data;
+      const stEl = document.getElementById('rep-stat-students');
+      const tcEl = document.getElementById('rep-stat-teachers');
+      const dpEl = document.getElementById('rep-stat-departments');
+      const clEl = document.getElementById('rep-stat-classes');
+      if (stEl) stEl.textContent = (s.students || 0).toLocaleString();
+      if (tcEl) tcEl.textContent = (s.teachers || 0).toLocaleString();
+      if (dpEl) dpEl.textContent = (s.departments || 0).toLocaleString();
+      if (clEl) clEl.textContent = (s.active_classes || s.total_classes || 0).toLocaleString();
+    }
+  } catch (_) {}
+
   if (window.innerWidth <= 768) {
     switchReportChart('trend');
   }

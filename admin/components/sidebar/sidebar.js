@@ -276,7 +276,6 @@
     if (!document.getElementById('mobile-top-header')) {
       const menuSvg = getIcon('menu', { width: 22, height: 22, stroke: 2.2 });
       const cubeSvgHeader = getIcon('cube', { width: 30, height: 30 });
-      const searchSvg = getIcon('search', { width: 19, height: 19, stroke: 2.2 });
       const bellSvg = getIcon('bell', { width: 19, height: 19, stroke: 2 });
 
       const mobileHeaderHtml = `
@@ -294,9 +293,6 @@
             </a>
           </div>
           <div class="mobile-header-right">
-            <button type="button" class="mobile-header-icon-btn mobile-search-btn" onclick="openAdminSearchModal()" aria-label="Search" title="Search Portal">
-              ${searchSvg}
-            </button>
             <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications" title="Notifications">
               ${bellSvg}
               <span class="mobile-bell-badge">3</span>

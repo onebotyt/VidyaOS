@@ -11,8 +11,10 @@
   <link rel="stylesheet" href="/css/reset.css?v=20261028">
   <link rel="stylesheet" href="/css/variables.css?v=20261028">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261102">
   <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/page-header/page-header.css?v=20261102">
+  <link rel="stylesheet" href="/admin/components/metrics/metrics.css?v=20261102">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -110,43 +112,90 @@
       <!-- top-nav-bar fallback for test suites / backward compatibility -->
       <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
 <main class="container page-main-container">
-    <!-- Page Header -->
-    <div class="audit-header">
-      <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-          <span class="badge badge-present" style="font-size: 0.72rem;">SECTION 54 COMPLIANT</span>
-          <span style="color: var(--text-muted); font-size: 0.8rem;">Immutable System Audit Trail</span>
+    <!-- Reusable Page Header Component -->
+    <section class="admin-page-header" aria-label="Institutional Audit Logs">
+      <div class="admin-header-compliance-pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <span>SECTION 54 COMPLIANT • Immutable System Audit Trail</span>
+      </div>
+      <div class="admin-header-main-row">
+        <div class="admin-header-squircle-icon icon-blue" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="currentColor" fill-opacity="0.15"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="8" y1="13" x2="16" y2="13"/>
+            <line x1="8" y1="17" x2="14" y2="17"/>
+            <circle cx="9" cy="9" r="1" fill="currentColor"/>
+          </svg>
         </div>
-        <h1 class="page-title">Institutional Audit Logs</h1>
-        <p class="page-subtitle">Permanent cryptographic event logs of administrative, biometric, attendance, and coursework transactions.</p>
+        <div class="admin-header-title-col">
+          <h1 class="admin-header-title">Institutional Audit Logs</h1>
+          <p class="admin-header-subtitle">Permanent, cryptocurrency-style audit logs of administrative, biometric, attendance, and coursework transactions.</p>
+        </div>
       </div>
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
-        <button class="btn btn-secondary btn-sm" onclick="exportLogsJson()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export JSON</button>
-        <button class="btn btn-primary btn-sm" onclick="loadAuditLogs()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Refresh Feed</button>
+      <div class="admin-header-actions-row">
+        <button class="btn btn-secondary btn-sm" onclick="exportLogsJson()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Export JSON</span>
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="loadAuditLogs()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span>Refresh Feed</span>
+        </button>
       </div>
-    </div>
+    </section>
 
-    <!-- KPI Summary Strip -->
-    <div class="kpi-board">
+    <!-- 4-Stat KPI Grid (Matching Mobile Image 5) -->
+    <div class="kpi-board" id="audit-kpi-board">
       <div class="kpi-box" style="--box-accent: var(--color-primary);">
-        <div class="kpi-box-lbl">Total Events Recorded</div>
-        <div class="kpi-box-val" id="kpi-total">--</div>
-        <div class="kpi-box-sub">Across institutional history</div>
+        <div class="kpi-squircle-icon icon-blue" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+        </div>
+        <div class="kpi-box-content">
+          <div class="kpi-box-lbl">Total Events Recorded</div>
+          <div class="kpi-box-val" id="kpi-total">--</div>
+        </div>
       </div>
       <div class="kpi-box" style="--box-accent: var(--status-present);">
-        <div class="kpi-box-lbl">Governance &amp; Approvals</div>
-        <div class="kpi-box-val" id="kpi-governance">--</div>
-        <div class="kpi-box-sub">Faculty &amp; student approvals</div>
+        <div class="kpi-squircle-icon icon-green" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <div class="kpi-box-content">
+          <div class="kpi-box-lbl">Governance &amp; Approvals</div>
+          <div class="kpi-box-val" id="kpi-governance">--</div>
+        </div>
       </div>
       <div class="kpi-box" style="--box-accent: var(--status-late);">
-        <div class="kpi-box-lbl">Biometrics &amp; Terminals</div>
-        <div class="kpi-box-val" id="kpi-biometric">--</div>
-        <div class="kpi-box-sub">Slots &amp; hardware touch events</div>
+        <div class="kpi-squircle-icon icon-amber" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <div class="kpi-box-content">
+          <div class="kpi-box-lbl">Biometrics &amp; Terminals</div>
+          <div class="kpi-box-val" id="kpi-biometric">--</div>
+        </div>
       </div>
       <div class="kpi-box" style="--box-accent: var(--chip-faculty-color);">
-        <div class="kpi-box-lbl">Academic &amp; Attendance</div>
-        <div class="kpi-box-val" id="kpi-academic">--</div>
-        <div class="kpi-box-sub">Finalizations, tests &amp; grades</div>
+        <div class="kpi-squircle-icon icon-purple" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <div class="kpi-box-content">
+          <div class="kpi-box-lbl">Academic &amp; Attendance</div>
+          <div class="kpi-box-val" id="kpi-academic">--</div>
+        </div>
       </div>
     </div>
 
@@ -219,9 +268,9 @@
       </div>
     </div>
 
-    <!-- Audit Ledger Table -->
+    <!-- Audit Ledger Table & Mobile Cards -->
     <div class="table-card">
-      <div class="table-responsive">
+      <div class="table-responsive d-desktop-only">
         <table class="audit-table">
           <thead>
             <tr>
@@ -243,14 +292,20 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Mobile Audit Events List (Matching Image 5) -->
+      <div id="audit-mobile-cards-wrap" class="audit-mobile-cards-wrap d-mobile-only" style="padding: 0.75rem;"></div>
+
       <!-- Pagination Bar -->
       <div class="pagination-bar">
         <div style="font-size: 0.8rem; color: var(--text-muted);" id="pagination-info">
           Showing 0-0 of 0 entries
         </div>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <div class="pagination-controls-row" style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
           <button id="prev-btn" class="btn btn-secondary btn-sm" onclick="changePage(-1)" disabled>&larr; Previous</button>
-          <span id="page-num" style="font-size: 0.8rem; font-weight: 700; padding: 0 0.5rem;">Page 1</span>
+          <div id="pagination-pages" class="pagination-pages-group" style="display: inline-flex; gap: 0.25rem;">
+            <span id="page-num" style="font-size: 0.8rem; font-weight: 700; padding: 0 0.5rem;">Page 1</span>
+          </div>
           <button id="next-btn" class="btn btn-secondary btn-sm" onclick="changePage(1)" disabled>Next &rarr;</button>
         </div>
       </div>

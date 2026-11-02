@@ -200,7 +200,7 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.65);
+      background: var(--overlay-bg, rgba(0, 0, 0, 0.6));
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
@@ -220,5 +220,168 @@
       padding: 1.5rem;
       box-shadow: var(--shadow-lg);
       position: relative;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       RESPONSIVE & MOBILE AUDIT CARDS (Image 5 Reference)
+    ══════════════════════════════════════════════════════════════ */
+    .d-desktop-only { display: block; }
+    .d-mobile-only { display: none !important; }
+
+    @media (max-width: 768px) {
+      .d-desktop-only { display: none !important; }
+      .d-mobile-only { display: block !important; }
+
+      .admin-main-wrap {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+
+      .page-main-container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        padding-top: 0.75rem;
+      }
+
+      .audit-mobile-cards-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .audit-mobile-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 0.85rem;
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .audit-mobile-card:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .audit-mobile-card-top {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .audit-card-icon-squircle {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .audit-card-icon-squircle.icon-blue {
+        background: var(--color-primary-light, hsl(215, 90%, 94%));
+        color: var(--color-primary, hsl(217, 91%, 55%));
+      }
+
+      .audit-card-icon-squircle.icon-green {
+        background: var(--status-present-bg, hsl(145, 80%, 94%));
+        color: var(--status-present, hsl(150, 75% 35%));
+      }
+
+      .audit-card-icon-squircle.icon-amber {
+        background: var(--status-late-bg, hsl(45, 95%, 94%));
+        color: var(--status-late, hsl(40, 95%, 42%));
+      }
+
+      .audit-card-icon-squircle.icon-purple {
+        background: hsl(270, 80%, 95%);
+        color: hsl(270, 70%, 55%);
+      }
+
+      .audit-mobile-card-meta {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .audit-mobile-chips-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        align-items: center;
+        margin-bottom: 0.25rem;
+      }
+
+      .audit-actor-badge {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 0.12rem 0.45rem;
+        border-radius: 4px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
+
+      .audit-mobile-actor {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      .audit-target-sub {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+
+      .audit-card-view-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        padding: 0.25rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .audit-mobile-details-preview {
+        margin-top: 0.5rem;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        background: var(--bg-surface);
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .audit-mobile-card-footer {
+        margin-top: 0.55rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+
+      .audit-ip-tag {
+        margin-left: auto;
+        font-family: var(--font-family-mono);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+      }
+
+      .filter-card {
+        padding: 0.85rem;
+        gap: 0.65rem;
+      }
+
+      .filter-field {
+        min-width: 100%;
+      }
     }
 

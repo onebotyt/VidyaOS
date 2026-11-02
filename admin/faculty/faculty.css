@@ -489,17 +489,26 @@
 
 /* ── 9. RESPONSIVE BREAKPOINTS ───────────────────────────────── */
 
-/* Hide mobile cards on desktop, show table */
-@media (min-width: 640px) {
-  .hod-mobile-cards-wrap {
-    display: none !important;
-  }
+/* Mobile & Desktop Table Alignment */
+.hod-mobile-cards-wrap {
+  display: none !important;
 }
 
-/* Mobile Screens (< 640px) */
-@media (max-width: 639px) {
-  .hod-desktop-table {
+.hod-desktop-table {
+  width: 100% !important;
+  display: table !important;
+}
+
+/* Mobile Screens (< 769px) */
+@media (max-width: 768px) {
+  .th-gmail,
+  .td-gmail,
+  .d-desktop-only {
     display: none !important;
+  }
+
+  .d-mobile-only {
+    display: block !important;
   }
 
   main.container {

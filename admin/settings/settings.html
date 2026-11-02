@@ -11,8 +11,9 @@
   <link rel="stylesheet" href="/css/reset.css?v=20261028">
   <link rel="stylesheet" href="/css/variables.css?v=20261028">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261102">
   <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/page-header/page-header.css?v=20261102">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -111,32 +112,39 @@
 <main class="container settings-main">
     <div class="settings-container">
 
-      <!-- Minimal Page Header -->
-      <div class="settings-page-header">
-        <div class="settings-header-text">
-          <h1 class="page-title">Institution Settings</h1>
-          <p class="page-subtitle">Campus identity and official examination board accreditation</p>
+    <!-- Reusable Page Header Component -->
+    <section class="admin-page-header" aria-label="Institution Settings">
+      <div class="admin-header-main-row">
+        <div class="admin-header-squircle-icon icon-blue" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.25"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
         </div>
-        <div class="settings-header-actions">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="loadSettings(true)" title="Reload from database">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            <span>Reload</span>
-          </button>
+        <div class="admin-header-title-col">
+          <h1 class="admin-header-title">Institution Settings</h1>
+          <p class="admin-header-subtitle">Campus identity and official examination board accreditation.</p>
         </div>
       </div>
+      <div class="admin-header-actions-row">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadSettings(true)" title="Reload from database">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span>Reload</span>
+        </button>
+      </div>
+    </section>
 
-      <!-- Focused Settings Card -->
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
-            <span>Institutional Identity</span>
+      <form id="identity-form">
+        <!-- 1. Institutional Identity Card -->
+        <div class="settings-card" style="margin-bottom: 1.25rem;">
+          <div class="settings-card-header">
+            <div class="settings-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+              <span>Institutional Identity</span>
+            </div>
           </div>
-        </div>
 
-        <div class="settings-card-body">
-          <form id="identity-form">
-
+          <div class="settings-card-body">
             <div class="settings-form-grid">
               <!-- Field 1: Name -->
               <div class="form-group">
@@ -144,18 +152,8 @@
                   Institution Name <span class="required-star">*</span>
                 </label>
                 <input type="text" id="setting-inst-name" class="form-control"
-                  placeholder="e.g. Government Polytechnic College"
+                  placeholder="Government Polytechnic College"
                   required autocomplete="off">
-              </div>
-
-              <!-- Field 1b: Tagline / Accreditation Subtitle -->
-              <div class="form-group">
-                <label class="form-label-strong" for="setting-inst-tagline">
-                  Institution Subtitle / Accreditation Tagline
-                </label>
-                <input type="text" id="setting-inst-tagline" class="form-control"
-                  placeholder="e.g. Uttarakhand | Completely Adhered to NBA Guidelines"
-                  autocomplete="off">
               </div>
 
               <!-- Field 2: Code -->
@@ -164,7 +162,7 @@
                   College Code <span class="required-star">*</span>
                 </label>
                 <input type="text" id="setting-inst-code" class="form-control"
-                  placeholder="e.g. GP-UBTER-101"
+                  placeholder="GP-UBTER-101"
                   required autocomplete="off">
               </div>
 
@@ -174,7 +172,7 @@
                   Affiliating Board / Directorate
                 </label>
                 <input type="text" id="setting-affiliating-body" class="form-control"
-                  placeholder="e.g. UBTER / IRDT Uttarakhand"
+                  placeholder="UBTER (Uttarakhand Board of Technical Education)"
                   autocomplete="off">
               </div>
 
@@ -184,109 +182,89 @@
                   Campus Region / Headquarters
                 </label>
                 <input type="text" id="setting-location" class="form-control"
-                  placeholder="e.g. Uttarakhand, India"
+                  placeholder="Uttarakhand, India"
                   autocomplete="off">
               </div>
+
+              <!-- Hidden/Desktop Field: Tagline -->
+              <input type="hidden" id="setting-inst-tagline" value="Uttarakhand | Completely Adhered to NBA Guidelines">
             </div>
-
-            <!-- Visual Identity: College Logo & Campus Showcase Image -->
-            <div class="branding-settings-section" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
-              <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                <span>College Logo & Campus Banner</span>
-              </h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.15rem;">
-                Upload official college emblem and campus building photo. These dynamically appear across Teacher Classes header, Faculty Dashboard, and Institutional Portals.
-              </p>
-
-              <div class="branding-upload-grid">
-                <!-- 1. College Logo Upload Box -->
-                <div class="branding-card">
-                  <span class="branding-card-title">1. College Official Logo</span>
-                  <div class="branding-preview-row">
-                    <div class="branding-logo-circle-wrap">
-                      <img id="preview-logo-img" src="/images/college-logo.svg" alt="College Logo" onerror="this.onerror=null;this.src='/images/college-logo.svg';">
-                    </div>
-                    <div class="branding-actions-col">
-                      <input type="file" id="upload-logo-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="handleLogoFileSelect(event)">
-                      <input type="hidden" id="setting-inst-logo-url" value="/images/college-logo.svg">
-                      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('upload-logo-file').click()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                        <span>Upload Logo</span>
-                      </button>
-                      <button type="button" class="btn btn-link btn-xs" onclick="resetDefaultLogo()" style="color:var(--text-muted);font-size:0.75rem;">
-                        Reset Default
-                      </button>
-                    </div>
-                  </div>
-                  <span class="branding-hint">Recommended: Transparent PNG or SVG (Square 1:1, up to 5MB)</span>
-                </div>
-
-                <!-- 2. College Campus Image Upload Box -->
-                <div class="branding-card">
-                  <span class="branding-card-title">2. Campus Building Photo (Panoramic)</span>
-                  <div class="branding-preview-row">
-                    <div class="branding-banner-pano-wrap">
-                      <img id="preview-banner-img" src="/admin/dashboard/campus-nainital.jpg" alt="Campus Building" onerror="this.onerror=null;this.src='/admin/dashboard/campus-nainital.jpg';">
-                    </div>
-                    <div class="branding-actions-col">
-                      <input type="file" id="upload-banner-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleBannerFileSelect(event)">
-                      <input type="hidden" id="setting-inst-banner-url" value="/admin/dashboard/campus-nainital.jpg">
-                      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('upload-banner-file').click()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                        <span>Upload Campus Image</span>
-                      </button>
-                      <button type="button" class="btn btn-link btn-xs" onclick="resetDefaultBanner()" style="color:var(--text-muted);font-size:0.75rem;">
-                        Reset Default
-                      </button>
-                    </div>
-                  </div>
-                  <span class="branding-hint">Recommended: Landscape photo of college building (16:9 ratio, up to 10MB)</span>
-                </div>
-              </div>
-
-              <!-- 3. Live Banner Preview Bar Mockup -->
-              <div style="margin-top: 1.25rem;">
-                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.45rem;">
-                  Live Hero Header Preview (Real-time Showcase)
-                </span>
-                <div class="branding-mockup-banner">
-                  <div class="mockup-banner-left">
-                    <div class="mockup-logo-circle">
-                      <img id="mockup-logo-img" src="/images/college-logo.svg" alt="Logo">
-                    </div>
-                    <div>
-                      <div class="mockup-inst-name" id="mockup-inst-name">Government Polytechnic Nainital</div>
-                      <div class="mockup-inst-tagline" id="mockup-inst-tagline">Uttarakhand | Completely Adhered to NBA Guidelines</div>
-                    </div>
-                    <div class="mockup-v-divider"></div>
-                    <div>
-                      <div class="mockup-dash-title">Faculty Dashboard</div>
-                      <div class="mockup-dash-subtitle">Manage your classes, attendance, students and more.</div>
-                    </div>
-                  </div>
-                  <div class="mockup-banner-right">
-                    <img id="mockup-banner-img" src="/admin/dashboard/campus-nainital.jpg" alt="Campus">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="settings-card-actions">
-              <button type="button" class="btn btn-secondary" onclick="resetToOfficialDefaults()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                <span>Reset Defaults</span>
-              </button>
-              <button type="submit" id="save-settings-btn" class="btn btn-primary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                <span>Save Changes</span>
-              </button>
-            </div>
-
-          </form>
+          </div>
         </div>
-      </div>
+
+        <!-- 2. Campus Branding Card (Exact Image 4 Specification) -->
+        <div class="settings-card" style="margin-bottom: 1.25rem;">
+          <div class="settings-card-header">
+            <div>
+              <div class="settings-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span>Campus Branding</span>
+              </div>
+              <p class="settings-card-desc">Manage the institution logo and campus image used across dashboards.</p>
+            </div>
+          </div>
+
+          <div class="settings-card-body" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Box A: Institution Logo -->
+            <div class="branding-card-box">
+              <div class="branding-box-thumb-wrap branding-thumb-square">
+                <img id="preview-logo-img" src="/images/college-logo.svg" alt="Institution Logo" onerror="this.onerror=null;this.src='/images/college-logo.svg';">
+              </div>
+              <div class="branding-box-info-col">
+                <h4 class="branding-box-title">Institution Logo</h4>
+                <p class="branding-box-meta">Recommended: 512 &times; 512 px<br>Formats: PNG, JPG, JPEG</p>
+                <div class="branding-box-actions-row">
+                  <input type="file" id="upload-logo-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="handleLogoFileSelect(event)">
+                  <input type="hidden" id="setting-inst-logo-url" value="/images/college-logo.svg">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('upload-logo-file').click()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span>Upload Logo</span>
+                  </button>
+                  <button type="button" class="btn btn-icon-square" onclick="resetDefaultLogo()" title="Reset default logo">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Box B: Campus Image (Dashboard Banner) -->
+            <div class="branding-card-box">
+              <div class="branding-box-thumb-wrap branding-thumb-pano">
+                <img id="preview-banner-img" src="/admin/dashboard/campus-nainital.jpg" alt="Campus Image" onerror="this.onerror=null;this.src='/admin/dashboard/campus-nainital.jpg';">
+              </div>
+              <div class="branding-box-info-col">
+                <h4 class="branding-box-title">Campus Image <span style="font-weight:400;font-size:0.75rem;color:var(--text-muted);">(Dashboard Banner)</span></h4>
+                <p class="branding-box-meta">Recommended: 1600 &times; 400 px (or 4:1 ratio)<br>Formats: PNG, JPG, JPEG</p>
+                <div class="branding-box-actions-row">
+                  <input type="file" id="upload-banner-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleBannerFileSelect(event)">
+                  <input type="hidden" id="setting-inst-banner-url" value="/admin/dashboard/campus-nainital.jpg">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('upload-banner-file').click()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span>Replace Image</span>
+                  </button>
+                  <button type="button" class="btn btn-icon-square" onclick="resetDefaultBanner()" title="Reset default campus banner">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info Note Box -->
+            <div class="branding-info-note">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <span><strong>Note:</strong> This campus image appears on the Admin dashboard and all role dashboards (HOD, Faculty and Student).</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Full-Width Save Changes Button (Image 4 Reference) -->
+        <div class="settings-submit-row">
+          <button type="submit" id="save-settings-btn" class="btn btn-primary btn-save-fullwidth">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </form>
 
     </div>
   </main>

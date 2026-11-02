@@ -223,7 +223,7 @@ try {
               <tr>
                 <th>HOD</th>
                 <th>Department</th>
-                <th>Gmail (Login ID)</th>
+                <th class="th-gmail d-desktop-only">Gmail (Login ID)</th>
                 <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
@@ -243,10 +243,10 @@ try {
                   </td>
                   <td>
                     ${h.department_name
-                      ? `<span style="background: var(--status-present-bg); color: var(--status-present); border-radius: var(--radius-sm); padding: 0.2rem 0.6rem; font-size: 0.8rem; font-weight: 600;">${escHtml(h.department_name)}</span>`
+                      ? `<span class="hod-dept-tag-pill" style="background: var(--status-present-bg); color: var(--status-present); border-radius: var(--radius-sm); padding: 0.25rem 0.65rem; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center;">${escHtml(h.department_name)}</span>`
                       : `<span style="color: var(--text-muted); font-size: 0.8rem;">Unassigned</span>`}
                   </td>
-                  <td style="font-family: monospace; font-size: 0.85rem; color: var(--color-primary);">${escHtml(h.gmail || '')}</td>
+                  <td class="td-gmail d-desktop-only" style="font-family: monospace; font-size: 0.85rem; color: var(--color-primary);">${escHtml(h.gmail || '')}</td>
                   <td style="text-align: right;">
                     <div class="kebab-menu-container" id="kebab-${h.teacher_id}">
                       <button type="button" class="kebab-btn" aria-haspopup="true" aria-expanded="false" title="Actions" onclick="toggleHodKebab(event, 'kebab-${h.teacher_id}')">
