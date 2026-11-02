@@ -16,6 +16,9 @@
 (function () {
   'use strict';
 
+  /** @type {any} */
+  const win = typeof window !== 'undefined' ? window : {};
+
   function renderHtml() {
     return `
       <section class="section-quick-actions" aria-label="Quick Access Portals">
@@ -112,7 +115,7 @@
     el.innerHTML = renderHtml();
   }
 
-  window.AdminQuickActions = {
+  win.AdminQuickActions = {
     mount,
     renderHtml
   };

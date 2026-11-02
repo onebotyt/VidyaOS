@@ -24,7 +24,7 @@
 }
 
 .section-title-icon-purple {
-  color: hsl(270 70% 55%);
+  color: hsl(270, 70%, 55%);
   flex-shrink: 0;
 }
 
@@ -94,27 +94,27 @@
 }
 
 .action-tile-icon-wrap.icon-blue {
-  background: var(--color-primary-light, hsl(220 90% 96%));
+  background: var(--color-primary-light, hsl(220, 90%, 96%));
   color: var(--color-primary);
 }
 
 .action-tile-icon-wrap.icon-purple {
-  background: hsl(270 70% 95%);
-  color: hsl(270 70% 55%);
+  background: hsl(270, 70%, 95%);
+  color: hsl(270, 70%, 55%);
 }
 
 .action-tile-icon-wrap.icon-green {
-  background: var(--status-present-bg, hsl(142 71% 95%));
+  background: var(--status-present-bg, hsl(142, 71%, 95%));
   color: var(--status-present);
 }
 
 .action-tile-icon-wrap.icon-amber {
-  background: var(--status-late-bg, hsl(38 92% 95%));
+  background: var(--status-late-bg, hsl(38, 92%, 95%));
   color: var(--status-late);
 }
 
 .action-tile-icon-wrap.icon-red {
-  background: var(--status-absent-bg, hsl(0 84% 96%));
+  background: var(--status-absent-bg, hsl(0, 84%, 96%));
   color: var(--status-absent);
 }
 

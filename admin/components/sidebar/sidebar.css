@@ -15,7 +15,6 @@
 
 /* ── 1. Root Layout ── */
 .admin-app-layout {
-  min-height: 100vh;
   min-height: 100dvh;
   background: var(--bg-app);
   display: flex;
@@ -32,7 +31,6 @@
   top: 0 !important;
   left: 0 !important;
   bottom: 0 !important;
-  height: 100vh !important;
   height: 100dvh !important;
   background: var(--bg-card) !important;
   border-right: 1px solid var(--border-color) !important;

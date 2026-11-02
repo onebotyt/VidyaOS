@@ -10,6 +10,9 @@
 (function () {
   'use strict';
 
+  /** @type {any} */
+  const win = typeof window !== 'undefined' ? window : {};
+
   const DEFAULT_ACTIVITIES = [
     {
       type: 'create',
@@ -72,13 +75,15 @@
     el.innerHTML = renderHtml(DEFAULT_ACTIVITIES);
 
     try {
-      if (typeof window.fetchApi === 'function') {
-        const res = await window.fetchApi('/admin/audit-logs?limit=4');
+      if (typeof win.fetchApi === 'function') {
+        const res = await win.fetchApi('/admin/audit-logs?limit=4');
         if (res && res.success && res.data && res.data.length > 0) {
           const mapped = res.data.map(log => {
             const isCreate = (log.action || '').toLowerCase().includes('create') || (log.action || '').toLowerCase().includes('add');
             const dateObj = new Date(log.created_at || Date.now());
-            const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            /** @type {Intl.DateTimeFormatOptions} */
+            const timeOpts = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const timeStr = dateObj.toLocaleTimeString('en-US', timeOpts);
 
             return {
               type: isCreate ? 'create' : 'update',
@@ -103,7 +108,7 @@
     el.innerHTML = renderHtml(items);
   }
 
-  window.AdminRecentActivity = {
+  win.AdminRecentActivity = {
     mount,
     fetchAndRender,
     renderHtml

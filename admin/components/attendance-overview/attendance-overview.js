@@ -11,6 +11,9 @@
 (function () {
   'use strict';
 
+  /** @type {any} */
+  const win = typeof window !== 'undefined' ? window : {};
+
   let cachedData = null;
 
   function renderHtml() {
@@ -141,7 +144,7 @@
     const circumference = 301.6;
     if (donutCircle) {
       const offset = circumference * (1 - Math.min(Math.max(pct, 0), 100) / 100);
-      donutCircle.style.strokeDashoffset = offset;
+      donutCircle.style.strokeDashoffset = String(offset);
     }
 
     // Populate department select dropdown if not populated
@@ -149,7 +152,7 @@
   }
 
   function populateDeptDropdown(depts) {
-    const sel = document.getElementById('overview-dept-filter');
+    const sel = /** @type {HTMLSelectElement | null} */ (document.getElementById('overview-dept-filter'));
     if (!sel || sel.options.length > 1) return;
 
     depts.forEach(d => {
@@ -171,7 +174,7 @@
     update(stats);
   }
 
-  window.AdminAttendanceOverview = {
+  win.AdminAttendanceOverview = {
     mount,
     update,
     renderHtml

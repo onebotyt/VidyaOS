@@ -11,6 +11,9 @@
 (function () {
   'use strict';
 
+  /** @type {any} */
+  const win = typeof window !== 'undefined' ? window : {};
+
   function renderHtml() {
     return `
       <article class="panel-dept-breakdown" aria-label="Department Breakdown">
@@ -81,7 +84,7 @@
     update(depts, avgPct);
   }
 
-  window.AdminDeptBreakdown = {
+  win.AdminDeptBreakdown = {
     mount,
     update,
     renderHtml

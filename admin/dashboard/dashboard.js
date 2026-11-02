@@ -12,9 +12,13 @@
  * ══════════════════════════════════════════════════════════════
  */
 
+// Window object with any-cast for TypeScript / IDE language service compatibility
+/** @type {any} */
+const win = typeof window !== 'undefined' ? window : {};
+
 // 1. RBAC Guard: Restrict page strictly to System Administrators
-if (typeof guardRoute === 'function') {
-  guardRoute(['SYSTEM_ADMIN']);
+if (typeof win.guardRoute === 'function') {
+  win.guardRoute(['SYSTEM_ADMIN']);
 }
 
 /**
@@ -28,10 +32,12 @@ function startLiveDateTime() {
     const now = new Date();
 
     // Format: Fri, 30 Oct 2026
+    /** @type {Intl.DateTimeFormatOptions} */
     const optionsDate = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
     const dateStr = now.toLocaleDateString('en-GB', optionsDate);
 
     // Format: 6:52 PM
+    /** @type {Intl.DateTimeFormatOptions} */
     const optionsTime = { hour: 'numeric', minute: '2-digit', hour12: true };
     const timeStr = now.toLocaleTimeString('en-US', optionsTime);
 
@@ -50,14 +56,17 @@ let adminStatsData = null;
  */
 async function loadAdminStats() {
   try {
-    const res = await fetchApi('/admin/stats');
+    const fetchFn = win.fetchApi;
+    if (!fetchFn) return;
+
+    const res = await fetchFn('/admin/stats');
     if (res && res.success && res.data) {
       const d = res.data;
       adminStatsData = d;
 
       // Update metrics via component module if loaded
-      if (window.AdminMetrics && typeof window.AdminMetrics.update === 'function') {
-        window.AdminMetrics.update(d);
+      if (win.AdminMetrics && typeof win.AdminMetrics.update === 'function') {
+        win.AdminMetrics.update(d);
       }
 
       const elTeachers = document.getElementById('stat-teachers');
@@ -97,13 +106,13 @@ async function loadAdminStats() {
 
 function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
   // Delegate to modular component if available
-  if (window.AdminAttendanceOverview && typeof window.AdminAttendanceOverview.update === 'function') {
-    window.AdminAttendanceOverview.update(d, filterDeptCode);
+  if (win.AdminAttendanceOverview && typeof win.AdminAttendanceOverview.update === 'function') {
+    win.AdminAttendanceOverview.update(d, filterDeptCode);
   }
 
   const donutPct = document.getElementById('donut-pct-text');
-  const presentCircle = document.getElementById('donut-gauge-circle') || document.getElementById('donut-present-circle');
-  const absentCircle = document.getElementById('donut-absent-circle');
+  const presentCircle = /** @type {any} */ (document.getElementById('donut-gauge-circle') || document.getElementById('donut-present-circle'));
+  const absentCircle = /** @type {any} */ (document.getElementById('donut-absent-circle'));
   const campusAvgBadge = document.getElementById('campus-avg-badge');
   const elPresent = document.getElementById('att-present-val');
   const elAbsent = document.getElementById('att-absent-val');
@@ -148,7 +157,7 @@ function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
   const circumference = 301.6;
   if (presentCircle) {
     const offset = circumference * (1 - Math.min(Math.max(pct, 0), 100) / 100);
-    presentCircle.style.strokeDashoffset = offset;
+    presentCircle.style.strokeDashoffset = String(offset);
   }
   if (absentCircle) {
     absentCircle.style.strokeDashoffset = '0';
@@ -165,9 +174,9 @@ function renderAttendanceDonut(d, filterDeptCode = 'ALL') {
 
 function renderDepartmentBars(d) {
   // Delegate to modular component if available
-  if (window.AdminDeptBreakdown && typeof window.AdminDeptBreakdown.update === 'function') {
+  if (win.AdminDeptBreakdown && typeof win.AdminDeptBreakdown.update === 'function') {
     const campusPct = d.today_attendance ? d.today_attendance.attendance_pct : 0;
-    window.AdminDeptBreakdown.update(d.department_breakdown, campusPct);
+    win.AdminDeptBreakdown.update(d.department_breakdown, campusPct);
     return;
   }
 
@@ -203,7 +212,7 @@ function renderDepartmentBars(d) {
 }
 
 function populateDepartmentFilter(d) {
-  const select = document.getElementById('overview-dept-filter');
+  const select = /** @type {HTMLSelectElement | null} */ (document.getElementById('overview-dept-filter'));
   if (!select) return;
 
   const depts = d.department_breakdown || [];
@@ -235,7 +244,8 @@ function escapeHtml(str) {
  * 4. Populate Session User Identity across Hero Banner & Top Header
  */
 function populateUserIdentity() {
-  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const getUserFn = win.getCurrentUser;
+  const user = getUserFn ? getUserFn() : null;
   if (!user) return;
 
   const displayName = user.full_name || user.name || user.username || 'System Administrator';
@@ -283,9 +293,9 @@ function openNoticesModal(e) {
 }
 
 // Attach handlers to window
-window.openCreateNoticeModal = openCreateNoticeModal;
-window.openScheduleEventModal = openScheduleEventModal;
-window.openNoticesModal = openNoticesModal;
+win.openCreateNoticeModal = openCreateNoticeModal;
+win.openScheduleEventModal = openScheduleEventModal;
+win.openNoticesModal = openNoticesModal;
 
 // 6. Master Page Initialization
 (async function init() {

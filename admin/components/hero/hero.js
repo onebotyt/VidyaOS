@@ -11,12 +11,17 @@
 (function () {
   'use strict';
 
+  /** @type {any} */
+  const win = typeof window !== 'undefined' ? window : {};
+
   let clockInterval = null;
 
   function formatCurrentDateTime() {
     const now = new Date();
+    /** @type {Intl.DateTimeFormatOptions} */
     const optionsDate = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
     const dateStr = now.toLocaleDateString('en-GB', optionsDate);
+    /** @type {Intl.DateTimeFormatOptions} */
     const optionsTime = { hour: 'numeric', minute: '2-digit', hour12: true };
     const timeStr = now.toLocaleTimeString('en-US', optionsTime);
     return { dateStr, timeStr };
@@ -39,8 +44,8 @@
 
   function getSessionAdminName() {
     try {
-      const user = (typeof window.getCurrentUser === 'function')
-        ? window.getCurrentUser()
+      const user = (typeof win.getCurrentUser === 'function')
+        ? win.getCurrentUser()
         : JSON.parse(localStorage.getItem('user') || 'null');
       return user?.full_name || user?.name || user?.username || 'System Administrator';
     } catch (_) {
@@ -108,7 +113,7 @@
     }
   });
 
-  window.AdminHero = {
+  win.AdminHero = {
     mount,
     startClock,
     renderHeroHtml

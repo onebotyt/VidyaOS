@@ -11,6 +11,9 @@
 (function () {
   'use strict';
 
+  /** @type {any} */
+  const win = typeof window !== 'undefined' ? window : {};
+
   function renderMetricsHtml(stats = {}) {
     const students = Number(stats.total_enrolled_students ?? stats.total_students ?? 5).toLocaleString();
     const faculty = Number(stats.total_teachers ?? 5).toLocaleString();
@@ -118,7 +121,7 @@
     }
   }
 
-  window.AdminMetrics = {
+  win.AdminMetrics = {
     mount,
     update,
     renderMetricsHtml

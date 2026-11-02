@@ -19,6 +19,9 @@
 (function () {
   'use strict';
 
+  /** @type {any} */
+  const win = typeof window !== 'undefined' ? window : {};
+
   // Reliable inline clean modern SVGs for all admin controls and modules
   const FALLBACK_ICONS = {
     cube: `<svg class="rail-cube-logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 3.5L27.5 9.8L16 16.2L4.5 9.8L16 3.5Z" fill="var(--color-primary-light, hsl(215 90% 95%))" stroke="var(--color-primary)" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 9.8L16 16.2V28.5L4.5 22.2V9.8Z" fill="var(--color-primary, hsl(217 91% 60%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 16.2L27.5 9.8V22.2L16 28.5V16.2Z" fill="var(--color-primary-hover, hsl(224 76% 48%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 16.5V27.5" stroke="hsl(0 0% 100% / 0.4)" stroke-width="1.2" stroke-linecap="round"/><path d="M16.5 16L26.5 10.5" stroke="hsl(0 0% 100% / 0.3)" stroke-width="1.2" stroke-linecap="round"/></svg>`,
@@ -63,21 +66,21 @@
    * Helper to retrieve rendered SVG markup with automatic fallback
    */
   function getIcon(name, options = {}) {
-    if (typeof window.getAdminIcon === 'function') {
-      const svg = window.getAdminIcon(name, options);
+    if (typeof win.getAdminIcon === 'function') {
+      const svg = win.getAdminIcon(name, options);
       if (svg) return svg;
     }
-    if (window.ADMIN_ICONS) {
-      if (typeof window.ADMIN_ICONS.get === 'function') {
-        const svg = window.ADMIN_ICONS.get(name, options);
+    if (win.ADMIN_ICONS) {
+      if (typeof win.ADMIN_ICONS.get === 'function') {
+        const svg = win.ADMIN_ICONS.get(name, options);
         if (svg) return svg;
       }
-      if (typeof window.ADMIN_ICONS[name] === 'function') {
+      if (typeof win.ADMIN_ICONS[name] === 'function') {
         const w = options.width || options.w || 20;
         const h = options.height || options.h || w;
         const s = options.stroke || options.strokeWidth || 2;
         const c = options.className || options.cls || '';
-        return window.ADMIN_ICONS[name](w, h, s, c);
+        return win.ADMIN_ICONS[name](w, h, s, c);
       }
     }
     return FALLBACK_ICONS[name] || '';
@@ -205,8 +208,8 @@
    * 5. Logout Session Function
    */
   function adminLogout() {
-    if (typeof window.logout === 'function') {
-      window.logout();
+    if (typeof win.logout === 'function') {
+      win.logout();
       return;
     }
     const token = localStorage.getItem('access_token');
@@ -237,8 +240,8 @@
    */
   function syncMobileUserIdentity() {
     try {
-      const user = (typeof window.getCurrentUser === 'function')
-        ? window.getCurrentUser()
+      const user = (typeof win.getCurrentUser === 'function')
+        ? win.getCurrentUser()
         : JSON.parse(localStorage.getItem('user') || 'null');
       if (!user) return;
       const name = user.full_name || user.name || user.username || 'Admin';
@@ -501,14 +504,14 @@
   });
 
   // Attach methods to window for inline onclick handlers & outside access
-  window.toggleSidebar = toggleSidebar;
-  window.openSidebar = openSidebar;
-  window.closeSidebar = closeSidebar;
-  window.toggleDesktopSidebar = toggleDesktopSidebar;
-  window.toggleNotifications = toggleNotifications;
-  window.adminLogout = adminLogout;
-  window.mountAdminNavigation = mountAdminNavigation;
-  window.openAdminSearchModal = function () {
+  win.toggleSidebar = toggleSidebar;
+  win.openSidebar = openSidebar;
+  win.closeSidebar = closeSidebar;
+  win.toggleDesktopSidebar = toggleDesktopSidebar;
+  win.toggleNotifications = toggleNotifications;
+  win.adminLogout = adminLogout;
+  win.mountAdminNavigation = mountAdminNavigation;
+  win.openAdminSearchModal = function () {
     const term = prompt('Search Admin Portal (Department, Faculty, Settings):');
     if (term && term.trim()) {
       window.location.href = `/admin/academic-structure.html?search=${encodeURIComponent(term.trim())}`;
