@@ -520,11 +520,17 @@
 /* ─── 6 Quick Navigation Links Grid & Academic Dossier Entry Bars ───────── */
 .card-quick-links-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem 0.25rem;
   padding: 0.65rem 0.75rem;
   border-top: 1px solid var(--border-color);
   background: var(--bg-card);
+}
+
+@media (max-width: 420px) {
+  .card-quick-links-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .card-quick-link {

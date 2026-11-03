@@ -451,6 +451,18 @@
       "destination": "/faculty/lab-classes/index.html"
     },
     {
+      "source": "/faculty/student-performance",
+      "destination": "/faculty/student-performance/index.html"
+    },
+    {
+      "source": "/faculty/student-performance/",
+      "destination": "/faculty/student-performance/index.html"
+    },
+    {
+      "source": "/faculty/student-performance.html",
+      "destination": "/faculty/student-performance/index.html"
+    },
+    {
       "source": "/faculty/groups",
       "destination": "/faculty/dashboard/index.html"
     },
@@ -665,6 +677,18 @@
     {
       "source": "/student/lab-classes.html",
       "destination": "/student/lab-classes/index.html"
+    },
+    {
+      "source": "/student/student-performance",
+      "destination": "/student/student-performance/index.html"
+    },
+    {
+      "source": "/student/student-performance/",
+      "destination": "/student/student-performance/index.html"
+    },
+    {
+      "source": "/student/student-performance.html",
+      "destination": "/student/student-performance/index.html"
     },
     {
       "source": "/student/nba",
