@@ -357,7 +357,22 @@ function renderGoogleClassCards() {
     return;
   }
 
-  grid.innerHTML = filtered.map((c, index) => {
+  const hiddenCards = JSON.parse(localStorage.getItem('vidya_hidden_subject_cards') || '[]');
+  const visible = filtered.filter(c => !hiddenCards.includes(Number(c.id)));
+
+  if (visible.length === 0 && hiddenCards.length > 0) {
+    grid.innerHTML = `
+      <div class="gc-empty-state" style="grid-column: 1 / -1; padding: 3rem 1.5rem; text-align: center; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+        <h3 class="gc-empty-title" style="margin: 0.75rem 0 0.25rem 0;">All Subject Cards Hidden</h3>
+        <p class="gc-empty-text" style="color: var(--text-muted); font-size: 0.88rem;">You have removed subject cards from your dashboard view.</p>
+        <button class="btn btn-secondary btn-sm" onclick="restoreHiddenSubjectCards()" style="margin-top:0.75rem;">Restore All Subject Cards</button>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = visible.map((c, index) => {
     const paletteClass = `palette-${index % 6}`;
     const isTheory = (c.component || '').toUpperCase() === 'THEORY';
     const compLabel = isTheory ? 'Theory' : 'Practical';
@@ -377,8 +392,29 @@ function renderGoogleClassCards() {
         <!-- Gradient Banner Header -->
         <header class="gc-card-header ${paletteClass}">
           <div class="gc-card-header-top">
-            <span class="gc-card-code-tag">${escapeHtml(code)}</span>
-            <span class="gc-component-tag">${compLabel}</span>
+            <div class="gc-card-header-tags">
+              <span class="gc-card-code-tag">${escapeHtml(code)}</span>
+              <span class="gc-component-tag">${compLabel}</span>
+            </div>
+            <div class="gc-card-header-right-meta">
+              <button type="button" class="gc-header-dots-btn" onclick="toggleStudentCardMenu(event, 'student-${c.id}')" title="Subject Options" aria-label="Subject Options">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
+              </button>
+              <div class="gc-menu-dropdown gc-menu-header" id="card-menu-student-${c.id}">
+                <a href="/student/group-detail.html?id=${c.id}" class="gc-menu-item" title="View Subject Details">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>View Subject Details</span>
+                </a>
+                <button type="button" class="gc-menu-item" onclick="promptStudentEditSubject('${escapeHtml(c.name || c.subject_name).replace(/'/g, "\\'")}')" title="Edit Subject">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  <span>Edit Subject</span>
+                </button>
+                <button type="button" class="gc-menu-item danger" onclick="openDeleteSubjectCardModal(${c.id}, '${escapeHtml(c.name || c.subject_name).replace(/'/g, "\\'")}')" title="Delete Subject Card">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Delete Subject Card</span>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div>
@@ -495,57 +531,6 @@ function renderGoogleClassCards() {
             <span>Laboratory Classes</span>
           </a>
         </div>
-
-        <!-- Academic Dossier Entry Bars (Theory Classes, Laboratory Classes, Course File NBA) -->
-        <a href="/student/theory-classes/index.html?groupId=${c.id}" class="card-theory-classes-bar" title="Open Theory Classes Academic Dossier (7 Records)" onclick="event.stopPropagation()">
-          <div class="card-cf-left">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
-            <span>Theory Classes</span>
-          </div>
-          <div class="card-cf-right">
-            <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </a>
-
-        <a href="/student/lab-classes/index.html?groupId=${c.id}" class="card-lab-classes-bar" title="Open Laboratory Classes Academic Dossier (7 Records)" onclick="event.stopPropagation()">
-          <div class="card-cf-left">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
-              <path d="M8.5 2h7"></path>
-              <path d="M14 9.3h-4"></path>
-            </svg>
-            <span>Laboratory Classes</span>
-          </div>
-          <div class="card-cf-right">
-            <span class="card-cf-count" style="background:var(--status-present-bg);color:var(--status-present);font-weight:700;">7 Records</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </a>
-
-        <a href="/student/nba/index.html?groupId=${c.id}" class="card-cf-footer-bar" title="Open NBA Academic Accreditation Dossier (18 Docs)" onclick="event.stopPropagation()">
-          <div class="card-cf-left">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span>Course File (NBA/NAAC)</span>
-          </div>
-          <div class="card-cf-right">
-            <span class="card-cf-count">18 Docs</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </a>
       </article>
     `;
   }).join('');
@@ -675,6 +660,11 @@ function initDropdownCloseListeners() {
     if (profilePopover && profilePopover.style.display !== 'none' && !profilePopover.contains(e.target) && !profileTrigger) {
       profilePopover.style.display = 'none';
     }
+
+    // Subject Card Dropdowns
+    if (!e.target.closest('.gc-card-header-right-meta')) {
+      document.querySelectorAll('.gc-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+    }
   });
 
   // Close on Escape key
@@ -686,6 +676,8 @@ function initDropdownCloseListeners() {
       closeJoinModal();
       closeSelfAttendanceModal();
       closeStudentStreamModal();
+      closeDeleteSubjectCardModal();
+      document.querySelectorAll('.gc-menu-dropdown.open').forEach(m => m.classList.remove('open'));
     }
   });
 }
@@ -1012,3 +1004,146 @@ window.loadEnrolledClasses = loadEnrolledClasses;
 window.openCompleteProfileModal = openCompleteProfileModal;
 window.closeCompleteProfileModal = closeCompleteProfileModal;
 window.handlePopupProfileSubmit = handlePopupProfileSubmit;
+
+/* --- Three-Dot Menu & Delete Subject Card Modal Handlers --- */
+let pendingDeleteCardId = null;
+let pendingDeleteCardName = '';
+
+function ensureDeleteSubjectCardModal() {
+  if (document.getElementById('delete-subject-card-modal')) return;
+  const modalHtml = `
+    <div id="delete-subject-card-modal" class="gc-modal-backdrop" style="display:none;" onclick="closeDeleteSubjectCardModal(event)">
+      <div class="gc-modal-card" onclick="event.stopPropagation()">
+        <div class="gc-modal-header danger-header">
+          <div class="gc-modal-icon-badge danger">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="gc-modal-title">Delete Subject Card</h3>
+            <p class="gc-modal-subtitle">Dashboard Customization</p>
+          </div>
+          <button type="button" class="gc-modal-close" onclick="closeDeleteSubjectCardModal()" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="gc-modal-body">
+          <p class="delete-confirm-text">
+            Are you sure you want to remove the subject card for <strong id="delete-subject-card-name" class="highlight-subject-name">Subject</strong> from your dashboard?
+          </p>
+          <div class="delete-permission-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>This removes the subject card from your active dashboard view. Permanent course records, student enrollments, and academic data remain securely stored in the institutional database.</span>
+          </div>
+        </div>
+        <div class="gc-modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeDeleteSubjectCardModal()">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btn-confirm-delete-card" onclick="executeDeleteSubjectCard()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Delete Card</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+window.openDeleteSubjectCardModal = function(id, name) {
+  pendingDeleteCardId = id;
+  pendingDeleteCardName = name;
+  ensureDeleteSubjectCardModal();
+  const nameEl = document.getElementById('delete-subject-card-name');
+  if (nameEl) nameEl.textContent = name || 'this Subject';
+  const modal = document.getElementById('delete-subject-card-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeDeleteSubjectCardModal = function(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('gc-modal-close') && !e.target.classList.contains('btn-secondary')) return;
+  const modal = document.getElementById('delete-subject-card-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  pendingDeleteCardId = null;
+  pendingDeleteCardName = '';
+};
+
+window.executeDeleteSubjectCard = function() {
+  if (!pendingDeleteCardId) return;
+  const targetId = pendingDeleteCardId;
+  const targetName = pendingDeleteCardName;
+  closeDeleteSubjectCardModal();
+
+  const cardEl = document.getElementById(`class-card-${targetId}`);
+  if (cardEl) {
+    cardEl.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    cardEl.style.opacity = '0';
+    cardEl.style.transform = 'scale(0.92) translateY(10px)';
+    setTimeout(() => {
+      cardEl.remove();
+      renderEnrolledClasses();
+    }, 320);
+  }
+
+  try {
+    const hidden = JSON.parse(localStorage.getItem('vidya_hidden_subject_cards') || '[]');
+    if (!hidden.includes(Number(targetId))) {
+      hidden.push(Number(targetId));
+      localStorage.setItem('vidya_hidden_subject_cards', JSON.stringify(hidden));
+    }
+  } catch (err) {
+    console.warn('Could not persist hidden card state', err);
+  }
+
+  if (typeof showToast === 'function') {
+    showToast(`Subject card "${targetName}" removed from your dashboard.`, 'success');
+  } else if (typeof window.showToast === 'function') {
+    window.showToast(`Subject card "${targetName}" removed from your dashboard.`, 'success');
+  }
+};
+
+window.restoreHiddenSubjectCards = function() {
+  localStorage.removeItem('vidya_hidden_subject_cards');
+  renderEnrolledClasses();
+  if (typeof showToast === 'function') {
+    showToast('All subject cards restored to dashboard.', 'success');
+  }
+};
+
+window.promptStudentEditSubject = function(subjectName) {
+  const msg = `Permission Restricted: Editing "${subjectName}" requires instructor or administrator authority.`;
+  if (typeof showToast === 'function') {
+    showToast(msg, 'warning');
+  } else if (typeof window.showToast === 'function') {
+    window.showToast(msg, 'warning');
+  } else {
+    alert(msg);
+  }
+};
+
+window.toggleStudentCardMenu = function(e, menuKey) {
+  e.stopPropagation();
+  const menuId = `card-menu-${menuKey}`;
+  const menu = document.getElementById(menuId);
+  if (!menu) return;
+
+  document.querySelectorAll('.gc-menu-dropdown.open').forEach(m => {
+    if (m.id !== menuId) m.classList.remove('open');
+  });
+
+  menu.classList.toggle('open');
+};

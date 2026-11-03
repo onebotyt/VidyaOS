@@ -3980,6 +3980,7 @@ body {
 }
 
 .gc-card-header-right-meta {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.45rem;
@@ -4549,10 +4550,12 @@ body {
     align-items: stretch;
     gap: 0.85rem;
   }
+
   .classes-toolbar-controls {
     justify-content: flex-start;
     flex-wrap: wrap;
   }
+
   .classes-search-pill-wrap {
     min-width: 100%;
     max-width: 100%;
@@ -4796,4 +4799,69 @@ body {
 .card-theory-classes-bar .card-cf-right svg,
 .card-lab-classes-bar .card-cf-right svg {
   color: var(--text-muted);
+}
+
+/* Delete Subject Card Confirmation Modal Styles */
+.delete-confirm-text {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+.highlight-subject-name {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.delete-permission-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.delete-permission-note svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  margin-top: 2px;
+}
+
+.gc-modal-header.danger-header {
+  background: var(--status-absent-bg);
+}
+
+.gc-modal-icon-badge.danger {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--status-absent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.gc-empty-cards-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  grid-column: 1 / -1;
+}
+
+.gc-empty-cards-state h3 {
+  margin: 0.75rem 0 0.25rem 0;
+  color: var(--text-main);
+  font-size: 1.1rem;
 }
