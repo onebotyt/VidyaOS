@@ -431,6 +431,108 @@
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
+/* ─── 6 Quick Navigation Links Grid & Academic Dossier Entry Bars ───────── */
+.card-quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem 0.25rem;
+  padding: 0.65rem 0.75rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.card-quick-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease, background 0.15s ease;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.card-quick-link:hover {
+  color: var(--color-primary);
+  background: var(--bg-surface-secondary);
+}
+
+.card-quick-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.card-theory-classes-bar,
+.card-lab-classes-bar,
+.card-cf-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  text-decoration: none;
+  transition: background 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.card-theory-classes-bar:hover,
+.card-lab-classes-bar:hover,
+.card-cf-footer-bar:hover {
+  background: var(--bg-surface-secondary);
+}
+
+.card-cf-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.card-cf-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.card-cf-count {
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.card-theory-classes-bar .card-cf-left svg {
+  color: var(--color-primary);
+}
+
+.card-lab-classes-bar .card-cf-left svg {
+  color: var(--status-present);
+}
+
+.card-cf-footer-bar .card-cf-left svg {
+  color: var(--color-primary);
+}
+
+.card-theory-classes-bar .card-cf-right svg,
+.card-lab-classes-bar .card-cf-right svg,
+.card-cf-footer-bar .card-cf-right svg {
+  color: var(--text-muted);
+}
+
 .gc-action-btn {
   display: inline-flex;
   flex-direction: column;

@@ -438,46 +438,114 @@ function renderGoogleClassCards() {
           </div>
         </div>
 
-        <!-- 4 Action Toolbar Footer -->
-        <footer class="gc-card-footer">
-          <a href="/student/group-detail.html?id=${c.id}&tab=attendance" class="gc-action-btn" title="View Detailed Attendance Register">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            <span>Attendance</span>
-          </a>
-
-          <a href="/student/group-detail.html?id=${c.id}&tab=classwork" class="gc-action-btn ${(c.pending_work_count > 0) ? 'has-pending' : ''}" title="Classwork & Assignments${(c.pending_work_count > 0) ? (' (' + c.pending_work_count + ' pending)') : ''}">
-            <div class="gc-action-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9"></path>
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-              </svg>
-              ${(c.pending_work_count > 0) ? '<span class="gc-red-dot" title="' + c.pending_work_count + ' pending work"></span>' : ''}
-            </div>
-            <span>Classwork</span>
-          </a>
-
-          <a href="/student/group-detail.html?id=${c.id}&tab=people" class="gc-action-btn" title="Classmates & Teachers">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- 6 Navigation Quick Links Grid (Students, Classwork, Resources, NBA, Theory Classes, Laboratory Classes) -->
+        <div class="card-quick-links-grid" onclick="event.stopPropagation()">
+          <a href="/student/group-detail.html?id=${c.id}&tab=people" class="card-quick-link" title="Classmates & Teachers">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>People</span>
+            <span>Students</span>
           </a>
 
-          <a href="/student/group-detail.html?id=${c.id}&tab=stream" class="gc-action-btn" title="Classroom Stream & Announcements">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          <a href="/student/group-detail.html?id=${c.id}&tab=classwork" class="card-quick-link ${(c.pending_work_count > 0) ? 'has-pending' : ''}" title="Classwork & Assignments">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
-            <span>Stream</span>
+            <span>Classwork</span>
           </a>
-        </footer>
+
+          <a href="/student/group-detail.html?id=${c.id}&tab=resources" class="card-quick-link" title="Class Resources & Documents">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Resources</span>
+          </a>
+
+          <a href="/student/nba/index.html?groupId=${c.id}" class="card-quick-link" title="NBA Academic Accreditation Dossier & Course Outcomes">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>NBA</span>
+          </a>
+
+          <a href="/student/theory-classes/index.html?groupId=${c.id}" class="card-quick-link" title="Theory Classes Dossier, Notes & Lesson Plans">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Theory Classes</span>
+          </a>
+
+          <a href="/student/lab-classes/index.html?groupId=${c.id}" class="card-quick-link" title="Laboratory Classes, Manuals & Experiments">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
+              <path d="M8.5 2h7"></path>
+              <path d="M14 9.3h-4"></path>
+            </svg>
+            <span>Laboratory Classes</span>
+          </a>
+        </div>
+
+        <!-- Academic Dossier Entry Bars (Theory Classes, Laboratory Classes, Course File NBA) -->
+        <a href="/student/theory-classes/index.html?groupId=${c.id}" class="card-theory-classes-bar" title="Open Theory Classes Academic Dossier (7 Records)" onclick="event.stopPropagation()">
+          <div class="card-cf-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Theory Classes</span>
+          </div>
+          <div class="card-cf-right">
+            <span class="card-cf-count" style="background:var(--color-primary-light);color:var(--color-primary);font-weight:700;">7 Records</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <a href="/student/lab-classes/index.html?groupId=${c.id}" class="card-lab-classes-bar" title="Open Laboratory Classes Academic Dossier (7 Records)" onclick="event.stopPropagation()">
+          <div class="card-cf-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
+              <path d="M8.5 2h7"></path>
+              <path d="M14 9.3h-4"></path>
+            </svg>
+            <span>Laboratory Classes</span>
+          </div>
+          <div class="card-cf-right">
+            <span class="card-cf-count" style="background:var(--status-present-bg);color:var(--status-present);font-weight:700;">7 Records</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <a href="/student/nba/index.html?groupId=${c.id}" class="card-cf-footer-bar" title="Open NBA Academic Accreditation Dossier (18 Docs)" onclick="event.stopPropagation()">
+          <div class="card-cf-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Course File (NBA/NAAC)</span>
+          </div>
+          <div class="card-cf-right">
+            <span class="card-cf-count">18 Docs</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </a>
       </article>
     `;
   }).join('');

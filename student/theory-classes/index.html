@@ -1,0 +1,390 @@
+<!-- VidyaOS Student Theory Classes Entry Index -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Theory Classes — Student Academic Dossier | VidyaOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261028">
+  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/css/layout.css?v=20261028">
+  <link rel="stylesheet" href="/css/components.css?v=20261028">
+  <link rel="stylesheet" href="/css/classroom-nav.css?v=20261028">
+  <link rel="stylesheet" href="/css/nav.css?v=20261028">
+  <link rel="stylesheet" href="/student/theory-classes/theory-classes.css?v=20261103">
+</head>
+<body class="classroom-page">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       GOOGLE CLASSROOM TOP NAVBAR
+       ═══════════════════════════════════════════════════════════ -->
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <button type="button" class="gc-menu-btn" id="btn-menu-toggle" onclick="toggleStudentDrawer()" title="Main Menu" aria-label="Toggle Navigation Drawer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="/student/dashboard.html" class="gc-brand-link" title="VidyaOS Student Workspace">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </div>
+        <div class="gc-brand-title">VidyaOS</div>
+      </a>
+
+      <!-- Breadcrumb -->
+      <div class="gc-breadcrumb-wrap">
+        <span class="gc-breadcrumb-sep">›</span>
+        <span class="gc-breadcrumb-current">Theory Classes</span>
+      </div>
+    </div>
+
+    <div class="gc-nav-right">
+      <button type="button" class="gc-icon-btn" onclick="toggleAppsLauncher()" title="Student Academic Modules" aria-label="Apps Launcher">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      </button>
+
+      <button type="button" class="gc-icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleUserProfile()" title="Student Account">ST</div>
+
+      <!-- Apps Launcher Dropdown -->
+      <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;">
+        <a href="/student/dashboard.html" class="app-item">
+          <div class="app-icon" data-icon="book" style="background:var(--color-primary-light); color:var(--color-primary);"></div>
+          <span class="app-name">Classes</span>
+        </a>
+        <a href="/student/assignments.html" class="app-item">
+          <div class="app-icon" data-icon="assignment" style="background:var(--color-primary-light); color:var(--color-primary);"></div>
+          <span class="app-name">To-do</span>
+        </a>
+        <a href="/student/attendance.html" class="app-item">
+          <div class="app-icon" data-icon="calendar" style="background:var(--status-present-bg); color:var(--status-present);"></div>
+          <span class="app-name">Attendance</span>
+        </a>
+        <a href="/student/timetable.html" class="app-item">
+          <div class="app-icon" data-icon="clock" style="background:var(--col-att-group-bg); color:var(--col-att-group-color);"></div>
+          <span class="app-name">Timetable</span>
+        </a>
+        <a href="/student/profile.html" class="app-item">
+          <div class="app-icon" data-icon="user" style="background:var(--chip-faculty-bg); color:var(--chip-faculty-color);"></div>
+          <span class="app-name">Profile</span>
+        </a>
+      </div>
+
+      <!-- Student Profile Popover -->
+      <div class="user-profile-popover" id="user-profile-popover" style="display:none;">
+        <div class="popover-avatar" id="popover-avatar">ST</div>
+        <div class="popover-name" id="popover-user-name">Student Member</div>
+        <div class="popover-email" id="popover-user-email">student@college.edu</div>
+        <div id="popover-reg-badge" style="margin-bottom:0.75rem;"></div>
+        <div class="popover-divider"></div>
+        <a href="/student/profile.html" class="popover-btn" style="text-decoration:none; justify-content:center;">View Dossier</a>
+        <button type="button" class="popover-btn" onclick="logout()" style="color:var(--status-absent);">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide-out Drawer Navigation -->
+  <div class="gc-drawer-backdrop" id="drawer-backdrop" onclick="toggleStudentDrawer(false)"></div>
+  <aside class="gc-drawer" id="student-drawer">
+    <div class="gc-drawer-header">
+      <a href="/student/dashboard.html" class="gc-brand-link">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </div>
+        <div class="gc-brand-title">VidyaOS</div>
+      </a>
+      <button type="button" class="gc-icon-btn" onclick="toggleStudentDrawer(false)" aria-label="Close Drawer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="gc-drawer-body">
+      <a href="/student/dashboard.html" class="gc-drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Enrolled Classes</span>
+      </a>
+
+      <a href="/student/assignments.html" class="gc-drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+        </svg>
+        <span>Coursework &amp; To-do</span>
+      </a>
+
+      <a href="/student/attendance.html" class="gc-drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>Attendance Registry</span>
+      </a>
+
+      <a href="/student/timetable.html" class="gc-drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>Class Timetable</span>
+      </a>
+
+      <div class="gc-drawer-divider"></div>
+      <div class="gc-drawer-sec-title">Academic Dossiers</div>
+
+      <a href="/student/theory-classes/index.html" class="gc-drawer-link active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>Theory Classes (7 Records)</span>
+      </a>
+
+      <a href="/student/lab-classes/index.html" class="gc-drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
+          <path d="M8.5 2h7"></path>
+          <path d="M14 9.3h-4"></path>
+        </svg>
+        <span>Laboratory Classes (7 Records)</span>
+      </a>
+
+      <a href="/student/nba/index.html" class="gc-drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>NBA Academic Dossier</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PAGE CONTENT CONTAINER
+       ═══════════════════════════════════════════════════════════ -->
+  <main class="page-main-container container" style="max-width:1280px; padding-top:1rem; padding-bottom:3.5rem;">
+
+    <!-- Top Navigation Action Bar -->
+    <div class="tc-top-action-bar">
+      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:0.4rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back to Student Dashboard</span>
+      </a>
+
+      <!-- Course Switcher Dropdown -->
+      <div class="tc-course-picker-wrap">
+        <label for="tc-course-selector" class="tc-picker-label">Active Course:</label>
+        <select id="tc-course-selector" class="tc-course-selector" onchange="handleCourseChange(this.value)">
+          <option value="">Loading enrolled courses...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Hero Banner Card -->
+    <section class="tc-hero-card">
+      <div class="tc-hero-main">
+        <div class="tc-hero-badge-row">
+          <span class="tc-hero-pill tc-pill-sem" id="tc-hero-sem">Semester 5</span>
+          <span class="tc-hero-pill tc-pill-comp" id="tc-hero-component">THEORY</span>
+          <span class="tc-hero-pill tc-pill-ay" id="tc-hero-ay">AY 2026–27</span>
+          <span class="tc-hero-pill tc-pill-code" id="tc-hero-code">101</span>
+        </div>
+
+        <h1 class="tc-hero-title" id="tc-hero-title">Software Engineering</h1>
+
+        <div class="tc-hero-meta">
+          <span class="tc-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18"></path>
+              <path d="M5 21V7l8-4v18"></path>
+              <path d="M19 21V11l-6-3"></path>
+            </svg>
+            <span id="tc-hero-dept">Information Technology</span>
+          </span>
+          <span class="tc-meta-sep">•</span>
+          <span class="tc-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span id="tc-hero-teacher">Course Instructor</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Turnout & Academic Compliance Meter -->
+      <div class="tc-hero-meter-box">
+        <div class="tc-meter-top">
+          <span class="tc-meter-label">Student Course Attendance</span>
+          <span class="tc-meter-score" id="tc-meter-pct">--%</span>
+        </div>
+        <div class="tc-meter-track">
+          <div class="tc-meter-bar" id="tc-meter-bar" style="width: 0%;"></div>
+        </div>
+        <div class="tc-meter-sub" id="tc-meter-caption">
+          Attended: -- / -- lectures
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Action Pills Strip -->
+    <div class="tc-quick-pills-row">
+      <a href="#" id="link-my-attendance" class="tc-quick-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>My Attendance Register</span>
+      </a>
+
+      <a href="#" id="link-my-classwork" class="tc-quick-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>Classwork &amp; Submissions</span>
+      </a>
+
+      <a href="#" id="link-my-nba" class="tc-quick-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>NBA Course Outcomes</span>
+      </a>
+
+      <a href="#" id="link-my-people" class="tc-quick-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span>Classmates &amp; Teacher</span>
+      </a>
+    </div>
+
+    <!-- Filter Pills & Search Section -->
+    <div class="tc-filter-bar">
+      <div class="tc-filter-pills">
+        <button type="button" class="tc-filter-pill active" onclick="setCategoryFilter('all')">
+          All 7 Records (<span id="count-cat-all">7</span>)
+        </button>
+        <button type="button" class="tc-filter-pill" onclick="setCategoryFilter('attendance')">
+          Attendance &amp; Log (<span id="count-cat-attendance">2</span>)
+        </button>
+        <button type="button" class="tc-filter-pill" onclick="setCategoryFilter('instruction')">
+          Curriculum &amp; Coverage (<span id="count-cat-instruction">2</span>)
+        </button>
+        <button type="button" class="tc-filter-pill" onclick="setCategoryFilter('pedagogy')">
+          Notes &amp; Assessment (<span id="count-cat-pedagogy">3</span>)
+        </button>
+      </div>
+
+      <div class="tc-search-wrap">
+        <span class="tc-search-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input type="text" id="tc-search-input" placeholder="Search theory class documents & notes..." oninput="handleSearch(this.value)">
+      </div>
+    </div>
+
+    <!-- 7 Artifacts Card Grid -->
+    <section class="tc-cards-grid" id="tc-cards-grid">
+      <div class="tc-loading-box">
+        <div class="tc-spinner"></div>
+        <p>Loading Theory Classes Academic Dossier...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Document Preview & Download Modal -->
+  <div class="modal-backdrop" id="doc-modal" style="display:none;" onclick="if(event.target===this) closeDocModal()">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div class="tc-doc-icon-circle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" id="doc-modal-title">Theory Academic Document</h3>
+            <div style="font-size:0.75rem; color:var(--text-muted);" id="doc-modal-subtitle">Official study material</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close" onclick="closeDocModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" id="doc-modal-body">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:0.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocModal()">Close</button>
+        <a href="#" id="doc-modal-download-btn" target="_blank" download class="btn btn-primary btn-sm" style="display:inline-flex;align-items:center;gap:0.35rem;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Download Document</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Core Scripts -->
+  <script src="/js/icons.js?v=20261026"></script>
+  <script src="/js/auth.js?v=20261028"></script>
+  <script src="/js/nav.js?v=20261028"></script>
+  <script src="/js/api.js?v=20261028"></script>
+  <script src="/student/theory-classes/theory-classes.js?v=20261103"></script>
+</body>
+</html>

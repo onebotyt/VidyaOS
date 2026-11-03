@@ -1,0 +1,600 @@
+/**
+ * NBA Academic Accreditation Dossier — Student Stylesheet
+ * Location: student/nba/nba.css
+ * VidyaOS Institutional Campus Operating System
+ * Strict Invariant: 100% Theme Token Compliance (Zero Hardcoded Hex / RGB Colors)
+ */
+
+/* ─── Top Action Bar & Course Switcher ────────────────────── */
+.nba-top-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.nba-course-picker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nba-picker-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.nba-course-selector {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-main);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nba-course-selector:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+/* ─── Hero Banner Card ─────────────────────────────────────── */
+.nba-hero-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.25rem;
+}
+
+.nba-hero-main {
+  flex: 1 1 320px;
+}
+
+.nba-hero-badge-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.nba-hero-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+}
+
+.nba-pill-sem {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.nba-pill-comp {
+  background: var(--status-pending-bg);
+  color: var(--status-pending);
+}
+
+.nba-pill-ay {
+  background: var(--bg-surface-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.nba-pill-code {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+}
+
+.nba-hero-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.nba-hero-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.nba-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nba-meta-sep {
+  color: var(--border-color);
+}
+
+/* ─── Hero Accreditation Readiness Meter ───────────────────── */
+.nba-hero-meter-box {
+  flex: 0 0 260px;
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+}
+
+.nba-meter-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.nba-meter-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.nba-meter-score {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--color-primary);
+}
+
+.nba-meter-track {
+  width: 100%;
+  height: 8px;
+  background: var(--border-color);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.nba-meter-bar {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+.nba-meter-sub {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ─── Quick Pills Strip ────────────────────────────────────── */
+.nba-quick-pills-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.nba-quick-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.nba-quick-pill:hover {
+  background: var(--bg-surface-secondary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.nba-quick-pill svg {
+  color: var(--text-muted);
+}
+
+.nba-quick-pill:hover svg {
+  color: var(--color-primary);
+}
+
+/* ─── Course Outcomes (COs) Section ────────────────────────── */
+.nba-cos-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+}
+
+.nba-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.nba-icon-sq {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nba-section-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.nba-section-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.nba-cos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.nba-co-card {
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.nba-co-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.nba-co-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.nba-co-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.nba-bloom-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.nba-co-desc {
+  font-size: 0.84rem;
+  color: var(--text-main);
+  line-height: 1.45;
+  margin: 0 0 0.5rem 0;
+}
+
+.nba-co-target {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--status-present);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ─── Filter Bar & Search ──────────────────────────────────── */
+.nba-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.nba-filter-pills {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.nba-filter-pill {
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nba-filter-pill:hover {
+  color: var(--text-main);
+  background: var(--bg-surface-secondary);
+}
+
+.nba-filter-pill.active {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.nba-search-wrap {
+  position: relative;
+  min-width: 260px;
+}
+
+.nba-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+#nba-search-input {
+  width: 100%;
+  padding: 0.45rem 0.85rem 0.45rem 2.2rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#nba-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+/* ─── 18 Artifact Cards Grid ───────────────────────────────── */
+.nba-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.nba-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.15rem 1.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nba-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.nba-card-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1 1 340px;
+}
+
+.nba-card-num-box {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-secondary);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nba-card-body {
+  flex: 1;
+}
+
+.nba-card-header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.nba-card-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.nba-card-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.nba-card-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  margin-top: 0.4rem;
+}
+
+.nba-card-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nba-btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.nba-btn-primary {
+  background: var(--color-primary);
+  color: var(--text-white);
+}
+
+.nba-btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.nba-btn-secondary {
+  background: var(--bg-surface-secondary);
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+.nba-btn-secondary:hover {
+  background: var(--bg-surface);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ─── Loading & Empty States ───────────────────────────────── */
+.nba-loading-box {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+}
+
+.nba-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: nbaSpin 0.75s linear infinite;
+  margin: 0 auto 0.75rem auto;
+}
+
+@keyframes nbaSpin {
+  to { transform: rotate(360deg); }
+}
+
+.nba-doc-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ─── Responsive Media Queries ─────────────────────────────── */
+@media (max-width: 768px) {
+  .nba-hero-card {
+    padding: 1.15rem;
+    gap: 1rem;
+  }
+
+  .nba-hero-title {
+    font-size: 1.3rem;
+  }
+
+  .nba-hero-meter-box {
+    flex: 1 1 100%;
+  }
+
+  .nba-cos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nba-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nba-search-wrap {
+    min-width: 100%;
+  }
+
+  .nba-card {
+    padding: 1rem;
+  }
+
+  .nba-card-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

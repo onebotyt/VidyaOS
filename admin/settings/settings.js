@@ -54,7 +54,7 @@ async function loadSettings(isManual = false) {
           institution_logo_url: logoUrl,
           institution_banner_url: bannerUrl
         }));
-      } catch (_) {}
+      } catch (_) { }
 
       if (isManual && typeof showToast === 'function') {
         showToast('Settings reloaded from database', 'info');
@@ -281,7 +281,7 @@ if (form) {
         try {
           localStorage.setItem('institutionSettings', JSON.stringify(settingsPayload));
           window.dispatchEvent(new CustomEvent('institution-settings-updated', { detail: settingsPayload }));
-        } catch (_) {}
+        } catch (_) { }
 
         if (typeof showToast === 'function') showToast('Institutional branding & settings saved successfully', 'success');
         await loadSettings();

@@ -631,6 +631,42 @@
       "destination": "/student/profile/index.html"
     },
     {
+      "source": "/student/theory-classes",
+      "destination": "/student/theory-classes/index.html"
+    },
+    {
+      "source": "/student/theory-classes/",
+      "destination": "/student/theory-classes/index.html"
+    },
+    {
+      "source": "/student/theory-classes.html",
+      "destination": "/student/theory-classes/index.html"
+    },
+    {
+      "source": "/student/lab-classes",
+      "destination": "/student/lab-classes/index.html"
+    },
+    {
+      "source": "/student/lab-classes/",
+      "destination": "/student/lab-classes/index.html"
+    },
+    {
+      "source": "/student/lab-classes.html",
+      "destination": "/student/lab-classes/index.html"
+    },
+    {
+      "source": "/student/nba",
+      "destination": "/student/nba/index.html"
+    },
+    {
+      "source": "/student/nba/",
+      "destination": "/student/nba/index.html"
+    },
+    {
+      "source": "/student/nba.html",
+      "destination": "/student/nba/index.html"
+    },
+    {
       "source": "/student/group-detail",
       "destination": "/faculty/group-detail/index.html"
     },
