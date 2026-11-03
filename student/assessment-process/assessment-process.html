@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Assessment Process — VidyaOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css?v=20261028">
+  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/css/layout.css?v=20261028">
+  <link rel="stylesheet" href="/css/components.css?v=20261028">
+  <link rel="stylesheet" href="/css/classroom-nav.css?v=20261028">
+  <link rel="stylesheet" href="/css/nav.css?v=20261028">
+  <link rel="stylesheet" href="/student/assessment-process/assessment-process.css?v=20261103_v1">
+</head>
+<body class="classroom-page">
+
+  <!-- Top Navigation Header -->
+  <header class="gc-navbar">
+    <div class="gc-nav-left">
+      <a href="/student/dashboard.html" class="gc-menu-btn" title="Back to Student Dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </a>
+
+      <a href="/student/dashboard.html" class="gc-brand-link" title="VidyaOS Student Workspace">
+        <div class="gc-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+        </div>
+        <div class="gc-brand-title">VidyaOS</div>
+      </a>
+
+      <!-- Breadcrumb -->
+      <div class="gc-breadcrumb-wrap">
+        <span class="gc-breadcrumb-sep">&rsaquo;</span>
+        <span class="gc-breadcrumb-current">Assessment Process</span>
+      </div>
+    </div>
+
+    <div class="gc-nav-right">
+      <button type="button" class="gc-icon-btn" onclick="toggleTheme()" id="btn-theme-toggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <div class="gc-user-avatar" id="gc-user-avatar" title="Student Account">ST</div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="cf-main-container">
+    <!-- Hero Banner Card -->
+    <section class="cf-hero-card" id="assess-hero-card">
+      <div class="cf-hero-body">
+        <div class="cf-hero-details">
+          <div class="cf-badge-row">
+            <span class="badge badge-sem" id="assess-hero-sem">Semester --</span>
+            <span class="badge" style="background:var(--bg-card);border:1px solid var(--border-color);" id="assess-hero-branch">Branch</span>
+            <span class="badge" style="background:var(--bg-card);border:1px solid var(--border-color);" id="assess-hero-ay">AY 2026-27</span>
+            <span class="badge badge-status-progress" id="assess-hero-status-badge">IN PROGRESS</span>
+          </div>
+          <h1 class="cf-hero-title" id="assess-hero-title">Loading Assessment Dossier...</h1>
+          <div class="cf-hero-subtitle">Assessment Process &bull; Direct Assessment (CO Attainment) &amp; Indirect Feedback Surveys</div>
+          <div class="cf-hero-meta">
+            <span id="assess-hero-code" class="cf-code-tag">--</span>
+            <span class="cf-meta-dot">&bull;</span>
+            <span id="assess-hero-dept">Department</span>
+            <span class="cf-meta-dot">&bull;</span>
+            <span id="assess-hero-teacher">Course Instructor</span>
+          </div>
+        </div>
+
+        <!-- Documentation Readiness Meter -->
+        <div class="cf-hero-meter-card">
+          <div class="cf-meter-header">
+            <div>
+              <span class="cf-meter-label">Documentation Readiness</span>
+              <div class="cf-meter-score" id="assess-meter-score">0 / 13</div>
+            </div>
+            <div class="cf-meter-pct" id="assess-meter-pct">0%</div>
+          </div>
+          <div class="cf-meter-track">
+            <div class="cf-meter-bar" id="assess-meter-bar" style="width: 0%;"></div>
+          </div>
+          <div class="cf-meter-caption" id="assess-meter-caption">Documentation ongoing</div>
+        </div>
+      </div>
+
+      <!-- Course Switcher Row (if enrolled in multiple subjects) -->
+      <div class="cf-switcher-row" id="assess-switcher-row" style="display:none;">
+        <span class="cf-switcher-label">Enrolled Subject:</span>
+        <select id="course-selector" class="cf-switcher-select" onchange="onCourseSwitch(this.value)">
+          <!-- Injected via JS -->
+        </select>
+      </div>
+    </section>
+
+    <!-- Filter & Search Section -->
+    <section class="cf-filter-section">
+      <div class="cf-tab-pills" role="tablist">
+        <button type="button" class="cf-tab-pill active" onclick="setCategoryFilter('all', this)" role="tab" aria-selected="true">
+          <span>All 13 Records</span>
+          <span class="cf-tab-count" id="count-cat-all">13</span>
+        </button>
+        <button type="button" class="cf-tab-pill" onclick="setCategoryFilter('direct_assessment', this)" role="tab" aria-selected="false">
+          <span>Direct Assessment</span>
+          <span class="cf-tab-count" id="count-cat-direct">8</span>
+        </button>
+        <button type="button" class="cf-tab-pill" onclick="setCategoryFilter('indirect_assessment', this)" role="tab" aria-selected="false">
+          <span>Indirect Assessment</span>
+          <span class="cf-tab-count" id="count-cat-indirect">5</span>
+        </button>
+      </div>
+
+      <div class="cf-search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="assess-search-input" placeholder="Search assessment document..." oninput="onSearchDocuments(this.value)">
+      </div>
+    </section>
+
+    <!-- 13 Artifact Cards List -->
+    <section class="cf-grid-section" id="assess-cards-grid">
+      <!-- Injected via JS -->
+    </section>
+  </main>
+
+  <!-- PDF Preview Modal -->
+  <div class="cf-modal-overlay" id="preview-modal-overlay" style="display:none;" onclick="closeModalOnOverlay(event, 'preview-modal-overlay')">
+    <div class="cf-modal-card preview-wide" role="dialog" aria-modal="true" aria-labelledby="modal-preview-title">
+      <div class="cf-modal-header">
+        <div class="cf-modal-header-left">
+          <div class="cf-modal-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <div>
+            <h3 class="cf-modal-title" id="modal-preview-title">Document Preview</h3>
+            <p class="cf-modal-subtitle" id="modal-preview-subtitle">Viewing PDF file</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <a href="#" id="btn-preview-download" class="cf-card-btn" download title="Download this PDF">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download</span>
+          </a>
+          <button type="button" class="cf-modal-close-btn" onclick="closePreviewModal()" aria-label="Close dialog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div style="padding:0;flex:1;overflow:hidden;">
+        <iframe id="pdf-preview-frame" class="cf-preview-frame" src="" title="PDF Preview"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js?v=20261028"></script>
+  <script src="/student/assessment-process/assessment-process.js?v=20261103_v1"></script>
+</body>
+</html>

@@ -463,6 +463,18 @@
       "destination": "/faculty/student-performance/index.html"
     },
     {
+      "source": "/faculty/assessment-process",
+      "destination": "/faculty/assessment-process/index.html"
+    },
+    {
+      "source": "/faculty/assessment-process/",
+      "destination": "/faculty/assessment-process/index.html"
+    },
+    {
+      "source": "/faculty/assessment-process.html",
+      "destination": "/faculty/assessment-process/index.html"
+    },
+    {
       "source": "/faculty/groups",
       "destination": "/faculty/dashboard/index.html"
     },
@@ -689,6 +701,18 @@
     {
       "source": "/student/student-performance.html",
       "destination": "/student/student-performance/index.html"
+    },
+    {
+      "source": "/student/assessment-process",
+      "destination": "/student/assessment-process/index.html"
+    },
+    {
+      "source": "/student/assessment-process/",
+      "destination": "/student/assessment-process/index.html"
+    },
+    {
+      "source": "/student/assessment-process.html",
+      "destination": "/student/assessment-process/index.html"
     },
     {
       "source": "/student/nba",
