@@ -1150,7 +1150,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -1175,7 +1175,7 @@
   flex-direction: column;
   justify-content: space-between;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .gc-card-header::before {
@@ -1373,7 +1373,7 @@
   box-shadow: var(--shadow-lg);
   min-width: 175px;
   padding: 0.4rem 0;
-  z-index: 500;
+  z-index: 1000;
   display: none;
 }
 
@@ -3876,7 +3876,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
@@ -3893,7 +3893,7 @@ body {
   padding: 1.15rem 1.25rem;
   color: var(--text-white);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .gc-card-header-inner {

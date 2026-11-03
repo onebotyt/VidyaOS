@@ -207,7 +207,7 @@
   flex-direction: column;
   justify-content: space-between;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .gc-card-header::before {
@@ -285,7 +285,7 @@
   box-shadow: var(--shadow-lg);
   min-width: 195px;
   padding: 0.4rem 0;
-  z-index: 500;
+  z-index: 1000;
   display: none;
 }
 
