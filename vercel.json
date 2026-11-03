@@ -415,6 +415,18 @@
       "destination": "/faculty/course-file/index.html"
     },
     {
+      "source": "/faculty/nba",
+      "destination": "/faculty/course-file/index.html"
+    },
+    {
+      "source": "/faculty/nba/",
+      "destination": "/faculty/course-file/index.html"
+    },
+    {
+      "source": "/faculty/nba.html",
+      "destination": "/faculty/course-file/index.html"
+    },
+    {
       "source": "/faculty/theory-classes",
       "destination": "/faculty/theory-classes/index.html"
     },

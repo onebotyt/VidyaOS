@@ -4687,11 +4687,12 @@ body {
   border-color: var(--color-primary);
 }
 
-.card-quick-links-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 0.65rem 1.25rem 0.85rem 1.25rem;
+.card-quick-links-row,
+.card-quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem 0.25rem;
+  padding: 0.65rem 0.75rem 0.85rem 0.75rem;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-card);
 }
@@ -4700,19 +4701,30 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.3rem;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: var(--text-muted);
   text-decoration: none;
-  transition: color 0.15s ease;
-  padding: 4px 8px;
-  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm, 6px);
+  text-align: center;
 }
 
 .card-quick-link:hover {
   color: var(--color-primary);
   background: var(--bg-surface-secondary);
+}
+
+.card-quick-link svg {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.card-quick-link:hover svg {
+  transform: translateY(-1px);
 }
 
 .card-cf-footer-bar {
@@ -4778,7 +4790,7 @@ body {
 }
 
 .card-lab-classes-bar .card-cf-left svg {
-  color: var(--status-present, #10b981);
+  color: var(--status-present);
 }
 
 .card-theory-classes-bar .card-cf-right svg,

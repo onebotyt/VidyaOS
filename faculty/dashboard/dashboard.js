@@ -932,9 +932,9 @@ function renderGroups() {
           </a>
         </div>
 
-        <!-- 4. Quick Links Row (Students | Classwork | Resources) -->
-        <div class="card-quick-links-row">
-          <a href="/faculty/group-detail.html?id=${g.id}&tab=people" class="card-quick-link" title="Class Students">
+        <!-- 4. 6 Navigation Quick Links Grid (Students, Classwork, Resources, NBA, Theory Classes, Laboratory Classes) -->
+        <div class="card-quick-links-grid" onclick="event.stopPropagation()">
+          <a href="/faculty/group-detail.html?id=${g.id}&tab=people" class="card-quick-link" title="Class Students & Roster">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
@@ -958,6 +958,30 @@ function renderGroups() {
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
             </svg>
             <span>Resources</span>
+          </a>
+          <a href="/faculty/course-file.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="NBA Academic Accreditation Dossier & Course Outcomes">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>NBA</span>
+          </a>
+          <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="Theory Classes Dossier, Notes & Lesson Plans (7 Records)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Theory Classes</span>
+          </a>
+          <a href="/faculty/lab-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="Laboratory Classes, Manuals & Experiments (7 Records)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
+              <path d="M8.5 2h7"></path>
+              <path d="M14 9.3h-4"></path>
+            </svg>
+            <span>Laboratory Classes</span>
           </a>
         </div>
 
