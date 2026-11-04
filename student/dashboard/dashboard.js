@@ -535,13 +535,25 @@ function renderGoogleClassCards() {
             <span>Student Performance</span>
           </a>
 
-          <a href="/student/assessment-process/index.html?groupId=${c.id}" class="card-quick-link" title="Assessment Process (Direct & Indirect Assessment, CO Attainment)">
+          <a href="/student/direct-assessment/index.html?groupId=${c.id}" class="card-quick-link" title="Direct Assessment (CO Attainment, Examinations & Marksheets)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
               <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
               <path d="m9 14 2 2 4-4"></path>
             </svg>
-            <span>Assessment Process</span>
+            <span>Direct Assessment</span>
+          </a>
+
+          <a href="/student/indirect-assessment/index.html?groupId=${c.id}" class="card-quick-link" title="Indirect Assessment (Course Exit Surveys & Stakeholder Feedback)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <path d="M12 11h4"></path>
+              <path d="M12 16h4"></path>
+              <path d="M8 11h.01"></path>
+              <path d="M8 16h.01"></path>
+            </svg>
+            <span>Indirect Assessment</span>
           </a>
         </div>
       </article>

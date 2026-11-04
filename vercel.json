@@ -475,6 +475,30 @@
       "destination": "/faculty/assessment-process/index.html"
     },
     {
+      "source": "/faculty/direct-assessment",
+      "destination": "/faculty/direct-assessment/index.html"
+    },
+    {
+      "source": "/faculty/direct-assessment/",
+      "destination": "/faculty/direct-assessment/index.html"
+    },
+    {
+      "source": "/faculty/direct-assessment.html",
+      "destination": "/faculty/direct-assessment/index.html"
+    },
+    {
+      "source": "/faculty/indirect-assessment",
+      "destination": "/faculty/indirect-assessment/index.html"
+    },
+    {
+      "source": "/faculty/indirect-assessment/",
+      "destination": "/faculty/indirect-assessment/index.html"
+    },
+    {
+      "source": "/faculty/indirect-assessment.html",
+      "destination": "/faculty/indirect-assessment/index.html"
+    },
+    {
       "source": "/faculty/groups",
       "destination": "/faculty/dashboard/index.html"
     },
@@ -713,6 +737,30 @@
     {
       "source": "/student/assessment-process.html",
       "destination": "/student/assessment-process/index.html"
+    },
+    {
+      "source": "/student/direct-assessment",
+      "destination": "/student/direct-assessment/index.html"
+    },
+    {
+      "source": "/student/direct-assessment/",
+      "destination": "/student/direct-assessment/index.html"
+    },
+    {
+      "source": "/student/direct-assessment.html",
+      "destination": "/student/direct-assessment/index.html"
+    },
+    {
+      "source": "/student/indirect-assessment",
+      "destination": "/student/indirect-assessment/index.html"
+    },
+    {
+      "source": "/student/indirect-assessment/",
+      "destination": "/student/indirect-assessment/index.html"
+    },
+    {
+      "source": "/student/indirect-assessment.html",
+      "destination": "/student/indirect-assessment/index.html"
     },
     {
       "source": "/student/nba",

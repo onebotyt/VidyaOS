@@ -4693,7 +4693,7 @@ body {
 .card-quick-links-row,
 .card-quick-links-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem 0.25rem;
   padding: 0.65rem 0.75rem 0.85rem 0.75rem;
   border-bottom: 1px solid var(--border-color);
