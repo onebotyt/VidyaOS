@@ -297,11 +297,24 @@ function handleClassesSearch(query) {
 }
 
 /**
+ * Verifies if user account possesses teacher, HOD, or administrative privileges
+ */
+function canAccessStaffNavigation(user) {
+  if (!user) return false;
+  const roles = Array.isArray(user.roles) ? user.roles : (user.role ? [user.role] : []);
+  const staffRoles = ['TEACHER', 'FACULTY', 'HOD', 'DEPT_HEAD', 'SYSTEM_ADMIN', 'ADMIN'];
+  return roles.some(r => staffRoles.includes(r)) || Boolean(user.is_hod || user.is_admin || user.teacher_id);
+}
+
+/**
  * Renders the authentic Google Classroom Class Cards grid
  */
 function renderGoogleClassCards() {
   const grid = document.getElementById('classes-grid');
   if (!grid) return;
+
+  const currentUser = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const isStaff = canAccessStaffNavigation(currentUser);
 
   let filtered = studentDashboardState.classes;
 
@@ -466,7 +479,8 @@ function renderGoogleClassCards() {
           </div>
         </div>
 
-        <!-- 6 Navigation Quick Links Grid (Students, Classwork, Resources, NBA, Theory Classes, Laboratory Classes) -->
+        ${isStaff ? `
+        <!-- Staff Navigation Quick Links Grid (Students, Classwork, Resources, NBA, Theory Classes, Laboratory Classes, Student Performance, Direct Assessment, Indirect Assessment) -->
         <div class="card-quick-links-grid" onclick="event.stopPropagation()">
           <a href="/student/group-detail.html?id=${c.id}&tab=people" class="card-quick-link" title="Classmates & Teachers">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -556,6 +570,7 @@ function renderGoogleClassCards() {
             <span>Indirect Assessment</span>
           </a>
         </div>
+        ` : ''}
       </article>
     `;
   }).join('');

@@ -4701,6 +4701,7 @@ body {
 }
 
 @media (max-width: 420px) {
+
   .card-quick-links-row,
   .card-quick-links-grid {
     grid-template-columns: repeat(3, 1fr);

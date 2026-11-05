@@ -322,7 +322,8 @@ function guardRoute(options = []) {
 
   // 1. Role verification
   if (allowedRoles.length > 0) {
-    const hasRole = user.roles && user.roles.some(r => allowedRoles.includes(r));
+    const isHodAuthorized = Boolean(user.is_hod && (allowedRoles.includes('HOD') || allowedRoles.includes('DEPT_HEAD') || allowedRoles.includes('TEACHER') || allowedRoles.includes('FACULTY')));
+    const hasRole = isHodAuthorized || (user.roles && user.roles.some(r => allowedRoles.includes(r)));
     if (!hasRole) {
       try {
         if (typeof sessionStorage !== 'undefined') {

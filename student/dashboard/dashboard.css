@@ -411,6 +411,11 @@
   gap: 0.85rem;
 }
 
+.gc-card-body:last-child {
+  padding-bottom: 1.25rem;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
 /* Attendance Progress Strip */
 .gc-card-att-box {
   background: var(--bg-surface);

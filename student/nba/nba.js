@@ -255,7 +255,8 @@
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       if (typeof window.guardRoute === 'function') {
-        state.currentUser = await window.guardRoute();
+        state.currentUser = await window.guardRoute({ roles: ['TEACHER', 'FACULTY', 'HOD', 'DEPT_HEAD', 'SYSTEM_ADMIN'] });
+        if (!state.currentUser) return;
       }
 
       // Populate user avatar
