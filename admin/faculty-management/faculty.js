@@ -279,7 +279,7 @@ try {
       const tabBtnApp = document.getElementById('tab-btn-approvals');
       const approvalsBtn = document.getElementById('approvals-tab-btn');
       const pendingCard = document.getElementById('pending-hods-card');
-      const rosterSection = document.getElementById('fac-roster-section');
+      const dirWorkspace = document.getElementById('fac-directory-workspace');
       const chips = document.querySelectorAll('.fac-chips-row .fac-filter-chip');
 
       if (currentFacultyMainTab === 'approvals') {
@@ -293,12 +293,10 @@ try {
           else chip.classList.remove('active');
         });
 
+        if (dirWorkspace) dirWorkspace.style.display = 'none';
         if (pendingCard) {
           pendingCard.style.display = 'block';
           pendingCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        if (rosterSection) {
-          rosterSection.style.display = 'none';
         }
         renderPendingHods();
       } else {
@@ -306,12 +304,8 @@ try {
         if (tabBtnApp) { tabBtnApp.classList.remove('active'); tabBtnApp.setAttribute('aria-selected', 'false'); }
         if (approvalsBtn) approvalsBtn.classList.remove('active');
 
-        if (rosterSection) {
-          rosterSection.style.display = 'block';
-        }
-        if (pendingCard) {
-          pendingCard.style.display = (pendingHodsList && pendingHodsList.length > 0) ? 'block' : 'none';
-        }
+        if (dirWorkspace) dirWorkspace.style.display = 'block';
+        if (pendingCard) pendingCard.style.display = 'none';
 
         if (activeFacultyRoleFilter === 'PENDING') {
           activeFacultyRoleFilter = 'ALL';
@@ -2078,17 +2072,17 @@ try {
             card.style.display = 'block';
             if (wrap) {
               wrap.innerHTML = `
-                <div class="fac-empty-state" style="padding: 2.25rem 1rem; text-align: center;">
-                  <div class="fac-empty-state-icon" style="color: var(--status-present, #10b981); margin-bottom: 0.75rem;">
-                    <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <div class="fac-empty-state" style="padding: 2.5rem 1.25rem; text-align: center;">
+                  <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--status-present-bg, rgba(16, 185, 129, 0.12)); color: var(--status-present, #10b981); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.85rem auto;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                   </div>
                   <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.35rem 0;">No Pending Registration Approvals</h3>
-                  <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 480px; margin: 0 auto 1.25rem; line-height: 1.5;">
-                    All candidate self-registration requests have been reviewed. When prospective faculty or HODs apply through the registration portal, their applications will be queued here for administrator approval.
+                  <p style="font-size: 0.84rem; color: var(--text-muted); max-width: 440px; margin: 0 auto 1.25rem auto; line-height: 1.5;">
+                    All candidate self-registration requests have been reviewed. When prospective faculty or HOD candidates apply through the registration portal, their requests will appear here for administrator verification.
                   </p>
-                  <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                  <div class="fac-approvals-empty-actions">
                     <button type="button" class="btn btn-secondary btn-sm" onclick="openRegGatesModal()">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                       <span>Check Registration Gates</span>
                     </button>
                     <button type="button" class="btn btn-secondary btn-sm" onclick="loadPendingHods()">

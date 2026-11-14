@@ -106,70 +106,40 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 2. SELF-REGISTRATION GATE OPTION (RIGHT AFTER STATUS CARDS)    -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <section class="fac-gate-bar" aria-label="Self-Registration Gates">
-    <div class="fac-gate-info">
-      <div class="fac-gate-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>Self-Registration:</span>
-      </div>
-      <div class="fac-gate-tags" id="fac-gate-tags-container">
-        <!-- Rendered dynamically -->
-        <span class="fac-gate-tag loading">Checking gates...</span>
-      </div>
-    </div>
-    <button type="button" class="btn btn-secondary btn-xs fac-gate-cfg-btn" onclick="openRegGatesModal()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span>Open Registration</span>
-    </button>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 3. COMMON FACULTY COMPACT SECTION                             -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <section class="fac-cfm-compact-strip" id="fac-cfm-strip" aria-label="Common Faculty Manager">
-    <div id="common-mgr-content" class="fac-cfm-content">
-      <div style="font-size: 0.8rem; color: var(--text-muted);">Loading Common Faculty Manager...</div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 3A. MAIN WORKSPACE TABS (DIRECTORY vs APPROVALS)              -->
+  <!-- 2. MAIN WORKSPACE TABS (SEGMENTED CONTROL: DIRECTORY vs APPROVALS) -->
   <!-- ══════════════════════════════════════════════════════════════ -->
   <nav class="fac-main-tabs-nav" id="fac-main-tabs-nav" role="tablist" aria-label="Faculty Views">
     <button type="button" class="fac-main-tab-btn active" id="tab-btn-directory" role="tab" aria-selected="true" onclick="switchFacultyMainTab('directory')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span>Faculty Directory</span>
+      <span class="fac-tab-label"><span class="fac-tab-label-short">Directory</span><span class="fac-tab-label-long">Faculty Directory</span></span>
       <span class="fac-main-tab-badge" id="tab-badge-directory">0</span>
     </button>
     <button type="button" class="fac-main-tab-btn" id="tab-btn-approvals" role="tab" aria-selected="false" onclick="switchFacultyMainTab('approvals')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span>Pending Approvals</span>
+      <span class="fac-tab-label"><span class="fac-tab-label-short">Approvals</span><span class="fac-tab-label-long">Registration Approvals</span></span>
       <span class="fac-main-tab-badge fac-badge-highlight" id="tab-badge-approvals">0</span>
     </button>
   </nav>
 
   <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 3B. PENDING REGISTRATIONS QUEUE                                -->
+  <!-- 3. PENDING REGISTRATIONS WORKSPACE (APPROVALS TAB VIEW)         -->
   <!-- ══════════════════════════════════════════════════════════════ -->
   <section class="fac-section-card" id="pending-hods-card" style="display: none; margin-bottom: 1.25rem;">
-    <div class="fac-card-head" style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.15rem; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 0.5rem;">
-      <div class="fac-card-head-left" style="display: flex; align-items: center; gap: 0.6rem;">
+    <div class="fac-card-head fac-approvals-head">
+      <div class="fac-approvals-head-title">
         <span class="fac-card-head-icon" style="color: var(--status-late, #f59e0b);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </span>
-        <div class="fac-card-head-text">
-          <h2 style="font-size: 0.98rem; font-weight: 700; margin: 0; color: var(--text-main);">Pending Registration Approvals</h2>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Self-registration requests awaiting administrator approval</p>
+        <div class="fac-approvals-title-wrap">
+          <h2 class="fac-approvals-title">Pending Approvals</h2>
+          <p class="fac-approvals-sub">Self-registration requests awaiting verification</p>
         </div>
       </div>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <button type="button" class="btn btn-secondary btn-xs" onclick="loadPendingHods()" title="Refresh pending requests" style="display: inline-flex; align-items: center; gap: 0.3rem;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          <span>Refresh</span>
+      <div class="fac-approvals-head-actions">
+        <button type="button" class="btn btn-secondary btn-xs fac-icon-btn" onclick="loadPendingHods()" title="Refresh approvals" aria-label="Refresh approvals">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         </button>
-        <div id="pending-hods-badge" class="badge" style="background: var(--status-late-bg, #fef3c7); color: var(--status-late, #d97706); padding: 0.25rem 0.65rem; border-radius: 9999px; font-weight: 700; font-size: 0.78rem;">0 Pending</div>
+        <span id="pending-hods-badge" class="badge" style="background: var(--status-late-bg, #fef3c7); color: var(--status-late, #d97706); padding: 0.22rem 0.6rem; border-radius: 9999px; font-weight: 700; font-size: 0.74rem; white-space: nowrap;">0 Pending</span>
       </div>
     </div>
     <div class="fac-card-body" id="pending-hods-wrap" style="padding: 0.85rem 1.15rem;">
@@ -178,9 +148,36 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 4. FACULTY ROSTER (SINGLE UNIFIED VIEW)                       -->
+  <!-- 4. DIRECTORY WORKSPACE (WRAPPED FOR INSTANT TAB SWITCHING)     -->
   <!-- ══════════════════════════════════════════════════════════════ -->
-  <section class="fac-roster-section" id="fac-roster-section" aria-label="Faculty Directory">
+  <div id="fac-directory-workspace">
+    <!-- 4A. SELF-REGISTRATION GATE OPTION -->
+    <section class="fac-gate-bar" aria-label="Self-Registration Gates">
+      <div class="fac-gate-info">
+        <div class="fac-gate-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Self-Registration:</span>
+        </div>
+        <div class="fac-gate-tags" id="fac-gate-tags-container">
+          <!-- Rendered dynamically -->
+          <span class="fac-gate-tag loading">Checking gates...</span>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-xs fac-gate-cfg-btn" onclick="openRegGatesModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Open Registration</span>
+      </button>
+    </section>
+
+    <!-- 4B. COMMON FACULTY COMPACT SECTION -->
+    <section class="fac-cfm-compact-strip" id="fac-cfm-strip" aria-label="Common Faculty Manager">
+      <div id="common-mgr-content" class="fac-cfm-content">
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Loading Common Faculty Manager...</div>
+      </div>
+    </section>
+
+    <!-- 4C. FACULTY ROSTER (SINGLE UNIFIED VIEW) -->
+    <section class="fac-roster-section" id="fac-roster-section" aria-label="Faculty Directory">
     <div class="fac-section-card">
       <!-- Search & Filter Controls -->
       <div class="fac-filter-bar">
@@ -219,6 +216,7 @@
       </div>
     </div>
   </section>
+  </div>
 
   <!-- ══════════════════════════════════════════════════════════════ -->
   <!-- MODAL: CONFIGURE REGISTRATION GATES                          -->
