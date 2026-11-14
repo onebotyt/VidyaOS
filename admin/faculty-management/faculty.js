@@ -271,7 +271,69 @@ try {
     }
     window.handleFacultyFilterChange = handleFacultyFilterChange;
 
+    var currentFacultyMainTab = 'directory'; // 'directory' | 'approvals'
+
+    function switchFacultyMainTab(tab) {
+      currentFacultyMainTab = (tab === 'approvals') ? 'approvals' : 'directory';
+      const tabBtnDir = document.getElementById('tab-btn-directory');
+      const tabBtnApp = document.getElementById('tab-btn-approvals');
+      const approvalsBtn = document.getElementById('approvals-tab-btn');
+      const pendingCard = document.getElementById('pending-hods-card');
+      const rosterSection = document.getElementById('fac-roster-section');
+      const chips = document.querySelectorAll('.fac-chips-row .fac-filter-chip');
+
+      if (currentFacultyMainTab === 'approvals') {
+        if (tabBtnDir) { tabBtnDir.classList.remove('active'); tabBtnDir.setAttribute('aria-selected', 'false'); }
+        if (tabBtnApp) { tabBtnApp.classList.add('active'); tabBtnApp.setAttribute('aria-selected', 'true'); }
+        if (approvalsBtn) approvalsBtn.classList.add('active');
+
+        activeFacultyRoleFilter = 'PENDING';
+        chips.forEach(chip => {
+          if (chip.getAttribute('data-role') === 'PENDING') chip.classList.add('active');
+          else chip.classList.remove('active');
+        });
+
+        if (pendingCard) {
+          pendingCard.style.display = 'block';
+          pendingCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        if (rosterSection) {
+          rosterSection.style.display = 'none';
+        }
+        renderPendingHods();
+      } else {
+        if (tabBtnDir) { tabBtnDir.classList.add('active'); tabBtnDir.setAttribute('aria-selected', 'true'); }
+        if (tabBtnApp) { tabBtnApp.classList.remove('active'); tabBtnApp.setAttribute('aria-selected', 'false'); }
+        if (approvalsBtn) approvalsBtn.classList.remove('active');
+
+        if (rosterSection) {
+          rosterSection.style.display = 'block';
+        }
+        if (pendingCard) {
+          pendingCard.style.display = (pendingHodsList && pendingHodsList.length > 0) ? 'block' : 'none';
+        }
+
+        if (activeFacultyRoleFilter === 'PENDING') {
+          activeFacultyRoleFilter = 'ALL';
+        }
+        chips.forEach(chip => {
+          if (chip.getAttribute('data-role') === activeFacultyRoleFilter) chip.classList.add('active');
+          else chip.classList.remove('active');
+        });
+        applyFacultyFilters();
+      }
+    }
+    window.switchFacultyMainTab = switchFacultyMainTab;
+    window.openApprovalsTab = () => switchFacultyMainTab('approvals');
+
     function setFacultyRoleFilter(role) {
+      if (role === 'PENDING') {
+        switchFacultyMainTab('approvals');
+        return;
+      }
+      if (currentFacultyMainTab === 'approvals') {
+        switchFacultyMainTab('directory');
+      }
       activeFacultyRoleFilter = role;
       const chips = document.querySelectorAll('.fac-chips-row .fac-filter-chip');
       chips.forEach(chip => {
@@ -310,14 +372,30 @@ try {
       if (elCActive) elCActive.textContent = cActive;
       if (elCInactive) elCInactive.textContent = cInactive;
 
+      // Update main tab badges and top action badge
+      const elTabBadgeDir = document.getElementById('tab-badge-directory');
+      const elTabBadgeApp = document.getElementById('tab-badge-approvals');
+      const elKpiBadgeApp = document.getElementById('kpi-approvals-badge');
+      if (elTabBadgeDir) elTabBadgeDir.textContent = cAll;
+      if (elTabBadgeApp) {
+        elTabBadgeApp.textContent = cPending;
+        if (cPending > 0) elTabBadgeApp.classList.add('has-pending');
+        else elTabBadgeApp.classList.remove('has-pending');
+      }
+      if (elKpiBadgeApp) {
+        elKpiBadgeApp.textContent = cPending;
+        if (cPending > 0) elKpiBadgeApp.classList.add('has-pending');
+        else elKpiBadgeApp.classList.remove('has-pending');
+      }
+
       // Handle PENDING queue display
       const pendingCard = document.getElementById('pending-hods-card');
-      if (activeFacultyRoleFilter === 'PENDING') {
+      if (currentFacultyMainTab === 'approvals' || activeFacultyRoleFilter === 'PENDING') {
         if (pendingCard) {
           pendingCard.style.display = 'block';
           pendingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        list = []; // Clear roster list so user focuses on the pending queue
+        list = []; // Focus on pending queue
       } else {
         if (pendingCard) {
           pendingCard.style.display = (pendingHodsList && pendingHodsList.length > 0) ? 'block' : 'none';
@@ -1973,17 +2051,54 @@ try {
       const card = document.getElementById('pending-hods-card');
       const badge = document.getElementById('pending-hods-badge');
       const wrap = document.getElementById('pending-hods-wrap');
-      if (badge) badge.textContent = `${pendingHodsList.length} Pending`;
-      const tabBadgePending = document.getElementById('tab-badge-pending');
-      if (tabBadgePending) tabBadgePending.textContent = pendingHodsList.length;
-      const chipBadge = document.getElementById('chip-count-pending');
-      if (chipBadge) chipBadge.textContent = pendingHodsList.length;
+      const count = (pendingHodsList || []).length;
 
-      if (!pendingHodsList.length) {
+      if (badge) badge.textContent = `${count} Pending`;
+
+      const tabBadgeApp = document.getElementById('tab-badge-approvals');
+      if (tabBadgeApp) {
+        tabBadgeApp.textContent = count;
+        if (count > 0) tabBadgeApp.classList.add('has-pending');
+        else tabBadgeApp.classList.remove('has-pending');
+      }
+
+      const kpiBadgeApp = document.getElementById('kpi-approvals-badge');
+      if (kpiBadgeApp) {
+        kpiBadgeApp.textContent = count;
+        if (count > 0) kpiBadgeApp.classList.add('has-pending');
+        else kpiBadgeApp.classList.remove('has-pending');
+      }
+
+      const chipBadge = document.getElementById('chip-count-pending');
+      if (chipBadge) chipBadge.textContent = count;
+
+      if (!count) {
         if (card) {
-          if (activeFacultyRoleFilter === 'PENDING') {
+          if (currentFacultyMainTab === 'approvals' || activeFacultyRoleFilter === 'PENDING') {
             card.style.display = 'block';
-            if (wrap) wrap.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem; text-align: center; padding: 2rem;">No pending registration requests awaiting approval.</div>`;
+            if (wrap) {
+              wrap.innerHTML = `
+                <div class="fac-empty-state" style="padding: 2.25rem 1rem; text-align: center;">
+                  <div class="fac-empty-state-icon" style="color: var(--status-present, #10b981); margin-bottom: 0.75rem;">
+                    <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  </div>
+                  <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.35rem 0;">No Pending Registration Approvals</h3>
+                  <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 480px; margin: 0 auto 1.25rem; line-height: 1.5;">
+                    All candidate self-registration requests have been reviewed. When prospective faculty or HODs apply through the registration portal, their applications will be queued here for administrator approval.
+                  </p>
+                  <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="openRegGatesModal()">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                      <span>Check Registration Gates</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="loadPendingHods()">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                      <span>Refresh</span>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }
           } else {
             card.style.display = 'none';
           }
@@ -1992,10 +2107,10 @@ try {
       }
 
       if (card) card.style.display = 'block';
-
       if (!wrap) return;
+
       wrap.innerHTML = `
-        <div style="overflow-x: auto;">
+        <div class="fac-desktop-approvals-table" style="overflow-x: auto;">
           <table class="table" style="margin: 0; font-size: 0.85rem;">
             <thead>
               <tr>
@@ -2030,7 +2145,7 @@ try {
                     <td style="font-size: 0.78rem; color: var(--text-muted);">${fmtDate(item.created_at)}</td>
                     <td>
                       <div style="display: flex; gap: 0.4rem; align-items: center;">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="openApproveHodModal(${item.id})">Approve HOD</button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="openApproveHodModal(${item.id})">Approve</button>
                         <button type="button" class="btn btn-secondary btn-sm" style="color: var(--status-absent); border-color: var(--status-absent);" onclick="promptRejectHod(${item.id}, '${escHtml(item.full_name)}')">Reject</button>
                       </div>
                     </td>
@@ -2039,7 +2154,35 @@ try {
               }).join('')}
             </tbody>
           </table>
-        </div>`;
+        </div>
+        <div class="fac-mobile-approvals-cards">
+          ${pendingHodsList.map(item => {
+            const hasCurrentHod = !!item.current_hod;
+            const impactTag = hasCurrentHod
+              ? `<span style="display: inline-flex; align-items: center; gap: 0.3rem; background: var(--status-late-bg); color: var(--status-late); border-radius: var(--radius-sm); padding: 0.2rem 0.55rem; font-size: 0.76rem; font-weight: 600;">Replaces ${escHtml(item.current_hod.full_name)}</span>`
+              : `<span style="display: inline-flex; align-items: center; gap: 0.3rem; background: var(--status-present-bg); color: var(--status-present); border-radius: var(--radius-sm); padding: 0.2rem 0.55rem; font-size: 0.76rem; font-weight: 600;">Vacant Department</span>`;
+
+            return `
+              <div class="fac-mini-card" style="padding: 0.85rem; border-left: 3px solid var(--status-late, #f59e0b);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+                  <div>
+                    <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">${escHtml(item.full_name)}</div>
+                    <div style="font-size: 0.76rem; color: var(--color-primary); font-family: monospace;">${escHtml(item.email)}</div>
+                  </div>
+                  <span class="fac-dept-badge">${escHtml(item.department_code || item.department_name || '')}</span>
+                </div>
+                <div style="margin-bottom: 0.6rem;">
+                  ${impactTag}
+                </div>
+                <div style="display: flex; gap: 0.4rem;">
+                  <button type="button" class="btn btn-primary btn-sm" style="flex: 1;" onclick="openApproveHodModal(${item.id})">Approve</button>
+                  <button type="button" class="btn btn-secondary btn-sm" style="flex: 1; color: var(--status-absent); border-color: var(--status-absent);" onclick="promptRejectHod(${item.id}, '${escHtml(item.full_name)}')">Reject</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
     function openApproveHodModal(reqId) {

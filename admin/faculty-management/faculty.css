@@ -132,6 +132,13 @@
   border-top: 1px dashed var(--border-color);
 }
 
+.fac-status-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
 .fac-trash-trigger-btn {
   display: inline-flex;
   align-items: center;
@@ -155,6 +162,42 @@
   line-height: 1;
 }
 
+.fac-approvals-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  border-radius: var(--radius-md, 8px);
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.fac-approvals-trigger-btn.active {
+  background: var(--color-primary-light, rgba(37, 99, 235, 0.1));
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.fac-approvals-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--status-late-bg, rgba(245, 158, 11, 0.15));
+  color: var(--status-late, #d97706);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fac-approvals-badge.has-pending {
+  background: var(--status-late, #f59e0b);
+  color: #ffffff;
+}
+
 .fac-create-btn {
   display: inline-flex;
   align-items: center;
@@ -163,6 +206,78 @@
   border-radius: var(--radius-md, 8px);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* ── 3A. MAIN WORKSPACE TABS NAV ─────────────────────────────── */
+.fac-main-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  padding: 0.35rem;
+  margin-bottom: 1.15rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.fac-main-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.fac-main-tab-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-surface-hover, rgba(0, 0, 0, 0.03));
+}
+
+.fac-main-tab-btn.active {
+  color: var(--color-primary);
+  background: var(--bg-surface);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-color);
+  font-weight: 700;
+}
+
+.fac-main-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--bg-surface-hover, #f1f5f9);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.fac-main-tab-btn.active .fac-main-tab-badge {
+  background: var(--color-primary-light, rgba(37, 99, 235, 0.12));
+  color: var(--color-primary);
+}
+
+.fac-main-tab-badge.fac-badge-highlight {
+  background: var(--status-late-bg, #fef3c7);
+  color: var(--status-late, #d97706);
+}
+
+.fac-main-tab-badge.fac-badge-highlight.has-pending {
+  background: var(--status-late, #f59e0b);
+  color: #ffffff;
 }
 
 /* ── 2B. SELF-REGISTRATION GATE BAR ──────────────────────────── */
@@ -1886,5 +2001,28 @@ tr:has(.fac-kebab-menu.open) {
   min-width: 95px;
 }
 
+@keyframes pulse-badge {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
 
+@media (max-width: 768px) {
+  .fac-desktop-approvals-table {
+    display: none !important;
+  }
+  .fac-mobile-approvals-cards {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+}
 
+@media (min-width: 769px) {
+  .fac-desktop-approvals-table {
+    display: block !important;
+  }
+  .fac-mobile-approvals-cards {
+    display: none !important;
+  }
+}
