@@ -76,11 +76,11 @@
     },
     {
       "source": "/admin",
-      "destination": "/admin/academic-structure/index.html"
+      "destination": "/admin/dashboard/index.html"
     },
     {
       "source": "/admin/",
-      "destination": "/admin/academic-structure/index.html"
+      "destination": "/admin/dashboard/index.html"
     },
     {
       "source": "/admin/academic_structure.html",
@@ -547,16 +547,28 @@
       "destination": "/admin/academic-structure/index.html"
     },
     {
+      "source": "/admin/faculty-management",
+      "destination": "/admin/faculty-management/index.html"
+    },
+    {
+      "source": "/admin/faculty-management/",
+      "destination": "/admin/faculty-management/index.html"
+    },
+    {
+      "source": "/admin/faculty-management.html",
+      "destination": "/admin/faculty-management/index.html"
+    },
+    {
       "source": "/admin/faculty",
-      "destination": "/admin/faculty/index.html"
+      "destination": "/admin/faculty-management/index.html"
     },
     {
       "source": "/admin/faculty/",
-      "destination": "/admin/faculty/index.html"
+      "destination": "/admin/faculty-management/index.html"
     },
     {
       "source": "/admin/faculty.html",
-      "destination": "/admin/faculty/index.html"
+      "destination": "/admin/faculty-management/index.html"
     },
     {
       "source": "/admin/audit-logs",
@@ -776,15 +788,15 @@
     },
     {
       "source": "/student/group-detail",
-      "destination": "/faculty/group-detail/index.html"
+      "destination": "/student/group-detail/index.html"
     },
     {
       "source": "/student/group-detail/",
-      "destination": "/faculty/group-detail/index.html"
+      "destination": "/student/group-detail/index.html"
     },
     {
       "source": "/student/group-detail.html",
-      "destination": "/faculty/group-detail/index.html"
+      "destination": "/student/group-detail/index.html"
     },
     {
       "source": "/:section/:page.css",

@@ -594,10 +594,14 @@ function toggleUserProfile(forceState) {
 }
 
 function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const current = document.documentElement.getAttribute('data-theme') || (typeof localStorage !== 'undefined' ? (localStorage.getItem('app_theme') || localStorage.getItem('theme')) : 'light') || 'light';
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  try { localStorage.setItem('theme', next); } catch {}
+  try {
+    localStorage.setItem('theme', next);
+    localStorage.setItem('app_theme', next);
+    localStorage.setItem('vidya_theme', next);
+  } catch {}
 }
 
 if (typeof window !== 'undefined') {

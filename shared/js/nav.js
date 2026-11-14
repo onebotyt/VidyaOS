@@ -403,7 +403,7 @@ const NAVIGATION_PROFILES = {
     appsTiles: [
       { href: '/admin/dashboard.html', icon: 'dashboard', label: 'Dashboard' },
       { href: '/admin/academic-structure.html', icon: 'academic', label: 'Structure' },
-      { href: '/admin/faculty.html', icon: 'hod', label: 'HODs' },
+      { href: '/admin/faculty-management/index.html', icon: 'hod', label: 'Faculty' },
       { href: '/admin/reports.html', icon: 'reports', label: 'Reports' },
       { href: '/admin/audit-logs.html', icon: 'audit', label: 'Audit Logs' },
       { href: '/admin/settings.html', icon: 'settings', label: 'Settings' }
@@ -414,7 +414,7 @@ const NAVIGATION_PROFILES = {
         items: [
           { href: '/admin/dashboard.html', icon: 'dashboard', label: 'Dashboard' },
           { href: '/admin/academic-structure.html', icon: 'academic', label: 'Academic Structure' },
-          { href: '/admin/faculty.html', icon: 'hod', label: 'HOD Management' },
+          { href: '/admin/faculty-management/index.html', icon: 'hod', label: 'Faculty Management' },
           { href: '/admin/reports.html', icon: 'reports', label: 'Reports & Analytics' },
           { href: '/admin/audit-logs.html', icon: 'audit', label: 'Audit Logs' },
           { href: '/admin/settings.html', icon: 'settings', label: 'System Settings' }
@@ -424,7 +424,7 @@ const NAVIGATION_PROFILES = {
     bottomTabs: [
       { href: '/admin/dashboard.html', icon: 'home', label: 'Home' },
       { href: '/admin/academic-structure.html', icon: 'academic', label: 'Structure' },
-      { href: '/admin/faculty.html', icon: 'hod', label: 'HODs' },
+      { href: '/admin/faculty-management/index.html', icon: 'hod', label: 'Faculty' },
       { isMenu: true, icon: 'menu', label: 'Menu' }
     ]
   },

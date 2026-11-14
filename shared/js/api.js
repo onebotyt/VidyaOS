@@ -25,6 +25,7 @@ async function fetchApi(endpoint, options = {}) {
 
   const config = {
     ...options,
+    credentials: options.credentials || 'include',
     headers
   };
 

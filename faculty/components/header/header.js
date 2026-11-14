@@ -313,7 +313,8 @@
       return;
     }
 
-    const mainWrap = document.querySelector('.faculty-main-wrap') || document.querySelector('.admin-main-wrap') || document.getElementById('faculty-app-layout') || document.body;
+    const mount = document.getElementById('faculty-header-mount');
+    const mainWrap = mount || document.querySelector('.faculty-main-wrap') || document.querySelector('.admin-main-wrap') || document.getElementById('faculty-app-layout') || document.body;
     if (!mainWrap) return;
 
     const headerHtml = `
@@ -389,7 +390,11 @@
       </header>
     `;
 
-    mainWrap.insertAdjacentHTML('afterbegin', headerHtml);
+    if (mount) {
+      mount.innerHTML = headerHtml;
+    } else {
+      mainWrap.insertAdjacentHTML('afterbegin', headerHtml);
+    }
     syncFacultyHeader();
     setupProfileHover();
   }

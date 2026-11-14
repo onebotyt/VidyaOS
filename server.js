@@ -76,11 +76,15 @@ const STATIC_REWRITES = [
   [/^\/login\/faculty-register$/,       '/login/register/index.html?role=faculty'],
 
   // Admin
-  [/^\/admin\/?$/,                      '/admin/academic-structure/index.html'],
+  [/^\/admin\/?$/,                      '/admin/dashboard/index.html'],
   [/^\/admin\/academic_structure\.html$/, '/admin/academic-structure/index.html'],
   [/^\/admin\/audit_logs\.html$/,       '/admin/audit-logs/index.html'],
   [/^\/admin\/departments\/?$/,         '/admin/academic-structure/index.html?tab=departments'],
   [/^\/admin\/departments\.html$/,      '/admin/academic-structure/index.html?tab=departments'],
+  [/^\/admin\/faculty-management(\.html)?\/?$/, '/admin/faculty-management/index.html'],
+  [/^\/admin\/faculty(\.html)?\/?$/,            '/admin/faculty-management/index.html'],
+  [/^\/admin\/hod(-management)?(\.html)?\/?$/,  '/admin/faculty-management/index.html'],
+  [/^\/admin\/faculty\/(.+)$/,                  '/admin/faculty-management/$1'],
 
   // Faculty
   [/^\/faculty\/?$/,                    '/faculty/dashboard/index.html'],
@@ -101,7 +105,7 @@ const STATIC_REWRITES = [
   [/^\/student\/timetable\/?$/,         '/student/timetable/index.html'],
   [/^\/student\/leave\/?$/,             '/student/leave/index.html'],
   [/^\/student\/profile\/?$/,           '/student/profile/index.html'],
-  [/^\/student\/group-detail\/?$/,      '/faculty/group-detail/index.html'],
+  [/^\/student\/group-detail\/?$/,      '/student/group-detail/index.html'],
 
   // Generic section/:page pattern
   [/^\/(admin|faculty|student)\/([a-zA-Z0-9_-]+)\/?$/, '/$1/$2/index.html'],

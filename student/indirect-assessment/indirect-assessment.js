@@ -80,7 +80,7 @@
   // Lifecycle Initialization
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const user = await window.guardRoute({ roles: ['TEACHER', 'FACULTY', 'HOD', 'DEPT_HEAD', 'SYSTEM_ADMIN'] });
+      const user = await window.guardRoute({ roles: ['STUDENT', 'TEACHER', 'FACULTY', 'HOD', 'DEPT_HEAD', 'SYSTEM_ADMIN'] });
       if (!user) return;
       state.currentUser = user;
 

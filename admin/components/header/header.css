@@ -12,25 +12,103 @@
   height: 60px;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end; /* Clean, right-aligned toolbar */
-  padding: 0 1.75rem;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 1.25rem;
   box-sizing: border-box;
-  position: sticky;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  z-index: 10;
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 10001 !important;
   user-select: none;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
+/* ── Left Section: Mobile Hamburger Toggle & VidyaOS Brand ── */
+.header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  flex-shrink: 0;
+}
+
+.header-mobile-toggle-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.18s ease;
+}
+
+.header-mobile-toggle-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
+  border-color: var(--color-primary-light);
+}
+
+.header-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.header-brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-brand-logo svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.header-brand-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.header-brand-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.header-brand-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.45rem;
+  border-radius: 6px;
+  background: var(--color-primary-light, hsl(217 91% 95%));
+  color: var(--color-primary, hsl(217 91% 60%));
+}
+
 @media (max-width: 768px) {
   .admin-top-header {
-    display: none !important;
-    /* Mobile uses .mobile-top-header */
+    height: 56px !important;
+    padding: 0 0.85rem !important;
+    display: flex !important;
+  }
+
+  .header-mobile-toggle-btn {
+    display: inline-flex !important;
   }
 }
 

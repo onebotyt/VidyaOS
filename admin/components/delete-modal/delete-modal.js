@@ -35,7 +35,7 @@
       } else if (path.startsWith('/student')) {
         link.href = '/student/components/delete-modal/delete-modal.css';
       } else {
-        link.href = '/shared/css/delete-modal.css';
+        link.href = '/admin/components/delete-modal/delete-modal.css';
       }
       document.head.appendChild(link);
     }

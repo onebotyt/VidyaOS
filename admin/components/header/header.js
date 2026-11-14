@@ -26,11 +26,35 @@
       return;
     }
 
-    const mainWrap = document.querySelector('.admin-main-wrap');
-    if (!mainWrap) return;
+    const layout = document.getElementById('admin-app-layout') || document.body;
+    if (!layout) return;
+
+    // Clear old placeholder inside mainWrap if it exists so it takes zero space
+    const oldMount = document.getElementById('admin-header-mount');
+    if (oldMount) {
+      oldMount.style.display = 'none';
+      oldMount.innerHTML = '';
+    }
+
+    const cubeSvg = `<svg class="header-brand-cube" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 3.5L27.5 9.8L16 16.2L4.5 9.8L16 3.5Z" fill="var(--color-primary-light, hsl(215 90% 95%))" stroke="var(--color-primary)" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 9.8L16 16.2V28.5L4.5 22.2V9.8Z" fill="var(--color-primary, hsl(217 91% 60%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 16.2L27.5 9.8V22.2L16 28.5V16.2Z" fill="var(--color-primary-hover, hsl(224 76% 48%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 16.5V27.5" stroke="hsl(0 0% 100% / 0.4)" stroke-width="1.2" stroke-linecap="round"/><path d="M16.5 16L26.5 10.5" stroke="hsl(0 0% 100% / 0.3)" stroke-width="1.2" stroke-linecap="round"/></svg>`;
+
+    const hamburgerSvg = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
 
     const headerHtml = `
       <header class="admin-top-header" id="admin-top-header" aria-label="Admin Header Bar">
+        <div class="header-left">
+          <button type="button" class="header-mobile-toggle-btn" id="admin-mobile-nav-toggle" onclick="if(typeof toggleSidebar==='function')toggleSidebar()" aria-label="Toggle Navigation Menu">
+            ${hamburgerSvg}
+          </button>
+          <a href="/admin/dashboard/index.html" class="header-brand-link" aria-label="VidyaOS Dashboard">
+            <span class="header-brand-logo">${cubeSvg}</span>
+            <div class="header-brand-info">
+              <span class="header-brand-title">VidyaOS</span>
+              <span class="header-brand-badge">Console</span>
+            </div>
+          </a>
+        </div>
+
         <div class="header-right">
           <!-- Theme Toggle (Light / Dark) -->
           <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn" onclick="toggleDashboardTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
@@ -55,21 +79,21 @@
               </div>
             </div>
             <div class="profile-dropdown-divider"></div>
-            <a href="/admin/profile.html" class="profile-dropdown-item">
+            <a href="/admin/profile/index.html" class="profile-dropdown-item">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
               <span>My Profile</span>
             </a>
-            <a href="/admin/settings.html" class="profile-dropdown-item">
+            <a href="/admin/settings/index.html" class="profile-dropdown-item">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
               </svg>
               <span>System Settings</span>
             </a>
-            <a href="/admin/audit-logs.html" class="profile-dropdown-item">
+            <a href="/admin/audit-logs/index.html" class="profile-dropdown-item">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
@@ -79,7 +103,7 @@
               <span>Audit Trail &amp; Logs</span>
             </a>
             <div class="profile-dropdown-divider"></div>
-            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="if(typeof confirmAdminLogout==='function'){confirmAdminLogout();}else if(typeof adminLogout==='function'){adminLogout();}else if(typeof logout==='function'){logout();}">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                 <polyline points="16 17 21 12 16 7"></polyline>
@@ -92,7 +116,7 @@
       </header>
     `;
 
-    mainWrap.insertAdjacentHTML('afterbegin', headerHtml);
+    layout.insertAdjacentHTML('afterbegin', headerHtml);
     syncHeaderIdentity();
     setupProfileHover();
   }
@@ -211,11 +235,13 @@
    * 4. Theme Toggle Engine
    */
   function toggleDashboardTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('app_theme') || localStorage.getItem('theme') || 'light';
     const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nextTheme);
     try {
       localStorage.setItem('theme', nextTheme);
+      localStorage.setItem('app_theme', nextTheme);
+      localStorage.setItem('vidya_theme', nextTheme);
     } catch (_) {}
   }
 

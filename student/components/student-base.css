@@ -1,0 +1,96 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS STUDENT BASE STYLESHEET (student-base.css)
+ * Location: /frontend/student/components/student-base.css
+ * 
+ * - Theme-tokenized foundations for the Student Portal (/student/*)
+ * - Safe area support for mobile devices & app wrappers
+ * - Touch targets >= 44px
+ * - Zero hardcoded hex colors
+ * ══════════════════════════════════════════════════════════════
+ */
+
+:root {
+  --student-nav-height: 60px;
+  --student-drawer-width: 280px;
+  --student-bottom-bar-height: 64px;
+}
+
+/* Page Foundation */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+}
+
+html, body.page-layout, body.classroom-page {
+  font-family: var(--font-family-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+.container, .page-main-container {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .container, .page-main-container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .gc-class-card, .student-hero-banner {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Safe area padding for mobile notches and bottom gesture bars */
+body.classroom-page {
+  padding-top: var(--student-nav-height);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 768px) {
+  body.classroom-page {
+    padding-bottom: calc(var(--student-bottom-bar-height) + env(safe-area-inset-bottom, 12px));
+  }
+}
+
+/* Accessibility Focus Rings */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Interactive Touch Targets */
+button, a, input, select, textarea {
+  font-family: inherit;
+  touch-action: manipulation;
+}
+
+button:not(:disabled), a {
+  cursor: pointer;
+}
+
+/* Prevent iOS input auto-zoom by keeping font-size >= 16px */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

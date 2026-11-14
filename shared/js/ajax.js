@@ -31,6 +31,7 @@
 
     const config = {
       ...options,
+      credentials: options.credentials || 'include',
       headers
     };
 

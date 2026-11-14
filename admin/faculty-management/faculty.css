@@ -1,0 +1,1890 @@
+/* ══════════════════════════════════════════════════════════════
+   PAGE STYLES: HOD LEADERSHIP & GOVERNANCE
+   frontend/admin/faculty/faculty.css
+   Mobile-first responsive redesign.
+   All colors use CSS variable tokens (zero hardcoded hex).
+══════════════════════════════════════════════════════════════ */
+
+
+/* ── 1. MODAL FOUNDATION ─────────────────────────────────────── */
+.modal-backdrop[style*="display: none"] {
+  display: none !important;
+}
+.modal-backdrop.open,
+.modal-backdrop[style*="display: flex"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  padding: 1rem !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  z-index: 2500 !important;
+}
+.modal-card {
+  max-height: calc(100vh - 2.5rem);
+  max-height: calc(100dvh - 2.5rem);
+  overflow-y: auto;
+  box-sizing: border-box;
+  margin: auto;
+}
+
+
+/* ── 2. STATUS CARD 4 IN ROW (2 ROWS) & ACTION BAR ────────── */
+.fac-status-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.fac-status-grid-8 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.fac-status-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.5rem 0.25rem;
+  text-align: center;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 52px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.fac-status-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+.fac-status-card:first-child::before {
+  background: var(--color-primary);
+  opacity: 0.8;
+}
+
+.fac-status-card:nth-child(2)::before {
+  background: #f59e0b;
+  opacity: 0.8;
+}
+
+.fac-status-card:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-surface-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.fac-status-card:hover::before {
+  background: var(--color-primary);
+}
+
+.fac-status-num {
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-family-mono, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto);
+  letter-spacing: -0.02em;
+}
+
+.fac-status-lbl {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 3px;
+}
+
+.fac-status-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.fac-trash-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  border-radius: var(--radius-md, 8px);
+}
+
+.fac-trash-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--status-absent, #ef4444);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fac-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  border-radius: var(--radius-md, 8px);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── 2B. SELF-REGISTRATION GATE BAR ──────────────────────────── */
+.fac-gate-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.fac-gate-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.fac-gate-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.fac-gate-tags {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.fac-gate-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.fac-gate-tag.open {
+  background: var(--status-present-bg, rgba(16, 185, 129, 0.12));
+  color: var(--status-present, #10b981);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.fac-gate-tag.closed {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+.fac-gate-tag.hod {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.fac-gate-tag.cfm {
+  background: rgba(139, 92, 246, 0.15);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+.fac-gate-cfg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: var(--radius-sm, 6px);
+}
+
+/* ── 2C. COMPACT COMMON FACULTY STRIP ────────────────────────── */
+.fac-cfm-compact-strip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.fac-cfm-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+}
+
+
+/* ── 3. SECTION CARDS ────────────────────────────────────────── */
+.fac-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: visible;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.fac-section-card:last-child {
+  margin-bottom: 0;
+}
+
+.fac-card-head {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.fac-card-head-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.fac-card-head-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.fac-card-head-text h2 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem 0;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.fac-card-head-text p {
+  font-size: 0.79rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.fac-card-body {
+  padding: 1rem 1.25rem;
+}
+
+
+/* ── 4. REGISTRATION GATEWAY STRIP ──────────────────────────── */
+.fac-gates-strip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fac-gates-strip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.fac-gates-strip-rows {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.fac-gate-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0.22rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.fac-gate-pill-btn:hover {
+  background: var(--bg-card);
+}
+
+.fac-gate-pill-tag {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 0.72rem;
+  margin-right: 0.15rem;
+}
+
+/* Common Faculty Manager Component Styles */
+.fac-mgr-compact-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+}
+
+.fac-mgr-compact-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+.fac-mgr-appointed-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem;
+}
+
+.fac-mgr-appointed-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.fac-mgr-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-white);
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fac-mgr-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+
+.fac-mgr-name-row strong {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.fac-mgr-dept {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.fac-mgr-meta-row {
+  font-size: 0.74rem;
+  color: var(--color-primary);
+  font-family: monospace;
+  margin-top: 0.1rem;
+}
+
+.fac-mgr-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.fac-btn-danger-outline {
+  color: var(--status-absent) !important;
+  border-color: var(--status-absent) !important;
+}
+
+
+/* ── 5. BADGE UTILITIES ──────────────────────────────────────── */
+.fac-pending-badge {
+  background: var(--status-late);
+  color: var(--text-white);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fac-hod-badge {
+  background: var(--color-primary);
+  color: var(--text-white);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+
+/* ── 6. HOD TABLE (desktop ≥ 640px) ─────────────────────────── */
+.hod-desktop-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+.hod-desktop-table th,
+.hod-desktop-table td {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.hod-desktop-table th {
+  background: var(--table-th-bg);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.hod-desktop-table tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* ── 7. HOD MOBILE CARD STACK (< 640px) ─────────────────────── */
+.hod-mobile-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 0.65rem;
+}
+
+.hod-mobile-card:last-child {
+  margin-bottom: 0;
+}
+
+.hod-mobile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.45rem;
+}
+
+.hod-mobile-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.92rem;
+  flex-shrink: 0;
+}
+
+.hod-mobile-name-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.hod-mobile-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.25;
+}
+
+.hod-mobile-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+  flex-wrap: wrap;
+}
+
+.hod-dept-tag {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.hod-dept-unassigned {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.hod-empid-tag {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-family-mono, monospace);
+}
+
+.hod-mobile-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-bottom: 0.55rem;
+  gap: 0.5rem;
+}
+
+.hod-mobile-gmail {
+  font-family: var(--font-family-mono, monospace);
+  color: var(--color-primary);
+  font-size: 0.74rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hod-mobile-date {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.hod-mobile-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.35rem;
+}
+
+.hod-mobile-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  padding: 0.35rem 0.3rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fac-btn-delete {
+  color: var(--status-absent) !important;
+  border-color: var(--status-absent) !important;
+}
+
+
+/* ── 8. EMPTY STATES ─────────────────────────────────────────── */
+.fac-empty-state {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.fac-empty-state-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.fac-empty-state-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 0.2rem 0;
+}
+
+.fac-empty-state-sub {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+
+/* ── 9. RESPONSIVE BREAKPOINTS ───────────────────────────────── */
+
+/* Mobile & Desktop Table Alignment */
+.hod-mobile-cards-wrap {
+  display: none !important;
+}
+
+.hod-desktop-table {
+  width: 100% !important;
+  display: table !important;
+}
+
+/* Mobile Screens (< 769px) */
+@media (max-width: 768px) {
+  .th-gmail,
+  .td-gmail,
+  .d-desktop-only {
+    display: none !important;
+  }
+
+  .d-mobile-only {
+    display: block !important;
+  }
+
+  main.container {
+    padding-top: 0.85rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .fac-page-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .fac-page-header h1 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  /* Excising verbose subtitle paragraphs on mobile */
+  .fac-page-header-text p,
+  .fac-card-head-text p {
+    display: none !important;
+  }
+
+  .fac-create-btn {
+    width: auto;
+    padding: 0.38rem 0.75rem;
+    font-size: 0.76rem;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .fac-create-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .fac-section-card {
+    margin-bottom: 0.75rem;
+    border-radius: var(--radius-md);
+  }
+
+  .fac-card-head {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .fac-card-body {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .hod-mobile-cards-wrap {
+    padding: 0.65rem !important;
+  }
+
+  .fac-gates-strip {
+    padding: 0.35rem 0.65rem;
+    margin-bottom: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .fac-gate-pill-btn {
+    padding: 0.18rem 0.45rem;
+    font-size: 0.7rem;
+  }
+
+  /* Modal Mobile UX Optimization */
+  .modal-backdrop {
+    padding: 0.5rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow-y: auto !important;
+  }
+
+  .modal-card {
+    width: 100% !important;
+    max-width: 440px !important;
+    padding: 1rem 1.15rem !important;
+    max-height: calc(100dvh - 1.5rem) !important;
+    border-radius: var(--radius-md) !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    margin: auto !important;
+  }
+
+  #modal-sub-hod {
+    display: none !important;
+  }
+
+  .modal-card .form-group {
+    margin-bottom: 0.6rem !important;
+  }
+
+  .modal-card .form-control {
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .modal-card .form-label {
+    font-size: 0.8rem !important;
+    margin-bottom: 0.2rem !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* -------------------------------------------------------------
+   3-DOT KEBAB ACTIONS DROPDOWN (DESKTOP & MOBILE)
+   ------------------------------------------------------------- */
+#hod-table-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  min-height: 240px;
+  padding-bottom: 2.5rem;
+}
+
+.kebab-menu-container {
+  position: relative;
+  display: inline-block;
+  text-align: left;
+}
+
+.kebab-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+  padding: 0;
+  user-select: none;
+}
+
+.kebab-btn:hover,
+.kebab-btn:focus-visible,
+.kebab-menu-container.open .kebab-btn {
+  background: var(--bg-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  outline: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.kebab-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--bg-card);
+  min-width: 175px;
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  z-index: 1050;
+  display: none;
+  flex-direction: column;
+  padding: 6px 0;
+  animation: kebabFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kebab-menu-container.open .kebab-dropdown {
+  display: flex;
+}
+
+@keyframes kebabFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.kebab-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--text-main);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+  white-space: nowrap;
+}
+
+.kebab-item svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: color 0.12s ease;
+}
+
+.kebab-item:hover {
+  background: var(--bg-surface-hover);
+  color: var(--color-primary);
+}
+
+.kebab-item:hover svg {
+  color: var(--color-primary);
+}
+
+.kebab-item.danger {
+  color: var(--status-absent);
+}
+
+.kebab-item.danger svg {
+  color: var(--status-absent);
+}
+
+.kebab-item.danger:hover {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+.kebab-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ALL REGISTERED FACULTY DIRECTORY & MANAGEMENT STYLES
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── KPI Stats Strip ── */
+.fac-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+.fac-kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  padding: 0.85rem 1rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.fac-kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fac-kpi-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+.fac-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ── Primary View Navigation Tabs (Pills) ── */
+.fac-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.65rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.fac-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid transparent;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.fac-tab-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-main);
+}
+.fac-tab-btn.active {
+  background: var(--color-primary);
+  color: var(--text-white, #ffffff);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+.fac-tab-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+}
+.fac-tab-btn.active .fac-tab-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* ── Faculty Filter & Search Toolbar ── */
+.fac-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+.fac-filter-top-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.fac-search-box {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+}
+.fac-search-box input {
+  width: 100%;
+  padding: 0.55rem 0.85rem 0.55rem 2.2rem;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border-color);
+  background: var(--bg-input, var(--bg-main));
+  color: var(--text-main);
+  font-size: 0.85rem;
+  box-sizing: border-box;
+}
+.fac-search-box svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.fac-filter-select {
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.fac-chips-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.fac-filter-chip {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.fac-filter-chip:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-main);
+}
+.fac-filter-chip.active {
+  background: var(--color-primary-light, rgba(59, 130, 246, 0.15));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ── Faculty Table Rows & Elements ── */
+.fac-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.85rem;
+}
+.fac-table th {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+.fac-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+.fac-table tbody tr {
+  transition: background 0.15s ease;
+}
+.fac-table tbody tr:hover {
+  background: var(--bg-surface-hover, rgba(0, 0, 0, 0.02));
+}
+.fac-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.fac-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--radius-lg, 12px);
+}
+.fac-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--radius-lg, 12px);
+}
+
+.fac-table-wrap {
+  position: relative;
+  overflow: visible;
+  width: 100%;
+}
+
+.fac-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.fac-avatar,
+.fac-avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary-light, rgba(59, 130, 246, 0.15));
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fac-user-name {
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+.fac-user-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-family-mono, monospace);
+  margin-top: 0.1rem;
+}
+
+.fac-dept-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.fac-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.fac-role-hod {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.fac-role-cfm {
+  background: rgba(139, 92, 246, 0.15);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+.fac-role-teacher {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.fac-status-pill,
+.fac-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+.fac-status-pill.active,
+.fac-status-active {
+  background: var(--status-present-bg, rgba(16, 185, 129, 0.12));
+  color: var(--status-present, #10b981);
+}
+.fac-status-pill.inactive,
+.fac-status-inactive {
+  background: var(--status-absent-bg, rgba(239, 68, 68, 0.12));
+  color: var(--status-absent, #ef4444);
+}
+.fac-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.fac-action-btns {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.fac-act-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.fac-act-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.fac-act-btn.danger:hover {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+  border-color: var(--status-absent);
+}
+
+/* ── Faculty Mobile Minimal Cards Stack ── */
+#faculty-mobile-cards-wrap,
+.fac-mini-cards-stack {
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 0.75rem 7rem 0.75rem;
+}
+
+.fac-mini-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.65rem 0.85rem;
+  gap: 0.65rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+}
+.fac-mini-card:hover {
+  background: var(--bg-surface-hover, rgba(0, 0, 0, 0.02));
+  border-color: var(--border-color-focus, var(--color-primary));
+}
+
+.fac-mini-main {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.fac-mini-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-primary-light, rgba(59, 130, 246, 0.15));
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fac-mini-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.fac-mini-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.fac-mini-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.25;
+}
+
+.fac-mini-badge {
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.fac-mini-badge.hod {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.fac-mini-badge.cfm {
+  background: rgba(139, 92, 246, 0.15);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+.fac-mini-badge.suspended {
+  background: var(--status-absent-bg, rgba(239, 68, 68, 0.12));
+  color: var(--status-absent, #ef4444);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.fac-mini-subtext {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fac-dept-code {
+  font-weight: 700;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.fac-sub-dot {
+  color: var(--border-color);
+  flex-shrink: 0;
+}
+
+.fac-email-sub {
+  color: var(--text-muted);
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.74rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── 3-Dot Kebab Menu ── */
+.fac-kebab-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.fac-kebab-wrap.menu-open,
+.fac-kebab-wrap:has(.fac-kebab-menu.open) {
+  z-index: 1250;
+  position: relative;
+}
+tr.row-kebab-open,
+tr:has(.fac-kebab-menu.open) {
+  position: relative;
+  z-index: 1240;
+}
+.fac-mini-card.menu-open,
+.fac-mini-card:has(.fac-kebab-menu.open) {
+  position: relative;
+  z-index: 1240;
+}
+
+.fac-kebab-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.fac-kebab-btn:hover,
+.fac-kebab-btn:focus {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+.fac-kebab-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  min-width: 195px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  z-index: 1250;
+  padding: 0.35rem;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.fac-kebab-menu.show,
+.fac-kebab-menu.open {
+  display: flex;
+}
+.fac-kebab-menu.dropup {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 6px;
+  box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.25);
+}
+
+
+.fac-kebab-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.fac-kebab-item svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+.fac-kebab-item:hover {
+  background: var(--bg-surface);
+  color: var(--color-primary);
+}
+.fac-kebab-item:hover svg {
+  color: var(--color-primary);
+}
+.fac-kebab-item.warning:hover {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+.fac-kebab-item.warning:hover svg {
+  color: #d97706;
+}
+.fac-kebab-item.danger {
+  color: var(--status-absent);
+}
+.fac-kebab-item.danger svg {
+  color: var(--status-absent);
+}
+.fac-kebab-item.danger:hover {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+.fac-kebab-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.25rem 0;
+}
+
+/* ── Trash List Items ── */
+.trash-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.65rem 0.85rem;
+}
+.trash-item-main {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+}
+.trash-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.trash-item-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trash-item-sub {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+.trash-countdown-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--status-absent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Responsive Switching at <= 768px ── */
+@media (max-width: 768px) {
+  #faculty-table-wrap {
+    display: none !important;
+  }
+  #faculty-mobile-cards-wrap,
+  .fac-mini-cards-stack {
+    display: flex !important;
+  }
+  .fac-status-section {
+    padding: 0.6rem;
+  }
+  .fac-status-grid-8 {
+    gap: 0.35rem;
+  }
+  .fac-status-card {
+    padding: 0.35rem 0.15rem;
+    min-height: 44px;
+  }
+  .fac-status-num {
+    font-size: 1.05rem;
+  }
+  .fac-status-lbl {
+    font-size: 0.62rem;
+  }
+  .fac-status-actions-bar {
+    gap: 0.35rem;
+  }
+}
+
+/* ── Compact Open Registration Modal ── */
+.fac-reg-modal-compact {
+  max-width: 440px !important;
+  padding: 1rem 1.15rem !important;
+  border-radius: var(--radius-md, 10px) !important;
+  box-sizing: border-box;
+}
+
+.fac-modal-header-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.fac-modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-primary);
+}
+
+.fac-modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.fac-modal-close-btn {
+  font-size: 1.35rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+  line-height: 1;
+  border-radius: 4px;
+}
+.fac-modal-close-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-surface-hover);
+}
+
+.fac-gate-switch-box {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.fac-gate-switch-box:hover {
+  border-color: var(--color-primary);
+}
+.fac-gate-switch-box.master {
+  margin-bottom: 0.75rem;
+}
+.fac-gate-switch-box input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.fac-gate-switch-text {
+  display: flex;
+  flex-direction: column;
+}
+.fac-gate-switch-text strong {
+  font-size: 0.86rem;
+  color: var(--text-main);
+}
+.fac-gate-switch-text small {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.fac-gate-dept-section {
+  margin-bottom: 0.75rem;
+}
+
+.fac-gate-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.fac-gate-dept-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+}
+
+.fac-gate-dept-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.45rem 0.35rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.fac-gate-dept-pill:hover {
+  border-color: var(--color-primary);
+}
+.fac-gate-dept-pill.active {
+  background: var(--color-primary-light, rgba(59, 130, 246, 0.12));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.fac-gate-dept-pill input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.fac-gate-roles-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+.fac-gate-switch-box.role {
+  padding: 0.45rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.fac-gate-error {
+  background: var(--status-absent-bg, rgba(239, 68, 68, 0.12));
+  border: 1px solid var(--status-absent, #ef4444);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.45rem 0.65rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.78rem;
+  color: var(--status-absent, #ef4444);
+}
+
+.fac-modal-actions-compact {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.85rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ── Monospace Employee ID Chip ── */
+.fac-empid-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  padding: 0.18rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  letter-spacing: 0.02em;
+}
+
+.fac-empid-sub {
+  color: var(--text-muted);
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.74rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Inactive Faculty Light Red Shade ── */
+.fac-row-inactive {
+  background: rgba(239, 68, 68, 0.04) !important;
+}
+.fac-row-inactive:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+.fac-row-inactive td {
+  border-bottom-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+.fac-card-inactive {
+  background: rgba(239, 68, 68, 0.04) !important;
+  border-color: rgba(239, 68, 68, 0.28) !important;
+}
+.fac-card-inactive:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+}
+
+/* ── Custom Styled Dialog Modal ── */
+.fac-custom-dialog-card {
+  max-width: 420px;
+  width: 90%;
+  margin: auto;
+  text-align: center;
+  padding: 1.5rem 1.35rem 1.25rem 1.35rem;
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  animation: facModalPop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fac-dialog-icon-wrap {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 0.85rem auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fac-dialog-icon-wrap.danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--status-absent, #ef4444);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.fac-dialog-icon-wrap.warning {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+.fac-dialog-icon-wrap.info {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.fac-dialog-title {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.fac-dialog-message {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+  word-break: break-word;
+}
+
+.fac-dialog-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+.fac-dialog-actions button {
+  min-width: 95px;
+}
+
+
+

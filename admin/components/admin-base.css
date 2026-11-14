@@ -11,6 +11,12 @@
  */
 
 /* ── 1. Page Main Container ── */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+}
+
 .container {
   max-width: 1440px;
   margin: 0 auto;

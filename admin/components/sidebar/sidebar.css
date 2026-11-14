@@ -28,14 +28,14 @@
 #app-sidebar.admin-sidebar,
 .admin-sidebar {
   position: fixed !important;
-  top: 0 !important;
+  top: 60px !important;
   left: 0 !important;
   bottom: 0 !important;
-  height: 100dvh !important;
+  height: calc(100dvh - 60px) !important;
   background: var(--bg-card) !important;
   border-right: 1px solid var(--border-color) !important;
   z-index: 10000 !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
   box-sizing: border-box !important;
@@ -55,7 +55,7 @@
     margin-left: 72px !important;
     width: calc(100% - 72px) !important;
     max-width: calc(100% - 72px) !important;
-    min-height: 100vh !important;
+    min-height: calc(100dvh - 60px) !important;
     box-sizing: border-box !important;
     transition: none !important;
     position: relative;
@@ -78,30 +78,18 @@
     transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
   }
 
-  /* When collapsed (default): show rail header & rail footer */
-  .admin-sidebar:not(.desktop-open) .sidebar-rail-header,
-  .admin-app-layout.sidebar-collapsed .sidebar-rail-header,
-  html.sidebar-collapsed .sidebar-rail-header {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
+  /* In PC mode, top header shows the logo and brand; rail header is hidden */
+  .sidebar-rail-header {
+    display: none !important;
   }
 
-  .admin-sidebar:not(.desktop-open) .sidebar-rail-footer,
-  .admin-app-layout.sidebar-collapsed .sidebar-rail-footer,
-  html.sidebar-collapsed .sidebar-rail-footer {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
+  /* Redundant sidebar headers (e.g. Navigation text) are hidden across all views */
+  .sidebar-expanded-header {
+    display: none !important;
   }
 
-  /* When collapsed (default): hide expanded headers & footers */
-  .admin-sidebar:not(.desktop-open) .sidebar-expanded-header,
-  .admin-sidebar:not(.desktop-open) .sidebar-expanded-footer,
-  .admin-app-layout.sidebar-collapsed .sidebar-expanded-header,
-  .admin-app-layout.sidebar-collapsed .sidebar-expanded-footer,
-  html.sidebar-collapsed .sidebar-expanded-header,
-  html.sidebar-collapsed .sidebar-expanded-footer {
+  /* Obsolete duplicate rail footer hidden in favor of unified footer */
+  .sidebar-rail-footer {
     display: none !important;
   }
 
@@ -205,37 +193,16 @@
     stroke: var(--text-white, hsl(0 0% 100%)) !important;
   }
 
-  /* Unified Navigation Body (0-shift geometry) */
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-body,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-body,
-  html.sidebar-collapsed .sidebar-nav-body {
-    padding: 0.65rem 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    overflow: visible !important;
-  }
-
-  .admin-sidebar.desktop-open .sidebar-nav-body {
-    padding: 0.5rem 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-  }
-
-  /* Unified Navigation Body (Zero scrollbar invariant) */
+  /* Unified Navigation Body (Scrollable navigation links only) */
   .admin-sidebar .sidebar-nav-body,
   .sidebar-nav-body {
-    padding: 0.5rem 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    padding: 0.75rem 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.35rem !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
+    flex: 1 1 auto !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
   }
@@ -247,148 +214,89 @@
     height: 0 !important;
   }
 
-  /* Universal Navigation Item */
+  /* Universal Navigation Item (Always row geometry: zero layout shift on open/close) */
   .sidebar-nav-item {
-    box-sizing: border-box;
-    display: flex;
-    position: relative;
-    color: var(--text-muted);
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.16s ease;
-  }
-
-  /* In collapsed rail: items are 56px wide, stacked vertically with icon on top and short label below */
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-item,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-item,
-  html.sidebar-collapsed .sidebar-nav-item {
-    width: 56px !important;
-    height: 52px !important;
-    min-height: 52px !important;
-    margin: 0.15rem auto !important;
-    flex-direction: column !important;
-    justify-content: center !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
-    padding: 4px 2px !important;
+    height: 44px !important;
+    min-height: 44px !important;
     border-radius: 12px !important;
     border: 1px solid var(--border-color) !important;
     background: var(--bg-surface) !important;
     box-shadow: 0 2px 4px hsl(0 0% 0% / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.7) !important;
-    gap: 2px !important;
-    overflow: visible !important;
     color: var(--text-muted) !important;
-    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), margin 0.24s cubic-bezier(0.16, 1, 0.3, 1), padding 0.24s cubic-bezier(0.16, 1, 0.3, 1), background 0.16s ease, color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease !important;
   }
 
-  /* In collapsed rail: 24x24 Icon container */
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-icon,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-icon,
-  html.sidebar-collapsed .sidebar-nav-icon {
+  /* 1. Desktop Collapsed State (72px Rail): 48px square pills centered precisely */
+  .admin-sidebar:not(.desktop-open) .sidebar-nav-item {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    margin: 0.15rem auto !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-nav-icon {
     width: 24px !important;
     height: 24px !important;
     min-width: 24px !important;
-    max-width: 24px !important;
-    min-height: 24px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
     margin: 0 !important;
-    padding: 0 !important;
   }
 
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-icon svg,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-icon svg,
-  html.sidebar-collapsed .sidebar-nav-icon svg {
+  .admin-sidebar:not(.desktop-open) .sidebar-nav-icon svg {
     width: 20px !important;
     height: 20px !important;
     stroke: currentColor !important;
     display: block !important;
   }
 
-  /* Short name shown below icon in small collapsed navbar */
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-short-label,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-short-label,
-  html.sidebar-collapsed .sidebar-nav-short-label {
-    display: block !important;
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
-    letter-spacing: -0.01em !important;
-    text-align: center !important;
-    line-height: 1 !important;
-    color: inherit !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 52px !important;
-    margin-top: 1px !important;
-    pointer-events: none !important;
-  }
-
-  /* Full label hidden in collapsed rail */
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-label,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-label,
-  html.sidebar-collapsed .sidebar-nav-label {
+  .admin-sidebar:not(.desktop-open) .sidebar-nav-short-label {
     display: none !important;
   }
 
-  /* Hover state on collapsed rail */
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-item:hover:not(.active),
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-item:hover:not(.active),
-  html.sidebar-collapsed .sidebar-nav-item:hover:not(.active) {
-    background: var(--bg-surface-hover, var(--bg-surface)) !important;
-    border-color: var(--color-primary-light) !important;
-    color: var(--color-primary) !important;
-    transform: translateY(-2px) scale(1.04) !important;
-    box-shadow: 0 4px 10px hsl(217 91% 60% / 0.16) !important;
+  .admin-sidebar:not(.desktop-open) .sidebar-nav-label {
+    opacity: 0 !important;
+    max-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.12s ease, max-width 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
-  /* Active squircle pill on collapsed rail - 3D Raised Squircle with Vibrant Gradient */
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-item.active,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-item.active,
-  html.sidebar-collapsed .sidebar-nav-item.active {
-    background: linear-gradient(145deg, hsl(217 91% 62%), hsl(224 76% 48%)) !important;
-    border: 1px solid hsl(217 91% 54%) !important;
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.42), inset 0 1px 1px hsl(0 0% 100% / 0.5), inset 0 -2px 3px hsl(224 76% 36% / 0.45) !important;
-  }
-
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-icon svg,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-item.active .sidebar-nav-icon svg {
-    stroke: var(--text-white, hsl(0 0% 100%)) !important;
-    filter: drop-shadow(0 1px 2px hsl(224 76% 30% / 0.45));
-  }
-
-  .admin-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-short-label,
-  .admin-app-layout.sidebar-collapsed .sidebar-nav-item.active .sidebar-nav-short-label {
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-  }
-
-  /* In expanded drawer: width is 234px */
+  /* 2. Desktop Expanded State (260px Overlay Drawer): 234px wide row with label */
   .admin-sidebar.desktop-open .sidebar-nav-item {
     width: 234px !important;
-    height: 46px !important;
-    margin: 0.2rem 13px !important;
-    flex-direction: row !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
+    min-width: 234px !important;
+    max-width: 234px !important;
+    margin: 0.15rem 13px !important;
     padding: 0 0.85rem !important;
+    justify-content: flex-start !important;
     gap: 0.75rem !important;
-    border-radius: 12px !important;
-    background: var(--bg-surface) !important;
-    border: 1px solid var(--border-color) !important;
-    box-shadow: 0 2px 4px hsl(0 0% 0% / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.7) !important;
-    color: var(--text-muted) !important;
-    overflow: hidden !important;
   }
 
   .admin-sidebar.desktop-open .sidebar-nav-icon {
     width: 24px !important;
     height: 24px !important;
-    display: inline-flex !important;
+    min-width: 24px !important;
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
+    margin: 0 !important;
   }
 
   .admin-sidebar.desktop-open .sidebar-nav-icon svg {
@@ -405,111 +313,213 @@
   .admin-sidebar.desktop-open .sidebar-nav-label {
     display: block !important;
     opacity: 1 !important;
-    visibility: visible !important;
-    font-size: 0.88rem !important;
-    font-weight: 600 !important;
+    max-width: 170px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     white-space: nowrap !important;
     color: inherit !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
     pointer-events: auto !important;
+    transition: opacity 0.2s ease 0.05s, max-width 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
 
-  .admin-sidebar.desktop-open .sidebar-nav-item:hover:not(.active) {
+  /* Hover & Active States */
+  .admin-sidebar .sidebar-nav-item:hover:not(.active) {
     background: var(--bg-surface-hover, var(--bg-surface)) !important;
     border-color: var(--color-primary-light) !important;
     color: var(--color-primary) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px hsl(217 91% 60% / 0.16) !important;
   }
 
-  .admin-sidebar.desktop-open .sidebar-nav-item.active {
+  .admin-sidebar .sidebar-nav-item.active {
     background: linear-gradient(145deg, hsl(217 91% 62%), hsl(224 76% 48%)) !important;
     border: 1px solid hsl(217 91% 54%) !important;
     color: var(--text-white, hsl(0 0% 100%)) !important;
-    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.42) !important;
+    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.42), inset 0 1px 1px hsl(0 0% 100% / 0.5), inset 0 -2px 3px hsl(224 76% 36% / 0.45) !important;
   }
 
-  .admin-sidebar.desktop-open .sidebar-nav-item.active .sidebar-nav-icon svg {
+  .admin-sidebar .sidebar-nav-item.active .sidebar-nav-icon svg {
     stroke: var(--text-white, hsl(0 0% 100%)) !important;
+    filter: drop-shadow(0 1px 2px hsl(224 76% 30% / 0.45));
   }
 
-  /* Collapsed Rail Footer */
-  .sidebar-rail-footer {
-    padding: 0.5rem 0 0.65rem;
+  .admin-sidebar .sidebar-nav-item.active .sidebar-nav-label {
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+  }
+
+  /* Smooth chevron rotation on rail toggle item */
+  .admin-sidebar .sidebar-toggle-icon svg {
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .admin-sidebar.desktop-open .sidebar-toggle-icon svg {
+    transform: rotate(180deg) !important;
+  }
+
+  /* 3. Unified Sidebar Footer (.sidebar-expanded-footer): Smooth transition between 72px & 260px */
+  .sidebar-expanded-footer {
     display: flex !important;
     flex-direction: column !important;
+    border-top: 1px solid var(--border-color) !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    margin-top: auto !important;
+    background: var(--bg-card) !important;
+    transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), padding 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-expanded-footer {
+    width: 72px !important;
+    padding: 0.5rem 0 0.65rem !important;
     align-items: center !important;
-    gap: 0.35rem;
-    border-top: 1px solid var(--border-color);
-    flex-shrink: 0;
-    margin-top: auto;
+    gap: 0.35rem !important;
   }
 
-  .rail-footer-btn {
-    width: 56px !important;
+  .admin-sidebar.desktop-open .sidebar-expanded-footer {
+    width: 260px !important;
+    padding: 0.65rem 13px 0.85rem !important;
+    align-items: stretch !important;
+    gap: 0.45rem !important;
+  }
+
+  /* User Card inside footer */
+  .sidebar-user-card {
+    display: flex !important;
+    align-items: center !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--bg-surface) !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), padding 0.24s cubic-bezier(0.16, 1, 0.3, 1), background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-user-card {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 44px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+
+  .admin-sidebar.desktop-open .sidebar-user-card {
+    width: 234px !important;
+    min-width: 234px !important;
+    max-width: 234px !important;
     height: 48px !important;
-    border-radius: 12px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
+    margin: 0 !important;
+    padding: 0.45rem 0.65rem !important;
+    justify-content: flex-start !important;
+    gap: 0.65rem !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .admin-sidebar.desktop-open .sidebar-user-avatar {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-user-meta {
+    display: none !important;
+    opacity: 0 !important;
+    max-width: 0 !important;
+  }
+
+  .admin-sidebar.desktop-open .sidebar-user-meta {
     display: flex !important;
     flex-direction: column !important;
+    opacity: 1 !important;
+    max-width: 155px !important;
+    overflow: hidden !important;
+    line-height: 1.25 !important;
+    transition: opacity 0.2s ease 0.05s !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-user-arrow {
+    display: none !important;
+  }
+
+  .admin-sidebar.desktop-open .sidebar-user-arrow {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-left: auto !important;
+    color: var(--text-muted) !important;
+  }
+
+  /* Sign Out Button inside footer */
+  .sidebar-signout-card-btn {
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.16s ease;
-    gap: 2px !important;
-    padding: 2px !important;
-    box-shadow: none !important;
-  }
-
-  .rail-footer-btn:hover {
-    background: var(--bg-surface);
-    color: var(--color-primary);
-  }
-
-  .rail-user-circle {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    color: var(--text-white, hsl(0 0% 100%));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.65rem;
-    font-weight: 700;
-    position: relative;
-  }
-
-  .rail-user-circle::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    right: -1px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--status-present, hsl(142 71% 45%));
-    border: 1.5px solid var(--bg-card);
-  }
-
-  .rail-footer-btn .sidebar-nav-short-label {
-    display: block !important;
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
-    line-height: 1 !important;
-    color: inherit !important;
-  }
-
-  .rail-signout-btn {
+    box-sizing: border-box !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--status-absent-bg, hsl(0 84% 92%)) !important;
+    background: var(--status-absent-bg, hsl(0 84% 95%)) !important;
     color: var(--status-absent, hsl(0 84% 60%)) !important;
+    font-size: 0.84rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), padding 0.24s cubic-bezier(0.16, 1, 0.3, 1), background 0.16s ease, color 0.16s ease !important;
   }
 
-  .rail-signout-btn .sidebar-nav-short-label {
-    color: var(--status-absent, hsl(0 84% 60%)) !important;
+  .admin-sidebar:not(.desktop-open) .sidebar-signout-card-btn {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 38px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    gap: 0 !important;
   }
 
-  .rail-signout-btn:hover {
-    background: var(--status-absent-bg, hsl(0 80% 95%)) !important;
+  .admin-sidebar.desktop-open .sidebar-signout-card-btn {
+    width: 234px !important;
+    min-width: 234px !important;
+    max-width: 234px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    padding: 0.55rem 0.85rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-signout-card-btn span {
+    display: none !important;
+  }
+
+  .admin-sidebar.desktop-open .sidebar-signout-card-btn span {
+    display: inline !important;
+    opacity: 1 !important;
+    transition: opacity 0.2s ease 0.05s !important;
+  }
+
+  .admin-sidebar .sidebar-signout-card-btn svg {
+    stroke: var(--status-absent, hsl(0 84% 60%)) !important;
+    width: 18px !important;
+    height: 18px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-rail-footer,
+  .admin-sidebar.desktop-open .sidebar-rail-footer,
+  .sidebar-rail-footer {
+    display: none !important;
   }
 
   /* ─────────────────────────────────────────────────────────────
@@ -633,69 +643,10 @@
 }
 
 .admin-sidebar.desktop-open .sidebar-rail-header,
-.admin-sidebar.desktop-open .sidebar-rail-footer {
-  display: none !important;
-}
-
+.admin-sidebar.desktop-open .sidebar-rail-footer,
 .admin-sidebar.desktop-open .sidebar-expanded-header,
-.admin-sidebar.desktop-open .sidebar-expanded-footer {
-  display: flex !important;
-}
-
-/* Expanded Flyout Header */
-.sidebar-expanded-header {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.15rem;
-  box-sizing: border-box;
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.sidebar-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.sidebar-header-cube-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sidebar-header-title {
-  font-size: 0.96rem;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.01em;
-}
-
-/* Desktop circular collapse button (Chevron Left <) */
-.sidebar-desktop-collapse-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--bg-surface);
-  color: var(--color-primary);
-  border: 1px solid var(--border-color);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  padding: 0;
-  box-shadow: 0 2px 5px hsl(0 0% 0% / 0.06), inset 0 1px 0 hsl(0 0% 100% / 0.8);
-}
-
-.sidebar-desktop-collapse-btn:hover {
-  background: var(--color-primary-light);
-  color: var(--color-primary-hover);
-  transform: scale(1.08);
-}
-
+.sidebar-expanded-header,
+.sidebar-desktop-collapse-btn,
 .sidebar-mobile-close-btn {
   display: none !important;
 }
@@ -704,93 +655,136 @@
 body:not(.sidebar-collapsed) .sidebar-nav-body,
 .admin-app-layout:not(.sidebar-collapsed) .sidebar-nav-body,
 html:not(.sidebar-collapsed) .sidebar-nav-body {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
 }
 
-/* Expanded Footer: Polished User Card & Tactile Sign Out Button */
-.sidebar-expanded-footer {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  box-sizing: border-box;
-  flex-shrink: 0;
-  border-top: 1px solid var(--border-color);
-  background: var(--bg-card);
+.sidebar-user-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  padding: 0.6rem 0.75rem !important;
+  border-radius: 12px !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  cursor: pointer !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
 }
 
-.sidebar-user-card {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.55rem 0.65rem;
-  border-radius: 10px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
+.sidebar-user-card:hover {
+  background: var(--bg-surface-hover, var(--bg-surface)) !important;
+  border-color: var(--color-primary-light) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px hsl(217 91% 60% / 0.15) !important;
 }
 
 .sidebar-user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  color: var(--text-white, hsl(0 0% 100%));
-  font-size: 0.78rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
+  color: var(--text-white, hsl(0 0% 100%)) !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 2px 6px hsl(217 91% 60% / 0.25) !important;
+}
+
+.sidebar-user-avatar .avatar-online-dot {
+  position: absolute !important;
+  bottom: 0px !important;
+  right: 0px !important;
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 50% !important;
+  background: var(--status-present, #10b981) !important;
+  border: 2px solid var(--bg-card) !important;
 }
 
 .sidebar-user-meta {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-  min-width: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  line-height: 1.25 !important;
+  min-width: 0 !important;
+  flex: 1 !important;
 }
 
 .sidebar-user-name {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-main);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .sidebar-user-sub {
-  font-size: 0.68rem;
-  color: var(--text-muted);
+  font-size: 0.72rem !important;
+  font-weight: 500 !important;
+  color: var(--text-muted) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin-top: 2px !important;
+}
+
+.sidebar-user-arrow {
+  color: var(--text-muted) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  transition: transform 0.16s ease, color 0.16s ease !important;
+}
+
+.sidebar-user-card:hover .sidebar-user-arrow {
+  color: var(--color-primary) !important;
+  transform: translateX(2px) !important;
 }
 
 .sidebar-signout-card-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-surface);
-  color: var(--status-absent);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.18s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  padding: 0.65rem 0.85rem !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--status-absent-bg, hsl(0 84% 92%)) !important;
+  background: var(--status-absent-bg, hsl(0 84% 95%)) !important;
+  color: var(--status-absent, hsl(0 84% 60%)) !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  box-sizing: border-box !important;
+  margin-top: 0.25rem !important;
 }
 
 .sidebar-signout-card-btn svg {
-  stroke: var(--status-absent);
+  stroke: var(--status-absent, hsl(0 84% 60%)) !important;
 }
 
 .sidebar-signout-card-btn:hover {
-  background: var(--status-absent-bg);
-  border-color: var(--status-absent);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px hsl(0 84% 60% / 0.15);
+  background: var(--status-absent, hsl(0 84% 60%)) !important;
+  color: hsl(0 0% 100%) !important;
+  border-color: var(--status-absent, hsl(0 84% 60%)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px hsl(0 84% 60% / 0.22) !important;
+}
+
+.sidebar-signout-card-btn:hover svg {
+  stroke: hsl(0 0% 100%) !important;
 }
 
 /* Desktop Flyout Backdrop Overlay */
@@ -798,12 +792,18 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: hsl(0 0% 0% / 0.28);
-  backdrop-filter: blur(2px);
-  transition: opacity 0.22s ease;
+  position: fixed !important;
+  top: 60px !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  height: calc(100dvh - 60px) !important;
+  width: 100vw !important;
+  z-index: 9999 !important;
+  background: hsl(0 0% 0% / 0.28) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+  transition: opacity 0.22s ease !important;
 }
 
 .admin-sidebar.desktop-open ~ #sidebar-backdrop,
@@ -1021,18 +1021,18 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     border: 2px solid var(--bg-card);
   }
 
-  /* Mobile Drawer Sidebar (50% Width per user specification) */
+  /* Mobile Drawer Sidebar (60% Width; Starts strictly AFTER the 56px top header) */
   #vidya-admin-sidebar,
   #app-sidebar.admin-sidebar,
   .admin-sidebar {
     position: fixed !important;
-    top: 0 !important;
+    top: 56px !important;
     bottom: 0 !important;
     left: 0 !important;
-    height: 100dvh !important;
-    width: 50% !important;
+    height: calc(100dvh - 56px) !important;
+    width: 60% !important;
     min-width: 0 !important;
-    max-width: 50% !important;
+    max-width: 60% !important;
     transform: translateX(-100%) !important;
     box-shadow: var(--shadow-xl) !important;
     z-index: 10000 !important;
@@ -1052,14 +1052,17 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     transform: translateX(0) !important;
   }
 
-  /* Full-bleed Backdrop Overlay covering the other 50% screen */
+  /* Full-bleed Backdrop Overlay covering remainder of screen under top header */
   #sidebar-backdrop,
   .sidebar-backdrop,
   .gc-drawer-backdrop {
     position: fixed !important;
-    inset: 0 !important;
+    top: 56px !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100vw !important;
-    height: 100dvh !important;
+    height: calc(100dvh - 56px) !important;
     z-index: 9999 !important;
     background: hsl(0 0% 0% / 0.42) !important;
     backdrop-filter: blur(2px) !important;
@@ -1094,92 +1097,63 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     min-height: calc(100vh - 56px);
   }
 
-  /* Hide desktop rail elements on mobile */
+  /* Hide rail elements, redundant 'Navigation' drawer headers, and old mobile topbar */
   .sidebar-rail-header,
-  .sidebar-rail-footer {
+  .sidebar-rail-footer,
+  .sidebar-expanded-header,
+  .mobile-top-header {
     display: none !important;
   }
 
-  .sidebar-expanded-header {
-    height: 56px;
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 0.65rem;
-    border-bottom: 1px solid var(--border-color);
-    box-sizing: border-box;
-    flex-shrink: 0;
-  }
-
-  .sidebar-header-left {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-width: 0;
-  }
-
-  .sidebar-header-cube-icon svg {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-  }
-
-  .sidebar-header-title {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--text-main);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .sidebar-desktop-collapse-btn {
-    display: none !important;
-  }
-
+  .sidebar-desktop-collapse-btn,
   .sidebar-mobile-close-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-surface);
-    color: var(--text-main);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
+    display: none !important;
   }
 
   .sidebar-nav-body {
-    flex: 1;
+    flex: 1 1 auto;
     overflow-y: auto;
-    padding: 0.45rem 0.3rem;
+    padding: 0.85rem 0.75rem;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.45rem;
+    -webkit-overflow-scrolling: touch;
   }
 
   .sidebar-nav-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 0.55rem;
-    color: var(--text-main);
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 500;
-    border-radius: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 0.85rem !important;
+    min-height: 44px !important;
+    color: var(--text-main) !important;
+    text-decoration: none !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    border-radius: 10px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transition: all 0.16s ease !important;
+  }
+
+  .sidebar-nav-item:hover:not(.active) {
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
+    color: var(--color-primary) !important;
   }
 
   .sidebar-nav-item.active {
-    background: linear-gradient(145deg, hsl(217 91% 62%), hsl(224 76% 48%));
-    color: var(--text-white, hsl(0 0% 100%));
-    font-weight: 600;
+    background: linear-gradient(145deg, hsl(217 91% 62%), hsl(224 76% 48%)) !important;
+    border: 1px solid hsl(217 91% 54%) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.35) !important;
   }
 
   .sidebar-nav-item.active .sidebar-nav-icon svg {
@@ -1194,8 +1168,8 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   }
 
   .sidebar-nav-icon svg {
-    width: 17px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
   }
 
   .sidebar-nav-label {
@@ -1203,72 +1177,152 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 0.8rem;
+    font-size: 0.88rem;
+    font-weight: 600;
   }
 
+  /* Rail toggle button is for desktop only; hidden on mobile */
+  .sidebar-rail-toggle-item {
+    display: none !important;
+  }
+
+  /* Mobile Expanded Footer */
   .sidebar-expanded-footer {
-    padding: 0.65rem 0.5rem;
+    padding: 0.75rem 0.65rem;
     display: flex !important;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.45rem;
     border-top: 1px solid var(--border-color);
     flex-shrink: 0;
     box-sizing: border-box;
+    background: var(--bg-card);
   }
 
   .sidebar-user-card {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    min-width: 0;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    padding: 0.55rem 0.65rem !important;
+    border-radius: 12px !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    transition: all 0.16s ease !important;
+  }
+
+  .sidebar-user-card:hover {
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
+    border-color: var(--color-primary-light) !important;
+    transform: translateY(-1px) !important;
   }
 
   .sidebar-user-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    color: var(--text-white, hsl(0 0% 100%));
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.72rem;
-    font-weight: 700;
-    flex-shrink: 0;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    font-size: 0.82rem !important;
+    font-weight: 800 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 2px 6px hsl(217 91% 60% / 0.25) !important;
+  }
+
+  .sidebar-user-avatar .avatar-online-dot {
+    position: absolute !important;
+    bottom: 0px !important;
+    right: 0px !important;
+    width: 9px !important;
+    height: 9px !important;
+    border-radius: 50% !important;
+    background: var(--status-present, #10b981) !important;
+    border: 2px solid var(--bg-card) !important;
   }
 
   .sidebar-user-meta {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    line-height: 1.2;
+    display: flex !important;
+    flex-direction: column !important;
+    line-height: 1.25 !important;
+    min-width: 0 !important;
+    flex: 1 !important;
   }
 
   .sidebar-user-name {
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: var(--text-main);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
-  .sidebar-brand-credit {
-    font-size: 0.68rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .sidebar-user-sub {
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-top: 2px !important;
   }
 
-  .sidebar-signout-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    text-align: left;
-    padding: 0;
-    cursor: pointer;
+  .sidebar-user-arrow {
+    color: var(--text-muted) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.16s ease, color 0.16s ease !important;
+  }
+
+  .sidebar-user-card:hover .sidebar-user-arrow {
+    color: var(--color-primary) !important;
+    transform: translateX(2px) !important;
+  }
+
+  .sidebar-signout-card-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    padding: 0.6rem 0.85rem !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--status-absent-bg, hsl(0 84% 92%)) !important;
+    background: var(--status-absent-bg, hsl(0 84% 95%)) !important;
+    color: var(--status-absent, hsl(0 84% 60%)) !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.18s ease !important;
+    box-sizing: border-box !important;
+    margin-top: 0.2rem !important;
+  }
+
+  .sidebar-signout-card-btn svg {
+    stroke: var(--status-absent, hsl(0 84% 60%)) !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .sidebar-signout-card-btn:hover {
+    background: var(--status-absent, hsl(0 84% 60%)) !important;
+    color: hsl(0 0% 100%) !important;
+    border-color: var(--status-absent, hsl(0 84% 60%)) !important;
+  }
+
+  .sidebar-signout-card-btn:hover svg {
+    stroke: hsl(0 0% 100%) !important;
   }
 }
 
@@ -1400,4 +1454,211 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   .admin-main-wrap {
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
   }
+}
+
+/* ── 8. Desktop Rail Toggle Expand/Collapse Button ── */
+@media (min-width: 769px) {
+  /* Collapsed Rail mode: 56x52 squircle button */
+  .admin-sidebar:not(.desktop-open) .sidebar-rail-toggle-item,
+  .admin-app-layout.sidebar-collapsed .sidebar-rail-toggle-item {
+    border: 1px dashed var(--color-primary-light, hsl(217 91% 85%)) !important;
+    background: var(--bg-surface) !important;
+    color: var(--color-primary) !important;
+    margin-top: 0.35rem !important;
+    cursor: pointer !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-rail-toggle-item .sidebar-toggle-icon svg,
+  .admin-app-layout.sidebar-collapsed .sidebar-rail-toggle-item .sidebar-toggle-icon svg {
+    stroke: var(--color-primary) !important;
+    width: 18px !important;
+    height: 18px !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-rail-toggle-item:hover,
+  .admin-app-layout.sidebar-collapsed .sidebar-rail-toggle-item:hover {
+    background: var(--color-primary) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    border-color: var(--color-primary) !important;
+    border-style: solid !important;
+    transform: translateY(-2px) scale(1.04) !important;
+    box-shadow: 0 4px 12px hsl(217 91% 60% / 0.28) !important;
+  }
+
+  .admin-sidebar:not(.desktop-open) .sidebar-rail-toggle-item:hover .sidebar-toggle-icon svg,
+  .admin-app-layout.sidebar-collapsed .sidebar-rail-toggle-item:hover .sidebar-toggle-icon svg {
+    stroke: var(--text-white, hsl(0 0% 100%)) !important;
+    transform: translateX(2px) !important;
+  }
+
+  /* Expanded Flyout Drawer mode: full-width button with label */
+  .admin-sidebar.desktop-open .sidebar-rail-toggle-item {
+    width: 234px !important;
+    height: 46px !important;
+    margin: 0.35rem 13px 0.2rem 13px !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 0 0.85rem !important;
+    gap: 0.75rem !important;
+    border-radius: 12px !important;
+    background: var(--bg-surface) !important;
+    border: 1px dashed var(--border-color) !important;
+    color: var(--text-muted) !important;
+    cursor: pointer !important;
+  }
+
+  .admin-sidebar.desktop-open .sidebar-rail-toggle-item:hover {
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
+    border-color: var(--color-primary-light) !important;
+    color: var(--color-primary) !important;
+  }
+
+  .admin-sidebar.desktop-open .sidebar-rail-toggle-item .sidebar-toggle-icon svg {
+    transform: rotate(180deg) !important;
+    stroke: currentColor !important;
+  }
+}
+
+/* ── 9. Styled Admin Logout Confirmation Dialog Box ── */
+.admin-logout-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  background: hsl(0 0% 0% / 0.52) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  z-index: 100050 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.25rem !important;
+  box-sizing: border-box !important;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.admin-logout-modal:not(.open) {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.admin-logout-modal.open {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.admin-logout-dialog {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 20px !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  padding: 1.6rem 1.6rem 1.4rem !important;
+  box-shadow: 0 24px 60px hsl(0 0% 0% / 0.28), 0 0 0 1px hsl(0 0% 100% / 0.06) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.4rem !important;
+  box-sizing: border-box !important;
+  transform: scale(0.94) translateY(8px);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.admin-logout-modal.open .admin-logout-dialog {
+  transform: scale(1) translateY(0) !important;
+}
+
+.admin-logout-dialog-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 1rem !important;
+}
+
+.admin-logout-icon-bubble {
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  min-height: 50px !important;
+  border-radius: 16px !important;
+  background: var(--status-absent-bg, hsl(0 84% 95%)) !important;
+  color: var(--status-absent, hsl(0 84% 58%)) !important;
+  border: 1px solid hsl(0 84% 88%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 14px hsl(0 84% 60% / 0.18) !important;
+}
+
+.admin-logout-icon-bubble svg {
+  stroke: var(--status-absent, hsl(0 84% 58%)) !important;
+}
+
+.admin-logout-text-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.35rem !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.admin-logout-title {
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: var(--text-main) !important;
+  margin: 0 !important;
+  letter-spacing: -0.015em !important;
+  line-height: 1.25 !important;
+}
+
+.admin-logout-subtitle {
+  font-size: 0.88rem !important;
+  color: var(--text-muted) !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.admin-logout-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.75rem !important;
+}
+
+.admin-logout-cancel-btn {
+  padding: 0.65rem 1.25rem !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.16s ease !important;
+}
+
+.admin-logout-cancel-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface)) !important;
+  border-color: var(--border-focus) !important;
+}
+
+.admin-logout-confirm-btn {
+  padding: 0.65rem 1.4rem !important;
+  border-radius: 12px !important;
+  border: 1px solid hsl(0 84% 54%) !important;
+  background: linear-gradient(135deg, hsl(0 84% 60%), hsl(352 82% 48%)) !important;
+  color: hsl(0 0% 100%) !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px hsl(0 84% 60% / 0.35) !important;
+  transition: all 0.16s ease !important;
+}
+
+.admin-logout-confirm-btn:hover {
+  background: linear-gradient(135deg, hsl(0 84% 56%), hsl(352 85% 44%)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px hsl(0 84% 60% / 0.45) !important;
 }

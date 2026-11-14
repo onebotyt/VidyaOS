@@ -1,0 +1,336 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS STUDENT TOP HEADER COMPONENT (header.css)
+ * Location: /frontend/student/components/header/header.css
+ * 100% Theme Tokenized — Mobile-First & Accessible
+ * ══════════════════════════════════════════════════════════════
+ */
+
+.gc-navbar, .student-top-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--student-nav-height, 60px);
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  padding-top: env(safe-area-inset-top, 0px);
+  z-index: 1000;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ─── Left Section ────────────────────────────────────────────── */
+.gc-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gc-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gc-menu-btn:hover {
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.gc-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.gc-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.gc-page-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid currentColor;
+}
+
+/* ─── Right Section ───────────────────────────────────────────── */
+.gc-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gc-create-btn, .student-nav-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  min-height: 40px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gc-create-btn:hover, .student-nav-action-btn:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-focus);
+}
+
+.gc-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gc-icon-btn:hover {
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+}
+
+/* User Avatar */
+.gc-user-avatar {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), hsl(262 70% 55%));
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--border-color);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gc-user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--color-primary);
+}
+
+/* ─── Apps Launcher Popover (9-Dot Grid) ──────────────────────── */
+.apps-launcher-dropdown {
+  position: fixed;
+  top: calc(var(--student-nav-height, 60px) + 8px);
+  right: 1rem;
+  width: 320px;
+  max-width: calc(100vw - 2rem);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem;
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  z-index: 1050;
+  animation: popoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apps-launcher-dropdown.open {
+  display: grid;
+}
+
+.app-launcher-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--radius-md, 10px);
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-align: center;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.app-launcher-tile:hover {
+  background-color: var(--bg-surface);
+  transform: translateY(-2px);
+}
+
+.app-launcher-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-surface);
+  color: var(--color-primary);
+  transition: all 0.15s ease;
+}
+
+.app-launcher-tile:hover .app-launcher-icon {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* ─── User Profile Popover ────────────────────────────────────── */
+.user-profile-popover {
+  position: fixed;
+  top: calc(var(--student-nav-height, 60px) + 8px);
+  right: 1rem;
+  width: 290px;
+  max-width: calc(100vw - 2rem);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-lg);
+  padding: 1.25rem 1rem;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 1050;
+  animation: popoverFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-profile-popover.open {
+  display: flex;
+}
+
+.profile-popover-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), hsl(262 70% 55%));
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.65rem;
+}
+
+.profile-popover-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.2rem;
+}
+
+.profile-popover-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.15rem;
+  font-family: var(--font-family-mono);
+}
+
+.profile-popover-email {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  word-break: break-all;
+}
+
+.profile-popover-divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 0.5rem 0 0.85rem 0;
+}
+
+.profile-popover-links {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.profile-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-md, 10px);
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.profile-popover-item:hover {
+  background-color: var(--bg-surface);
+}
+
+.profile-popover-item.danger {
+  color: var(--status-absent);
+}
+
+.profile-popover-item.danger:hover {
+  background-color: var(--status-absent-bg);
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ─── Mobile Viewport Optimizations ──────────────────────────── */
+@media (max-width: 600px) {
+  .gc-brand-title {
+    display: none;
+  }
+  .student-nav-action-btn span.btn-text, .gc-create-btn span.btn-text {
+    display: none;
+  }
+}

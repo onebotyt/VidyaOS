@@ -5,18 +5,16 @@
 
 ---
 
-## 🏛️ Isolation & Boundary Rules (Zero Outside Conflict)
+## 🏛️ Isolation & Boundary Rules (100% Autonomous Architecture)
 
-1. **Self-Contained Components**:
-   - All admin components reside under `frontend/admin/components/`.
-   - Admin pages **MUST NOT** load outside navigation scripts (`/js/nav.js`, `/js/admin-nav.js`) or outside layout/component bundles (`/css/layout.css`, `/css/components.css`, `/css/classroom-nav.css`).
-   - Outside scripts have runtime guards that immediately abort execution when mounted on any `/admin/*` page.
-
-2. **Permitted Shared Foundations**:
-   - `frontend/shared/css/reset.css`: Universal CSS reset.
-   - `frontend/shared/css/variables.css`: Universal theme tokens (CSS variables: `--bg-app`, `--text-main`, `--color-primary`, etc.). 0 hardcoded hex colors allowed.
-   - `frontend/shared/js/api.js`: Standard institutional API client (`fetchApi`).
-   - `frontend/shared/js/auth.js`: Session management and RBAC route guarding (`guardRoute(['SYSTEM_ADMIN'])`, `getCurrentUser()`).
+1. **Self-Contained Components & Core Foundations**:
+   - All admin components, assets, and runtime scripts reside strictly under `/admin/components/`.
+   - Core foundations are fully isolated inside `/admin/components/core/`:
+     - `core/reset.css`: Isolated element normalization.
+     - `core/variables.css`: Theme token dictionary & color variables.
+     - `core/api.js`: Admin API fetch wrapper.
+     - `core/auth.js`: Admin route guarding & session state.
+   - Admin pages **DO NOT** load outside scripts or stylesheets (`/css/*`, `/js/*`, `/shared/*`). Zero external dependency.
 
 ---
 

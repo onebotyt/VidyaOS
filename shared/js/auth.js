@@ -116,14 +116,17 @@ function getCurrentUser() {
 }
 
 async function syncCurrentUser() {
-  const token = getAuthToken();
-  if (!token) return;
   try {
+    const token = getAuthToken();
+    const headers = {
+      'X-Device-Id': getDeviceId()
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     const res = await fetch('/api/v1/auth/me', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'X-Device-Id': getDeviceId()
-      }
+      credentials: 'include',
+      headers
     });
     if (res.status === 401) {
       const errJson = await res.json().catch(() => ({}));
@@ -225,23 +228,21 @@ function logout() {
 
   // 1. Invalidate session on backend
   try {
-    if (token || refreshToken) {
-      const payload = {
-        device_id: deviceId || '',
-        refresh_token: refreshToken || ''
-      };
-      fetch('/api/v1/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json',
-          'X-Device-Id': deviceId || ''
-        },
-        body: JSON.stringify(payload),
-        keepalive: true,
-        credentials: 'include'
-      }).catch(() => {});
-    }
+    const payload = {
+      device_id: deviceId || '',
+      refresh_token: refreshToken || ''
+    };
+    fetch('/api/v1/auth/logout', {
+      method: 'POST',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Content-Type': 'application/json',
+        'X-Device-Id': deviceId || ''
+      },
+      body: JSON.stringify(payload),
+      keepalive: true,
+      credentials: 'include'
+    }).catch(() => {});
   } catch (_) {}
 
   // 2. Clear timers
@@ -857,7 +858,7 @@ const NAVIGATION_PROFILES = {
     appsTiles: [
       { href: '/admin/dashboard.html', icon: 'dashboard', label: 'Dashboard' },
       { href: '/admin/academic-structure.html', icon: 'academic', label: 'Structure' },
-      { href: '/admin/faculty.html', icon: 'hod', label: 'HODs' },
+      { href: '/admin/faculty-management/index.html', icon: 'hod', label: 'Faculty' },
       { href: '/admin/reports.html', icon: 'reports', label: 'Reports' },
       { href: '/admin/audit-logs.html', icon: 'audit', label: 'Audit Logs' },
       { href: '/admin/settings.html', icon: 'settings', label: 'Settings' }
@@ -868,7 +869,7 @@ const NAVIGATION_PROFILES = {
         items: [
           { href: '/admin/dashboard.html', icon: 'dashboard', label: 'Dashboard' },
           { href: '/admin/academic-structure.html', icon: 'academic', label: 'Academic Structure' },
-          { href: '/admin/faculty.html', icon: 'hod', label: 'HOD Management' },
+          { href: '/admin/faculty-management/index.html', icon: 'hod', label: 'Faculty Management' },
           { href: '/admin/reports.html', icon: 'reports', label: 'Reports & Analytics' },
           { href: '/admin/audit-logs.html', icon: 'audit', label: 'Audit Logs' },
           { href: '/admin/settings.html', icon: 'settings', label: 'System Settings' }
@@ -878,7 +879,7 @@ const NAVIGATION_PROFILES = {
     bottomTabs: [
       { href: '/admin/dashboard.html', icon: 'home', label: 'Home' },
       { href: '/admin/academic-structure.html', icon: 'academic', label: 'Structure' },
-      { href: '/admin/faculty.html', icon: 'hod', label: 'HODs' },
+      { href: '/admin/faculty-management/index.html', icon: 'hod', label: 'Faculty' },
       { isMenu: true, icon: 'menu', label: 'Menu' }
     ]
   },
@@ -1055,11 +1056,13 @@ function mountNavigationSystem(options = {}) {
 
   const currentPath = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
 
-  // 0. STRICT ADMIN & FACULTY PORTAL ISOLATION: Both portals have dedicated modular components in /admin/components/ and /faculty/components/
+  // 0. STRICT ROLE PORTAL ISOLATION: Admin, Faculty, and Student portals have dedicated modular components in /admin/components/, /faculty/components/, and /student/components/
   if (currentPath.startsWith('/admin') ||
       currentPath.startsWith('/faculty') ||
       currentPath.includes('/faculty/') ||
-      Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page, .faculty-sidebar, .faculty-app-layout, .vidya-faculty-sidebar, .faculty-top-header'))) {
+      currentPath.startsWith('/student') ||
+      currentPath.includes('/student/') ||
+      Boolean(document.querySelector('.admin-sidebar, .admin-app-layout, .admin-dashboard-page, .faculty-sidebar, .faculty-app-layout, .vidya-faculty-sidebar, .faculty-top-header, #student-header-mount, #student-sidebar-mount, .student-top-navbar, .student-offcanvas-drawer, .student-app-layout'))) {
     return;
   }
 
@@ -1565,8 +1568,16 @@ async function _loadNavPendingBadge() {
 // ─────────────────────────────────────────────────────────
 // THEME MANAGEMENT (Dark / Light Mode)
 // ─────────────────────────────────────────────────────────
+function getStoredTheme() {
+  try {
+    return localStorage.getItem('app_theme') || localStorage.getItem('theme') || localStorage.getItem('vidya_theme') || 'light';
+  } catch (_) {
+    return 'light';
+  }
+}
+
 function initAppTheme() {
-  const savedTheme = localStorage.getItem('app_theme') || 'light';
+  const savedTheme = getStoredTheme();
   document.documentElement.setAttribute('data-theme', savedTheme);
   updateThemeToggleUI(savedTheme);
 }
@@ -1594,10 +1605,14 @@ function updateThemeToggleUI(theme) {
 }
 
 function toggleAppTheme() {
-  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const current = (document.documentElement.getAttribute('data-theme') === 'dark' || getStoredTheme() === 'dark') ? 'dark' : 'light';
   const nextTheme = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', nextTheme);
-  localStorage.setItem('app_theme', nextTheme);
+  try {
+    localStorage.setItem('app_theme', nextTheme);
+    localStorage.setItem('theme', nextTheme);
+    localStorage.setItem('vidya_theme', nextTheme);
+  } catch (_) {}
   updateThemeToggleUI(nextTheme);
   if (typeof showToast === 'function') {
     showToast(`Appearance changed to ${nextTheme === 'dark' ? 'Dark Mode' : 'Light Mode'}`, 'info', 2000);
@@ -2167,7 +2182,7 @@ if (typeof window !== 'undefined') {
 if (typeof document !== 'undefined') {
   initAppTheme();
   const p = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
-  const isIsolated = p.startsWith('/admin') || p.startsWith('/faculty') || p.includes('/faculty/');
+  const isIsolated = p.startsWith('/admin') || p.startsWith('/faculty') || p.includes('/faculty/') || p.startsWith('/student') || p.includes('/student/');
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

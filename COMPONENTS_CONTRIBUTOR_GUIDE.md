@@ -18,21 +18,24 @@ By moving UI modules into self-contained **Components**:
 
 ## 🏛️ 2. Three-Role Component Directory Structure & Isolation
 
-To prevent permission leaks, styling collisions, or security breaches, the system has **3 strictly isolated component domains**, plus **1 shared UI primitive domain**:
+To prevent permission leaks, styling collisions, or security breaches, the system has **3 strictly isolated domains**:
 
 ```
 VidyaOS/
 ├── admin/
-│   └── components/          # 🔴 Developer 1 (Admin Domain)
+│   └── components/          # 🔴 Admin Domain (100% Self-Contained)
+│       ├── core/            # Autonomous Foundations (reset.css, variables.css, api.js, auth.js)
 │       ├── header/          # Admin top bar with system status & profile
 │       ├── sidebar/         # Dual-state admin rail (Desktop 250px/72px, Mobile drawer)
 │       ├── delete-modal/    # Admin entity deletion confirmation modal
-│       ├── icons/           # Pure inline SVG vectors for admin routes
+│       ├── page-header/     # Page title & breadcrumb header
+│       ├── metrics/         # KPI metric summaries
+│       ├── icons.js         # Pure inline SVG vectors for admin routes
 │       ├── admin-base.css   # Theme-tokenized admin base styling
 │       └── admin-ui.js      # Admin toast alerts and modal triggers
 │
 ├── faculty/
-│   └── components/          # 🔵 Developer 2 (Faculty Domain)
+│   └── components/          # 🔵 Faculty Domain
 │       ├── header/          # Faculty top bar with class shortcuts & profile
 │       ├── sidebar/         # Faculty navigation drawer with active class indicators
 │       ├── confirm-dialog/  # Action confirmation dialog
@@ -42,19 +45,12 @@ VidyaOS/
 │       ├── faculty-base.css # Theme-tokenized faculty styling
 │       └── faculty-ui.js    # Faculty toast and modal engine
 │
-├── student/
-│   └── components/          # 🟢 Developer 2 (Student Domain)
-│       ├── header/          # Student header with branch/semester badge & bell
-│       ├── sidebar/         # Student navigation drawer (attendance, scores, timetable)
-│       ├── delete-modal/    # Student action confirmation modal
-│       └── icons/           # Student SVG icons
-│
-└── components/              # ⚪ Shared UI Primitives (Both Developers)
-    ├── ajax.js              # Resilient fetch utility
-    ├── dialog.js            # Universal dialog
-    ├── stat-card.js         # KPI metric card builder
-    ├── table.js             # Data table pagination & sorting helper
-    └── toast.js             # Notification toasts
+└── student/
+    └── components/          # 🟢 Student Domain
+        ├── header/          # Student header with branch/semester badge & bell
+        ├── sidebar/         # Student navigation drawer (attendance, scores, timetable)
+        ├── delete-modal/    # Student action confirmation modal
+        └── icons/           # Student SVG icons
 ```
 
 ### 🔒 Strict Isolation Rules:

@@ -1151,6 +1151,10 @@ function submitPcClassComment() {
   input.value = '';
 }
 
+function submitModalWorkComment() {
+  return submitPcClassComment();
+}
+
 function focusMobileCommentInput() {
   const input = document.getElementById('pc-class-comment-input');
   if (input) {

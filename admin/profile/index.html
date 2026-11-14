@@ -8,14 +8,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/reset.css?v=20261029">
-  <link rel="stylesheet" href="/css/variables.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/core/reset.css?v=20261114">
+  <link rel="stylesheet" href="/admin/components/core/variables.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261029">
+  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261114_smooth">
   <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
   <script>
-    /* Always start closed (72px collapsed mini-rail) when page opens */
+    /* Synchronously apply saved theme and collapsed rail before DOM render */
     (function () {
+      try {
+        var t = localStorage.getItem('app_theme') || localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) { }
       try {
         if (window.innerWidth >= 769) {
           document.documentElement.classList.add('sidebar-collapsed');
@@ -36,6 +40,7 @@
     <div class="admin-main-wrap">
 
       <!-- Navigation, Top Header, and Mobile Navigation are dynamically mounted by /admin/components/ -->
+      <div id="admin-header-mount"></div>
 
       <!-- top-nav-bar fallback for test suites / backward compatibility -->
       <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
@@ -480,8 +485,8 @@
     </div> <!-- /.admin-main-wrap -->
   </div> <!-- /#admin-app-layout -->
 
-  <script src="/js/api.js?v=20261029"></script>
-  <script src="/js/auth.js?v=20261029"></script>
+  <script src="/admin/components/core/api.js?v=20261114"></script>
+  <script src="/admin/components/core/auth.js?v=20261114"></script>
   <script src="/admin/components/icons.js?v=20261029"></script>
   <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
   <script src="/admin/components/header/header.js?v=20261029"></script>

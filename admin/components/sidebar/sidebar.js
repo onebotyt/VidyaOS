@@ -45,21 +45,20 @@
 
   // Navigation module registry for Admin portal
   const ADMIN_NAV_ITEMS = [
-    { key: 'dashboard', label: 'Dashboard', shortLabel: 'Overview', href: '/admin/dashboard.html', icon: 'dashboard' },
-    { key: 'academics', label: 'Academic Structure', shortLabel: 'Structure', href: '/admin/academic-structure.html', icon: 'academicStructure' },
-    { key: 'faculty', label: 'HOD Management', shortLabel: 'Faculty', href: '/admin/faculty.html', icon: 'hodManagement' },
-    { key: 'reports', label: 'Reports & Analytics', shortLabel: 'Reports', href: '/admin/reports.html', icon: 'reports' },
-    { key: 'settings', label: 'System Settings', shortLabel: 'Settings', href: '/admin/settings.html', icon: 'settings' },
-    { key: 'audit', label: 'Audit Logs', shortLabel: 'Audit', href: '/admin/audit-logs.html', icon: 'audit' }
+    { key: 'dashboard', label: 'Dashboard', shortLabel: 'Overview', href: '/admin/dashboard/index.html', icon: 'dashboard' },
+    { key: 'academics', label: 'Academic Structure', shortLabel: 'Structure', href: '/admin/academic-structure/index.html', icon: 'academicStructure' },
+    { key: 'faculty', label: 'Faculty Management', shortLabel: 'Faculty', href: '/admin/faculty-management/index.html', icon: 'hodManagement' },
+    { key: 'settings', label: 'System Settings', shortLabel: 'Settings', href: '/admin/settings/index.html', icon: 'settings' },
+    { key: 'audit', label: 'Audit Logs', shortLabel: 'Audit', href: '/admin/audit-logs/index.html', icon: 'audit' }
   ];
 
   // Mobile Bottom Navigation Tabs (5 Canonical Tabs Matching Mobile App Reference)
   const ADMIN_MOBILE_TABS = [
-    { key: 'dashboard', label: 'Home', href: '/admin/dashboard.html', icon: 'home' },
-    { key: 'academics', label: 'Structure', href: '/admin/academic-structure.html', icon: 'academicStructure' },
-    { key: 'faculty', label: 'HOD', href: '/admin/faculty.html', icon: 'hodManagement' },
-    { key: 'reports', label: 'Reports', href: '/admin/reports.html', icon: 'reports' },
-    { key: 'settings', label: 'Settings', href: '/admin/settings.html', icon: 'settings' }
+    { key: 'dashboard', label: 'Home', href: '/admin/dashboard/index.html', icon: 'home' },
+    { key: 'academics', label: 'Structure', href: '/admin/academic-structure/index.html', icon: 'academicStructure' },
+    { key: 'faculty', label: 'Faculty', href: '/admin/faculty-management/index.html', icon: 'hodManagement' },
+    { key: 'audit', label: 'Audit', href: '/admin/audit-logs/index.html', icon: 'audit' },
+    { key: 'settings', label: 'Settings', href: '/admin/settings/index.html', icon: 'settings' }
   ];
 
   /**
@@ -123,7 +122,6 @@
       toggleSidebar();
       return;
     }
-    const layout = document.getElementById('admin-app-layout') || document.body;
     const sidebar = getSidebar();
     const backdrop = document.getElementById('sidebar-backdrop');
     if (!sidebar) return;
@@ -131,19 +129,13 @@
     const isCurrentlyOpen = sidebar.classList.contains('desktop-open');
 
     if (isCurrentlyOpen) {
-      // CLOSE back to mini-rail
+      // Smooth CLOSE back to mini-rail
       sidebar.classList.remove('desktop-open');
       if (backdrop) backdrop.classList.remove('active', 'open');
-      document.documentElement.classList.add('sidebar-collapsed');
-      document.body.classList.add('sidebar-collapsed');
-      if (layout) layout.classList.add('sidebar-collapsed');
     } else {
-      // OPEN overlay flyout drawer
+      // Smooth OPEN overlay flyout drawer
       sidebar.classList.add('desktop-open');
       if (backdrop) backdrop.classList.add('active', 'open');
-      document.documentElement.classList.remove('sidebar-collapsed');
-      document.body.classList.remove('sidebar-collapsed');
-      if (layout) layout.classList.remove('sidebar-collapsed');
     }
   }
 
@@ -226,26 +218,80 @@
     }
     const token = localStorage.getItem('access_token');
     const refreshToken = localStorage.getItem('refresh_token');
-    if (token || refreshToken) {
-      try {
-        fetch('/api/v1/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ refresh_token: refreshToken || '' }),
-          keepalive: true,
-          credentials: 'include'
-        }).catch(() => { });
-      } catch (_) { }
-    }
+    try {
+      fetch('/api/v1/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refresh_token: refreshToken || '' }),
+        keepalive: true,
+        credentials: 'include'
+      }).catch(() => { });
+    } catch (_) { }
     const keys = ['access_token', 'refresh_token', 'authToken', 'auth_token', 'token', 'user', 'currentUser', 'auth_user', 'user_profile', 'user_roles', 'role', 'roles', 'session_id'];
     keys.forEach(k => { try { localStorage.removeItem(k); } catch (_) { } });
     try { sessionStorage.clear(); } catch (_) { }
     try { sessionStorage.setItem('vidya_logged_out_flag', '1'); } catch (_) { }
     window.location.replace('/login');
   }
+
+  function confirmAdminLogout() {
+    let modal = document.getElementById('admin-logout-modal');
+    if (!modal) {
+      const modalHtml = `
+        <div id="admin-logout-modal" class="modal-backdrop admin-logout-modal" style="display:none;" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-sm admin-logout-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-logout-modal-title">
+            <div class="admin-logout-dialog-header">
+              <div class="admin-logout-icon-bubble">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+              </div>
+              <div class="admin-logout-text-wrap">
+                <h3 id="admin-logout-modal-title" class="admin-logout-title">Sign Out of VidyaOS?</h3>
+                <p class="admin-logout-subtitle">Are you sure you want to end your administrative session?</p>
+              </div>
+            </div>
+            <div class="admin-logout-actions">
+              <button type="button" class="btn btn-secondary admin-logout-cancel-btn" onclick="closeAdminLogoutModal()">Cancel</button>
+              <button type="button" class="btn btn-danger admin-logout-confirm-btn" onclick="adminLogout()">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      modal = document.getElementById('admin-logout-modal');
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeAdminLogoutModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+          closeAdminLogoutModal();
+        }
+      });
+    }
+
+    modal.classList.add('open');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeAdminLogoutModal() {
+    const modal = document.getElementById('admin-logout-modal');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.setProperty('display', 'none', 'important');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  win.confirmAdminLogout = confirmAdminLogout;
+  win.closeAdminLogoutModal = closeAdminLogoutModal;
 
   /**
    * 6. User Identity Synchronization (Avatar Initials & Names)
@@ -284,55 +330,18 @@
 
     const currentPath = (window.location.pathname || '').toLowerCase();
 
-    // ── A. Mount Mobile Top Header (<= 768px only) if missing ──
-    if (!document.getElementById('mobile-top-header')) {
-      const menuSvg = getIcon('menu', { width: 22, height: 22, stroke: 2.2 });
-      const cubeSvgHeader = getIcon('cube', { width: 30, height: 30 });
-      const bellSvg = getIcon('bell', { width: 19, height: 19, stroke: 2 });
-
-      const mobileHeaderHtml = `
-        <header class="mobile-top-header" id="mobile-top-header" aria-label="Mobile App Header">
-          <div class="mobile-header-left">
-            <button type="button" class="mobile-hamburger-btn" id="mobile-sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Open Navigation Menu">
-              ${menuSvg}
-            </button>
-            <a href="/admin/dashboard.html" class="mobile-brand-block">
-              <span class="mobile-brand-cube">${cubeSvgHeader}</span>
-              <div class="mobile-brand-meta">
-                <span class="mobile-brand-name">VidyaOS</span>
-                <span class="mobile-brand-sub">Admin Portal</span>
-              </div>
-            </a>
-          </div>
-          <div class="mobile-header-right">
-            <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications" title="Notifications">
-              ${bellSvg}
-              <span class="mobile-bell-badge">3</span>
-            </button>
-            <a href="/admin/profile.html" class="mobile-user-avatar-btn" id="mobile-user-profile" aria-label="Admin Profile" title="Admin Profile">
-              <span class="mobile-avatar-initials" id="mobile-user-initials">SA</span>
-              <span class="avatar-online-dot"></span>
-            </a>
-          </div>
-        </header>
-      `;
-      layout.insertAdjacentHTML('afterbegin', mobileHeaderHtml);
-    }
-
     // ── B. Mount Dual-State Sidebar (#vidya-admin-sidebar) if missing ──
     if (!getSidebar()) {
-      const cubeSvg = getIcon('cube', { width: 32, height: 32, className: 'rail-cube-logo' });
-      const headerCubeSvg = getIcon('cube', { width: 24, height: 24, className: 'header-cube-logo' });
       const expandChevronSvg = getIcon('chevronRight', { width: 15, height: 15, stroke: 2.8 });
       const collapseChevronSvg = getIcon('chevronLeft', { width: 14, height: 14, stroke: 2.5 });
       const closeSvg = getIcon('close', { width: 18, height: 18, stroke: 2.2 });
-      const userSvg = getIcon('user', { width: 20, height: 20, stroke: 2 });
       const signoutSvg = getIcon('logout', { width: 20, height: 20, stroke: 2 });
 
-      // Render 3D Navigation items with high-speed CSS tooltip and zero native title delay
+      // Render Navigation items with high-speed CSS tooltip
       const navItemsHtml = ADMIN_NAV_ITEMS.map(item => {
         const isActive = currentPath.endsWith(item.href) ||
           currentPath.endsWith(item.href.replace('.html', '')) ||
+          currentPath.includes(item.key) ||
           (item.key === 'dashboard' && (currentPath === '/admin/' || currentPath.endsWith('/admin') || currentPath.endsWith('/admin/dashboard.html') || currentPath.endsWith('/admin/dashboard')));
 
         const activeCls = isActive ? ' active' : '';
@@ -347,66 +356,41 @@
         `;
       }).join('');
 
+      // Expand/Collapse toggle button placed directly with navigation links
+      const toggleItemHtml = `
+        <button type="button" class="sidebar-nav-item sidebar-rail-toggle-item" onclick="toggleDesktopSidebar()" data-tooltip="Expand Menu" aria-label="Expand Navigation Menu">
+          <span class="sidebar-nav-icon sidebar-toggle-icon">${expandChevronSvg}</span>
+          <span class="sidebar-nav-short-label">Expand</span>
+          <span class="sidebar-nav-label">Collapse Menu</span>
+        </button>
+      `;
+
       const sidebarHtml = `
         <aside id="vidya-admin-sidebar" class="admin-sidebar vidya-admin-sidebar" data-component="vidya-admin-sidebar" aria-label="Admin Navigation">
-          <!-- A. Rail Header (Desktop Collapsed 72px Rail) -->
-          <div class="sidebar-rail-header" aria-hidden="true">
-            <div class="rail-brand-row">
-              <a href="/admin/dashboard.html" class="rail-logo-link" data-tooltip="VidyaOS Dashboard" aria-label="VidyaOS Dashboard">
-                ${cubeSvg}
-              </a>
-              <!-- Fast Expand Arrow button right on side of logo -->
-              <button type="button" class="rail-expand-btn" onclick="toggleDesktopSidebar()" data-tooltip="Expand Menu" aria-label="Open Navigation Menu">
-                ${expandChevronSvg}
-              </button>
-            </div>
-          </div>
-
-          <!-- B. Expanded Header (Desktop Flyout Drawer & Mobile Drawer) -->
-          <div class="sidebar-expanded-header">
-            <div class="sidebar-header-left">
-              <span class="sidebar-header-cube-icon" aria-hidden="true">${headerCubeSvg}</span>
-              <span class="sidebar-header-title">VidyaOS Console</span>
-            </div>
-            <!-- Desktop Collapse Button: Chevron Left < -->
-            <button type="button" class="sidebar-desktop-collapse-btn" onclick="toggleDesktopSidebar()" title="Collapse navigation" aria-label="Collapse navigation">
-              ${collapseChevronSvg}
-            </button>
-            <button type="button" class="sidebar-mobile-close-btn" onclick="closeSidebar()" title="Close menu" aria-label="Close menu">
-              ${closeSvg}
-            </button>
-          </div>
-
-          <!-- C. Navigation Links -->
+          <!-- Navigation Links (Scrollable if overflowing) -->
           <nav class="sidebar-nav-body" aria-label="Admin Navigation Links">
             ${navItemsHtml}
+            ${toggleItemHtml}
           </nav>
 
-          <!-- D. Sidebar Footers -->
+          <!-- Sidebar Footer: Clickable Profile & Confirmation Logout -->
           <div class="sidebar-expanded-footer">
-            <div class="sidebar-user-card">
-              <div class="sidebar-user-avatar" aria-hidden="true">
-                <span>SA</span>
+            <a href="/admin/profile/index.html" class="sidebar-user-card" id="sidebar-user-profile-link" title="Open Admin Profile" aria-label="Open Admin Profile" onclick="if(window.innerWidth<=768)closeSidebar()">
+              <div class="sidebar-user-avatar">
+                <span class="sidebar-user-avatar-initials">SA</span>
+                <span class="avatar-online-dot"></span>
               </div>
               <div class="sidebar-user-meta">
                 <span class="sidebar-user-name">System Administrator</span>
-                <span class="sidebar-user-sub">VidyaOS Console</span>
+                <span class="sidebar-user-sub">Super Admin &bull; Profile</span>
               </div>
-            </div>
-            <button type="button" class="sidebar-signout-card-btn" onclick="adminLogout()" title="Sign Out" aria-label="Sign Out">
+              <div class="sidebar-user-arrow" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </a>
+            <button type="button" class="sidebar-signout-card-btn" onclick="confirmAdminLogout()" title="Sign Out" aria-label="Sign Out">
               ${signoutSvg}
               <span>Sign Out</span>
-            </button>
-          </div>
-
-          <div class="sidebar-rail-footer" aria-hidden="true">
-            <a href="/admin/profile.html" class="rail-footer-btn" data-tooltip="Admin Profile" aria-label="Admin Profile">
-              <span class="rail-user-circle">SA</span>
-              <span class="sidebar-nav-short-label">Profile</span>
-            </a>
-            <button type="button" class="rail-footer-btn rail-signout-btn" onclick="adminLogout()" data-tooltip="Sign Out" aria-label="Sign Out">
-              ${signoutSvg}
-              <span class="sidebar-nav-short-label">Logout</span>
             </button>
           </div>
         </aside>
@@ -448,9 +432,9 @@
         } else if (tab.key === 'academics') {
           isActive = (currentPath.includes('/admin/academic-structure') || currentPath.includes('/academic-structure.html') || currentPath.includes('/admin/structure'));
         } else if (tab.key === 'faculty') {
-          isActive = (currentPath.includes('/admin/faculty') || currentPath.includes('/faculty.html'));
-        } else if (tab.key === 'reports') {
-          isActive = (currentPath.includes('/admin/reports') || currentPath.includes('/reports.html'));
+          isActive = (currentPath.includes('/admin/faculty') || currentPath.includes('/admin/faculty-management') || currentPath.includes('/faculty.html'));
+        } else if (tab.key === 'audit') {
+          isActive = (currentPath.includes('/admin/audit') || currentPath.includes('/audit-logs.html'));
         } else if (tab.key === 'settings') {
           isActive = (currentPath.includes('/admin/settings') || currentPath.includes('/settings.html'));
         }
