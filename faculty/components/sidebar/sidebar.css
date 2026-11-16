@@ -30,15 +30,14 @@
 #app-sidebar.faculty-sidebar,
 .faculty-sidebar {
   position: fixed !important;
-  top: 0 !important;
+  top: 60px !important;
   left: 0 !important;
   bottom: 0 !important;
-  height: 100vh !important;
-  height: 100dvh !important;
+  height: calc(100dvh - 60px) !important;
   background: var(--bg-card) !important;
   border-right: 1px solid var(--border-color) !important;
   z-index: 10000 !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
   box-sizing: border-box !important;
@@ -52,14 +51,15 @@
   /* 
    * ZERO CONTENT LAYOUT SHIFT INVARIANT:
    * .faculty-main-wrap sits PERMANENTLY at margin-left: 72px!
-   * Opening the menu bar NEVER adjusts or shrinks page content.
+   * Content starts below 60px fixed top header.
    */
   .faculty-main-wrap,
   .admin-main-wrap {
     margin-left: 72px !important;
     width: calc(100% - 72px) !important;
     max-width: calc(100% - 72px) !important;
-    min-height: 100vh !important;
+    padding-top: 60px !important;
+    min-height: calc(100dvh - 60px) !important;
     box-sizing: border-box !important;
     transition: none !important;
     position: relative;
@@ -69,12 +69,11 @@
 
   /* Support pages without .faculty-main-wrap container */
   body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>main,
-  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>.container,
-  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>#faculty-header,
-  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>.faculty-top-header {
+  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>.container {
     margin-left: 72px !important;
     width: calc(100% - 72px) !important;
     max-width: calc(100% - 72px) !important;
+    padding-top: 60px !important;
     box-sizing: border-box !important;
   }
 
@@ -93,30 +92,10 @@
     transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
   }
 
-  /* When collapsed (default): show rail header & rail footer */
-  .faculty-sidebar:not(.desktop-open) .sidebar-rail-header,
-  .faculty-app-layout.sidebar-collapsed .sidebar-rail-header,
-  html.sidebar-collapsed .sidebar-rail-header {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-  }
-
-  .faculty-sidebar:not(.desktop-open) .sidebar-rail-footer,
-  .faculty-app-layout.sidebar-collapsed .sidebar-rail-footer,
-  html.sidebar-collapsed .sidebar-rail-footer {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-  }
-
-  /* When collapsed (default): hide expanded headers & footers */
-  .faculty-sidebar:not(.desktop-open) .sidebar-expanded-header,
-  .faculty-sidebar:not(.desktop-open) .sidebar-expanded-footer,
-  .faculty-app-layout.sidebar-collapsed .sidebar-expanded-header,
-  .faculty-app-layout.sidebar-collapsed .sidebar-expanded-footer,
-  html.sidebar-collapsed .sidebar-expanded-header,
-  html.sidebar-collapsed .sidebar-expanded-footer {
+  /* In PC mode, full size top header spans entire top; rail header and expanded headers are hidden */
+  .sidebar-rail-header,
+  .sidebar-expanded-header,
+  .sidebar-rail-footer {
     display: none !important;
   }
 
@@ -331,34 +310,36 @@
     display: block !important;
   }
 
-  /* Short name shown below icon in small collapsed navbar */
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
-  #faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
-  .faculty-app-layout.sidebar-collapsed .sidebar-nav-short-label,
-  html.sidebar-collapsed .sidebar-nav-short-label {
-    display: block !important;
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
-    letter-spacing: -0.01em !important;
-    text-align: center !important;
-    line-height: 1 !important;
-    color: inherit !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 52px !important;
-    margin-top: 1px !important;
-    pointer-events: none !important;
-  }
+  /* Short name shown below icon in small collapsed navbar (Desktop Rail only) */
+  @media (min-width: 769px) {
+    #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
+    #faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
+    .faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
+    .faculty-app-layout.sidebar-collapsed .sidebar-nav-short-label,
+    html.sidebar-collapsed .sidebar-nav-short-label {
+      display: block !important;
+      font-size: 0.65rem !important;
+      font-weight: 600 !important;
+      letter-spacing: -0.01em !important;
+      text-align: center !important;
+      line-height: 1 !important;
+      color: inherit !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      max-width: 52px !important;
+      margin-top: 1px !important;
+      pointer-events: none !important;
+    }
 
-  /* Full label hidden in collapsed rail */
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
-  #faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
-  .faculty-app-layout.sidebar-collapsed .sidebar-nav-label,
-  html.sidebar-collapsed .sidebar-nav-label {
-    display: none !important;
+    /* Full label hidden in collapsed rail */
+    #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
+    #faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
+    .faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
+    .faculty-app-layout.sidebar-collapsed .sidebar-nav-label,
+    html.sidebar-collapsed .sidebar-nav-label {
+      display: none !important;
+    }
   }
 
   /* Hover state on 3D squircle rail */
@@ -410,6 +391,24 @@
     box-shadow: 0 2px 4px hsl(0 0% 0% / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.7) !important;
     color: var(--text-muted) !important;
     overflow: hidden !important;
+  }
+
+  /* Expand/Collapse button inside sidebar navigation links (Desktop only) */
+  @media (min-width: 769px) {
+    .faculty-sidebar .sidebar-rail-toggle-item,
+    #faculty-sidebar .sidebar-rail-toggle-item,
+    #vidya-faculty-sidebar .sidebar-rail-toggle-item {
+      display: flex !important;
+      cursor: pointer !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .faculty-sidebar .sidebar-rail-toggle-item,
+    #faculty-sidebar .sidebar-rail-toggle-item,
+    #vidya-faculty-sidebar .sidebar-rail-toggle-item {
+      display: none !important;
+    }
   }
 
   .faculty-sidebar.desktop-open .sidebar-nav-icon {
@@ -535,41 +534,132 @@
   display: none !important;
 }
 
-/* Expanded Footer: User Profile Card & Sign Out */
-.faculty-sidebar.desktop-open .sidebar-expanded-footer {
+/* ── 3. Unified Sidebar Footer (.sidebar-expanded-footer): Responsive between 72px Rail & 260px Flyout ── */
+.sidebar-expanded-footer {
   display: flex !important;
-  flex-direction: column;
-  gap: 0.65rem;
-  padding: 1rem 13px;
-  border-top: 1px solid var(--border-color);
-  background: var(--bg-card);
-  margin-top: auto;
-  flex-shrink: 0;
-  box-sizing: border-box;
+  flex-direction: column !important;
+  border-top: 1px solid var(--border-color) !important;
+  background: var(--bg-card) !important;
+  margin-top: auto !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), padding 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@media (min-width: 769px) {
+  /* Small Sidebar Collapsed Rail (72px) */
+  .faculty-sidebar:not(.desktop-open) .sidebar-expanded-footer,
+  #faculty-sidebar:not(.desktop-open) .sidebar-expanded-footer,
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-expanded-footer {
+    width: 72px !important;
+    padding: 0.5rem 0 0.65rem !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+  }
+
+  /* Desktop Expanded Flyout (260px) */
+  .faculty-sidebar.desktop-open .sidebar-expanded-footer,
+  #faculty-sidebar.desktop-open .sidebar-expanded-footer,
+  #vidya-faculty-sidebar.desktop-open .sidebar-expanded-footer {
+    width: 260px !important;
+    padding: 0.65rem 13px 0.85rem !important;
+    align-items: stretch !important;
+    gap: 0.45rem !important;
+  }
 }
 
 .sidebar-user-card {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0.65rem;
-  border-radius: 10px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
+  display: flex !important;
+  align-items: center !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-surface) !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.sidebar-user-card:hover {
+  background: var(--bg-surface-hover, var(--bg-surface)) !important;
+  border-color: var(--color-primary-light) !important;
+}
+
+@media (min-width: 769px) {
+  .faculty-sidebar:not(.desktop-open) .sidebar-user-card,
+  #faculty-sidebar:not(.desktop-open) .sidebar-user-card,
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-user-card {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 44px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-user-card,
+  #faculty-sidebar.desktop-open .sidebar-user-card,
+  #vidya-faculty-sidebar.desktop-open .sidebar-user-card {
+    width: 234px !important;
+    min-width: 234px !important;
+    max-width: 234px !important;
+    height: 48px !important;
+    margin: 0 !important;
+    padding: 0.45rem 0.65rem !important;
+    justify-content: flex-start !important;
+    gap: 0.65rem !important;
+  }
+
+  .faculty-sidebar:not(.desktop-open) .sidebar-user-avatar,
+  #faculty-sidebar:not(.desktop-open) .sidebar-user-avatar,
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-user-avatar,
+  #faculty-sidebar.desktop-open .sidebar-user-avatar,
+  #vidya-faculty-sidebar.desktop-open .sidebar-user-avatar {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    font-size: 0.84rem !important;
+  }
+
+  .faculty-sidebar:not(.desktop-open) .sidebar-user-meta,
+  #faculty-sidebar:not(.desktop-open) .sidebar-user-meta,
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-user-meta {
+    display: none !important;
+    opacity: 0 !important;
+    max-width: 0 !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-user-meta,
+  #faculty-sidebar.desktop-open .sidebar-user-meta,
+  #vidya-faculty-sidebar.desktop-open .sidebar-user-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    opacity: 1 !important;
+    max-width: 155px !important;
+    overflow: hidden !important;
+    line-height: 1.25 !important;
+  }
 }
 
 .sidebar-user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  color: var(--text-white, hsl(0 0% 100%));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.82rem;
-  font-weight: 700;
-  flex-shrink: 0;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
+  color: var(--text-white, hsl(0 0% 100%)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 700 !important;
+  flex-shrink: 0 !important;
 }
 
 .sidebar-user-meta {
@@ -580,54 +670,217 @@
 }
 
 .sidebar-user-name {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-main);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .sidebar-user-sub {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.72rem !important;
+  color: var(--text-muted) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
+/* Sign Out Button */
 .sidebar-signout-card-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--status-absent-bg, hsl(0 80% 95%));
-  border: 1px solid var(--status-absent, hsl(0 84% 60%));
-  color: var(--status-absent, hsl(0 84% 60%));
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.18s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--status-absent-bg, hsl(0 84% 92%)) !important;
+  background: var(--status-absent-bg, hsl(0 84% 95%)) !important;
+  color: var(--status-absent, hsl(0 84% 60%)) !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .sidebar-signout-card-btn:hover {
-  background: var(--status-absent, hsl(0 84% 60%));
-  color: var(--text-white, hsl(0 0% 100%));
+  background: var(--status-absent, hsl(0 84% 60%)) !important;
+  color: var(--text-white, hsl(0 0% 100%)) !important;
 }
 
-/* Rail Footer (Mini 72px mode) */
-.sidebar-rail-footer {
-  margin-top: auto;
-  padding: 0.75rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  border-top: 1px solid var(--border-color);
-  flex-shrink: 0;
+@media (min-width: 769px) {
+  .faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn,
+  #faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn,
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 38px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-signout-card-btn,
+  #faculty-sidebar.desktop-open .sidebar-signout-card-btn,
+  #vidya-faculty-sidebar.desktop-open .sidebar-signout-card-btn {
+    width: 234px !important;
+    min-width: 234px !important;
+    max-width: 234px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    padding: 0.55rem 0.85rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn span,
+  #faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn span,
+  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn span {
+    display: none !important;
+  }
+
+  .faculty-sidebar.desktop-open .sidebar-signout-card-btn span,
+  #faculty-sidebar.desktop-open .sidebar-signout-card-btn span,
+  #vidya-faculty-sidebar.desktop-open .sidebar-signout-card-btn span {
+    display: inline !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FACULTY LOGOUT CONFIRMATION MODAL
+   ══════════════════════════════════════════════════════════════ */
+.faculty-logout-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: hsl(0 0% 0% / 0.55) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  z-index: 100060 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.25rem !important;
+  box-sizing: border-box !important;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.faculty-logout-modal:not(.open) {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.faculty-logout-modal.open {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.faculty-logout-dialog {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 20px !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  padding: 1.6rem 1.6rem 1.4rem !important;
+  box-shadow: 0 24px 60px hsl(0 0% 0% / 0.28), 0 0 0 1px hsl(0 0% 100% / 0.06) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.4rem !important;
+  box-sizing: border-box !important;
+  transform: scale(0.94) translateY(8px);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.faculty-logout-modal.open .faculty-logout-dialog {
+  transform: scale(1) translateY(0) !important;
+}
+
+.faculty-logout-dialog-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 1rem !important;
+}
+
+.faculty-logout-icon-bubble {
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  min-height: 50px !important;
+  border-radius: 16px !important;
+  background: var(--status-absent-bg, hsl(0 84% 95%)) !important;
+  color: var(--status-absent, hsl(0 84% 58%)) !important;
+  border: 1px solid hsl(0 84% 88%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 14px hsl(0 84% 60% / 0.18) !important;
+}
+
+.faculty-logout-text-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.3rem !important;
+}
+
+.faculty-logout-title {
+  margin: 0 !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: var(--text-main) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.faculty-logout-subtitle {
+  margin: 0 !important;
+  font-size: 0.88rem !important;
+  color: var(--text-muted) !important;
+  line-height: 1.45 !important;
+}
+
+.faculty-logout-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.75rem !important;
+  margin-top: 0.2rem !important;
+}
+
+.faculty-logout-cancel-btn {
+  padding: 0.6rem 1.15rem !important;
+  border-radius: 10px !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  cursor: pointer !important;
+  transition: all 0.16s ease !important;
+}
+
+.faculty-logout-cancel-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface)) !important;
+}
+
+.faculty-logout-confirm-btn {
+  padding: 0.6rem 1.35rem !important;
+  border-radius: 10px !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  background: var(--status-absent, hsl(0 84% 60%)) !important;
+  border: 1px solid var(--status-absent, hsl(0 84% 56%)) !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px hsl(0 84% 60% / 0.3) !important;
+  transition: all 0.16s ease !important;
+}
+
+.faculty-logout-confirm-btn:hover {
+  filter: brightness(1.08) !important;
+  transform: translateY(-1px) !important;
 }
 
 .rail-footer-btn {
@@ -680,23 +933,99 @@
 /* Desktop Flyout Backdrop */
 .sidebar-backdrop,
 .faculty-sidebar-backdrop {
-  position: fixed;
-  inset: 0;
-  background: hsl(0 0% 0% / 0.45);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.22s ease;
+  position: fixed !important;
+  top: 60px !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  height: calc(100dvh - 60px) !important;
+  background: hsl(0 0% 0% / 0.35) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.22s ease !important;
 }
 
 .sidebar-backdrop.active,
 .sidebar-backdrop.open,
 .faculty-sidebar-backdrop.active,
 .faculty-sidebar-backdrop.open {
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ── Desktop Rail Toggle Expand/Collapse Button (Matches Admin Image 9) ── */
+.faculty-sidebar:not(.desktop-open) .sidebar-rail-toggle-item,
+.faculty-app-layout.sidebar-collapsed .sidebar-rail-toggle-item,
+html.sidebar-collapsed .sidebar-rail-toggle-item {
+  width: 48px !important;
+  height: 44px !important;
+  margin: 0.4rem auto 0.2rem auto !important;
+  border: 1px dashed var(--color-primary-light, hsl(217 91% 85%)) !important;
+  background: var(--bg-surface) !important;
+  color: var(--color-primary) !important;
+  cursor: pointer !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.faculty-sidebar:not(.desktop-open) .sidebar-rail-toggle-item .sidebar-toggle-icon svg,
+.faculty-app-layout.sidebar-collapsed .sidebar-rail-toggle-item .sidebar-toggle-icon svg {
+  stroke: var(--color-primary) !important;
+  width: 16px !important;
+  height: 16px !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.faculty-sidebar:not(.desktop-open) .sidebar-rail-toggle-item:hover,
+.faculty-app-layout.sidebar-collapsed .sidebar-rail-toggle-item:hover {
+  background: var(--color-primary) !important;
+  color: var(--text-white, hsl(0 0% 100%)) !important;
+  border-color: var(--color-primary) !important;
+  border-style: solid !important;
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 4px 12px hsl(217 91% 60% / 0.28) !important;
+}
+
+.faculty-sidebar:not(.desktop-open) .sidebar-rail-toggle-item:hover .sidebar-toggle-icon svg,
+.faculty-app-layout.sidebar-collapsed .sidebar-rail-toggle-item:hover .sidebar-toggle-icon svg {
+  stroke: var(--text-white, hsl(0 0% 100%)) !important;
+  transform: translateX(2px) !important;
+}
+
+/* Expanded Flyout Drawer mode: full-width button with label */
+.faculty-sidebar.desktop-open .sidebar-rail-toggle-item {
+  width: calc(100% - 1.5rem) !important;
+  height: 46px !important;
+  margin: 0.35rem 0.75rem 0.2rem 0.75rem !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  padding: 0 0.85rem !important;
+  gap: 0.75rem !important;
+  border-radius: 12px !important;
+  background: var(--bg-surface) !important;
+  border: 1px dashed var(--border-color) !important;
+  color: var(--text-muted) !important;
+  cursor: pointer !important;
+  display: flex !important;
+}
+
+.faculty-sidebar.desktop-open .sidebar-rail-toggle-item:hover {
+  background: var(--bg-surface-hover, var(--bg-surface)) !important;
+  border-color: var(--color-primary-light) !important;
+  color: var(--color-primary) !important;
+}
+
+.faculty-sidebar.desktop-open .sidebar-rail-toggle-item .sidebar-toggle-icon svg {
+  transform: rotate(180deg) !important;
+  stroke: currentColor !important;
 }
 
 .mobile-top-header {
@@ -712,98 +1041,206 @@
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    padding-top: 58px !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
+  /* ── 4.1 Mobile Top Header ── */
   .mobile-top-header {
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 56px;
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 58px !important;
+    background: var(--bg-card) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid var(--border-color) !important;
     display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
-    z-index: 9998;
-    box-sizing: border-box;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 0.85rem !important;
+    z-index: 9998 !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 1px 4px hsl(0 0% 0% / 0.05) !important;
   }
 
-  .mobile-header-left,
-  .mobile-header-right {
-    display: flex;
-    align-items: center;
+  .mobile-header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
   }
 
   .mobile-hamburger-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: transparent;
-    border: none;
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    border-radius: 10px !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    transition: all 0.16s ease !important;
+    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.04) !important;
+  }
+
+  .mobile-hamburger-btn:active {
+    transform: scale(0.93) !important;
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
   }
 
   .mobile-brand-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    color: var(--text-main);
-    font-size: 1.1rem;
-    font-weight: 700;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    text-decoration: none !important;
+    color: var(--text-main) !important;
   }
 
   .mobile-brand-icon {
-    color: var(--color-primary);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+  }
+
+  .mobile-brand-text-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    line-height: 1.1 !important;
+  }
+
+  .mobile-brand-text {
+    font-size: 1.02rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--text-main) !important;
+  }
+
+  .mobile-brand-sub {
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    color: var(--color-primary) !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+  }
+
+  .mobile-header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
   }
 
   .mobile-header-icon-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    cursor: pointer;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 50% !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    transition: all 0.16s ease !important;
+    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.04) !important;
+  }
+
+  .mobile-header-icon-btn:active {
+    transform: scale(0.92) !important;
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
   }
 
   .mobile-bell-badge {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    background: var(--status-absent, hsl(0 84% 60%));
-    color: var(--text-white, hsl(0 0% 100%));
-    font-size: 0.65rem;
-    font-weight: 700;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute !important;
+    top: -2px !important;
+    right: -2px !important;
+    background: var(--status-absent, hsl(0 84% 60%)) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    font-size: 0.62rem !important;
+    font-weight: 700 !important;
+    border-radius: 50% !important;
+    width: 16px !important;
+    height: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 2px solid var(--bg-card) !important;
   }
 
-  /* Mobile Drawer Sliding Behavior */
+  .mobile-avatar-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    border: 2px solid var(--border-color) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 6px hsl(217 91% 60% / 0.25) !important;
+    transition: all 0.16s ease !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobile-avatar-btn:active {
+    transform: scale(0.92) !important;
+  }
+
+  .mobile-avatar-initials {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .mobile-avatar-dot {
+    position: absolute !important;
+    bottom: -1px !important;
+    right: -1px !important;
+    width: 9px !important;
+    height: 9px !important;
+    background: var(--status-present, hsl(142 71% 45%)) !important;
+    border: 2px solid var(--bg-card) !important;
+    border-radius: 50% !important;
+  }
+
+  /* ── 4.2 Mobile Slideout Drawer (<= 768px) ── */
   #vidya-faculty-sidebar,
   #faculty-sidebar,
   #app-sidebar.faculty-sidebar,
   .faculty-sidebar {
+    position: fixed !important;
+    top: 58px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: calc(100dvh - 58px) !important;
     width: 280px !important;
     max-width: 85vw !important;
     transform: translateX(-100%) !important;
     transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1) !important;
     box-shadow: none !important;
     border-right: 1px solid var(--border-color) !important;
+    background: var(--bg-card) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    z-index: 10000 !important;
   }
 
   #vidya-faculty-sidebar.open,
@@ -816,93 +1253,382 @@
     box-shadow: 16px 0 40px hsl(0 0% 0% / 0.35) !important;
   }
 
+  /* Redundant sidebar headers and collapse buttons hidden across mobile */
   .sidebar-rail-header,
-  .sidebar-rail-footer {
+  .sidebar-rail-footer,
+  .sidebar-expanded-header,
+  .sidebar-desktop-collapse-btn,
+  .sidebar-mobile-close-btn,
+  .sidebar-rail-toggle-item {
     display: none !important;
-  }
-
-  .sidebar-expanded-header {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    padding: 0 1rem;
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-  }
-
-  .sidebar-desktop-collapse-btn {
-    display: none !important;
-  }
-
-  .sidebar-mobile-close-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    color: var(--text-muted);
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
   }
 
   .sidebar-nav-body {
-    padding: 0.75rem 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    overflow-y: auto;
+    padding: 0.75rem 0.65rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+    overflow-y: auto !important;
+    flex: 1 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* CRITICAL: HIDE SHORT LABELS ON MOBILE TO ELIMINATE DUPLICATION */
+  #faculty-sidebar .sidebar-nav-short-label,
+  #vidya-faculty-sidebar .sidebar-nav-short-label,
+  .faculty-sidebar .sidebar-nav-short-label,
+  .sidebar-nav-short-label {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* HIDE DASHBOARD LINK ON MOBILE (USER REQUIREMENT) */
+  #faculty-sidebar [data-nav="dashboard"],
+  #vidya-faculty-sidebar [data-nav="dashboard"],
+  .faculty-sidebar [data-nav="dashboard"] {
+    display: none !important;
+  }
+
+  /* SINGLE CLEAN FULL LABEL ON MOBILE */
+  .sidebar-nav-label {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    color: inherit !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    pointer-events: auto !important;
   }
 
   .sidebar-nav-item {
     margin: 0 !important;
-    height: 44px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    padding: 0 0.75rem;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    text-decoration: none;
+    height: 46px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 0 0.85rem !important;
+    gap: 0.75rem !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 1px 3px hsl(0 0% 0% / 0.04) !important;
+    color: var(--text-muted) !important;
+    text-decoration: none !important;
+    transition: all 0.16s ease !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
-  .sidebar-nav-label {
-    opacity: 1 !important;
-    font-size: 0.9rem;
-    font-weight: 600;
+  /* Expand/Collapse button inside sidebar navigation links (Desktop only) */
+  @media (min-width: 769px) {
+    .faculty-sidebar .sidebar-rail-toggle-item,
+    #faculty-sidebar .sidebar-rail-toggle-item,
+    #vidya-faculty-sidebar .sidebar-rail-toggle-item {
+      display: flex !important;
+      cursor: pointer !important;
+    }
   }
 
+  @media (max-width: 768px) {
+    .faculty-sidebar .sidebar-rail-toggle-item,
+    #faculty-sidebar .sidebar-rail-toggle-item,
+    #vidya-faculty-sidebar .sidebar-rail-toggle-item {
+      display: none !important;
+    }
+  }
+
+  .sidebar-nav-item:hover,
+  .sidebar-nav-item:active {
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
+    border-color: var(--color-primary-light, var(--color-primary)) !important;
+    color: var(--color-primary) !important;
+  }
+
+  .sidebar-nav-item.active {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
+    border-color: var(--color-primary-hover) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    box-shadow: 0 3px 10px hsl(217 91% 60% / 0.35) !important;
+  }
+
+  .sidebar-nav-item.active .sidebar-nav-icon svg {
+    stroke: var(--text-white, hsl(0 0% 100%)) !important;
+  }
+
+  .sidebar-nav-item.active .sidebar-nav-label {
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    font-weight: 700 !important;
+  }
+
+  .sidebar-nav-icon {
+    width: 22px !important;
+    height: 22px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sidebar-nav-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: currentColor !important;
+    display: block !important;
+  }
+
+  /* ── 4.3 Mobile Drawer Footer: User Profile & Sign Out ── */
   .sidebar-expanded-footer {
     display: flex !important;
-    flex-direction: column;
-    gap: 0.65rem;
-    padding: 0.85rem;
-    border-top: 1px solid var(--border-color);
-    margin-top: auto;
+    flex-direction: column !important;
+    gap: 0.65rem !important;
+    padding: 0.85rem !important;
+    border-top: 1px solid var(--border-color) !important;
+    background: var(--bg-card) !important;
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
   }
 
+  .sidebar-user-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.55rem 0.7rem !important;
+    border-radius: 12px !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 1px 3px hsl(0 0% 0% / 0.04) !important;
+    box-sizing: border-box !important;
+    text-decoration: none !important;
+    transition: all 0.16s ease !important;
+  }
+
+  .sidebar-user-card:active {
+    transform: scale(0.98) !important;
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
+  }
+
+  .sidebar-user-avatar {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 2px 6px hsl(217 91% 60% / 0.3) !important;
+  }
+
+  .sidebar-user-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    flex: 1 !important;
+  }
+
+  .sidebar-user-name {
+    font-size: 0.86rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.25 !important;
+  }
+
+  .sidebar-user-sub {
+    font-size: 0.72rem !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.25 !important;
+    margin-top: 2px !important;
+  }
+
+  .sidebar-signout-card-btn {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    background: var(--status-absent-bg, hsl(0 80% 95%)) !important;
+    border: 1px solid var(--status-absent, hsl(0 84% 60%)) !important;
+    color: var(--status-absent, hsl(0 84% 60%)) !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.18s ease !important;
+    box-sizing: border-box !important;
+    padding: 0 1rem !important;
+  }
+
+  .sidebar-signout-card-btn:hover,
+  .sidebar-signout-card-btn:active {
+    background: var(--status-absent, hsl(0 84% 60%)) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+  }
+
+  .sidebar-signout-card-btn svg {
+    stroke: currentColor !important;
+    flex-shrink: 0 !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* ── 4.4 Mobile Backdrop ── */
   .sidebar-backdrop,
   .faculty-sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: hsl(0 0% 0% / 0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s ease;
+    position: fixed !important;
+    top: 58px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: calc(100dvh - 58px) !important;
+    background: hsl(0 0% 0% / 0.45) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    z-index: 9999 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.22s ease !important;
   }
 
   .sidebar-backdrop.active,
   .sidebar-backdrop.open,
   .faculty-sidebar-backdrop.active,
   .faculty-sidebar-backdrop.open {
-    opacity: 1;
-    pointer-events: auto;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* ── 4.5 Mobile Bottom Navigation Bar (5 Canonical Tabs) ── */
+  .mobile-bottom-nav {
+    display: block !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    background: var(--bg-card) !important;
+    border-top: 1px solid var(--border-color) !important;
+    z-index: 9990 !important;
+    box-shadow: 0 -3px 14px hsl(0 0% 0% / 0.07) !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobile-bottom-nav-inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    height: 58px !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    position: relative !important;
+  }
+
+  .mobile-nav-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    flex: 1 !important;
+    height: 100% !important;
+    color: var(--text-muted) !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 6px 2px 4px 2px !important;
+    position: relative !important;
+    transition: color 0.15s ease !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobile-nav-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    transition: transform 0.15s ease !important;
+  }
+
+  .mobile-nav-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: currentColor !important;
+    transition: stroke 0.15s ease !important;
+  }
+
+  .mobile-nav-label {
+    font-size: 0.68rem !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    transition: color 0.15s ease, font-weight 0.15s ease !important;
+  }
+
+  .mobile-nav-indicator {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 0 !important;
+    height: 3px !important;
+    background: var(--color-primary) !important;
+    border-radius: 3px 3px 0 0 !important;
+    transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .mobile-nav-item:hover,
+  .mobile-nav-item:active {
+    color: var(--color-primary) !important;
+  }
+
+  .mobile-nav-item.active {
+    color: var(--color-primary) !important;
+  }
+
+  .mobile-nav-item.active .mobile-nav-icon {
+    background: var(--color-primary-light, hsl(215 90% 95%)) !important;
+    border-radius: 999px !important;
+    padding: 3px 18px !important;
+    color: var(--color-primary) !important;
+    transform: none !important;
+  }
+
+  .mobile-nav-item.active .mobile-nav-label {
+    font-weight: 700 !important;
+    color: var(--color-primary) !important;
+  }
+
+  .mobile-nav-item.active .mobile-nav-indicator {
+    display: none !important;
   }
 }
 
@@ -989,4 +1715,15 @@
   .faculty-sidebar.open [data-tooltip]::before {
     display: none !important;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Exclusive Classroom Workspace Mobile Bottom Navigation
+   ───────────────────────────────────────────────────────────── */
+body:has(#classroom-mobile-bottom-nav) .faculty-mobile-bottom-nav,
+body:has(.classroom-mobile-bottom-nav) .faculty-mobile-bottom-nav,
+.page-group-detail .faculty-mobile-bottom-nav {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

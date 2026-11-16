@@ -195,7 +195,6 @@ try {
       await loadDepartments();
       await loadAllFaculty();
       await loadHODs();
-      await loadCommonFacultyManager();
       await loadRegistrationGates();
       await loadTrashCount();
       await loadPendingHods();
@@ -205,7 +204,17 @@ try {
     async function loadAllFaculty() {
       try {
         const r = await apiFetch(`${API}/admin/teachers`);
-        allFacultyList = r.data || [];
+        allFacultyList = (r.data || []).filter(f => {
+          if (!f) return false;
+          const roles = String(f.roles || '');
+          const emp = String(f.employee_id || '');
+          const email = String(f.gmail || f.email || '');
+          const name = String(f.full_name || '');
+          if (roles.includes('SYSTEM_ADMIN') || emp === 'ADMIN-01' || email === 'admin@gmail.com' || name.toLowerCase().includes('system administrator')) {
+            return false;
+          }
+          return true;
+        });
         updateFacultyCounters();
         populateFacultyDeptFilter();
         applyFacultyFilters();
@@ -343,9 +352,9 @@ try {
 
       // Update chip counts
       const cAll = list.length;
-      const cTeachers = list.filter(f => !f.is_hod && !f.is_common_faculty_manager).length;
+      const cTeachers = list.filter(f => !f.is_hod && f.department_id !== null && f.department_id !== undefined && f.department_code !== 'COMMON').length;
       const cHods = list.filter(f => f.is_hod).length;
-      const cCfm = list.filter(f => f.is_common_faculty_manager).length;
+      const cCommon = list.filter(f => !f.department_id || f.department_id === null || f.department_code === 'COMMON' || f.department_name === 'Common').length;
       const cPending = (pendingHodsList || []).length;
       const cActive = list.filter(f => f.status === 'ACTIVE').length;
       const cInactive = list.filter(f => f.status === 'INACTIVE').length;
@@ -353,7 +362,7 @@ try {
       const elCAll = document.getElementById('chip-count-all');
       const elCTeachers = document.getElementById('chip-count-teachers');
       const elCHods = document.getElementById('chip-count-hods');
-      const elCCfm = document.getElementById('chip-count-cfm');
+      const elCCommon = document.getElementById('chip-count-common');
       const elCPending = document.getElementById('chip-count-pending');
       const elCActive = document.getElementById('chip-count-active');
       const elCInactive = document.getElementById('chip-count-inactive');
@@ -361,7 +370,7 @@ try {
       if (elCAll) elCAll.textContent = cAll;
       if (elCTeachers) elCTeachers.textContent = cTeachers;
       if (elCHods) elCHods.textContent = cHods;
-      if (elCCfm) elCCfm.textContent = cCfm;
+      if (elCCommon) elCCommon.textContent = cCommon;
       if (elCPending) elCPending.textContent = cPending;
       if (elCActive) elCActive.textContent = cActive;
       if (elCInactive) elCInactive.textContent = cInactive;
@@ -403,11 +412,11 @@ try {
 
       // Filter by role chip
       if (activeFacultyRoleFilter === 'TEACHER') {
-        list = list.filter(f => !f.is_hod && !f.is_common_faculty_manager);
+        list = list.filter(f => !f.is_hod && f.department_id !== null && f.department_code !== 'COMMON');
       } else if (activeFacultyRoleFilter === 'HOD') {
         list = list.filter(f => f.is_hod);
-      } else if (activeFacultyRoleFilter === 'CFM') {
-        list = list.filter(f => f.is_common_faculty_manager);
+      } else if (activeFacultyRoleFilter === 'COMMON') {
+        list = list.filter(f => !f.department_id || f.department_id === null || f.department_code === 'COMMON' || f.department_name === 'Common');
       } else if (activeFacultyRoleFilter === 'ACTIVE') {
         list = list.filter(f => f.status === 'ACTIVE');
       } else if (activeFacultyRoleFilter === 'INACTIVE') {
@@ -475,14 +484,15 @@ try {
             <tbody>
               ${filteredFacultyList.map(f => {
                 const initial = (f.full_name || 'F').charAt(0).toUpperCase();
+                const isCommon = !f.department_id || f.department_code === 'COMMON' || f.department_name === 'Common';
                 const deptObj = departments.find(d => d.id === f.department_id || d.code === f.department_code);
-                const deptShort = f.department_code || (deptObj ? deptObj.code : (f.department_name ? f.department_name.split(' ').map(w => w[0]).join('').toUpperCase() : '—'));
+                const deptShort = isCommon ? 'COMMON' : (f.department_code || (deptObj ? deptObj.code : (f.department_name ? f.department_name.split(' ').map(w => w[0]).join('').toUpperCase() : '—')));
 
                 let roleBadge = '<span class="fac-role-pill fac-role-teacher">Faculty</span>';
                 if (f.is_hod) {
                   roleBadge = '<span class="fac-role-pill fac-role-hod">HOD</span>';
-                } else if (f.is_common_faculty_manager) {
-                  roleBadge = '<span class="fac-role-pill fac-role-cfm">Common Mgr</span>';
+                } else if (isCommon) {
+                  roleBadge = '<span class="fac-role-pill fac-role-cfm" style="background:rgba(16,185,129,0.12);color:#059669;border-color:rgba(16,185,129,0.25);">Common</span>';
                 }
 
                 const isInactive = f.status !== 'ACTIVE';
@@ -552,8 +562,9 @@ try {
       if (mwrap) {
         mwrap.innerHTML = filteredFacultyList.map(f => {
           const initial = (f.full_name || 'F').charAt(0).toUpperCase();
+          const isCommon = !f.department_id || f.department_code === 'COMMON' || f.department_name === 'Common';
           const deptObj = departments.find(d => d.id === f.department_id || d.code === f.department_code);
-          const deptShort = f.department_code || (deptObj ? deptObj.code : (f.department_name ? f.department_name.split(' ').map(w => w[0]).join('').toUpperCase() : 'GEN'));
+          const deptShort = isCommon ? 'COMMON' : (f.department_code || (deptObj ? deptObj.code : (f.department_name ? f.department_name.split(' ').map(w => w[0]).join('').toUpperCase() : 'GEN')));
           const isInactive = f.status !== 'ACTIVE';
 
           return `
@@ -564,7 +575,7 @@ try {
                   <div class="fac-mini-name-row">
                     <span class="fac-mini-name">${escHtml(cleanFacultyDisplayName(f.full_name))}</span>
                     ${f.is_hod ? '<span class="fac-mini-badge hod">HOD</span>' : ''}
-                    ${f.is_common_faculty_manager ? '<span class="fac-mini-badge cfm">CFM</span>' : ''}
+                    ${isCommon ? '<span class="fac-mini-badge" style="background:rgba(16,185,129,0.15);color:#059669;font-weight:600;">Common</span>' : ''}
                     ${isInactive ? '<span class="fac-mini-badge suspended">Suspended</span>' : ''}
                   </div>
                   <div class="fac-mini-subtext">
@@ -639,11 +650,10 @@ try {
       const employeeId = document.getElementById('add-fac-employee-id').value.trim();
       const phone = document.getElementById('add-fac-phone').value.trim();
       const departmentId = document.getElementById('add-fac-dept').value;
-      const rawRole = document.getElementById('add-fac-role').value;
-      const role = rawRole === 'CFM' ? 'COMMON_FACULTY_MANAGER' : rawRole;
+      const role = document.getElementById('add-fac-role').value;
       const password = document.getElementById('add-fac-password').value;
 
-      if (!fullName || !email || !departmentId || !password) {
+      if (!fullName || !email || !password) {
         if (err) {
           err.textContent = 'Please fill in all required fields.';
           err.style.display = 'block';
@@ -660,7 +670,7 @@ try {
             email,
             employee_id: employeeId,
             phone,
-            department_id: parseInt(departmentId, 10),
+            department_id: departmentId ? parseInt(departmentId, 10) : null,
             role,
             password
           })
@@ -671,7 +681,6 @@ try {
           showToast(res.message || 'Faculty registered successfully!', 'success');
           await loadAllFaculty();
           await loadHODs();
-          if (role === 'COMMON_FACULTY_MANAGER') await loadCommonFacultyManager();
         } else {
           throw new Error(res.message || 'Failed to create faculty');
         }
@@ -760,8 +769,11 @@ try {
 
       const roleBadges = [];
       if (fac.is_hod) roleBadges.push(`<span class="fac-role-pill fac-role-hod">Head of Department (${escHtml(fac.hod_department_name || fac.department_name || '')})</span>`);
-      if (fac.is_common_faculty_manager) roleBadges.push(`<span class="fac-role-pill fac-role-cfm">Common Faculty Manager</span>`);
-      if (roleBadges.length === 0) roleBadges.push(`<span class="fac-role-pill fac-role-teacher">Faculty Teacher</span>`);
+      if (!fac.department_id || fac.department_code === 'COMMON' || fac.department_name === 'Common') {
+        roleBadges.push(`<span class="fac-role-pill fac-role-cfm" style="background:rgba(16,185,129,0.12);color:#059669;border-color:rgba(16,185,129,0.25);">Common Faculty</span>`);
+      } else {
+        roleBadges.push(`<span class="fac-role-pill fac-role-teacher">Faculty Teacher</span>`);
+      }
 
       const statusBadge = fac.status === 'ACTIVE'
         ? `<span class="fac-status-pill active"><span class="fac-status-dot"></span>Active</span>`
@@ -2275,135 +2287,13 @@ try {
       }
     }
 
-    // ─── Common Faculty Manager ──────────────────────────────
-    async function loadCommonFacultyManager() {
-      try {
-        const r = await apiFetch(`${API}/admin/common-faculty-manager`);
-        renderCommonFacultyManager(r.data);
-      } catch (e) {
-        console.error('Failed to load Common Faculty Manager:', e);
-        document.getElementById('common-mgr-content').innerHTML =
-          `<div style="color: var(--status-absent); font-size: 0.85rem;">Failed to load manager: ${escHtml(e.message)}</div>`;
-      }
-    }
-
-    function renderCommonFacultyManager(manager) {
-      const wrap = document.getElementById('common-mgr-content');
-      if (!manager) {
-        wrap.innerHTML = `
-          <div class="fac-mgr-compact-box">
-            <div class="fac-mgr-compact-info">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <span>No manager appointed (cross-department courses)</span>
-            </div>
-            <button type="button" class="btn btn-primary btn-sm" onclick="openAppointCommonMgrModal()">+ Appoint</button>
-          </div>`;
-        return;
-      }
-
-      wrap.innerHTML = `
-        <div class="fac-mgr-appointed-box">
-          <div class="fac-mgr-appointed-left">
-            <div class="fac-mgr-avatar">
-              ${(manager.full_name || 'M').charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <div class="fac-mgr-name-row">
-                <strong>${escHtml(cleanFacultyDisplayName(manager.full_name))}</strong>
-                <span class="badge badge-present" style="font-size:0.68rem; padding:0.1rem 0.35rem;">Active Manager</span>
-                ${manager.department_code || manager.department_name ? `<span class="fac-mgr-dept">(${escHtml(manager.department_code || manager.department_name)})</span>` : ''}
-              </div>
-              <div class="fac-mgr-meta-row">
-                <span class="fac-empid-pill">${manager.employee_id ? escHtml(manager.employee_id) : 'EMP#' + manager.teacher_id}</span>
-              </div>
-            </div>
-          </div>
-          <div class="fac-mgr-actions">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="openAppointCommonMgrModal()">Change</button>
-            <button type="button" class="btn btn-secondary btn-sm fac-btn-danger-outline" onclick="removeCommonMgr('${escHtml(manager.full_name)}')">Remove</button>
-          </div>
-        </div>`;
-    }
-
-    async function openAppointCommonMgrModal() {
-      const select = document.getElementById('common-mgr-teacher-select');
-      const errEl = document.getElementById('appoint-common-mgr-err');
-      errEl.style.display = 'none';
-      select.innerHTML = '<option value="">Loading faculty list...</option>';
-      showModal('appoint-common-mgr-modal');
-
-      try {
-        const r = await apiFetch(`${API}/admin/teachers`);
-        allTeachersList = r.data || [];
-        select.innerHTML = '<option value="">— Select an active faculty member —</option>';
-        allTeachersList.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t.teacher_id;
-          opt.textContent = `${t.full_name} (${t.gmail})${t.department_name ? ' — ' + t.department_name : ' — Common'}`;
-          select.appendChild(opt);
-        });
-      } catch (e) {
-        select.innerHTML = '<option value="">Failed to load teachers</option>';
-        errEl.textContent = e.message || 'Could not load faculty list.';
-        errEl.style.display = 'block';
-      }
-    }
-
-    function closeAppointCommonMgrModal() {
-      hideModal('appoint-common-mgr-modal');
-    }
-
-    async function submitAppointCommonMgr() {
-      const select = document.getElementById('common-mgr-teacher-select');
-      const teacherId = select.value;
-      const errEl = document.getElementById('appoint-common-mgr-err');
-      const btn = document.getElementById('btn-submit-common-mgr');
-
-      if (!teacherId) {
-        errEl.textContent = 'Please select a faculty member.';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Saving...';
-      errEl.style.display = 'none';
-
-      try {
-        const res = await apiFetch(`${API}/admin/common-faculty-manager`, {
-          method: 'POST',
-          body: JSON.stringify({ teacher_id: parseInt(teacherId) })
-        });
-        closeAppointCommonMgrModal();
-        showToast(res.message || 'Common Faculty Manager appointed successfully!', 'success');
-        await loadCommonFacultyManager();
-      } catch (err) {
-        errEl.textContent = err.message || 'Failed to appoint Common Faculty Manager.';
-        errEl.style.display = 'block';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Save Appointment';
-      }
-    }
-
-    async function removeCommonMgr(name) {
-      const ok = await showStyledConfirm({
-        title: 'Remove Common Faculty Manager',
-        message: `Are you sure you want to remove ${name} from the Common Faculty Manager role?`,
-        confirmText: 'Remove Role',
-        isDanger: true,
-        icon: 'danger'
-      });
-      if (!ok) return;
-
-      try {
-        const res = await apiFetch(`${API}/admin/common-faculty-manager`, { method: 'DELETE' });
-        showToast(res.message || 'Common Faculty Manager removed.', 'info');
-        await loadCommonFacultyManager();
-      } catch (err) {
-        showToast(err.message || 'Failed to remove manager.', 'error');
-      }
-    }
+    // ─── Common Faculty Management: Managed directly by Admin ───
+    async function loadCommonFacultyManager() {}
+    function renderCommonFacultyManager() {}
+    async function openAppointCommonMgrModal() {}
+    function closeAppointCommonMgrModal() {}
+    async function submitAppointCommonMgr() {}
+    async function removeCommonMgr() {}
 
     // ─── 3-Dot Kebab Action Menu Helper ───────────────────────
     function toggleHodKebab(event, containerId) {

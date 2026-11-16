@@ -1,183 +1,200 @@
 /**
- * VIDYAOS UNIFIED INSTITUTIONAL HERO COMPONENT STYLES
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS UNIFIED INSTITUTIONAL HERO COMPONENT STYLES (dept-hero.css)
  * Location: /faculty/components/dept-hero/dept-hero.css
+ * 
+ * Clean Institutional Showcase Card matching Admin Dashboard (Image 8 & 9)
+ * Dynamically populated from Admin Settings (logo, college name, banner photo)
  * 100% Theme Token Compliant — Zero Hardcoded Hex Colors
+ * ══════════════════════════════════════════════════════════════
  */
 
+.dash-hero-card,
 .dept-hero-component {
+  position: relative;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  padding: 0.85rem 1.15rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.25rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 0.85rem 1.25rem;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  min-height: 84px;
+  margin-bottom: 1.15rem;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
-/* ── Left Column: Logo + College Branding + Divider + Page Title ── */
-.hero-left-col {
+.dash-hero-brand-group {
   display: flex;
   align-items: center;
-  gap: 0.95rem;
-  flex: 1;
-  min-width: 0;
-  flex-wrap: wrap;
-}
-
-/* Circular College Logo Emblem */
-.hero-logo-circle-wrap {
-  width: 52px;
-  height: 52px;
-  min-width: 52px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid var(--border-color);
-  box-shadow: var(--shadow-xs);
-  background: var(--bg-surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.hero-inst-logo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* College Name & Tagline */
-.hero-inst-text-block {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.hero-inst-name {
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: var(--text-main);
-  margin: 0;
-  line-height: 1.2;
-}
-
-.hero-inst-tagline {
-  font-size: 0.74rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  margin: 3px 0 0 0;
-  line-height: 1.25;
-}
-
-/* Elegant Thin Vertical Divider */
-.hero-vertical-divider {
-  width: 1px;
-  height: 38px;
-  background: var(--border-color);
-  margin: 0 0.35rem;
-  flex-shrink: 0;
-}
-
-/* Page Title & Subtitle */
-.hero-page-text-block {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.hero-page-title {
-  font-size: 1.18rem;
-  font-weight: 800;
-  letter-spacing: -0.015em;
-  color: var(--text-main);
-  margin: 0;
-  line-height: 1.2;
-}
-
-.hero-page-subtitle {
-  font-size: 0.74rem;
-  color: var(--text-muted);
-  margin: 3px 0 0 0;
-  line-height: 1.25;
-}
-
-/* ── Right Column: Panoramic Campus Photo ── */
-.hero-right-col {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-.hero-campus-photo-wrap {
-  width: 440px;
-  height: 72px;
-  min-width: 320px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-xs);
+  gap: 0.75rem;
+  z-index: 2;
   position: relative;
-  background: var(--bg-surface);
+  max-width: 66%;
+  min-width: 0;
 }
 
-.hero-campus-photo {
+.dash-hero-logo-badge {
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.dash-hero-logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.dash-hero-vdivider {
+  width: 1.5px;
+  height: 40px;
+  background: var(--border-color, #e2e8f0);
+  flex-shrink: 0;
+}
+
+.dash-hero-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dash-hero-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  white-space: normal;
+}
+
+.dash-hero-subtitle {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  margin: 0.2rem 0 0 0;
+  line-height: 1.25;
+}
+
+.dash-hero-banner-wrap {
+  position: relative;
+  width: 32%;
+  max-width: 300px;
+  height: 68px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.dash-hero-banner-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
   display: block;
 }
 
-.hero-campus-photo-overlay {
+.dash-hero-banner-glow {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(0, 0, 0, 0.05), transparent 60%);
+  background: linear-gradient(90deg, var(--bg-card, #ffffff) 0%, transparent 35%);
   pointer-events: none;
 }
 
-/* ── Responsive Adaptations ── */
-@media (max-width: 1100px) {
-  .hero-campus-photo-wrap {
-    width: 320px;
-    height: 64px;
-    min-width: 240px;
+/* ── Dark Mode Overrides ── */
+[data-theme="dark"] .dash-hero-logo-badge {
+  background: var(--bg-surface, hsl(215 28% 17%));
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .dash-hero-banner-glow {
+  background: linear-gradient(90deg, var(--bg-card, hsl(222 47% 11%)) 0%, transparent 40%);
+}
+
+/* ── Desktop Viewport (>= 769px) ── */
+@media (min-width: 769px) {
+  .dash-hero-card,
+  .dept-hero-component {
+    min-height: 100px;
+    padding: 1.15rem 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .dash-hero-logo-badge {
+    width: 66px;
+    height: 66px;
+    min-width: 66px;
+  }
+
+  .dash-hero-vdivider {
+    height: 48px;
+  }
+
+  .dash-hero-title {
+    font-size: 1.3rem;
+  }
+
+  .dash-hero-subtitle {
+    font-size: 0.82rem;
+  }
+
+  .dash-hero-banner-wrap {
+    width: 40%;
+    max-width: 420px;
+    height: 84px;
   }
 }
 
-@media (max-width: 860px) {
-  .hero-campus-photo-wrap {
-    display: none;
-  }
-  .hero-right-col {
-    display: none;
-  }
-  .hero-vertical-divider {
-    display: none;
-  }
-}
-
+/* ── Compact Mobile Viewports (<= 480px) ── */
 @media (max-width: 480px) {
+  .dash-hero-card,
   .dept-hero-component {
     padding: 0.75rem 0.85rem;
-    gap: 0.65rem;
+    min-height: 76px;
+    gap: 0.5rem;
   }
-  .hero-logo-circle-wrap {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
+
+  .dash-hero-brand-group {
+    max-width: 64%;
+    gap: 0.55rem;
   }
-  .hero-inst-name {
-    font-size: 1rem;
+
+  .dash-hero-logo-badge {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
   }
-  .hero-page-title {
-    font-size: 1rem;
+
+  .dash-hero-vdivider {
+    height: 34px;
+  }
+
+  .dash-hero-title {
+    font-size: 0.86rem;
+  }
+
+  .dash-hero-subtitle {
+    font-size: 0.65rem;
+  }
+
+  .dash-hero-banner-wrap {
+    width: 32%;
+    height: 58px;
   }
 }

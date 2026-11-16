@@ -4,8 +4,14 @@
  * frontend/faculty/group-detail/js/group-detail-core.js
  * ══════════════════════════════════════════════════════════════
  */
+(function () {
+  'use strict';
 
-var apiFetch = window.apiFetch || ((url, opts) => typeof apiRequest === 'function' ? apiRequest(url, opts) : fetchApi(url.replace(/^\/api\/v1/, ''), opts));
+  var apiFetch = window.apiFetch || ((url, opts) => {
+    if (typeof apiRequest === 'function') return apiRequest(url, opts);
+    if (window.FacultyAPI && typeof FacultyAPI.request === 'function') return FacultyAPI.request(url, opts);
+    return fetchApi(url.replace(/^\/api\/v1/, ''), opts);
+  });
 
 // Global Application State shared across classroom modules
 window.S = window.S || {
@@ -566,29 +572,23 @@ function renderUpcomingWorkSidebar() {
 }
 
 function initGroupPage() {
-  guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN', 'STUDENT'] });
+  if (typeof requireFacultyAuth === 'function') {
+    requireFacultyAuth(['TEACHER', 'HOD']);
+  } else if (typeof guardRoute === 'function') {
+    guardRoute({ roles: ['TEACHER', 'HOD'] });
+  }
   const p = new URLSearchParams(window.location.search);
   S.groupId = Number(p.get('id') || p.get('groupId') || p.get('group'));
   const hashTab = (window.location.hash || '').replace('#', '').trim();
-  const validTabs = ['stream', 'classwork', 'attendance', 'people', 'grades', 'analytics'];
+  const validTabs = ['stream', 'classwork', 'register', 'marks', 'sheets', 'people', 'attendance', 'grades', 'analytics'];
   let initTab = p.get('tab') || (validTabs.includes(hashTab) ? hashTab : '') || 'stream';
   const initAction = p.get('action');
 
-  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-  const isStudent = (user?.role === 'STUDENT') || (Array.isArray(user?.roles) && user.roles.includes('STUDENT')) || window.location.pathname.startsWith('/student');
-  S.isStudent = isStudent;
-  if (isStudent) {
-    document.body.classList.add('student-mode');
-    document.body.setAttribute('data-user-role', 'STUDENT');
-    initStudentModeUI(user);
-    if (initTab === 'register' || initTab === 'marks' || initTab === 'sheets') {
-      initTab = 'attendance';
-    }
-  }
+  S.isStudent = false;
 
   if (!S.groupId) {
     toast('No group specified');
-    setTimeout(() => location.href = isStudent ? '/student/dashboard.html' : '/faculty/groups.html', 1500);
+    setTimeout(() => location.href = '/faculty/groups', 1500);
     return;
   }
   document.body.setAttribute('data-active-tab', initTab);
@@ -608,10 +608,7 @@ function initGroupPage() {
   loadGroup().then(() => {
     switchTab(initTab);
     renderUserAvatar();
-    if (isStudent) {
-      renderUpcomingWorkSidebar();
-    }
-    if (!isStudent && (initAction === 'rollcall' || initAction === 'attendance')) {
+    if (initAction === 'rollcall' || initAction === 'attendance') {
       setTimeout(() => {
         if (typeof openClassRollCallModal === 'function') {
           openClassRollCallModal();
@@ -737,3 +734,5 @@ window.initStudentModeUI = initStudentModeUI;
 window.loadStudentSubjectAttendance = loadStudentSubjectAttendance;
 window.renderStudentAttendanceHistory = renderStudentAttendanceHistory;
 window.renderUpcomingWorkSidebar = renderUpcomingWorkSidebar;
+
+})();

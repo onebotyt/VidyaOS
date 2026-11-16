@@ -5,25 +5,38 @@
  * ══════════════════════════════════════════════════════════════
  */
 
+  const ALL_AUTH_STORAGE_KEYS = [
+    'access_token', 'accessToken', 'token', 'authToken', 'auth_token', 'vidyaos_token',
+    'user', 'currentUser', 'auth_user', 'vidyaos_user', 'user_profile', 'user_roles',
+    'role', 'roles', 'session_id'
+  ];
+
+  function purgeAllStoredAuth() {
+    ALL_AUTH_STORAGE_KEYS.forEach(k => {
+      try { localStorage.removeItem(k); } catch (_) {}
+    });
+    try { sessionStorage.removeItem('vidya_logged_out_flag'); } catch (_) {}
+    try {
+      document.cookie.split(";").forEach(c => {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+    } catch (_) {}
+  }
+
 /* ── Redirect if already logged in ── */
   (function checkExistingSession() {
-    // If user explicitly logged out or has a logout reason parameter, NEVER auto-redirect
+    // If user explicitly logged out or has a logout reason parameter, NEVER auto-redirect and wipe any stale tokens
     try {
       const params = new URLSearchParams(window.location.search);
       if (sessionStorage.getItem('vidya_logged_out_flag') || params.has('reason') || params.has('logged_out')) {
-        sessionStorage.removeItem('vidya_logged_out_flag');
+        purgeAllStoredAuth();
         return;
       }
     } catch (_) {}
 
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
     if (!token) {
-      // Clean up any stale partial user state
-      try {
-        localStorage.removeItem('user');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('auth_user');
-      } catch (_) {}
+      purgeAllStoredAuth();
       return;
     }
 
@@ -34,20 +47,24 @@
         const payload = JSON.parse(atob(parts[1]));
         if (payload.exp && (payload.exp * 1000) <= Date.now()) {
           // Token is expired! Purge and do not auto-redirect
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('user');
+          purgeAllStoredAuth();
           return;
         }
       }
     } catch (_) {}
 
     try {
-      const u = JSON.parse(localStorage.getItem('user') || 'null');
+      const u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('currentUser') || 'null');
       if (!u) return;
       const roles = u.roles || [];
       if (roles.includes('SYSTEM_ADMIN'))  { window.location.replace('/admin/dashboard');     return; }
       if (roles.includes('STUDENT'))       { window.location.replace('/student/dashboard');   return; }
+      const isMobile = window.innerWidth <= 768;
+      const isHod = roles.includes('HOD') || Boolean(u.is_hod);
+      if (isMobile && isHod) {
+        window.location.replace('/faculty/classes/index.html');
+        return;
+      }
       window.location.replace('/faculty/dashboard');
     } catch (_) {}
   })();
@@ -71,13 +88,16 @@
 
       if (!notice && reason) {
         if (reason === 'session_transferred') {
-          notice = 'Your session has ended because this account was logged into from another device.';
+          notice = 'Your session has ended because this account was logged into from another device or signed out.';
         } else if (reason === 'session_expired') {
-          notice = 'Your session expired due to 30 minutes of inactivity. Please sign in again.';
+          notice = 'Your session expired due to inactivity. Please sign in again.';
         }
       }
 
       if (notice) {
+        // Ensure stale tokens are purged so reload or auto-checks don't loop
+        purgeAllStoredAuth();
+
         const sb = document.getElementById('status-alert-banner');
         if (sb) {
           const titleEl = document.getElementById('status-alert-title');
@@ -200,6 +220,12 @@
     const roles = user.roles || [];
     if (roles.includes('SYSTEM_ADMIN'))  { window.location.href = '/admin/dashboard';   return; }
     if (roles.includes('STUDENT'))       { window.location.href = '/student/dashboard'; return; }
+    const isMobile = window.innerWidth <= 768;
+    const isHod = roles.includes('HOD') || Boolean(user.is_hod);
+    if (isMobile && isHod) {
+      window.location.href = '/faculty/classes/index.html';
+      return;
+    }
     window.location.href = '/faculty/dashboard';
   }
 
@@ -214,6 +240,8 @@
   /* ── Input events: hide banners ── */
   document.getElementById('identifier').addEventListener('input', hideBanners);
   document.getElementById('password').addEventListener('input', hideBanners);
+  document.getElementById('identifier').addEventListener('focus', hideBanners);
+  document.getElementById('password').addEventListener('focus', hideBanners);
 
   /* ── Main login submit ── */
   document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -238,10 +266,7 @@
       });
 
       if (res.success) {
-        const sb = document.getElementById('status-alert-banner');
-        if (sb && document.getElementById('status-alert-title')?.textContent === 'Server Waking Up') {
-          sb.style.display = 'none';
-        }
+        hideBanners();
         if (res.data.must_change_password) {
           currentActivationToken = res.data.activation_token;
           document.getElementById('act-name').textContent  = res.data.user?.full_name || res.data.user?.email || 'Faculty';
@@ -314,10 +339,7 @@
         force_logout: true
       });
       if (res.success) {
-        const sb = document.getElementById('status-alert-banner');
-        if (sb && document.getElementById('status-alert-title')?.textContent === 'Server Waking Up') {
-          sb.style.display = 'none';
-        }
+        hideBanners();
         setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
         try { if (typeof showToast === 'function') showToast('Previous session disconnected. Signing in…', 'success'); } catch(_) {}
         setTimeout(() => redirectAfterLogin(res.data.user), 350);

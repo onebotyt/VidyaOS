@@ -61,9 +61,9 @@
   }
 
   /**
-   * 1. Synchronize Live User Identity & Photo Avatar
+   * Helper to retrieve active user
    */
-  function syncFacultyHeader() {
+  function getUser() {
     let user = null;
     if (typeof window.getCurrentUser === 'function') {
       user = window.getCurrentUser();
@@ -74,6 +74,14 @@
         if (stored) user = JSON.parse(stored);
       } catch (_) { }
     }
+    return user;
+  }
+
+  /**
+   * 1. Synchronize Live User Identity & Photo Avatar
+   */
+  function syncFacultyHeader() {
+    const user = getUser();
 
     const name = user?.full_name || user?.name || user?.username || 'Faculty Member';
     const email = user?.email || 'faculty@college.edu';
@@ -105,6 +113,15 @@
     rolePills.forEach(el => {
       el.textContent = isHod ? 'Head of Department' : 'Faculty Member';
     });
+
+    const brandLink = document.getElementById('header-brand-link');
+    if (brandLink) {
+      if (window.innerWidth <= 768 && isHod) {
+        brandLink.href = '/faculty/classes/index.html';
+      } else {
+        brandLink.href = '/faculty/dashboard/index.html';
+      }
+    }
 
     // Check for custom uploaded avatar image in localStorage
     try {
@@ -179,14 +196,18 @@
     const dropdown = document.getElementById('header-profile-dropdown') || document.getElementById('user-profile-popover');
     const trigger = document.getElementById('header-user-profile');
     if (dropdown) {
-      dropdown.classList.add('show');
-      dropdown.style.display = 'block';
+      dropdown.classList.add('show', 'open');
+      dropdown.style.setProperty('display', 'flex', 'important');
+      dropdown.style.setProperty('opacity', '1', 'important');
+      dropdown.style.setProperty('visibility', 'visible', 'important');
       dropdown.setAttribute('aria-hidden', 'false');
     }
     if (trigger) {
       trigger.setAttribute('aria-expanded', 'true');
     }
-    // Close apps launcher if open
+    // Close notifications and apps launcher if open
+    const notifDesktop = document.getElementById('header-notifications-dropdown');
+    if (notifDesktop) notifDesktop.style.display = 'none';
     const launcher = document.getElementById('apps-launcher-dropdown');
     if (launcher) launcher.style.display = 'none';
   }
@@ -199,8 +220,8 @@
     const dropdown = document.getElementById('header-profile-dropdown') || document.getElementById('user-profile-popover');
     const trigger = document.getElementById('header-user-profile');
     if (dropdown) {
-      dropdown.classList.remove('show');
-      dropdown.style.display = 'none';
+      dropdown.classList.remove('show', 'open');
+      dropdown.style.setProperty('display', 'none', 'important');
       dropdown.setAttribute('aria-hidden', 'true');
     }
     if (trigger) {
@@ -210,8 +231,13 @@
 
   function toggleUserProfile(e) {
     if (e && e.stopPropagation) e.stopPropagation();
+    if (hoverTimer) {
+      clearTimeout(hoverTimer);
+      hoverTimer = null;
+    }
     const dropdown = document.getElementById('header-profile-dropdown') || document.getElementById('user-profile-popover');
-    const isVisible = dropdown && (dropdown.classList.contains('show') || dropdown.style.display === 'block');
+    if (!dropdown) return;
+    const isVisible = dropdown.classList.contains('show') || dropdown.classList.contains('open') || dropdown.style.display === 'flex' || dropdown.style.display === 'block';
     if (isVisible) {
       closeProfileMenu();
     } else {
@@ -223,6 +249,13 @@
     const trigger = document.getElementById('header-user-profile');
     const dropdown = document.getElementById('header-profile-dropdown') || document.getElementById('user-profile-popover');
     if (!trigger || !dropdown) return;
+
+    // Only attach mouseenter/mouseleave hover listeners on Desktop devices
+    // Touch devices (Android / iOS) trigger simulated mouseenter followed immediately by mouseleave on tap,
+    // which was closing the profile menu instantly on mobile!
+    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      return;
+    }
 
     function handleEnter() {
       if (hoverTimer) {
@@ -271,17 +304,68 @@
   }
 
   /**
+   * 4b. Notifications Dropdown Toggle (Desktop & Mobile)
+   */
+  function toggleNotifications(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const isMobile = window.innerWidth <= 768;
+    const notifDropdown = isMobile
+      ? (document.getElementById('mobile-notifications-dropdown') || document.getElementById('header-notifications-dropdown'))
+      : document.getElementById('header-notifications-dropdown');
+    if (!notifDropdown) return;
+    const isVisible = notifDropdown.style.display === 'flex' || notifDropdown.style.display === 'block' || notifDropdown.classList.contains('show');
+    if (isVisible) {
+      notifDropdown.style.display = 'none';
+      notifDropdown.classList.remove('show');
+      notifDropdown.setAttribute('aria-hidden', 'true');
+    } else {
+      closeProfileMenu();
+      const launcher = document.getElementById('apps-launcher-dropdown');
+      if (launcher) launcher.style.display = 'none';
+      notifDropdown.style.display = isMobile ? 'block' : 'flex';
+      notifDropdown.classList.add('show');
+      notifDropdown.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  function closeNotifications() {
+    ['header-notifications-dropdown', 'mobile-notifications-dropdown'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = 'none';
+        el.classList.remove('show');
+        el.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
+  /**
    * 5. Outside Click and Escape Dismissal
    */
   document.addEventListener('click', (e) => {
     const profileDropdown = document.getElementById('header-profile-dropdown') || document.getElementById('user-profile-popover');
     const profileTrigger = document.getElementById('header-user-profile');
+    const notifDesktop = document.getElementById('header-notifications-dropdown');
+    const notifMobile = document.getElementById('mobile-notifications-dropdown');
+    const bellBtn = document.getElementById('header-bell-btn') || document.getElementById('mobile-bell-btn');
     const launcherDropdown = document.getElementById('apps-launcher-dropdown');
     const launcherTrigger = document.getElementById('btn-apps-launcher');
 
     if (profileDropdown && profileDropdown.classList.contains('show')) {
       if (!profileDropdown.contains(e.target) && (!profileTrigger || !profileTrigger.contains(e.target))) {
         closeProfileMenu();
+      }
+    }
+
+    if (notifDesktop && (notifDesktop.classList.contains('show') || notifDesktop.style.display === 'flex')) {
+      if (!notifDesktop.contains(e.target) && (!bellBtn || !bellBtn.contains(e.target))) {
+        closeNotifications();
+      }
+    }
+
+    if (notifMobile && (notifMobile.classList.contains('show') || notifMobile.style.display === 'block')) {
+      if (!notifMobile.contains(e.target) && (!bellBtn || !bellBtn.contains(e.target))) {
+        closeNotifications();
       }
     }
 
@@ -295,6 +379,7 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeProfileMenu();
+      closeNotifications();
       const launcher = document.getElementById('apps-launcher-dropdown');
       if (launcher) launcher.style.display = 'none';
     }
@@ -313,26 +398,50 @@
       return;
     }
 
-    const mount = document.getElementById('faculty-header-mount');
-    const mainWrap = mount || document.querySelector('.faculty-main-wrap') || document.querySelector('.admin-main-wrap') || document.getElementById('faculty-app-layout') || document.body;
-    if (!mainWrap) return;
+    const layout = document.getElementById('faculty-app-layout') || document.getElementById('admin-app-layout') || document.body;
+    if (!layout) return;
+
+    // Clear old placeholder inside mainWrap if it exists so it takes zero space
+    const oldMount = document.getElementById('faculty-header-mount');
+    if (oldMount) {
+      oldMount.style.display = 'none';
+      oldMount.innerHTML = '';
+    }
+
+    // Clean duplicate mobile header elements
+    document.querySelectorAll('.mobile-top-header, .faculty-mobile-top-header').forEach(el => el.remove());
+
+    const user = getUser();
+    const isHod = Boolean(user && (
+      (Array.isArray(user.roles) && user.roles.includes('HOD')) ||
+      user.role === 'HOD' ||
+      user.is_hod === true ||
+      user.is_hod === 1
+    ));
+    const isMobile = window.innerWidth <= 768;
+    const homeHref = (isHod && isMobile) ? '/faculty/classes/index.html' : '/faculty/dashboard/index.html';
+    const badgeText = isHod ? 'HOD Portal' : 'Faculty Portal';
 
     const headerHtml = `
       <header class="faculty-top-header admin-top-header" id="faculty-header" aria-label="Faculty Header Bar">
         <div class="header-left">
-          <span class="header-dept-pill" id="dept-header-name" style="display:none;"></span>
-        </div>
-        <div class="header-right">
-          <!-- Apps Launcher -->
-          <button type="button" class="header-icon-btn" onclick="toggleAppsLauncher(event)" id="btn-apps-launcher" title="Academic Apps &amp; Modules" aria-label="Apps Launcher">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+          <button type="button" class="header-mobile-toggle-btn" id="faculty-nav-toggle" onclick="if(window.innerWidth>=769&&typeof toggleDesktopSidebar==='function'){toggleDesktopSidebar();}else if(typeof toggleSidebar==='function'){toggleSidebar();}" aria-label="Toggle Navigation Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-
+          <a href="${homeHref}" class="header-brand-link" id="header-brand-link" aria-label="VidyaOS Dashboard">
+            <span class="header-brand-logo">
+              <svg class="header-brand-cube" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 3.5L27.5 9.8L16 16.2L4.5 9.8L16 3.5Z" fill="var(--color-primary-light, hsl(215 90% 95%))" stroke="var(--color-primary)" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 9.8L16 16.2V28.5L4.5 22.2V9.8Z" fill="var(--color-primary, hsl(217 91% 60%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 16.2L27.5 9.8V22.2L16 28.5V16.2Z" fill="var(--color-primary-hover, hsl(224 76% 48%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 16.5V27.5" stroke="hsl(0 0% 100% / 0.4)" stroke-width="1.2" stroke-linecap="round"/><path d="M16.5 16L26.5 10.5" stroke="hsl(0 0% 100% / 0.3)" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </span>
+            <div class="header-brand-info">
+              <span class="header-brand-title">VidyaOS</span>
+            </div>
+          </a>
+        </div>
+        <div class="header-right">
           <!-- Theme Toggle -->
           <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn" onclick="toggleAppTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
             <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -340,19 +449,56 @@
             </svg>
           </button>
 
-          <!-- Round Profile Avatar -->
-          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleUserProfile(event)" aria-haspopup="true" aria-expanded="false" title="Account Profile" aria-label="Open User Profile Menu">
-            <span class="user-avatar-initials" id="header-user-initials">FA</span>
-            <span class="avatar-online-dot"></span>
+          <!-- Notification Bell Button with Red Badge (3) -->
+          <button type="button" class="header-icon-btn header-bell-btn" id="header-bell-btn" onclick="if(typeof toggleNotifications==='function'){toggleNotifications(event);}else{alert('Academic Notifications: All institutional systems operating normally.');}" aria-label="Notifications" title="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="header-bell-badge" id="header-bell-badge-count">3</span>
           </button>
 
-          <!-- Apps Launcher Dropdown -->
-          <div class="apps-launcher-dropdown" id="apps-launcher-dropdown" style="display:none;" role="menu"></div>
+          <!-- Notifications Dropdown Menu -->
+          <div class="header-notifications-dropdown" id="header-notifications-dropdown" aria-hidden="true" style="display:none;">
+            <div class="notif-dropdown-header">
+              <div class="notif-header-title">Notifications</div>
+              <span class="notif-header-badge">3 New</span>
+            </div>
+            <div class="notif-items-list">
+              <div class="notif-item unread">
+                <div class="notif-icon-circle icon-blue">📋</div>
+                <div class="notif-item-body">
+                  <div class="notif-item-title">Mid-Term Marks Verification</div>
+                  <div class="notif-item-sub">15 mins ago • IT Department</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon-circle icon-green">🏛️</div>
+                <div class="notif-item-body">
+                  <div class="notif-item-title">NBA Self-Assessment Report Due</div>
+                  <div class="notif-item-sub">2 hours ago • Academic Cell</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <div class="notif-icon-circle icon-purple">👥</div>
+                <div class="notif-item-body">
+                  <div class="notif-item-title">Department Meeting Tomorrow 10 AM</div>
+                  <div class="notif-item-sub">Today • HOD Office</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Round Profile Avatar -->
+          <button type="button" class="header-profile-round-btn" id="header-user-profile" onclick="toggleUserProfile(event)" aria-haspopup="true" aria-expanded="false" title="Account Profile" aria-label="Open User Profile Menu">
+            <span class="user-avatar-initials" id="header-user-initials">NM</span>
+            <span class="avatar-online-dot"></span>
+          </button>
 
           <!-- Dropdown Profile Menu -->
           <div class="header-profile-dropdown" id="header-profile-dropdown" aria-hidden="true">
             <div class="profile-dropdown-user-card">
-              <div class="dropdown-avatar-circle" id="dropdown-avatar-circle" aria-hidden="true">FA</div>
+              <div class="dropdown-avatar-circle" id="dropdown-avatar-circle" aria-hidden="true">NM</div>
               <div class="dropdown-user-meta">
                 <span class="dropdown-full-name" id="dropdown-full-name">Faculty Member</span>
                 <span class="dropdown-email" id="dropdown-email">faculty@college.edu</span>
@@ -360,14 +506,14 @@
               </div>
             </div>
             <div class="profile-dropdown-divider"></div>
-            <a href="/faculty/profile.html" class="profile-dropdown-item">
+            <a href="/faculty/profile/index.html" class="profile-dropdown-item">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
               <span>My Profile</span>
             </a>
-            <a href="/faculty/timetable.html" class="profile-dropdown-item">
+            <a href="/faculty/timetable/index.html" class="profile-dropdown-item">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -377,7 +523,7 @@
               <span>Weekly Timetable</span>
             </a>
             <div class="profile-dropdown-divider"></div>
-            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="logout()">
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn" onclick="if(typeof confirmFacultyLogout==='function'){confirmFacultyLogout();}else if(typeof facultyLogout==='function'){facultyLogout();}else if(typeof logout==='function'){logout();}">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                 <polyline points="16 17 21 12 16 7"></polyline>
@@ -390,11 +536,7 @@
       </header>
     `;
 
-    if (mount) {
-      mount.innerHTML = headerHtml;
-    } else {
-      mainWrap.insertAdjacentHTML('afterbegin', headerHtml);
-    }
+    layout.insertAdjacentHTML('afterbegin', headerHtml);
     syncFacultyHeader();
     setupProfileHover();
   }
@@ -404,6 +546,7 @@
   window.toggleDashboardTheme = toggleAppTheme;
   window.toggleUserProfile = toggleUserProfile;
   window.toggleAdminProfileMenu = toggleUserProfile;
+  window.toggleNotifications = toggleNotifications;
   window.toggleAppsLauncher = toggleAppsLauncher;
   window.syncFacultyHeader = syncFacultyHeader;
   window.syncHeaderIdentity = syncFacultyHeader;

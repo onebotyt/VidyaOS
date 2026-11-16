@@ -40,9 +40,13 @@ async function fetchApi(endpoint, options = {}) {
             handleSessionRevocation('session_transferred');
             return;
           }
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('user');
+          if (typeof window.handleSessionRevocation === 'function') {
+            window.handleSessionRevocation('session_transferred');
+            return;
+          }
+          ['access_token', 'accessToken', 'token', 'authToken', 'user', 'currentUser', 'auth_user', 'vidyaos_token', 'vidyaos_user'].forEach(k => {
+            try { localStorage.removeItem(k); } catch (_) {}
+          });
           try { sessionStorage.clear(); } catch (_) {}
           window.location.replace('/login/index.html?reason=session_transferred');
           return;

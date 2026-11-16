@@ -4,8 +4,12 @@
  * frontend/faculty/group-detail/js/group-detail-people.js
  * ══════════════════════════════════════════════════════════════
  */
+(function () {
+  'use strict';
 
-async function loadMembers() {
+  var apiFetch = window.apiFetch || ((url, opts) => typeof apiRequest === 'function' ? apiRequest(url, opts) : fetchApi(url.replace(/^\/api\/v1/, ''), opts));
+
+  async function loadMembers() {
   try {
     const r = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/members');
     S.members = r.data || [];
@@ -33,7 +37,7 @@ function renderPeople() {
     sl.innerHTML = emptyState('students', 'No students enrolled yet', 'Add students using their enrollment number or share the invite code.');
     return;
   }
-  const isStudent = document.body.classList.contains('student-mode') || S.isStudent;
+  const removeIcon = window.FacultyIcons ? FacultyIcons.get('close', { size: 14 }) : (window.getSvgIcon ? window.getSvgIcon('close', 14) : '&times;');
   sl.innerHTML = S.members.map((m, i) =>
     '<div class="person-row">' +
       '<div class="person-av" style="background:hsl(' + ((i * 47 + 142) % 360) + ',55%,48%)">' + initials(m.full_name) + '</div>' +
@@ -41,11 +45,9 @@ function renderPeople() {
         '<div class="person-name">' + esc(m.full_name || 'Student') + '</div>' +
         '<div class="person-sub">Roll ' + (m.class_roll_no || '—') + ' • ' + esc(m.official_enrollment_no || m.enrollment_no || 'No enrollment no.') + '</div>' +
       '</div>' +
-      (!isStudent ? (
-        '<button class="person-rm-btn" onclick="removeStudent(' + m.student_id + ')" title="Remove">' +
-          (window.getSvgIcon ? window.getSvgIcon('close', 14) : '&times;') +
-        '</button>'
-      ) : '') +
+      '<button class="person-rm-btn" onclick="removeStudent(' + m.student_id + ')" title="Remove">' +
+        removeIcon +
+      '</button>' +
     '</div>'
   ).join('');
 }
@@ -298,3 +300,5 @@ window.openArchiveModal = openArchiveModal;
 window.executeArchive = executeArchive;
 window.openEditGroupModal = openEditGroupModal;
 window.submitEditGroup = submitEditGroup;
+
+})();

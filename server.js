@@ -89,13 +89,14 @@ const STATIC_REWRITES = [
   // Faculty
   [/^\/faculty\/?$/,                    '/faculty/dashboard/index.html'],
   [/^\/faculty\/dashboard(\.html)?\/?$/,'/faculty/dashboard/index.html'],
-  [/^\/faculty\/classes(\.html)?\/?$/,  '/faculty/dashboard/index.html'],
-  [/^\/faculty\/groups(\.html)?\/?$/,   '/faculty/dashboard/index.html'],
+  [/^\/faculty\/classes(\.html)?\/?$/,  '/faculty/classes/index.html'],
+  [/^\/faculty\/groups(\.html)?\/?$/,   '/faculty/classes/index.html'],
   [/^\/faculty\/analytics\/?$/,         '/faculty/reports/index.html?tab=analytics'],
   [/^\/faculty\/assignments\/?$/,       '/faculty/registers/index.html?tab=assignments'],
   [/^\/faculty\/tests\/?$/,             '/faculty/registers/index.html?tab=marks'],
   [/^\/faculty\/marks\/?$/,             '/faculty/registers/index.html?tab=marks'],
   [/^\/faculty\/attendance\/quick\/?$/, '/faculty/registers/index.html'],
+  [/^\/faculty\/classwork\/create(\.html)?\/?$/, '/faculty/classwork/create/index.html'],
 
   // Student
   [/^\/student\/dashboard\/?$/,         '/student/dashboard/index.html'],

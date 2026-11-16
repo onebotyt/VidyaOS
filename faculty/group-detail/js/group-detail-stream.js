@@ -4,8 +4,12 @@
  * frontend/faculty/group-detail/js/group-detail-stream.js
  * ══════════════════════════════════════════════════════════════
  */
+(function () {
+  'use strict';
 
-async function loadStream() {
+  var apiFetch = window.apiFetch || ((url, opts) => typeof apiRequest === 'function' ? apiRequest(url, opts) : fetchApi(url.replace(/^\/api\/v1/, ''), opts));
+
+  async function loadStream() {
   try {
     const r = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/stream');
     S.posts = r.data || [];
@@ -807,3 +811,5 @@ window.clearCompose = clearCompose;
 window.postAnnouncement = postAnnouncement;
 window.focusMobileAnnouncement = focusMobileAnnouncement;
 window.expandCompose = expandCompose;
+
+})();

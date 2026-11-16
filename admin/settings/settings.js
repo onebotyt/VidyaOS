@@ -8,7 +8,7 @@ guardRoute(['SYSTEM_ADMIN']);
 
 const DEFAULT_BRANDING = {
   institution_name: 'Government Polytechnic Nainital',
-  institution_tagline: 'Uttarakhand | Completely Adhered to NBA Guidelines',
+  institution_tagline: '',
   institution_code: 'GP-UBTER-101',
   affiliating_body: 'UBTER (Uttarakhand Board of Technical Education) / IRDT',
   campus_location: 'Uttarakhand, India',

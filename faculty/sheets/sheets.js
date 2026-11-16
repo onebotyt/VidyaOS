@@ -106,7 +106,9 @@
        ══════════════════════════════════════════════════════════════ */
     async function initSheetsStudio() {
       try {
-        if (typeof guardRoute === 'function') {
+        if (typeof requireFacultyAuth === 'function') {
+          requireFacultyAuth(['TEACHER', 'HOD']);
+        } else if (typeof guardRoute === 'function') {
           guardRoute({ requireRoles: ['TEACHER', 'SYSTEM_ADMIN'] });
         }
         S.user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;

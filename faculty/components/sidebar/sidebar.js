@@ -24,7 +24,6 @@
   function cleanLegacyNav() {
     if (typeof document === 'undefined') return;
     const legacySelectors = [
-      '.mobile-bottom-nav',
       '#universal-bottom-nav',
       '#app-sidebar:not(.faculty-sidebar)',
       '.app-sidebar:not(.faculty-sidebar)'
@@ -41,6 +40,8 @@
     chevronLeft: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>`,
     menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`,
     close: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+    home: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="currentColor" fill-opacity="0.15"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`,
+    dashboard: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5" fill="currentColor" fill-opacity="0.2"></rect><rect x="14" y="3" width="7" height="5" rx="1.5" fill="currentColor" fill-opacity="0.15"></rect><rect x="14" y="12" width="7" height="9" rx="1.5" fill="currentColor" fill-opacity="0.2"></rect><rect x="3" y="16" width="7" height="5" rx="1.5" fill="currentColor" fill-opacity="0.15"></rect></svg>`,
     user: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill="currentColor" fill-opacity="0.15"/><circle cx="12" cy="7" r="4" fill="currentColor" fill-opacity="0.25"/></svg>`,
     logout: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
     bell: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`,
@@ -57,19 +58,29 @@
     settings: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`
   };
 
-  // Faculty Navigation modules (Consolidated: registers.html hosts coursework & marks tabs)
+  // Canonical Faculty Navigation modules
   const FACULTY_NAV_ITEMS = [
-    { key: 'dashboard', label: 'Classes & Cohorts', shortLabel: 'Classes', href: '/faculty/dashboard.html', icon: 'classes' },
-    { key: 'registers', label: 'Attendance Registers', shortLabel: 'Attend', href: '/faculty/registers.html', icon: 'registers' },
-    { key: 'students', label: 'Faculty & Student Roster', shortLabel: 'Students', href: '/faculty/students.html', icon: 'students' },
-    { key: 'sheets', label: 'Sheets Studio', shortLabel: 'Sheets', href: '/faculty/sheets.html', icon: 'sheets' },
-    { key: 'reports', label: 'Analytics & Reports', shortLabel: 'Results', href: '/faculty/reports.html', icon: 'reports' },
-    { key: 'timetable', label: 'Weekly Timetable', shortLabel: 'Time', href: '/faculty/timetable.html', icon: 'timetable' },
-    { key: 'leaves', label: 'Leave Requests', shortLabel: 'Leave', href: '/faculty/leave-approvals.html', icon: 'leaves' },
-    { key: 'media', label: 'Faculty Drive', shortLabel: 'Drive', href: '/faculty/media.html', icon: 'drive' }
+    { key: 'dashboard', label: 'Dashboard', shortLabel: 'Dashboard', href: '/faculty/dashboard/index.html', icon: 'home' },
+    { key: 'classes', label: 'Classroom', shortLabel: 'Classes', href: '/faculty/classes/index.html', icon: 'classes' },
+    { key: 'attendance', label: 'Attendance Register', shortLabel: 'Attendance', href: '/faculty/registers/index.html', icon: 'registers' },
+    { key: 'sheets', label: 'Sheet Studio', shortLabel: 'Sheets', href: '/faculty/sheets/index.html', icon: 'sheets' },
+    { key: 'leaves', label: 'Leave Request', shortLabel: 'Leave', href: '/faculty/leave-approvals/index.html', icon: 'leaves' },
+    { key: 'students', label: 'Faculty & Students Management', shortLabel: 'Students', href: '/faculty/students/index.html', icon: 'students' },
+    { key: 'timetable', label: 'Timetable', shortLabel: 'Timetable', href: '/faculty/timetable/index.html', icon: 'timetable' },
+    { key: 'drive', label: 'Faculty Drive', shortLabel: 'Drive', href: '/faculty/media/index.html', icon: 'drive' },
+    { key: 'reports', label: 'Report & Analysis', shortLabel: 'Reports', href: '/faculty/reports/index.html', icon: 'reports' }
   ];
 
-  // HOD specific navigation items (empty - settings consolidated/removed per institutional policy)
+  // Faculty Mobile Bottom Navigation Tabs (5 Canonical Tabs Matching Image 3: Home, Classes, Students, Reports, Settings)
+  const FACULTY_MOBILE_TABS = [
+    { key: 'home', label: 'Home', href: '/faculty/dashboard/index.html', icon: 'home' },
+    { key: 'classes', label: 'Classes', href: '/faculty/classes/index.html', icon: 'classes' },
+    { key: 'students', label: 'Students', href: '/faculty/students/index.html', icon: 'students' },
+    { key: 'reports', label: 'Reports', href: '/faculty/reports/index.html', icon: 'reports' },
+    { key: 'settings', label: 'Settings', href: '/faculty/profile/index.html', icon: 'settings' }
+  ];
+
+  // HOD specific navigation items (Setting link removed per user instruction)
   const HOD_NAV_ITEMS = [];
 
   /**
@@ -143,6 +154,10 @@
    * The page content remains fixed at margin-left: 72px without any layout shift.
    */
   function toggleDesktopSidebar() {
+    if (window.innerWidth <= 768) {
+      toggleSidebar();
+      return;
+    }
     const layout = document.getElementById('faculty-app-layout') || document.body;
     const sidebar = getSidebar();
     const backdrop = getBackdrop();
@@ -220,9 +235,43 @@
     }
   }
 
+  function handleBackdropClick(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    closeSidebar();
+  }
+
   /**
-   * 4. Notifications Feedback
+   * 4. Theme & Notifications
    */
+  function toggleAppTheme() {
+    if (typeof window.toggleFacultyTheme === 'function') {
+      window.toggleFacultyTheme();
+      return;
+    }
+    const root = document.documentElement;
+    const current = root.getAttribute('data-theme') || (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    if (document.body) document.body.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem('theme', next);
+      localStorage.setItem('vidya_theme', next);
+    } catch (_) { }
+
+    const isDark = next === 'dark';
+    document.querySelectorAll('.icon-theme').forEach(svg => {
+      if (isDark) {
+        svg.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      } else {
+        svg.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      }
+    });
+  }
+
+  if (!window.toggleAppTheme) {
+    window.toggleAppTheme = toggleAppTheme;
+  }
+
   function toggleNotifications(e) {
     if (e && e.stopPropagation) e.stopPropagation();
     if (typeof window.showToast === 'function') {
@@ -233,7 +282,7 @@
   }
 
   /**
-   * 5. Logout Session Function
+   * 5. Logout Session Function & Confirmation Modal
    */
   function facultyLogout() {
     if (typeof window.logout === 'function') {
@@ -263,6 +312,64 @@
     window.location.replace('/login');
   }
 
+  function confirmFacultyLogout() {
+    let modal = document.getElementById('faculty-logout-modal');
+    if (!modal) {
+      const modalHtml = `
+        <div id="faculty-logout-modal" class="modal-backdrop faculty-logout-modal" style="display:none;" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-sm faculty-logout-dialog" role="dialog" aria-modal="true" aria-labelledby="faculty-logout-modal-title">
+            <div class="faculty-logout-dialog-header">
+              <div class="faculty-logout-icon-bubble">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+              </div>
+              <div class="faculty-logout-text-wrap">
+                <h3 id="faculty-logout-modal-title" class="faculty-logout-title">Sign Out of VidyaOS?</h3>
+                <p class="faculty-logout-subtitle">Are you sure you want to end your academic session?</p>
+              </div>
+            </div>
+            <div class="faculty-logout-actions">
+              <button type="button" class="btn btn-secondary faculty-logout-cancel-btn" onclick="closeFacultyLogoutModal()">Cancel</button>
+              <button type="button" class="btn btn-danger faculty-logout-confirm-btn" onclick="facultyLogout()">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      modal = document.getElementById('faculty-logout-modal');
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeFacultyLogoutModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+          closeFacultyLogoutModal();
+        }
+      });
+    }
+
+    modal.classList.add('open');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeFacultyLogoutModal() {
+    const modal = document.getElementById('faculty-logout-modal');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.setProperty('display', 'none', 'important');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  window.facultyLogout = facultyLogout;
+  window.confirmFacultyLogout = confirmFacultyLogout;
+  window.closeFacultyLogoutModal = closeFacultyLogoutModal;
+  window.confirmLogout = confirmFacultyLogout;
+
   /**
    * 6. Dynamic Component Mounting Engine
    */
@@ -287,123 +394,62 @@
     const initial = parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : (cleanName[0] || 'F').toUpperCase();
     const deptRole = isHod ? 'Head of Department' : 'Faculty Member';
 
-    // ── A. Mount Mobile Top Header (<= 768px only) if missing ──
-    if (!document.getElementById('mobile-top-header') && !document.getElementById('faculty-mobile-top-header')) {
-      const menuSvg = getIcon('menu', { width: 20, height: 20, stroke: 2.2 });
-      const instSvg = getIcon('institution', { width: 18, height: 18, stroke: 2 }) || getIcon('brand', { width: 18, height: 18 });
-      const bellSvg = getIcon('bell', { width: 18, height: 18, stroke: 2 });
-
-      const mobileHeaderHtml = `
-        <header class="mobile-top-header faculty-mobile-top-header" id="faculty-mobile-top-header">
-          <div class="mobile-header-left">
-            <button type="button" class="mobile-hamburger-btn" id="mobile-sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Open Navigation Menu">
-              ${menuSvg}
-            </button>
-          </div>
-          <div class="mobile-header-center">
-            <a href="/faculty/dashboard.html" class="mobile-brand-link">
-              <span class="mobile-brand-icon">${instSvg}</span>
-              <span class="mobile-brand-text">VidyaOS</span>
-            </a>
-          </div>
-          <div class="mobile-header-right">
-            <button type="button" class="mobile-header-icon-btn mobile-bell-btn" onclick="toggleNotifications(event)" aria-label="Notifications">
-              ${bellSvg}
-              <span class="mobile-bell-badge">1</span>
-            </button>
-          </div>
-        </header>
-      `;
-      layout.insertAdjacentHTML('afterbegin', mobileHeaderHtml);
+    // ── A. Ensure Unified Full-Size Top Header is Mounted ──
+    if (typeof window.mountFacultyHeader === 'function' && !document.getElementById('faculty-header')) {
+      window.mountFacultyHeader();
     }
+    // Clean up any obsolete duplicate mobile headers
+    document.querySelectorAll('.faculty-mobile-top-header, #faculty-mobile-top-header').forEach(el => el.remove());
 
-    // ── B. Mount Dual-State Sidebar (#vidya-faculty-sidebar) if missing ──
+    // ── B. Mount Dual-State Sidebar (#faculty-sidebar) if missing ──
     if (!getSidebar()) {
-      const cubeSvg = getIcon('cube', { width: 32, height: 32, className: 'rail-cube-logo' });
-      const headerCubeSvg = getIcon('cube', { width: 24, height: 24, className: 'header-cube-logo' });
       const expandChevronSvg = getIcon('chevronRight', { width: 15, height: 15, stroke: 2.8 });
-      const collapseChevronSvg = getIcon('chevronLeft', { width: 14, height: 14, stroke: 2.5 });
-      const closeSvg = getIcon('close', { width: 18, height: 18, stroke: 2.2 });
-      const userSvg = getIcon('user', { width: 20, height: 20, stroke: 2 });
       const signoutSvg = getIcon('logout', { width: 20, height: 20, stroke: 2 });
 
       // Render standard items
       const standardItemsHtml = FACULTY_NAV_ITEMS.map(item => {
+        let label = item.label;
+        if (item.key === 'students') {
+          label = isHod ? 'Faculty & Students Management' : 'Students Management';
+        }
+
         const isActive = currentPath.endsWith(item.href) ||
           currentPath.endsWith(item.href.replace('.html', '')) ||
+          currentPath.includes(item.key) ||
           (item.key === 'dashboard' && (currentPath === '/faculty/' || currentPath.endsWith('/faculty') || currentPath.endsWith('/faculty/dashboard.html') || currentPath.endsWith('/faculty/dashboard')));
 
         const activeCls = isActive ? ' active' : '';
         const itemSvg = getIcon(item.icon, { width: 20, height: 20, stroke: 1.8 });
 
         return `
-          <a href="${item.href}" class="sidebar-nav-item drawer-link${activeCls}" data-nav="${item.key}" data-tooltip="${item.label}" aria-label="${item.label}">
+          <a href="${item.href}" class="sidebar-nav-item drawer-link${activeCls}" data-nav="${item.key}" data-tooltip="${label}" aria-label="${label}" onclick="if(window.innerWidth<=768)closeSidebar()">
             <span class="sidebar-nav-icon">${itemSvg}</span>
-            <span class="sidebar-nav-short-label">${item.shortLabel || item.label}</span>
-            <span class="sidebar-nav-label">${item.label}</span>
+            <span class="sidebar-nav-short-label">${item.shortLabel || label}</span>
+            <span class="sidebar-nav-label">${label}</span>
           </a>
         `;
       }).join('');
 
-      // Render HOD items if user has HOD privileges and there are active HOD items
-      let hodItemsHtml = '';
-      if (isHod && HOD_NAV_ITEMS.length > 0) {
-        hodItemsHtml = `
-          <div class="sidebar-section-header">HOD MANAGEMENT</div>
-        ` + HOD_NAV_ITEMS.map(item => {
-          const isActive = currentPath.endsWith(item.href) || currentPath.endsWith(item.href.replace('.html', ''));
-          const activeCls = isActive ? ' active' : '';
-          const itemSvg = getIcon(item.icon, { width: 20, height: 20, stroke: 1.8 });
-
-          return `
-            <a href="${item.href}" class="sidebar-nav-item drawer-link${activeCls}" data-nav="${item.key}" data-tooltip="${item.label}" aria-label="${item.label}">
-              <span class="sidebar-nav-icon">${itemSvg}</span>
-              <span class="sidebar-nav-short-label">${item.shortLabel || item.label}</span>
-              <span class="sidebar-nav-label">${item.label}</span>
-            </a>
-          `;
-        }).join('');
-      }
+      // Expand/Collapse Rail Toggle item positioned inside sidebar navigation links (desktop rail only)
+      const toggleItemHtml = `
+        <button type="button" class="sidebar-nav-item sidebar-rail-toggle-item" onclick="toggleDesktopSidebar()" data-tooltip="Expand Menu" aria-label="Expand Navigation Menu">
+          <span class="sidebar-nav-icon sidebar-toggle-icon">${expandChevronSvg}</span>
+          <span class="sidebar-nav-short-label">Expand</span>
+          <span class="sidebar-nav-label">Collapse Menu</span>
+        </button>
+      `;
 
       const sidebarHtml = `
         <aside id="faculty-sidebar" class="faculty-sidebar vidya-faculty-sidebar" data-component="vidya-faculty-sidebar" aria-label="Faculty Navigation">
-          <!-- A. Rail Header (Desktop Collapsed 72px Rail) -->
-          <div class="sidebar-rail-header" aria-hidden="true">
-            <div class="rail-brand-row">
-              <a href="/faculty/dashboard.html" class="rail-logo-link" data-tooltip="VidyaOS Academic Workspace" aria-label="VidyaOS Academic Workspace">
-                ${cubeSvg}
-              </a>
-              <!-- Fast Expand Arrow button right on side of logo -->
-              <button type="button" class="rail-expand-btn" onclick="toggleDesktopSidebar()" data-tooltip="Expand Menu" aria-label="Open Navigation Menu">
-                ${expandChevronSvg}
-              </button>
-            </div>
-          </div>
-
-          <!-- B. Expanded Header (Desktop Flyout Drawer & Mobile Drawer) -->
-          <div class="sidebar-expanded-header">
-            <div class="sidebar-header-left">
-              <span class="sidebar-header-cube-icon" aria-hidden="true">${headerCubeSvg}</span>
-              <span class="sidebar-header-title">VidyaOS Academic</span>
-            </div>
-            <!-- Desktop Collapse Button: Chevron Left < -->
-            <button type="button" class="sidebar-desktop-collapse-btn" onclick="toggleDesktopSidebar()" title="Collapse navigation" aria-label="Collapse navigation">
-              ${collapseChevronSvg}
-            </button>
-            <button type="button" class="sidebar-mobile-close-btn" onclick="closeSidebar()" title="Close menu" aria-label="Close menu">
-              ${closeSvg}
-            </button>
-          </div>
-
-          <!-- C. Navigation Links -->
+          <!-- Navigation Links (Scrollable if overflowing) -->
           <nav class="sidebar-nav-body" aria-label="Faculty Navigation Links">
             ${standardItemsHtml}
-            ${hodItemsHtml}
+            ${toggleItemHtml}
           </nav>
 
-          <!-- D. Sidebar Footers -->
+          <!-- Sidebar Footer: User Profile & Sign Out -->
           <div class="sidebar-expanded-footer">
-            <div class="sidebar-user-card">
+            <a href="/faculty/profile/index.html" class="sidebar-user-card" id="sidebar-user-profile-link" data-tooltip="${name}" aria-label="User Profile" onclick="if(window.innerWidth<=768)closeSidebar()">
               <div class="sidebar-user-avatar" id="sidebar-drawer-avatar" aria-hidden="true">
                 <span>${initial}</span>
               </div>
@@ -411,27 +457,16 @@
                 <span class="sidebar-user-name" id="sidebar-drawer-name">${name}</span>
                 <span class="sidebar-user-sub" id="sidebar-drawer-sub">${deptRole}</span>
               </div>
-            </div>
-            <button type="button" class="sidebar-signout-card-btn" onclick="facultyLogout()" title="Sign Out" aria-label="Sign Out">
+            </a>
+            <button type="button" class="sidebar-signout-card-btn" onclick="confirmFacultyLogout()" data-tooltip="Sign Out" title="Sign Out" aria-label="Sign Out">
               ${signoutSvg}
               <span>Sign Out</span>
-            </button>
-          </div>
-
-          <div class="sidebar-rail-footer" aria-hidden="true">
-            <a href="/faculty/profile.html" class="rail-footer-btn" data-tooltip="Faculty Profile" aria-label="Faculty Profile">
-              <span class="rail-user-circle">${initial}</span>
-              <span class="sidebar-nav-short-label">Profile</span>
-            </a>
-            <button type="button" class="rail-footer-btn rail-signout-btn" onclick="facultyLogout()" data-tooltip="Sign Out" aria-label="Sign Out">
-              ${signoutSvg}
-              <span class="sidebar-nav-short-label">Logout</span>
             </button>
           </div>
         </aside>
 
         <!-- Backdrop Overlay for Desktop Flyout & Mobile Drawer -->
-        <div id="faculty-sidebar-backdrop" class="gc-drawer-backdrop sidebar-backdrop faculty-sidebar-backdrop" onclick="toggleDesktopSidebar()"></div>
+        <div id="faculty-sidebar-backdrop" class="gc-drawer-backdrop sidebar-backdrop faculty-sidebar-backdrop" onclick="handleBackdropClick(event)"></div>
       `;
 
       // Insert sidebar immediately before .faculty-main-wrap, .admin-main-wrap or prepend to layout
@@ -449,6 +484,7 @@
       const href = (item.getAttribute('href') || '').toLowerCase();
       const key = item.getAttribute('data-nav');
       const isMatch = (href && (currentPath.endsWith(href) || currentPath.endsWith(href.replace('.html', '')))) ||
+        (key && currentPath.includes(key)) ||
         (key === 'dashboard' && (currentPath === '/faculty/' || currentPath.endsWith('/faculty') || currentPath.endsWith('/faculty/dashboard.html') || currentPath.endsWith('/faculty/dashboard')));
 
       if (isMatch) {
@@ -458,22 +494,157 @@
       }
     });
 
-    // Tooltips are handled cleanly via high-performance CSS pseudo-elements (0 latency)
+    // ── D. Mount Mobile Bottom Navbar (<= 768px only) if missing ──
+    // Suppress global bottom navbar completely on classroom workspace pages (e.g. group-detail)
+    const isClassroomGroup = currentPath.includes('group-detail') || Boolean(document.getElementById('classroom-mobile-bottom-nav'));
+    if (isClassroomGroup) {
+      const existingNav = document.querySelector('.faculty-mobile-bottom-nav');
+      if (existingNav) existingNav.remove();
+      syncMobileUserIdentity();
+      return;
+    }
 
-    // Sync avatar photo if stored in localStorage
+    if (!document.querySelector('.mobile-bottom-nav')) {
+      const tabsToRender = isHod ? [
+        { key: 'classes', label: 'Classes', href: '/faculty/classes/index.html', icon: 'classes' },
+        { key: 'attendance', label: 'Attendance', href: '/faculty/registers/index.html', icon: 'registers' },
+        { key: 'students', label: 'Students', href: '/faculty/students/index.html', icon: 'students' },
+        { key: 'reports', label: 'Reports', href: '/faculty/reports/index.html', icon: 'reports' },
+        { key: 'settings', label: 'Settings', href: '/faculty/profile/index.html', icon: 'settings' }
+      ] : FACULTY_MOBILE_TABS;
+
+      const bottomNavItemsHtml = tabsToRender.map(tab => {
+        let isActive = false;
+        if (tab.key === 'classes') {
+          isActive = currentPath.includes('/faculty/classes') || currentPath.includes('/faculty/groups') || (isHod && (currentPath === '/faculty' || currentPath === '/faculty/' || currentPath.endsWith('/faculty/index.html')));
+        } else if (tab.key === 'attendance') {
+          isActive = currentPath.includes('/faculty/registers');
+        } else if (tab.key === 'students') {
+          isActive = currentPath.includes('/faculty/students');
+        } else if (tab.key === 'reports') {
+          isActive = currentPath.includes('/faculty/reports');
+        } else if (tab.key === 'settings') {
+          isActive = currentPath.includes('/faculty/profile');
+        } else if (tab.key === 'home') {
+          isActive = currentPath === '/faculty' || currentPath === '/faculty/' || currentPath.includes('/faculty/dashboard') || currentPath.endsWith('/faculty/index.html');
+        }
+
+        const activeCls = isActive ? ' active' : '';
+        const tabSvg = getIcon(tab.icon, { width: 20, height: 20, stroke: 1.9 });
+
+        return `
+          <a href="${tab.href}" class="mobile-nav-item${activeCls}" data-tab="${tab.key}" aria-label="${tab.label}">
+            <span class="mobile-nav-icon">${tabSvg}</span>
+            <span class="mobile-nav-label">${tab.label}</span>
+            <span class="mobile-nav-indicator"></span>
+          </a>
+        `;
+      }).join('');
+
+      const bottomNavHtml = `
+        <nav class="mobile-bottom-nav faculty-mobile-bottom-nav" aria-label="Faculty Mobile Navigation">
+          <div class="mobile-bottom-nav-inner">
+            ${bottomNavItemsHtml}
+          </div>
+        </nav>
+      `;
+
+      if (layout) {
+        layout.insertAdjacentHTML('beforeend', bottomNavHtml);
+      } else {
+        document.body.insertAdjacentHTML('beforeend', bottomNavHtml);
+      }
+    }
+
+    syncMobileUserIdentity();
+
+    // Tooltips are handled cleanly via high-performance CSS pseudo-elements (0 latency)
+  }
+
+  /**
+   * 7. User Identity Synchronization (Avatar Initials & Names)
+   */
+  function syncMobileUserIdentity() {
     try {
+      const user = getUser();
+      if (!user) return;
+      const name = user.full_name || user.name || user.username || 'Faculty Member';
+      const cleanName = name.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
+      const parts = cleanName.split(/\s+/).filter(Boolean);
+      const initial = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : (cleanName[0] || 'F').toUpperCase();
+      const isHod = Boolean(user && (
+        (Array.isArray(user.roles) && user.roles.includes('HOD')) ||
+        user.role === 'HOD' ||
+        user.is_hod === true ||
+        user.is_hod === 1
+      ));
+      const deptRole = isHod ? 'Head of Department' : 'Faculty Member';
+
+      const mobileInitials = document.getElementById('mobile-user-initials');
+      if (mobileInitials) mobileInitials.textContent = initial;
+
+      const mobileAvatarBtn = document.getElementById('mobile-header-avatar');
+      if (mobileAvatarBtn) mobileAvatarBtn.setAttribute('title', name);
+
+      const drawerAvatarSpans = document.querySelectorAll('#sidebar-drawer-avatar span');
+      drawerAvatarSpans.forEach(el => el.textContent = initial);
+
+      const drawerName = document.getElementById('sidebar-drawer-name');
+      if (drawerName) drawerName.textContent = name;
+
+      const drawerSub = document.getElementById('sidebar-drawer-sub');
+      if (drawerSub) drawerSub.textContent = deptRole;
+
+      const railInitials = document.querySelector('.rail-user-circle');
+      if (railInitials) railInitials.textContent = initial;
+
+      // Sync custom avatar photo if set in localStorage
       const customAvatar = localStorage.getItem('vidya_faculty_avatar');
       if (customAvatar) {
-        const drawerAvatar = document.getElementById('sidebar-drawer-avatar');
-        if (drawerAvatar) {
-          drawerAvatar.innerHTML = `<img src="${customAvatar}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        const mobAvatar = document.getElementById('mobile-header-avatar');
+        if (mobAvatar) {
+          mobAvatar.innerHTML = `<img src="${customAvatar}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"><span class="mobile-avatar-dot"></span>`;
+        }
+        const sideAvatar = document.getElementById('sidebar-drawer-avatar');
+        if (sideAvatar) {
+          sideAvatar.innerHTML = `<img src="${customAvatar}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
         }
       }
     } catch (_) { }
   }
 
+  // Handle tap or click anywhere outside the sidebar to close it immediately on mobile
+  function handleOutsideSidebarTap(e) {
+    const sidebar = getSidebar();
+    if (!sidebar) return;
+
+    const isMobileOpen = sidebar.classList.contains('open') || sidebar.classList.contains('sidebar-open');
+    const isDesktopOpen = sidebar.classList.contains('desktop-open');
+
+    if (!isMobileOpen && !isDesktopOpen) return;
+
+    // If click/tap is inside the sidebar itself, allow normal interaction
+    if (sidebar.contains(e.target)) return;
+
+    // If click/tap is on the toggle triggers, let their click handlers handle it
+    const mobileToggleBtn = document.getElementById('mobile-sidebar-toggle-btn') || document.getElementById('faculty-nav-toggle') || document.getElementById('admin-mobile-nav-toggle');
+    if (mobileToggleBtn && (mobileToggleBtn === e.target || mobileToggleBtn.contains(e.target))) return;
+
+    const railToggleItem = e.target && e.target.closest && (e.target.closest('.sidebar-rail-toggle-item') || e.target.closest('.rail-expand-btn'));
+    if (railToggleItem) return;
+
+    // Tap on mobile bottom nav item 'menu' handled by its own onclick
+    const bottomNavMenuBtn = e.target && e.target.closest && e.target.closest('[data-tab="menu"]');
+    if (bottomNavMenuBtn) return;
+
+    // User clicked outside the open sidebar: close it immediately
+    closeSidebar();
+  }
+
+  document.addEventListener('click', handleOutsideSidebarTap, true);
+
   /**
-   * 7. Global Keyboard Accessibility
+   * 8. Global Keyboard Accessibility
    */
   document.addEventListener('keydown', (e) => {
     // ESC to close drawer or flyout
@@ -512,9 +683,12 @@
   window.toggleDesktopSidebar = toggleDesktopSidebar;
   window.openSidebar = openSidebar;
   window.closeSidebar = closeSidebar;
+  window.handleBackdropClick = handleBackdropClick;
   window.mountFacultySidebar = mountFacultyNavigation;
   window.mountSidebar = mountFacultyNavigation;
   window.toggleNotifications = toggleNotifications;
+  window.toggleAppTheme = window.toggleAppTheme || toggleAppTheme;
+  window.syncMobileUserIdentity = syncMobileUserIdentity;
   window.facultyLogout = facultyLogout;
 
   if (document.readyState === 'loading') {

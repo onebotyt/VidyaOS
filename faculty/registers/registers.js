@@ -5,11 +5,18 @@
  * ══════════════════════════════════════════════════════════════
  */
 
-guardRoute({ roles: ['TEACHER'], requireSubjects: true });
+if (typeof requireFacultyAuth === 'function') {
+  requireFacultyAuth(['TEACHER', 'HOD']);
+} else if (typeof guardRoute === 'function') {
+  guardRoute({ roles: ['TEACHER'], requireSubjects: true });
+}
 
-    function getToken() {
-      return typeof getAuthToken === 'function' ? getAuthToken() : (localStorage.getItem('access_token') || '');
-    }
+function getToken() {
+  if (window.FacultyAPI && typeof FacultyAPI.getToken === 'function') {
+    return FacultyAPI.getToken();
+  }
+  return typeof getAuthToken === 'function' ? getAuthToken() : (localStorage.getItem('access_token') || localStorage.getItem('token') || '');
+}
 
     let allRegisters = [];
     let currentRegisterId = null;

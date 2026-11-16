@@ -5,8 +5,15 @@
  * ══════════════════════════════════════════════════════════════
  */
 
-// Guard route for Faculty
-guardRoute({ requireRoles: ['TEACHER'] });
+(function () {
+  'use strict';
+
+  // Guard route for Faculty
+  if (typeof requireFacultyAuth === 'function') {
+    requireFacultyAuth(['TEACHER', 'HOD']);
+  } else if (typeof guardRoute === 'function') {
+    guardRoute({ requireRoles: ['TEACHER'] });
+  }
 
 if (typeof window.escapeHtml !== 'function') {
   window.escapeHtml = function (str) {
@@ -223,18 +230,14 @@ function updateDashboardMode() {
   const queryTab = urlParams.get('tab');
   let tabToOpen = isHOD ? 'DEPT' : 'CLASSES';
   if (queryTab) {
-    if (queryTab.toLowerCase() === 'dept' && isHOD) {
-      tabToOpen = 'DEPT';
-    } else {
+    if (queryTab.toLowerCase() === 'classes') {
       tabToOpen = 'CLASSES';
+    } else if (isHOD) {
+      tabToOpen = 'DEPT';
     }
   } else if (isHOD) {
-    try {
-      const savedTab = localStorage.getItem('hod_dashboard_tab');
-      if (savedTab === 'CLASSES' || savedTab === 'DEPT') {
-        tabToOpen = savedTab;
-      }
-    } catch (_) { }
+    // For HOD on PC dashboard, always default to the unified Command Center (Image 2)
+    tabToOpen = 'DEPT';
   } else {
     tabToOpen = 'CLASSES';
   }
@@ -271,8 +274,10 @@ function switchDashboardTab(tab) {
       btnDept.classList.add('active');
       btnDept.setAttribute('aria-selected', 'true');
     }
-    if (teachingView) teachingView.style.display = 'none';
     if (deptView) deptView.style.display = 'block';
+    if (teachingView) {
+      teachingView.style.display = 'none';
+    }
     loadHodDashboardData();
   } else {
     if (btnClasses) {
@@ -880,37 +885,9 @@ function renderGroups() {
           </div>
         </div>
 
-        <!-- 2. Metrics Row (Students count + Attendance Ring + Active Pill) -->
-        <div class="card-body-metrics-row">
-          <div class="card-metric-students">
-            <div class="card-metric-icon-wrap" style="color:${cardAccent};">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-            </div>
-            <strong class="card-metric-num">${memberCount}</strong>
-          </div>
-
-          <div class="card-ring-wrap" title="${attPct}% Attendance Rate">
-            <svg viewBox="0 0 36 36" class="card-ring-chart" width="42" height="42">
-              <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--border-color, #e2e8f0)" stroke-width="3"/>
-              <path class="ring-fill" stroke-dasharray="${attPct}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${ringColor}" stroke-width="3.2" stroke-linecap="round"/>
-              <text x="18" y="20.5" class="ring-text" text-anchor="middle" font-size="8.5" font-weight="800" fill="var(--text-main, #1e293b)">${attPct}%</text>
-            </svg>
-          </div>
-
-          <div class="card-status-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-            <span>Active</span>
-          </div>
-        </div>
-
-        <!-- 3. Two Prominent Action Buttons (Take Attendance + Register) -->
+        <!-- 2. Two Prominent Action Buttons (Take Attendance + Register) -->
         <div class="card-action-btns-row">
-          <a href="/faculty/group-detail.html?id=${g.id}&tab=register&action=rollcall" class="card-btn-take-attendance" title="Launch instant attendance roll call">
+          <a href="/faculty/group-detail/index.html?id=${g.id}&tab=register&action=rollcall" class="card-btn-take-attendance" title="Launch instant attendance roll call">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 2a10 10 0 0 0-10 10c0 3.1 1.4 5.9 3.6 7.8"></path>
               <path d="M12 6a6 6 0 0 0-6 6c0 1.9.9 3.6 2.2 4.7"></path>
@@ -921,7 +898,7 @@ function renderGroups() {
             </svg>
             <span>Take Attendance</span>
           </a>
-          <a href="/faculty/registers.html${regParam}" class="card-btn-register" title="Physical attendance matrix register">
+          <a href="/faculty/registers/index.html${regParam}" class="card-btn-register" title="Physical attendance matrix register">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
               <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
@@ -930,86 +907,35 @@ function renderGroups() {
           </a>
         </div>
 
-        <!-- 4. 6 Navigation Quick Links Grid (Students, Classwork, Resources, NBA, Theory Classes, Laboratory Classes) -->
-        <div class="card-quick-links-grid" onclick="event.stopPropagation()">
-          <a href="/faculty/group-detail.html?id=${g.id}&tab=people" class="card-quick-link" title="Class Students & Roster">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            <span>Students</span>
+        <!-- 3. Navigation Links Strip (Matching Image 4 Desktop Reference) -->
+        <div class="card-quick-links-desktop-strip" onclick="event.stopPropagation()">
+          <a href="/faculty/theory-classes/index.html?groupId=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="desktop-strip-item" title="Theory Classes Dossier & Lessons">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="hsl(217 91% 60%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <span>Theory Classes &gt;</span>
           </a>
-          <a href="/faculty/group-detail.html?id=${g.id}&tab=classwork" class="card-quick-link" title="Coursework, assignments & marks">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            <span>Classwork</span>
+          <a href="/faculty/lab-classes/index.html?groupId=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="desktop-strip-item" title="Laboratory Manuals & Practicals">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="hsl(142 71% 45%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path><path d="M8.5 2h7"></path></svg>
+            <span>Lab Classes &gt;</span>
           </a>
-          <a href="/faculty/group-detail.html?id=${g.id}&tab=resources" class="card-quick-link" title="Class Resources & Documents">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span>Resources</span>
+          <a href="/faculty/course-file/index.html?groupId=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="desktop-strip-item" title="NBA Academic Dossier">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="hsl(270 70% 60%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <span>NBA &gt;</span>
           </a>
-          <a href="/faculty/course-file.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="NBA Academic Accreditation Dossier & Course Outcomes">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-            </svg>
-            <span>NBA</span>
+          <a href="/faculty/student-performance/index.html?groupId=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="desktop-strip-item" title="Student Performance Analytics">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="hsl(38 92% 50%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span>Performance &gt;</span>
           </a>
-          <a href="/faculty/theory-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="Theory Classes Dossier, Notes & Lesson Plans (7 Records)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
-            <span>Theory Classes</span>
+          <a href="/faculty/direct-assessment/index.html?groupId=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="desktop-strip-item" title="Direct Assessment Dossier">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="hsl(0 84% 60%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><polyline points="9 11 11 13 15 9"></polyline></svg>
+            <span>Direct Assess &gt;</span>
           </a>
-          <a href="/faculty/lab-classes.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="Laboratory Classes, Manuals & Experiments (7 Records)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
-              <path d="M8.5 2h7"></path>
-              <path d="M14 9.3h-4"></path>
-            </svg>
-            <span>Laboratory Classes</span>
+          <a href="/faculty/indirect-assessment/index.html?groupId=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="desktop-strip-item" title="Indirect Assessment Surveys">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="hsl(175 80% 40%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+            <span>Indirect Assess &gt;</span>
           </a>
-          <a href="/faculty/student-performance.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="Student Performance Monitoring (Advanced & Slow Learners, Remedial Measures)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 16v5"></path>
-              <path d="M16 14v7"></path>
-              <path d="M20 10v11"></path>
-              <path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"></path>
-              <path d="M4 18v3"></path>
-              <path d="M8 14v7"></path>
-            </svg>
-            <span>Student Performance</span>
-          </a>
-          <a href="/faculty/direct-assessment.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="Direct Assessment (CO Attainment, Examinations & Marksheets)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
-              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-              <path d="m9 14 2 2 4-4"></path>
-            </svg>
-            <span>Direct Assessment</span>
-          </a>
-          <a href="/faculty/indirect-assessment.html?group_id=${g.id}${g.register_id ? '&register_id=' + g.register_id : ''}" class="card-quick-link" title="Indirect Assessment (Course Exit Surveys & Stakeholder Feedback)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect>
-              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-              <path d="M12 11h4"></path>
-              <path d="M12 16h4"></path>
-              <path d="M8 11h.01"></path>
-              <path d="M8 16h.01"></path>
-            </svg>
-            <span>Indirect Assessment</span>
+          <a href="/faculty/media/index.html?groupId=${g.id}" class="desktop-strip-item" title="Resources & Media Assets">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="hsl(200 80% 50%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <span>Resources &gt;</span>
           </a>
         </div>
       </div>
@@ -3197,5 +3123,20 @@ window.restoreHiddenSubjectCards = function() {
   }
 };
 
-init();
+  // Window exports for HTML event bindings
+  Object.assign(window, {
+    addStudentByEnrollment, backArchiveStep1, backDeleteStep1, backRemoveMemberStep1,
+    closeEnrollDeptModal, closeModal, confirmMoveToTrash, confirmPermanentDeleteFromModal,
+    copyHubInviteCode, executeArchiveGroup, executeConfirmedRemoveMember,
+    openAddUnenrolledModal, openBroadcastNoticeModal,
+    openCreateGroupAssignmentModal, openCreateGroupTestModal,
+    openLinkedRegister, openModal,
+    openPromoteCohortModal, openTrashBinModal, proceedArchiveStep2, proceedDeleteStep2,
+    proceedRemoveMemberStep2, setGroupFilter, submitAnnouncement, submitBatchEnrollUnenrolled,
+    submitEnrollDeptStudents, submitSaveExamScores, switchDashboardTab, switchHubTab,
+    toggleArchivedClassesView, triggerAutoArchiveCheck
+  });
+
+  init();
+})();
 

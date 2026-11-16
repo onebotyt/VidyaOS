@@ -5,8 +5,15 @@
  * ══════════════════════════════════════════════════════════════
  */
 
-// Guard route for Faculty
+(function () {
+  'use strict';
+
+  // Guard route for Faculty
+  if (typeof requireFacultyAuth === 'function') {
+    requireFacultyAuth(['TEACHER', 'HOD']);
+  } else if (typeof guardRoute === 'function') {
     guardRoute({ requireRoles: ['TEACHER'] });
+  }
 
     // ── NBA/NAAC Course File: 18 Document Definitions ──────────
     const CF_DOCS = [
@@ -2451,9 +2458,20 @@
       }
     });
 
-    window.openModal = openModal;
-    window.closeModal = closeModal;
-    window.toggleArchivedClassesView = toggleArchivedClassesView;
+    // Window exports for HTML event bindings
+    Object.assign(window, {
+      openModal, closeModal, toggleArchivedClassesView,
+      addStudentByEnrollment, backArchiveStep1, backDeleteStep1, backRemoveMemberStep1,
+      closeEnrollDeptModal, confirmMoveToTrash, confirmPermanentDeleteFromModal,
+      copyHubInviteCode, executeArchiveGroup, executeConfirmedRemoveMember,
+      loadHodDashboardData, openAddUnenrolledModal, openBroadcastNoticeModal,
+      openCreateGroupAssignmentModal, openCreateGroupTestModal, openLinkedRegister,
+      openPromoteCohortModal, openTrashBinModal, proceedArchiveStep2, proceedDeleteStep2,
+      proceedRemoveMemberStep2, setGroupFilter, submitAnnouncement,
+      submitBatchEnrollUnenrolled, submitEnrollDeptStudents, submitSaveExamScores,
+      switchDashboardTab, switchHubTab, triggerAutoArchiveCheck
+    });
 
     init();
+})();
 

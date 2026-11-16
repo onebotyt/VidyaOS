@@ -1,92 +1,125 @@
 /**
  * ══════════════════════════════════════════════════════════════
  * PAGE LOGIC: PROFILE
- * frontend/faculty/profile/profile.js
+ * Location: /faculty/profile/profile.js
+ * 
+ * Strict Domain Isolation: Encapsulated IIFE execution.
  * ══════════════════════════════════════════════════════════════
  */
 
-guardRoute(['TEACHER']);
+(function () {
+  'use strict';
 
-    let profileData = null;
+  // Auth & RBAC Gate
+  if (typeof requireFacultyAuth === 'function') {
+    requireFacultyAuth(['TEACHER', 'HOD']);
+  } else if (typeof guardRoute === 'function') {
+    guardRoute(['TEACHER']);
+  }
 
-    function togglePassVisibility(inputId, btn) {
-      const inp = document.getElementById(inputId);
-      if (!inp) return;
-      if (inp.type === 'password') {
-        inp.type = 'text';
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
-      } else {
-        inp.type = 'password';
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-      }
+  let profileData = null;
+
+  const esc = (typeof escHtml === 'function') ? escHtml : (s) => (s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+  const getIcon = (name, opts) => (window.FacultyIcons && typeof window.FacultyIcons.get === 'function') ? window.FacultyIcons.get(name, opts) : '';
+
+  function togglePassVisibility(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    if (!inp || !btn) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      btn.innerHTML = getIcon('eyeOff', { size: 14 }) || '🙈';
+    } else {
+      inp.type = 'password';
+      btn.innerHTML = getIcon('eye', { size: 14 }) || '👁️';
     }
+  }
 
-    async function loadProfile() {
-      try {
-        const res = await fetchApi('/faculty/profile');
-        if (res.success && res.data) {
-          profileData = res.data;
+  async function loadProfile() {
+    try {
+      const res = await fetchApi('/faculty/profile');
+      if (res.success && res.data) {
+        profileData = res.data;
 
-          // 1. Hero card
-          const fullName = profileData.full_name || 'Faculty Member';
-          document.getElementById('hero-name').innerText = fullName;
-          document.getElementById('hero-empid').innerText = profileData.employee_id || '—';
-          document.getElementById('hero-dept').innerText = profileData.department_name || 'Department of Information Technology';
+        // 1. Hero card
+        const fullName = profileData.full_name || 'Faculty Member';
+        const elHeroName = document.getElementById('hero-name');
+        const elHeroEmpid = document.getElementById('hero-empid');
+        const elHeroDept = document.getElementById('hero-dept');
+        const elHeroAvatar = document.getElementById('hero-avatar');
 
-          // Avatar initials (strip honorifics so Dr. Rajesh Sharma => RS)
-          const cleanName = fullName.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
-          const nameParts = cleanName.split(/\s+/).filter(Boolean);
-          const initials = nameParts.length >= 2 
-            ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
-            : (cleanName.slice(0, 2).toUpperCase() || 'FA');
-          document.getElementById('hero-avatar').innerText = initials;
+        if (elHeroName) elHeroName.textContent = fullName;
+        if (elHeroEmpid) elHeroEmpid.textContent = profileData.employee_id || '—';
+        if (elHeroDept) elHeroDept.textContent = profileData.department_name || 'Department of Information Technology';
 
-          // Dynamic badges
-          const badgesContainer = document.getElementById('hero-badges');
-          let badgesHtml = '<span class="role-chip verified"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Verified Account</span>';
+        // Avatar initials
+        const cleanName = fullName.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
+        const nameParts = cleanName.split(/\s+/).filter(Boolean);
+        const initials = nameParts.length >= 2
+          ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+          : (cleanName.slice(0, 2).toUpperCase() || 'FA');
+        if (elHeroAvatar) elHeroAvatar.textContent = initials;
+
+        // Dynamic badges
+        const badgesContainer = document.getElementById('hero-badges');
+        if (badgesContainer) {
+          let badgesHtml = `<span class="role-chip verified">${getIcon('check', { size: 14 })} Verified Account</span>`;
           if (profileData.is_hod) {
-            badgesHtml += `<span class="role-chip hod">Head of Department (${profileData.hod_department_name || profileData.department_code || 'Dept'})</span>`;
+            badgesHtml += `<span class="role-chip hod">Head of Department (${esc(profileData.hod_department_name || profileData.department_code || 'Dept')})</span>`;
           }
           if (profileData.department_name || profileData.department_code) {
-            badgesHtml += `<span class="role-chip class-teacher">${profileData.department_code || 'Dept'} Faculty</span>`;
+            badgesHtml += `<span class="role-chip class-teacher">${esc(profileData.department_code || 'Dept')} Faculty</span>`;
           }
-          badgesHtml += `<span class="role-chip subject"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> Subject Faculty</span>`;
+          badgesHtml += `<span class="role-chip subject">${getIcon('registers', { size: 14 })} Subject Faculty</span>`;
           badgesContainer.innerHTML = badgesHtml;
+        }
 
-          // 2. Metrics strip
-          document.getElementById('stat-registers').innerText = profileData.active_registers_count || profileData.registers?.length || 0;
-          document.getElementById('stat-students').innerText = profileData.total_students_count || 'Cohort';
-          document.getElementById('stat-dept').innerText = profileData.department_name || 'Faculty';
-          document.getElementById('stat-dept-code').innerText = `Code: ${profileData.department_code || 'CS'}`;
+        // 2. Metrics strip
+        const elStatReg = document.getElementById('stat-registers');
+        const elStatStu = document.getElementById('stat-students');
+        const elStatDept = document.getElementById('stat-dept');
+        const elStatDeptCode = document.getElementById('stat-dept-code');
 
-          // Form fields
-          document.getElementById('prof-empid').value = profileData.employee_id || '—';
-          document.getElementById('prof-name').value = fullName;
-          document.getElementById('prof-email').value = profileData.email || profileData.username || '';
-          document.getElementById('prof-phone').value = profileData.phone || '';
+        if (elStatReg) elStatReg.textContent = profileData.active_registers_count || profileData.registers?.length || 0;
+        if (elStatStu) elStatStu.textContent = profileData.total_students_count || 'Cohort';
+        if (elStatDept) elStatDept.textContent = profileData.department_name || 'Faculty';
+        if (elStatDeptCode) elStatDeptCode.textContent = `Code: ${profileData.department_code || 'CS'}`;
 
-          // 3. Google Status
-          const badge = document.getElementById('google-status-badge');
-          const statGoogle = document.getElementById('stat-google');
-          const btn = document.getElementById('btn-google-action');
+        // Form fields
+        const elEmpId = document.getElementById('prof-empid');
+        const elProfName = document.getElementById('prof-name');
+        const elProfEmail = document.getElementById('prof-email');
+        const elProfPhone = document.getElementById('prof-phone');
+
+        if (elEmpId) elEmpId.value = profileData.employee_id || '—';
+        if (elProfName) elProfName.value = fullName;
+        if (elProfEmail) elProfEmail.value = profileData.email || profileData.username || '';
+        if (elProfPhone) elProfPhone.value = profileData.phone || '';
+
+        // 3. Google Status
+        const badge = document.getElementById('google-status-badge');
+        const statGoogle = document.getElementById('stat-google');
+        const btn = document.getElementById('btn-google-action');
+        if (badge && statGoogle && btn) {
           if (profileData.google_linked) {
             badge.className = 'badge badge-present';
-            badge.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected</span>';
-            statGoogle.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected</span>';
+            badge.innerHTML = `<span style="display:inline-flex;align-items:center;gap:4px;">${getIcon('check', { size: 14 })} Connected</span>`;
+            statGoogle.innerHTML = `<span style="display:inline-flex;align-items:center;gap:4px;">${getIcon('check', { size: 14 })} Connected</span>`;
             statGoogle.style.color = '#16a34a';
             btn.className = 'btn btn-secondary btn-sm';
-            btn.innerText = 'Re-link Google';
+            btn.textContent = 'Re-link Google';
           } else {
             badge.className = 'badge badge-absent';
-            badge.innerText = 'Not Connected';
-            statGoogle.innerText = 'Not Linked';
+            badge.textContent = 'Not Connected';
+            statGoogle.textContent = 'Not Linked';
             statGoogle.style.color = '#dc2626';
             btn.className = 'btn btn-primary btn-sm';
-            btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg><span>Connect Google Account</span></span>';
+            btn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;">${getIcon('link', { size: 14 })}<span>Connect Google Account</span></span>`;
           }
+        }
 
-          // 4. Teaching allocations table
-          const tbody = document.getElementById('assignments-tbody');
+        // 4. Teaching allocations table
+        const tbody = document.getElementById('assignments-tbody');
+        if (tbody) {
           const assignments = profileData.assignments || [];
           if (!assignments.length) {
             tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No active course teaching allocations found.</td></tr>`;
@@ -99,184 +132,241 @@ guardRoute(['TEACHER']);
                   </span>
                 </td>
                 <td style="font-weight: 700;">
-                  ${a.subject_name || 'Full Cohort Roster'}
-                  ${a.subject_code ? `<span style="font-family: var(--font-family-mono); font-size: 0.75rem; color: #64748b; margin-left: 4px;">(${a.subject_code})</span>` : ''}
+                  ${esc(a.subject_name || 'Full Cohort Roster')}
+                  ${a.subject_code ? `<span style="font-family: var(--font-family-mono); font-size: 0.75rem; color: #64748b; margin-left: 4px;">(${esc(a.subject_code)})</span>` : ''}
                 </td>
-                <td>${a.department_name || a.branch_name || 'Engineering'}</td>
-                <td style="text-align: center; font-weight: 700;">Year ${a.year} / Sem ${a.semester}</td>
+                <td>${esc(a.department_name || a.branch_name || 'Engineering')}</td>
+                <td style="text-align: center; font-weight: 700;">Year ${esc(a.year)} / Sem ${esc(a.semester)}</td>
                 <td style="text-align: center;">
                   <span class="badge" style="background: #f1f5f9; color: #334155; font-size: 0.7rem;">
-                    ${a.session_type_scope || 'THEORY'}
+                    ${esc(a.session_type_scope || 'THEORY')}
                   </span>
                 </td>
               </tr>
             `).join('');
           }
         }
-      } catch (err) {
-        console.error(err);
       }
+    } catch (err) {
+      console.error(err);
     }
+  }
 
-    async function handleGoogleLinkAction() {
-      const user = getCurrentUser();
-      try {
-        const res = await fetchApi('/auth/google/url?mode=LINK&user_id=' + (user?.id || ''));
-        if (res.configured && res.data?.url) {
-          window.location.href = res.data.url;
-          return;
-        }
-      } catch {}
-      openProfileGoogleCard();
-    }
-
-    // Listen for OAuth completion
-    window.addEventListener('message', (event) => {
-      if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
-        showToast('Google account linked successfully!', 'success');
-        loadProfile();
-      } else if (event.data?.type === 'GOOGLE_AUTH_ERROR') {
-        showToast(event.data.message || 'Google account linking failed', 'error');
+  async function handleGoogleLinkAction() {
+    const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    try {
+      const res = await fetchApi('/auth/google/url?mode=LINK&user_id=' + (user?.id || ''));
+      if (res.configured && res.data?.url) {
+        window.location.href = res.data.url;
+        return;
       }
-    });
+    } catch (_) {}
+    openProfileGoogleCard();
+  }
 
-    function openProfileGoogleCard() {
-      const modal = document.getElementById('google-signin-modal');
-      const errorBox = document.getElementById('google-card-error');
-      errorBox.style.display = 'none';
+  function openProfileGoogleCard() {
+    const modal = document.getElementById('google-signin-modal');
+    const errorBox = document.getElementById('google-card-error');
+    if (!modal) return;
+    if (errorBox) errorBox.style.display = 'none';
 
-      document.getElementById('google-accounts-view').style.display = 'block';
-      document.getElementById('google-input-view').style.display = 'none';
-      document.getElementById('google-loading-view').style.display = 'none';
-      document.getElementById('google-manual-email').value = '';
+    const acctView = document.getElementById('google-accounts-view');
+    const inputView = document.getElementById('google-input-view');
+    const loadView = document.getElementById('google-loading-view');
+    const manEmail = document.getElementById('google-manual-email');
 
-      const currentEmail = document.getElementById('prof-email').value.trim() || 'faculty@college.edu';
-      const currentName = document.getElementById('prof-name').value.trim() || 'Faculty Member';
-      const initial = currentEmail.charAt(0).toUpperCase();
+    if (acctView) acctView.style.display = 'block';
+    if (inputView) inputView.style.display = 'none';
+    if (loadView) loadView.style.display = 'none';
+    if (manEmail) manEmail.value = '';
 
-      const accountList = document.getElementById('google-account-list');
+    const elEmail = document.getElementById('prof-email');
+    const elName = document.getElementById('prof-name');
+    const currentEmail = (elEmail ? elEmail.value.trim() : '') || 'faculty@college.edu';
+    const currentName = (elName ? elName.value.trim() : '') || 'Faculty Member';
+    const initial = currentEmail.charAt(0).toUpperCase();
+
+    const accountList = document.getElementById('google-account-list');
+    if (accountList) {
       accountList.innerHTML = `
-        <li class="google-account-item" onclick="linkProfileGoogleAccount('${currentEmail}')">
-          <div class="google-account-avatar">${initial}</div>
+        <li class="google-account-item" onclick="linkProfileGoogleAccount('${esc(currentEmail)}')">
+          <div class="google-account-avatar">${esc(initial)}</div>
           <div class="google-account-details">
-            <div class="google-account-name">${currentName}</div>
-            <div class="google-account-email">${currentEmail}</div>
+            <div class="google-account-name">${esc(currentName)}</div>
+            <div class="google-account-email">${esc(currentEmail)}</div>
           </div>
           <span class="google-signed-in-badge">Matching Profile</span>
         </li>
       `;
-
-      modal.style.display = 'flex';
     }
 
-    function closeGoogleCard() {
-      document.getElementById('google-signin-modal').style.display = 'none';
-    }
+    modal.style.display = 'flex';
+  }
 
-    function showGoogleEmailInput() {
-      document.getElementById('google-accounts-view').style.display = 'none';
-      document.getElementById('google-input-view').style.display = 'block';
-      document.getElementById('google-manual-email').focus();
-    }
+  function closeGoogleCard() {
+    const modal = document.getElementById('google-signin-modal');
+    if (modal) modal.style.display = 'none';
+  }
 
-    function showGoogleAccountList() {
-      document.getElementById('google-input-view').style.display = 'none';
-      document.getElementById('google-accounts-view').style.display = 'block';
-      document.getElementById('google-card-error').style.display = 'none';
-    }
+  function showGoogleEmailInput() {
+    const acct = document.getElementById('google-accounts-view');
+    const inp = document.getElementById('google-input-view');
+    const man = document.getElementById('google-manual-email');
+    if (acct) acct.style.display = 'none';
+    if (inp) inp.style.display = 'block';
+    if (man) man.focus();
+  }
 
-    function submitProfileGoogleEmail() {
-      const email = document.getElementById('google-manual-email').value.trim();
-      if (!email || !email.includes('@')) {
-        const errorBox = document.getElementById('google-card-error');
-        errorBox.innerText = 'Please enter a valid Google email address.';
+  function showGoogleAccountList() {
+    const inp = document.getElementById('google-input-view');
+    const acct = document.getElementById('google-accounts-view');
+    const err = document.getElementById('google-card-error');
+    if (inp) inp.style.display = 'none';
+    if (acct) acct.style.display = 'block';
+    if (err) err.style.display = 'none';
+  }
+
+  function submitProfileGoogleEmail() {
+    const el = document.getElementById('google-manual-email');
+    const email = el ? el.value.trim() : '';
+    if (!email || !email.includes('@')) {
+      const errorBox = document.getElementById('google-card-error');
+      if (errorBox) {
+        errorBox.textContent = 'Please enter a valid Google email address.';
         errorBox.style.display = 'block';
-        return;
       }
-      linkProfileGoogleAccount(email);
+      return;
     }
+    linkProfileGoogleAccount(email);
+  }
 
-    async function linkProfileGoogleAccount(email) {
-      document.getElementById('google-accounts-view').style.display = 'none';
-      document.getElementById('google-input-view').style.display = 'none';
-      document.getElementById('google-loading-view').style.display = 'block';
-      document.getElementById('google-card-error').style.display = 'none';
+  async function linkProfileGoogleAccount(email) {
+    const acct = document.getElementById('google-accounts-view');
+    const inp = document.getElementById('google-input-view');
+    const load = document.getElementById('google-loading-view');
+    const err = document.getElementById('google-card-error');
 
-      try {
-        const res = await fetchApi('/auth/google/link', {
-          method: 'POST',
-          body: JSON.stringify({ id_token: `google_${email}` })
-        });
+    if (acct) acct.style.display = 'none';
+    if (inp) inp.style.display = 'none';
+    if (load) load.style.display = 'block';
+    if (err) err.style.display = 'none';
 
-        if (res.success) {
-          closeGoogleCard();
+    try {
+      const res = await fetchApi('/auth/google/link', {
+        method: 'POST',
+        body: JSON.stringify({ id_token: `google_${email}` })
+      });
+
+      if (res.success) {
+        closeGoogleCard();
+        if (typeof showToast === 'function') {
           showToast('Google account linked! You can now sign in with one click.', 'success');
-          loadProfile();
         }
-      } catch (err) {
-        document.getElementById('google-loading-view').style.display = 'none';
-        document.getElementById('google-accounts-view').style.display = 'block';
-        const errorBox = document.getElementById('google-card-error');
-        errorBox.innerText = err.message || 'Google account linking failed. Google email must match your registered faculty email.';
-        errorBox.style.display = 'block';
+        loadProfile();
+      }
+    } catch (error) {
+      if (load) load.style.display = 'none';
+      if (acct) acct.style.display = 'block';
+      if (err) {
+        err.textContent = error.message || 'Google account linking failed. Google email must match your registered faculty email.';
+        err.style.display = 'block';
       }
     }
+  }
 
-    document.getElementById('profile-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const full_name = document.getElementById('prof-name').value.trim();
-      const email = document.getElementById('prof-email').value.trim();
-      const phone = document.getElementById('prof-phone').value.trim();
-      const btn = document.getElementById('save-prof-btn');
-      btn.disabled = true;
+  // Bind forms
+  function setupForms() {
+    const profForm = document.getElementById('profile-form');
+    if (profForm) {
+      profForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const full_name = document.getElementById('prof-name')?.value.trim();
+        const email = document.getElementById('prof-email')?.value.trim();
+        const phone = document.getElementById('prof-phone')?.value.trim();
+        const btn = document.getElementById('save-prof-btn');
+        if (btn) btn.disabled = true;
 
-      try {
-        const res = await fetchApi('/faculty/profile', {
-          method: 'PUT',
-          body: JSON.stringify({ full_name, email, phone })
-        });
-        if (res.success) {
-          showToast('Profile updated successfully', 'success');
-          loadProfile();
+        try {
+          const res = await fetchApi('/faculty/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ full_name, email, phone })
+          });
+          if (res.success) {
+            if (typeof showToast === 'function') showToast('Profile updated successfully', 'success');
+            loadProfile();
+          }
+        } catch (_) {
+        } finally {
+          if (btn) btn.disabled = false;
         }
-      } catch (err) {
-        // Handled by toast
-      } finally {
-        btn.disabled = false;
-      }
-    });
+      });
+    }
 
-    document.getElementById('password-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const current_password = document.getElementById('pass-current').value;
-      const new_password = document.getElementById('pass-new').value;
-      const confirm_password = document.getElementById('pass-confirm').value;
+    const passForm = document.getElementById('password-form');
+    if (passForm) {
+      passForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const current_password = document.getElementById('pass-current')?.value;
+        const new_password = document.getElementById('pass-new')?.value;
+        const confirm_password = document.getElementById('pass-confirm')?.value;
 
-      if (new_password !== confirm_password) {
-        showToast('New passwords do not match', 'error');
-        return;
-      }
-
-      const btn = document.getElementById('save-pass-btn');
-      btn.disabled = true;
-
-      try {
-        const res = await fetchApi('/faculty/profile', {
-          method: 'PUT',
-          body: JSON.stringify({ current_password, new_password })
-        });
-        if (res.success) {
-          showToast('Password changed successfully!', 'success');
-          document.getElementById('pass-current').value = '';
-          document.getElementById('pass-new').value = '';
-          document.getElementById('pass-confirm').value = '';
+        if (new_password !== confirm_password) {
+          if (typeof showToast === 'function') showToast('New passwords do not match', 'error');
+          return;
         }
-      } catch (err) {
-        // Handled by toast
-      } finally {
-        btn.disabled = false;
-      }
-    });
 
+        const btn = document.getElementById('save-pass-btn');
+        if (btn) btn.disabled = true;
+
+        try {
+          const res = await fetchApi('/faculty/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ current_password, new_password })
+          });
+          if (res.success) {
+            if (typeof showToast === 'function') showToast('Password changed successfully!', 'success');
+            const p1 = document.getElementById('pass-current');
+            const p2 = document.getElementById('pass-new');
+            const p3 = document.getElementById('pass-confirm');
+            if (p1) p1.value = '';
+            if (p2) p2.value = '';
+            if (p3) p3.value = '';
+          }
+        } catch (_) {
+        } finally {
+          if (btn) btn.disabled = false;
+        }
+      });
+    }
+  }
+
+  // Cross-window OAuth listener
+  window.addEventListener('message', (event) => {
+    if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
+      if (typeof showToast === 'function') showToast('Google account linked successfully!', 'success');
+      loadProfile();
+    } else if (event.data?.type === 'GOOGLE_AUTH_ERROR') {
+      if (typeof showToast === 'function') showToast(event.data.message || 'Google account linking failed', 'error');
+    }
+  });
+
+  // Export functions bound to DOM events
+  window.togglePassVisibility = togglePassVisibility;
+  window.handleGoogleLinkAction = handleGoogleLinkAction;
+  window.openProfileGoogleCard = openProfileGoogleCard;
+  window.closeGoogleCard = closeGoogleCard;
+  window.showGoogleEmailInput = showGoogleEmailInput;
+  window.showGoogleAccountList = showGoogleAccountList;
+  window.submitProfileGoogleEmail = submitProfileGoogleEmail;
+  window.linkProfileGoogleAccount = linkProfileGoogleAccount;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setupForms();
+      loadProfile();
+    });
+  } else {
+    setupForms();
     loadProfile();
-
+  }
+})();

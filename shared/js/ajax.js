@@ -47,9 +47,11 @@
               window.handleSessionRevocation('session_transferred');
               return;
             }
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('user');
-            window.location.href = '/login/index.html?reason=session_transferred';
+            ['access_token', 'accessToken', 'token', 'authToken', 'user', 'currentUser', 'auth_user', 'vidyaos_token', 'vidyaos_user'].forEach(k => {
+              try { localStorage.removeItem(k); } catch (_) {}
+            });
+            try { sessionStorage.clear(); } catch (_) {}
+            window.location.replace('/login/index.html?reason=session_transferred');
             return;
           }
 

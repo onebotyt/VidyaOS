@@ -164,13 +164,16 @@ function handleSessionRevocation(reason = 'session_transferred') {
   if (typeof window === 'undefined') return;
   const authKeys = [
     'access_token',
+    'accessToken',
     'refresh_token',
     'authToken',
     'auth_token',
     'token',
+    'vidyaos_token',
     'user',
     'currentUser',
     'auth_user',
+    'vidyaos_user',
     'user_profile',
     'user_roles',
     'role',
@@ -181,12 +184,20 @@ function handleSessionRevocation(reason = 'session_transferred') {
     try { localStorage.removeItem(k); } catch (_) {}
   });
   try {
+    document.cookie.split(";").forEach(c => {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+  } catch (_) {}
+  try {
     sessionStorage.clear();
     sessionStorage.setItem('vidya_logout_notice', reason === 'session_expired'
       ? 'Your session expired due to inactivity. Please sign in again.'
       : 'Your session has ended because this account was logged into from another device or signed out.');
   } catch (_) { }
   window.location.replace(`/login/index.html?reason=${encodeURIComponent(reason)}`);
+}
+if (typeof window !== 'undefined') {
+  window.handleSessionRevocation = handleSessionRevocation;
 }
 
 let _heartbeatTimer = null;

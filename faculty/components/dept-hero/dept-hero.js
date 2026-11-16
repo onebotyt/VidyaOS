@@ -15,7 +15,7 @@
 
   const DEFAULTS = {
     institution_name: 'Government Polytechnic Nainital',
-    institution_tagline: 'Uttarakhand | Completely Adhered to NBA Guidelines',
+    institution_tagline: '',
     institution_code: 'GP-UBTER-101',
     institution_logo_url: '/images/college-logo.svg',
     institution_banner_url: '/admin/dashboard/campus-nainital.jpg',
@@ -43,47 +43,37 @@
     }
   }
 
+  function isTaglineSuppressed(tagline) {
+    if (!tagline || !tagline.trim()) return true;
+    const lower = tagline.toLowerCase();
+    return lower.includes('nba guidelines') || lower.includes('completely adhered');
+  }
+
   function renderTemplate(config) {
     const instName = config.institution_name || DEFAULTS.institution_name;
-    const tagline = config.institution_tagline || DEFAULTS.institution_tagline;
+    const rawTagline = config.institution_tagline !== undefined ? config.institution_tagline : DEFAULTS.institution_tagline;
+    const tagline = isTaglineSuppressed(rawTagline) ? '' : rawTagline.trim();
     const logoUrl = config.institution_logo_url || DEFAULTS.institution_logo_url;
     const bannerUrl = config.institution_banner_url || DEFAULTS.institution_banner_url;
-    const pageTitle = config.page_title || DEFAULTS.page_title;
-    const pageSubtitle = config.page_subtitle || DEFAULTS.page_subtitle;
 
     return `
-      <section class="dept-hero-component" aria-label="Institutional Campus Showcase & Faculty Command Header">
-        <!-- Left Side: College Identity & Page Meta -->
-        <div class="hero-left-col">
-          <!-- College Circular Logo -->
-          <div class="hero-logo-circle-wrap" aria-hidden="true">
-            <img class="hero-inst-logo-img hero-inst-logo-val" src="${logoUrl}" alt="College Logo"
+      <section class="dash-hero-card dept-hero-component" aria-label="Institutional Showcase">
+        <div class="dash-hero-brand-group">
+          <div class="dash-hero-logo-badge">
+            <img class="hero-inst-logo-val" id="dash-inst-logo" src="${logoUrl}" alt="Institutional Logo"
               onerror="this.onerror=null;this.src='/images/college-logo.svg';">
           </div>
-
-          <!-- College Name & Subtitle -->
-          <div class="hero-inst-text-block">
-            <h2 class="hero-inst-name hero-inst-name-val">${escapeHtml(instName)}</h2>
-            <p class="hero-inst-tagline hero-inst-tagline-val">${escapeHtml(tagline)}</p>
-          </div>
-
-          <!-- Vertical Divider -->
-          <div class="hero-vertical-divider" aria-hidden="true"></div>
-
-          <!-- Page Title & Subtitle -->
-          <div class="hero-page-text-block">
-            <h1 class="hero-page-title hero-page-title-val">${escapeHtml(pageTitle)}</h1>
-            <p class="hero-page-subtitle hero-page-subtitle-val">${escapeHtml(pageSubtitle)}</p>
+          <div class="dash-hero-vdivider" aria-hidden="true"></div>
+          <div class="dash-hero-text">
+            <h1 class="dash-hero-title hero-inst-name-val" id="dash-inst-name">${escapeHtml(instName)}</h1>
+            ${tagline ? `<p class="dash-hero-subtitle hero-inst-tagline-val" id="dash-inst-tagline">${escapeHtml(tagline)}</p>` : ''}
           </div>
         </div>
 
-        <!-- Right Side: Panoramic College Campus Building Photo -->
-        <div class="hero-right-col" aria-hidden="true">
-          <div class="hero-campus-photo-wrap">
-            <img class="hero-campus-photo hero-campus-photo-val" src="${bannerUrl}" alt="${escapeHtml(instName)} Campus"
-              onerror="this.onerror=null;this.src='/admin/dashboard/campus-nainital.jpg';">
-            <div class="hero-campus-photo-overlay"></div>
-          </div>
+        <div class="dash-hero-banner-wrap" aria-hidden="true">
+          <img class="dash-hero-banner-img hero-campus-photo-val" id="dash-inst-banner" src="${bannerUrl}" alt="${escapeHtml(instName)} Campus"
+            onerror="this.onerror=null;this.src='/admin/dashboard/campus-nainital.jpg';">
+          <div class="dash-hero-banner-glow"></div>
         </div>
 
         <!-- Backward Compatibility Hidden Anchors -->
@@ -109,7 +99,8 @@
   function applyBrandingToDOM(settings) {
     if (!settings) return;
     const instName = settings.institution_name || DEFAULTS.institution_name;
-    const tagline = settings.institution_tagline || DEFAULTS.institution_tagline;
+    const rawTagline = settings.institution_tagline !== undefined ? settings.institution_tagline : DEFAULTS.institution_tagline;
+    const tagline = isTaglineSuppressed(rawTagline) ? '' : rawTagline.trim();
     const logoUrl = settings.institution_logo_url || DEFAULTS.institution_logo_url;
     const bannerUrl = settings.institution_banner_url || DEFAULTS.institution_banner_url;
 
@@ -117,7 +108,13 @@
       el.textContent = instName;
     });
     document.querySelectorAll('.hero-inst-tagline-val, #hero-inst-tagline').forEach(el => {
-      el.textContent = tagline;
+      if (!tagline) {
+        el.style.display = 'none';
+        el.textContent = '';
+      } else {
+        el.style.display = '';
+        el.textContent = tagline;
+      }
     });
     document.querySelectorAll('.hero-inst-logo-val, #hero-inst-logo').forEach(el => {
       if (el.tagName === 'IMG') el.src = logoUrl;

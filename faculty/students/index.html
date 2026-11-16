@@ -8,14 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/reset.css?v=20261029">
-  <link rel="stylesheet" href="/css/variables.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/core/reset.css">
+  <link rel="stylesheet" href="/faculty/components/core/variables.css">
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261029">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261029">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
-  <link rel="stylesheet" href="/faculty/components/dept-hero/dept-hero.css?v=20261030">
-  <link rel="stylesheet" href="/faculty/components/confirm-dialog/confirm-dialog.css?v=20261030">
-  <link rel="stylesheet" href="/faculty/components/dept-hero/dept-hero.css?v=20261030">
   <link rel="stylesheet" href="/faculty/components/confirm-dialog/confirm-dialog.css?v=20261030">
   <link rel="stylesheet" href="/faculty/students/students.css?v=20261030">
   <script>
@@ -46,16 +43,14 @@
         <a href="/faculty/profile.html">Profile</a>
       </nav>
 
-      <main class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+      <main class="container" style="padding-top: 1rem; padding-bottom: 5rem;">
         
-        <!-- ══════════════════ 1. TOP HEADER (REUSABLE DEPT-HERO COMPONENT) ══════════════════ -->
-        <div id="dept-hero-container"></div>
         <!-- Backward compatibility badge elements for test suites -->
         <span id="class-teacher-badge" style="display:none;"></span>
         <span id="hod-badge" style="display:none;"></span>
         <span id="faculty-provision-notice" style="display:none;"></span>
 
-        <!-- ══════════════════ 2. QUICK STATS ROW (IMAGE 2) ══════════════════ -->
+        <!-- ══════════════════ 1. QUICK STATS ROW (3 COMPACT CARDS) ══════════════════ -->
         <div class="portal-stats-row">
           <!-- Card 1: Faculty -->
           <div class="portal-stat-card card-faculty">
@@ -101,29 +96,7 @@
             </div>
           </div>
 
-          <!-- Card 3: Subjects -->
-          <div class="portal-stat-card card-subjects">
-            <div class="stat-card-header">
-              <div class="stat-icon-square icon-purple">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-              </div>
-              <div class="stat-badge purple-badge">0% ↑</div>
-            </div>
-            <div class="stat-metric-body">
-              <div class="stat-metric-label">Subjects</div>
-              <div class="stat-metric-val" id="stat-subjects-count">12</div>
-            </div>
-            <div class="stat-card-footer">
-              <span class="stat-subtext">Assigned to department</span>
-              <div class="stat-sparkline">
-                <svg viewBox="0 0 80 24" class="sparkline-svg sparkline-purple">
-                  <path d="M0 20 C 20 18, 35 15, 50 12 S 65 8, 80 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card 4: Pending Registrations -->
+          <!-- Card 3: Pending Registrations -->
           <div class="portal-stat-card card-pending">
             <div class="stat-card-header">
               <div class="stat-icon-square icon-orange">
@@ -147,156 +120,105 @@
         </div>
 
         <!-- Hidden counters preserved for backward compatibility -->
+        <div style="display:none;" id="stat-subjects-count">0</div>
         <div style="display:none;" id="stat-active">0</div>
         <div style="display:none;" id="stat-google">0</div>
 
-        <!-- ══════════════════ 3. SELF-REGISTRATION GATEWAYS (IMAGE 2) ══════════════════ -->
-        <div class="portal-gateways-card" id="registration-control-hub">
-          <div class="gateway-hero-col">
-            <div class="gateway-hero-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        <!-- ══════════════════ 2. SELF-REGISTRATION GATEWAYS (COMPACT DESIGN) ══════════════════ -->
+        <div class="portal-gateways-card compact-hub" id="registration-control-hub">
+          <div class="gw-compact-flex">
+            <div class="gw-compact-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Self-Registration:</span>
             </div>
-            <div>
-              <div class="gateway-hero-title">Self-Registration Gateways</div>
-              <div class="gateway-hero-sub">Allow new users to register on public portal.</div>
+            <div class="gw-compact-items">
+              <!-- Faculty Gateway Item -->
+              <div class="gw-compact-item">
+                <span class="gw-compact-title">Faculty</span>
+                <span id="quick-teacher-reg-badge" class="badge-status-pill closed">● CLOSED</span>
+                <label class="switch-toggle sm" title="Toggle Faculty Registration">
+                  <input type="checkbox" id="chk-faculty-reg" onchange="toggleFacultyRegistration()">
+                  <span class="switch-slider"></span>
+                </label>
+                <button type="button" id="quick-teacher-reg-toggle-btn" onclick="toggleFacultyRegistration()" style="display:none;">Toggle</button>
+              </div>
+
+              <div class="gw-compact-sep"></div>
+
+              <!-- Student Gateway Item -->
+              <div class="gw-compact-item">
+                <span class="gw-compact-title">Students</span>
+                <span id="quick-student-reg-badge" class="badge-status-pill closed">● CLOSED</span>
+                <label class="switch-toggle sm" title="Toggle Student Registration">
+                  <input type="checkbox" id="chk-student-reg" onchange="toggleDepartmentStudentRegistration()">
+                  <span class="switch-slider"></span>
+                </label>
+                <button type="button" id="quick-student-reg-toggle-btn" onclick="toggleDepartmentStudentRegistration()" style="display:none;">Toggle</button>
+                <button type="button" id="quick-dept-student-reg-toggle-btn" onclick="toggleDepartmentStudentRegistration()" style="display:none;">Toggle</button>
+              </div>
             </div>
           </div>
 
-          <!-- Faculty Registration Box -->
-          <div class="gateway-ctrl-box">
-            <div class="gateway-ctrl-top">
-              <div class="gateway-ctrl-info">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                <span>Faculty Registration</span>
-              </div>
-              <span id="quick-teacher-reg-badge" class="badge-status-pill closed">● CLOSED</span>
-              <label class="switch-toggle" title="Toggle Faculty Registration">
-                <input type="checkbox" id="chk-faculty-reg" onchange="toggleFacultyRegistration()">
-                <span class="switch-slider"></span>
-              </label>
-              <button type="button" id="quick-teacher-reg-toggle-btn" onclick="toggleFacultyRegistration()" style="display:none;">Toggle</button>
-            </div>
-            <div class="gateway-ctrl-bottom">
-              <div class="gateway-stats-mini">
-                <span class="mini-stat pending"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <strong id="gw-faculty-pending">0</strong> Pending</span>
-                <span class="mini-stat approved"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> <strong id="gw-faculty-approved">3</strong> Approved</span>
-                <span class="mini-stat rejected"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> <strong id="gw-faculty-rejected">0</strong> Rejected</span>
-              </div>
-              <button type="button" class="btn-gateway-view" onclick="showMainTab('pending'); switchPendingSubtab('faculty')">View</button>
-            </div>
-          </div>
-
-          <!-- Student Registration Box -->
-          <div class="gateway-ctrl-box">
-            <div class="gateway-ctrl-top">
-              <div class="gateway-ctrl-info">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-                <span>Student Registration</span>
-              </div>
-              <span id="quick-student-reg-badge" class="badge-status-pill closed">● CLOSED</span>
-              <label class="switch-toggle" title="Toggle Student Registration">
-                <input type="checkbox" id="chk-student-reg" onchange="toggleDepartmentStudentRegistration()">
-                <span class="switch-slider"></span>
-              </label>
-              <button type="button" id="quick-student-reg-toggle-btn" onclick="toggleDepartmentStudentRegistration()" style="display:none;">Toggle</button>
-              <button type="button" id="quick-dept-student-reg-toggle-btn" onclick="toggleDepartmentStudentRegistration()" style="display:none;">Toggle</button>
-            </div>
-            <div class="gateway-ctrl-bottom">
-              <div class="gateway-stats-mini">
-                <span class="mini-stat pending"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <strong id="gw-student-pending">0</strong> Pending</span>
-                <span class="mini-stat approved"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> <strong id="gw-student-approved">8</strong> Approved</span>
-                <span class="mini-stat rejected"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> <strong id="gw-student-rejected">0</strong> Rejected</span>
-              </div>
-              <button type="button" class="btn-gateway-view" onclick="showMainTab('pending'); switchPendingSubtab('students')">View &rarr;</button>
-            </div>
-          </div>
+          <!-- Preserved backward compatibility data counters -->
+          <span id="gw-faculty-pending" style="display:none;">0</span>
+          <span id="gw-faculty-approved" style="display:none;">0</span>
+          <span id="gw-faculty-rejected" style="display:none;">0</span>
+          <span id="gw-student-pending" style="display:none;">0</span>
+          <span id="gw-student-approved" style="display:none;">0</span>
+          <span id="gw-student-rejected" style="display:none;">0</span>
         </div>
 
-        <!-- ══════════════════ 4. TABS & SEARCH ACTION BAR ══════════════════ -->
+        <!-- ══════════════════ 3. TABS & SEARCH ACTION BAR ══════════════════ -->
         <div class="portal-nav-bar">
           <div class="portal-tabs-group">
             <button type="button" class="portal-tab-btn active" id="tab-faculty-btn" onclick="showMainTab('faculty')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              <span>Department Faculty</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <span>Faculty</span>
               <span class="portal-tab-counter" id="tab-faculty-count">3</span>
             </button>
             <button type="button" class="portal-tab-btn" id="tab-students-btn" onclick="showMainTab('students')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
               <span>Students</span>
               <span class="portal-tab-counter" id="tab-students-count">8</span>
             </button>
             <button type="button" class="portal-tab-btn" id="tab-pending-btn" onclick="showMainTab('pending')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              <span>Pending Registrations</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Pending</span>
               <span class="portal-tab-counter" id="pending-badge">0</span>
-            </button>
-            <button type="button" class="portal-tab-btn" id="tab-lifecycle-btn" onclick="showMainTab('lifecycle')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
-              <span>Roster &amp; Lifecycle</span>
-            </button>
-            <button type="button" class="portal-tab-btn" id="tab-analytics-btn" onclick="showMainTab('analytics')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              <span>Enrollment Analytics</span>
             </button>
 
             <!-- Backward compatibility tab buttons for older tests -->
+            <button type="button" id="tab-lifecycle-btn" onclick="showMainTab('lifecycle')" style="display:none;">Lifecycle</button>
+            <button type="button" id="tab-analytics-btn" onclick="showMainTab('analytics')" style="display:none;">Analytics</button>
             <button type="button" id="tab-overview-btn" onclick="showMainTab('faculty')" style="display:none;">Overview</button>
             <button type="button" id="tab-teachers-btn" onclick="showMainTab('faculty')" style="display:none;">Teachers</button>
             <button type="button" id="tab-roster-btn" onclick="showMainTab('students')" style="display:none;">Roster</button>
             <span id="pending-faculty-badge-tab" style="display:none;">0</span>
           </div>
 
-          <div class="portal-nav-actions">
-            <div class="portal-search-box">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input type="text" id="portal-global-search" placeholder="Search by name, roll no, or ID..." oninput="handleGlobalSearch(this.value)">
+          <div class="portal-nav-actions" id="portal-nav-actions">
+            <!-- Year filter pills for students -->
+            <div class="student-year-pills" id="student-year-filter-pills" style="display: none;">
+              <button type="button" class="year-pill-btn active" data-year="all" onclick="filterStudentsByYear('all')">All</button>
+              <button type="button" class="year-pill-btn" data-year="1" onclick="filterStudentsByYear(1)">1st Year</button>
+              <button type="button" class="year-pill-btn" data-year="2" onclick="filterStudentsByYear(2)">2nd Year</button>
+              <button type="button" class="year-pill-btn" data-year="3" onclick="filterStudentsByYear(3)">3rd Year</button>
             </div>
-            <button type="button" class="portal-filter-btn" onclick="toggleFilterDrawer()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-              <span>Filter</span>
-            </button>
+
+            <div class="portal-search-box" id="portal-search-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="portal-global-search" placeholder="Search faculty by name, ID..." oninput="handleGlobalSearch(this.value)">
+            </div>
           </div>
         </div>
 
-        <!-- ══════════════════ 5. FILTER DRAWER (Collapsible) ══════════════════ -->
-        <div class="portal-filter-drawer" id="portal-filter-drawer" style="display: none;">
-          <div class="filter-grid">
-            <div class="form-group" style="margin:0;">
-              <label class="form-label" style="font-size:0.78rem;font-weight:700;">Cohort Filter</label>
-              <select id="cohort-select" class="form-select" onchange="onCohortChange(this.value)">
-                <option value="">All Cohorts (Full Department)</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin:0;">
-              <label class="form-label" style="font-size:0.78rem;font-weight:700;">Year</label>
-              <select id="filter-year" class="form-select" onchange="applyFilters()">
-                <option value="">All Years</option>
-                <option value="1">Year 1</option>
-                <option value="2">Year 2</option>
-                <option value="3">Year 3</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin:0;">
-              <label class="form-label" style="font-size:0.78rem;font-weight:700;">Semester</label>
-              <select id="filter-sem" class="form-select" onchange="applyFilters()">
-                <option value="">All Semesters</option>
-                <option value="1">Sem 1</option>
-                <option value="2">Sem 2</option>
-                <option value="3">Sem 3</option>
-                <option value="4">Sem 4</option>
-                <option value="5">Sem 5</option>
-                <option value="6">Sem 6</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin:0;">
-              <label class="form-label" style="font-size:0.78rem;font-weight:700;">Search Roster</label>
-              <input type="text" id="search-input" class="form-control" placeholder="Search by name, roll no..." oninput="debounceSearch()">
-            </div>
-            <div style="display:flex;gap:0.4rem;">
-              <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilters()">Reset</button>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="toggleFilterDrawer()">Close</button>
-            </div>
-          </div>
+        <!-- Hidden legacy form elements for backward compatibility -->
+        <div style="display:none;" aria-hidden="true" id="legacy-filter-storage">
+          <select id="cohort-select"><option value="">All Cohorts</option></select>
+          <select id="filter-year"><option value="">All</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+          <select id="filter-sem"><option value="">All</option></select>
+          <input type="text" id="search-input">
+          <button type="button" id="filter-toggle-btn">Filter</button>
         </div>
 
         <!-- ══════════════════ 6. DEDICATED FULL TAB: DEPARTMENT FACULTY ONLY ══════════════════ -->
@@ -306,25 +228,22 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
               <span>Department Faculty (<span id="faculty-list-count">3</span>)</span>
             </div>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div class="panel-header-actions-row">
               <input type="text" id="teacher-search-box" class="form-control" placeholder="Search faculty by name..." style="max-width: 240px; font-size: 0.82rem; padding: 0.35rem 0.65rem;" oninput="filterTeachers(this.value)">
               <button type="button" class="btn btn-primary btn-sm" id="btn-add-teacher" style="display: none;" onclick="openCreateModal()">
                 + Add Faculty
               </button>
             </div>
           </div>
-          <div class="panel-card-table-wrap">
+          <div id="faculty-table-wrap" class="panel-card-table-wrap fac-table-wrap">
             <table class="portal-table" id="faculty-main-table">
               <thead>
                 <tr>
                   <th style="width: 45px;">#</th>
                   <th>Faculty Member</th>
                   <th>Employee ID</th>
-                  <th>Login Email</th>
                   <th>Designation / Role</th>
-                  <th>Assigned Subjects</th>
-                  <th>Status</th>
-                  <th class="th-faculty-actions" style="text-align: right; width: 140px;">Actions</th>
+                  <th class="th-faculty-actions" style="text-align: right; width: 70px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="faculty-main-tbody">
@@ -332,6 +251,8 @@
               </tbody>
             </table>
           </div>
+          <!-- Mobile Minimal Cards Stack (< 769px) -->
+          <div id="faculty-mobile-cards-wrap" class="fac-mini-cards-stack"></div>
           <div class="panel-card-footer">
             <span id="faculty-showing-text">Showing active department faculty members</span>
             <div class="mini-pagination">
@@ -354,6 +275,10 @@
               <span id="cohort-status-badge" class="badge" style="background: var(--bg-surface-secondary); color: var(--text-muted); font-size: 0.78rem;">All Cohorts</span>
             </div>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+              <a href="/faculty/hod-archive/index.html" class="btn btn-secondary btn-sm" id="btn-archive-link" title="Student Alumni &amp; Passout Archive" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                <span>Student Archive</span>
+              </a>
               <button type="button" class="btn btn-secondary btn-sm" id="btn-bulk-csv" onclick="openBulkModal()">Bulk CSV</button>
               <button type="button" class="btn btn-secondary btn-sm" id="btn-reindex-roll" onclick="openReindexModal()">Re-Index Roll</button>
               <button type="button" class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Student</button>
@@ -366,7 +291,7 @@
                 Showing enrolled students
               </div>
             </div>
-            <div class="table-scroll-wrapper">
+            <div id="students-table-wrap" class="table-scroll-wrapper">
               <table class="roster-table" id="students-table">
                 <thead>
                   <tr>
@@ -375,7 +300,7 @@
                     <th>Official Enrollment</th>
                     <th>Full Name</th>
                     <th>Cohort</th>
-                    <th style="text-align: right;">Actions</th>
+                    <th style="text-align: right; width: 70px;">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="students-tbody">
@@ -383,55 +308,110 @@
                 </tbody>
               </table>
             </div>
+            <!-- Mobile Minimal Cards Stack (< 769px) -->
+            <div id="students-mobile-cards-wrap" class="fac-mini-cards-stack"></div>
           </div>
+        </div>
         </div>
 
         <!-- ══════════════════ 9. DEDICATED FULL TAB: PENDING REGISTRATIONS ══════════════════ -->
         <div id="tab-pending-panel" class="full-tab-panel" style="display: none;">
-          <!-- Pending Faculty Approvals Card -->
-          <div class="card" id="pending-faculty-card" style="margin-bottom: 1.25rem;">
-            <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding: 1rem 1.25rem;">
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                <h2 class="card-title" style="font-size: 1rem; margin: 0; font-weight: 700;">Pending Faculty Applications</h2>
+          <!-- Modern Pending Header & Subtab Switcher -->
+          <div class="pending-header-card">
+            <div class="pending-header-info">
+              <div class="pending-header-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </div>
-              <div id="pending-faculty-badge" style="background: var(--status-late); color: var(--text-white); border-radius: 999px; padding: 0.15rem 0.65rem; font-size: 0.75rem; font-weight: 700;">0 Pending</div>
+              <div>
+                <h2 class="pending-header-title">Adjudication &amp; Verification Queue</h2>
+                <p class="pending-header-sub">Review incoming faculty onboarding requests and student self-enrollments</p>
+              </div>
             </div>
-            <div id="pending-faculty-wrap" style="padding: 1rem;">
-              <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem;">No pending faculty applications.</div>
+            <!-- Subtab Segmented Switcher -->
+            <div class="pending-segmented-tabs">
+              <button type="button" class="pending-subtab-btn active" id="subtab-pending-all-btn" onclick="switchPendingSubtab('all')">
+                <span>All Queue</span>
+                <span class="subtab-badge" id="pending-all-count">0</span>
+              </button>
+              <button type="button" class="pending-subtab-btn" id="subtab-pending-faculty-btn" onclick="switchPendingSubtab('faculty')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                <span>Faculty</span>
+                <span class="subtab-badge" id="pending-faculty-count">0</span>
+              </button>
+              <button type="button" class="pending-subtab-btn" id="subtab-pending-students-btn" onclick="switchPendingSubtab('students')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                <span>Students</span>
+                <span class="subtab-badge" id="pending-students-count">0</span>
+              </button>
             </div>
           </div>
 
+          <!-- Pending Faculty Approvals Card -->
+          <div class="pending-section-card" id="pending-faculty-card">
+            <div class="pending-section-header">
+              <div class="pending-section-title">
+                <div class="pending-type-icon icon-blue">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                </div>
+                <span>Pending Faculty Applications</span>
+              </div>
+              <div id="pending-faculty-badge" class="pending-pill-badge orange">0 Pending</div>
+              <span id="pending-faculty-badge-tab" style="display:none;">0</span>
+            </div>
+            <div id="pending-faculty-wrap" class="pending-table-wrap">
+              <table class="portal-table" id="pending-faculty-table">
+                <thead>
+                  <tr>
+                    <th style="width: 45px;">#</th>
+                    <th>Applicant Name</th>
+                    <th>Institutional Gmail</th>
+                    <th>Contact Phone</th>
+                    <th>Applied At</th>
+                    <th style="text-align: right; width: 170px;">Adjudication</th>
+                  </tr>
+                </thead>
+                <tbody id="pending-faculty-tbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+            <!-- Mobile Minimal Cards Stack for Faculty (< 769px) -->
+            <div id="pending-faculty-mobile-cards" class="pending-mobile-stack"></div>
+          </div>
+
           <!-- Pending Student Approvals Card -->
-          <div class="card" style="padding: 0; overflow: hidden;">
-            <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-              <div style="font-weight: 700; font-size: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+          <div class="pending-section-card" id="pending-student-card">
+            <div class="pending-section-header">
+              <div class="pending-section-title">
+                <div class="pending-type-icon icon-green">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                </div>
                 <span>Pending Student Verification Queue</span>
               </div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);" id="pending-count-label">
-                0 requests pending
-              </div>
+              <div id="pending-count-label" class="pending-pill-badge green">0 requests pending</div>
             </div>
-            <div class="table-scroll-wrapper" style="overflow-x: auto;">
-              <table class="table" style="margin: 0; width: 100%; border-collapse: collapse;">
+            <div class="pending-table-wrap" id="pending-student-table-wrap">
+              <table class="portal-table" id="pending-students-table">
                 <thead>
-                  <tr style="background: var(--table-th-bg); border-bottom: 2px solid var(--border-color); text-align: left;">
-                    <th style="padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase;">Applicant Name</th>
-                    <th style="padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase;">Enrollment #</th>
-                    <th style="padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase;">Email Address</th>
-                    <th style="padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase;">Cohort</th>
-                    <th style="padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase;">Registered At</th>
-                    <th style="padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase; text-align: right;">Adjudication</th>
+                  <tr>
+                    <th style="width: 45px;">#</th>
+                    <th>Applicant Name</th>
+                    <th>Official Enrollment</th>
+                    <th>Institutional Email</th>
+                    <th>Cohort</th>
+                    <th>Registered At</th>
+                    <th style="text-align: right; width: 170px;">Adjudication</th>
                   </tr>
                 </thead>
                 <tbody id="pending-tbody">
                   <tr>
-                    <td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No pending student registrations.</td>
+                    <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No pending student registrations.</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+            <!-- Mobile Minimal Cards Stack for Students (< 769px) -->
+            <div id="pending-student-mobile-cards" class="pending-mobile-stack"></div>
           </div>
         </div>
 
@@ -501,6 +481,33 @@
   </div>
 
   <!-- ══════════════════ ALL MODALS (100% PRESERVED & ENHANCED) ══════════════════ -->
+
+  <!-- VIEW FACULTY DETAILS MODAL -->
+  <div id="view-faculty-modal" class="modal-backdrop" style="display: none;" aria-hidden="true">
+    <div class="modal-card view-faculty-modal-card" style="max-width: 580px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+      <div class="view-faculty-modal-header" style="padding: 1.15rem 1.4rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div class="stat-icon-square icon-blue" style="width: 32px; height: 32px; border-radius: var(--radius-sm, 6px); display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main); line-height: 1.2;">Faculty Member Profile</h2>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Comprehensive institutional, academic, and assignment details</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeViewFacultyModal()" class="modal-close-btn" aria-label="Close" style="font-size: 1.4rem; line-height: 1; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; border-radius: var(--radius-sm);">&times;</button>
+      </div>
+
+      <div id="view-faculty-body" style="padding: 1.25rem 1.4rem; overflow-y: auto; flex: 1;">
+        <!-- Rendered dynamically by openViewFacultyModal() -->
+      </div>
+
+      <div id="view-faculty-footer" style="padding: 0.85rem 1.4rem; border-top: 1px solid var(--border-color); background: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+        <div id="view-faculty-extra-action"></div>
+        <button type="button" class="btn btn-secondary" onclick="closeViewFacultyModal()">Close</button>
+      </div>
+    </div>
+  </div>
 
   <!-- CREATE TEACHER MODAL -->
   <div id="create-modal" class="modal-backdrop" style="display: none;">
@@ -880,15 +887,12 @@
   </div>
 
   <div id="toast" class="toast" style="display: none;"></div>
-  <script src="/js/api.js?v=20261029"></script>
-  <script src="/js/auth.js?v=20261029"></script>
+  <script src="/faculty/components/core/api.js"></script>
+  <script src="/faculty/components/core/auth.js"></script>
   <script src="/faculty/components/icons.js?v=20261029"></script>
   <script src="/faculty/components/faculty-ui.js?v=20261029"></script>
   <script src="/faculty/components/header/header.js?v=20261029"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
-  <script src="/faculty/components/dept-hero/dept-hero.js?v=20261030"></script>
-  <script src="/faculty/components/confirm-dialog/confirm-dialog.js?v=20261030"></script>
-  <script src="/faculty/components/dept-hero/dept-hero.js?v=20261030"></script>
   <script src="/faculty/components/confirm-dialog/confirm-dialog.js?v=20261030"></script>
   
   <script src="/faculty/students/students.js?v=20261030"></script>

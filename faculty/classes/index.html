@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>My Teaching Classes — VidyaOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/faculty/components/core/reset.css">
+  <link rel="stylesheet" href="/faculty/components/core/variables.css">
+  <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261115">
+  <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261115">
+  <link rel="stylesheet" href="/faculty/components/dept-hero/dept-hero.css?v=20261115">
+  <link rel="stylesheet" href="/faculty/classes/classes.css?v=20261115">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens on desktop */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+</head>
+
+<body class="page-layout">
+
+  <div class="faculty-app-layout" id="faculty-app-layout">
+    <div class="faculty-main-wrap">
+      <!-- Semantic Mount for Dedicated Faculty Header Component -->
+      <div id="faculty-header-mount"></div>
+
+      <main class="page-main-container container classes-container">
+        <!-- Reusable Institutional Hero Banner -->
+        <div id="dept-hero-container" class="dept-hero-mount" data-title="My Teaching Classes" data-subtitle="Manage your assigned classes, students, attendance, and activities."></div>
+
+        <!-- 3 KPI Status Cards in 1 Row (My Classes, Total Students, Subjects) -->
+        <section class="dash-kpi-row classes-kpi-row" aria-label="Classes Overview Metrics">
+          <!-- Stat 1: My Classes -->
+          <article class="dash-kpi-card">
+            <div class="dash-kpi-top">
+              <div class="dash-kpi-icon icon-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <span class="dash-kpi-label">My Classes</span>
+            </div>
+            <div class="dash-kpi-value" id="stat-my-classes">1</div>
+          </article>
+
+          <!-- Stat 2: Total Students -->
+          <article class="dash-kpi-card">
+            <div class="dash-kpi-top">
+              <div class="dash-kpi-icon icon-green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+              </div>
+              <span class="dash-kpi-label">Total Students</span>
+            </div>
+            <div class="dash-kpi-value" id="stat-total-students">15</div>
+            <div class="dash-kpi-trend positive">
+              <span class="dash-trend-arrow">&uarr;</span> +12%
+            </div>
+          </article>
+
+          <!-- Stat 3: Subjects -->
+          <article class="dash-kpi-card">
+            <div class="dash-kpi-top">
+              <div class="dash-kpi-icon icon-purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+              </div>
+              <span class="dash-kpi-label">Subjects</span>
+            </div>
+            <div class="dash-kpi-value" id="stat-total-subjects">1</div>
+          </article>
+        </section>
+
+        <!-- 4. Action Buttons Row (+ Create Class, Students Roster, Broadcast Notice) -->
+        <div class="classes-action-buttons-row">
+          <button type="button" class="btn-create-class-solid" onclick="openCreateGroupModal()">
+            <span>+ Create Class</span>
+          </button>
+          <a href="/faculty/students/index.html" class="btn-action-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Students Roster</span>
+          </a>
+          <button type="button" class="btn-action-outline" onclick="openBroadcastNoticeModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Broadcast Notice</span>
+          </button>
+        </div>
+
+        <!-- 5. Search Bar & Semester Dropdown Filter -->
+        <div class="classes-search-filter-row">
+          <div class="classes-search-box">
+            <svg class="classes-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-classes-input" placeholder="Search class, code or subject..." oninput="handleSearchClasses(this.value)">
+          </div>
+          <div class="classes-filter-dropdown-wrap">
+            <select id="filter-semester-select" onchange="handleSemesterFilter(this.value)">
+              <option value="ALL">All Semesters</option>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 6. Classes Cards Grid Container -->
+        <section id="classes-cards-container" class="classes-cards-grid" aria-label="Assigned Subject Classes">
+          <!-- Injected via classes.js -->
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal: Create Teaching Class -->
+  <div id="create-class-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:11000; align-items:center; justify-content:center; padding:1rem;">
+    <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; width:100%; max-width:480px; box-shadow:0 12px 36px rgba(0,0,0,0.2); overflow:hidden;">
+      <div style="padding:1rem 1.25rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
+        <strong style="font-size:1.1rem; color:var(--text-main);">+ Create New Class</strong>
+        <button type="button" onclick="closeCreateGroupModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+      <form onsubmit="submitCreateClass(event)" style="padding:1.25rem;">
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Subject Name *</label>
+          <input type="text" id="input-class-name" required placeholder="e.g. Cloud Computing &amp; DevOps" style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+          <div>
+            <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Semester</label>
+            <select id="select-class-sem" style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
+              <option value="1">Sem 1</option>
+              <option value="2">Sem 2</option>
+              <option value="3">Sem 3</option>
+              <option value="4">Sem 4</option>
+              <option value="5">Sem 5</option>
+              <option value="6" selected>Sem 6</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Component</label>
+            <select id="select-class-comp" style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
+              <option value="THEORY" selected>THEORY</option>
+              <option value="PRACTICAL">PRACTICAL</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:1.25rem;">
+          <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Room / Batch Code</label>
+          <input type="text" id="input-class-room" placeholder="e.g. 101" value="101" style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.65rem;">
+          <button type="button" onclick="closeCreateGroupModal()" style="padding:0.65rem 1.15rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); cursor:pointer;">Cancel</button>
+          <button type="submit" style="padding:0.65rem 1.35rem; border-radius:8px; border:none; background:var(--color-primary); color:#ffffff; font-weight:700; cursor:pointer;">Create Class</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Broadcast Notice -->
+  <div id="broadcast-notice-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:11000; align-items:center; justify-content:center; padding:1rem;">
+    <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; width:100%; max-width:480px; box-shadow:0 12px 36px rgba(0,0,0,0.2); overflow:hidden;">
+      <div style="padding:1rem 1.25rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
+        <strong style="font-size:1.1rem; color:var(--text-main);">Broadcast Notice to Classes</strong>
+        <button type="button" onclick="closeBroadcastNoticeModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+      <div style="padding:1.25rem;">
+        <textarea id="broadcast-notice-text" placeholder="Write notice to publish across all active teaching groups..." rows="4" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box; margin-bottom:1rem;"></textarea>
+        <div style="display:flex; justify-content:flex-end; gap:0.65rem;">
+          <button type="button" onclick="closeBroadcastNoticeModal()" style="padding:0.65rem 1.15rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); cursor:pointer;">Cancel</button>
+          <button type="button" onclick="alert('Notice broadcast successfully to all enrolled classes.'); closeBroadcastNoticeModal();" style="padding:0.65rem 1.35rem; border-radius:8px; border:none; background:var(--color-primary); color:#ffffff; font-weight:700; cursor:pointer;">Broadcast</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="/faculty/components/core/api.js"></script>
+  <script src="/faculty/components/core/auth.js"></script>
+  <script src="/faculty/components/icons.js?v=20261115"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261115"></script>
+  <script src="/faculty/components/header/header.js?v=20261115"></script>
+  <script src="/faculty/components/dept-hero/dept-hero.js?v=20261115"></script>
+  <script src="/faculty/classes/classes.js?v=20261115"></script>
+</body>
+
+</html>

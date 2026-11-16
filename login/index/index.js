@@ -5,24 +5,38 @@
  * ══════════════════════════════════════════════════════════════
  */
 
+  const ALL_AUTH_STORAGE_KEYS = [
+    'access_token', 'accessToken', 'token', 'authToken', 'auth_token', 'vidyaos_token',
+    'user', 'currentUser', 'auth_user', 'vidyaos_user', 'user_profile', 'user_roles',
+    'role', 'roles', 'session_id'
+  ];
+
+  function purgeAllStoredAuth() {
+    ALL_AUTH_STORAGE_KEYS.forEach(k => {
+      try { localStorage.removeItem(k); } catch (_) {}
+    });
+    try { sessionStorage.removeItem('vidya_logged_out_flag'); } catch (_) {}
+    try {
+      document.cookie.split(";").forEach(c => {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+    } catch (_) {}
+  }
+
 /* ── Redirect if already logged in ── */
   (function checkExistingSession() {
-    // If user explicitly logged out or has a logout reason parameter, NEVER auto-redirect
+    // If user explicitly logged out or has a logout reason parameter, NEVER auto-redirect and wipe any stale tokens
     try {
       const params = new URLSearchParams(window.location.search);
       if (sessionStorage.getItem('vidya_logged_out_flag') || params.has('reason') || params.has('logged_out')) {
-        sessionStorage.removeItem('vidya_logged_out_flag');
+        purgeAllStoredAuth();
         return;
       }
     } catch (_) {}
 
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
     if (!token) {
-      try {
-        localStorage.removeItem('user');
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('auth_user');
-      } catch (_) {}
+      purgeAllStoredAuth();
       return;
     }
 
@@ -31,20 +45,24 @@
       if (parts.length === 3) {
         const payload = JSON.parse(atob(parts[1]));
         if (payload.exp && (payload.exp * 1000) <= Date.now()) {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('user');
+          purgeAllStoredAuth();
           return;
         }
       }
     } catch (_) {}
 
     try {
-      const u = JSON.parse(localStorage.getItem('user') || 'null');
+      const u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('currentUser') || 'null');
       if (!u) return;
       const roles = u.roles || [];
       if (roles.includes('SYSTEM_ADMIN'))  { window.location.replace('/admin/dashboard');     return; }
       if (roles.includes('STUDENT'))       { window.location.replace('/student/dashboard');   return; }
+      const isMobile = window.innerWidth <= 768;
+      const isHod = roles.includes('HOD') || Boolean(u.is_hod);
+      if (isMobile && isHod) {
+        window.location.replace('/faculty/classes/index.html');
+        return;
+      }
       window.location.replace('/faculty/dashboard');
     } catch (_) {}
   })();
@@ -68,13 +86,14 @@
 
       if (!notice && reason) {
         if (reason === 'session_transferred') {
-          notice = 'Your session has ended because this account was logged into from another device.';
+          notice = 'Your session has ended because this account was logged into from another device or signed out.';
         } else if (reason === 'session_expired') {
-          notice = 'Your session expired due to 30 minutes of inactivity. Please sign in again.';
+          notice = 'Your session expired due to inactivity. Please sign in again.';
         }
       }
 
       if (notice) {
+        purgeAllStoredAuth();
         const sb = document.getElementById('status-alert-banner');
         if (sb) {
           const titleEl = document.getElementById('status-alert-title');
@@ -187,6 +206,12 @@
     const roles = user.roles || [];
     if (roles.includes('SYSTEM_ADMIN'))  { window.location.href = '/admin/dashboard.html';   return; }
     if (roles.includes('STUDENT'))       { window.location.href = '/student/dashboard.html'; return; }
+    const isMobile = window.innerWidth <= 768;
+    const isHod = roles.includes('HOD') || Boolean(user.is_hod);
+    if (isMobile && isHod) {
+      window.location.href = '/faculty/classes/index.html';
+      return;
+    }
     window.location.href = '/faculty/dashboard.html';
   }
 
