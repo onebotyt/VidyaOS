@@ -62,6 +62,7 @@
 .faculty-sidebar .sidebar-nav-body::-webkit-scrollbar {
   width: 4px;
 }
+
 .faculty-sidebar .sidebar-nav-body::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 4px;
@@ -91,9 +92,9 @@
 }
 
 .faculty-sidebar .sidebar-nav-icon {
-  width: 20px !important;
-  height: 20px !important;
-  min-width: 20px !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -101,8 +102,8 @@
 }
 
 .faculty-sidebar .sidebar-nav-icon svg {
-  width: 16px !important;
-  height: 16px !important;
+  width: 15px !important;
+  height: 15px !important;
   stroke: currentColor !important;
   display: block !important;
 }
@@ -142,10 +143,11 @@
 
 /* ── 4. Desktop Mode (>= 769px) ── */
 @media (min-width: 769px) {
+
   /* Permanent 72px rail margin for zero layout shift */
   .faculty-main-wrap,
   .admin-main-wrap,
-  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap)) > main {
+  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>main {
     margin-left: 72px !important;
     width: calc(100% - 72px) !important;
     max-width: calc(100% - 72px) !important;
@@ -169,17 +171,17 @@
 
   /* 3D Tactile Squircle Nav Item (72px Rail Mode Only) */
   .faculty-sidebar:not(.desktop-open):not(.open):not(.sidebar-open) .sidebar-nav-item {
-    width: 52px !important;
-    height: 40px !important;
-    min-width: 52px !important;
-    min-height: 40px !important;
+    width: 48px !important;
+    height: 36px !important;
+    min-width: 48px !important;
+    min-height: 36px !important;
     margin: 1px auto !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    padding: 2px 1px !important;
-    border-radius: 9px !important;
+    padding: 1.5px 1px !important;
+    border-radius: 8px !important;
     background: var(--bg-surface) !important;
     border: 1px solid var(--border-color) !important;
     box-shadow: 0 1px 2px hsl(0 0% 0% / 0.04), inset 0 1px 0 hsl(0 0% 100% / 0.7) !important;
@@ -190,18 +192,18 @@
   }
 
   .faculty-sidebar:not(.desktop-open):not(.open):not(.sidebar-open) .sidebar-nav-icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .faculty-sidebar:not(.desktop-open):not(.open):not(.sidebar-open) .sidebar-nav-icon svg {
     width: 16px;
     height: 16px;
   }
 
+  .faculty-sidebar:not(.desktop-open):not(.open):not(.sidebar-open) .sidebar-nav-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
   .faculty-sidebar:not(.desktop-open):not(.open):not(.sidebar-open) .sidebar-nav-short-label {
     display: block !important;
-    font-size: 0.52rem !important;
+    font-size: 0.50rem !important;
     font-weight: 600 !important;
     letter-spacing: -0.01em !important;
     text-align: center !important;
@@ -210,7 +212,7 @@
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: clip !important;
-    max-width: 48px !important;
+    max-width: 46px !important;
     width: 100% !important;
     margin-top: 1px !important;
     pointer-events: none !important;
@@ -351,6 +353,7 @@
 
 /* ── 5. Mobile Mode (<= 768px) ── */
 @media (max-width: 768px) {
+
   .faculty-main-wrap,
   .admin-main-wrap {
     margin-left: 0 !important;

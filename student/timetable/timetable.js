@@ -129,8 +129,8 @@ function renderTimetables() {
 
   // The latest upload for this year becomes featured
   const featured = filtered[0];
-  const fileUrl = featured.file_path.startsWith('http') || featured.file_path.startsWith('/') 
-    ? featured.file_path 
+  const fileUrl = featured.file_path.startsWith('http') || featured.file_path.startsWith('/')
+    ? featured.file_path
     : `/${featured.file_path}`;
 
   const formattedDate = featured.created_at ? new Date(featured.created_at).toLocaleDateString(undefined, {
@@ -185,8 +185,8 @@ function renderTimetables() {
     `;
 
     filtered.forEach((item, idx) => {
-      const itemUrl = item.file_path.startsWith('http') || item.file_path.startsWith('/') 
-        ? item.file_path 
+      const itemUrl = item.file_path.startsWith('http') || item.file_path.startsWith('/')
+        ? item.file_path
         : `/${item.file_path}`;
       const itemDate = item.created_at ? new Date(item.created_at).toLocaleDateString() : '';
       const itemSize = item.file_size ? `${Math.round(item.file_size / 1024)} KB` : 'PDF';

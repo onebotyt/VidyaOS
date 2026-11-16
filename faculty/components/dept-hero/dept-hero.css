@@ -42,7 +42,7 @@
   height: 52px;
   min-width: 52px;
   border-radius: 50%;
-  background: var(--bg-surface, #ffffff);
+  background: var(--bg-card, #ffffff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,14 +50,14 @@
   border: 2px solid var(--border-color, #e2e8f0);
   flex-shrink: 0;
   overflow: hidden;
-  padding: 0;
+  padding: 2px;
   box-sizing: border-box;
 }
 
 .dash-hero-logo-badge img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 50%;
   display: block;
 }
