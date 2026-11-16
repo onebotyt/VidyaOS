@@ -66,6 +66,7 @@
     { key: 'sheets', label: 'Sheet Studio', shortLabel: 'Sheets', href: '/faculty/sheets/index.html', icon: 'sheets' },
     { key: 'leaves', label: 'Leave Request', shortLabel: 'Leave', href: '/faculty/leave-approvals/index.html', icon: 'leaves' },
     { key: 'students', label: 'Faculty & Students Management', shortLabel: 'Students', href: '/faculty/students/index.html', icon: 'students' },
+    { key: 'esp32', label: 'ESP32 Biometric Terminals', shortLabel: 'ESP32 Bio', href: '/faculty/esp32-devices/index.html', icon: 'settings' },
     { key: 'timetable', label: 'Timetable', shortLabel: 'Timetable', href: '/faculty/timetable/index.html', icon: 'timetable' },
     { key: 'drive', label: 'Faculty Drive', shortLabel: 'Drive', href: '/faculty/media/index.html', icon: 'drive' },
     { key: 'reports', label: 'Report & Analysis', shortLabel: 'Reports', href: '/faculty/reports/index.html', icon: 'reports' }

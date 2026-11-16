@@ -18,7 +18,7 @@
     institution_tagline: '',
     institution_code: 'GP-UBTER-101',
     institution_logo_url: '/images/college-logo.svg',
-    institution_banner_url: '/admin/dashboard/campus-nainital.jpg',
+    institution_banner_url: '/faculty/students/campus-nainital.jpg',
     page_title: 'Faculty Dashboard',
     page_subtitle: 'Manage your classes, attendance, students and more.'
   };
@@ -72,7 +72,7 @@
 
         <div class="dash-hero-banner-wrap" aria-hidden="true">
           <img class="dash-hero-banner-img hero-campus-photo-val" id="dash-inst-banner" src="${bannerUrl}" alt="${escapeHtml(instName)} Campus"
-            onerror="this.onerror=null;this.src='/admin/dashboard/campus-nainital.jpg';">
+            onerror="this.onerror=null;this.src='/faculty/students/campus-nainital.jpg';">
           <div class="dash-hero-banner-glow"></div>
         </div>
 

@@ -44,7 +44,8 @@
     { label: 'Timetable', href: '/faculty/timetable.html', icon: 'timetable' },
     { label: 'Leaves', href: '/faculty/leave-approvals.html', icon: 'leaves' },
     { label: 'Drive', href: '/faculty/media.html', icon: 'drive' },
-    { label: 'HOD Hub', href: '/faculty/students.html', icon: 'hodHub', hodOnly: true }
+    { label: 'HOD Hub', href: '/faculty/students/index.html', icon: 'hodHub', hodOnly: true },
+    { label: 'ESP32 Biometrics', href: '/faculty/esp32-devices/index.html', icon: 'hodHub' }
   ];
 
   function renderAppsLauncherTiles(container, isHod) {

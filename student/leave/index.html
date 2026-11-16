@@ -3,60 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Apply for Leave — Student Portal</title>
+  <title>Leave Applications — Student Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/reset.css?v=20261028">
-  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <link rel="stylesheet" href="/student/components/core/reset.css">
+  <link rel="stylesheet" href="/student/components/core/variables.css">
   <link rel="stylesheet" href="/student/components/student-base.css">
   <link rel="stylesheet" href="/student/components/header/header.css">
   <link rel="stylesheet" href="/student/components/sidebar/sidebar.css">
-  
-  <link rel="stylesheet" href="/student/leave/leave.css?v=20261028">
+  <link rel="stylesheet" href="/student/leave/leave.css?v=20261116">
 </head>
 <body class="page-layout">
-  <!-- Semantic Mount Anchors for Isolated Student Components -->
   <div id="student-header-mount"></div>
   <div id="student-sidebar-mount"></div>
-
-  <!-- Compatibility marker for user-nav -->
   <div id="user-nav" style="display:none;" aria-hidden="true"></div>
 
-  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem; max-width: 800px;">
-    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem;">
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem; max-width: 960px;">
+    <div class="page-header">
       <div>
-        <h1 class="page-title">Apply for Leave</h1>
-        <p class="page-subtitle">Tell your teacher when you'll be away and why.</p>
+        <h1 class="page-title">Leave Applications</h1>
+        <p class="page-subtitle">Submit official leave requests to your Class Teacher / HOD and track approval status.</p>
       </div>
-      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+      <a href="/student/dashboard/index.html" class="btn btn-secondary btn-sm">← Classes Hub</a>
     </div>
 
+    <!-- Leave KPI Summary Strip -->
+    <div class="student-kpi-grid">
+      <div class="student-kpi-card">
+        <span class="student-kpi-label">Total Requests</span>
+        <span class="student-kpi-value" id="kpi-leave-total">0</span>
+        <span class="student-kpi-sub">Submitted applications</span>
+      </div>
+      <div class="student-kpi-card kpi-success">
+        <span class="student-kpi-label">Approved</span>
+        <span class="student-kpi-value" id="kpi-leave-approved">0</span>
+        <span class="student-kpi-sub">Sanctioned leave requests</span>
+      </div>
+      <div class="student-kpi-card kpi-warning">
+        <span class="student-kpi-label">Pending Review</span>
+        <span class="student-kpi-value" id="kpi-leave-pending">0</span>
+        <span class="student-kpi-sub">Awaiting faculty action</span>
+      </div>
+    </div>
+
+    <!-- New Leave Application Card -->
     <div class="card" style="margin-bottom: 1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.85rem;">
+        <h2 style="font-size:1.02rem; font-weight:800; margin:0;">Submit New Leave Request</h2>
+        <span class="badge badge-sem" id="leave-duration-badge">Select Dates</span>
+      </div>
+
       <form class="add-form" onsubmit="applyLeave(event)">
-        <div><label>From</label><input type="date" id="f-from" required></div>
-        <div><label>To</label><input type="date" id="f-to" required></div>
-        <div class="full-row"><label>Reason</label><textarea id="f-reason" rows="2" placeholder="e.g. Family function" required></textarea></div>
-        <div class="full-row"><button class="btn btn-primary" type="submit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> Submit Application</button></div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="f-from">From Date</label>
+          <input type="date" id="f-from" class="form-control" onchange="updateLeaveDuration()" required>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" for="f-to">To Date</label>
+          <input type="date" id="f-to" class="form-control" onchange="updateLeaveDuration()" required>
+        </div>
+        <div class="full-row form-group" style="margin-bottom:0;">
+          <label class="form-label" for="f-reason">Reason for Leave</label>
+          <div class="leave-quick-reasons">
+            <button type="button" class="reason-chip" onclick="setLeaveReason('Medical / Fever — Doctor advised rest')">Medical / Sick Leave</button>
+            <button type="button" class="reason-chip" onclick="setLeaveReason('Important family function out of station')">Family Function</button>
+            <button type="button" class="reason-chip" onclick="setLeaveReason('Participating in official technical / sports event')">Official Event</button>
+            <button type="button" class="reason-chip" onclick="setLeaveReason('Urgent personal / domestic work')">Personal Work</button>
+          </div>
+          <textarea id="f-reason" class="form-control" rows="2" placeholder="Describe the reason for your leave request..." required></textarea>
+        </div>
+        <div class="full-row" style="display:flex; justify-content:flex-end;">
+          <button class="btn btn-primary" type="submit">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            Submit Leave Application
+          </button>
+        </div>
       </form>
     </div>
 
-    <h3 style="font-size:1rem; font-weight:700; margin-bottom:0.75rem;">My Applications</h3>
-    <div id="leave-list">Loading...</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.85rem;">
+      <h3 style="font-size:1.02rem; font-weight:800; margin:0;">My Leave History</h3>
+    </div>
+    <div id="leave-list">
+      <div class="card" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading your leave applications...</div>
+    </div>
   </main>
 
-  <!-- Shared Security & API Core -->
-  <script src="/js/api.js?v=20261028"></script>
-  <script src="/js/auth.js?v=20261028"></script>
-  <script src="/js/utils.js"></script>
-
-  <!-- Dedicated Student Component Suite -->
+  <script src="/student/components/core/api.js"></script>
+  <script src="/student/components/core/auth.js"></script>
+  <script src="/student/components/core/utils.js"></script>
   <script src="/student/components/icons.js"></script>
   <script src="/student/components/student-ui.js"></script>
   <script src="/student/components/header/header.js"></script>
   <script src="/student/components/sidebar/sidebar.js"></script>
-  
-  <!-- Scoped Page Script -->
-  <script src="/student/leave/leave.js?v=20261028"></script>
+  <script src="/student/leave/leave.js?v=20261116"></script>
 </body>
 </html>

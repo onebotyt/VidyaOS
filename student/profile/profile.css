@@ -166,3 +166,22 @@
       color: var(--text-main);
     }
 
+
+
+/* ─── Mobile Responsiveness (<= 768px) ──────────────────────── */
+@media (max-width: 768px) {
+  .student-id-hero {
+    padding: 1.25rem;
+  }
+  .student-id-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .student-meta h1 {
+    font-size: 1.3rem;
+  }
+  .profile-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

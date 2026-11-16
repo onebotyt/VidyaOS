@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ESP32 Biometric Terminals &amp; Student Fingerprint Vault — HOD Portal</title>
+  <meta name="description" content="Manage department ESP32 AS608 biometric terminals, AES-256-GCM encryption keys, W25Q32 offline sync, and portable student fingerprint templates.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/faculty/components/core/reset.css">
+  <link rel="stylesheet" href="/faculty/components/core/variables.css">
+  <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261116">
+  <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
+  <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
+  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261116">
+  <script>
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) {}
+    })();
+  </script>
+</head>
+<body>
+  <div class="faculty-app-layout" id="faculty-app-layout">
+    <div class="faculty-main-wrap">
+      <div id="faculty-header-mount"></div>
+
+      <main class="container" style="padding-top: 1.25rem; padding-bottom: 5rem; max-width: 1380px;">
+        <!-- Page Header -->
+        <div class="esp-page-header">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.3rem;">
+              <h1 class="esp-page-title">ESP32 Biometric Terminals &amp; Fingerprint Vault</h1>
+              <span class="esp-crypto-badge" id="dept-code-pill">AES-256-GCM ENCRYPTED</span>
+            </div>
+            <p class="esp-page-subtitle">
+              Connect department ESP32 nodes (AS608 + 0.96" OLED + W25Q32 4MB Flash + 2S 7.4V Battery), register student fingerprints into the portable MySQL template vault, and restore templates to replacement devices in one click.
+            </p>
+          </div>
+          <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+            <a href="/faculty/students/index.html" class="btn btn-secondary btn-sm">← Department Roster</a>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadEsp32Overview()">↻ Refresh Telemetry</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openRegisterDeviceModal()">+ Connect New ESP32</button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Telemetry Cards -->
+        <div class="esp-kpi-grid">
+          <div class="esp-kpi-card">
+            <div class="esp-kpi-top">
+              <span class="esp-kpi-label">Department ESP32 Nodes</span>
+              <span class="esp-kpi-dot online"></span>
+            </div>
+            <div class="esp-kpi-val" id="kpi-esp-devices">0 / 0</div>
+            <div class="esp-kpi-sub">Online / Total paired terminals</div>
+          </div>
+
+          <div class="esp-kpi-card">
+            <div class="esp-kpi-top">
+              <span class="esp-kpi-label">Cloud Fingerprint Vault</span>
+              <span class="esp-pill-tag">Slot-Agnostic</span>
+            </div>
+            <div class="esp-kpi-val" id="kpi-esp-templates">0 / 0</div>
+            <div class="esp-kpi-sub" id="kpi-esp-coverage">0% students with 512B AS608 template</div>
+          </div>
+
+          <div class="esp-kpi-card">
+            <div class="esp-kpi-top">
+              <span class="esp-kpi-label">2S 3.7V Battery Telemetry</span>
+              <span class="esp-pill-tag green" id="kpi-batt-status">7.4V Pack</span>
+            </div>
+            <div class="esp-kpi-val" id="kpi-esp-battery">7.85V (84%)</div>
+            <div class="esp-kpi-sub">6.40V cutoff – 8.40V full charge</div>
+          </div>
+
+          <div class="esp-kpi-card">
+            <div class="esp-kpi-top">
+              <span class="esp-kpi-label">W25Q32 4MB Flash Queue</span>
+              <span class="esp-pill-tag">SPI NOR</span>
+            </div>
+            <div class="esp-kpi-val" id="kpi-esp-offline">0 Pending</div>
+            <div class="esp-kpi-sub">Auto-syncs offline attendance on Wi-Fi</div>
+          </div>
+        </div>
+
+        <!-- Top Split Layout: Department ESP32 Terminals (Left) + Live 0.96" OLED & Hardware Simulator (Right) -->
+        <div class="esp-top-split">
+          <!-- Left: Connected Department ESP32 Terminals -->
+          <section class="card esp-terminals-card">
+            <div class="esp-section-header">
+              <div>
+                <h2 class="esp-section-title">Connected Department ESP32 Terminals</h2>
+                <p class="esp-section-sub">Select an active terminal to enroll student fingerprints or push stored templates when replacing hardware.</p>
+              </div>
+              <select id="active-device-select" class="form-select" style="max-width:240px;" onchange="onSelectActiveDevice(this.value)">
+                <option value="">Select Active ESP32...</option>
+              </select>
+            </div>
+
+            <div id="esp-devices-list" class="esp-devices-grid">
+              <div style="text-align:center; padding:2rem; color:var(--text-muted);">Loading department ESP32 terminals...</div>
+            </div>
+          </section>
+
+          <!-- Right: Live 0.96" SSD1306 OLED Display + LED + 5V Passive Buzzer Hardware Preview -->
+          <aside class="card esp-oled-simulator-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <div>
+                <h3 style="font-size:0.95rem; font-weight:800; margin:0;">Live ESP32 Hardware Console</h3>
+                <span style="font-size:0.75rem; color:var(--text-muted);">0.96" OLED (128×64) • AS608 • W25Q32 • 5V Buzzer</span>
+              </div>
+              <label style="display:inline-flex; align-items:center; gap:0.35rem; font-size:0.75rem; font-weight:600; cursor:pointer;">
+                <input type="checkbox" id="chk-buzzer-audio" checked>
+                <span>5V Buzzer Audio</span>
+              </label>
+            </div>
+
+            <!-- Simulated Physical Enclosure -->
+            <div class="esp-hardware-bezel">
+              <!-- LED Indicators Row -->
+              <div class="esp-leds-row">
+                <div class="esp-led-item">
+                  <span class="esp-led-bulb green" id="sim-led-green"></span>
+                  <span>GREEN (Verified)</span>
+                </div>
+                <div class="esp-led-item">
+                  <span class="esp-led-bulb red" id="sim-led-red"></span>
+                  <span>RED (Alert)</span>
+                </div>
+                <div class="esp-led-item">
+                  <span class="esp-led-bulb blue" id="sim-led-blue"></span>
+                  <span>BLUE (Sync/Enroll)</span>
+                </div>
+              </div>
+
+              <!-- 0.96" I2C OLED Screen (Yellow/Blue Dual-Zone SSD1306 Style) -->
+              <div class="oled-screen" id="oled-screen">
+                <!-- Yellow Top Status Bar (128x14) -->
+                <div class="oled-top-bar">
+                  <span id="oled-status-left">🔒 AES256 ONLINE</span>
+                  <span id="oled-status-right">🔋 7.8V 84%</span>
+                </div>
+                <!-- Cyan/Blue Main Matrix (128x50) -->
+                <div class="oled-body">
+                  <div class="oled-headline" id="oled-headline">VIDYAOS BIOMETRIC</div>
+                  <div class="oled-line1" id="oled-line1">SCAN FINGERPRINT</div>
+                  <div class="oled-line2" id="oled-line2">AS608 Ready • W25Q32 OK</div>
+                  <div class="oled-line3" id="oled-line3">Slot-Agnostic Cloud Sync</div>
+                </div>
+              </div>
+
+              <!-- Hardware Peripheral Badges -->
+              <div class="esp-hw-chips">
+                <span class="hw-chip">AS608 UART2 (57600)</span>
+                <span class="hw-chip">W25Q32 4MB SPI</span>
+                <span class="hw-chip">Piezo GPIO14</span>
+                <span class="hw-chip">2S Li-ion ADC34</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <!-- Student Fingerprint Registration & Portable Cloud Template Vault -->
+        <section class="card" style="margin-top: 1.35rem;">
+          <div class="esp-section-header" style="margin-bottom: 1rem;">
+            <div>
+              <h2 class="esp-section-title">Department Students — Biometric Registration &amp; Portable Template Vault</h2>
+              <p class="esp-section-sub">
+                Templates are stored under each student's record in MySQL (512-byte AS608 character buffer). Server never tracks sensor slot numbers—replacing an ESP32 requires zero student re-registration.
+              </p>
+            </div>
+            <div class="esp-roster-filters">
+              <select id="filter-bio-year" class="form-select" style="width:auto; min-width:125px;" onchange="renderStudentsBiometricTable()">
+                <option value="all">All Years</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+              </select>
+              <select id="filter-bio-status" class="form-select" style="width:auto; min-width:155px;" onchange="renderStudentsBiometricTable()">
+                <option value="all">All Statuses</option>
+                <option value="ENROLLED">Template Stored</option>
+                <option value="NOT_ENROLLED">Not Enrolled</option>
+              </select>
+              <input type="search" id="search-bio-student" class="form-control" style="max-width:240px;" placeholder="Search name, roll #, reg..." oninput="renderStudentsBiometricTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="esp-table" id="bio-students-table">
+              <thead>
+                <tr>
+                  <th style="width:75px;">Roll #</th>
+                  <th>Student Name</th>
+                  <th>Enrollment / UBTER #</th>
+                  <th>Cohort</th>
+                  <th>Cloud Biometric Template (MySQL)</th>
+                  <th style="text-align:right;">ESP32 Enrollment &amp; Test Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bio-students-tbody">
+                <tr>
+                  <td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading department student roster...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Bottom Grid: Recent Live Attendance Scans + Remote ESP32 Command Queue -->
+        <div class="esp-bottom-grid" style="margin-top: 1.35rem;">
+          <section class="card">
+            <h3 class="esp-section-title" style="margin-bottom:0.75rem;">Recent Encrypted Biometric Attendance Scans</h3>
+            <div id="esp-recent-scans" class="esp-feed-list">
+              <div style="text-align:center; padding:1.5rem; color:var(--text-muted);">No attendance scans recorded yet.</div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h3 class="esp-section-title" style="margin-bottom:0.75rem;">ESP32 Remote Command Queue &amp; Sync Log</h3>
+            <div id="esp-command-log" class="esp-feed-list">
+              <div style="text-align:center; padding:1.5rem; color:var(--text-muted);">No remote commands queued yet.</div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL 1: CONNECT / PAIR NEW ESP32 BIOMETRIC TERMINAL -->
+  <div id="register-esp-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" style="max-width:520px; width:100%;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="font-size:1.15rem; font-weight:800; margin:0;">Connect ESP32 Biometric Terminal</h2>
+        <button type="button" onclick="closeRegisterDeviceModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+      <form onsubmit="submitRegisterEspDevice(event)">
+        <div class="form-group">
+          <label class="form-label">ESP32 Hardware UID <span style="color:var(--status-absent);">*</span></label>
+          <input type="text" id="esp-uid-input" class="form-control" placeholder="e.g. ESP32-IT-LAB-01" required style="font-family:var(--font-family-mono); text-transform:uppercase;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Terminal Location / Classroom Name <span style="color:var(--status-absent);">*</span></label>
+          <input type="text" id="esp-name-input" class="form-control" placeholder="e.g. IT Dept Smart Classroom Room 102" required>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Primary Year</label>
+            <select id="esp-year-input" class="form-select">
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3" selected>3rd Year</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Semester</label>
+            <select id="esp-sem-input" class="form-select">
+              <option value="1">Sem 1</option>
+              <option value="2">Sem 2</option>
+              <option value="3">Sem 3</option>
+              <option value="4">Sem 4</option>
+              <option value="5" selected>Sem 5</option>
+              <option value="6">Sem 6</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">256-Bit AES-GCM Shared Encryption Secret (Auto-Generated if blank)</label>
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="esp-secret-input" class="form-control" placeholder="64-character hex AES-256 key" style="font-family:var(--font-family-mono); font-size:0.78rem;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="generateRandomHexSecret()">Generate</button>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.65rem; margin-top:1.25rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeRegisterDeviceModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Pair ESP32 to Department</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: READY-TO-FLASH ESP32 C++ CONFIG.H GENERATOR -->
+  <div id="esp-config-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" style="max-width:680px; width:100%;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <div>
+          <h2 style="font-size:1.12rem; font-weight:800; margin:0;">ESP32 Firmware Configuration (`config.h`)</h2>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Paste this into `esp32_firmware/VidyaOS_ESP32_Biometric_Node/config.h` and flash via Arduino IDE or PlatformIO.</p>
+        </div>
+        <button type="button" onclick="closeEspConfigModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+      <pre id="esp-config-code" class="esp-code-block"></pre>
+      <div style="display:flex; justify-content:flex-end; gap:0.65rem; margin-top:1rem;">
+        <button type="button" class="btn btn-secondary" onclick="copyEspConfigCode()">Copy `config.h`</button>
+        <button type="button" class="btn btn-primary" onclick="closeEspConfigModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/faculty/components/core/api.js"></script>
+  <script src="/faculty/components/core/auth.js"></script>
+  <script src="/faculty/components/icons.js?v=20261116"></script>
+  <script src="/faculty/components/faculty-ui.js?v=20261116"></script>
+  <script src="/faculty/components/header/header.js?v=20261116"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
+  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261116"></script>
+</body>
+</html>

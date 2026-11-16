@@ -1095,6 +1095,7 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     width: 100% !important;
     max-width: 100% !important;
     min-height: calc(100vh - 56px);
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* Hide rail elements, redundant 'Navigation' drawer headers, and old mobile topbar */

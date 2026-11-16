@@ -416,11 +416,11 @@ async function loadGroup() {
 function initStudentModeUI(user) {
   // Update header brand link to Student Dashboard
   const brandLink = document.querySelector('.gc-brand-link');
-  if (brandLink) brandLink.href = '/student/dashboard.html';
+  if (brandLink) brandLink.href = '/faculty/dashboard.html';
 
   const hubBtn = document.querySelector('.gc-create-btn, .gc-classes-hub-btn');
   if (hubBtn) {
-    hubBtn.href = '/student/dashboard.html';
+    hubBtn.href = '/faculty/dashboard.html';
     hubBtn.innerHTML = `
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -432,13 +432,13 @@ function initStudentModeUI(user) {
 
   // Update profile popover links
   const profileLink = document.querySelector('#user-profile-popover a[href*="profile.html"]');
-  if (profileLink) profileLink.href = '/student/profile.html';
+  if (profileLink) profileLink.href = '/faculty/profile.html';
 
   const pRole = ById('popover-user-role');
   if (pRole) pRole.textContent = 'Student';
 
   const backBtn = document.querySelector('.back-btn');
-  if (backBtn) backBtn.href = '/student/dashboard.html';
+  if (backBtn) backBtn.href = '/faculty/dashboard.html';
 }
 
 async function loadStudentSubjectAttendance() {
@@ -621,7 +621,7 @@ function initGroupPage() {
 function copyInviteCode() {
   const code = S.group?.invite_code;
   if (!code) return;
-  navigator.clipboard.writeText(location.origin + '/student/groups.html?join=' + code).then(() => toast('Invite link copied!'));
+  navigator.clipboard.writeText(location.origin + '/login/index.html?join=' + code).then(() => toast('Invite link copied!'));
 }
 
 function copyClassInviteCode() {

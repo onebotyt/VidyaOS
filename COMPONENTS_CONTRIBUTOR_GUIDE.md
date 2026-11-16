@@ -58,11 +58,11 @@ VidyaOS/
    - `student/` pages must NEVER load `admin/components/` or `faculty/components/`.
    - `faculty/` pages must NEVER load `admin/components/`.
 2. **Never Touch Core / Backend Files**:
-   - Component developers are **strictly barred** from editing files in `backend/`, `server.js`, database files (`*.sqlite`), or auth middlewares.
+   - Component developers are **strictly barred** from editing files in `backend/`, `server.js`, database files (`*.sql`), or auth middlewares.
 3. **Never Touch Frozen Modules**:
    - The 9 frozen core faculty registers and evaluation folders are read-only.
 4. **Zero Hardcoded Colors**:
-   - Always use CSS variables from `shared/css/variables.css` (e.g., `var(--bg-app)`, `var(--text-main)`, `var(--border-color)`). Never hardcode hex codes like `#1e293b`.
+   - Always use CSS variables from `<role>/components/core/variables.css` (e.g., `var(--bg-app)`, `var(--text-main)`, `var(--border-color)`). Never hardcode hex codes like `#1e293b`.
 
 ---
 

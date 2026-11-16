@@ -1,18 +1,102 @@
 /* ══════════════════════════════════════════════════════════════
-   PAGE STYLES: LEAVE
+   PAGE STYLES: STUDENT LEAVE APPLICATIONS
    frontend/student/leave/leave.css
 ══════════════════════════════════════════════════════════════ */
 
-form.add-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
-    form.add-form label { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display:block; margin-bottom: 0.25rem; }
-    form.add-form input, form.add-form textarea {
-      width: 100%; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-family: inherit;
-    }
-    .full-row { grid-column: 1 / -1; }
-    .leave-card { border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-card); padding: 1rem 1.2rem; margin-bottom: 0.8rem; }
-    .leave-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
-    .status-pill { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 999px; }
-    .status-pill.PENDING { background: var(--status-pending-bg); color: var(--status-pending); }
-    .status-pill.APPROVED { background: var(--status-present-bg); color: var(--status-present); }
-    .status-pill.REJECTED { background: var(--status-absent-bg); color: var(--status-absent); }
+form.add-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
 
+@media (max-width: 640px) {
+  form.add-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+.full-row {
+  grid-column: 1 / -1;
+}
+
+.leave-quick-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.45rem;
+}
+
+.reason-chip {
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reason-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.leave-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 14px);
+  background: var(--bg-card);
+  padding: 1.05rem 1.2rem;
+  margin-bottom: 0.85rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.leave-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.leave-reason {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.45;
+}
+
+.leave-review-note {
+  margin-top: 0.55rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg-surface);
+  border-left: 3px solid var(--color-primary);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.status-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+}
+
+.status-pill.PENDING {
+  background: var(--status-pending-bg);
+  color: var(--status-pending);
+}
+
+.status-pill.APPROVED {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+}
+
+.status-pill.REJECTED {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}

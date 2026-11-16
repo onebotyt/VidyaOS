@@ -12,11 +12,11 @@
    - Student pages **MUST NOT** load administrative or faculty scripts (`/admin/components/*`, `/faculty/components/*`).
    - Student components are strictly read-oriented for attendance ledgers, marks, classwork, timetable, and leave requests.
 
-2. **Permitted Shared Foundations (Read-Only)**:
-   - `shared/css/reset.css`: Universal CSS reset.
-   - `shared/css/variables.css`: Universal design tokens (CSS variables: `--bg-app`, `--bg-card`, `--text-main`, `--color-primary`, etc.). Zero hardcoded hex colors allowed.
-   - `shared/js/api.js`: Standard institutional API client (`fetchApi`).
-   - `shared/js/auth.js`: Session management and RBAC route guarding (`guardRoute(['STUDENT'])`, `getCurrentUser()`).
+2. **Autonomous Student Core Foundations (`student/components/core/`)**:
+   - `student/components/core/reset.css`: Universal CSS reset.
+   - `student/components/core/variables.css`: Universal design tokens (CSS variables: `--bg-app`, `--bg-card`, `--text-main`, `--color-primary`, etc.). Zero hardcoded hex colors allowed.
+   - `student/components/core/api.js`: Standard institutional API client (`fetchApi`).
+   - `student/components/core/auth.js`: Session management and RBAC route guarding (`guardRoute(['STUDENT'])`, `getCurrentUser()`).
 
 ---
 

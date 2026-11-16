@@ -29,13 +29,13 @@
       // Resolve relative to current portal or fallback to shared
       const path = window.location.pathname || '';
       if (path.startsWith('/admin')) {
-        link.href = '/admin/components/delete-modal/delete-modal.css';
+        link.href = '/faculty/components/delete-modal/delete-modal.css';
       } else if (path.startsWith('/faculty')) {
         link.href = '/faculty/components/delete-modal/delete-modal.css';
       } else if (path.startsWith('/student')) {
-        link.href = '/student/components/delete-modal/delete-modal.css';
+        link.href = '/faculty/components/delete-modal/delete-modal.css';
       } else {
-        link.href = '/shared/css/delete-modal.css';
+        link.href = '/faculty/components/delete-modal/delete-modal.css';
       }
       document.head.appendChild(link);
     }

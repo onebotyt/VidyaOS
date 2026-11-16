@@ -28,8 +28,8 @@ if (fs.existsSync(envPath)) {
     });
 }
 
-const PORT = parseInt(process.env.PORT || '5001', 10);
-const BACKEND_URL = (process.env.BACKEND_URL || 'http://localhost:3001').replace(/\/$/, '');
+const PORT = parseInt(process.env.PORT || '5000', 10);
+const BACKEND_URL = (process.env.BACKEND_URL || 'http://localhost:3000').replace(/\/$/, '');
 const ROOT = __dirname;
 
 // ─── MIME types ──────────────────────────────────────────────────────────────
@@ -56,8 +56,6 @@ const MIME = {
 // ─── Static rewrites (mirrors vercel.json) ───────────────────────────────────
 const STATIC_REWRITES = [
   // Shared assets
-  [/^\/css\/(.+)$/,        '/shared/css/$1'],
-  [/^\/js\/(.+)$/,         '/shared/js/$1'],
 
   // Login page assets (isolated — not in shared/)
   // login/index.css and login/index.js live at login/ root

@@ -196,7 +196,7 @@ Populated in `leave_applications`:
    - *Problem:* Fatal runtime crash `ReferenceError: sess is not defined` whenever inspecting active user sessions.
    - *Fix:* Added `const sess = sessionRows[0];` immediately after validating `sessionRows.length > 0`.
 2. **`VidyaOS_BackEnd/src/models/hodModel.js` (Line 43):**
-   - *Problem:* SQL Syntax Error caused by SQLite `datetime('now', '-10 minutes')` in MySQL environment during `/api/v1/hod/dashboard`.
+   - *Problem:* SQL Syntax Error caused by legacy dialect `legacy date offset` in MySQL environment during `/api/v1/hod/dashboard`.
    - *Fix:* Replaced with standard MySQL interval arithmetic: `NOW() - INTERVAL 10 MINUTE`.
 
 ---
@@ -487,12 +487,12 @@ To prevent drift between root-relative clean URLs (`/student/[module]`) and lega
    - Fixed `Field 'appointed_by' doesn't have a default value` SQL error.
 2. **Backend Model Compatibility (`AdminModel.assignCommonFacultyManager`):**
    - Updated MariaDB query to insert both `appointed_by` and `assigned_by` using `adminUserId || 1`.
-   - Replaced SQLite `INSERT OR IGNORE` with MariaDB `INSERT IGNORE` for `user_roles`.
+   - Replaced legacy dialect `legacy ignore insert` with MariaDB `INSERT IGNORE` for `user_roles`.
    - Successfully verified live appointment of Dr. Amit Verma via modal and REST API.
 
 ### E. Two-Way Self-Registration Gate Synchronization (Admin ⇄ HODs)
 1. **HOD Model Sync (`HodModel.toggleFacultyRegistration` & `getFacultyRegistrationStatus`):**
-   - Replaced SQLite `ON CONFLICT` with MariaDB `ON DUPLICATE KEY UPDATE`.
+   - Replaced legacy dialect `legacy upsert clause` with MariaDB `ON DUPLICATE KEY UPDATE`.
    - When an HOD opens registration for their department:
      - Updates `faculty_reg_dept_${deptId} = '1'`.
      - Automatically appends the department code to `admin_reg_open_departments`.

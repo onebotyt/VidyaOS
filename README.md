@@ -12,6 +12,14 @@
 
 ---
 
+
+## 📚 Exhaustive Frontend & Component Documentation (`/docs`)
+
+- **[`docs/FRONTEND_COMPLETE_DOCUMENTATION.md`](docs/FRONTEND_COMPLETE_DOCUMENTATION.md)** — Complete file-by-file, component-by-component, and page-by-page reference covering all 228 files across `/admin/`, `/faculty/`, `/student/`, and `/login/`, strict 3-portal isolation rules, in-flight GET request deduplication, and the reusable `FacultyDossier` / `StudentDossier` component engines.
+- **[`COMPONENTS_CONTRIBUTOR_GUIDE.md`](COMPONENTS_CONTRIBUTOR_GUIDE.md)** — Collaboration & isolation rules for `/admin/components/`, `/faculty/components/`, and `/student/components/`.
+
+---
+
 ## 📖 Table of Contents
 
 1. [Overview](#overview)
@@ -323,7 +331,7 @@ Every HTML page follows this standard template:
 | **Faculty** | `prof.patel@college.edu` | `Password@123` | `/faculty/registers.html` |
 | **Student** | `student.it01@college.edu` | `Password@123` | `/student/attendance.html` |
 
-> 💡 These accounts exist in the **demo SQLite database** in the backend. Change all passwords before going live.
+> 💡 These accounts exist in the **MySQL 8.x database** in the backend. Change all passwords before going live.
 
 ---
 

@@ -1,7 +1,7 @@
 /**
  * ══════════════════════════════════════════════════════════════
  * PAGE LOGIC: FACULTY
- * frontend/admin/faculty/faculty.js
+ * frontend/admin/faculty-management/faculty.js
  * ══════════════════════════════════════════════════════════════
  */
 

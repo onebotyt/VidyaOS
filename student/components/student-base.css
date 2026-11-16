@@ -1,74 +1,508 @@
 /**
  * ══════════════════════════════════════════════════════════════
- * VIDYAOS STUDENT BASE STYLESHEET (student-base.css)
+ * VIDYAOS STUDENT PORTAL DESIGN SYSTEM (student-base.css)
  * Location: /frontend/student/components/student-base.css
- * 
- * - Theme-tokenized foundations for the Student Portal (/student/*)
- * - Safe area support for mobile devices & app wrappers
- * - Touch targets >= 44px
- * - Zero hardcoded hex colors
+ *
+ * - 100% Theme-Tokenized Foundations for the Student Portal (/student/*)
+ * - Desktop 72px Persistent Rail + Mobile Top Navbar & 5-Tab Bottom Bar Safe Areas
+ * - Complete UI Primitives: Cards, Buttons, Badges, Forms, Tables, KPI Grids, Modals
+ * - Mobile-First Touch Ergonomics (>= 44px touch targets, zero horizontal overflow)
  * ══════════════════════════════════════════════════════════════
  */
 
 :root {
   --student-nav-height: 60px;
+  --student-rail-width: 72px;
   --student-drawer-width: 280px;
   --student-bottom-bar-height: 64px;
 }
 
-/* Page Foundation */
+/* ── 1. Page Foundation & Viewport Guardrails ────────────────── */
 html, body {
   overflow-x: hidden !important;
   max-width: 100vw !important;
   box-sizing: border-box !important;
 }
 
-html, body.page-layout, body.classroom-page {
-  font-family: var(--font-family-sans);
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+body.page-layout,
+body.classroom-page,
+body.student-page {
+  font-family: var(--font-family-sans, 'Inter', system-ui, -apple-system, sans-serif);
   background-color: var(--bg-app);
   color: var(--text-main);
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
 }
 
-.container, .page-main-container {
+/* Ensure all Student pages clear the fixed 60px top header & 72px desktop rail */
+body.page-layout,
+body.classroom-page,
+body.student-page {
+  padding-top: var(--student-nav-height, 60px) !important;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+@media (min-width: 769px) {
+  body.page-layout,
+  body.classroom-page,
+  body.student-page {
+    padding-left: var(--student-rail-width, 72px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body.page-layout,
+  body.classroom-page,
+  body.student-page {
+    padding-left: 0 !important;
+    padding-top: var(--student-nav-height, 58px) !important;
+    padding-bottom: calc(var(--student-bottom-bar-height, 64px) + env(safe-area-inset-bottom, 16px)) !important;
+  }
+}
+
+/* ── 2. Containers & Page Headers ────────────────────────────── */
+.container,
+.page-main-container,
+.cf-main-container,
+.todo-container,
+.student-classroom-container {
   box-sizing: border-box !important;
-  max-width: 100% !important;
+  max-width: 1360px;
   width: 100% !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 @media (max-width: 768px) {
-  .container, .page-main-container {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-  .gc-class-card, .student-hero-banner {
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-}
-
-/* Safe area padding for mobile notches and bottom gesture bars */
-body.classroom-page {
-  padding-top: var(--student-nav-height);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-@media (max-width: 768px) {
-  body.classroom-page {
-    padding-bottom: calc(var(--student-bottom-bar-height) + env(safe-area-inset-bottom, 12px));
+  .container,
+  .page-main-container,
+  .cf-main-container,
+  .todo-container,
+  .student-classroom-container {
+    padding-left: 0.9rem !important;
+    padding-right: 0.9rem !important;
+    padding-top: 1rem !important;
   }
 }
 
-/* Accessibility Focus Rings */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.25;
+}
+
+.page-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .page-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* ── 3. Surface Cards & KPI Grids ────────────────────────────── */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 14px);
+  padding: 1.25rem 1.35rem;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 1rem;
+    border-radius: var(--radius-md, 12px);
+  }
+}
+
+.student-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.35rem;
+}
+
+@media (max-width: 640px) {
+  .student-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+}
+
+.student-kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 12px);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.student-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--color-primary);
+}
+
+.student-kpi-card.kpi-success::before { background: var(--status-present); }
+.student-kpi-card.kpi-warning::before { background: var(--status-pending); }
+.student-kpi-card.kpi-danger::before { background: var(--status-absent); }
+
+.student-kpi-label {
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.student-kpi-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.15;
+  font-family: var(--font-family-mono, 'JetBrains Mono', monospace);
+}
+
+.student-kpi-sub {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+/* ── 4. Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.1rem;
+  min-height: 40px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.3;
+  white-space: nowrap;
+  user-select: none;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-sm {
+  padding: 0.38rem 0.8rem;
+  min-height: 34px;
+  font-size: 0.78rem;
+  border-radius: var(--radius-sm, 8px);
+}
+
+.btn-lg {
+  padding: 0.75rem 1.4rem;
+  min-height: 46px;
+  font-size: 0.95rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 6px hsl(217 91% 60% / 0.25);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover, var(--color-primary));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsl(217 91% 60% / 0.35);
+}
+
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-surface-hover, var(--bg-card));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-outline:hover {
+  background: var(--color-primary-light);
+}
+
+.btn-danger {
+  background: var(--status-absent);
+  color: #ffffff;
+  border-color: var(--status-absent);
+}
+
+.btn-danger:hover {
+  opacity: 0.92;
+}
+
+/* ── 5. Badges & Code Pills ──────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.badge-present {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+}
+
+.badge-absent {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+.badge-late,
+.badge-pending {
+  background: var(--status-pending-bg);
+  color: var(--status-pending);
+}
+
+.badge-sem {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.code-badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  font-family: var(--font-family-mono, 'JetBrains Mono', monospace);
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: var(--bg-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
+}
+
+/* ── 6. Form Controls ────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.form-label,
+label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.form-control,
+.form-select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  min-height: 42px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+textarea.form-control,
+textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.form-control:focus,
+.form-select:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: var(--bg-card);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+/* ── 7. Responsive Grids & Tables ────────────────────────────── */
+.grid-cols-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.grid-cols-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.grid-cols-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-lg, 14px);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.86rem;
+}
+
+.table th {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── 8. Modals & Accessibility ───────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-backdrop.open,
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: 1.35rem;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Interactive Touch Targets */
 button, a, input, select, textarea {
   font-family: inherit;
   touch-action: manipulation;
@@ -78,14 +512,13 @@ button:not(:disabled), a {
   cursor: pointer;
 }
 
-/* Prevent iOS input auto-zoom by keeping font-size >= 16px */
+/* Prevent iOS input auto-zoom by keeping font-size >= 16px on mobile */
 @media (max-width: 768px) {
   input, select, textarea {
     font-size: 16px !important;
   }
 }
 
-/* Respect Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

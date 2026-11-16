@@ -3,48 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>My Timetable — Student Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/reset.css?v=20261028">
-  <link rel="stylesheet" href="/css/variables.css?v=20261028">
+  <title>My Timetable &amp; Schedule — Student Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/student/components/core/reset.css">
+  <link rel="stylesheet" href="/student/components/core/variables.css">
   <link rel="stylesheet" href="/student/components/student-base.css">
   <link rel="stylesheet" href="/student/components/header/header.css">
   <link rel="stylesheet" href="/student/components/sidebar/sidebar.css">
-  
-  <link rel="stylesheet" href="/student/timetable/timetable.css?v=20261028">
+  <link rel="stylesheet" href="/student/timetable/timetable.css?v=20261116">
 </head>
 <body class="page-layout">
-  <!-- Semantic Mount Anchors for Isolated Student Components -->
   <div id="student-header-mount"></div>
   <div id="student-sidebar-mount"></div>
-
-  <!-- Compatibility marker for user-nav -->
   <div id="user-nav" style="display:none;" aria-hidden="true"></div>
 
-  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem; max-width: 1100px;">
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem; max-width: 1240px;">
+    <!-- Page Header -->
     <div class="page-header">
       <div>
-        <h1 class="page-title">My Timetable &amp; Schedule</h1>
-        <p class="page-subtitle">Your weekly class timetable and lecture periods.</p>
+        <h1 class="page-title">Weekly Class Timetable</h1>
+        <p class="page-subtitle" id="tt-cohort-subtitle">Your official lecture periods, practical labs, and room assignments.</p>
       </div>
-      <a href="/student/dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-today-focus" onclick="filterTimetableDay('today')">Today's Schedule</button>
+        <a href="/student/dashboard/index.html" class="btn btn-secondary btn-sm">← Classes Hub</a>
+      </div>
     </div>
 
-    <div class="week-grid" id="week-grid"></div>
+    <!-- KPI Summary Row -->
+    <div class="student-kpi-grid" id="tt-kpi-grid">
+      <div class="student-kpi-card">
+        <span class="student-kpi-label">Weekly Periods</span>
+        <span class="student-kpi-value" id="kpi-total-slots">0</span>
+        <span class="student-kpi-sub">Scheduled sessions / week</span>
+      </div>
+      <div class="student-kpi-card kpi-success">
+        <span class="student-kpi-label">Today's Classes</span>
+        <span class="student-kpi-value" id="kpi-today-slots">0</span>
+        <span class="student-kpi-sub" id="kpi-today-label">Current day routine</span>
+      </div>
+      <div class="student-kpi-card kpi-warning">
+        <span class="student-kpi-label">Theory vs Practical</span>
+        <span class="student-kpi-value" id="kpi-theory-lab">0 / 0</span>
+        <span class="student-kpi-sub">Lectures / Lab sessions</span>
+      </div>
+    </div>
+
+    <!-- Mobile & Desktop Day Selector Pill Bar -->
+    <div class="tt-day-filter-bar" id="tt-day-filter-bar" role="tablist" aria-label="Filter Timetable by Day">
+      <button type="button" class="tt-day-pill active" data-day="all" onclick="filterTimetableDay('all')">All Days</button>
+      <button type="button" class="tt-day-pill" data-day="1" onclick="filterTimetableDay(1)">Mon</button>
+      <button type="button" class="tt-day-pill" data-day="2" onclick="filterTimetableDay(2)">Tue</button>
+      <button type="button" class="tt-day-pill" data-day="3" onclick="filterTimetableDay(3)">Wed</button>
+      <button type="button" class="tt-day-pill" data-day="4" onclick="filterTimetableDay(4)">Thu</button>
+      <button type="button" class="tt-day-pill" data-day="5" onclick="filterTimetableDay(5)">Fri</button>
+      <button type="button" class="tt-day-pill" data-day="6" onclick="filterTimetableDay(6)">Sat</button>
+    </div>
+
+    <!-- Responsive Weekly Schedule Grid -->
+    <div class="week-grid" id="week-grid">
+      <div class="card" style="text-align:center; padding:2.5rem; color:var(--text-muted); grid-column: 1 / -1;">
+        Loading your weekly class timetable...
+      </div>
+    </div>
   </main>
 
-  <!-- Shared Security & API Core -->
-  <script src="/js/api.js?v=20261028"></script>
-  <script src="/js/auth.js?v=20261028"></script>
-  <script src="/js/utils.js"></script>
-
-  <!-- Dedicated Student Component Suite -->
+  <script src="/student/components/core/api.js"></script>
+  <script src="/student/components/core/auth.js"></script>
+  <script src="/student/components/core/utils.js"></script>
   <script src="/student/components/icons.js"></script>
   <script src="/student/components/student-ui.js"></script>
   <script src="/student/components/header/header.js"></script>
   <script src="/student/components/sidebar/sidebar.js"></script>
-  
-  <!-- Scoped Page Script -->
-  <script src="/student/timetable/timetable.js?v=20261028"></script>
+  <script src="/student/timetable/timetable.js?v=20261116"></script>
 </body>
 </html>

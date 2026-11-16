@@ -1,11 +1,44 @@
 /**
- * Shared API Client with Transparent Bearer Token Injection & Error Handling
+ * Shared API Client with Transparent Bearer Token Injection, In-Flight GET Deduplication & Error Handling
  * Location: /shared/js/api.js
  */
 
 const API_BASE = '/api/v1';
+const _inflightGetRequests = new Map();
+const _getResponseCache = new Map();
+const GET_CACHE_TTL_MS = 3000; // 3s micro-cache coalesces duplicate page-load calls (/students/me, /auth/me, etc.)
+
+function clearApiCache() {
+  _getResponseCache.clear();
+}
 
 async function fetchApi(endpoint, options = {}) {
+  const method = (options.method || 'GET').toUpperCase();
+  const cleanEp = endpoint.startsWith(API_BASE) ? endpoint.slice(API_BASE.length) : endpoint;
+  const token = localStorage.getItem('access_token') || '';
+
+  if (method !== 'GET') {
+    clearApiCache();
+  } else if (!options.noCache) {
+    const cacheKey = `${token.slice(-12)}:${cleanEp}`;
+    const cached = _getResponseCache.get(cacheKey);
+    if (cached && (Date.now() - cached.ts) < GET_CACHE_TTL_MS) {
+      return structuredClone ? structuredClone(cached.data) : JSON.parse(JSON.stringify(cached.data));
+    }
+    if (_inflightGetRequests.has(cacheKey)) {
+      return _inflightGetRequests.get(cacheKey);
+    }
+    const reqPromise = _executeFetchApi(cleanEp, options, cacheKey).finally(() => {
+      _inflightGetRequests.delete(cacheKey);
+    });
+    _inflightGetRequests.set(cacheKey, reqPromise);
+    return reqPromise;
+  }
+
+  return _executeFetchApi(cleanEp, options, null);
+}
+
+async function _executeFetchApi(endpoint, options = {}, cacheKey = null) {
   const token = localStorage.getItem('access_token');
   const headers = {
     ...(options.headers || {})
@@ -52,10 +85,8 @@ async function fetchApi(endpoint, options = {}) {
           return;
         }
         if (!endpoint.includes('/auth/')) {
-          // Attempt token refresh
           const refreshed = await attemptTokenRefresh();
           if (refreshed) {
-            // Retry original request once
             headers['Authorization'] = `Bearer ${localStorage.getItem('access_token')}`;
             const retryRes = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
             return await retryRes.json();
@@ -83,6 +114,9 @@ async function fetchApi(endpoint, options = {}) {
       throw errObj;
     }
 
+    if (cacheKey && data && data.success !== false) {
+      _getResponseCache.set(cacheKey, { ts: Date.now(), data });
+    }
     return data;
   } catch (err) {
     if (!options.suppressToast && typeof showToast === 'function') {
@@ -131,4 +165,5 @@ if (typeof window !== 'undefined') {
   window.apiRequest = apiRequest;
   window.apiFetch = apiFetch;
   window.attemptTokenRefresh = attemptTokenRefresh;
+  window.clearApiCache = clearApiCache;
 }

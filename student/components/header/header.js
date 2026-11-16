@@ -27,7 +27,8 @@
     { label: 'Timetable', href: '/student/timetable.html', icon: 'timetable' },
     { label: 'Tasks', href: '/student/assignments.html', icon: 'assignments' },
     { label: 'Marks', href: '/student/scores.html', icon: 'scores' },
-    { label: 'Leave', href: '/student/leave.html', icon: 'leave' },
+    { label: 'Leave', href: '/student/leave/index.html', icon: 'leave' },
+    { label: 'NBA Dossier', href: '/student/nba/index.html', icon: 'classes' },
     { label: 'Profile', href: '/student/profile.html', icon: 'profile' }
   ];
 
@@ -42,6 +43,7 @@
     if (p.includes('/theory-classes')) return 'THEORY';
     if (p.includes('/lab-classes')) return 'PRACTICAL';
     if (p.includes('/group-detail')) return 'CLASSROOM';
+    if (p.includes('/nba') || p.includes('/assessment')) return 'NBA DOSSIER';
     return 'STUDENT';
   }
 
