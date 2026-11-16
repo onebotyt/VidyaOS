@@ -255,7 +255,6 @@ function switchDashboardTab(tab) {
 
   loadHodDashboardData();
 }
-}
 window.switchDashboardTab = switchDashboardTab;
 window.loadHodDashboardData = loadHodDashboardData;
 

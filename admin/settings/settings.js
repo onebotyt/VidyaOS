@@ -12,7 +12,7 @@ const DEFAULT_BRANDING = {
   institution_code: 'GP-UBTER-101',
   affiliating_body: 'UBTER (Uttarakhand Board of Technical Education) / IRDT',
   campus_location: 'Uttarakhand, India',
-  institution_logo_url: '/images/college-logo.svg',
+  institution_logo_url: '\VidyaOS-main\images\WhatsApp Image 2026-11-17 at 12.20.23 AM.jpeg',
   institution_banner_url: '/admin/dashboard/campus-nainital.jpg'
 };
 

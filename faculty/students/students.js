@@ -392,8 +392,11 @@
 
     // Main Workspace Tab Switching
     function showMainTab(tab) {
-      const isFaculty = tab === 'faculty' || tab === 'teachers' || tab === 'overview' || (!tab && !['students', 'roster', 'pending', 'lifecycle', 'analytics'].includes(tab));
-      const isStudents = tab === 'students' || tab === 'roster';
+      if (!isHod && (tab === 'faculty' || tab === 'teachers' || tab === 'overview')) {
+        tab = 'students';
+      }
+      const isFaculty = isHod && (tab === 'faculty' || tab === 'teachers' || tab === 'overview' || (!tab && !['students', 'roster', 'pending', 'lifecycle', 'analytics'].includes(tab)));
+      const isStudents = tab === 'students' || tab === 'roster' || (!isHod && !['pending', 'lifecycle', 'analytics'].includes(tab));
       const isPending = tab === 'pending';
       const isLifecycle = tab === 'lifecycle';
       const isAnalytics = tab === 'analytics';
@@ -574,13 +577,16 @@
         await updateRegistrationStatusBadge();
         await loadAllPendingData();
 
-        // Check URL tab parameter or default to overview (Image 2)
+        if (!isHod) {
+          const fb = document.getElementById('tab-faculty-btn') || document.getElementById('tab-overview-btn');
+          if (fb) fb.style.display = 'none';
+        }
+
+        // Check URL tab parameter or default to students roster
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
-        if (tabParam === 'teachers' || tabParam === 'faculty' || window.location.pathname.includes('hod-teachers')) {
+        if (isHod && (tabParam === 'teachers' || tabParam === 'faculty' || window.location.pathname.includes('hod-teachers'))) {
           showMainTab('teachers');
-        } else if (tabParam === 'roster' || tabParam === 'students') {
-          showMainTab('roster');
         } else if (tabParam === 'pending' || tabParam === 'approvals') {
           showMainTab('pending');
         } else if (tabParam === 'lifecycle') {
@@ -588,7 +594,7 @@
         } else if (tabParam === 'analytics') {
           showMainTab('analytics');
         } else {
-          showMainTab('overview');
+          showMainTab('roster');
         }
       } catch (err) {
         console.error('Initialization error:', err);

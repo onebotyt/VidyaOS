@@ -316,10 +316,10 @@ function getToken() {
       daysToShow.forEach(d => {
         const daySessions = finalizedSessions.filter(s => s.session_date === d.date);
         if (daySessions.length > 1) {
-          const pNums = daySessions.map(s => s.period_number);
-          const hasDistinctPeriods = (new Set(pNums)).size === daySessions.length && !pNums.includes(null) && !pNums.includes(undefined);
+          const pNums = daySessions.map(s => s.period_number != null ? parseInt(s.period_number, 10) : null);
+          const hasDistinctPeriods = !pNums.includes(null) && !pNums.some(isNaN) && (new Set(pNums)).size === daySessions.length;
           daySessions.forEach((s, sIdx) => {
-            const pNum = hasDistinctPeriods ? s.period_number : (sIdx + 1);
+            const pNum = hasDistinctPeriods ? parseInt(s.period_number, 10) : (sIdx + 1);
             matrixCols.push({
               ...d,
               period_number: pNum,

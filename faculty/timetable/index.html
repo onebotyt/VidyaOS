@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
-  <link rel="stylesheet" href="/faculty/components/dept-hero/dept-hero.css?v=20261116">
   <link rel="stylesheet" href="/faculty/timetable/timetable.css?v=20261116">
   <script>
     (function () {
@@ -34,9 +33,6 @@
       <div id="faculty-header-mount"></div>
 
       <main class="page-main-container container timetable-container">
-        <!-- Reusable Institutional Hero Banner -->
-        <div id="dept-hero-container" class="dept-hero-mount" data-title="Academic Timetable" data-subtitle="Upload and manage official academic timetables by year for student access."></div>
-
         <!-- Page Action Row -->
         <div class="tt-page-header">
           <div class="tt-header-left">
@@ -83,10 +79,6 @@
             <span>3rd Year</span>
             <span class="tt-year-count-badge" id="badge-count-3">0</span>
           </button>
-          <button type="button" class="tt-year-pill" data-year="4" onclick="filterTimetableByYear(4)">
-            <span>4th Year</span>
-            <span class="tt-year-count-badge" id="badge-count-4">0</span>
-          </button>
         </nav>
 
         <!-- Timetable Cards Container -->
@@ -124,7 +116,6 @@
               <option value="1">1st Year (Semester 1 & 2)</option>
               <option value="2">2nd Year (Semester 3 & 4)</option>
               <option value="3">3rd Year (Semester 5 & 6)</option>
-              <option value="4">4th Year (Semester 7 & 8)</option>
             </select>
           </div>
 
@@ -191,7 +182,6 @@
   <script src="/faculty/components/icons.js?v=20261116"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
   <script src="/faculty/components/header/header.js?v=20261116"></script>
-  <script src="/faculty/components/dept-hero/dept-hero.js?v=20261116"></script>
   <script src="/faculty/timetable/timetable.js?v=20261116"></script>
 </body>
 

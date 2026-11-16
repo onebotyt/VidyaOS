@@ -16,13 +16,12 @@ let studentCohort = {
 };
 
 let allPdfTimetables = [];
-let currentYearFilter = 'MY'; // 'MY', 'ALL', 1, 2, 3, 4
+let currentYearFilter = 'MY'; // 'MY', 'ALL', 1, 2, 3
 
 const YEAR_NAMES = {
   1: '1st Year',
   2: '2nd Year',
-  3: '3rd Year',
-  4: '4th Year'
+  3: '3rd Year'
 };
 
 document.addEventListener('DOMContentLoaded', initTimetablePage);

@@ -35,7 +35,6 @@
     if (y === 1) return '1st Year';
     if (y === 2) return '2nd Year';
     if (y === 3) return '3rd Year';
-    if (y === 4) return '4th Year';
     return `${year}th Year`;
   }
 
@@ -72,7 +71,7 @@
 
   // ── 2. Update Badge Counts ──
   function updateYearCounts() {
-    const counts = { ALL: allTimetables.length, 1: 0, 2: 0, 3: 0, 4: 0 };
+    const counts = { ALL: allTimetables.length, 1: 0, 2: 0, 3: 0 };
     allTimetables.forEach(t => {
       const y = parseInt(t.year, 10);
       if (counts[y] !== undefined) counts[y]++;
@@ -80,7 +79,7 @@
 
     const badgeAll = document.getElementById('badge-count-all');
     if (badgeAll) badgeAll.textContent = counts.ALL;
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 3; i++) {
       const b = document.getElementById(`badge-count-${i}`);
       if (b) b.textContent = counts[i] || 0;
     }

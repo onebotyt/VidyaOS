@@ -14,11 +14,11 @@
   'use strict';
 
   const DEFAULTS = {
-    institution_name: 'Government Polytechnic Nainital',
+    institution_name: 'Government Polytechnic College',
     institution_tagline: '',
     institution_code: 'GP-UBTER-101',
-    institution_logo_url: '/images/college-logo.svg',
-    institution_banner_url: '/faculty/students/campus-nainital.jpg',
+    institution_logo_url: '/images/collegelogo.jpeg',
+    institution_banner_url: '/images/campus-nainital.jpg',
     page_title: 'Faculty Dashboard',
     page_subtitle: 'Manage your classes, attendance, students and more.'
   };
@@ -61,7 +61,7 @@
         <div class="dash-hero-brand-group">
           <div class="dash-hero-logo-badge">
             <img class="hero-inst-logo-val" id="dash-inst-logo" src="${logoUrl}" alt="Institutional Logo"
-              onerror="this.onerror=null;this.src='/images/college-logo.svg';">
+              onerror="this.onerror=null;this.src='/images/collegelogo.jpeg';">
           </div>
           <div class="dash-hero-vdivider" aria-hidden="true"></div>
           <div class="dash-hero-text">
