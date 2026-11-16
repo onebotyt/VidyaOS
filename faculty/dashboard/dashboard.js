@@ -39,6 +39,7 @@
 
     if (titleEl) {
       titleEl.textContent = instName;
+      document.title = `${instName} — Faculty Dashboard`;
     }
 
     if (logoSlot) {
@@ -92,10 +93,31 @@
    * 3. DYNAMIC DEPARTMENT, USER & HOD ROLE HYDRATION
    */
   async function loadUserAndDepartment() {
+    function updateDeptUI(u) {
+      if (!u) return;
+      const deptEl = document.getElementById('dash-dept-name');
+      if (deptEl) {
+        const deptName = u.department_name || u.dept_name || (u.department && typeof u.department === 'object' ? u.department.name : null) || u.department || 'Academic Department';
+        deptEl.textContent = deptName;
+      }
+      const isHod = Boolean(
+        u.role === 'HOD' ||
+        (Array.isArray(u.roles) && u.roles.includes('HOD')) ||
+        u.is_hod === 1 || u.is_hod === true
+      );
+      const facultyTile = document.getElementById('qa-tile-faculty');
+      if (facultyTile) {
+        facultyTile.style.display = isHod ? '' : 'none';
+      }
+    }
+
     let user = null;
     try {
       const raw = localStorage.getItem('user') || localStorage.getItem('auth_user');
-      if (raw) user = JSON.parse(raw);
+      if (raw) {
+        user = JSON.parse(raw);
+        updateDeptUI(user);
+      }
     } catch (_) { }
 
     try {
@@ -111,29 +133,9 @@
       if (res && res.success && res.data) {
         user = res.data;
         localStorage.setItem('user', JSON.stringify(user));
+        updateDeptUI(user);
       }
     } catch (_) { }
-
-    if (!user) return;
-
-    const isHod = Boolean(
-      user.role === 'HOD' ||
-      (Array.isArray(user.roles) && user.roles.includes('HOD')) ||
-      user.is_hod === 1 || user.is_hod === true
-    );
-
-    // Update Department Name Badge
-    const deptEl = document.getElementById('dash-dept-name');
-    if (deptEl) {
-      const deptName = user.department_name || user.dept_name || (user.department ? user.department.name : 'Information Technology');
-      deptEl.textContent = deptName;
-    }
-
-    // Role-dependent Visibility: Faculty Management is visible only for HOD
-    const facultyTile = document.getElementById('qa-tile-faculty');
-    if (facultyTile && !isHod) {
-      facultyTile.style.display = 'none';
-    }
   }
 
   /**
