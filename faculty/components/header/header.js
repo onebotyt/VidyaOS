@@ -18,6 +18,25 @@
     }
   }
 
+  const HAMBURGER_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+  const CLOSE_CROSS_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+  function updateNavToggleIcon(isOpen) {
+    const btns = document.querySelectorAll('#faculty-nav-toggle, .header-nav-toggle-btn');
+    btns.forEach(btn => {
+      btn.innerHTML = isOpen ? CLOSE_CROSS_SVG : HAMBURGER_SVG;
+      btn.title = isOpen ? 'Close Navigation Menu' : 'Toggle Navigation Menu';
+      btn.setAttribute('aria-label', isOpen ? 'Close Navigation Menu' : 'Toggle Navigation Menu');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      if (isOpen) {
+        btn.classList.add('is-open');
+      } else {
+        btn.classList.remove('is-open');
+      }
+    });
+  }
+  window.updateNavToggleIcon = updateNavToggleIcon;
+
   // ── 1. Synchronize Live User Identity & Avatar ──
   function syncFacultyHeader() {
     const user = getUser();
@@ -81,6 +100,9 @@
       };
       btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
       headerLeft.prepend(btn);
+      const sb = document.getElementById('faculty-sidebar') || document.querySelector('.faculty-sidebar');
+      const isSidebarOpen = sb ? (sb.classList.contains('desktop-open') || sb.classList.contains('open')) : false;
+      updateNavToggleIcon(isSidebarOpen);
     }
   }
 
@@ -252,6 +274,9 @@
     const layout = document.getElementById('faculty-app-layout') || document.body;
     layout.insertAdjacentHTML('afterbegin', headerHtml);
     syncFacultyHeader();
+    const sb = document.getElementById('faculty-sidebar') || document.querySelector('.faculty-sidebar');
+    const isSidebarOpen = sb ? (sb.classList.contains('desktop-open') || sb.classList.contains('open')) : false;
+    updateNavToggleIcon(isSidebarOpen);
   }
 
   // Global listeners

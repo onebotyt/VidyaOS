@@ -316,13 +316,15 @@ function getToken() {
       daysToShow.forEach(d => {
         const daySessions = finalizedSessions.filter(s => s.session_date === d.date);
         if (daySessions.length > 1) {
+          const pNums = daySessions.map(s => s.period_number);
+          const hasDistinctPeriods = (new Set(pNums)).size === daySessions.length && !pNums.includes(null) && !pNums.includes(undefined);
           daySessions.forEach((s, sIdx) => {
-            const pNum = s.period_number || (sIdx + 1);
+            const pNum = hasDistinctPeriods ? s.period_number : (sIdx + 1);
             matrixCols.push({
               ...d,
               period_number: pNum,
               session_id: s.id,
-              col_key: `${d.date}_${pNum}`,
+              col_key: `${d.date}_p${pNum}`,
               session_key: `sess_${s.id}`,
               display_day: `${d.day} [P${pNum}]`,
               display_title: `${d.date} (${d.day_name}) — Period ${pNum}${s.label ? ': ' + s.label : ''}`,
@@ -475,7 +477,9 @@ function getToken() {
 
           // Regular lecture cell with digital pen interaction
           let mark = null;
-          if (col.session_key && st.attendance_marks?.[col.session_key]) {
+          if (col.session_id && st.session_marks?.[col.session_id]) {
+            mark = st.session_marks[col.session_id];
+          } else if (col.session_key && st.attendance_marks?.[col.session_key]) {
             mark = st.attendance_marks[col.session_key];
           } else if (col.col_key && st.attendance_marks?.[col.col_key]) {
             mark = st.attendance_marks[col.col_key];

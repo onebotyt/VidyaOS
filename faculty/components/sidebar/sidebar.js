@@ -47,6 +47,27 @@
     { key: 'settings', label: 'Settings', href: '/faculty/profile/index.html', icon: 'settings' }
   ];
 
+  const HAMBURGER_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+  const CLOSE_CROSS_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+  function updateNavToggleIcon(isOpen) {
+    const btns = document.querySelectorAll('#faculty-nav-toggle, .header-nav-toggle-btn');
+    btns.forEach(btn => {
+      btn.innerHTML = isOpen ? CLOSE_CROSS_SVG : HAMBURGER_SVG;
+      btn.title = isOpen ? 'Close Navigation Menu' : 'Toggle Navigation Menu';
+      btn.setAttribute('aria-label', isOpen ? 'Close Navigation Menu' : 'Toggle Navigation Menu');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      if (isOpen) {
+        btn.classList.add('is-open');
+      } else {
+        btn.classList.remove('is-open');
+      }
+    });
+  }
+  if (typeof window.updateNavToggleIcon !== 'function') {
+    window.updateNavToggleIcon = updateNavToggleIcon;
+  }
+
   function getSidebar() {
     return document.getElementById('faculty-sidebar') || document.querySelector('.faculty-sidebar');
   }
@@ -75,13 +96,19 @@
     const bd = getBackdrop();
     if (!sb) return;
 
-    const isOpen = sb.classList.contains('desktop-open');
+    const isOpen = sb.classList.contains('desktop-open') || sb.classList.contains('open');
     if (isOpen) {
-      sb.classList.remove('desktop-open');
+      sb.classList.remove('desktop-open', 'open', 'sidebar-open');
       if (bd) bd.classList.remove('active', 'open');
+      document.documentElement.classList.add('sidebar-collapsed');
+      document.body.classList.add('sidebar-collapsed');
+      if (typeof window.updateNavToggleIcon === 'function') window.updateNavToggleIcon(false);
     } else {
-      sb.classList.add('desktop-open');
+      sb.classList.add('desktop-open', 'open');
       if (bd) bd.classList.add('active', 'open');
+      document.documentElement.classList.remove('sidebar-collapsed');
+      document.body.classList.remove('sidebar-collapsed');
+      if (typeof window.updateNavToggleIcon === 'function') window.updateNavToggleIcon(true);
     }
   }
 
@@ -95,13 +122,14 @@
     const bd = getBackdrop();
     if (!sb) return;
 
-    const isOpen = sb.classList.contains('open') || sb.classList.contains('sidebar-open');
+    const isOpen = sb.classList.contains('open') || sb.classList.contains('sidebar-open') || sb.classList.contains('desktop-open');
     if (isOpen) {
       closeSidebar();
     } else {
-      sb.classList.add('open', 'sidebar-open');
+      sb.classList.add('open', 'sidebar-open', 'desktop-open');
       if (bd) bd.classList.add('active', 'open');
       document.body.style.overflow = 'hidden';
+      if (typeof window.updateNavToggleIcon === 'function') window.updateNavToggleIcon(true);
     }
   }
 
@@ -115,6 +143,9 @@
       bd.classList.remove('active', 'open');
     }
     document.body.style.overflow = '';
+    document.documentElement.classList.add('sidebar-collapsed');
+    document.body.classList.add('sidebar-collapsed');
+    if (typeof window.updateNavToggleIcon === 'function') window.updateNavToggleIcon(false);
   }
 
   function handleBackdropClick(e) {

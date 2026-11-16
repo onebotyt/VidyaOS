@@ -228,72 +228,33 @@ function updateDashboardMode() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const queryTab = urlParams.get('tab');
-  let tabToOpen = isHOD ? 'DEPT' : 'CLASSES';
-  if (queryTab) {
-    if (queryTab.toLowerCase() === 'classes') {
-      tabToOpen = 'CLASSES';
-    } else if (isHOD) {
-      tabToOpen = 'DEPT';
-    }
-  } else if (isHOD) {
-    // For HOD on PC dashboard, always default to the unified Command Center (Image 2)
-    tabToOpen = 'DEPT';
-  } else {
-    tabToOpen = 'CLASSES';
+  if (queryTab && queryTab.toLowerCase() === 'classes') {
+    // Forward direct to dedicated Classroom page
+    window.location.replace('/faculty/classes/index.html');
+    return;
   }
-  switchDashboardTab(tabToOpen);
+  switchDashboardTab('DEPT');
 }
 
 function switchDashboardTab(tab) {
-  const isHOD = Boolean(state.currentUser?.is_hod || state.currentUser?.roles?.includes('HOD') || state.currentUser?.roles?.includes('SYSTEM_ADMIN'));
-  if (tab === 'DEPT' && !isHOD) {
-    tab = 'CLASSES';
+  if (tab === 'CLASSES') {
+    window.location.href = '/faculty/classes/index.html';
+    return;
   }
-  currentDashboardTab = tab;
-  try {
-    localStorage.setItem('hod_dashboard_tab', tab);
-  } catch (_) { }
-
+  currentDashboardTab = 'DEPT';
   try {
     const url = new URL(window.location.href);
-    url.searchParams.set('tab', tab.toLowerCase());
+    url.searchParams.set('tab', 'dept');
     window.history.replaceState({}, '', url.toString());
   } catch (_) { }
 
-  const btnClasses = document.getElementById('btn-tab-classes');
-  const btnDept = document.getElementById('btn-tab-dept');
-  const teachingView = document.getElementById('teaching-classes-view');
   const deptView = document.getElementById('hod-dept-command-center');
+  const teachingView = document.getElementById('teaching-classes-view');
+  if (deptView) deptView.style.display = 'block';
+  if (teachingView) teachingView.style.display = 'none';
 
-  if (tab === 'DEPT' && isHOD) {
-    if (btnClasses) {
-      btnClasses.classList.remove('active');
-      btnClasses.setAttribute('aria-selected', 'false');
-    }
-    if (btnDept) {
-      btnDept.classList.add('active');
-      btnDept.setAttribute('aria-selected', 'true');
-    }
-    if (deptView) deptView.style.display = 'block';
-    if (teachingView) {
-      teachingView.style.display = 'none';
-    }
-    loadHodDashboardData();
-  } else {
-    if (btnClasses) {
-      btnClasses.classList.add('active');
-      btnClasses.setAttribute('aria-selected', 'true');
-    }
-    if (btnDept) {
-      btnDept.classList.remove('active');
-      btnDept.setAttribute('aria-selected', 'false');
-    }
-    if (teachingView) {
-      teachingView.style.display = 'block';
-      renderGroups();
-    }
-    if (deptView) deptView.style.display = 'none';
-  }
+  loadHodDashboardData();
+}
 }
 window.switchDashboardTab = switchDashboardTab;
 window.loadHodDashboardData = loadHodDashboardData;

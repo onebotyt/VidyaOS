@@ -1,201 +1,336 @@
-/* ══════════════════════════════════════════════════════════════
-   PAGE STYLES: STUDENT TIMETABLE (Mobile-First Responsive Grid)
-   frontend/student/timetable/timetable.css
-══════════════════════════════════════════════════════════════ */
+/* ==========================================================================
+   STUDENT TIMETABLE (SIMPLE YEAR-BASED PDF VIEWER)
+   Location: /student/timetable/timetable.css
+   100% Theme Compliant (Zero Hardcoded Colors)
+   ========================================================================== */
 
-.tt-day-filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0.35rem 0 0.75rem 0;
-  margin-bottom: 0.75rem;
-  scrollbar-width: none;
+.student-tt-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3.5rem;
 }
 
-.tt-day-filter-bar::-webkit-scrollbar {
-  display: none;
-}
-
-.tt-day-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.95rem;
-  min-height: 38px;
-  border-radius: 9999px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s ease;
-}
-
-.tt-day-pill:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.tt-day-pill.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #ffffff;
-  box-shadow: 0 2px 8px hsl(217 91% 60% / 0.28);
-}
-
-.tt-today-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--status-present);
-  display: inline-block;
-}
-
-.tt-day-pill.active .tt-today-dot {
-  background: #ffffff;
-}
-
-.week-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-@media (max-width: 640px) {
-  .week-grid {
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
-  }
-}
-
-.day-col {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg, 14px);
-  padding: 1rem;
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-}
-
-.day-col.is-today {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 1px var(--color-primary), var(--shadow-sm);
-}
-
-.day-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 800;
-  font-size: 0.92rem;
-  padding: 0.55rem 0.75rem;
-  background: var(--bg-surface);
-  border-radius: var(--radius-sm, 8px);
-  margin-bottom: 0.75rem;
-  color: var(--text-main);
-}
-
-.day-count-badge {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.day-slots-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.slot-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-left: 4px solid var(--color-primary);
-  border-radius: var(--radius-md, 10px);
-  padding: 0.8rem 0.9rem;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.slot-card.slot-lab {
-  border-left-color: var(--status-present);
-}
-
-.slot-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-.slot-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.slot-time {
-  font-family: var(--font-family-mono, 'JetBrains Mono', monospace);
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.slot-type-pill {
-  font-size: 0.65rem;
-  font-weight: 800;
-  padding: 0.12rem 0.45rem;
-  border-radius: 999px;
-  letter-spacing: 0.04em;
-}
-
-.slot-type-pill.theory {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
-.slot-type-pill.lab {
-  background: var(--status-present-bg);
-  color: var(--status-present);
-}
-
-.slot-subject {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--text-main);
-  line-height: 1.3;
-}
-
-.slot-meta {
+/* Page Header */
+.tt-page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  color: var(--text-muted);
-  font-size: 0.76rem;
-  margin-top: 0.45rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.slot-room-pill {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: 0.1rem 0.45rem;
-  border-radius: 6px;
+.tt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.tt-header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-md, 10px);
+  background: var(--bg-surface-elevated, #f0f4f9);
+  color: var(--color-primary, #1a73e8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color, #e0e4ec);
+  flex-shrink: 0;
+}
+
+.tt-page-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.tt-page-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0.2rem 0 0;
+}
+
+/* Year Filter Navigation Bar */
+.tt-year-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  scrollbar-width: thin;
+}
+
+.tt-year-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--border-radius-full, 9999px);
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-secondary, #475569);
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.slot-empty {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+.tt-year-pill:hover {
+  background: var(--bg-hover, #f8fafc);
+  border-color: var(--color-primary, #1a73e8);
+  color: var(--color-primary, #1a73e8);
+}
+
+.tt-year-pill.active {
+  background: var(--color-primary, #1a73e8);
+  border-color: var(--color-primary, #1a73e8);
+  color: #ffffff;
+}
+
+.tt-year-badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--border-radius-full, 9999px);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--bg-surface-elevated, #e2e8f0);
+  color: var(--text-secondary, #475569);
+}
+
+.tt-year-pill.active .tt-year-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Featured / Active Timetable Hero Card */
+.tt-featured-card {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--border-radius-lg, 14px);
+  padding: 1.5rem;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.tt-featured-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.tt-featured-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+
+.tt-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--border-radius-sm, 6px);
+  background: var(--bg-surface-elevated, #f1f5f9);
+  color: var(--text-secondary, #475569);
+}
+
+.tt-meta-pill.primary {
+  background: var(--color-primary-light, #e8f0fe);
+  color: var(--color-primary, #1a73e8);
+}
+
+.tt-featured-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Embedded PDF Viewer Box */
+.tt-viewer-frame-box {
+  width: 100%;
+  height: 680px;
+  background: var(--bg-surface-elevated, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--border-radius-md, 10px);
+  overflow: hidden;
+  position: relative;
+}
+
+.tt-viewer-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Timetable Cards Grid */
+.tt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.tt-card {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--border-radius-md, 12px);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tt-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.tt-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.tt-card-pdf-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-sm, 8px);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--status-absent, #ef4444);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tt-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.tt-card-body {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #64748b);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tt-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #f1f5f9);
+}
+
+/* Empty State */
+.tt-empty-state {
   text-align: center;
-  padding: 1.5rem 0.5rem;
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md, 10px);
+  padding: 3rem 1.5rem;
+  background: var(--bg-surface, #ffffff);
+  border: 1px dashed var(--border-color, #cbd5e1);
+  border-radius: var(--border-radius-lg, 12px);
+  color: var(--text-secondary, #64748b);
+}
+
+.tt-empty-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 1rem;
+  border-radius: var(--border-radius-full, 9999px);
+  background: var(--bg-surface-elevated, #f1f5f9);
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tt-empty-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  margin: 0 0 0.35rem;
+}
+
+.tt-empty-desc {
+  font-size: 0.85rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* Fullscreen Preview Modal */
+.tt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.tt-modal-backdrop.open {
+  display: flex;
+}
+
+.tt-modal-dialog {
+  background: var(--bg-surface, #ffffff);
+  border-radius: var(--border-radius-lg, 14px);
+  width: 100%;
+  max-width: 1050px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.tt-modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tt-modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  margin: 0;
+}
+
+.tt-modal-body {
+  flex: 1;
+  padding: 0;
+  height: 75vh;
+  background: var(--bg-surface-elevated, #f8fafc);
+}
+
+@media (max-width: 768px) {
+  .tt-viewer-frame-box {
+    height: 480px;
+  }
+  .tt-modal-body {
+    height: 60vh;
+  }
 }
