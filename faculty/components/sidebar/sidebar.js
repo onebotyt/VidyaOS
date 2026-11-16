@@ -60,13 +60,13 @@
 
   // Canonical Faculty Navigation modules
   const FACULTY_NAV_ITEMS = [
-    { key: 'dashboard', label: 'Dashboard', shortLabel: 'Dashboard', href: '/faculty/dashboard/index.html', icon: 'home' },
+    { key: 'dashboard', label: 'Dashboard', shortLabel: 'Home', href: '/faculty/dashboard/index.html', icon: 'home' },
     { key: 'classes', label: 'Classroom', shortLabel: 'Classes', href: '/faculty/classes/index.html', icon: 'classes' },
-    { key: 'attendance', label: 'Attendance Register', shortLabel: 'Attendance', href: '/faculty/registers/index.html', icon: 'registers' },
+    { key: 'attendance', label: 'Attendance Register', shortLabel: 'Register', href: '/faculty/registers/index.html', icon: 'registers' },
     { key: 'sheets', label: 'Sheet Studio', shortLabel: 'Sheets', href: '/faculty/sheets/index.html', icon: 'sheets' },
     { key: 'leaves', label: 'Leave Request', shortLabel: 'Leave', href: '/faculty/leave-approvals/index.html', icon: 'leaves' },
     { key: 'students', label: 'Faculty & Students Management', shortLabel: 'Students', href: '/faculty/students/index.html', icon: 'students' },
-    { key: 'esp32', label: 'ESP32 Biometric Terminals', shortLabel: 'ESP32 Bio', href: '/faculty/esp32-devices/index.html', icon: 'settings' },
+    { key: 'esp32', label: 'ESP32 Biometric Terminals', shortLabel: 'ESP32', href: '/faculty/esp32-devices/index.html', icon: 'settings' },
     { key: 'timetable', label: 'Timetable', shortLabel: 'Timetable', href: '/faculty/timetable/index.html', icon: 'timetable' },
     { key: 'drive', label: 'Faculty Drive', shortLabel: 'Drive', href: '/faculty/media/index.html', icon: 'drive' },
     { key: 'reports', label: 'Report & Analysis', shortLabel: 'Reports', href: '/faculty/reports/index.html', icon: 'reports' }
