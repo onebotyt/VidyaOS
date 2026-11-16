@@ -124,6 +124,32 @@
       }
     }
 
+    // Ensure header expand button exists before logo
+    const headerLeft = document.querySelector('#faculty-header .header-left, .faculty-top-header .header-left, .admin-top-header .header-left');
+    if (headerLeft && !headerLeft.querySelector('#faculty-nav-toggle')) {
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'header-mobile-toggle-btn header-nav-toggle-btn';
+      toggleBtn.id = 'faculty-nav-toggle';
+      toggleBtn.title = 'Toggle Navigation Menu';
+      toggleBtn.setAttribute('aria-label', 'Toggle Navigation Menu');
+      toggleBtn.onclick = function() {
+        if (window.innerWidth >= 769 && typeof toggleDesktopSidebar === 'function') {
+          toggleDesktopSidebar();
+        } else if (typeof toggleSidebar === 'function') {
+          toggleSidebar();
+        }
+      };
+      toggleBtn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      `;
+      headerLeft.prepend(toggleBtn);
+    }
+
     // Check for custom uploaded avatar image in localStorage
     try {
       const customAvatar = localStorage.getItem('vidya_faculty_avatar') || localStorage.getItem('vidya_admin_avatar');
@@ -426,8 +452,8 @@
     const headerHtml = `
       <header class="faculty-top-header admin-top-header" id="faculty-header" aria-label="Faculty Header Bar">
         <div class="header-left">
-          <button type="button" class="header-mobile-toggle-btn" id="faculty-nav-toggle" onclick="if(window.innerWidth>=769&&typeof toggleDesktopSidebar==='function'){toggleDesktopSidebar();}else if(typeof toggleSidebar==='function'){toggleSidebar();}" aria-label="Toggle Navigation Menu">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <button type="button" class="header-mobile-toggle-btn header-nav-toggle-btn" id="faculty-nav-toggle" onclick="if(window.innerWidth>=769&&typeof toggleDesktopSidebar==='function'){toggleDesktopSidebar();}else if(typeof toggleSidebar==='function'){toggleSidebar();}" aria-label="Toggle Navigation Menu" title="Toggle Navigation Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>

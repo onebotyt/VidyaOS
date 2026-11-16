@@ -205,9 +205,11 @@
   .faculty-sidebar.desktop-open .sidebar-nav-body,
   .faculty-app-layout.sidebar-collapsed .sidebar-nav-body,
   html.sidebar-collapsed .sidebar-nav-body {
-    flex: 1 1 auto !important;
+    flex: 1 1 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
     min-height: 0 !important;
-    padding: 0.35rem 0 !important;
+    padding: 0.4rem 0 !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 2px !important;
@@ -325,16 +327,17 @@
     .faculty-app-layout.sidebar-collapsed .sidebar-nav-short-label,
     html.sidebar-collapsed .sidebar-nav-short-label {
       display: block !important;
-      font-size: 0.58rem !important;
+      font-size: 0.54rem !important;
       font-weight: 600 !important;
-      letter-spacing: -0.02em !important;
+      letter-spacing: -0.01em !important;
       text-align: center !important;
-      line-height: 1 !important;
+      line-height: 1.1 !important;
       color: inherit !important;
       white-space: nowrap !important;
       overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      max-width: 56px !important;
+      text-overflow: clip !important;
+      max-width: 100% !important;
+      width: 100% !important;
       margin-top: 1px !important;
       pointer-events: none !important;
     }
@@ -541,39 +544,19 @@
   display: none !important;
 }
 
-/* ── 3. Unified Sidebar Footer (.sidebar-expanded-footer): Responsive between 72px Rail & 260px Flyout ── */
-.sidebar-expanded-footer {
-  display: flex !important;
-  flex-direction: column !important;
-  border-top: 1px solid var(--border-color) !important;
-  background: var(--bg-card) !important;
-  margin-top: auto !important;
-  flex-shrink: 0 !important;
-  box-sizing: border-box !important;
-  transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), padding 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-@media (min-width: 769px) {
-  /* Small Sidebar Collapsed Rail (72px) */
-  .faculty-sidebar:not(.desktop-open) .sidebar-expanded-footer,
-  #faculty-sidebar:not(.desktop-open) .sidebar-expanded-footer,
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-expanded-footer {
-    width: 72px !important;
-    padding: 0.25rem 0 0.4rem !important;
-    align-items: center !important;
-    gap: 0.2rem !important;
-    flex-shrink: 0 !important;
-  }
-
-  /* Desktop Expanded Flyout (260px) */
-  .faculty-sidebar.desktop-open .sidebar-expanded-footer,
-  #faculty-sidebar.desktop-open .sidebar-expanded-footer,
-  #vidya-faculty-sidebar.desktop-open .sidebar-expanded-footer {
-    width: 260px !important;
-    padding: 0.65rem 13px 0.85rem !important;
-    align-items: stretch !important;
-    gap: 0.45rem !important;
-  }
+/* ── 3. Unified Sidebar Footer & Rail Toggle: Permanently removed (Auth & expand are on Top Header) ── */
+.sidebar-expanded-footer,
+.sidebar-rail-toggle-item,
+.sidebar-rail-footer {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  pointer-events: none !important;
 }
 
 .sidebar-user-card {
@@ -964,76 +947,12 @@
   pointer-events: auto !important;
 }
 
-/* ── Desktop Rail Toggle Expand/Collapse Button (Matches Admin Image 9) ── */
-.faculty-sidebar:not(.desktop-open) .sidebar-rail-toggle-item,
-.faculty-app-layout.sidebar-collapsed .sidebar-rail-toggle-item,
-html.sidebar-collapsed .sidebar-rail-toggle-item {
-  width: 48px !important;
-  height: 44px !important;
-  margin: 0.4rem auto 0.2rem auto !important;
-  border: 1px dashed var(--color-primary-light, hsl(217 91% 85%)) !important;
-  background: var(--bg-surface) !important;
-  color: var(--color-primary) !important;
-  cursor: pointer !important;
-  border-radius: 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.faculty-sidebar:not(.desktop-open) .sidebar-rail-toggle-item .sidebar-toggle-icon svg,
-.faculty-app-layout.sidebar-collapsed .sidebar-rail-toggle-item .sidebar-toggle-icon svg {
-  stroke: var(--color-primary) !important;
-  width: 16px !important;
-  height: 16px !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.faculty-sidebar:not(.desktop-open) .sidebar-rail-toggle-item:hover,
-.faculty-app-layout.sidebar-collapsed .sidebar-rail-toggle-item:hover {
-  background: var(--color-primary) !important;
-  color: var(--text-white, hsl(0 0% 100%)) !important;
-  border-color: var(--color-primary) !important;
-  border-style: solid !important;
-  transform: translateY(-2px) scale(1.04) !important;
-  box-shadow: 0 4px 12px hsl(217 91% 60% / 0.28) !important;
-}
-
-.faculty-sidebar:not(.desktop-open) .sidebar-rail-toggle-item:hover .sidebar-toggle-icon svg,
-.faculty-app-layout.sidebar-collapsed .sidebar-rail-toggle-item:hover .sidebar-toggle-icon svg {
-  stroke: var(--text-white, hsl(0 0% 100%)) !important;
-  transform: translateX(2px) !important;
-}
-
-/* Expanded Flyout Drawer mode: full-width button with label */
-.faculty-sidebar.desktop-open .sidebar-rail-toggle-item {
-  width: calc(100% - 1.5rem) !important;
-  height: 46px !important;
-  margin: 0.35rem 0.75rem 0.2rem 0.75rem !important;
-  flex-direction: row !important;
-  justify-content: flex-start !important;
-  align-items: center !important;
-  padding: 0 0.85rem !important;
-  gap: 0.75rem !important;
-  border-radius: 12px !important;
-  background: var(--bg-surface) !important;
-  border: 1px dashed var(--border-color) !important;
-  color: var(--text-muted) !important;
-  cursor: pointer !important;
-  display: flex !important;
-}
-
-.faculty-sidebar.desktop-open .sidebar-rail-toggle-item:hover {
-  background: var(--bg-surface-hover, var(--bg-surface)) !important;
-  border-color: var(--color-primary-light) !important;
-  color: var(--color-primary) !important;
-}
-
-.faculty-sidebar.desktop-open .sidebar-rail-toggle-item .sidebar-toggle-icon svg {
-  transform: rotate(180deg) !important;
-  stroke: currentColor !important;
+/* ── Desktop Rail Toggle Expand/Collapse Button: Permanently hidden (Integrated in Top Header) ── */
+.sidebar-rail-toggle-item {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  pointer-events: none !important;
 }
 
 .mobile-top-header {

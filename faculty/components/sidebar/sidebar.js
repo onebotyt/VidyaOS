@@ -402,68 +402,46 @@
     // Clean up any obsolete duplicate mobile headers
     document.querySelectorAll('.faculty-mobile-top-header, #faculty-mobile-top-header').forEach(el => el.remove());
 
-    // ── B. Mount Dual-State Sidebar (#faculty-sidebar) if missing ──
-    if (!getSidebar()) {
-      const expandChevronSvg = getIcon('chevronRight', { width: 15, height: 15, stroke: 2.8 });
-      const signoutSvg = getIcon('logout', { width: 20, height: 20, stroke: 2 });
+    // Render standard items
+    const standardItemsHtml = FACULTY_NAV_ITEMS.map(item => {
+      let label = item.label;
+      if (item.key === 'students') {
+        label = isHod ? 'Faculty & Students Management' : 'Students Management';
+      }
 
-      // Render standard items
-      const standardItemsHtml = FACULTY_NAV_ITEMS.map(item => {
-        let label = item.label;
-        if (item.key === 'students') {
-          label = isHod ? 'Faculty & Students Management' : 'Students Management';
-        }
+      const isActive = currentPath.endsWith(item.href) ||
+        currentPath.endsWith(item.href.replace('.html', '')) ||
+        currentPath.includes(item.key) ||
+        (item.key === 'dashboard' && (currentPath === '/faculty/' || currentPath.endsWith('/faculty') || currentPath.endsWith('/faculty/dashboard.html') || currentPath.endsWith('/faculty/dashboard')));
 
-        const isActive = currentPath.endsWith(item.href) ||
-          currentPath.endsWith(item.href.replace('.html', '')) ||
-          currentPath.includes(item.key) ||
-          (item.key === 'dashboard' && (currentPath === '/faculty/' || currentPath.endsWith('/faculty') || currentPath.endsWith('/faculty/dashboard.html') || currentPath.endsWith('/faculty/dashboard')));
+      const activeCls = isActive ? ' active' : '';
+      const itemSvg = getIcon(item.icon, { width: 20, height: 20, stroke: 1.8 });
 
-        const activeCls = isActive ? ' active' : '';
-        const itemSvg = getIcon(item.icon, { width: 20, height: 20, stroke: 1.8 });
-
-        return `
-          <a href="${item.href}" class="sidebar-nav-item drawer-link${activeCls}" data-nav="${item.key}" data-tooltip="${label}" aria-label="${label}" onclick="if(window.innerWidth<=768)closeSidebar()">
-            <span class="sidebar-nav-icon">${itemSvg}</span>
-            <span class="sidebar-nav-short-label">${item.shortLabel || label}</span>
-            <span class="sidebar-nav-label">${label}</span>
-          </a>
-        `;
-      }).join('');
-
-      // Expand/Collapse Rail Toggle item positioned inside sidebar navigation links (desktop rail only)
-      const toggleItemHtml = `
-        <button type="button" class="sidebar-nav-item sidebar-rail-toggle-item" onclick="toggleDesktopSidebar()" data-tooltip="Expand Menu" aria-label="Expand Navigation Menu">
-          <span class="sidebar-nav-icon sidebar-toggle-icon">${expandChevronSvg}</span>
-          <span class="sidebar-nav-short-label">Expand</span>
-          <span class="sidebar-nav-label">Collapse Menu</span>
-        </button>
+      return `
+        <a href="${item.href}" class="sidebar-nav-item drawer-link${activeCls}" data-nav="${item.key}" data-tooltip="${label}" aria-label="${label}" onclick="if(window.innerWidth<=768)closeSidebar()">
+          <span class="sidebar-nav-icon">${itemSvg}</span>
+          <span class="sidebar-nav-short-label">${item.shortLabel || label}</span>
+          <span class="sidebar-nav-label">${label}</span>
+        </a>
       `;
+    }).join('');
 
+    // ── B. Mount Dual-State Sidebar (#faculty-sidebar) if missing or update if existing ──
+    const existingSidebar = getSidebar();
+    if (existingSidebar) {
+      // Remove any lingering toggle button or footer
+      existingSidebar.querySelectorAll('.sidebar-rail-toggle-item, .sidebar-expanded-footer, .sidebar-rail-footer').forEach(el => el.remove());
+      const navBody = existingSidebar.querySelector('.sidebar-nav-body');
+      if (navBody && (!navBody.children.length || navBody.children.length < 5)) {
+        navBody.innerHTML = standardItemsHtml;
+      }
+    } else {
       const sidebarHtml = `
         <aside id="faculty-sidebar" class="faculty-sidebar vidya-faculty-sidebar" data-component="vidya-faculty-sidebar" aria-label="Faculty Navigation">
           <!-- Navigation Links (Scrollable if overflowing) -->
           <nav class="sidebar-nav-body" aria-label="Faculty Navigation Links">
             ${standardItemsHtml}
-            ${toggleItemHtml}
           </nav>
-
-          <!-- Sidebar Footer: User Profile & Sign Out -->
-          <div class="sidebar-expanded-footer">
-            <a href="/faculty/profile/index.html" class="sidebar-user-card" id="sidebar-user-profile-link" data-tooltip="${name}" aria-label="User Profile" onclick="if(window.innerWidth<=768)closeSidebar()">
-              <div class="sidebar-user-avatar" id="sidebar-drawer-avatar" aria-hidden="true">
-                <span>${initial}</span>
-              </div>
-              <div class="sidebar-user-meta">
-                <span class="sidebar-user-name" id="sidebar-drawer-name">${name}</span>
-                <span class="sidebar-user-sub" id="sidebar-drawer-sub">${deptRole}</span>
-              </div>
-            </a>
-            <button type="button" class="sidebar-signout-card-btn" onclick="confirmFacultyLogout()" data-tooltip="Sign Out" title="Sign Out" aria-label="Sign Out">
-              ${signoutSvg}
-              <span>Sign Out</span>
-            </button>
-          </div>
         </aside>
 
         <!-- Backdrop Overlay for Desktop Flyout & Mobile Drawer -->
@@ -478,6 +456,18 @@
         layout.insertAdjacentHTML('afterbegin', sidebarHtml);
       }
     }
+
+    // Ensure backdrop exists even if sidebar was statically rendered
+    if (!document.getElementById('faculty-sidebar-backdrop')) {
+      const bd = document.createElement('div');
+      bd.id = 'faculty-sidebar-backdrop';
+      bd.className = 'gc-drawer-backdrop sidebar-backdrop faculty-sidebar-backdrop';
+      bd.onclick = handleBackdropClick;
+      document.body.appendChild(bd);
+    }
+
+    // Clean up any stray footer/rail items globally
+    document.querySelectorAll('.sidebar-rail-toggle-item, .sidebar-expanded-footer, .sidebar-rail-footer').forEach(el => el.remove());
 
     // ── C. Ensure Tooltip Attribute & Highlight Active Item ──
     const navItems = document.querySelectorAll('.sidebar-nav-item');
