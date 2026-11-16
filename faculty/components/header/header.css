@@ -1,14 +1,11 @@
 /**
  * ══════════════════════════════════════════════════════════════
  * VIDYAOS FACULTY TOP HEADER STYLES (header.css)
- * Location: /frontend/faculty/components/header/header.css
- * 
- * 100% Theme Tokenized — Zero Hardcoded Hex Colors
- * Upgraded to match Admin Header: Right-aligned minimal toolbar,
- * smooth theme toggle, and interactive round profile avatar
+ * Optimized & Streamlined (100% Theme Tokenized, Zero Hex Colors)
  * ══════════════════════════════════════════════════════════════
  */
 
+/* ── 1. Top Fixed Navigation Bar ── */
 .faculty-top-header,
 #faculty-header,
 .gc-navbar.admin-top-header,
@@ -33,6 +30,7 @@
   margin: 0 !important;
 }
 
+/* ── 2. Header Left: Toggle Button + Brand Identity ── */
 .header-left {
   display: flex;
   align-items: center;
@@ -80,7 +78,8 @@
   justify-content: center;
 }
 
-.header-brand-logo svg {
+.header-brand-logo svg,
+.header-brand-cube {
   width: 28px;
   height: 28px;
   display: block;
@@ -110,16 +109,45 @@
   color: var(--color-primary, hsl(217 91% 60%));
 }
 
-.header-bell-btn {
+/* ── 3. Header Right Controls: Theme, Bell, Apps & Profile Avatar ── */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
   position: relative;
+}
+
+.header-icon-btn,
+.header-theme-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.18s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.header-icon-btn:hover,
+.header-theme-toggle:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
+  border-color: var(--color-primary-light, var(--color-primary));
 }
 
 .header-bell-badge {
   position: absolute;
   top: -2px;
   right: -2px;
-  background: #ef4444;
-  color: #ffffff;
+  background: var(--status-absent, hsl(0 84% 60%));
+  color: var(--text-white, hsl(0 0% 100%));
   font-size: 0.62rem;
   font-weight: 800;
   min-width: 17px;
@@ -130,94 +158,10 @@
   align-items: center;
   justify-content: center;
   border: 2px solid var(--bg-card);
-  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 1px 4px hsl(0 84% 60% / 0.4);
 }
 
-.header-dept-pill {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  background: var(--color-primary-light, hsl(215 90% 95%));
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  letter-spacing: 0.02em;
-}
-
-@media (max-width: 768px) {
-  .faculty-top-header,
-  #faculty-header,
-  .gc-navbar.admin-top-header,
-  .admin-top-header {
-    height: 58px !important;
-    padding: 0 0.85rem !important;
-    display: flex !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    z-index: 10001 !important;
-  }
-
-  .header-mobile-toggle-btn {
-    display: inline-flex !important;
-    width: 36px !important;
-    height: 36px !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  .header-brand-title {
-    font-size: 1rem !important;
-  }
-
-  .header-brand-badge {
-    font-size: 0.62rem !important;
-    padding: 0.1rem 0.35rem !important;
-  }
-}
-
-/* ── Right Section: Apps Launcher, Theme Toggle & Round Profile Avatar ── */
-.header-right,
-.gc-nav-right {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  margin-left: auto !important;
-  gap: 0.75rem;
-  position: relative;
-}
-
-.header-icon-btn,
-.gc-icon-btn {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  min-height: 38px;
-  border-radius: 50%;
-  border: 1px solid var(--border-color);
-  background: var(--bg-surface);
-  color: var(--text-main);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  position: relative;
-  padding: 0;
-  transition: all 0.18s ease;
-}
-
-.header-icon-btn:hover,
-.gc-icon-btn:hover {
-  background: var(--bg-surface-hover, var(--bg-surface));
-  color: var(--color-primary);
-  border-color: var(--color-primary-light, var(--color-primary));
-  transform: translateY(-1px);
-}
-
-/* ── Round User Profile Avatar Trigger ── */
+/* Profile Avatar Button */
 .header-profile-round-btn,
 .gc-user-avatar {
   width: 38px;
@@ -236,7 +180,7 @@
   padding: 0;
   outline: none;
   box-shadow: 0 2px 8px hsl(217 91% 60% / 0.25);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
 }
 
@@ -245,7 +189,6 @@
 .gc-user-avatar:hover {
   border-color: var(--color-primary);
   transform: translateY(-1px) scale(1.05);
-  box-shadow: 0 4px 14px hsl(217 91% 60% / 0.4);
 }
 
 .user-avatar-initials {
@@ -266,7 +209,7 @@
   border-radius: 50%;
 }
 
-/* Invisible Hover Bridge: Bridges the 8px gap between trigger and popover */
+/* Hover bridge to keep dropdown open during mouse movement */
 .header-profile-round-btn::after {
   content: '';
   position: absolute;
@@ -278,107 +221,13 @@
   pointer-events: auto;
 }
 
-/* ── Interactive Notifications Dropdown Popover ── */
-.header-notifications-dropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 50px;
-  width: 320px;
-  max-width: calc(100vw - 2rem);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  box-shadow: 0 12px 32px hsl(0 0% 0% / 0.2), 0 0 0 1px var(--border-color);
-  padding: 0.85rem;
-  box-sizing: border-box;
-  display: none;
-  flex-direction: column;
-  z-index: 10050;
-  animation: headerMenuSlideIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.header-notifications-dropdown.show {
-  display: flex !important;
-}
-
-.notif-dropdown-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.35rem 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.notif-header-title {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.notif-header-badge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  background: var(--color-primary-light, hsl(215 90% 95%));
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-.notif-items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  padding-top: 0.65rem;
-}
-
-.notif-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  padding: 0.6rem;
-  border-radius: 10px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  transition: background 0.15s ease;
-  cursor: pointer;
-}
-
-.notif-item:hover {
-  background: var(--bg-hover, hsl(210 20% 94%));
-}
-
-.notif-icon-circle {
-  font-size: 1.15rem;
-  line-height: 1;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.notif-item-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.notif-item-title {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-main);
-  line-height: 1.3;
-}
-
-.notif-item-sub {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  margin-top: 0.2rem;
-}
-
-/* ── Interactive Profile Dropdown Popover ── */
+/* ── 4. Dropdown Popovers (Notifications, Profile & Apps) ── */
 .header-profile-dropdown,
-.user-profile-popover {
+.user-profile-popover,
+.header-notifications-dropdown,
+.apps-launcher-dropdown {
   position: absolute;
   top: calc(100% + 10px);
-  right: 0;
-  width: 260px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 14px;
@@ -388,39 +237,27 @@
   display: none;
   flex-direction: column;
   z-index: 100050 !important;
-  animation: headerMenuSlideIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: headerSlideIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .header-profile-dropdown.show,
 .header-profile-dropdown.open,
 .user-profile-popover.show,
-.user-profile-popover.open {
+.user-profile-popover.open,
+.header-notifications-dropdown.show {
   display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
 }
 
-@media (max-width: 768px) {
-  .header-profile-dropdown,
-  .user-profile-popover {
-    position: fixed !important;
-    top: 64px !important;
-    right: 12px !important;
-    width: min(280px, calc(100vw - 24px)) !important;
-    z-index: 100050 !important;
-    box-shadow: 0 16px 40px hsl(0 0% 0% / 0.35) !important;
-  }
+@keyframes headerSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes headerMenuSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Profile Dropdown Specifics */
+.header-profile-dropdown,
+.user-profile-popover {
+  right: 0;
+  width: 260px;
 }
 
 .profile-dropdown-user-card {
@@ -434,7 +271,6 @@
   width: 42px;
   height: 42px;
   min-width: 42px;
-  min-height: 42px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: var(--text-white, hsl(0 0% 100%));
@@ -444,7 +280,6 @@
   font-size: 0.95rem;
   font-weight: 700;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px hsl(217 91% 60% / 0.3);
 }
 
 .dropdown-user-meta {
@@ -499,29 +334,17 @@
   color: var(--text-main);
   text-decoration: none;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 500;
+  transition: all 0.15s ease;
   background: transparent;
   border: none;
-  cursor: pointer;
   width: 100%;
   box-sizing: border-box;
-  text-align: left;
-  transition: all 0.15s ease;
+  cursor: pointer;
 }
 
 .profile-dropdown-item:hover {
   background: var(--bg-surface-hover, var(--bg-surface));
-  color: var(--color-primary);
-  transform: translateX(2px);
-}
-
-.profile-dropdown-item svg {
-  color: var(--text-muted);
-  transition: color 0.15s ease;
-  flex-shrink: 0;
-}
-
-.profile-dropdown-item:hover svg {
   color: var(--color-primary);
 }
 
@@ -534,62 +357,138 @@
   color: var(--status-absent, hsl(0 84% 60%)) !important;
 }
 
-.dropdown-logout-btn svg {
-  color: var(--status-absent, hsl(0 84% 60%)) !important;
+/* Notifications Dropdown Specifics */
+.header-notifications-dropdown {
+  right: 50px;
+  width: 320px;
+  max-width: calc(100vw - 2rem);
 }
 
-/* ── Academic Apps Launcher Dropdown Grid ── */
-.apps-launcher-dropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 48px;
-  width: 320px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: 0 16px 40px hsl(0 0% 0% / 0.22), 0 0 0 1px var(--border-color);
-  padding: 1rem;
-  box-sizing: border-box;
-  display: none;
-  grid-template-columns: repeat(3, 1fr);
+.notif-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notif-header-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.notif-header-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.notif-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding-top: 0.65rem;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
   gap: 0.65rem;
-  z-index: 10050;
-  animation: headerMenuSlideIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  padding: 0.6rem;
+  border-radius: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.notif-item:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+}
+
+.notif-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-item-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.notif-item-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+/* Apps Launcher Specifics */
+.apps-launcher-dropdown {
+  right: 90px;
+  width: 320px;
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
 }
 
 .app-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.75rem 0.35rem;
+  padding: 0.65rem 0.35rem;
   border-radius: 10px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
   text-decoration: none;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-  transition: all 0.18s ease;
+  color: var(--text-main);
+  font-size: 0.72rem;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
 }
 
 .app-tile:hover {
   background: var(--bg-surface-hover, var(--bg-surface));
-  border-color: var(--color-primary-light, var(--color-primary));
   color: var(--color-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px hsl(0 0% 0% / 0.08);
+  border-color: var(--border-color);
 }
 
-.app-tile-icon {
-  color: var(--color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* ── 5. Responsive Mobile (<= 768px) ── */
+@media (max-width: 768px) {
+  .faculty-top-header,
+  #faculty-header,
+  .gc-navbar.admin-top-header,
+  .admin-top-header {
+    height: 58px !important;
+    padding: 0 0.85rem !important;
+  }
 
-.hod-only-tile {
-  border-style: dashed;
+  .header-mobile-toggle-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .header-brand-title {
+    font-size: 1rem !important;
+  }
+
+  .header-brand-badge {
+    font-size: 0.62rem !important;
+    padding: 0.1rem 0.35rem !important;
+  }
+
+  .header-profile-dropdown,
+  .user-profile-popover {
+    position: fixed !important;
+    top: 64px !important;
+    right: 12px !important;
+    width: min(280px, calc(100vw - 24px)) !important;
+    box-shadow: 0 16px 40px hsl(0 0% 0% / 0.35) !important;
+  }
 }

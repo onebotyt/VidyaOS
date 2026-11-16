@@ -1,19 +1,11 @@
 /**
  * ══════════════════════════════════════════════════════════════
- * VIDYAOS FACULTY DUAL-STATE SIDEBAR & MOBILE HEADER (sidebar.css)
- * Location: /frontend/faculty/components/sidebar/sidebar.css
- * 
- * 1. Desktop Rail (72px collapsed) & Floating Overlay Drawer (260px)
- * 2. Zero Layout Shift: Page content stays permanently at margin-left: 72px
- * 3. Hamburger Flyout Model: Menu opens OVER the page with soft backdrop
- * 4. Only Expand Arrow in Rail (three lines removed)
- * 5. 3D Tactile Squircles & Clean Vector Navigation
- * 6. Mobile Drawer (280px slideout) & Mobile Top Header (56px)
- * 7. 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * VIDYAOS FACULTY DUAL-STATE SIDEBAR & MOBILE NAVIGATION (sidebar.css)
+ * Optimized & Streamlined (Zero Redundancy, 100% Theme Tokenized)
  * ══════════════════════════════════════════════════════════════
  */
 
-/* ── 1. Root Layout ── */
+/* ── 1. Root Layout & Content Canvas ── */
 .faculty-app-layout {
   min-height: 100vh;
   min-height: 100dvh;
@@ -24,10 +16,9 @@
   box-sizing: border-box;
 }
 
-/* ── 2. Unified Sidebar (#vidya-faculty-sidebar / .faculty-sidebar) ── */
+/* ── 2. Unified Base Sidebar (#faculty-sidebar) ── */
 #vidya-faculty-sidebar,
 #faculty-sidebar,
-#app-sidebar.faculty-sidebar,
 .faculty-sidebar {
   position: fixed !important;
   top: 60px !important;
@@ -45,16 +36,37 @@
   transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* ── 3. Desktop Styles (>= 769px) ── */
-@media (min-width: 769px) {
+/* Navigation scroll body */
+.faculty-sidebar .sidebar-nav-body {
+  flex: 1 1 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0.4rem 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--border-color) transparent !important;
+  box-sizing: border-box !important;
+}
 
-  /* 
-   * ZERO CONTENT LAYOUT SHIFT INVARIANT:
-   * .faculty-main-wrap sits PERMANENTLY at margin-left: 72px!
-   * Content starts below 60px fixed top header.
-   */
+.faculty-sidebar .sidebar-nav-body::-webkit-scrollbar {
+  width: 4px;
+}
+.faculty-sidebar .sidebar-nav-body::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+/* ── 3. Desktop Mode (>= 769px) ── */
+@media (min-width: 769px) {
+  /* Permanent 72px rail margin for zero layout shift */
   .faculty-main-wrap,
-  .admin-main-wrap {
+  .admin-main-wrap,
+  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap)) > main {
     margin-left: 72px !important;
     width: calc(100% - 72px) !important;
     max-width: calc(100% - 72px) !important;
@@ -67,208 +79,17 @@
     overflow-x: hidden !important;
   }
 
-  /* Support pages without .faculty-main-wrap container */
-  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>main,
-  body:not(.no-sidebar):not(:has(.faculty-main-wrap)):not(:has(.admin-main-wrap))>.container {
-    margin-left: 72px !important;
-    width: calc(100% - 72px) !important;
-    max-width: calc(100% - 72px) !important;
-    padding-top: 60px !important;
-    box-sizing: border-box !important;
-  }
-
-  /* 
-   * Default Desktop State: Collapsed 72px Mini-Rail
-   */
-  #vidya-faculty-sidebar:not(.desktop-open),
-  #faculty-sidebar:not(.desktop-open),
-  #app-sidebar.faculty-sidebar:not(.desktop-open),
+  /* 3.1 Collapsed Rail (72px) - Default */
   .faculty-sidebar:not(.desktop-open) {
     width: 72px !important;
     min-width: 72px !important;
     max-width: 72px !important;
     transform: none !important;
     box-shadow: none !important;
-    transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
   }
 
-  /* In PC mode, full size top header spans entire top; rail header and expanded headers are hidden */
-  .sidebar-rail-header,
-  .sidebar-expanded-header,
-  .sidebar-rail-footer {
-    display: none !important;
-  }
-
-  /* ─────────────────────────────────────────────────────────────
-     Desktop Collapsed Rail Components (72px)
-     ───────────────────────────────────────────────────────────── */
-  .sidebar-rail-header {
-    height: 64px;
-    width: 72px;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    flex-shrink: 0;
-    border-bottom: 1px solid var(--border-color);
-    box-sizing: border-box;
-    position: relative !important;
-    overflow: visible !important;
-    z-index: 10002 !important;
-  }
-
-  .rail-brand-row {
-    width: 72px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    position: relative !important;
-    overflow: visible !important;
-    z-index: 10003 !important;
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-  }
-
-  /* Exact horizontal geometry: width 46px, margin 0 13px = center precisely at x = 36px */
-  .rail-logo-link {
-    width: 46px;
-    height: 46px;
-    margin: 0 13px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    flex-shrink: 0;
-    box-sizing: border-box;
-  }
-
-  .rail-logo-link:hover {
-    transform: scale(1.08) rotate(2deg);
-  }
-
-  .rail-cube-logo {
-    width: 32px;
-    height: 32px;
-    filter: drop-shadow(0 2px 6px hsl(217 91% 60% / 0.35));
-    display: block;
-  }
-
-  /* Circular 3D Expand Arrow Button */
-  .rail-expand-btn {
-    position: absolute !important;
-    left: 55px !important;
-    right: auto !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    z-index: 10010 !important;
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    min-height: 34px !important;
-    border-radius: 50% !important;
-    background: var(--bg-card) !important;
-    color: var(--color-primary) !important;
-    border: 2px solid var(--color-primary) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    padding: 0 !important;
-    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.35), 0 2px 4px hsl(0 0% 0% / 0.12) !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-
-  .rail-expand-btn:hover {
-    background: var(--color-primary) !important;
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-    border-color: var(--color-primary-hover) !important;
-    transform: translateY(-50%) scale(1.12) !important;
-    box-shadow: 0 6px 20px hsl(217 91% 60% / 0.5) !important;
-  }
-
-  .rail-expand-btn:hover svg {
-    stroke: var(--text-white, hsl(0 0% 100%)) !important;
-  }
-
-  /* Unified Navigation Body: Fully scrollable and auto-fitting across all screen heights */
-  .faculty-sidebar .sidebar-nav-body,
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-body,
-  .faculty-sidebar.desktop-open .sidebar-nav-body,
-  .faculty-app-layout.sidebar-collapsed .sidebar-nav-body,
-  html.sidebar-collapsed .sidebar-nav-body {
-    flex: 1 1 100% !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    min-height: 0 !important;
-    padding: 0.4rem 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    overscroll-behavior-y: contain !important;
-    scrollbar-width: thin !important;
-    scrollbar-color: var(--border-color) transparent !important;
-  }
-
-  .faculty-sidebar.desktop-open .sidebar-nav-body {
-    padding: 0.5rem 0.65rem !important;
-    gap: 0.35rem !important;
-  }
-
-  .faculty-sidebar .sidebar-nav-body::-webkit-scrollbar,
-  .sidebar-nav-body::-webkit-scrollbar {
-    width: 4px !important;
-  }
-
-  .faculty-sidebar .sidebar-nav-body::-webkit-scrollbar-thumb,
-  .sidebar-nav-body::-webkit-scrollbar-thumb {
-    background: var(--border-color) !important;
-    border-radius: 4px !important;
-  }
-
-  /* Section header for HOD items */
-  .sidebar-section-header {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 0.75rem 1.25rem 0.35rem;
-    white-space: nowrap;
-    opacity: 0.85;
-  }
-
-  .faculty-sidebar:not(.desktop-open) .sidebar-section-header {
-    display: none !important;
-  }
-
-  /* ── Universal Navigation Item ── */
-  .sidebar-nav-item {
-    box-sizing: border-box;
-    display: flex;
-    position: relative;
-    color: var(--text-muted);
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.16s ease;
-  }
-
-  /* ── Desktop Collapsed Rail Mode: 3D Tactile Squircle Box (Matching Admin Parity) ── */
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-item,
-  #faculty-sidebar:not(.desktop-open) .sidebar-nav-item,
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item,
-  .faculty-app-layout.sidebar-collapsed .sidebar-nav-item,
-  html.sidebar-collapsed .sidebar-nav-item {
+  /* 3D Tactile Squircle Nav Item */
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item {
     width: 58px !important;
     height: 48px !important;
     min-width: 58px !important;
@@ -284,112 +105,86 @@
     border: 1px solid var(--border-color) !important;
     box-shadow: 0 1px 3px hsl(0 0% 0% / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.7) !important;
     color: var(--text-muted) !important;
+    text-decoration: none !important;
     gap: 1px !important;
-    overflow: visible !important;
+    box-sizing: border-box !important;
     transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    flex-shrink: 0 !important;
   }
 
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-icon,
-  #faculty-sidebar:not(.desktop-open) .sidebar-nav-icon,
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-icon,
-  .faculty-app-layout.sidebar-collapsed .sidebar-nav-icon,
-  html.sidebar-collapsed .sidebar-nav-icon {
-    width: 22px !important;
-    height: 22px !important;
-    min-width: 22px !important;
-    max-width: 22px !important;
-    min-height: 22px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-icon svg,
-  #faculty-sidebar:not(.desktop-open) .sidebar-nav-icon svg,
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-icon svg,
-  .faculty-app-layout.sidebar-collapsed .sidebar-nav-icon svg,
-  html.sidebar-collapsed .sidebar-nav-icon svg {
-    width: 18px !important;
-    height: 18px !important;
-    stroke: currentColor !important;
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    display: block;
+  }
+
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label {
     display: block !important;
+    font-size: 0.54rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    text-align: center !important;
+    line-height: 1.1 !important;
+    color: inherit !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-top: 1px !important;
+    pointer-events: none !important;
   }
 
-  /* Short name shown below icon in small collapsed navbar (Desktop Rail only) */
-  @media (min-width: 769px) {
-    #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
-    #faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
-    .faculty-sidebar:not(.desktop-open) .sidebar-nav-short-label,
-    .faculty-app-layout.sidebar-collapsed .sidebar-nav-short-label,
-    html.sidebar-collapsed .sidebar-nav-short-label {
-      display: block !important;
-      font-size: 0.54rem !important;
-      font-weight: 600 !important;
-      letter-spacing: -0.01em !important;
-      text-align: center !important;
-      line-height: 1.1 !important;
-      color: inherit !important;
-      white-space: nowrap !important;
-      overflow: hidden !important;
-      text-overflow: clip !important;
-      max-width: 100% !important;
-      width: 100% !important;
-      margin-top: 1px !important;
-      pointer-events: none !important;
-    }
-
-    /* Full label hidden in collapsed rail */
-    #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
-    #faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
-    .faculty-sidebar:not(.desktop-open) .sidebar-nav-label,
-    .faculty-app-layout.sidebar-collapsed .sidebar-nav-label,
-    html.sidebar-collapsed .sidebar-nav-label {
-      display: none !important;
-    }
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-label {
+    display: none !important;
   }
 
-  /* Hover state on 3D squircle rail */
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-item:hover:not(.active),
-  #faculty-sidebar:not(.desktop-open) .sidebar-nav-item:hover:not(.active),
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item:hover:not(.active),
-  .faculty-app-layout.sidebar-collapsed .sidebar-nav-item:hover:not(.active),
-  html.sidebar-collapsed .sidebar-nav-item:hover:not(.active) {
+  /* Hover & Active States (Rail) */
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item:hover:not(.active) {
     background: var(--bg-surface-hover, var(--bg-surface)) !important;
-    border-color: var(--color-primary-light) !important;
+    border-color: var(--color-primary-light, var(--color-primary)) !important;
     color: var(--color-primary) !important;
     transform: translateY(-2px) scale(1.05) !important;
     box-shadow: 0 4px 10px hsl(217 91% 60% / 0.16) !important;
   }
 
-  /* Active 3D squircle pill on collapsed rail */
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active,
-  #faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active,
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active,
-  .faculty-app-layout.sidebar-collapsed .sidebar-nav-item.active,
-  html.sidebar-collapsed .sidebar-nav-item.active {
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active {
     background: linear-gradient(145deg, hsl(217 91% 62%), hsl(224 76% 48%)) !important;
     border: 1px solid hsl(217 91% 54%) !important;
     color: var(--text-white, hsl(0 0% 100%)) !important;
-    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.42), inset 0 1px 1px hsl(0 0% 100% / 0.5), inset 0 -2px 3px hsl(224 76% 36% / 0.45) !important;
+    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.42), inset 0 1px 1px hsl(0 0% 100% / 0.5) !important;
+  }
+
+  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-icon svg {
+    stroke: var(--text-white, hsl(0 0% 100%)) !important;
+  }
+
+  /* 3.2 Expanded Flyout Overlay Drawer (260px) */
+  .faculty-sidebar.desktop-open {
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+    box-shadow: 16px 0 36px hsl(0 0% 0% / 0.22) !important;
     transform: none !important;
   }
 
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-icon svg,
-  #faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-icon svg,
-  .faculty-sidebar:not(.desktop-open) .sidebar-nav-item.active .sidebar-nav-icon svg {
-    stroke: var(--text-white, hsl(0 0% 100%)) !important;
-    filter: drop-shadow(0 1px 2px hsl(224 76% 30% / 0.45)) !important;
+  .faculty-sidebar.desktop-open .sidebar-nav-body {
+    padding: 0.5rem 0.65rem !important;
+    gap: 0.35rem !important;
   }
 
-  /* ── Desktop Expanded Flyout Drawer: Horizontal capsule row ── */
   .faculty-sidebar.desktop-open .sidebar-nav-item {
     width: 234px !important;
     height: 46px !important;
-    margin: 0.2rem 13px !important;
+    margin: 0.2rem auto !important;
     flex-direction: row !important;
     justify-content: flex-start !important;
     align-items: center !important;
@@ -398,43 +193,12 @@
     border-radius: 12px !important;
     background: var(--bg-surface) !important;
     border: 1px solid var(--border-color) !important;
-    box-shadow: 0 2px 4px hsl(0 0% 0% / 0.05), inset 0 1px 0 hsl(0 0% 100% / 0.7) !important;
+    box-shadow: 0 2px 4px hsl(0 0% 0% / 0.05) !important;
     color: var(--text-muted) !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
     overflow: hidden !important;
-  }
-
-  /* Expand/Collapse button inside sidebar navigation links (Desktop only) */
-  @media (min-width: 769px) {
-    .faculty-sidebar .sidebar-rail-toggle-item,
-    #faculty-sidebar .sidebar-rail-toggle-item,
-    #vidya-faculty-sidebar .sidebar-rail-toggle-item {
-      display: flex !important;
-      cursor: pointer !important;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .faculty-sidebar .sidebar-rail-toggle-item,
-    #faculty-sidebar .sidebar-rail-toggle-item,
-    #vidya-faculty-sidebar .sidebar-rail-toggle-item {
-      display: none !important;
-    }
-  }
-
-  .faculty-sidebar.desktop-open .sidebar-nav-icon {
-    width: 24px !important;
-    height: 24px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-  }
-
-  .faculty-sidebar.desktop-open .sidebar-nav-icon svg {
-    width: 20px !important;
-    height: 20px !important;
-    stroke: currentColor !important;
-    display: block !important;
+    transition: all 0.16s ease !important;
   }
 
   .faculty-sidebar.desktop-open .sidebar-nav-short-label {
@@ -443,500 +207,183 @@
 
   .faculty-sidebar.desktop-open .sidebar-nav-label {
     display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
     font-size: 0.88rem !important;
     font-weight: 600 !important;
-    white-space: nowrap !important;
     color: inherit !important;
-    pointer-events: auto !important;
+    white-space: nowrap !important;
   }
 
   .faculty-sidebar.desktop-open .sidebar-nav-item:hover:not(.active) {
     background: var(--bg-surface-hover, var(--bg-surface)) !important;
-    border-color: var(--color-primary-light) !important;
     color: var(--color-primary) !important;
+    border-color: var(--color-primary-light, var(--color-primary)) !important;
+    transform: translateX(3px) !important;
   }
 
   .faculty-sidebar.desktop-open .sidebar-nav-item.active {
-    background: linear-gradient(145deg, hsl(217 91% 62%), hsl(224 76% 48%)) !important;
-    border: 1px solid hsl(217 91% 54%) !important;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
     color: var(--text-white, hsl(0 0% 100%)) !important;
-    box-shadow: 0 4px 14px hsl(217 91% 60% / 0.42) !important;
+    border-color: var(--color-primary-hover) !important;
+    box-shadow: 0 4px 12px hsl(217 91% 60% / 0.32) !important;
   }
 
   .faculty-sidebar.desktop-open .sidebar-nav-item.active .sidebar-nav-icon svg {
     stroke: var(--text-white, hsl(0 0% 100%)) !important;
-    filter: drop-shadow(0 1px 2px hsl(224 76% 30% / 0.45));
   }
 
-/* ─────────────────────────────────────────────────────────────
-     Desktop Floating Overlay Drawer (260px)
-     ───────────────────────────────────────────────────────────── */
-#vidya-faculty-sidebar.desktop-open,
-#faculty-sidebar.desktop-open,
-.faculty-sidebar.desktop-open {
-  width: 260px !important;
-  min-width: 260px !important;
-  max-width: 260px !important;
-  box-shadow: 12px 0 36px hsl(0 0% 0% / 0.22), 0 0 0 1px var(--border-color) !important;
-  transition: width 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
-}
-
-.faculty-sidebar.desktop-open .sidebar-rail-header,
-.faculty-sidebar.desktop-open .sidebar-rail-footer {
-  display: none !important;
-}
-
-.faculty-sidebar.desktop-open .sidebar-expanded-header {
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-  padding: 0 1rem 0 1.25rem;
-  border-bottom: 1px solid var(--border-color);
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-.sidebar-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.sidebar-header-cube-icon {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sidebar-header-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.01em;
-}
-
-.sidebar-desktop-collapse-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.sidebar-desktop-collapse-btn:hover {
-  background: var(--color-primary);
-  color: var(--text-white, hsl(0 0% 100%));
-  border-color: var(--color-primary);
-}
-
-.sidebar-mobile-close-btn {
-  display: none !important;
-}
-
-/* ── 3. Unified Sidebar Footer & Rail Toggle: Permanently removed (Auth & expand are on Top Header) ── */
-.sidebar-expanded-footer,
-.sidebar-rail-toggle-item,
-.sidebar-rail-footer {
-  display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
-  max-height: 0 !important;
-  overflow: hidden !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  pointer-events: none !important;
-}
-
-.sidebar-user-card {
-  display: flex !important;
-  align-items: center !important;
-  border-radius: 12px !important;
-  border: 1px solid var(--border-color) !important;
-  background: var(--bg-surface) !important;
-  text-decoration: none !important;
-  color: inherit !important;
-  cursor: pointer !important;
-  box-sizing: border-box !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.sidebar-user-card:hover {
-  background: var(--bg-surface-hover, var(--bg-surface)) !important;
-  border-color: var(--color-primary-light) !important;
-}
-
-@media (min-width: 769px) {
-  .faculty-sidebar:not(.desktop-open) .sidebar-user-card,
-  #faculty-sidebar:not(.desktop-open) .sidebar-user-card,
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-user-card {
-    width: 48px !important;
-    min-width: 48px !important;
-    max-width: 48px !important;
-    height: 44px !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    justify-content: center !important;
-    gap: 0 !important;
+  /* 3.3 Zero-Latency Instant CSS Tooltips (Rail Only) */
+  .faculty-sidebar:not(.desktop-open) [data-tooltip] {
+    position: relative;
   }
 
-  .faculty-sidebar.desktop-open .sidebar-user-card,
-  #faculty-sidebar.desktop-open .sidebar-user-card,
-  #vidya-faculty-sidebar.desktop-open .sidebar-user-card {
-    width: 234px !important;
-    min-width: 234px !important;
-    max-width: 234px !important;
-    height: 48px !important;
-    margin: 0 !important;
-    padding: 0.45rem 0.65rem !important;
-    justify-content: flex-start !important;
-    gap: 0.65rem !important;
+  .faculty-sidebar:not(.desktop-open) [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 14px);
+    top: 50%;
+    background: var(--text-main);
+    color: var(--bg-card);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px hsl(0 0% 0% / 0.18);
+    border: 1px solid var(--border-color);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%) translateX(-4px);
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+    z-index: 100050 !important;
   }
 
-  .faculty-sidebar:not(.desktop-open) .sidebar-user-avatar,
-  #faculty-sidebar:not(.desktop-open) .sidebar-user-avatar,
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-user-avatar {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    font-size: 0.78rem !important;
+  .faculty-sidebar:not(.desktop-open) [data-tooltip]::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 8px);
+    top: 50%;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 6px solid var(--text-main);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%) translateX(-4px);
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+    z-index: 100051 !important;
   }
 
-  .faculty-sidebar.desktop-open .sidebar-user-avatar,
-  #faculty-sidebar.desktop-open .sidebar-user-avatar,
-  #vidya-faculty-sidebar.desktop-open .sidebar-user-avatar {
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    font-size: 0.84rem !important;
+  .faculty-sidebar:not(.desktop-open) [data-tooltip]:hover::after,
+  .faculty-sidebar:not(.desktop-open) [data-tooltip]:hover::before {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(-50%) translateX(0) !important;
+  }
+}
+
+/* ── 4. Mobile Mode (<= 768px) ── */
+@media (max-width: 768px) {
+  .faculty-main-wrap,
+  .admin-main-wrap {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-top: 58px !important;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  .faculty-sidebar:not(.desktop-open) .sidebar-user-meta,
-  #faculty-sidebar:not(.desktop-open) .sidebar-user-meta,
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-user-meta {
-    display: none !important;
-    opacity: 0 !important;
-    max-width: 0 !important;
+  /* Slideout Drawer */
+  .faculty-sidebar {
+    position: fixed !important;
+    top: 58px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: calc(100dvh - 58px) !important;
+    width: 280px !important;
+    max-width: 85vw !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: none !important;
+    z-index: 10000 !important;
   }
 
-  .faculty-sidebar.desktop-open .sidebar-user-meta,
-  #faculty-sidebar.desktop-open .sidebar-user-meta,
-  #vidya-faculty-sidebar.desktop-open .sidebar-user-meta {
+  .faculty-sidebar.open,
+  .faculty-sidebar.sidebar-open {
+    transform: translateX(0) !important;
+    box-shadow: 16px 0 40px hsl(0 0% 0% / 0.35) !important;
+  }
+
+  .faculty-sidebar .sidebar-nav-body {
+    padding: 0.75rem 0.65rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .faculty-sidebar .sidebar-nav-item {
+    height: 46px !important;
+    border-radius: 12px !important;
     display: flex !important;
-    flex-direction: column !important;
-    opacity: 1 !important;
-    max-width: 155px !important;
-    overflow: hidden !important;
-    line-height: 1.25 !important;
-  }
-}
-
-.sidebar-user-avatar {
-  border-radius: 50% !important;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
-  color: var(--text-white, hsl(0 0% 100%)) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-weight: 700 !important;
-  flex-shrink: 0 !important;
-}
-
-.sidebar-user-meta {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.sidebar-user-name {
-  font-size: 0.85rem !important;
-  font-weight: 700 !important;
-  color: var(--text-main) !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-.sidebar-user-sub {
-  font-size: 0.72rem !important;
-  color: var(--text-muted) !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-/* Sign Out Button */
-.sidebar-signout-card-btn {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-sizing: border-box !important;
-  border-radius: 10px !important;
-  border: 1px solid var(--status-absent-bg, hsl(0 84% 92%)) !important;
-  background: var(--status-absent-bg, hsl(0 84% 95%)) !important;
-  color: var(--status-absent, hsl(0 84% 60%)) !important;
-  font-size: 0.84rem !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.sidebar-signout-card-btn:hover {
-  background: var(--status-absent, hsl(0 84% 60%)) !important;
-  color: var(--text-white, hsl(0 0% 100%)) !important;
-}
-
-@media (min-width: 769px) {
-  .faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn,
-  #faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn,
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn {
-    width: 48px !important;
-    min-width: 48px !important;
-    max-width: 48px !important;
-    height: 38px !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    gap: 0 !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 0 0.85rem !important;
+    gap: 0.75rem !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-muted) !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
   }
 
-  .faculty-sidebar.desktop-open .sidebar-signout-card-btn,
-  #faculty-sidebar.desktop-open .sidebar-signout-card-btn,
-  #vidya-faculty-sidebar.desktop-open .sidebar-signout-card-btn {
-    width: 234px !important;
-    min-width: 234px !important;
-    max-width: 234px !important;
-    height: 40px !important;
-    margin: 0 !important;
-    padding: 0.55rem 0.85rem !important;
-    gap: 0.5rem !important;
-  }
-
-  .faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn span,
-  #faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn span,
-  #vidya-faculty-sidebar:not(.desktop-open) .sidebar-signout-card-btn span {
+  .faculty-sidebar .sidebar-nav-short-label {
     display: none !important;
   }
 
-  .faculty-sidebar.desktop-open .sidebar-signout-card-btn span,
-  #faculty-sidebar.desktop-open .sidebar-signout-card-btn span,
-  #vidya-faculty-sidebar.desktop-open .sidebar-signout-card-btn span {
-    display: inline !important;
-    opacity: 1 !important;
+  .faculty-sidebar .sidebar-nav-label {
+    display: block !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    color: inherit !important;
+    white-space: nowrap !important;
+  }
+
+  /* Hide redundant home link in mobile drawer (Home is on bottom bar) */
+  .faculty-sidebar [data-nav="dashboard"] {
+    display: none !important;
+  }
+
+  .faculty-sidebar .sidebar-nav-item:active {
+    background: var(--bg-surface-hover, var(--bg-surface)) !important;
+    color: var(--color-primary) !important;
+  }
+
+  .faculty-sidebar .sidebar-nav-item.active {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
+    color: var(--text-white, hsl(0 0% 100%)) !important;
+    border-color: var(--color-primary-hover) !important;
+  }
+
+  .faculty-sidebar .sidebar-nav-item.active .sidebar-nav-icon svg {
+    stroke: var(--text-white, hsl(0 0% 100%)) !important;
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   FACULTY LOGOUT CONFIRMATION MODAL
-   ══════════════════════════════════════════════════════════════ */
-.faculty-logout-modal {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background: hsl(0 0% 0% / 0.55) !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
-  z-index: 100060 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 1.25rem !important;
-  box-sizing: border-box !important;
-  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.faculty-logout-modal:not(.open) {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-.faculty-logout-modal.open {
-  display: flex !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
-.faculty-logout-dialog {
-  background: var(--bg-card) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 20px !important;
-  width: 100% !important;
-  max-width: 420px !important;
-  padding: 1.6rem 1.6rem 1.4rem !important;
-  box-shadow: 0 24px 60px hsl(0 0% 0% / 0.28), 0 0 0 1px hsl(0 0% 100% / 0.06) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 1.4rem !important;
-  box-sizing: border-box !important;
-  transform: scale(0.94) translateY(8px);
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.faculty-logout-modal.open .faculty-logout-dialog {
-  transform: scale(1) translateY(0) !important;
-}
-
-.faculty-logout-dialog-header {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 1rem !important;
-}
-
-.faculty-logout-icon-bubble {
-  width: 50px !important;
-  height: 50px !important;
-  min-width: 50px !important;
-  min-height: 50px !important;
-  border-radius: 16px !important;
-  background: var(--status-absent-bg, hsl(0 84% 95%)) !important;
-  color: var(--status-absent, hsl(0 84% 58%)) !important;
-  border: 1px solid hsl(0 84% 88%) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-  box-shadow: 0 4px 14px hsl(0 84% 60% / 0.18) !important;
-}
-
-.faculty-logout-text-wrap {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.3rem !important;
-}
-
-.faculty-logout-title {
-  margin: 0 !important;
-  font-size: 1.15rem !important;
-  font-weight: 800 !important;
-  color: var(--text-main) !important;
-  letter-spacing: -0.02em !important;
-}
-
-.faculty-logout-subtitle {
-  margin: 0 !important;
-  font-size: 0.88rem !important;
-  color: var(--text-muted) !important;
-  line-height: 1.45 !important;
-}
-
-.faculty-logout-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 0.75rem !important;
-  margin-top: 0.2rem !important;
-}
-
-.faculty-logout-cancel-btn {
-  padding: 0.6rem 1.15rem !important;
-  border-radius: 10px !important;
-  font-size: 0.88rem !important;
-  font-weight: 600 !important;
-  background: var(--bg-surface) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-main) !important;
-  cursor: pointer !important;
-  transition: all 0.16s ease !important;
-}
-
-.faculty-logout-cancel-btn:hover {
-  background: var(--bg-surface-hover, var(--bg-surface)) !important;
-}
-
-.faculty-logout-confirm-btn {
-  padding: 0.6rem 1.35rem !important;
-  border-radius: 10px !important;
-  font-size: 0.88rem !important;
-  font-weight: 700 !important;
-  background: var(--status-absent, hsl(0 84% 60%)) !important;
-  border: 1px solid var(--status-absent, hsl(0 84% 56%)) !important;
-  color: #ffffff !important;
-  cursor: pointer !important;
-  box-shadow: 0 4px 12px hsl(0 84% 60% / 0.3) !important;
-  transition: all 0.16s ease !important;
-}
-
-.faculty-logout-confirm-btn:hover {
-  filter: brightness(1.08) !important;
-  transform: translateY(-1px) !important;
-}
-
-.rail-footer-btn {
-  width: 56px !important;
-  height: 48px !important;
-  border-radius: 12px;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.16s ease;
-  gap: 2px !important;
-  padding: 2px !important;
-  box-shadow: none !important;
-}
-
-.rail-footer-btn:hover {
-  background: var(--bg-surface-hover, var(--bg-surface));
-  color: var(--color-primary);
-  transform: translateY(-2px);
-}
-
-.rail-footer-btn .rail-user-circle {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: var(--text-white, hsl(0 0% 100%));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  font-weight: 700;
-}
-
-.rail-signout-btn {
-  color: var(--status-absent, hsl(0 84% 60%)) !important;
-}
-
-.rail-signout-btn:hover {
-  background: var(--status-absent-bg, hsl(0 84% 96%)) !important;
-  color: var(--status-absent, hsl(0 84% 60%)) !important;
-}
-
-/* Desktop Flyout Backdrop */
+/* ── 5. Shared Backdrop Overlay ── */
 .sidebar-backdrop,
 .faculty-sidebar-backdrop {
   position: fixed !important;
-  top: 60px !important;
+  top: 58px !important;
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  height: calc(100dvh - 60px) !important;
-  background: hsl(0 0% 0% / 0.35) !important;
+  height: calc(100dvh - 58px) !important;
+  background: hsl(0 0% 0% / 0.45) !important;
   backdrop-filter: blur(4px) !important;
   -webkit-backdrop-filter: blur(4px) !important;
   z-index: 9999 !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.22s ease !important;
+  transition: opacity 0.2s ease !important;
 }
 
 .sidebar-backdrop.active,
@@ -947,710 +394,112 @@
   pointer-events: auto !important;
 }
 
-/* ── Desktop Rail Toggle Expand/Collapse Button: Permanently hidden (Integrated in Top Header) ── */
-.sidebar-rail-toggle-item {
-  display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
-  pointer-events: none !important;
+/* ── 6. Mobile Bottom Navigation Bar (5 Canonical Tabs) ── */
+.mobile-bottom-nav,
+.faculty-mobile-bottom-nav {
+  display: block !important;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border-color) !important;
+  z-index: 9990 !important;
+  box-shadow: 0 -3px 14px hsl(0 0% 0% / 0.07) !important;
+  box-sizing: border-box !important;
 }
 
-.mobile-top-header {
-  display: none !important;
-}
-}
-
-/* ── 4. Mobile Styles (<= 768px) ── */
-@media (max-width: 768px) {
-
-  .faculty-main-wrap,
-  .admin-main-wrap {
-    margin-left: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding-top: 58px !important;
-    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
-  }
-
-  /* ── 4.1 Mobile Top Header ── */
-  .mobile-top-header {
-    position: sticky !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 58px !important;
-    background: var(--bg-card) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0 0.85rem !important;
-    z-index: 9998 !important;
-    box-sizing: border-box !important;
-    box-shadow: 0 1px 4px hsl(0 0% 0% / 0.05) !important;
-  }
-
-  .mobile-header-left {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.65rem !important;
-  }
-
-  .mobile-hamburger-btn {
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    min-height: 38px !important;
-    border-radius: 10px !important;
-    background: var(--bg-surface) !important;
-    border: 1px solid var(--border-color) !important;
-    color: var(--text-main) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    padding: 0 !important;
-    transition: all 0.16s ease !important;
-    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.04) !important;
-  }
-
-  .mobile-hamburger-btn:active {
-    transform: scale(0.93) !important;
-    background: var(--bg-surface-hover, var(--bg-surface)) !important;
-  }
-
-  .mobile-brand-link {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    text-decoration: none !important;
-    color: var(--text-main) !important;
-  }
-
-  .mobile-brand-icon {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1 !important;
-  }
-
-  .mobile-brand-text-wrap {
-    display: flex !important;
-    flex-direction: column !important;
-    line-height: 1.1 !important;
-  }
-
-  .mobile-brand-text {
-    font-size: 1.02rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.01em !important;
-    color: var(--text-main) !important;
-  }
-
-  .mobile-brand-sub {
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
-    color: var(--color-primary) !important;
-    letter-spacing: 0.04em !important;
-    text-transform: uppercase !important;
-  }
-
-  .mobile-header-right {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-  }
-
-  .mobile-header-icon-btn {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-    border-radius: 50% !important;
-    background: var(--bg-surface) !important;
-    border: 1px solid var(--border-color) !important;
-    color: var(--text-main) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    position: relative !important;
-    cursor: pointer !important;
-    padding: 0 !important;
-    transition: all 0.16s ease !important;
-    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.04) !important;
-  }
-
-  .mobile-header-icon-btn:active {
-    transform: scale(0.92) !important;
-    background: var(--bg-surface-hover, var(--bg-surface)) !important;
-  }
-
-  .mobile-bell-badge {
-    position: absolute !important;
-    top: -2px !important;
-    right: -2px !important;
-    background: var(--status-absent, hsl(0 84% 60%)) !important;
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-    font-size: 0.62rem !important;
-    font-weight: 700 !important;
-    border-radius: 50% !important;
-    width: 16px !important;
-    height: 16px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: 2px solid var(--bg-card) !important;
-  }
-
-  .mobile-avatar-btn {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-    border-radius: 50% !important;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-    border: 2px solid var(--border-color) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    position: relative !important;
-    cursor: pointer !important;
-    padding: 0 !important;
-    text-decoration: none !important;
-    box-shadow: 0 2px 6px hsl(217 91% 60% / 0.25) !important;
-    transition: all 0.16s ease !important;
-    box-sizing: border-box !important;
-  }
-
-  .mobile-avatar-btn:active {
-    transform: scale(0.92) !important;
-  }
-
-  .mobile-avatar-initials {
-    font-size: 0.8rem !important;
-    font-weight: 700 !important;
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-    letter-spacing: 0.02em !important;
-  }
-
-  .mobile-avatar-dot {
-    position: absolute !important;
-    bottom: -1px !important;
-    right: -1px !important;
-    width: 9px !important;
-    height: 9px !important;
-    background: var(--status-present, hsl(142 71% 45%)) !important;
-    border: 2px solid var(--bg-card) !important;
-    border-radius: 50% !important;
-  }
-
-  /* ── 4.2 Mobile Slideout Drawer (<= 768px) ── */
-  #vidya-faculty-sidebar,
-  #faculty-sidebar,
-  #app-sidebar.faculty-sidebar,
-  .faculty-sidebar {
-    position: fixed !important;
-    top: 58px !important;
-    left: 0 !important;
-    bottom: 0 !important;
-    height: calc(100dvh - 58px) !important;
-    width: 280px !important;
-    max-width: 85vw !important;
-    transform: translateX(-100%) !important;
-    transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    box-shadow: none !important;
-    border-right: 1px solid var(--border-color) !important;
-    background: var(--bg-card) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    z-index: 10000 !important;
-  }
-
-  #vidya-faculty-sidebar.open,
-  #vidya-faculty-sidebar.sidebar-open,
-  #faculty-sidebar.open,
-  #faculty-sidebar.sidebar-open,
-  .faculty-sidebar.open,
-  .faculty-sidebar.sidebar-open {
-    transform: translateX(0) !important;
-    box-shadow: 16px 0 40px hsl(0 0% 0% / 0.35) !important;
-  }
-
-  /* Redundant sidebar headers and collapse buttons hidden across mobile */
-  .sidebar-rail-header,
-  .sidebar-rail-footer,
-  .sidebar-expanded-header,
-  .sidebar-desktop-collapse-btn,
-  .sidebar-mobile-close-btn,
-  .sidebar-rail-toggle-item {
-    display: none !important;
-  }
-
-  .sidebar-nav-body {
-    padding: 0.75rem 0.65rem !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.4rem !important;
-    overflow-y: auto !important;
-    flex: 1 !important;
-    box-sizing: border-box !important;
-  }
-
-  /* CRITICAL: HIDE SHORT LABELS ON MOBILE TO ELIMINATE DUPLICATION */
-  #faculty-sidebar .sidebar-nav-short-label,
-  #vidya-faculty-sidebar .sidebar-nav-short-label,
-  .faculty-sidebar .sidebar-nav-short-label,
-  .sidebar-nav-short-label {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-
-  /* HIDE DASHBOARD LINK ON MOBILE (USER REQUIREMENT) */
-  #faculty-sidebar [data-nav="dashboard"],
-  #vidya-faculty-sidebar [data-nav="dashboard"],
-  .faculty-sidebar [data-nav="dashboard"] {
-    display: none !important;
-  }
-
-  /* SINGLE CLEAN FULL LABEL ON MOBILE */
-  .sidebar-nav-label {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    font-size: 0.88rem !important;
-    font-weight: 600 !important;
-    letter-spacing: -0.01em !important;
-    color: inherit !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    pointer-events: auto !important;
-  }
-
-  .sidebar-nav-item {
-    margin: 0 !important;
-    height: 46px !important;
-    border-radius: 12px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    padding: 0 0.85rem !important;
-    gap: 0.75rem !important;
-    background: var(--bg-surface) !important;
-    border: 1px solid var(--border-color) !important;
-    box-shadow: 0 1px 3px hsl(0 0% 0% / 0.04) !important;
-    color: var(--text-muted) !important;
-    text-decoration: none !important;
-    transition: all 0.16s ease !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-  }
-
-  /* Expand/Collapse button inside sidebar navigation links (Desktop only) */
-  @media (min-width: 769px) {
-    .faculty-sidebar .sidebar-rail-toggle-item,
-    #faculty-sidebar .sidebar-rail-toggle-item,
-    #vidya-faculty-sidebar .sidebar-rail-toggle-item {
-      display: flex !important;
-      cursor: pointer !important;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .faculty-sidebar .sidebar-rail-toggle-item,
-    #faculty-sidebar .sidebar-rail-toggle-item,
-    #vidya-faculty-sidebar .sidebar-rail-toggle-item {
-      display: none !important;
-    }
-  }
-
-  .sidebar-nav-item:hover,
-  .sidebar-nav-item:active {
-    background: var(--bg-surface-hover, var(--bg-surface)) !important;
-    border-color: var(--color-primary-light, var(--color-primary)) !important;
-    color: var(--color-primary) !important;
-  }
-
-  .sidebar-nav-item.active {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
-    border-color: var(--color-primary-hover) !important;
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-    box-shadow: 0 3px 10px hsl(217 91% 60% / 0.35) !important;
-  }
-
-  .sidebar-nav-item.active .sidebar-nav-icon svg {
-    stroke: var(--text-white, hsl(0 0% 100%)) !important;
-  }
-
-  .sidebar-nav-item.active .sidebar-nav-label {
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-    font-weight: 700 !important;
-  }
-
-  .sidebar-nav-icon {
-    width: 22px !important;
-    height: 22px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-  }
-
-  .sidebar-nav-icon svg {
-    width: 20px !important;
-    height: 20px !important;
-    stroke: currentColor !important;
-    display: block !important;
-  }
-
-  /* ── 4.3 Mobile Drawer Footer: User Profile & Sign Out ── */
-  .sidebar-expanded-footer {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.65rem !important;
-    padding: 0.85rem !important;
-    border-top: 1px solid var(--border-color) !important;
-    background: var(--bg-card) !important;
-    margin-top: auto !important;
-    flex-shrink: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  .sidebar-user-card {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-    padding: 0.55rem 0.7rem !important;
-    border-radius: 12px !important;
-    background: var(--bg-surface) !important;
-    border: 1px solid var(--border-color) !important;
-    box-shadow: 0 1px 3px hsl(0 0% 0% / 0.04) !important;
-    box-sizing: border-box !important;
-    text-decoration: none !important;
-    transition: all 0.16s ease !important;
-  }
-
-  .sidebar-user-card:active {
-    transform: scale(0.98) !important;
-    background: var(--bg-surface-hover, var(--bg-surface)) !important;
-  }
-
-  .sidebar-user-avatar {
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
-    min-height: 38px !important;
-    border-radius: 50% !important;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover)) !important;
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 0.85rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.02em !important;
-    flex-shrink: 0 !important;
-    box-shadow: 0 2px 6px hsl(217 91% 60% / 0.3) !important;
-  }
-
-  .sidebar-user-meta {
-    display: flex !important;
-    flex-direction: column !important;
-    min-width: 0 !important;
-    overflow: hidden !important;
-    flex: 1 !important;
-  }
-
-  .sidebar-user-name {
-    font-size: 0.86rem !important;
-    font-weight: 700 !important;
-    color: var(--text-main) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.25 !important;
-  }
-
-  .sidebar-user-sub {
-    font-size: 0.72rem !important;
-    color: var(--text-muted) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.25 !important;
-    margin-top: 2px !important;
-  }
-
-  .sidebar-signout-card-btn {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-    width: 100% !important;
-    height: 40px !important;
-    border-radius: 10px !important;
-    background: var(--status-absent-bg, hsl(0 80% 95%)) !important;
-    border: 1px solid var(--status-absent, hsl(0 84% 60%)) !important;
-    color: var(--status-absent, hsl(0 84% 60%)) !important;
-    font-size: 0.84rem !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    transition: all 0.18s ease !important;
-    box-sizing: border-box !important;
-    padding: 0 1rem !important;
-  }
-
-  .sidebar-signout-card-btn:hover,
-  .sidebar-signout-card-btn:active {
-    background: var(--status-absent, hsl(0 84% 60%)) !important;
-    color: var(--text-white, hsl(0 0% 100%)) !important;
-  }
-
-  .sidebar-signout-card-btn svg {
-    stroke: currentColor !important;
-    flex-shrink: 0 !important;
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  /* ── 4.4 Mobile Backdrop ── */
-  .sidebar-backdrop,
-  .faculty-sidebar-backdrop {
-    position: fixed !important;
-    top: 58px !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    height: calc(100dvh - 58px) !important;
-    background: hsl(0 0% 0% / 0.45) !important;
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
-    z-index: 9999 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: opacity 0.22s ease !important;
-  }
-
-  .sidebar-backdrop.active,
-  .sidebar-backdrop.open,
-  .faculty-sidebar-backdrop.active,
-  .faculty-sidebar-backdrop.open {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-
-  /* ── 4.5 Mobile Bottom Navigation Bar (5 Canonical Tabs) ── */
-  .mobile-bottom-nav {
-    display: block !important;
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
-    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-    background: var(--bg-card) !important;
-    border-top: 1px solid var(--border-color) !important;
-    z-index: 9990 !important;
-    box-shadow: 0 -3px 14px hsl(0 0% 0% / 0.07) !important;
-    box-sizing: border-box !important;
-  }
-
-  .mobile-bottom-nav-inner {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-around !important;
-    height: 58px !important;
-    width: 100% !important;
-    max-width: 600px !important;
-    margin: 0 auto !important;
-    position: relative !important;
-  }
-
-  .mobile-nav-item {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 3px !important;
-    flex: 1 !important;
-    height: 100% !important;
-    color: var(--text-muted) !important;
-    text-decoration: none !important;
-    cursor: pointer !important;
-    background: transparent !important;
-    border: none !important;
-    padding: 6px 2px 4px 2px !important;
-    position: relative !important;
-    transition: color 0.15s ease !important;
-    user-select: none !important;
-    -webkit-tap-highlight-color: transparent !important;
-    box-sizing: border-box !important;
-  }
-
-  .mobile-nav-icon {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1 !important;
-    transition: transform 0.15s ease !important;
-  }
-
-  .mobile-nav-icon svg {
-    width: 20px !important;
-    height: 20px !important;
-    stroke: currentColor !important;
-    transition: stroke 0.15s ease !important;
-  }
-
-  .mobile-nav-label {
-    font-size: 0.68rem !important;
-    font-weight: 500 !important;
-    letter-spacing: -0.01em !important;
-    line-height: 1.1 !important;
-    white-space: nowrap !important;
-    transition: color 0.15s ease, font-weight 0.15s ease !important;
-  }
-
-  .mobile-nav-indicator {
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 0 !important;
-    height: 3px !important;
-    background: var(--color-primary) !important;
-    border-radius: 3px 3px 0 0 !important;
-    transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-
-  .mobile-nav-item:hover,
-  .mobile-nav-item:active {
-    color: var(--color-primary) !important;
-  }
-
-  .mobile-nav-item.active {
-    color: var(--color-primary) !important;
-  }
-
-  .mobile-nav-item.active .mobile-nav-icon {
-    background: var(--color-primary-light, hsl(215 90% 95%)) !important;
-    border-radius: 999px !important;
-    padding: 3px 18px !important;
-    color: var(--color-primary) !important;
-    transform: none !important;
-  }
-
-  .mobile-nav-item.active .mobile-nav-label {
-    font-weight: 700 !important;
-    color: var(--color-primary) !important;
-  }
-
-  .mobile-nav-item.active .mobile-nav-indicator {
-    display: none !important;
-  }
+.mobile-bottom-nav-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  height: 58px !important;
+  width: 100% !important;
+  max-width: 600px !important;
+  margin: 0 auto !important;
 }
 
-/* ── 5. Instant High-Speed CSS Tooltips (Zero Native Title Delay) ── */
-@media (min-width: 769px) {
-
-  .faculty-sidebar [data-tooltip] {
-    position: relative;
-  }
-
-  /* Tooltip Container */
-  .faculty-app-layout.sidebar-collapsed .faculty-sidebar [data-tooltip]::after,
-  body.sidebar-collapsed .faculty-sidebar [data-tooltip]::after,
-  html.sidebar-collapsed .faculty-sidebar [data-tooltip]::after,
-  .faculty-sidebar:not(.desktop-open) [data-tooltip]::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: calc(100% + 14px);
-    top: 50%;
-    background: var(--text-main);
-    color: var(--bg-card);
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    font-family: inherit;
-    line-height: 1;
-    white-space: nowrap;
-    padding: 6px 12px;
-    border-radius: 8px;
-    box-shadow: 0 6px 20px hsl(0 0% 0% / 0.18), 0 0 0 1px var(--border-color);
-    border: 1px solid var(--border-color);
-    pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-50%) translateX(-4px);
-    transition: opacity 0.14s ease, transform 0.14s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.14s;
-    z-index: 100050 !important;
-  }
-
-  /* Tooltip Arrow Caret */
-  .faculty-app-layout.sidebar-collapsed .faculty-sidebar [data-tooltip]::before,
-  body.sidebar-collapsed .faculty-sidebar [data-tooltip]::before,
-  html.sidebar-collapsed .faculty-sidebar [data-tooltip]::before,
-  .faculty-sidebar:not(.desktop-open) [data-tooltip]::before {
-    content: '';
-    position: absolute;
-    left: calc(100% + 8px);
-    top: 50%;
-    width: 0;
-    height: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-right: 6px solid var(--text-main);
-    pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-50%) translateX(-4px);
-    transition: opacity 0.14s ease, transform 0.14s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.14s;
-    z-index: 100051 !important;
-  }
-
-  /* Reveal on Hover */
-  .faculty-app-layout.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::after,
-  body.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::after,
-  html.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::after,
-  .faculty-sidebar:not(.desktop-open) [data-tooltip]:hover::after {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(-50%) translateX(0) !important;
-  }
-
-  .faculty-app-layout.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::before,
-  body.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::before,
-  html.sidebar-collapsed .faculty-sidebar [data-tooltip]:hover::before,
-  .faculty-sidebar:not(.desktop-open) [data-tooltip]:hover::before {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(-50%) translateX(0) !important;
-  }
-
-  .faculty-sidebar.desktop-open [data-tooltip]::after,
-  .faculty-sidebar.desktop-open [data-tooltip]::before,
-  .faculty-sidebar.open [data-tooltip]::after,
-  .faculty-sidebar.open [data-tooltip]::before {
-    display: none !important;
-  }
+.mobile-nav-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  flex: 1 !important;
+  height: 100% !important;
+  color: var(--text-muted) !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 6px 2px 4px 2px !important;
+  box-sizing: border-box !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
-/* ─────────────────────────────────────────────────────────────
-   Exclusive Classroom Workspace Mobile Bottom Navigation
-   ───────────────────────────────────────────────────────────── */
+.mobile-nav-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.mobile-nav-icon svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: currentColor !important;
+}
+
+.mobile-nav-label {
+  font-size: 0.68rem !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item:active {
+  color: var(--color-primary) !important;
+}
+
+.mobile-nav-item.active {
+  color: var(--color-primary) !important;
+}
+
+.mobile-nav-item.active .mobile-nav-icon {
+  background: var(--color-primary-light, hsl(215 90% 95%)) !important;
+  border-radius: 999px !important;
+  padding: 3px 18px !important;
+  color: var(--color-primary) !important;
+}
+
+.mobile-nav-item.active .mobile-nav-label {
+  font-weight: 700 !important;
+  color: var(--color-primary) !important;
+}
+
+/* Suppress bottom nav in dedicated classroom workspace */
 body:has(#classroom-mobile-bottom-nav) .faculty-mobile-bottom-nav,
 body:has(.classroom-mobile-bottom-nav) .faculty-mobile-bottom-nav,
 .page-group-detail .faculty-mobile-bottom-nav {
   display: none !important;
+}
+
+/* ── 7. Permanently Removed Elements (Enforce Zero Clutter) ── */
+.sidebar-expanded-footer,
+.sidebar-rail-toggle-item,
+.sidebar-rail-footer,
+.sidebar-expanded-header,
+.sidebar-rail-header,
+.mobile-top-header {
+  display: none !important;
   visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
   pointer-events: none !important;
+  overflow: hidden !important;
 }
