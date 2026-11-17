@@ -40,27 +40,18 @@ body.viewing-work-details #student-work-details-view {
   display: block !important;
 }
 
-/* Mobile-only elements must be hidden by default on desktop */
+/* Mobile duplicate navigation bars must remain completely hidden (delegated to universal components) */
 .mobile-class-app-bar,
-.student-mobile-bottom-nav,
-.mobile-cw-unit-section,
-.mobile-work-details-view,
-.mobile-options-dropdown {
+.student-mobile-bottom-nav {
   display: none !important;
 }
 
-/* Desktop (> 768px): Show PC layout, STRICTLY HIDE mobile layout */
+/* Desktop (> 768px): Show PC layout */
 @media (min-width: 769px) {
-  .gc-navbar {
-    display: flex !important;
-  }
-
   .pc-work-details-container {
     display: block !important;
   }
 
-  .mobile-class-app-bar,
-  .student-mobile-bottom-nav,
   .mobile-cw-unit-section,
   .mobile-work-details-view,
   .mobile-options-dropdown {
@@ -68,24 +59,15 @@ body.viewing-work-details #student-work-details-view {
   }
 }
 
-/* Mobile (<= 768px): STRICTLY HIDE PC layout, Show mobile layout, Hide desktop navbar */
+/* Mobile (<= 768px): Show mobile classroom work details */
 @media (max-width: 768px) {
 
-  .gc-navbar,
   .student-tabs-nav,
   .pc-unit-section,
   .pc-work-details-grid,
   .pwd-top-breadcrumbs,
   .pc-work-details-container {
     display: none !important;
-  }
-
-  .mobile-class-app-bar {
-    display: flex !important;
-  }
-
-  .student-mobile-bottom-nav {
-    display: flex !important;
   }
 
   .mobile-work-details-view {
