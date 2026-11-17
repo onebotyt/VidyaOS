@@ -59,7 +59,7 @@ html, body {
 @media (max-width: 768px) {
   .container,
   .page-main-container {
-    padding: 0.85rem 1rem 2rem;
+    padding: 0.85rem 1rem calc(76px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 

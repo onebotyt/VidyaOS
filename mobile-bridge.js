@@ -55,7 +55,7 @@
             const newUrl = CLOUD_BACKEND_URL + urlObj.pathname + urlObj.search;
             input = new Request(newUrl, input);
           }
-        } catch (_) {}
+        } catch (_) { }
       }
       return originalFetch.call(this, input, init);
     };

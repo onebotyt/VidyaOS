@@ -44,10 +44,20 @@ function applyBrandingData(s) {
   const elLogo = /** @type {HTMLImageElement | null} */ (document.getElementById('dash-inst-logo'));
   const elBanner = /** @type {HTMLImageElement | null} */ (document.getElementById('dash-inst-banner'));
 
+  function resolveBrandingUrl(url, fallback) {
+    if (!url) return fallback;
+    if (typeof window !== 'undefined' && (window.VIDYAOS_IS_NATIVE || window.VIDYAOS_FORCE_NATIVE)) {
+      if (url.startsWith('/uploads')) {
+        return (window.VIDYAOS_CLOUD_BACKEND || 'https://vidyaos-backend.onrender.com') + url;
+      }
+    }
+    return url;
+  }
+
   const name = s.institution_name || DEFAULT_BRANDING.institution_name;
   const tagline = s.institution_tagline || DEFAULT_BRANDING.institution_tagline;
-  const logoUrl = s.institution_logo_url || DEFAULT_BRANDING.institution_logo_url;
-  const bannerUrl = s.institution_banner_url || DEFAULT_BRANDING.institution_banner_url;
+  const logoUrl = resolveBrandingUrl(s.institution_logo_url || DEFAULT_BRANDING.institution_logo_url, '/images/collegelogo.jpeg');
+  const bannerUrl = resolveBrandingUrl(s.institution_banner_url || DEFAULT_BRANDING.institution_banner_url, '/images/campus-nainital.jpg');
 
   if (elName) elName.textContent = name;
   if (elTagline) elTagline.textContent = tagline;
@@ -56,7 +66,7 @@ function applyBrandingData(s) {
     elLogo.src = logoUrl;
     elLogo.onerror = () => {
       elLogo.onerror = null;
-      elLogo.src = '/images/college-logo.svg';
+      elLogo.src = '/images/collegelogo.jpeg';
     };
   }
 
@@ -64,7 +74,7 @@ function applyBrandingData(s) {
     elBanner.src = bannerUrl;
     elBanner.onerror = () => {
       elBanner.onerror = null;
-      elBanner.src = DEFAULT_BRANDING.institution_banner_url;
+      elBanner.src = '/images/campus-nainital.jpg';
     };
   }
 }

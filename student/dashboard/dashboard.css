@@ -835,7 +835,7 @@
   #student-fab-wrapper {
     position: fixed;
     right: 18px;
-    bottom: calc(var(--student-bottom-bar-height, 64px) + 16px);
+    bottom: calc(var(--student-bottom-bar-height, 64px) + 16px + env(safe-area-inset-bottom, 0px));
     z-index: 1050;
     display: flex !important;
     flex-direction: column;

@@ -9,13 +9,14 @@
  */
 
 .admin-top-header {
-  height: 60px;
+  height: calc(60px + env(safe-area-inset-top, 0px));
+  min-height: 60px;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 0 1.25rem;
+  padding: env(safe-area-inset-top, 0px) 1.25rem 0;
   box-sizing: border-box;
   position: sticky !important;
   top: 0 !important;
@@ -25,6 +26,13 @@
   z-index: 10001 !important;
   user-select: none;
   transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .admin-top-header {
+    height: calc(58px + env(safe-area-inset-top, 0px)) !important;
+    padding: env(safe-area-inset-top, 0px) max(0.85rem, env(safe-area-inset-right, 0px)) 0 max(0.85rem, env(safe-area-inset-left, 0px)) !important;
+  }
 }
 
 /* ── Left Section: Mobile Hamburger Toggle & VidyaOS Brand ── */

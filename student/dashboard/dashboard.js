@@ -860,9 +860,19 @@ function applyInstitutionSettings(settings) {
   const titleEl = document.getElementById('hero-inst-title');
   const bannerSlot = document.getElementById('hero-banner-slot');
 
+  function resolveBrandingUrl(url, fallback) {
+    if (!url) return fallback;
+    if (typeof window !== 'undefined' && (window.VIDYAOS_IS_NATIVE || window.VIDYAOS_FORCE_NATIVE)) {
+      if (url.startsWith('/uploads')) {
+        return (window.VIDYAOS_CLOUD_BACKEND || 'https://vidyaos-backend.onrender.com') + url;
+      }
+    }
+    return url;
+  }
+
   const instName = settings.institution_name || settings.name || INSTITUTION_DEFAULTS.institution_name;
-  const logoUrl = settings.institution_logo_url || settings.logo_url || INSTITUTION_DEFAULTS.institution_logo_url;
-  const bannerUrl = settings.institution_banner_url || settings.banner_url || INSTITUTION_DEFAULTS.institution_banner_url;
+  const logoUrl = resolveBrandingUrl(settings.institution_logo_url || settings.logo_url || INSTITUTION_DEFAULTS.institution_logo_url, '/images/collegelogo.jpeg');
+  const bannerUrl = resolveBrandingUrl(settings.institution_banner_url || settings.banner_url || INSTITUTION_DEFAULTS.institution_banner_url, '/images/campus-nainital.jpg');
   const campusName = settings.campus_name || settings.institution_tagline || INSTITUTION_DEFAULTS.campus_name;
 
   if (titleEl) {

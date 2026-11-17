@@ -68,7 +68,7 @@ body.viewing-work-details #student-work-details-view {
 @media (max-width: 768px) {
 
   body.classroom-page {
-    padding-bottom: 76px !important;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .student-tabs-nav,
@@ -1885,7 +1885,8 @@ body.viewing-work-details #student-work-details-view {
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    height: 64px !important;
+    height: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
     background: var(--bg-card) !important;
     border-top: 1px solid var(--border-color) !important;
     box-shadow: var(--shadow-sm) !important;

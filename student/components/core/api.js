@@ -109,9 +109,9 @@ async function _executeFetchApi(endpoint, options = {}, cacheKey = null) {
             return;
           }
           ['access_token', 'accessToken', 'token', 'authToken', 'user', 'currentUser', 'auth_user', 'vidyaos_token', 'vidyaos_user'].forEach(k => {
-            try { localStorage.removeItem(k); } catch (_) {}
+            try { localStorage.removeItem(k); } catch (_) { }
           });
-          try { sessionStorage.clear(); } catch (_) {}
+          try { sessionStorage.clear(); } catch (_) { }
           window.location.replace('/login/index.html?reason=session_transferred');
           return;
         }
@@ -129,7 +129,7 @@ async function _executeFetchApi(endpoint, options = {}, cacheKey = null) {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             localStorage.removeItem('user');
-            try { sessionStorage.clear(); } catch (_) {}
+            try { sessionStorage.clear(); } catch (_) { }
             window.location.replace('/login/index.html?reason=session_expired');
             return;
           }

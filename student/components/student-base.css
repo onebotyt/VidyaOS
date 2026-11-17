@@ -94,6 +94,7 @@ body.student-page {
     padding-left: 0.9rem !important;
     padding-right: 0.9rem !important;
     padding-top: 1rem !important;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
