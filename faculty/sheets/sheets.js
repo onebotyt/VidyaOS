@@ -1249,7 +1249,7 @@ function confirmRemoveColumn() {
 }
 
 function openAddRowModal() {
-  const nextRoll = (S.evalData?.roster?.length || S.members?.length || 10) + 1;
+  const nextRoll = (S.evalData?.roster?.length || S.members?.length || 0) + 1;
   const rollInput = document.getElementById('add-row-roll');
   const nameInput = document.getElementById('add-row-name');
   const enrollInput = document.getElementById('add-row-enroll');
@@ -1257,8 +1257,8 @@ function openAddRowModal() {
 
   if (rollInput) rollInput.value = nextRoll;
   if (nameInput) nameInput.value = '';
-  if (enrollInput) enrollInput.value = `2024IT0${nextRoll}`;
-  if (regInput) regInput.value = `241010540${nextRoll}`;
+  if (enrollInput) enrollInput.value = '';
+  if (regInput) regInput.value = '';
 
   openModal('modal-add-row');
 }
@@ -1266,8 +1266,8 @@ function openAddRowModal() {
 function confirmAddStudentRow() {
   const roll = parseInt(document.getElementById('add-row-roll')?.value, 10) || 1;
   const name = document.getElementById('add-row-name')?.value.trim() || 'New Student';
-  const enroll = document.getElementById('add-row-enroll')?.value.trim() || `2024IT0${roll}`;
-  const reg = document.getElementById('add-row-reg')?.value.trim() || `241010540${roll}`;
+  const enroll = document.getElementById('add-row-enroll')?.value.trim() || '';
+  const reg = document.getElementById('add-row-reg')?.value.trim() || '';
 
   const newStudentObj = {
     student_id: Date.now(),
@@ -1275,10 +1275,10 @@ function confirmAddStudentRow() {
     full_name: name,
     official_enrollment_no: enroll,
     registration_no: reg,
-    assignment_scores: [18, 17],
-    exam_scores: [{ marks: 18, is_absent: false }, { marks: 19, is_absent: false }],
-    attendance_percentage: 90,
-    presentation_score: 4.5
+    assignment_scores: [],
+    exam_scores: [],
+    attendance_percentage: 100,
+    presentation_score: 0
   };
 
   // Add to evaluation roster
@@ -1498,29 +1498,22 @@ async function loadEvaluationSheetData() {
     const res = await apiFetch(`/faculty/registers/${regId}/internal-evaluation`);
     if (res && res.success && res.data) {
       const d = res.data;
-      const assignList = Array.isArray(d.assignments) && d.assignments.length ? d.assignments : [
-        { id: 1, name: '1', max_marks: 25 },
-        { id: 2, name: '2', max_marks: 25 },
-        { id: 3, name: '3', max_marks: 25 },
-        { id: 4, name: '4', max_marks: 25 },
-        { id: 5, name: '5', max_marks: 25 }
-      ];
-      const examList = Array.isArray(d.exams) && d.exams.length ? d.exams : [
-        { id: 1, name: '1', max_marks: 25 },
-        { id: 2, name: '2', max_marks: 25 },
-        { id: 3, name: '3', max_marks: 25 },
-        { id: 4, name: '4', max_marks: 25 }
-      ];
+      const assignList = Array.isArray(d.assignments) ? d.assignments : (Array.isArray(S.assignments) ? S.assignments : []);
+      const examList = Array.isArray(d.exams) ? d.exams : (Array.isArray(S.tests) ? S.tests : []);
 
-      const studentRawList = Array.isArray(d.roster) ? d.roster : (Array.isArray(d.students) ? d.students : []);
+      const studentRawList = (Array.isArray(d.roster) && d.roster.length > 0)
+        ? d.roster
+        : ((Array.isArray(d.students) && d.students.length > 0)
+            ? d.students
+            : (Array.isArray(S.members) ? S.members : []));
 
       const scope = getGroupComponentScope(S.group);
       const hasPractical = Boolean(d.has_practical || scope.hasPractical);
 
       const practicalCols = [
-        { id: 'lab_record', name: 'Lab Record', max: 10, defaultScore: 8.5 },
-        { id: 'viva_voce', name: 'Viva Voce', max: 5, defaultScore: 4.0 },
-        { id: 'creative_work', name: 'Creative Work (Model/Chart/Project)', max: 10, defaultScore: 8.5 },
+        { id: 'lab_record', name: 'Lab Record', max: 10 },
+        { id: 'viva_voce', name: 'Viva Voce', max: 5 },
+        { id: 'creative_work', name: 'Creative Work (Model/Chart/Project)', max: 10 },
         { id: 'attendance', name: 'Attendance', max: 5, isAttendance: true }
       ];
       const theoryCols = [
@@ -1550,48 +1543,48 @@ async function loadEvaluationSheetData() {
 
       const mappedStudents = studentRawList.map((s, idx) => {
         const aScores = assignList.map((a, i) => {
-          if (s.assignment_scores && s.assignment_scores[i] !== undefined && s.assignment_scores[i] !== '') {
+          if (s.assignment_scores && s.assignment_scores[i] !== undefined && s.assignment_scores[i] !== null && s.assignment_scores[i] !== '') {
             return Number(s.assignment_scores[i]);
           }
-          return Math.round((a.max_marks || 25) * 0.6);
+          return '';
         });
         const eScores = [];
         const eAb = [];
         examList.forEach((_, i) => {
           const ex = s.exam_scores && s.exam_scores[i];
           if (typeof ex === 'object' && ex !== null) {
-            eScores.push((ex.marks !== '' && ex.marks !== undefined && ex.marks !== null) ? Number(ex.marks) : 0);
+            eScores.push((ex.marks !== '' && ex.marks !== undefined && ex.marks !== null) ? Number(ex.marks) : '');
             eAb.push(Boolean(ex.is_absent));
-          } else if (ex !== undefined && ex !== '') {
+          } else if (ex !== undefined && ex !== null && ex !== '') {
             eScores.push(Number(ex));
             eAb.push(Boolean(s.exam_absent && s.exam_absent[i]));
           } else {
-            eScores.push(Math.round((examList[i].max_marks || 25) * 0.6));
+            eScores.push('');
             eAb.push(false);
           }
         });
 
-        const attPct = s.attendance_percentage !== undefined ? s.attendance_percentage : 85;
+        const attPct = (s.attendance_percentage !== undefined && s.attendance_percentage !== null) ? Number(s.attendance_percentage) : 0;
 
         const savedStudent = cachedState && cachedState.students && cachedState.students.find(x => x.student_id === (s.student_id || idx + 1));
         let studentAssessScores = [];
         if (savedStudent && Array.isArray(savedStudent.assessment_scores) && savedStudent.assessment_scores.length === initialAssessmentCols.length) {
-          studentAssessScores = savedStudent.assessment_scores.map(Number);
+          studentAssessScores = savedStudent.assessment_scores.map(v => (v !== '' && v !== null && !isNaN(v)) ? Number(v) : '');
         } else {
           studentAssessScores = initialAssessmentCols.map(col => {
             if (col.isAttendance || col.id === 'attendance') {
-              return Math.round(((attPct / 100) * (col.max || 5)) * 10) / 10;
+              return attPct > 0 ? (Math.round(((attPct / 100) * (col.max || 5)) * 10) / 10) : 0;
             }
-            return col.defaultScore !== undefined ? col.defaultScore : Math.round((col.max || 10) * 0.8 * 10) / 10;
+            return '';
           });
         }
 
         const stObj = {
-          student_id: s.student_id || (idx + 1),
+          student_id: s.student_id || s.id || (idx + 1),
           class_roll_no: s.class_roll_no || (idx + 1),
-          registration_no: s.registration_no || `2410105400${idx + 1}`,
-          official_enrollment_no: s.official_enrollment_no || `2024IT00${idx + 1}`,
-          full_name: s.full_name || ('Student ' + (idx + 1)),
+          registration_no: s.registration_no || '',
+          official_enrollment_no: s.official_enrollment_no || s.enrollment_no || '',
+          full_name: s.full_name || s.student_name || s.name || ('Student ' + (idx + 1)),
           attendance_percentage: attPct,
           assignment_scores: aScores,
           assignment_avg: 0,
@@ -1640,29 +1633,22 @@ async function loadEvaluationSheetData() {
     console.warn('Evaluation register lookup note:', err);
   }
 
-  // Demo fallback cohort matching screenshot
-  const fallbackNames = [
-    'AARAV SHARMA', 'ADITI VERMA', 'AKASH PATEL', 'ANANYA GUPTA', 'ARJUN RAO',
-    'BHAVYA NAIR', 'CHIRAG JOSHI', 'DEEPIKA SINGH', 'ROHAN KULKARNI', 'SNEHA PATIL'
-  ];
-  const fallbackAtt = [4.4, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 2.5, 3.3];
+  // Authentic fallback directly using selected group's active members and components
+  const assignList = Array.isArray(S.assignments) ? S.assignments : [];
+  const examList = Array.isArray(S.tests) ? S.tests : [];
+  const scope = getGroupComponentScope(S.group);
+  const hasPractical = Boolean(scope.hasPractical);
 
-  const fallbackAssigns = [
-    { id: 1, name: '1', max_marks: 25 },
-    { id: 2, name: '2', max_marks: 25 },
-    { id: 3, name: '3', max_marks: 25 },
-    { id: 4, name: '4', max_marks: 25 },
-    { id: 5, name: '5', max_marks: 25 }
-  ];
-  const fallbackExams = [
-    { id: 1, name: '1', max_marks: 25 },
-    { id: 2, name: '2', max_marks: 25 },
-    { id: 3, name: '3', max_marks: 25 },
-    { id: 4, name: '4', max_marks: 25 }
-  ];
-  const fallbackAssessCols = [
+  const practicalCols = [
+    { id: 'lab_record', name: 'Lab Record', max: 10 },
+    { id: 'viva_voce', name: 'Viva Voce', max: 5 },
+    { id: 'creative_work', name: 'Creative Work (Model/Chart/Project)', max: 10 },
     { id: 'attendance', name: 'Attendance', max: 5, isAttendance: true }
   ];
+  const theoryCols = [
+    { id: 'attendance', name: 'Attendance', max: 5, isAttendance: true }
+  ];
+  const fallbackAssessCols = hasPractical ? practicalCols : theoryCols;
 
   const scheme = {
     assign_avg_max: 15,
@@ -1679,34 +1665,25 @@ async function loadEvaluationSheetData() {
     total_label: 'Total Marks'
   };
 
-  const rawCohort = (Array.isArray(S.members) && S.members.length > 0)
-    ? S.members
-    : fallbackNames.map((name, i) => ({
-      id: i + 1,
-      student_id: i + 1,
-      class_roll_no: i + 1,
-      official_enrollment_no: `2024IT00${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
-      registration_no: `2410105400${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
-      full_name: name,
-      attendance_percentage: Math.round(((fallbackAtt[i] || 5.0) / 5) * 100)
-    }));
+  const rawCohort = (Array.isArray(S.members) && S.members.length > 0) ? S.members : [];
 
   const students = rawCohort.map((m, i) => {
-    const attVal = fallbackAtt[i] || 5.0;
+    const attPct = (m.attendance_percentage !== undefined && m.attendance_percentage !== null) ? Number(m.attendance_percentage) : 0;
+    const attVal = attPct > 0 ? (Math.round((attPct / 100) * 5 * 10) / 10) : 0;
     const stObj = {
       student_id: m.student_id || m.id || (i + 1),
       class_roll_no: m.class_roll_no || (i + 1),
-      official_enrollment_no: m.official_enrollment_no || `2024IT00${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
-      registration_no: m.registration_no || `2410105400${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
-      full_name: m.full_name || m.name || ('Student ' + (i + 1)),
-      attendance_percentage: m.attendance_percentage !== undefined ? Number(m.attendance_percentage) : Math.round((attVal / 5) * 100),
-      assignment_scores: [15, 15, 15, 15, 15],
-      assignment_avg: 9.0,
-      exam_scores: [15, 15, 15, 15],
-      exam_absent: [false, false, false, false],
-      exam_avg: 12.0,
-      assessment_scores: [attVal],
-      grand_total: Math.round((9.0 + 12.0 + attVal) * 10) / 10
+      official_enrollment_no: m.official_enrollment_no || m.enrollment_no || '',
+      registration_no: m.registration_no || '',
+      full_name: m.full_name || m.student_name || m.name || ('Student ' + (i + 1)),
+      attendance_percentage: attPct,
+      assignment_scores: assignList.map(() => ''),
+      assignment_avg: 0,
+      exam_scores: examList.map(() => ''),
+      exam_absent: examList.map(() => false),
+      exam_avg: 0,
+      assessment_scores: fallbackAssessCols.map(col => (col.isAttendance || col.id === 'attendance') ? attVal : ''),
+      grand_total: attVal
     };
     return stObj;
   });
@@ -1716,10 +1693,10 @@ async function loadEvaluationSheetData() {
     institution_name: 'Uttarakhand Government Institute of Polytechnic, Nainital',
     institution_header: getDynamicSessionHeader(),
     session_label: (S.group?.academic_year_label || S.activeSessionLabel || '2026-27 (Winter Session)'),
-    has_practical: false,
+    has_practical: hasPractical,
     scheme: scheme,
-    assignments: fallbackAssigns,
-    exams: fallbackExams,
+    assignments: assignList,
+    exams: examList,
     assessment_columns: fallbackAssessCols,
     students: students,
     roster: students
@@ -1944,7 +1921,7 @@ function renderEvaluationSheetTable() {
     totalUtAvgSum += Number(s.exam_avg) || 0;
 
     const aTds = assignments.map((a, aIdx) => {
-      const val = s.assignment_scores?.[aIdx] ?? 15;
+      const val = (s.assignment_scores?.[aIdx] !== undefined && s.assignment_scores?.[aIdx] !== null) ? s.assignment_scores[aIdx] : '';
       return `
             <td class="col-assign">
               <input type="number"
@@ -1964,7 +1941,7 @@ function renderEvaluationSheetTable() {
 
     const eTds = exams.map((e, eIdx) => {
       const isAb = Boolean(s.exam_absent?.[eIdx]);
-      const val = isAb ? 'AB' : (s.exam_scores?.[eIdx] ?? 15);
+      const val = isAb ? 'AB' : ((s.exam_scores?.[eIdx] !== undefined && s.exam_scores?.[eIdx] !== null) ? s.exam_scores[eIdx] : '');
       return `
             <td class="col-test">
               <input type="text"
@@ -1982,7 +1959,7 @@ function renderEvaluationSheetTable() {
     }).join('');
 
     const assessTds = assessCols.map((c, cIdx) => {
-      const val = s.assessment_scores?.[cIdx] ?? 5;
+      const val = (s.assessment_scores?.[cIdx] !== undefined && s.assessment_scores?.[cIdx] !== null) ? s.assessment_scores[cIdx] : '';
       return `
             <td class="col-assess">
               <input type="number"
@@ -2023,6 +2000,17 @@ function renderEvaluationSheetTable() {
           </tr>
         `;
   }).join('');
+
+  if (!students.length) {
+    tbodyHtml = `
+      <tr>
+        <td colspan="${totalCols}" style="text-align: center; padding: 3.5rem 1rem; color: var(--text-muted);">
+          <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--text-primary);">No students enrolled</div>
+          <div style="font-size: 0.88rem;">${S.searchQuery ? 'No student matches your search filter.' : 'Enroll students in this teaching group or share the invite code to begin evaluation.'}</div>
+        </td>
+      </tr>
+    `;
+  }
 
   const count = students.length || 1;
   const classAvgAssign = (totalAssignAvgSum / count).toFixed(1);
@@ -2500,21 +2488,15 @@ async function loadTestSheetData() {
     console.warn('Could not fetch test scores:', err);
   }
 
-  const roster = (S.members.length ? S.members : Array.from({ length: 10 }, (_, i) => ({
-    student_id: i + 1,
-    class_roll_no: i + 1,
-    full_name: ['Aarav Sharma', 'Ananya Patel', 'Aditya Verma', 'Diya Gupta', 'Ishaan Singh', 'Kavya Joshi', 'Neha Rawat', 'Rohan Negi', 'Siddharth Bisht', 'Tanvi Bhatt'][i],
-    official_enrollment_no: `2024IT00${i + 1}`,
-    registration_no: `2410105400${i + 1}`
-  }))).map((m, idx) => {
+  const roster = (Array.isArray(S.members) && S.members.length > 0 ? S.members : []).map((m, idx) => {
     const saved = scoresMap[m.student_id] || {};
-    const isAbsent = saved.is_absent !== undefined ? Boolean(saved.is_absent) : (idx === 7);
+    const isAbsent = saved.is_absent !== undefined ? Boolean(saved.is_absent) : false;
     const qScores = questions.map((q, qIdx) => {
       if (isAbsent) return 0;
-      if (saved.question_scores && saved.question_scores[qIdx] !== undefined) {
+      if (saved.question_scores && saved.question_scores[qIdx] !== undefined && saved.question_scores[qIdx] !== null && saved.question_scores[qIdx] !== '') {
         return Number(saved.question_scores[qIdx]);
       }
-      return Math.max(0, Math.min(q.max, q.max - (idx % 2)));
+      return 0;
     });
 
     const totalMarks = isAbsent ? 0 : qScores.reduce((sum, v) => sum + v, 0);
@@ -2523,8 +2505,8 @@ async function loadTestSheetData() {
       student_id: m.student_id,
       class_roll_no: m.class_roll_no || idx + 1,
       full_name: m.full_name || m.name || `Student ${idx + 1}`,
-      official_enrollment_no: m.official_enrollment_no || `2024IT00${idx + 1}`,
-      registration_no: m.registration_no || `2410105400${idx + 1}`,
+      official_enrollment_no: m.official_enrollment_no || m.enrollment_no || '',
+      registration_no: m.registration_no || '',
       is_absent: isAbsent,
       question_scores: qScores,
       total_marks: totalMarks
@@ -2676,7 +2658,27 @@ function renderTestSheetTable() {
           </thead>
 
           <tbody>
-            ${roster.map((r, rIdx) => {
+            ${roster.length === 0 ? `
+              <tr>
+                <td colspan="${5 + questions.length + 1}" style="text-align: center; padding: 3.5rem 1rem; color: var(--text-muted);">
+                  <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--text-primary);">No students enrolled</div>
+                  <div style="font-size: 0.88rem;">${S.searchQuery ? 'No student matches your search filter.' : 'Enroll students in this teaching group to enter test scores.'}</div>
+                </td>
+                <td class="sheet-side-panel excel-side-panel-cell col-side-panel">
+                  <div class="excel-side-content">
+                    <div class="excel-side-sec-title"><span>Instructions :</span></div>
+                    <ol class="excel-side-instructions">
+                      ${st.instructions.map(ins => `<li style="margin-bottom:0.25rem;"><span>${esc(ins)}</span></li>`).join('')}
+                    </ol>
+                    <div class="excel-side-sec-title" style="margin-top: 0.85rem;">Questions :</div>
+                    <div class="excel-side-questions">
+                      ${questions.map(q => `<div style="margin-bottom: 0.35rem;"><strong>Q${q.num}:</strong> <span>${esc(q.text)}</span> <strong>(${q.max} Marks)</strong></div>`).join('')}
+                    </div>
+                    <div class="sheet-note-red">${esc(testDetails.noteRed || 'NOTE : All marked as RED were absent.')}</div>
+                  </div>
+                </td>
+              </tr>
+            ` : roster.map((r, rIdx) => {
     const isAb = Boolean(r.is_absent);
     return `
                 <tr class="${isAb ? 'is-absent' : ''}" id="test-student-row-${r.student_id}">
@@ -2940,13 +2942,7 @@ async function loadAllTestsCombinedData() {
 
   const sourceStudents = (S.evalData && S.evalData.students && S.evalData.students.length)
     ? S.evalData.students
-    : (S.members.length ? S.members : Array.from({ length: 10 }, (_, i) => ({
-      student_id: i + 1,
-      class_roll_no: i + 1,
-      full_name: ['AARAV SHARMA', 'ADITI VERMA', 'AKASH PATEL', 'ANANYA GUPTA', 'ARJUN RAO', 'BHAVYA NAIR', 'CHIRAG JOSHI', 'DEEPIKA SINGH', 'ROHAN KULKARNI', 'SNEHA PATIL'][i],
-      official_enrollment_no: `2024IT00${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`,
-      registration_no: `2410105400${i + 1 < 10 ? '0' + (i + 1) : (i + 1)}`
-    })));
+    : (Array.isArray(S.members) && S.members.length > 0 ? S.members : []);
 
   const utWeight = (cachedAllTests && cachedAllTests.ut_weight) || (S.evalData?.scheme?.exam_avg_max) || 20;
 
@@ -2967,11 +2963,7 @@ async function loadAllTestsCombinedData() {
         eScores = s.exam_scores.slice(0, allTests.length);
         eAbsent = (s.exam_absent || []).slice(0, allTests.length);
       } else {
-        const defaultUT1 = [18, 16, 17, 18, 19, 20, 14, 15, 16, 17];
-        eScores = allTests.map((t, tIdx) => {
-          if (tIdx === 0) return defaultUT1[idx % defaultUT1.length];
-          return 0;
-        });
+        eScores = allTests.map(() => 0);
         eAbsent = allTests.map(() => false);
       }
     }
@@ -2987,8 +2979,8 @@ async function loadAllTestsCombinedData() {
     return {
       student_id: s.student_id,
       class_roll_no: s.class_roll_no || (idx + 1),
-      official_enrollment_no: s.official_enrollment_no || `2024IT00${idx + 1}`,
-      registration_no: s.registration_no || `2410105400${idx + 1}`,
+      official_enrollment_no: s.official_enrollment_no || s.enrollment_no || '',
+      registration_no: s.registration_no || '',
       full_name: s.full_name || s.name || `Student ${idx + 1}`,
       scores: eScores,
       absent: eAbsent,
@@ -3115,7 +3107,14 @@ function renderAllTestsCombinedTable() {
           </thead>
 
           <tbody>
-            ${roster.map((s, rIdx) => {
+            ${roster.length === 0 ? `
+              <tr>
+                <td colspan="${totalCols}" style="text-align: center; padding: 3.5rem 1rem; color: var(--text-muted);">
+                  <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--text-primary);">No students enrolled</div>
+                  <div style="font-size: 0.88rem;">${S.searchQuery ? 'No student matches your search filter.' : 'Enroll students in this teaching group to view test marks.'}</div>
+                </td>
+              </tr>
+            ` : roster.map((s, rIdx) => {
     const testCells = allTests.map((t, tIdx) => {
       const isAb = Boolean(s.absent?.[tIdx]);
       const val = isAb ? 'AB' : (s.scores?.[tIdx] ?? 0);
@@ -3339,15 +3338,6 @@ async function loadAssignmentsSheetData() {
   S.theoryAssignments = (S.assignments || []).filter(a => !isPracticalCoursework(a));
   S.practicalAssignments = (S.assignments || []).filter(a => isPracticalCoursework(a));
 
-  if (!S.theoryAssignments.length) {
-    // Provide standard theory coursework default placeholders if none created yet
-    S.theoryAssignments = [
-      { id: 'a1', title: 'A1: SQL Queries & Relational Algebra', name: 'Assignment 1', max_marks: 20 },
-      { id: 'a2', title: 'A2: Database Normalization (1NF to BCNF)', name: 'Assignment 2', max_marks: 20 },
-      { id: 'a3', title: 'A3: Transaction Management & Concurrency', name: 'Assignment 3', max_marks: 20 }
-    ];
-  }
-
   renderAssignmentsSheetTable();
 }
 
@@ -3356,13 +3346,7 @@ function renderAssignmentsSheetTable() {
   if (!container) return;
 
   const assignments = S.theoryAssignments || [];
-  const rawRoster = S.members.length ? S.members : Array.from({ length: 10 }, (_, i) => ({
-    student_id: i + 1,
-    class_roll_no: i + 1,
-    full_name: ['Aarav Sharma', 'Ananya Patel', 'Aditya Verma', 'Diya Gupta', 'Ishaan Singh', 'Kavya Joshi', 'Neha Rawat', 'Rohan Negi', 'Siddharth Bisht', 'Tanvi Bhatt'][i],
-    official_enrollment_no: `2024IT00${i + 1}`,
-    registration_no: `2410105400${i + 1}`
-  }));
+  const rawRoster = (Array.isArray(S.members) && S.members.length > 0) ? S.members : [];
 
   const q = S.searchQuery;
   let roster = rawRoster.filter(r => {
@@ -3386,7 +3370,7 @@ function renderAssignmentsSheetTable() {
   const subName = esc(S.group?.subject_name || 'Database Management Systems');
   const yr = S.group?.year || 3;
   const sem = S.group?.semester || 5;
-  const totalCols = 5 + assignments.length + 2;
+  const totalCols = 5 + (assignments.length || 1) + 2;
   const maxPossible = assignments.reduce((s, a) => s + (Number(a.max_marks) || 20), 0);
 
   // Dedicated non-scrolling institutional header banner
@@ -3400,9 +3384,9 @@ function renderAssignmentsSheetTable() {
   const colTotals = assignments.map(() => 0);
   let grandTotalSum = 0;
 
-  const bodyRows = roster.map((st, idx) => {
+  const bodyRows = roster.length ? roster.map((st, idx) => {
     let sum = 0;
-    const aTds = assignments.map((a, aIdx) => {
+    const aTds = assignments.length ? assignments.map((a, aIdx) => {
       const max = Number(a.max_marks) || 20;
       const scoreKey = `${st.student_id}_${aIdx}`;
       const storedVal = S.assignmentScores ? S.assignmentScores[scoreKey] : undefined;
@@ -3424,7 +3408,7 @@ function renderAssignmentsSheetTable() {
                      oninput="onAssignmentStandaloneScoreChange(${st.student_id}, ${aIdx}, this.value)">
             </td>
           `;
-    }).join('');
+    }).join('') : '<td class="col-assign" style="text-align:center;color:var(--text-muted);font-size:0.8rem;">—</td>';
 
     grandTotalSum += sum;
     const pct = maxPossible > 0 ? Math.round((sum / maxPossible) * 100) : 0;
@@ -3447,16 +3431,23 @@ function renderAssignmentsSheetTable() {
             </td>
           </tr>
         `;
-  }).join('');
+  }).join('') : `
+    <tr>
+      <td colspan="${totalCols}" style="text-align: center; padding: 3.5rem 1rem; color: var(--text-muted);">
+        <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--text-primary);">No students enrolled</div>
+        <div style="font-size: 0.88rem;">${S.searchQuery ? 'No student matches your search filter.' : 'Enroll students in this teaching group to view assignment marks.'}</div>
+      </td>
+    </tr>
+  `;
 
   const rCount = roster.length || 1;
   const classAvgTotal = (grandTotalSum / rCount).toFixed(1);
   const classAvgPct = maxPossible > 0 ? Math.round((grandTotalSum / (rCount * maxPossible)) * 100) : 0;
 
-  const footerCols = assignments.map((_, i) => {
+  const footerCols = assignments.length ? assignments.map((_, i) => {
     const colAvg = (colTotals[i] / rCount).toFixed(1);
     return `<td class="col-assign excel-summary-avg" id="assign-col-avg-${i}">${colAvg}</td>`;
-  }).join('');
+  }).join('') : '<td class="col-assign excel-summary-avg">—</td>';
 
   let tableHtml = `
         <table class="excel-table sheet-table" id="table-assignments-marksheet">
@@ -3484,7 +3475,7 @@ function renderAssignmentsSheetTable() {
               <th class="col-reg" style="width: 125px;">REG. NO.</th>
               <th class="col-enroll" style="width: 125px;">ENROLLMENT NO.</th>
               <th class="col-name" style="min-width: 200px;">STUDENT NAME</th>
-              ${assignments.map((a, i) => `<th class="col-assign" title="${esc(a.title || a.name || 'Assignment ' + (i + 1))}">${esc(getAssignShortHeader(a, i))}</th>`).join('')}
+              ${assignments.length ? assignments.map((a, i) => `<th class="col-assign" title="${esc(a.title || a.name || 'Assignment ' + (i + 1))}">${esc(getAssignShortHeader(a, i))}</th>`).join('') : '<th class="col-assign" style="width: 120px;">Assignments</th>'}
               <th style="width: 90px;">Total Marks</th>
               <th class="col-total" style="width: 80px;">Average %</th>
             </tr>
@@ -3496,7 +3487,7 @@ function renderAssignmentsSheetTable() {
               <th class="col-reg hdr-num-label">—</th>
               <th class="col-enroll hdr-num-label">—</th>
               <th class="col-name hdr-num-label" style="text-align:right;padding-right:0.6rem;">Max Marks &rarr;</th>
-              ${assignments.map((a, i) => `
+              ${assignments.length ? assignments.map((a, i) => `
                 <th class="col-assign">
                   <input type="number" 
                          class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}" 
@@ -3508,7 +3499,7 @@ function renderAssignmentsSheetTable() {
                          title="${esc(a.title || a.name)} Max Marks"
                          onchange="onAssignmentColMaxChange(${i}, this.value)">
                 </th>
-              `).join('')}
+              `).join('') : '<th class="col-assign hdr-num-label">—</th>'}
               <th style="text-align:center;">
                 <span class="excel-hdr-num-badge" id="assign-hdr-total-max">${maxPossible}</span>
               </th>
@@ -3641,18 +3632,6 @@ async function loadPracticalsSheetData() {
   S.practicalAssignments = (S.assignments || []).filter(a => isPracticalCoursework(a));
   S.theoryAssignments = (S.assignments || []).filter(a => !isPracticalCoursework(a));
 
-  if (!S.practicalAssignments.length) {
-    // Default standard laboratory practicals if none created yet
-    S.practicalAssignments = [
-      { id: 'lab1', title: 'Lab 1: ER Modeling & Schema Design', name: 'Lab 1', max_marks: 25 },
-      { id: 'lab2', title: 'Lab 2: DDL Table Creation & Integrity Constraints', name: 'Lab 2', max_marks: 25 },
-      { id: 'lab3', title: 'Lab 3: DML Queries & Aggregations', name: 'Lab 3', max_marks: 25 },
-      { id: 'lab4', title: 'Lab 4: Joins, Nested Queries & Subqueries', name: 'Lab 4', max_marks: 25 },
-      { id: 'lab5', title: 'Lab 5: PL/SQL Procedures & Triggers', name: 'Lab 5', max_marks: 25 },
-      { id: 'lab6', title: 'Lab 6: Database Normalization & Indexing', name: 'Lab 6', max_marks: 30 }
-    ];
-  }
-
   try {
     const cachedScores = localStorage.getItem(`practical_scores_${S.groupId}`);
     if (cachedScores) S.practicalScores = JSON.parse(cachedScores) || {};
@@ -3668,13 +3647,7 @@ function renderPracticalsSheetTable() {
   if (!container) return;
 
   const practicals = S.practicalAssignments || [];
-  const rawRoster = S.members.length ? S.members : Array.from({ length: 10 }, (_, i) => ({
-    student_id: i + 1,
-    class_roll_no: i + 1,
-    full_name: ['Aarav Sharma', 'Ananya Patel', 'Aditya Verma', 'Diya Gupta', 'Ishaan Singh', 'Kavya Joshi', 'Neha Rawat', 'Rohan Negi', 'Siddharth Bisht', 'Tanvi Bhatt'][i],
-    official_enrollment_no: `2024IT00${i + 1}`,
-    registration_no: `2410105400${i + 1}`
-  }));
+  const rawRoster = (Array.isArray(S.members) && S.members.length > 0) ? S.members : [];
 
   const q = S.searchQuery;
   let roster = rawRoster.filter(r => {
@@ -3698,7 +3671,7 @@ function renderPracticalsSheetTable() {
   const subName = esc(S.group?.subject_name || 'Database Management Systems');
   const yr = S.group?.year || 3;
   const sem = S.group?.semester || 5;
-  const totalCols = 5 + practicals.length + 2;
+  const totalCols = 5 + (practicals.length || 1) + 2;
   const maxPossible = practicals.reduce((s, p) => s + (Number(p.max_marks) || 25), 0);
 
   // Dedicated non-scrolling institutional header banner for Practicals
@@ -3711,9 +3684,9 @@ function renderPracticalsSheetTable() {
   const colTotals = practicals.map(() => 0);
   let grandTotalSum = 0;
 
-  const bodyRows = roster.map((st, idx) => {
+  const bodyRows = roster.length ? roster.map((st, idx) => {
     let sum = 0;
-    const pTds = practicals.map((p, pIdx) => {
+    const pTds = practicals.length ? practicals.map((p, pIdx) => {
       const max = Number(p.max_marks) || 25;
       const scoreKey = `${st.student_id}_${pIdx}`;
       const storedVal = S.practicalScores ? S.practicalScores[scoreKey] : undefined;
@@ -3735,7 +3708,7 @@ function renderPracticalsSheetTable() {
                      oninput="onPracticalStandaloneScoreChange(${st.student_id}, ${pIdx}, this.value)">
             </td>
           `;
-    }).join('');
+    }).join('') : '<td class="col-practical" style="text-align:center;color:var(--text-muted);font-size:0.8rem;">—</td>';
 
     grandTotalSum += sum;
     const pct = maxPossible > 0 ? Math.round((sum / maxPossible) * 100) : 0;
@@ -3758,16 +3731,23 @@ function renderPracticalsSheetTable() {
             </td>
           </tr>
         `;
-  }).join('');
+  }).join('') : `
+    <tr>
+      <td colspan="${totalCols}" style="text-align: center; padding: 3.5rem 1rem; color: var(--text-muted);">
+        <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--text-primary);">No students enrolled</div>
+        <div style="font-size: 0.88rem;">${S.searchQuery ? 'No student matches your search filter.' : 'Enroll students in this teaching group to view practical lab marks.'}</div>
+      </td>
+    </tr>
+  `;
 
   const rCount = roster.length || 1;
   const classAvgTotal = (grandTotalSum / rCount).toFixed(1);
   const classAvgPct = maxPossible > 0 ? Math.round((grandTotalSum / (rCount * maxPossible)) * 100) : 0;
 
-  const footerCols = practicals.map((_, i) => {
+  const footerCols = practicals.length ? practicals.map((_, i) => {
     const colAvg = (colTotals[i] / rCount).toFixed(1);
     return `<td class="col-practical excel-summary-avg" id="practical-col-avg-${i}">${colAvg}</td>`;
-  }).join('');
+  }).join('') : '<td class="col-practical excel-summary-avg">—</td>';
 
   let tableHtml = `
         <table class="excel-table sheet-table" id="table-practicals-marksheet">
@@ -3795,7 +3775,7 @@ function renderPracticalsSheetTable() {
               <th class="col-reg" style="width: 125px;">REG. NO.</th>
               <th class="col-enroll" style="width: 125px;">ENROLLMENT NO.</th>
               <th class="col-name" style="min-width: 200px;">STUDENT NAME</th>
-              ${practicals.map((p, i) => `<th class="col-practical" title="${esc(p.title || p.name || 'Lab Experiment ' + (i + 1))}">${esc(getPracticalShortHeader(p, i))}</th>`).join('')}
+              ${practicals.length ? practicals.map((p, i) => `<th class="col-practical" title="${esc(p.title || p.name || 'Lab Experiment ' + (i + 1))}">${esc(getPracticalShortHeader(p, i))}</th>`).join('') : '<th class="col-practical" style="width: 120px;">Practicals</th>'}
               <th style="width: 90px;">Total Marks</th>
               <th class="col-total" style="width: 80px;">Average %</th>
             </tr>
@@ -3807,7 +3787,7 @@ function renderPracticalsSheetTable() {
               <th class="col-reg hdr-num-label">—</th>
               <th class="col-enroll hdr-num-label">—</th>
               <th class="col-name hdr-num-label" style="text-align:right;padding-right:0.6rem;">Max Marks &rarr;</th>
-              ${practicals.map((p, i) => `
+              ${practicals.length ? practicals.map((p, i) => `
                 <th class="col-practical">
                   <input type="number" 
                          class="excel-hdr-num-input ${S.isEditMode ? 'is-editable' : ''}" 
@@ -3819,7 +3799,7 @@ function renderPracticalsSheetTable() {
                          title="${esc(p.title || p.name)} Max Marks"
                          onchange="onPracticalColMaxChange(${i}, this.value)">
                 </th>
-              `).join('')}
+              `).join('') : '<th class="col-practical hdr-num-label">—</th>'}
               <th style="text-align:center;">
                 <span class="excel-hdr-num-badge" id="practical-hdr-total-max">${maxPossible}</span>
               </th>
@@ -4676,13 +4656,6 @@ function openEditStudentRosterModal() {
     roster = S.currentTestState.roster;
   } else if (S.members && S.members.length) {
     roster = S.members;
-  } else {
-    roster = Array.from({ length: 10 }, (_, i) => ({
-      student_id: i + 1,
-      class_roll_no: i + 1,
-      full_name: ['Aarav Sharma', 'Ananya Patel', 'Aditya Verma', 'Diya Gupta', 'Ishaan Singh', 'Kavya Joshi', 'Neha Rawat', 'Rohan Negi', 'Siddharth Bisht', 'Tanvi Bhatt'][i],
-      official_enrollment_no: `2024IT00${i + 1}`
-    }));
   }
 
   if (!roster.length) {
@@ -4715,7 +4688,7 @@ function onSelectStudentInRosterModal(studentId) {
     student_id: sId,
     class_roll_no: sId,
     full_name: 'Student ' + sId,
-    official_enrollment_no: '2024IT00' + sId
+    official_enrollment_no: ''
   };
 
   if (nameInput) nameInput.value = st.full_name || st.name || '';
