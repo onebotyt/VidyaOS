@@ -291,9 +291,9 @@
               <span class="date-from-text">${formattedFrom}</span>
               <span class="date-to-text">– ${formattedTo}</span>
             </div>
-            <span class="td-days">${daysCount} ${daysCount === 1 ? 'Day' : 'Days'}</span>
+            <span class="date-days-pill">${daysCount} ${daysCount === 1 ? 'Day' : 'Days'}</span>
           </td>
-          <td class="td-days">${daysCount}</td>
+          <td class="td-days desktop-only-col">${daysCount}</td>
           <td class="td-reason">
             <div class="reason-text" title="${escapeHtml(l.reason || '')}">${escapeHtml(l.reason || 'Leave requested')}</div>
           </td>

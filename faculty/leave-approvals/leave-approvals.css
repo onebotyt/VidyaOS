@@ -25,12 +25,7 @@
   gap: 1.25rem;
 }
 
-@media (max-width: 768px) {
-  .leave-page-container {
-    padding: 1rem 1rem 2rem;
-    gap: 1rem;
-  }
-}
+
 
 /* ── 2. Breadcrumbs ── */
 .leave-breadcrumb {
@@ -139,22 +134,7 @@
   font-weight: 500;
 }
 
-@media (max-width: 768px) {
-  .leave-compact-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  .leave-title {
-    font-size: 1.25rem;
-  }
-  .leave-dept-pill {
-    width: 100%;
-    box-sizing: border-box;
-    font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
-  }
-}
+
 
 /* ── 4. Segmented Filter Tabs & Search Controls Bar ── */
 .leave-controls-bar {
@@ -295,21 +275,7 @@
   border-color: var(--color-primary-light);
 }
 
-@media (max-width: 768px) {
-  .leave-controls-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .leave-search-filter-cluster {
-    width: 100%;
-  }
-  .leave-search-field {
-    flex: 1;
-  }
-  .leave-search-input {
-    width: 100%;
-  }
-}
+
 
 /* ── 5. Leave Applications Table Card ── */
 .leave-table-card {
@@ -785,245 +751,414 @@
 /* ── 8. Mobile Compact UI & Card Layout Transformation (<768px) ── */
 @media (max-width: 768px) {
   .leave-page-container {
-    padding: 0.75rem 0.85rem 2rem;
-    gap: 0.75rem;
+    padding: 0.65rem 0.65rem 2rem !important;
+    gap: 0.65rem !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
 
+  .leave-breadcrumb {
+    font-size: 0.76rem !important;
+    gap: 0.35rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  /* Compact Header */
+  .leave-compact-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .leave-title {
+    font-size: 1.2rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .leave-subtitle {
+    font-size: 0.76rem !important;
+  }
+
+  .leave-dept-pill {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.25rem 0.4rem !important;
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.6rem !important;
+    border-radius: 8px !important;
+  }
+
+  /* Controls Bar: 100% width, no overflow */
   .leave-controls-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.6rem;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
+  /* 4-Tab Segmented Grid: Fits 100% across the screen with NO horizontal scroll or cutoffs */
   .leave-tabs-cluster {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
-    gap: 0.35rem;
-  }
-
-  .leave-tabs-cluster::-webkit-scrollbar {
-    display: none;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    width: 100% !important;
+    gap: 0.25rem !important;
+    overflow-x: visible !important;
+    box-sizing: border-box !important;
   }
 
   .leave-tab-btn {
-    padding: 0.38rem 0.75rem;
-    font-size: 0.78rem;
-    border-radius: 8px;
-    flex-shrink: 0;
-    white-space: nowrap;
+    width: 100% !important;
+    padding: 0.45rem 0.2rem !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.25rem !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+  }
+
+  .leave-tab-btn svg {
+    display: none !important; /* Hide icon so text and badge fit in single row on 320px-390px */
   }
 
   .leave-tab-counter {
-    min-width: 17px;
-    height: 17px;
-    font-size: 0.68rem;
-    padding: 0 4px;
+    min-width: 16px !important;
+    height: 16px !important;
+    font-size: 0.62rem !important;
+    padding: 0 4px !important;
+    border-radius: 999px !important;
+    line-height: 16px !important;
+    text-align: center !important;
   }
 
+  /* Search & Filter Cluster */
   .leave-search-filter-cluster {
-    width: 100%;
-    gap: 0.45rem;
+    display: flex !important;
+    width: 100% !important;
+    gap: 0.4rem !important;
+    box-sizing: border-box !important;
   }
 
   .leave-search-field {
-    flex: 1;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    position: relative !important;
   }
 
   .leave-search-input {
-    width: 100%;
-    height: 36px;
-    font-size: 0.82rem;
-    padding-left: 2.1rem;
-    border-radius: 8px;
+    width: 100% !important;
+    height: 38px !important;
+    font-size: 0.8rem !important;
+    padding: 0 0.5rem 0 2rem !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
   }
 
   .leave-search-icon {
-    left: 0.65rem;
-    width: 14px;
-    height: 14px;
+    left: 0.65rem !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .leave-filter-action-btn {
-    height: 36px;
-    padding: 0 0.75rem;
-    font-size: 0.82rem;
-    border-radius: 8px;
+    flex-shrink: 0 !important;
+    height: 38px !important;
+    padding: 0 0.7rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    box-sizing: border-box !important;
   }
 
-  /* Table Card becomes flat card list on mobile */
+  /* Table Card becomes flat card list */
   .leave-table-card {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .leave-table-responsive {
-    overflow: visible;
+    overflow: visible !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  .leave-data-table,
-  .leave-data-table tbody,
-  .leave-data-table tr,
-  .leave-data-table td {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
+  .leave-data-table {
+    display: block !important;
+    width: 100% !important;
+    border: none !important;
+    box-sizing: border-box !important;
   }
 
   .leave-data-table thead {
-    display: none;
-  }
-
-  .leave-data-table tbody tr {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    margin-bottom: 0.75rem;
-    padding: 0.85rem;
-    box-shadow: 0 1px 4px hsl(0 0% 0% / 0.04);
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-    position: relative;
-  }
-
-  .leave-data-table td {
-    padding: 0 !important;
-    border: none !important;
-  }
-
-  .td-cb {
     display: none !important;
   }
 
-  .td-student {
-    padding-right: 5.5rem !important; /* Space for absolute status badge */
+  .leave-data-table tbody {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Each table row becomes an individual mobile card */
+  .leave-data-table tbody tr {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    margin-bottom: 0.75rem !important;
+    padding: 0.85rem !important;
+    box-shadow: var(--shadow-xs, var(--shadow-sm)) !important;
+    gap: 0.45rem !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Table cell base styling on mobile */
+  .leave-data-table tbody tr td {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Completely hide checkbox column on mobile */
+  .leave-data-table tbody tr td.td-cb,
+  .leave-data-table .th-cb {
+    display: none !important;
+  }
+
+  /* Completely hide the duplicate standalone Days column on mobile */
+  .leave-data-table tbody tr td.td-days.desktop-only-col,
+  .leave-data-table tbody tr td.td-days:not(.td-dates *),
+  .leave-data-table .th-days {
+    display: none !important;
+  }
+
+  /* Student Info (Top row in card flow) */
+  .leave-data-table tbody tr td.td-student {
+    display: block !important;
+    width: 100% !important;
+    padding-right: 6.8rem !important; /* Reserving space so student name NEVER collides with status badge */
+    box-sizing: border-box !important;
   }
 
   .student-cell-wrap {
-    gap: 0.55rem;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    min-width: 0 !important;
   }
 
   .student-avatar-circle {
-    width: 34px;
-    height: 34px;
-    font-size: 0.82rem;
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .student-cell-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
   }
 
   .student-name-text {
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.25 !important;
   }
 
   .student-roll-text {
-    font-size: 0.74rem;
+    font-size: 0.74rem !important;
+    color: var(--text-muted) !important;
+    font-family: var(--font-family-mono, monospace) !important;
+    margin-top: 1px !important;
   }
 
-  .td-status {
-    position: absolute;
-    top: 0.85rem;
-    right: 0.85rem;
+  /* Status Badge: Pinned cleanly to top-right corner of card */
+  .leave-data-table tbody tr td.td-status {
+    position: absolute !important;
+    top: 0.85rem !important;
+    right: 0.85rem !important;
+    width: auto !important;
+    max-width: 6.2rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
   }
 
   .leave-status-badge {
-    padding: 2px 7px;
-    font-size: 0.72rem;
-    border-radius: 6px;
+    padding: 3px 8px !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    white-space: nowrap !important;
   }
 
-  .td-class {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.76rem;
-    color: var(--text-muted);
+  .leave-status-badge svg {
+    width: 12px !important;
+    height: 12px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Class & Section */
+  .leave-data-table tbody tr td.td-class {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    font-size: 0.76rem !important;
+    color: var(--text-muted) !important;
   }
 
   .class-cell-wrap {
-    display: inline-flex;
-    flex-direction: row;
-    gap: 0.4rem;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
   }
 
-  .td-type {
-    display: inline-block;
+  .class-sem-text {
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+  }
+
+  .class-sec-text {
+    color: var(--text-muted) !important;
+  }
+
+  /* Leave Type Pill */
+  .leave-data-table tbody tr td.td-type {
+    display: block !important;
+    width: 100% !important;
   }
 
   .leave-type-pill {
-    padding: 2px 7px;
-    font-size: 0.72rem;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 2px 8px !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
   }
 
-  .td-dates {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--bg-surface);
-    padding: 0.35rem 0.6rem !important;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    font-size: 0.78rem;
+  /* Dates & Duration Banner */
+  .leave-data-table tbody tr td.td-dates {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: var(--bg-surface) !important;
+    padding: 0.45rem 0.65rem !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border-color) !important;
+    font-size: 0.78rem !important;
+    box-sizing: border-box !important;
   }
 
   .date-range-wrap {
-    display: inline-flex;
-    flex-direction: row;
-    gap: 0.25rem;
-    font-weight: 600;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    font-weight: 600 !important;
+    color: var(--text-main) !important;
+    font-size: 0.78rem !important;
   }
 
-  .td-days {
-    display: inline-block;
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: var(--color-primary);
+  .date-calendar-icon {
+    color: var(--text-muted) !important;
+    flex-shrink: 0 !important;
   }
 
-  .td-reason {
-    font-size: 0.82rem;
-    color: var(--text-main);
-    background: var(--bg-surface);
+  .date-days-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    color: var(--color-primary) !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    padding: 1px 7px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Reason Callout Box */
+  .leave-data-table tbody tr td.td-reason {
+    font-size: 0.8rem !important;
+    color: var(--text-main) !important;
+    background: var(--bg-surface) !important;
     padding: 0.45rem 0.65rem !important;
-    border-radius: 8px;
-    border-left: 3px solid var(--color-primary);
-    line-height: 1.4;
+    border-radius: 8px !important;
+    border-left: 3px solid var(--color-primary) !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important;
+    box-sizing: border-box !important;
   }
 
   .reason-text {
-    max-width: 100%;
-    white-space: normal;
-    text-overflow: unset;
-    overflow: visible;
+    max-width: 100% !important;
+    white-space: normal !important;
+    text-overflow: unset !important;
+    overflow: visible !important;
   }
 
-  .td-actions {
-    display: flex;
+  /* Action Buttons */
+  .leave-data-table tbody tr td.td-actions {
+    display: flex !important;
     padding-top: 0.45rem !important;
     border-top: 1px dashed var(--border-color) !important;
+    box-sizing: border-box !important;
   }
 
   .leave-action-buttons {
-    width: 100%;
-    display: flex;
-    gap: 0.5rem;
+    width: 100% !important;
+    display: flex !important;
+    gap: 0.5rem !important;
   }
 
   .leave-btn-approve,
   .leave-btn-reject {
-    flex: 1;
-    height: 36px;
-    border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    gap: 0.35rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 0.75rem;
+    flex: 1 1 50% !important;
+    height: 38px !important;
+    border-radius: 8px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    gap: 0.35rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 0.5rem !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
   }
 
   .leave-btn-approve span,
@@ -1032,15 +1167,22 @@
   }
 
   .leave-reviewed-tag {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.74rem !important;
+    padding: 0.25rem 0.6rem !important;
+    border-radius: 6px !important;
   }
 
+  /* Footer & Pagination */
   .leave-card-footer {
-    padding: 0.75rem 0.5rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.75rem 0.25rem 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .leave-counter-label {
-    font-size: 0.78rem;
+    font-size: 0.76rem !important;
   }
 }
