@@ -1,8 +1,8 @@
 {
-  "version": "1.0.1",
-  "buildNumber": 1,
-  "releaseDate": "2026-11-18",
+  "version": "1.0.9",
+  "buildNumber": 9,
+  "releaseDate": "2026-11-17",
   "appName": "VidyaOS",
   "apkUrl": "https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk",
-  "releaseNotes": "Institutional campus OS Android release with unified mobile attendance, camera QR scanning, PIN check-in, and offline-resilient sync."
+  "releaseNotes": "Automated build 1.0.9 with instant cloud sync and mobile attendance studio."
 }
