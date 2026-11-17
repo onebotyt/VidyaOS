@@ -989,6 +989,7 @@
     display: none !important;
   }
 
+  .leave-data-table tbody tr td.td-days,
   .leave-data-table tbody tr td.td-days.desktop-only-col,
   .leave-data-table .th-days {
     display: none !important;

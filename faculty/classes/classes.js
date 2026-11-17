@@ -79,43 +79,11 @@
       } else if (Array.isArray(data)) {
         state.groups = data;
       } else {
-        // Fallback demo classes
-        state.groups = [
-          {
-            id: 1,
-            name: 'Cloud Computing & DevOps',
-            subject_name: 'Cloud Computing & DevOps',
-            subject_short_name: 'CCDO',
-            subject_code: 'IT601',
-            room_no: '101',
-            semester: 6,
-            year: 3,
-            component: 'THEORY',
-            academic_year_label: '2026–27',
-            member_count: 62,
-            avg_attendance_pct: 85,
-            status: 'ACTIVE'
-          }
-        ];
+        state.groups = [];
       }
-    } catch (_) {
-      state.groups = [
-        {
-          id: 1,
-          name: 'Cloud Computing & DevOps',
-          subject_name: 'Cloud Computing & DevOps',
-          subject_short_name: 'CCDO',
-          subject_code: 'IT601',
-          room_no: '101',
-          semester: 6,
-          year: 3,
-          component: 'THEORY',
-          academic_year_label: '2026–27',
-          member_count: 62,
-          avg_attendance_pct: 85,
-          status: 'ACTIVE'
-        }
-      ];
+    } catch (err) {
+      console.warn('[Classes] Failed to load classes:', err);
+      state.groups = [];
     }
 
     updateStats();
@@ -197,7 +165,7 @@
     }
 
     container.innerHTML = filtered.map((g) => {
-      const subjectTitle = g.subject_name || g.name || 'Cloud Computing & DevOps';
+      const subjectTitle = g.subject_name || g.name || 'Untitled Class';
       const roomCode = g.subject_code || g.room_no || '101';
       const semester = g.semester || 6;
       const compRaw = String(g.component || 'THEORY').toUpperCase();
