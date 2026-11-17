@@ -1,17 +1,28 @@
 {
   "name": "vidyaos-frontend",
-  "version": "1.0.0",
-  "description": "VidyaOS Institutional Campus Operating System - Modern Frontend Client",
+  "version": "1.0.1",
+  "description": "VidyaOS Institutional Campus Operating System - Modern Frontend Client & Mobile App",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "prepare:mobile": "node scripts/prepare-mobile.js",
+    "cap:sync": "node scripts/prepare-mobile.js && npx cap sync android",
+    "cap:open": "npx cap open android"
   },
   "keywords": [
     "vidyaos",
     "attendance",
     "campus-os",
-    "frontend"
+    "frontend",
+    "capacitor",
+    "android"
   ],
   "author": "VidyaOS Core Team",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@capacitor/android": "^8.1.2",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/cli": "^8.1.2",
+    "@capacitor/core": "^8.1.2"
+  }
 }

@@ -1,14 +1,33 @@
 <div align="center">
-  <h1>🎓 VidyaOS — Frontend Portal</h1>
-  <p><strong>Unified Institutional Campus Operating System — Client</strong></p>
+  <h1>🎓 VidyaOS — Frontend Portal & Mobile App</h1>
+  <p><strong>Unified Institutional Campus Operating System — Client & Android App</strong></p>
   <p>
+    <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk">
+      <img src="https://img.shields.io/badge/Android_APK-Download_Latest-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download Android APK" />
+    </a>
+    <a href="https://vidyaos.pink.vercel.app">
+      <img src="https://img.shields.io/badge/Web_Portal-Live_Demo-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Web App" />
+    </a>
+  </p>
+  <p>
+    <img src="https://img.shields.io/badge/Capacitor-8.x-119EFF?style=flat-square&logo=capacitor&logoColor=white" />
     <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" />
     <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3" />
     <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" />
     <img src="https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel" />
-    <img src="https://img.shields.io/badge/Zero_Dependencies-✓-22c55e?style=flat-square" />
+    <img src="https://img.shields.io/badge/Auto_CI%2FCD-Active-22c55e?style=flat-square&logo=githubactions&logoColor=white" />
   </p>
 </div>
+
+---
+
+### 📱 Download & Install Android App (APK)
+
+Get the latest native Android release directly:
+- 📲 **[Download Latest VidyaOS.apk](https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk)**
+- **Automatic In-App Updates**: Already installed apps automatically detect updates upon startup and prompt with 1-click download.
+- **Zero Separate Code**: Built via Capacitor directly from our HTML5/CSS3/JavaScript web code.
+- **Cloud Backend**: App is frontend-only; all student and faculty database operations route securely to our cloud backend on Render.
 
 ---
 

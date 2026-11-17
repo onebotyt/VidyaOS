@@ -39,3 +39,11 @@ standalone/
 **/preview.html
 
 
+
+# Mobile Build Artifacts (Capacitor)
+www/
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.aab

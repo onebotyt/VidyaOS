@@ -54,9 +54,11 @@ body.viewing-work-details #student-work-details-view {
   .gc-navbar {
     display: flex !important;
   }
+
   .pc-work-details-container {
     display: block !important;
   }
+
   .mobile-class-app-bar,
   .student-mobile-bottom-nav,
   .mobile-cw-unit-section,
@@ -68,6 +70,7 @@ body.viewing-work-details #student-work-details-view {
 
 /* Mobile (<= 768px): STRICTLY HIDE PC layout, Show mobile layout, Hide desktop navbar */
 @media (max-width: 768px) {
+
   .gc-navbar,
   .student-tabs-nav,
   .pc-unit-section,
@@ -125,7 +128,8 @@ body.viewing-work-details #student-work-details-view {
     line-height: 1.25;
     margin: 0.35rem 0 0.4rem;
     color: var(--text-white);
-    padding-right: 54px; /* Ensure space for teacher avatar circle */
+    padding-right: 54px;
+    /* Ensure space for teacher avatar circle */
     word-break: break-word;
   }
 
@@ -134,7 +138,8 @@ body.viewing-work-details #student-work-details-view {
     font-weight: 500;
     opacity: 0.95;
     gap: 0.35rem;
-    padding-right: 54px; /* Ensure space for teacher avatar circle */
+    padding-right: 54px;
+    /* Ensure space for teacher avatar circle */
   }
 
   .student-hero-banner .hero-teacher-avatar {
@@ -178,12 +183,29 @@ body.viewing-work-details #student-work-details-view {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.student-hero-banner.palette-0 { background: linear-gradient(135deg, hsl(217, 82%, 46%), hsl(220, 90%, 56%)); }
-.student-hero-banner.palette-1 { background: linear-gradient(135deg, hsl(152, 72%, 34%), hsl(142, 71%, 45%)); }
-.student-hero-banner.palette-2 { background: linear-gradient(135deg, hsl(262, 70%, 48%), hsl(280, 80%, 56%)); }
-.student-hero-banner.palette-3 { background: linear-gradient(135deg, hsl(32, 94%, 42%), hsl(38, 92%, 50%)); }
-.student-hero-banner.palette-4 { background: linear-gradient(135deg, hsl(186, 86%, 32%), hsl(190, 90%, 44%)); }
-.student-hero-banner.palette-5 { background: linear-gradient(135deg, hsl(340, 76%, 44%), hsl(345, 80%, 54%)); }
+.student-hero-banner.palette-0 {
+  background: linear-gradient(135deg, hsl(217, 82%, 46%), hsl(220, 90%, 56%));
+}
+
+.student-hero-banner.palette-1 {
+  background: linear-gradient(135deg, hsl(152, 72%, 34%), hsl(142, 71%, 45%));
+}
+
+.student-hero-banner.palette-2 {
+  background: linear-gradient(135deg, hsl(262, 70%, 48%), hsl(280, 80%, 56%));
+}
+
+.student-hero-banner.palette-3 {
+  background: linear-gradient(135deg, hsl(32, 94%, 42%), hsl(38, 92%, 50%));
+}
+
+.student-hero-banner.palette-4 {
+  background: linear-gradient(135deg, hsl(186, 86%, 32%), hsl(190, 90%, 44%));
+}
+
+.student-hero-banner.palette-5 {
+  background: linear-gradient(135deg, hsl(340, 76%, 44%), hsl(345, 80%, 54%));
+}
 
 .hero-banner-top {
   display: flex;
@@ -314,8 +336,15 @@ body.viewing-work-details #student-work-details-view {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -1487,10 +1516,12 @@ body.viewing-work-details #student-work-details-view {
    MOBILE CLASSWORK VIEW (Image 3 Alignment)
    ───────────────────────────────────────────────────────────── */
 .mobile-cw-unit-section {
-  display: none; /* Only on <= 768px */
+  display: none;
+  /* Only on <= 768px */
 }
 
 @media (max-width: 768px) {
+
   /* Hide desktop-specific layouts */
   .student-tabs-nav,
   .pc-unit-section,
@@ -1654,7 +1685,8 @@ body.viewing-work-details #student-work-details-view {
   }
 
   .mobile-details-body {
-    padding: 1.25rem 1.25rem 220px; /* Safe padding for bottom sheet */
+    padding: 1.25rem 1.25rem 220px;
+    /* Safe padding for bottom sheet */
   }
 
   .m-due-date {
@@ -1799,7 +1831,8 @@ body.viewing-work-details #student-work-details-view {
   .btn-mobile-add-work {
     width: 100%;
     padding: 0.75rem;
-    border-radius: 999px; /* Pill */
+    border-radius: 999px;
+    /* Pill */
     background: var(--color-primary-light);
     color: var(--color-primary);
     font-size: 0.95rem;
