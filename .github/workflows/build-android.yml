@@ -67,8 +67,7 @@ jobs:
           node -e "const pkg = require('./package.json'); pkg.version = '${VERSION}'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
 
           # 3. Update Android Gradle versionCode and versionName
-          sed -i "s/versionCode [0-9]\+/versionCode ${BUILD_NUM}/g" android/app/build.gradle
-          sed -i "s/versionName \".*\"/versionName \"${VERSION}\"/g" android/app/build.gradle
+          node -e "const fs = require('fs'); let g = fs.readFileSync('android/app/build.gradle', 'utf8'); g = g.replace(/versionCode \d+/, 'versionCode ' + process.env.BUILD_NUM).replace(/versionName \".*?\"/, 'versionName \"' + process.env.VERSION + '\"'); fs.writeFileSync('android/app/build.gradle', g);"
 
       - name: Install Node Dependencies
         run: npm install
@@ -77,13 +76,15 @@ jobs:
         run: node scripts/prepare-mobile.js
 
       - name: Sync Capacitor Android Project
-        run: npx cap sync android
+        run: |
+          chmod +x android/gradlew
+          npx cap sync android
 
       - name: Build Android APK (Gradle)
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Copy Release APK Artifact
         run: |
