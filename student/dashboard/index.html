@@ -30,40 +30,33 @@
 
   <!-- Main Container -->
   <main class="page-main-container container" style="max-width:1380px;padding-top:1.5rem;padding-bottom:3.5rem;">
-    <!-- Active Classroom Live Attendance Alert Banner -->
-    <div id="active-session-banner" class="card"
-      style="display: none; background: var(--color-primary-light); border-color: var(--color-primary); margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <span class="badge" style="background: var(--color-primary); color: var(--text-white, white);">● Live
-              Session Active</span>
-            <strong id="active-session-subject" style="font-size: 1.05rem;">Operating Systems (IT402)</strong>
-          </div>
-          <div id="active-session-info" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
-            Teacher: Prof. Sharma | Auto-closes in 15 mins
-          </div>
-        </div>
-        <button id="open-self-attendance-btn" class="btn btn-primary" onclick="openSelfAttendanceModal()"
-          style="display:inline-flex;align-items:center;gap:0.4rem;">
-          <span>Submit Presence (PIN / QR)</span> <span>→</span>
-        </button>
-      </div>
+    <!-- Compatibility Markers for Active Session Checks -->
+    <div id="active-session-banner" style="display: none;" aria-hidden="true">
+      <span id="active-session-subject"></span>
+      <span id="active-session-info"></span>
+      <button id="open-self-attendance-btn" onclick="openSelfAttendanceModal()"></button>
     </div>
 
-    <!-- Student Identity & Academic Cohort Hero Strip -->
-    <section class="student-hero-banner">
-      <div class="student-hero-left">
-        <h1 id="student-name">Welcome, Student</h1>
-        <p id="student-cohort-info">Loading academic cohort details...</p>
+    <!-- Institutional Hero (Dynamically Linked to Admin Settings — Matching Faculty Dashboard) -->
+    <section class="hero-card" aria-label="Institutional Showcase">
+      <div class="hero-left">
+        <div class="hero-logo" id="hero-logo-slot">
+          <img src="/images/collegelogo.jpeg" alt="Institution Logo" onerror="this.onerror=null;this.src='/images/collegelogo.jpeg';">
+        </div>
+        <div>
+          <h1 class="hero-title" id="hero-inst-title">Government Polytechnic College</h1>
+          <div class="hero-student-meta" style="font-size: 0.84rem; color: var(--text-muted); margin-top: 0.2rem; display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+            <span id="student-name" style="font-weight: 600; color: var(--text-main);">Welcome, Student</span>
+            <span style="opacity: 0.6;">•</span>
+            <span id="student-cohort-info">Information Technology</span>
+          </div>
+        </div>
       </div>
-      <div class="student-hero-badges">
-        <span id="student-roll-badge" class="badge badge-present"
-          style="font-size: 0.88rem; padding: 0.45rem 0.95rem; font-weight: 700;">
-          Roll: -- • UBTER Reg: --
-        </span>
+      <div class="hero-banner" id="hero-banner-slot">
+        <img src="/images/campus-nainital.jpg" alt="College Campus" onerror="this.onerror=null;this.style.display='none';">
       </div>
       <!-- Backward compatibility contract element -->
+      <span id="student-roll-badge" style="display:none;" aria-hidden="true">Roll: -- • UBTER Reg: --</span>
       <span id="header-student-name" style="display:none;" aria-hidden="true">Student Portal</span>
     </section>
 
@@ -128,108 +121,22 @@
       </div>
     </section>
 
-    <!-- Institutional Telemetry & Attendance Predictor Section -->
-    <section class="analytics-section">
-      <div class="analytics-header">
-        <h3 class="analytics-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-          <span>Attendance Analytics &amp; Examination Eligibility</span>
-        </h3>
+    <!-- Backward compatibility markers for analytics/history telemetry queries -->
+    <div id="telemetry-compat-marker" style="display:none;" aria-hidden="true">
+      <span id="metric-percentage"></span>
+      <span id="metric-attended"></span>
+      <span id="metric-attended-sub"></span>
+      <span id="metric-absent"></span>
+      <span id="metric-conducted"></span>
+      <div id="predictor-card">
+        <span id="predictor-icon"></span>
+        <span id="predictor-headline"></span>
+        <span id="predictor-status-badge"></span>
+        <span id="predictor-message"></span>
       </div>
-
-      <!-- Attendance Metrics Grid -->
-      <div class="grid-cols-4" style="margin-bottom: 1.5rem;">
-        <div class="card" style="text-align: center;">
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Attendance Percentage</div>
-          <div id="metric-percentage" style="font-size: 2.2rem; font-weight: 800; color: var(--status-present);">--%
-          </div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Threshold: 75%</div>
-        </div>
-
-        <div class="card" style="text-align: center;">
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Attended Sessions</div>
-          <div id="metric-attended" style="font-size: 2.2rem; font-weight: 800; color: var(--text-main);">0</div>
-          <div id="metric-attended-sub" style="font-size: 0.75rem; color: var(--text-muted);">Present: 0 | Late: 0</div>
-        </div>
-
-        <div class="card" style="text-align: center;">
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Absent Sessions</div>
-          <div id="metric-absent" style="font-size: 2.2rem; font-weight: 800; color: var(--status-absent);">0</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Missed classes</div>
-        </div>
-
-        <div class="card" style="text-align: center;">
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Total Conducted</div>
-          <div id="metric-conducted" style="font-size: 2.2rem; font-weight: 800; color: var(--text-main);">0</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Finalized sessions</div>
-        </div>
-      </div>
-
-      <!-- Institutional Attendance Compliance Standing Widget -->
-      <div id="predictor-card" class="predictor-box predictor-safe" style="margin-bottom: 1.5rem;">
-        <div id="predictor-icon" style="display:flex;align-items:center;justify-content:center;">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-        </div>
-        <div style="flex: 1;">
-          <div
-            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-            <strong id="predictor-headline" style="font-size: 1.08rem;">Good Standing (Eligible)</strong>
-            <span id="predictor-status-badge" class="badge badge-present">Eligible for Exams</span>
-          </div>
-          <p id="predictor-message"
-            style="font-size: 0.92rem; margin-top: 0.35rem; color: var(--text-main); margin-bottom: 0;">
-            Checking attendance compliance...
-          </p>
-        </div>
-      </div>
-
-      <!-- Subject Breakdown & History Sections -->
-      <div class="grid-cols-2" style="margin-bottom: 2rem;">
-        <!-- Subject-Wise Breakdown -->
-        <div class="card">
-          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 class="card-title" style="font-size: 1.05rem;">Subject-Wise Attendance Matrix</h2>
-            <a href="/student/attendance/index.html" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Full
-              Calendar →</a>
-          </div>
-          <div id="subjects-container">
-            <p style="color: var(--text-muted); font-size: 0.875rem;">Loading courses...</p>
-          </div>
-        </div>
-
-        <!-- Recent History Log -->
-        <div class="card">
-          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 class="card-title" style="font-size: 1.05rem;">Recent Session Log</h2>
-            <a href="/student/attendance/index.html" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">View
-              All →</a>
-          </div>
-          <div class="table-wrapper">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Subject</th>
-                  <th>Status</th>
-                  <th>Source</th>
-                </tr>
-              </thead>
-              <tbody id="history-tbody">
-                <tr>
-                  <td colspan="4" style="text-align: center; color: var(--text-muted);">Loading history...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
+      <div id="subjects-container"></div>
+      <table><tbody id="history-tbody"></tbody></table>
+    </div>
 
     <!-- Hidden compatibility marker for user-nav -->
     <div id="user-nav" style="display:none;" aria-hidden="true"></div>
@@ -373,9 +280,36 @@
     </div>
   </div>
 
-  <!-- Floating Action Button (Student Portal) -->
+  <!-- Floating Action Button (Student Portal - Mobile Only Speed Dial) -->
   <div class="gc-fab-wrapper" id="student-fab-wrapper">
     <div class="gc-fab-menu" id="student-fab-menu" style="display: none;">
+      <!-- Option 1: Enter 6-Digit PIN Attendance -->
+      <button type="button" class="gc-fab-menu-action" id="fab-action-pin"
+        onclick="openSelfAttendanceModal('PIN'); toggleStudentFabMenu(false);" title="Submit PIN Attendance">
+        <span class="gc-fab-action-label">PIN Attendance</span>
+        <span class="gc-fab-action-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Option 2: Scan QR Attendance with Camera -->
+      <button type="button" class="gc-fab-menu-action" id="fab-action-qr"
+        onclick="openCameraQrModal(); toggleStudentFabMenu(false);" title="Scan QR Code via Camera">
+        <span class="gc-fab-action-label">Scan QR (Camera)</span>
+        <span class="gc-fab-action-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Option 3: Join Class with Code -->
       <button type="button" class="gc-fab-menu-action" id="fab-action-join-class"
         onclick="openStudentJoinModal(); toggleStudentFabMenu(false);" title="Join Class with Invite Code">
         <span class="gc-fab-action-label">Join Class</span>
@@ -399,6 +333,42 @@
         <line x1="5" y1="12" x2="19" y2="12"></line>
       </svg>
     </button>
+  </div>
+
+  <!-- MODAL: CAMERA QR CODE SCANNER -->
+  <div id="camera-qr-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)closeCameraQrModal()">
+    <div class="modal-card" style="max-width: 440px;" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 class="card-title" style="display: flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 1.1rem; color: var(--text-main);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <span>Scan Attendance QR</span>
+        </h3>
+        <button type="button" class="btn-close" onclick="closeCameraQrModal()" aria-label="Close"
+          style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <div style="position: relative; border-radius: var(--radius-md); overflow: hidden; background: #000000; min-height: 260px; display: flex; align-items: center; justify-content: center;">
+        <video id="qr-video-feed" playsinline autoplay style="width: 100%; height: 260px; object-fit: cover;"></video>
+        <!-- Scanner Crosshair Overlay -->
+        <div style="position: absolute; inset: 24px; border: 2px dashed var(--color-primary); border-radius: var(--radius-md); pointer-events: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);"></div>
+        <div id="qr-camera-status" style="position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(0,0,0,0.7); color: #ffffff; font-size: 0.78rem; text-align: center; padding: 4px 8px; border-radius: 6px;">
+          Align QR code within frame
+        </div>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.5rem; text-align: center;">
+          Or enter / paste QR Token hash below:
+        </p>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="manual-qr-token-input" class="form-control" placeholder="Paste token hash..." style="font-size: 0.85rem;">
+          <button type="button" class="btn btn-primary" onclick="submitManualQrToken()">Submit</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL: COMPLETE STUDENT PROFILE POPUP (FIRST LOGIN / INCOMPLETE PROFILE) -->

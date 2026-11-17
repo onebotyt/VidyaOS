@@ -86,17 +86,12 @@
             </div>
             <div class="gc-brand-title">VidyaOS</div>
           </a>
-          <span class="gc-page-badge" id="gc-page-badge">${badge}</span>
+          <span class="gc-page-badge" id="gc-page-badge" style="display:none;" aria-hidden="true">${badge}</span>
         </div>
 
         <!-- Right Section -->
         <div class="gc-nav-right">
-          ${actionButtonHtml}
-          
-          <!-- Apps Launcher (9-Dot Grid) -->
-          <button type="button" class="gc-icon-btn" onclick="toggleStudentApps(event)" id="btn-student-apps" title="Student Modules" aria-label="Open Academic Modules">
-            ${getIcon('appsGrid', { width: 18, height: 18 })}
-          </button>
+          <button type="button" id="btn-student-apps" style="display:none;" aria-hidden="true"></button>
 
           <!-- Theme Toggle Button -->
           <button type="button" class="gc-icon-btn" onclick="toggleStudentTheme()" id="btn-student-theme" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">

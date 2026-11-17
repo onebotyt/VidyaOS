@@ -1384,20 +1384,25 @@ async function loadDrawerEnrolledClasses() {
    ───────────────────────────────────────────────────────────── */
 
 function toggleStudentDrawer(forceState) {
-  if (typeof toggleSidebar === 'function') {
+  if (typeof window.toggleDrawerComponent === 'function') {
+    return window.toggleDrawerComponent(forceState);
+  }
+  if (typeof toggleSidebar === 'function' && toggleSidebar !== toggleStudentDrawer) {
     return toggleSidebar(forceState);
   }
-  const drawer = document.getElementById('gc-drawer');
-  const backdrop = document.getElementById('gc-drawer-backdrop');
+  const drawer = document.getElementById('student-drawer') || document.getElementById('gc-drawer');
+  const backdrop = document.getElementById('student-drawer-backdrop') || document.getElementById('gc-drawer-backdrop');
   if (!drawer) return;
 
   const isOpen = forceState !== undefined ? forceState : !drawer.classList.contains('open');
   if (isOpen) {
     drawer.classList.add('open');
     if (backdrop) backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
   } else {
     drawer.classList.remove('open');
     if (backdrop) backdrop.classList.remove('open');
+    document.body.style.overflow = '';
   }
   if (typeof _updateMenuToggleButtons === 'function') {
     _updateMenuToggleButtons(isOpen);

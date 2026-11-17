@@ -327,10 +327,14 @@
 
 /* ─── Mobile Viewport Optimizations ──────────────────────────── */
 @media (max-width: 600px) {
-  .gc-brand-title {
-    display: none;
+  .gc-navbar, .student-top-navbar {
+    padding: 0 0.75rem;
+    height: var(--student-nav-height, 56px);
   }
-  .student-nav-action-btn span.btn-text, .gc-create-btn span.btn-text {
-    display: none;
+  .gc-brand-title {
+    font-size: 1.05rem;
+  }
+  .student-nav-action-btn, .gc-create-btn, .gc-page-badge {
+    display: none !important;
   }
 }

@@ -25,6 +25,7 @@ let studentDashboardState = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  loadInstitutionBranding();
   loadStudentDashboard();
   loadEnrolledClasses();
   initDropdownCloseListeners();
@@ -440,28 +441,8 @@ function renderGoogleClassCards() {
           </div>
         </header>
 
-        <!-- Card Body with Live Attendance Telemetry -->
+        <!-- Compact Minimal Modern Card Body -->
         <div class="gc-card-body" onclick="window.location.href='/student/group-detail/index.html?id=${c.id}'" style="cursor:pointer;">
-          <div class="gc-card-att-box">
-            <div class="gc-card-att-top">
-              <span class="gc-card-att-pct" style="color: ${isSafe ? 'var(--status-present)' : 'var(--status-absent)'};">
-                ${pct}% Attendance
-              </span>
-              <span class="gc-card-att-status ${isSafe ? 'gc-status-safe' : 'gc-status-warn'}">
-                ${isSafe ? 'Safe Zone' : 'Deficit Warning'}
-              </span>
-            </div>
-
-            <div class="gc-card-progress">
-              <div class="gc-card-progress-bar" style="width: ${pct}%; background-color: ${isSafe ? 'var(--status-present)' : 'var(--status-absent)'};"></div>
-            </div>
-
-            <div class="gc-card-att-sub">
-              <span>Attended: <strong>${attended}</strong> / ${conducted} classes</span>
-              <span>Req: 75%</span>
-            </div>
-          </div>
-
           <div class="gc-card-coursework-row" onclick="event.stopPropagation()">
             <a href="/student/group-detail/index.html?id=${c.id}&tab=classwork" class="gc-coursework-pill ${(c.pending_work_count > 0) ? 'gc-coursework-pending' : ''}" title="View Coursework Assignments">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -480,6 +461,13 @@ function renderGoogleClassCards() {
               <span>${c.exam_count || 0} Tests</span>
             </a>
           </div>
+
+          <a href="/student/group-detail/index.html?id=${c.id}" class="gc-card-enter-link" title="Enter Classroom">
+            <span>Enter</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </a>
         </div>
 
         ${isStaff ? `
@@ -728,9 +716,16 @@ function initDropdownCloseListeners() {
 /**
  * Self Attendance Modal Handlers
  */
-function openSelfAttendanceModal() {
+function openSelfAttendanceModal(method) {
   const modal = document.getElementById('self-attendance-modal');
   if (modal) modal.classList.add('open');
+  if (method) {
+    const sel = document.getElementById('self-method');
+    if (sel) {
+      sel.value = method;
+      toggleSelfMethod();
+    }
+  }
 }
 
 function closeSelfAttendanceModal() {
@@ -745,6 +740,178 @@ function toggleSelfMethod() {
   if (pinField) pinField.style.display = method === 'PIN' ? 'block' : 'none';
   if (qrField) qrField.style.display = method === 'QR' ? 'block' : 'none';
 }
+
+/**
+ * Camera QR Scanner Engine (Mobile-First)
+ */
+let qrMediaStream = null;
+
+async function openCameraQrModal() {
+  const modal = document.getElementById('camera-qr-modal');
+  if (modal) modal.style.display = 'flex';
+
+  const video = document.getElementById('qr-video-feed');
+  const status = document.getElementById('qr-camera-status');
+
+  try {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      qrMediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      if (video) {
+        video.srcObject = qrMediaStream;
+        video.play();
+      }
+      if (status) status.innerText = 'Camera active. Point at professor QR code.';
+
+      if ('BarcodeDetector' in window) {
+        const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+        const scanInterval = setInterval(async () => {
+          if (!qrMediaStream || !video || video.readyState < 2) return;
+          try {
+            const barcodes = await detector.detect(video);
+            if (barcodes.length > 0) {
+              clearInterval(scanInterval);
+              const raw = barcodes[0].rawValue;
+              handleDetectedQrCode(raw);
+            }
+          } catch (_) {}
+        }, 400);
+      }
+    } else {
+      if (status) status.innerText = 'Camera not supported. Enter token manually below.';
+    }
+  } catch (err) {
+    console.warn('Camera access denied:', err);
+    if (status) status.innerText = 'Camera permission denied. Paste token hash below.';
+  }
+}
+
+function closeCameraQrModal() {
+  const modal = document.getElementById('camera-qr-modal');
+  if (modal) modal.style.display = 'none';
+  if (qrMediaStream) {
+    qrMediaStream.getTracks().forEach(track => track.stop());
+    qrMediaStream = null;
+  }
+}
+
+function handleDetectedQrCode(token) {
+  closeCameraQrModal();
+  submitPresenceWithToken(token);
+}
+
+function submitManualQrToken() {
+  const input = document.getElementById('manual-qr-token-input');
+  const token = input ? input.value.trim() : '';
+  if (!token) {
+    if (typeof showToast === 'function') showToast('Please enter QR token hash', 'warning');
+    else alert('Please enter QR token hash');
+    return;
+  }
+  closeCameraQrModal();
+  submitPresenceWithToken(token);
+}
+
+async function submitPresenceWithToken(qrToken) {
+  try {
+    if (!currentActiveSession) {
+      const sessRes = await fetchApi('/attendance/sessions?state=OPEN');
+      if (sessRes && sessRes.success && Array.isArray(sessRes.data) && sessRes.data.length > 0) {
+        currentActiveSession = sessRes.data[0];
+      }
+    }
+
+    if (!currentActiveSession) {
+      if (typeof showToast === 'function') showToast('No active attendance session currently open.', 'warning');
+      else alert('No active attendance session currently open.');
+      return;
+    }
+
+    const res = await fetchApi(`/attendance/sessions/${currentActiveSession.id}/self-attendance`, {
+      method: 'POST',
+      body: JSON.stringify({ method: 'QR', qr_token: qrToken })
+    });
+
+    if (res && res.success) {
+      if (typeof showToast === 'function') showToast('Presence recorded! Awaiting professor approval.', 'success');
+      else alert('Presence successfully recorded!');
+    }
+  } catch (err) {
+    if (typeof showToast === 'function') showToast(err.message || 'Failed to submit QR attendance', 'danger');
+    else alert(err.message || 'Failed to submit QR attendance');
+  }
+}
+
+/**
+ * Dynamic Institutional Hero Section (Synced from Admin Settings / Faculty parity)
+ */
+const INSTITUTION_DEFAULTS = {
+  institution_name: 'Government Polytechnic College',
+  campus_name: 'Nainital Campus',
+  institution_logo_url: '/images/collegelogo.jpeg',
+  institution_banner_url: '/images/campus-nainital.jpg'
+};
+
+function applyInstitutionSettings(settings) {
+  if (!settings) return;
+
+  const logoSlot = document.getElementById('hero-logo-slot');
+  const titleEl = document.getElementById('hero-inst-title');
+  const bannerSlot = document.getElementById('hero-banner-slot');
+
+  const instName = settings.institution_name || settings.name || INSTITUTION_DEFAULTS.institution_name;
+  const logoUrl = settings.institution_logo_url || settings.logo_url || INSTITUTION_DEFAULTS.institution_logo_url;
+  const bannerUrl = settings.institution_banner_url || settings.banner_url || INSTITUTION_DEFAULTS.institution_banner_url;
+  const campusName = settings.campus_name || settings.institution_tagline || INSTITUTION_DEFAULTS.campus_name;
+
+  if (titleEl) {
+    titleEl.textContent = instName;
+    document.title = `${instName} — Student Dashboard`;
+  }
+
+  if (logoSlot) {
+    logoSlot.innerHTML = `<img src="${logoUrl}" alt="${instName} Logo" onerror="this.onerror=null;this.src='/images/collegelogo.jpeg';">`;
+  }
+
+  if (bannerSlot) {
+    if (bannerUrl) {
+      bannerSlot.innerHTML = `<img src="${bannerUrl}" alt="${instName} Campus" onerror="this.onerror=null;this.style.display='none';this.parentElement.innerText='${campusName}';">`;
+    } else {
+      bannerSlot.textContent = campusName;
+    }
+  }
+}
+
+async function loadInstitutionBranding() {
+  try {
+    const cached = localStorage.getItem('institutionSettings');
+    if (cached) {
+      applyInstitutionSettings(JSON.parse(cached));
+    }
+  } catch (_) {}
+
+  try {
+    const fetchFn = typeof fetchApi === 'function' ? fetchApi : async (url) => {
+      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+      const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+      return res.json();
+    };
+    const res = await fetchFn('/settings');
+    if (res && res.success && res.data) {
+      localStorage.setItem('institutionSettings', JSON.stringify(res.data));
+      applyInstitutionSettings(res.data);
+    }
+  } catch (err) {
+    console.warn('Could not refresh institution settings:', err.message);
+  }
+}
+
+window.openSelfAttendanceModal = openSelfAttendanceModal;
+window.closeSelfAttendanceModal = closeSelfAttendanceModal;
+window.openCameraQrModal = openCameraQrModal;
+window.closeCameraQrModal = closeCameraQrModal;
+window.submitManualQrToken = submitManualQrToken;
 
 document.getElementById('self-attendance-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();

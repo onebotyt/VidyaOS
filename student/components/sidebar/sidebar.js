@@ -226,6 +226,8 @@
   window.toggleDrawerComponent = toggleDrawerComponent;
   window.mountStudentSidebar = mountStudentSidebar;
   window.toggleDrawer = toggleDrawerComponent;
+  window.toggleStudentDrawer = toggleDrawerComponent;
+  window.toggleSidebar = toggleDrawerComponent;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mountStudentSidebar);

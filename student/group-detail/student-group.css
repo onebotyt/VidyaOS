@@ -10,7 +10,6 @@
 /* Classroom Page Isolation (Zero legacy sidebar interference) */
 body.classroom-page {
   margin: 0;
-  padding: 0;
   background: var(--bg-app);
   color: var(--text-main);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
