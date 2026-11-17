@@ -12,7 +12,26 @@
 (function () {
   'use strict';
 
-  const API_BASE = '/api/v1';
+  function getVidyaApiBase() {
+    if (typeof window !== 'undefined' && window.VIDYAOS_API_BASE) {
+      return window.VIDYAOS_API_BASE;
+    }
+    if (typeof window !== 'undefined') {
+      const isMobileHost =
+        window.location.protocol === 'file:' ||
+        window.location.protocol === 'capacitor:' ||
+        (window.location.hostname === 'localhost' && (!window.location.port || window.location.protocol === 'https:')) ||
+        (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent) && window.location.hostname === 'localhost') ||
+        Boolean(window.VIDYAOS_FORCE_NATIVE) ||
+        Boolean(window.VIDYAOS_IS_NATIVE);
+      if (isMobileHost) {
+        return 'https://vidyaos-backend.onrender.com/api/v1';
+      }
+    }
+    return '/api/v1';
+  }
+
+  const API_BASE = getVidyaApiBase();
 
   /**
    * Helper to safely retrieve access token with backward compatibility
@@ -89,8 +108,14 @@
     };
 
     let normPath = endpoint;
-    if (normPath.startsWith(API_BASE)) {
+    if (normPath.startsWith('https://vidyaos-backend.onrender.com/api/v1')) {
+      normPath = normPath.slice('https://vidyaos-backend.onrender.com/api/v1'.length);
+    } else if (normPath.startsWith(API_BASE)) {
       normPath = normPath.slice(API_BASE.length);
+    } else if (normPath.startsWith('/api/v1')) {
+      normPath = normPath.slice(7);
+    } else if (normPath.startsWith('api/v1')) {
+      normPath = normPath.slice(6);
     }
     const url = endpoint.startsWith('http://') || endpoint.startsWith('https://')
       ? endpoint

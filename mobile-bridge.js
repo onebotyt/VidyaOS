@@ -20,10 +20,14 @@
 
   // Detect whether running in Capacitor / Mobile native shell
   const isCapacitor = typeof window !== 'undefined' && (
-    window.Capacitor?.isNativePlatform?.() ||
+    window.VIDYAOS_FORCE_NATIVE === true ||
+    window.VIDYAOS_IS_NATIVE === true ||
+    Boolean(window.Capacitor?.isNativePlatform?.()) ||
+    Boolean(window.Capacitor) ||
     window.location.protocol === 'capacitor:' ||
     window.location.protocol === 'file:' ||
-    (window.Capacitor && window.location.hostname === 'localhost')
+    (window.location.hostname === 'localhost' && (window.location.protocol === 'https:' || !window.location.port)) ||
+    (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent) && window.location.hostname === 'localhost')
   );
 
   window.VIDYAOS_IS_NATIVE = isCapacitor;
@@ -37,6 +41,12 @@
       if (typeof input === 'string') {
         if (input.startsWith('/api/v1') || input.startsWith('/uploads')) {
           input = CLOUD_BACKEND_URL + input;
+        } else if (input.startsWith('api/v1') || input.startsWith('uploads')) {
+          input = CLOUD_BACKEND_URL + '/' + input;
+        } else if (input.startsWith('https://localhost/api/v1') || input.startsWith('http://localhost/api/v1')) {
+          input = input.replace(/^https?:\/\/localhost/, CLOUD_BACKEND_URL);
+        } else if (input.startsWith('https://localhost/uploads') || input.startsWith('http://localhost/uploads')) {
+          input = input.replace(/^https?:\/\/localhost/, CLOUD_BACKEND_URL);
         }
       } else if (input instanceof Request) {
         try {

@@ -92,6 +92,7 @@ const mobileIndexHtml = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>VidyaOS</title>
+  <script>window.VIDYAOS_FORCE_NATIVE = true;</script>
   <script src="/mobile-bridge.js"></script>
   <script>
     (function () {
@@ -147,12 +148,15 @@ try {
 const bridgePath = path.join(WWW_DIR, 'mobile-bridge.js');
 if (fs.existsSync(bridgePath)) {
   let bridgeContent = fs.readFileSync(bridgePath, 'utf8');
+  if (!bridgeContent.startsWith('window.VIDYAOS_FORCE_NATIVE = true;')) {
+    bridgeContent = 'window.VIDYAOS_FORCE_NATIVE = true;\n' + bridgeContent;
+  }
   bridgeContent = bridgeContent.replace(
     /window\.VIDYAOS_APP_VERSION = .*?;/g,
     `window.VIDYAOS_APP_VERSION = '${appVersion}';`
   );
   fs.writeFileSync(bridgePath, bridgeContent, 'utf8');
-  console.log(`[Mobile Build] Stamped version ${appVersion} into mobile-bridge.js`);
+  console.log(`[Mobile Build] Stamped version ${appVersion} and FORCE_NATIVE into mobile-bridge.js`);
 }
 
 console.log('[Mobile Build] ✅ Capacitor www directory prepared successfully!');

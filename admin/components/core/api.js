@@ -3,7 +3,26 @@
  * Location: /shared/js/api.js
  */
 
-const API_BASE = '/api/v1';
+function getVidyaApiBase() {
+  if (typeof window !== 'undefined' && window.VIDYAOS_API_BASE) {
+    return window.VIDYAOS_API_BASE;
+  }
+  if (typeof window !== 'undefined') {
+    const isMobileHost =
+      window.location.protocol === 'file:' ||
+      window.location.protocol === 'capacitor:' ||
+      (window.location.hostname === 'localhost' && (!window.location.port || window.location.protocol === 'https:')) ||
+      (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent) && window.location.hostname === 'localhost') ||
+      Boolean(window.VIDYAOS_FORCE_NATIVE) ||
+      Boolean(window.VIDYAOS_IS_NATIVE);
+    if (isMobileHost) {
+      return 'https://vidyaos-backend.onrender.com/api/v1';
+    }
+  }
+  return '/api/v1';
+}
+
+const API_BASE = getVidyaApiBase();
 const _inflightGetRequests = new Map();
 const _getResponseCache = new Map();
 const GET_CACHE_TTL_MS = 3000; // 3s micro-cache coalesces duplicate page-load calls (/students/me, /auth/me, etc.)
@@ -14,7 +33,19 @@ function clearApiCache() {
 
 async function fetchApi(endpoint, options = {}) {
   const method = (options.method || 'GET').toUpperCase();
-  const cleanEp = endpoint.startsWith(API_BASE) ? endpoint.slice(API_BASE.length) : endpoint;
+  let cleanEp = endpoint;
+  if (cleanEp.startsWith('https://vidyaos-backend.onrender.com/api/v1')) {
+    cleanEp = cleanEp.slice('https://vidyaos-backend.onrender.com/api/v1'.length);
+  } else if (cleanEp.startsWith(API_BASE)) {
+    cleanEp = cleanEp.slice(API_BASE.length);
+  } else if (cleanEp.startsWith('/api/v1')) {
+    cleanEp = cleanEp.slice(7);
+  } else if (cleanEp.startsWith('api/v1')) {
+    cleanEp = cleanEp.slice(6);
+  }
+  if (!cleanEp.startsWith('/')) {
+    cleanEp = '/' + cleanEp;
+  }
   const token = localStorage.getItem('access_token') || '';
 
   if (method !== 'GET') {

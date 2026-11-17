@@ -57,15 +57,15 @@
       const u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('currentUser') || 'null');
       if (!u) return;
       const roles = u.roles || [];
-      if (roles.includes('SYSTEM_ADMIN'))  { window.location.replace('/admin/dashboard');     return; }
-      if (roles.includes('STUDENT'))       { window.location.replace('/student/dashboard');   return; }
+      if (roles.includes('SYSTEM_ADMIN'))  { window.location.replace('/admin/academic-structure/index.html');     return; }
+      if (roles.includes('STUDENT'))       { window.location.replace('/student/dashboard/index.html');   return; }
       const isMobile = window.innerWidth <= 768;
       const isHod = roles.includes('HOD') || Boolean(u.is_hod);
       if (isMobile && isHod) {
         window.location.replace('/faculty/classes/index.html');
         return;
       }
-      window.location.replace('/faculty/dashboard');
+      window.location.replace('/faculty/dashboard/index.html');
     } catch (_) {}
   })();
 
@@ -218,15 +218,15 @@
   /* ── Post-login redirect ── */
   function redirectAfterLogin(user) {
     const roles = user.roles || [];
-    if (roles.includes('SYSTEM_ADMIN'))  { window.location.href = '/admin/dashboard';   return; }
-    if (roles.includes('STUDENT'))       { window.location.href = '/student/dashboard'; return; }
+    if (roles.includes('SYSTEM_ADMIN'))  { window.location.href = '/admin/academic-structure/index.html';   return; }
+    if (roles.includes('STUDENT'))       { window.location.href = '/student/dashboard/index.html'; return; }
     const isMobile = window.innerWidth <= 768;
     const isHod = roles.includes('HOD') || Boolean(user.is_hod);
     if (isMobile && isHod) {
       window.location.href = '/faculty/classes/index.html';
       return;
     }
-    window.location.href = '/faculty/dashboard';
+    window.location.href = '/faculty/dashboard/index.html';
   }
 
   /* ── Form reset helper ── */
