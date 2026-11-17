@@ -43,8 +43,7 @@
           <article class="dash-kpi-card">
             <div class="dash-kpi-top">
               <div class="dash-kpi-icon icon-blue">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -60,8 +59,7 @@
           <article class="dash-kpi-card">
             <div class="dash-kpi-top">
               <div class="dash-kpi-icon icon-green">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
                   <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                 </svg>
@@ -78,8 +76,7 @@
           <article class="dash-kpi-card">
             <div class="dash-kpi-top">
               <div class="dash-kpi-icon icon-purple">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="2"></rect>
                   <line x1="3" y1="9" x2="21" y2="9"></line>
                   <line x1="9" y1="21" x2="9" y2="9"></line>
@@ -91,14 +88,17 @@
           </article>
         </section>
 
-        <!-- 4. Action Buttons Row (+ Create Class, Students Roster, Broadcast Notice) -->
+        <!-- 4. Action Buttons Row (+ Create Class, Students Roster, Broadcast Notice, Trash Bin) -->
         <div class="classes-action-buttons-row">
           <button type="button" class="btn-create-class-solid" onclick="openCreateGroupModal()">
-            <span>+ Create Class</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Create Class</span>
           </button>
           <a href="/faculty/students/index.html" class="btn-action-outline">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -107,24 +107,29 @@
             <span>Students Roster</span>
           </a>
           <button type="button" class="btn-action-outline" onclick="openBroadcastNoticeModal()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             <span>Broadcast Notice</span>
           </button>
+          <a href="/faculty/classes/trash.html" class="btn-action-outline btn-trash-action" id="btn-classes-trash" title="Open Classroom Trash Bin (30-day recovery)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Trash Bin</span>
+            <span class="trash-count-badge" id="classes-trash-count" style="display:none;">0</span>
+          </a>
         </div>
 
         <!-- 5. Search Bar & Semester Dropdown Filter -->
         <div class="classes-search-filter-row">
           <div class="classes-search-box">
-            <svg class="classes-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="classes-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="search-classes-input" placeholder="Search class, code or subject..."
-              oninput="handleSearchClasses(this.value)">
+            <input type="text" id="search-classes-input" placeholder="Search class, code or subject..." oninput="handleSearchClasses(this.value)">
           </div>
           <div class="classes-filter-dropdown-wrap">
             <select id="filter-semester-select" onchange="handleSemesterFilter(this.value)">
@@ -147,126 +152,266 @@
     </div>
   </div>
 
-  <!-- Modal: Create Teaching Class -->
-  <div id="create-class-modal"
-    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:11000; align-items:center; justify-content:center; padding:1rem;">
-    <div
-      style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; width:100%; max-width:520px; box-shadow:0 12px 36px rgba(0,0,0,0.2); overflow:hidden;">
-      <div
-        style="padding:1rem 1.25rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
-        <strong style="font-size:1.1rem; color:var(--text-main);">+ Create New Class</strong>
-        <button type="button" onclick="closeCreateGroupModal()"
-          style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+  <!-- Modal 1: Create Teaching Class -->
+  <div id="create-class-modal" class="vidya-modal-backdrop" style="display:none;">
+    <div class="vidya-modal-dialog">
+      <div class="vidya-modal-header">
+        <strong class="vidya-modal-title">+ Create New Class</strong>
+        <button type="button" class="modal-close-btn" onclick="closeCreateGroupModal()">&times;</button>
       </div>
-      <form onsubmit="submitCreateClass(event)" style="padding:1.25rem;">
-        <div style="margin-bottom:0.85rem;">
-          <label
-            style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Subject
-            Name *</label>
-          <input type="text" id="input-class-name" required placeholder="e.g. Database Management Systems"
-            oninput="autoSuggestShortName(this.value)"
-            style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
-        </div>
+      <form onsubmit="submitCreateClass(event)">
+        <div class="vidya-modal-body">
+          <div class="form-group-wrap">
+            <label class="form-field-label">Subject Name *</label>
+            <input type="text" id="input-class-name" required placeholder="e.g. Database Management Systems" oninput="autoSuggestShortName(this.value)" class="form-control-input">
+          </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.85rem;">
-          <div>
-            <label
-              style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Subject
-              Short Name</label>
-            <input type="text" id="input-class-short-name" placeholder="e.g. DBMS"
-              style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
+          <div class="form-grid-2col">
+            <div class="form-group-wrap">
+              <label class="form-field-label">Subject Short Name</label>
+              <input type="text" id="input-class-short-name" placeholder="e.g. DBMS" class="form-control-input">
+            </div>
+            <div class="form-group-wrap">
+              <label class="form-field-label">Subject Code</label>
+              <input type="text" id="input-class-code" placeholder="e.g. IT501" class="form-control-input">
+            </div>
           </div>
-          <div>
-            <label
-              style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Subject
-              Code</label>
-            <input type="text" id="input-class-code" placeholder="e.g. IT501"
-              style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
-          </div>
-        </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.85rem;">
-          <div>
-            <label
-              style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Components
-              *</label>
-            <select id="select-class-comp"
-              style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
-              <option value="THEORY" selected>THEORY</option>
-              <option value="PRACTICAL">PRACTICAL</option>
-              <option value="THEORY+PRACTICAL">THEORY + PRACTICAL</option>
-            </select>
+          <div class="form-grid-2col">
+            <div class="form-group-wrap">
+              <label class="form-field-label">Components *</label>
+              <select id="select-class-comp" class="form-control-select">
+                <option value="THEORY" selected>THEORY</option>
+                <option value="PRACTICAL">PRACTICAL</option>
+                <option value="THEORY+PRACTICAL">THEORY + PRACTICAL</option>
+              </select>
+            </div>
+            <div class="form-group-wrap">
+              <label class="form-field-label">Academic Session</label>
+              <select id="select-class-session" class="form-control-select">
+                <option value="">Loading session...</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label
-              style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Academic
-              Session</label>
-            <select id="select-class-session"
-              style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
-              <option value="">Loading session...</option>
-            </select>
-          </div>
-        </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.25rem;">
-          <div>
-            <label
-              style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Semester</label>
-            <select id="select-class-sem" onchange="autoUpdateYear(this.value)"
-              style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box;">
-              <option value="1">Sem 1</option>
-              <option value="2">Sem 2</option>
-              <option value="3">Sem 3</option>
-              <option value="4">Sem 4</option>
-              <option value="5">Sem 5</option>
-              <option value="6" selected>Sem 6</option>
-            </select>
-          </div>
-          <div>
-            <label
-              style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.35rem;">Year
-              (Auto-Derived)</label>
-            <input type="text" id="input-class-year" value="3rd Year" readonly
-              style="width:100%; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-muted); font-size:0.88rem; box-sizing:border-box; cursor:not-allowed;">
+          <div class="form-grid-2col">
+            <div class="form-group-wrap">
+              <label class="form-field-label">Semester</label>
+              <select id="select-class-sem" onchange="autoUpdateYear(this.value)" class="form-control-select">
+                <option value="1">Sem 1</option>
+                <option value="2">Sem 2</option>
+                <option value="3">Sem 3</option>
+                <option value="4">Sem 4</option>
+                <option value="5">Sem 5</option>
+                <option value="6" selected>Sem 6</option>
+              </select>
+            </div>
+            <div class="form-group-wrap">
+              <label class="form-field-label">Year (Auto-Derived)</label>
+              <input type="text" id="input-class-year" value="3rd Year" readonly class="form-control-input">
+            </div>
           </div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:0.65rem;">
-          <button type="button" onclick="closeCreateGroupModal()"
-            style="padding:0.65rem 1.15rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); cursor:pointer;">Cancel</button>
-          <button type="submit"
-            style="padding:0.65rem 1.35rem; border-radius:8px; border:none; background:var(--color-primary); color:#ffffff; font-weight:700; cursor:pointer;">Create
-            Class</button>
+        <div class="vidya-modal-footer">
+          <button type="button" class="btn-dialog-cancel" onclick="closeCreateGroupModal()">Cancel</button>
+          <button type="submit" class="btn-dialog-primary">Create Class</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal: Broadcast Notice -->
-  <div id="broadcast-notice-modal"
-    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:11000; align-items:center; justify-content:center; padding:1rem;">
-    <div
-      style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; width:100%; max-width:480px; box-shadow:0 12px 36px rgba(0,0,0,0.2); overflow:hidden;">
-      <div
-        style="padding:1rem 1.25rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
-        <strong style="font-size:1.1rem; color:var(--text-main);">Broadcast Notice to Classes</strong>
-        <button type="button" onclick="closeBroadcastNoticeModal()"
-          style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+  <!-- Modal 2: Edit Teaching Class -->
+  <div id="edit-class-modal" class="vidya-modal-backdrop" style="display:none;">
+    <div class="vidya-modal-dialog">
+      <div class="vidya-modal-header">
+        <strong class="vidya-modal-title">Edit Classroom Details</strong>
+        <button type="button" class="modal-close-btn" onclick="closeEditClassModal()">&times;</button>
       </div>
-      <div style="padding:1.25rem;">
-        <textarea id="broadcast-notice-text" placeholder="Write notice to publish across all active teaching groups..."
-          rows="4"
-          style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem; box-sizing:border-box; margin-bottom:1rem;"></textarea>
-        <div style="display:flex; justify-content:flex-end; gap:0.65rem;">
-          <button type="button" onclick="closeBroadcastNoticeModal()"
-            style="padding:0.65rem 1.15rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); cursor:pointer;">Cancel</button>
-          <button type="button"
-            onclick="alert('Notice broadcast successfully to all enrolled classes.'); closeBroadcastNoticeModal();"
-            style="padding:0.65rem 1.35rem; border-radius:8px; border:none; background:var(--color-primary); color:#ffffff; font-weight:700; cursor:pointer;">Broadcast</button>
+      <form onsubmit="submitEditClass(event)">
+        <input type="hidden" id="edit-class-id">
+        <div class="vidya-modal-body">
+          <div class="form-group-wrap">
+            <label class="form-field-label">Subject Name *</label>
+            <input type="text" id="input-edit-class-name" required placeholder="e.g. Database Management Systems" class="form-control-input">
+          </div>
+
+          <div class="form-grid-2col">
+            <div class="form-group-wrap">
+              <label class="form-field-label">Subject Short Name</label>
+              <input type="text" id="input-edit-class-short-name" placeholder="e.g. DBMS" class="form-control-input">
+            </div>
+            <div class="form-group-wrap">
+              <label class="form-field-label">Subject Code / Room</label>
+              <input type="text" id="input-edit-class-code" placeholder="e.g. IT501" class="form-control-input">
+            </div>
+          </div>
+
+          <div class="form-grid-2col">
+            <div class="form-group-wrap">
+              <label class="form-field-label">Components *</label>
+              <select id="select-edit-class-comp" class="form-control-select">
+                <option value="THEORY">THEORY</option>
+                <option value="PRACTICAL">PRACTICAL</option>
+                <option value="THEORY+PRACTICAL">THEORY + PRACTICAL</option>
+              </select>
+            </div>
+            <div class="form-group-wrap">
+              <label class="form-field-label">Academic Session</label>
+              <select id="select-edit-class-session" class="form-control-select">
+                <option value="">Loading session...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2col">
+            <div class="form-group-wrap">
+              <label class="form-field-label">Semester</label>
+              <select id="select-edit-class-sem" onchange="autoUpdateEditYear(this.value)" class="form-control-select">
+                <option value="1">Sem 1</option>
+                <option value="2">Sem 2</option>
+                <option value="3">Sem 3</option>
+                <option value="4">Sem 4</option>
+                <option value="5">Sem 5</option>
+                <option value="6">Sem 6</option>
+              </select>
+            </div>
+            <div class="form-group-wrap">
+              <label class="form-field-label">Year (Auto-Derived)</label>
+              <input type="text" id="input-edit-class-year" value="3rd Year" readonly class="form-control-input">
+            </div>
+          </div>
         </div>
+
+        <div class="vidya-modal-footer">
+          <button type="button" class="btn-dialog-cancel" onclick="closeEditClassModal()">Cancel</button>
+          <button type="submit" class="btn-dialog-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Styled Delete Confirmation Dialog (Type DELETE to Confirm) -->
+  <div id="delete-class-modal" class="vidya-modal-backdrop" style="display:none;">
+    <div class="vidya-modal-dialog delete-dialog-box">
+      <div class="delete-dialog-top">
+        <button type="button" class="modal-close-btn" onclick="closeDeleteClassModal()">&times;</button>
+        <div class="delete-icon-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </div>
+        <h3 class="delete-dialog-title">Move Class to Trash?</h3>
+        <p class="delete-dialog-desc">
+          Are you sure you want to delete <strong id="delete-target-class-name">this classroom</strong>?
+        </p>
+      </div>
+
+      <div class="delete-policy-notice">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>This class will be moved to <strong>Trash</strong> and permanently removed after <strong>30 days</strong>. You can restore it anytime within 30 days.</span>
+      </div>
+
+      <div class="delete-confirm-input-wrap">
+        <label for="input-confirm-delete">To confirm deletion, please type <strong>DELETE</strong> below:</label>
+        <input type="text" id="input-confirm-delete" placeholder="Type DELETE to confirm" autocomplete="off" oninput="handleDeleteInputChange(this.value)" class="form-control-input">
+      </div>
+
+      <div class="vidya-modal-footer">
+        <button type="button" class="btn-dialog-cancel" onclick="closeDeleteClassModal()">Cancel</button>
+        <button type="button" id="btn-confirm-delete-class" class="btn-dialog-danger" disabled onclick="executeDeleteClass()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Move to Trash</span>
+        </button>
       </div>
     </div>
   </div>
+
+  <!-- Modal 4: Broadcast Notice with Year Cohort Selector & Media Attachment -->
+  <div id="broadcast-notice-modal" class="vidya-modal-backdrop" style="display:none;">
+    <div class="vidya-modal-dialog">
+      <div class="vidya-modal-header">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <div class="broadcast-header-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <strong class="vidya-modal-title">Broadcast Notice to Classes</strong>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeBroadcastNoticeModal()">&times;</button>
+      </div>
+      <form id="broadcast-notice-form" onsubmit="submitBroadcastNotice(event)">
+        <div class="vidya-modal-body">
+          <div class="form-group-wrap">
+            <label class="form-field-label">Notice Title *</label>
+            <input type="text" id="broadcast-title-input" required placeholder="e.g. Schedule Change, Exam Guidelines, Project Submission" class="form-control-input">
+          </div>
+
+          <div class="form-group-wrap">
+            <label class="form-field-label">Target Cohort / Year *</label>
+            <select id="broadcast-target-year-select" class="form-control-select">
+              <option value="ALL">All Enrolled Years (Entire Cohort)</option>
+              <option value="1">1st Year Students (Semesters 1 & 2)</option>
+              <option value="2">2nd Year Students (Semesters 3 & 4)</option>
+              <option value="3">3rd Year Students (Semesters 5 & 6)</option>
+            </select>
+            <span class="form-field-hint">Only students in active teaching groups matching the chosen year cohort will receive this notice.</span>
+          </div>
+
+          <div class="form-group-wrap">
+            <label class="form-field-label">Notice Message *</label>
+            <textarea id="broadcast-notice-text" required rows="4" placeholder="Write announcement details to publish across active classroom streams..." class="form-control-textarea"></textarea>
+          </div>
+
+          <div class="form-group-wrap">
+            <label class="form-field-label">Media Attachment (Optional)</label>
+            <div class="broadcast-file-upload-zone" onclick="document.getElementById('broadcast-file-input').click()">
+              <input type="file" id="broadcast-file-input" accept="image/*,.pdf,.doc,.docx" style="display:none;" onchange="handleBroadcastFileSelect(event)">
+              <div id="broadcast-file-empty-state" class="file-upload-empty">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+                <span>Attach Image, PDF, or Document</span>
+                <small>PNG, JPG, PDF up to 25MB</small>
+              </div>
+              <div id="broadcast-file-selected-state" class="file-upload-selected" style="display:none;">
+                <div class="file-info-chip">
+                  <span id="broadcast-file-name" class="file-chip-name"></span>
+                  <span id="broadcast-file-size" class="file-chip-size"></span>
+                  <button type="button" class="file-chip-remove-btn" onclick="clearBroadcastFile(event)">&times;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vidya-modal-footer">
+          <button type="button" class="btn-dialog-cancel" onclick="closeBroadcastNoticeModal()">Cancel</button>
+          <button type="submit" id="btn-submit-broadcast" class="btn-dialog-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <span>Send Broadcast</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Styled Feedback Toast Notification Banner -->
+  <div id="classes-toast-banner" class="vidya-toast-banner"></div>
 
   <!-- Core Scripts -->
   <script src="/faculty/components/core/api.js"></script>

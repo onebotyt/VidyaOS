@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Classroom Trash Bin — VidyaOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/faculty/components/core/reset.css">
+  <link rel="stylesheet" href="/faculty/components/core/variables.css">
+  <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
+  <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
+  <link rel="stylesheet" href="/faculty/classes/classes.css?v=20261117_trash">
+  <script>
+    /* Always start closed (72px collapsed mini-rail) when page opens on desktop */
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+</head>
+
+<body class="page-layout">
+
+  <div class="faculty-app-layout" id="faculty-app-layout">
+    <div class="faculty-main-wrap">
+      <!-- Semantic Mount for Dedicated Faculty Header Component -->
+      <div id="faculty-header-mount"></div>
+
+      <main class="page-main-container container classes-container trash-container">
+        <!-- 1. Breadcrumb Navigation -->
+        <nav class="trash-breadcrumb" aria-label="Breadcrumb">
+          <a href="/faculty/index.html">Home</a>
+          <span class="bc-sep">/</span>
+          <a href="/faculty/classes/index.html">Teaching Classes</a>
+          <span class="bc-sep">/</span>
+          <span class="bc-active">Trash Bin</span>
+        </nav>
+
+        <!-- 2. Header Banner with Back Button -->
+        <div class="trash-header-banner">
+          <div class="trash-title-group">
+            <div class="trash-title-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </div>
+            <div class="trash-title-text">
+              <h1>Classroom Trash Bin</h1>
+              <p>Review soft-deleted classes. Recover them within 30 days or delete them permanently.</p>
+            </div>
+          </div>
+          <a href="/faculty/classes/index.html" class="btn-action-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back to Classes</span>
+          </a>
+        </div>
+
+        <!-- 3. Retention Policy Alert Banner -->
+        <div class="trash-policy-banner">
+          <div class="trash-policy-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <div class="trash-policy-content">
+            <strong>30-Day Auto-Purge Policy:</strong> Classrooms moved to the trash bin are safely kept for 30 days. You can restore them with full attendance registers and marks at any time. After 30 days, classes and associated student logs are permanently removed from the system.
+          </div>
+        </div>
+
+        <!-- 4. Search & Filter Bar -->
+        <div class="classes-search-filter-row">
+          <div class="classes-search-box">
+            <svg class="classes-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-trash-input" placeholder="Search deleted classes by name, code or teacher..." oninput="handleSearchTrash(this.value)">
+          </div>
+          <div class="classes-filter-dropdown-wrap">
+            <select id="filter-trash-semester-select" onchange="handleTrashSemesterFilter(this.value)">
+              <option value="ALL">All Semesters</option>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 5. Trashed Classrooms Grid -->
+        <section id="trash-cards-container" class="trash-cards-grid" aria-label="Deleted Classrooms in Trash">
+          <!-- Dynamically populated by trash.js -->
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal: Permanent Deletion Confirmation Dialog -->
+  <div id="permanent-delete-modal" class="vidya-modal-backdrop" style="display:none;">
+    <div class="vidya-modal-dialog delete-dialog-box">
+      <div class="delete-dialog-top">
+        <button type="button" class="modal-close-btn" onclick="closePermanentDeleteModal()">&times;</button>
+        <div class="delete-icon-circle">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <h3 class="delete-dialog-title">Permanently Delete Class?</h3>
+        <p class="delete-dialog-desc">
+          Are you sure you want to permanently delete <strong id="perm-delete-class-name">this classroom</strong>?
+        </p>
+      </div>
+
+      <div class="delete-policy-notice" style="border-color: var(--status-absent); background: var(--status-absent-bg);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <span><strong>CRITICAL WARNING:</strong> This action cannot be undone. All class rosters, attendance records, coursework, and marksheets will be permanently erased.</span>
+      </div>
+
+      <div class="delete-confirm-input-wrap">
+        <label for="input-confirm-perm-delete">To confirm permanent deletion, please type <strong>DELETE</strong> below:</label>
+        <input type="text" id="input-confirm-perm-delete" placeholder="Type DELETE to confirm" autocomplete="off" oninput="handlePermDeleteInputChange(this.value)" class="form-control-input">
+      </div>
+
+      <div class="vidya-modal-footer">
+        <button type="button" class="btn-dialog-cancel" onclick="closePermanentDeleteModal()">Cancel</button>
+        <button type="button" id="btn-confirm-perm-delete" class="btn-dialog-danger" disabled onclick="executePermanentDelete()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Delete Permanently</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Styled Feedback Toast Notification Banner -->
+  <div id="trash-toast-banner" class="vidya-toast-banner"></div>
+
+  <!-- Core Scripts -->
+  <script src="/faculty/components/core/api.js"></script>
+  <script src="/faculty/components/core/auth.js"></script>
+  <script src="/faculty/components/icons.js?v=20261116"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
+  <script src="/faculty/components/header/header.js?v=20261116"></script>
+  <script src="/faculty/classes/trash.js?v=20261117_trash"></script>
+</body>
+
+</html>

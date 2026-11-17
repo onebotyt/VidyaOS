@@ -172,20 +172,44 @@
     </div>
   </div>
 
-  <!-- Rejection Note Modal -->
+  <!-- Styled Rejection Note Modal Dialog -->
   <div class="leave-modal-backdrop" id="leave-rejection-modal" style="display:none;" aria-hidden="true">
-    <div class="leave-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-reject-title">
-      <div class="leave-modal-header">
-        <h3 id="modal-reject-title" class="leave-modal-title">Reject Leave Application</h3>
-        <button type="button" class="leave-modal-close-btn" onclick="closeRejectModal()">&times;</button>
+    <div class="leave-modal-dialog leave-alert-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-reject-title">
+      <div class="leave-alert-icon-box alert-icon-warning">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
       </div>
-      <div class="leave-modal-body">
-        <p class="leave-modal-desc">Please provide an optional reason or remark for rejecting this leave application.</p>
-        <textarea id="rejection-note-input" class="leave-modal-textarea" rows="3" placeholder="e.g. Insufficient documentation, overlaps with exams..."></textarea>
+      <div class="leave-alert-content">
+        <h3 id="modal-reject-title" class="leave-alert-title">Reject Leave Application</h3>
+        <p class="leave-alert-desc">Please specify the reason or remark for rejecting this application:</p>
       </div>
-      <div class="leave-modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Cancel</button>
-        <button type="button" class="btn btn-danger" id="confirm-reject-btn" onclick="confirmReject()">Confirm Rejection</button>
+      <textarea id="rejection-note-input" class="leave-modal-textarea" rows="3" placeholder="e.g. Insufficient documentation, overlaps with exams..."></textarea>
+      <div class="leave-alert-actions">
+        <button type="button" class="btn btn-secondary leave-alert-btn" onclick="closeRejectModal()">Cancel</button>
+        <button type="button" class="btn btn-danger leave-alert-btn" id="confirm-reject-btn" onclick="confirmReject()">Reject Application</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Styled Alert / Confirmation Dialog Box -->
+  <div class="leave-modal-backdrop" id="leave-alert-modal" style="display:none;" aria-hidden="true">
+    <div class="leave-modal-dialog leave-alert-dialog" role="dialog" aria-modal="true" aria-labelledby="alert-modal-title">
+      <div class="leave-alert-icon-box" id="leave-alert-icon-box">
+        <svg id="leave-alert-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <div class="leave-alert-content">
+        <h3 id="alert-modal-title" class="leave-alert-title">Notice</h3>
+        <p id="alert-modal-message" class="leave-alert-desc">Message content goes here.</p>
+      </div>
+      <div class="leave-alert-actions" id="leave-alert-actions">
+        <button type="button" class="btn btn-primary leave-alert-btn" id="leave-alert-ok-btn" onclick="closeLeaveAlert(true)">OK</button>
       </div>
     </div>
   </div>

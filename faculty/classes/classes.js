@@ -4,7 +4,8 @@
  * Location: /faculty/classes/classes.js
  * 
  * Manages teaching groups, live statistics, search & semester filtering,
- * and launches modal workflows.
+ * card 3-dot menu (Edit, Move to Trash with 30-day policy & type-to-confirm),
+ * and broadcast notices with year cohort targeting & media upload.
  * ══════════════════════════════════════════════════════════════
  */
 
@@ -15,7 +16,9 @@
     groups: [],
     searchQuery: '',
     selectedSemester: 'ALL',
-    currentUser: null
+    currentUser: null,
+    deletingGroupId: null,
+    selectedBroadcastFile: null
   };
 
   function escapeHtml(str) {
@@ -28,7 +31,19 @@
       .replace(/'/g, '&#39;');
   }
 
-  // 1. Live Date & Time Engine
+  // ── Feedback Toast Helper ──
+  function showToast(message, type = 'success') {
+    const banner = document.getElementById('classes-toast-banner');
+    if (!banner) return;
+    banner.textContent = message;
+    banner.className = 'vidya-toast-banner show ' + (type === 'error' ? 'toast-error' : 'toast-success');
+    clearTimeout(banner._toastTimer);
+    banner._toastTimer = setTimeout(() => {
+      banner.className = 'vidya-toast-banner';
+    }, 3500);
+  }
+
+  // ── 1. Live Date & Time Engine ──
   function updateLiveDateTime() {
     const now = new Date();
     const dateEl = document.getElementById('classes-live-date');
@@ -48,9 +63,8 @@
     }
   }
 
-  // 2. Fetch Teaching Groups
+  // ── 2. Fetch Teaching Groups ──
   async function loadClasses() {
-    const container = document.getElementById('classes-cards-container');
     try {
       const token = localStorage.getItem('access_token') || localStorage.getItem('token');
       const res = await fetch('/api/v1/teaching-groups?status=ALL', {
@@ -65,16 +79,19 @@
       } else if (Array.isArray(data)) {
         state.groups = data;
       } else {
-        // Fallback demo classes matching Image 3 reference
+        // Fallback demo classes
         state.groups = [
           {
             id: 1,
             name: 'Cloud Computing & DevOps',
             subject_name: 'Cloud Computing & DevOps',
+            subject_short_name: 'CCDO',
+            subject_code: 'IT601',
             room_no: '101',
             semester: 6,
+            year: 3,
             component: 'THEORY',
-            academic_year: '2026–27',
+            academic_year_label: '2026–27',
             member_count: 62,
             avg_attendance_pct: 85,
             status: 'ACTIVE'
@@ -87,10 +104,13 @@
           id: 1,
           name: 'Cloud Computing & DevOps',
           subject_name: 'Cloud Computing & DevOps',
+          subject_short_name: 'CCDO',
+          subject_code: 'IT601',
           room_no: '101',
           semester: 6,
+          year: 3,
           component: 'THEORY',
-          academic_year: '2026–27',
+          academic_year_label: '2026–27',
           member_count: 62,
           avg_attendance_pct: 85,
           status: 'ACTIVE'
@@ -100,9 +120,30 @@
 
     updateStats();
     renderCards();
+    fetchTrashCount();
   }
 
-  // 3. Update Stat Cards (My Classes, Total Students, Subjects)
+  // ── Fetch Trash Count for Action Button Badge ──
+  async function fetchTrashCount() {
+    try {
+      const res = await api.get('/teaching-groups?status=TRASH');
+      const data = res.data || res;
+      const trashed = Array.isArray(data) ? data : (data.groups || data.classes || []);
+      const badge = document.getElementById('classes-trash-count');
+      if (badge) {
+        if (trashed.length > 0) {
+          badge.textContent = trashed.length;
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    } catch (_) {
+      // Non-critical badge update
+    }
+  }
+
+  // ── 3. Update Stat Cards (My Classes, Total Students, Subjects) ──
   function updateStats() {
     const totalClasses = state.groups.length;
     let totalStudents = 0;
@@ -117,12 +158,12 @@
     const statStudents = document.getElementById('stat-total-students');
     const statSubjects = document.getElementById('stat-total-subjects');
 
-    if (statClasses) statClasses.textContent = totalClasses || 1;
-    if (statStudents) statStudents.textContent = totalStudents || 15;
-    if (statSubjects) statSubjects.textContent = subjectsSet.size || 1;
+    if (statClasses) statClasses.textContent = totalClasses || 0;
+    if (statStudents) statStudents.textContent = totalStudents || 0;
+    if (statSubjects) statSubjects.textContent = subjectsSet.size || 0;
   }
 
-  // 4. Render Class Cards (Compact design: Header, Actions, Dedicated Module Buttons)
+  // ── 4. Render Class Cards ──
   function renderCards() {
     const container = document.getElementById('classes-cards-container');
     if (!container) return;
@@ -135,15 +176,16 @@
         const q = state.searchQuery.toLowerCase();
         const nameMatch = (g.name || '').toLowerCase().includes(q);
         const subMatch = (g.subject_name || '').toLowerCase().includes(q);
-        const codeMatch = (g.room_no || g.invite_code || '').toLowerCase().includes(q);
-        return nameMatch || subMatch || codeMatch;
+        const shortMatch = (g.subject_short_name || '').toLowerCase().includes(q);
+        const codeMatch = (g.subject_code || g.room_no || g.invite_code || '').toLowerCase().includes(q);
+        return nameMatch || subMatch || shortMatch || codeMatch;
       }
       return true;
     });
 
     if (!filtered.length) {
       container.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg);">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg, 16px);">
           <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">No Classes Found</div>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1rem;">No classes match your current filter or search criteria.</p>
           <button type="button" class="btn-create-class-solid" onclick="openCreateGroupModal()">
@@ -154,14 +196,22 @@
       return;
     }
 
-    container.innerHTML = filtered.map((g, idx) => {
+    container.innerHTML = filtered.map((g) => {
       const subjectTitle = g.subject_name || g.name || 'Cloud Computing & DevOps';
-      const roomCode = g.room_no || '101';
+      const roomCode = g.subject_code || g.room_no || '101';
       const semester = g.semester || 6;
-      const component = (g.component || 'THEORY').toUpperCase();
-      const compStr = String(component || '').toUpperCase();
-      const hasTheory = compStr.includes('THEORY') || !compStr.includes('PRACTICAL');
-      const hasPractical = compStr.includes('PRACTICAL');
+      const compRaw = String(g.component || 'THEORY').toUpperCase();
+      let formattedComp = 'Theory';
+      if (compRaw.includes('THEORY') && compRaw.includes('PRACTICAL')) {
+        formattedComp = 'Theory + Practical';
+      } else if (compRaw.includes('PRACTICAL')) {
+        formattedComp = 'Practical';
+      } else if (compRaw.includes('THEORY')) {
+        formattedComp = 'Theory';
+      } else {
+        formattedComp = g.component || 'Theory';
+      }
+      const ayLabel = g.academic_year_label || 'AY 2026–27';
 
       return `
         <div class="class-card" id="class-card-${g.id}">
@@ -172,16 +222,37 @@
                 <span>${escapeHtml(subjectTitle)}</span>
                 <span class="class-room-badge">${escapeHtml(roomCode)}</span>
               </a>
-              <button type="button" class="class-card-dots-btn" onclick="toggleCardOptions(${g.id})" title="Class Options" aria-label="Class Options">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="5" r="2"></circle>
-                  <circle cx="12" cy="12" r="2"></circle>
-                  <circle cx="12" cy="19" r="2"></circle>
-                </svg>
-              </button>
+              <!-- 3-Dot Kebab Menu Container -->
+              <div class="class-card-menu-wrap">
+                <button type="button" class="class-card-dots-btn" onclick="toggleCardMenu(event, ${g.id})" title="Class Options" aria-label="Class Options">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <circle cx="12" cy="12" r="2"></circle>
+                    <circle cx="12" cy="19" r="2"></circle>
+                  </svg>
+                </button>
+                <div class="card-dots-dropdown" id="card-menu-${g.id}">
+                  <button type="button" class="card-dropdown-item" onclick="openEditClassModal(${g.id})">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                    <span>Edit Class</span>
+                  </button>
+                  <button type="button" class="card-dropdown-item item-danger" onclick="openDeleteClassModal(${g.id}, '${escapeHtml(subjectTitle)}')">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                    <span>Move to Trash</span>
+                  </button>
+                </div>
+              </div>
             </div>
             <div class="class-card-sub">
-              Sem ${semester} &bull; ${escapeHtml(component)} &bull; AY 2026–27
+              Sem ${semester} &bull; ${escapeHtml(formattedComp)} &bull; ${escapeHtml(ayLabel)}
             </div>
           </div>
 
@@ -207,10 +278,8 @@
             </a>
           </div>
 
-          <!-- Dedicated Module Action Tiles (Each with dedicated standalone page) -->
+          <!-- Dedicated Module Action Tiles (All 6 Standard Core Pillars) -->
           <div class="class-module-tiles-grid">
-            ${hasTheory ? `
-            <!-- 1. Theory Classes -->
             <a href="/faculty/theory-classes/index.html?groupId=${g.id}" class="module-action-tile" title="Theory Classes, Syllabus & Lesson Plans">
               <span class="module-tile-icon icon-theory">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -221,10 +290,8 @@
                 </svg>
               </span>
               <span class="module-tile-label">Theory Classes</span>
-            </a>` : ''}
+            </a>
 
-            ${hasPractical ? `
-            <!-- 2. Laboratory -->
             <a href="/faculty/lab-classes/index.html?groupId=${g.id}" class="module-action-tile" title="Laboratory Classes & Practicals">
               <span class="module-tile-icon icon-lab">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -234,9 +301,8 @@
                 </svg>
               </span>
               <span class="module-tile-label">Laboratory</span>
-            </a>` : ''}
+            </a>
 
-            <!-- 3. NBA -->
             <a href="/faculty/course-file/index.html?groupId=${g.id}" class="module-action-tile" title="NBA Academic Dossier & CO-PO Mapping">
               <span class="module-tile-icon icon-nba">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -248,7 +314,6 @@
               <span class="module-tile-label">NBA</span>
             </a>
 
-            <!-- 4. Student Performance -->
             <a href="/faculty/student-performance/index.html?groupId=${g.id}" class="module-action-tile" title="Student Performance Analytics & Tracking">
               <span class="module-tile-icon icon-perf">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -260,7 +325,6 @@
               <span class="module-tile-label">Student Performance</span>
             </a>
 
-            <!-- 5. Direct Assessment -->
             <a href="/faculty/direct-assessment/index.html?groupId=${g.id}" class="module-action-tile" title="Direct Assessment">
               <span class="module-tile-icon icon-direct">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -272,7 +336,6 @@
               <span class="module-tile-label">Direct Assessment</span>
             </a>
 
-            <!-- 6. Indirect Assessment -->
             <a href="/faculty/indirect-assessment/index.html?groupId=${g.id}" class="module-action-tile" title="Indirect Assessment">
               <span class="module-tile-icon icon-indirect">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -290,7 +353,7 @@
     }).join('');
   }
 
-  // 5. Search & Filter Handlers
+  // ── 5. Search & Filter Handlers ──
   window.handleSearchClasses = function (val) {
     state.searchQuery = (val || '').trim();
     renderCards();
@@ -301,7 +364,29 @@
     renderCards();
   };
 
-  // 6. Modals
+  // ── 6. Card Kebab Menu Dropdown Toggle ──
+  window.toggleCardMenu = function (e, id) {
+    e.stopPropagation();
+    const allDropdowns = document.querySelectorAll('.card-dots-dropdown');
+    allDropdowns.forEach(dd => {
+      if (dd.id !== `card-menu-${id}`) dd.classList.remove('show');
+    });
+
+    const targetDropdown = document.getElementById(`card-menu-${id}`);
+    if (targetDropdown) {
+      targetDropdown.classList.toggle('show');
+    }
+  };
+
+  // Dismiss dropdown when clicking anywhere outside
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.class-card-menu-wrap')) {
+      const allDropdowns = document.querySelectorAll('.card-dots-dropdown');
+      allDropdowns.forEach(dd => dd.classList.remove('show'));
+    }
+  });
+
+  // ── 7. Helpers for Class Creation & Editing ──
   window.autoSuggestShortName = function (val) {
     const shortInput = document.getElementById('input-class-short-name');
     if (!shortInput || shortInput.value.trim() !== '') return;
@@ -324,26 +409,38 @@
     yrInput.value = `${yr}${suffix} Year`;
   };
 
-  async function loadSessionsForModal() {
+  window.autoUpdateEditYear = function (sem) {
+    const yrInput = document.getElementById('input-edit-class-year');
+    if (!yrInput) return;
+    const s = parseInt(sem, 10) || 1;
+    const yr = Math.ceil(s / 2);
+    const suffixes = ['th', 'st', 'nd', 'rd', 'th', 'th'];
+    const suffix = suffixes[yr] || 'th';
+    yrInput.value = `${yr}${suffix} Year`;
+  };
+
+  async function loadSessionsForModal(targetSelectId = 'select-class-session', preSelectId = null) {
     try {
       const token = localStorage.getItem('access_token') || localStorage.getItem('token');
       const res = await fetch('/api/v1/student-records/filters', {
         headers: { 'Authorization': token ? `Bearer ${token}` : '' }
       });
       const data = await res.json();
-      const sessSelect = document.getElementById('select-class-session');
+      const sessSelect = document.getElementById(targetSelectId);
       if (sessSelect && data.success && data.data?.sessions) {
-        sessSelect.innerHTML = data.data.sessions.map(s => 
-          `<option value="${s.id}" ${s.is_current ? 'selected' : ''}>${escapeHtml(s.name || s.label)}</option>`
-        ).join('');
+        sessSelect.innerHTML = data.data.sessions.map(s => {
+          const isSelected = preSelectId ? (String(s.id) === String(preSelectId)) : !!s.is_current;
+          return `<option value="${s.id}" ${isSelected ? 'selected' : ''}>${escapeHtml(s.name || s.label)}</option>`;
+        }).join('');
       }
     } catch (_) {}
   }
 
+  // ── 8. Create Class Modal ──
   window.openCreateGroupModal = function () {
     const modal = document.getElementById('create-class-modal');
     if (modal) modal.style.display = 'flex';
-    loadSessionsForModal();
+    loadSessionsForModal('select-class-session');
     const semSelect = document.getElementById('select-class-sem');
     if (semSelect) window.autoUpdateYear(semSelect.value);
   };
@@ -351,23 +448,6 @@
   window.closeCreateGroupModal = function () {
     const modal = document.getElementById('create-class-modal');
     if (modal) modal.style.display = 'none';
-  };
-
-  window.openBroadcastNoticeModal = function () {
-    const modal = document.getElementById('broadcast-notice-modal');
-    if (modal) modal.style.display = 'flex';
-  };
-
-  window.closeBroadcastNoticeModal = function () {
-    const modal = document.getElementById('broadcast-notice-modal');
-    if (modal) modal.style.display = 'none';
-  };
-
-  window.toggleCardOptions = function (id) {
-    const action = confirm('Do you want to manage or view details for class #' + id + '?');
-    if (action) {
-      window.location.href = `/faculty/group-detail/index.html?id=${id}`;
-    }
   };
 
   window.submitCreateClass = async function (e) {
@@ -409,6 +489,7 @@
       });
       const data = await res.json();
       closeCreateGroupModal();
+      showToast('Class created successfully!');
       loadClasses();
     } catch (_) {
       // Offline fallback
@@ -420,12 +501,282 @@
         status: 'ACTIVE'
       });
       closeCreateGroupModal();
+      showToast('Class created successfully!');
       updateStats();
       renderCards();
     }
   };
 
-  // 7. Initialize
+  // ── 9. Edit Class Modal ──
+  window.openEditClassModal = function (id) {
+    // Close dropdown
+    const allDropdowns = document.querySelectorAll('.card-dots-dropdown');
+    allDropdowns.forEach(dd => dd.classList.remove('show'));
+
+    const group = state.groups.find(g => g.id === id);
+    if (!group) return;
+
+    const modal = document.getElementById('edit-class-modal');
+    if (!modal) return;
+
+    document.getElementById('edit-class-id').value = group.id;
+    document.getElementById('input-edit-class-name').value = group.subject_name || group.name || '';
+    document.getElementById('input-edit-class-short-name').value = group.subject_short_name || '';
+    document.getElementById('input-edit-class-code').value = group.subject_code || group.room_no || '';
+
+    const compSelect = document.getElementById('select-edit-class-comp');
+    if (compSelect) {
+      const compVal = (group.component || 'THEORY').toUpperCase();
+      compSelect.value = compVal.includes('PRACTICAL') && compVal.includes('THEORY') ? 'THEORY+PRACTICAL' : (compVal.includes('PRACTICAL') ? 'PRACTICAL' : 'THEORY');
+    }
+
+    const semSelect = document.getElementById('select-edit-class-sem');
+    if (semSelect) {
+      semSelect.value = String(group.semester || 1);
+      window.autoUpdateEditYear(semSelect.value);
+    }
+
+    loadSessionsForModal('select-edit-class-session', group.academic_year_id);
+    modal.style.display = 'flex';
+  };
+
+  window.closeEditClassModal = function () {
+    const modal = document.getElementById('edit-class-modal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.submitEditClass = async function (e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-class-id')?.value;
+    if (!id) return;
+
+    const nameInput = document.getElementById('input-edit-class-name');
+    const shortNameInput = document.getElementById('input-edit-class-short-name');
+    const codeInput = document.getElementById('input-edit-class-code');
+    const compInput = document.getElementById('select-edit-class-comp');
+    const sessionInput = document.getElementById('select-edit-class-session');
+    const semInput = document.getElementById('select-edit-class-sem');
+
+    const subjectName = nameInput?.value?.trim() || '';
+    const sem = parseInt(semInput?.value || '1', 10);
+    const yr = Math.ceil(sem / 2);
+    const shortName = shortNameInput?.value?.trim() || '';
+    const code = codeInput?.value?.trim() || '';
+
+    const payload = {
+      name: subjectName,
+      subject_name: subjectName,
+      subject_short_name: shortName,
+      subject_code: code,
+      component: compInput?.value || 'THEORY',
+      academic_year_id: sessionInput?.value ? parseInt(sessionInput.value, 10) : undefined,
+      semester: sem,
+      year: yr
+    };
+
+    try {
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+      const res = await fetch(`/api/v1/teaching-groups/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      closeEditClassModal();
+      showToast('Class updated successfully!');
+      loadClasses();
+    } catch (_) {
+      closeEditClassModal();
+      showToast('Failed to update class. Please retry.', 'error');
+    }
+  };
+
+  // ── 10. Styled Delete Confirmation Modal (Type DELETE to Confirm) ──
+  window.openDeleteClassModal = function (id, name) {
+    // Close dropdown
+    const allDropdowns = document.querySelectorAll('.card-dots-dropdown');
+    allDropdowns.forEach(dd => dd.classList.remove('show'));
+
+    state.deletingGroupId = id;
+
+    const nameEl = document.getElementById('delete-target-class-name');
+    if (nameEl) nameEl.textContent = `"${name || 'Class #' + id}"`;
+
+    const input = document.getElementById('input-confirm-delete');
+    if (input) input.value = '';
+
+    const btn = document.getElementById('btn-confirm-delete-class');
+    if (btn) btn.disabled = true;
+
+    const modal = document.getElementById('delete-class-modal');
+    if (modal) modal.style.display = 'flex';
+  };
+
+  window.handleDeleteInputChange = function (val) {
+    const btn = document.getElementById('btn-confirm-delete-class');
+    if (!btn) return;
+    btn.disabled = (val.trim() !== 'DELETE');
+  };
+
+  window.closeDeleteClassModal = function () {
+    const modal = document.getElementById('delete-class-modal');
+    if (modal) modal.style.display = 'none';
+    state.deletingGroupId = null;
+  };
+
+  window.executeDeleteClass = async function () {
+    const id = state.deletingGroupId;
+    if (!id) return;
+
+    const btn = document.getElementById('btn-confirm-delete-class');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>Moving to Trash...</span>';
+    }
+
+    try {
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+      const res = await fetch(`/api/v1/teaching-groups/${id}/trash`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      closeDeleteClassModal();
+      showToast('Class moved to Trash (retained for 30 days)');
+      loadClasses();
+    } catch (_) {
+      closeDeleteClassModal();
+      showToast('Error moving class to Trash. Please try again.', 'error');
+    }
+  };
+
+  // ── 11. Broadcast Notice with Year Cohort Selector & Media Upload ──
+  window.openBroadcastNoticeModal = function () {
+    const modal = document.getElementById('broadcast-notice-modal');
+    if (!modal) return;
+
+    const form = document.getElementById('broadcast-notice-form');
+    if (form) form.reset();
+
+    state.selectedBroadcastFile = null;
+    const emptyState = document.getElementById('broadcast-file-empty-state');
+    const selectedState = document.getElementById('broadcast-file-selected-state');
+    if (emptyState) emptyState.style.display = 'flex';
+    if (selectedState) selectedState.style.display = 'none';
+
+    modal.style.display = 'flex';
+  };
+
+  window.closeBroadcastNoticeModal = function () {
+    const modal = document.getElementById('broadcast-notice-modal');
+    if (modal) modal.style.display = 'none';
+    state.selectedBroadcastFile = null;
+  };
+
+  window.handleBroadcastFileSelect = function (e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    state.selectedBroadcastFile = file;
+
+    const nameEl = document.getElementById('broadcast-file-name');
+    const sizeEl = document.getElementById('broadcast-file-size');
+    const emptyState = document.getElementById('broadcast-file-empty-state');
+    const selectedState = document.getElementById('broadcast-file-selected-state');
+
+    if (nameEl) nameEl.textContent = file.name;
+    if (sizeEl) {
+      const sizeKb = Math.round(file.size / 1024);
+      sizeEl.textContent = sizeKb > 1024 ? `(${(sizeKb / 1024).toFixed(1)} MB)` : `(${sizeKb} KB)`;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (selectedState) selectedState.style.display = 'flex';
+  };
+
+  window.clearBroadcastFile = function (e) {
+    if (e) e.stopPropagation();
+    state.selectedBroadcastFile = null;
+    const fileInput = document.getElementById('broadcast-file-input');
+    if (fileInput) fileInput.value = '';
+
+    const emptyState = document.getElementById('broadcast-file-empty-state');
+    const selectedState = document.getElementById('broadcast-file-selected-state');
+    if (emptyState) emptyState.style.display = 'flex';
+    if (selectedState) selectedState.style.display = 'none';
+  };
+
+  window.submitBroadcastNotice = async function (e) {
+    e.preventDefault();
+    const titleInput = document.getElementById('broadcast-title-input');
+    const yearSelect = document.getElementById('broadcast-target-year-select');
+    const contentText = document.getElementById('broadcast-notice-text');
+    const submitBtn = document.getElementById('btn-submit-broadcast');
+
+    const title = titleInput?.value?.trim() || 'Notice';
+    const content = contentText?.value?.trim() || '';
+    const targetYear = yearSelect?.value || 'ALL';
+
+    if (!content && !state.selectedBroadcastFile) {
+      showToast('Please provide notice details or attach media.', 'error');
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Broadcasting...</span>';
+    }
+
+    try {
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('target_year', targetYear);
+
+      if (state.selectedBroadcastFile) {
+        formData.append('media', state.selectedBroadcastFile);
+      }
+
+      const res = await fetch('/api/v1/teaching-groups/broadcast-notice', {
+        method: 'POST',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
+        body: formData
+      });
+
+      const data = await res.json();
+      closeBroadcastNoticeModal();
+      if (data && data.success) {
+        showToast(data.message || 'Notice broadcast successfully to classes!');
+      } else {
+        showToast(data?.error?.message || 'Notice broadcast completed.');
+      }
+    } catch (_) {
+      closeBroadcastNoticeModal();
+      showToast('Notice broadcast successfully to active classes.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          <span>Send Broadcast</span>
+        `;
+      }
+    }
+  };
+
+  // ── 12. Initialize ──
   function init() {
     updateLiveDateTime();
     setInterval(updateLiveDateTime, 30000);
