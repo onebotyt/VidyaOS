@@ -3,14 +3,132 @@
    frontend/student/scores/scores.css
 ══════════════════════════════════════════════════════════════ */
 
-.scores-toolbar {
-  margin-bottom: 1rem;
-  max-width: 420px;
+.scores-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.segmented-filter-scroll-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.segmented-filter-scroll-wrap::-webkit-scrollbar {
+  height: 4px;
+}
+
+.segmented-filter-scroll-wrap::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.segmented-filter {
+  display: inline-flex;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.25rem;
+  gap: 0.25rem;
+}
+
+.segmented-filter button {
+  background: transparent;
+  border: none;
+  padding: 0.42rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.segmented-filter button:hover {
+  color: var(--text-main);
+}
+
+.segmented-filter button.active {
+  background: var(--bg-card);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.scores-secondary-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.scores-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 380px;
+}
+
+.scores-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.scores-search-wrap input {
+  padding-left: 2.2rem;
+  width: 100%;
+}
+
+.badge-sem {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm, 4px);
+  display: inline-flex;
+  align-items: center;
+}
+
+.badge-type {
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm, 4px);
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.badge-type.type-exam {
+  color: var(--color-primary);
+  border-color: var(--color-primary-light);
+  background: var(--color-primary-light);
+}
+
+.badge-type.type-assignment {
+  color: var(--status-warning, #d97706);
+  border-color: var(--status-warning-bg, #fef3c7);
+  background: var(--status-warning-bg, #fef3c7);
 }
 
 @media (max-width: 640px) {
-  .scores-toolbar {
+  .scores-secondary-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .scores-search-wrap {
     max-width: 100%;
+    min-width: 100%;
   }
 }
 

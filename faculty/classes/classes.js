@@ -159,6 +159,9 @@
       const roomCode = g.room_no || '101';
       const semester = g.semester || 6;
       const component = (g.component || 'THEORY').toUpperCase();
+      const compStr = String(component || '').toUpperCase();
+      const hasTheory = compStr.includes('THEORY') || !compStr.includes('PRACTICAL');
+      const hasPractical = compStr.includes('PRACTICAL');
 
       return `
         <div class="class-card" id="class-card-${g.id}">
@@ -206,6 +209,7 @@
 
           <!-- Dedicated Module Action Tiles (Each with dedicated standalone page) -->
           <div class="class-module-tiles-grid">
+            ${hasTheory ? `
             <!-- 1. Theory Classes -->
             <a href="/faculty/theory-classes/index.html?groupId=${g.id}" class="module-action-tile" title="Theory Classes, Syllabus & Lesson Plans">
               <span class="module-tile-icon icon-theory">
@@ -217,8 +221,9 @@
                 </svg>
               </span>
               <span class="module-tile-label">Theory Classes</span>
-            </a>
+            </a>` : ''}
 
+            ${hasPractical ? `
             <!-- 2. Laboratory -->
             <a href="/faculty/lab-classes/index.html?groupId=${g.id}" class="module-action-tile" title="Laboratory Classes & Practicals">
               <span class="module-tile-icon icon-lab">
@@ -229,7 +234,7 @@
                 </svg>
               </span>
               <span class="module-tile-label">Laboratory</span>
-            </a>
+            </a>` : ''}
 
             <!-- 3. NBA -->
             <a href="/faculty/course-file/index.html?groupId=${g.id}" class="module-action-tile" title="NBA Academic Dossier & CO-PO Mapping">
@@ -297,9 +302,50 @@
   };
 
   // 6. Modals
+  window.autoSuggestShortName = function (val) {
+    const shortInput = document.getElementById('input-class-short-name');
+    if (!shortInput || shortInput.value.trim() !== '') return;
+    if (!val) return;
+    const words = val.trim().split(/[\s-]+/).filter(w => !['and', '&', 'of', 'in', 'the', 'for'].includes(w.toLowerCase()));
+    if (words.length > 1) {
+      shortInput.placeholder = words.map(w => w[0].toUpperCase()).join('').slice(0, 8);
+    } else if (val.length >= 3) {
+      shortInput.placeholder = val.slice(0, 4).toUpperCase();
+    }
+  };
+
+  window.autoUpdateYear = function (sem) {
+    const yrInput = document.getElementById('input-class-year');
+    if (!yrInput) return;
+    const s = parseInt(sem, 10) || 1;
+    const yr = Math.ceil(s / 2);
+    const suffixes = ['th', 'st', 'nd', 'rd', 'th', 'th'];
+    const suffix = suffixes[yr] || 'th';
+    yrInput.value = `${yr}${suffix} Year`;
+  };
+
+  async function loadSessionsForModal() {
+    try {
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+      const res = await fetch('/api/v1/student-records/filters', {
+        headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+      });
+      const data = await res.json();
+      const sessSelect = document.getElementById('select-class-session');
+      if (sessSelect && data.success && data.data?.sessions) {
+        sessSelect.innerHTML = data.data.sessions.map(s => 
+          `<option value="${s.id}" ${s.is_current ? 'selected' : ''}>${escapeHtml(s.name || s.label)}</option>`
+        ).join('');
+      }
+    } catch (_) {}
+  }
+
   window.openCreateGroupModal = function () {
     const modal = document.getElementById('create-class-modal');
     if (modal) modal.style.display = 'flex';
+    loadSessionsForModal();
+    const semSelect = document.getElementById('select-class-sem');
+    if (semSelect) window.autoUpdateYear(semSelect.value);
   };
 
   window.closeCreateGroupModal = function () {
@@ -327,16 +373,28 @@
   window.submitCreateClass = async function (e) {
     e.preventDefault();
     const nameInput = document.getElementById('input-class-name');
-    const semInput = document.getElementById('select-class-sem');
+    const shortNameInput = document.getElementById('input-class-short-name');
+    const codeInput = document.getElementById('input-class-code');
     const compInput = document.getElementById('select-class-comp');
-    const roomInput = document.getElementById('input-class-room');
+    const sessionInput = document.getElementById('select-class-session');
+    const semInput = document.getElementById('select-class-sem');
+
+    const subjectName = nameInput?.value?.trim() || 'New Class';
+    const sem = parseInt(semInput?.value || '1', 10);
+    const yr = Math.ceil(sem / 2);
+    const shortName = shortNameInput?.value?.trim() || shortNameInput?.placeholder || '';
+    const code = codeInput?.value?.trim() || '';
 
     const payload = {
-      name: nameInput?.value || 'New Class',
-      subject_name: nameInput?.value || 'New Class',
-      semester: parseInt(semInput?.value || '1', 10),
+      name: subjectName,
+      subject_name: subjectName,
+      subject_short_name: shortName,
+      subject_code: code,
       component: compInput?.value || 'THEORY',
-      room_no: roomInput?.value || '101'
+      academic_year_id: sessionInput?.value ? parseInt(sessionInput.value, 10) : undefined,
+      semester: sem,
+      year: yr,
+      room_no: code || '101'
     };
 
     try {

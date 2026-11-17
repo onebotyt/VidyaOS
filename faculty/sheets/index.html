@@ -42,16 +42,12 @@
     <div class="studio-bar studio-bar-1 sheets-top-command-bar" id="studio-bar-1">
       <div class="studio-bar-left">
         <!-- Small Minimal Back Button -->
-        <button type="button" class="btn-icon-minimal" id="btn-back-bar1" onclick="const p = new URLSearchParams(window.location.search); const gid = p.get('id') || p.get('group_id'); if (gid) { window.location.href = '/faculty/group-detail.html?id=' + encodeURIComponent(gid); } else if (window.history.length > 1) { window.history.back(); } else { window.location.href = '/faculty/groups.html'; }" title="Back to Classroom">
+        <button type="button" class="btn-icon-minimal" id="btn-back-bar1" onclick="navigateBackFromSheets()" title="Back to Classroom / Registers">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </button>
-
-
-        <!-- Hidden legacy classroom link for backward compatibility with scripts -->
-        <a href="/faculty/groups.html" class="back-classroom-link" id="btn-back-classroom" style="display:none !important;"><span class="btn-text">Back</span></a>
 
         <!-- Class Switch List (Shows [CODE] Name (COMPONENT)) -->
         <select class="group-selector-select" id="group-switcher-select" onchange="onSwitchGroup(this.value)" title="Switch Teaching Group / Class">
@@ -115,11 +111,7 @@
           <span id="edit-save-btn-text">Edit</span>
         </button>
 
-        <!-- Hidden legacy save button & indicators for backward compatibility -->
-        <button type="button" id="btn-save-sheet-changes" onclick="saveActiveSheetChanges()" style="display:none !important;"></button>
-        <span class="save-indicator-badge saved" id="save-indicator" style="display:none !important;">
-          <span id="save-status-text">All changes synced</span>
-        </span>
+
       </div>
     </div>
 
@@ -128,13 +120,6 @@
          ══════════════════════════════════════════════════════════════ -->
     <div class="studio-bar studio-bar-2" id="studio-bar-2">
       <div class="studio-bar-left">
-        <!-- Tools badge (Retained for test suite compatibility, hidden from UI) -->
-        <div class="bar-tools-badge" style="display:none !important;" aria-hidden="true" title="Sheet Tools">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-          </svg>
-          <span>Tools</span>
-        </div>
 
         <!-- Drop-down list for sheets -->
         <select class="sheet-select-dropdown" id="sheet-selector-dropdown" onchange="switchSheetDropdown(this.value)" title="Choose Active Spreadsheet">
@@ -172,25 +157,12 @@
           <button type="button" class="btn btn-secondary btn-sm" onclick="openAddRowModal()" style="font-weight:700;font-size:0.75rem;padding:0.2rem 0.5rem;" title="Add Student Row">+ Student</button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="openAddColumnModal()" style="font-weight:700;font-size:0.75rem;padding:0.2rem 0.5rem;" title="Add Column">+ Column</button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="openRemoveColumnModal()" style="font-weight:700;font-size:0.75rem;padding:0.2rem 0.5rem;" title="Remove Column">− Column</button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="openEditStudentRosterModal()" style="font-weight:700;font-size:0.75rem;padding:0.2rem 0.5rem;display:inline-flex;align-items:center;gap:0.3rem;" title="Edit Student Data Modal">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openEditStudentRosterModal()" style="font-weight:700;font-size:0.75rem;padding:0.2rem 0.5rem;display:inline-flex;align-items:center;gap:0.3rem;" title="Open Scores Form (Vertical Modal Entry)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            <span>Edit Student</span>
+            <span>Edit Scores Form</span>
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- Hidden Legacy Tab Buttons & Subtoolbar Elements for Test Suites Compatibility -->
-    <div style="display:none !important;" id="legacy-sheet-tabs-container">
-      <button type="button" id="tab-sheet-evaluation" onclick="switchSheetTab('evaluation')"></button>
-      <button type="button" id="tab-sheet-tests" onclick="switchSheetTab('tests')"></button>
-      <button type="button" id="tab-sheet-assignments" onclick="switchSheetTab('assignments')"></button>
-      <button type="button" id="tab-sheet-practicals" onclick="switchSheetTab('practicals')"></button>
-      <button type="button" id="tab-sheet-attendance" onclick="switchSheetTab('attendance')"></button>
-      <div id="subtoolbar-left-content"></div>
-      <div id="subtoolbar-right-content"></div>
-      <span id="badge-tests-count">0</span>
-      <span id="badge-assignments-count">0</span>
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════
@@ -215,38 +187,9 @@
           <span id="filter-badge-indicator" style="display:none;background:var(--color-primary);color:var(--text-white);font-size:0.65rem;font-weight:800;padding:0.05rem 0.35rem;border-radius:999px;">1</span>
         </button>
 
-        <select class="eval-filter-select" id="sheet-filter-select" onchange="onSheetFilter(this.value)" style="display:none;">
-          <option value="ALL">All Students</option>
-          <option value="TOP">Top Performers (≥ 80%)</option>
-          <option value="AVERAGE">Average (50% - 79%)</option>
-          <option value="LOW">Low (&lt; 50%)</option>
-          <option value="ATT_LOW">Below 75% Attendance</option>
-          <option value="ABSENT">Absent</option>
-        </select>
 
-        <!-- Column Visibility Dropdown (Preserved in DOM for test suite assertions) -->
-        <div style="position:relative;display:none;">
-          <button type="button" class="btn btn-secondary btn-sm" id="btn-col-filter-toggle" onclick="toggleColumnVisibilityMenu()" title="Toggle hiding/showing specific columns" style="font-size:0.75rem;font-weight:700;padding:0.2rem 0.45rem;display:inline-flex;align-items:center;gap:0.25rem;white-space:nowrap;flex-shrink:0;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-            <span class="filter-btn-label">Columns Visibility ▾</span>
-            <span class="filter-btn-label-mobile" style="display:none;">Cols ▾</span>
-          </button>
-          <div id="col-filter-dropdown-menu" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg), 0 8px 30px rgba(0,0,0,0.25);z-index:500;min-width:260px;padding:0.6rem 0.85rem;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border-color);">
-              <strong style="font-size:0.78rem;color:var(--text-main);">Toggle Columns Visibility</strong>
-              <div style="display:flex;align-items:center;gap:0.45rem;">
-                <button type="button" onclick="resetAllColumnsVisible()" style="border:none;background:none;color:var(--color-primary);font-size:0.72rem;cursor:pointer;font-weight:700;">Show All</button>
-                <button type="button" onclick="toggleColumnVisibilityMenu()" style="border:none;background:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:800;padding:0 0.2rem;" title="Close" data-icon="close" aria-label="Close"></button>
-              </div>
-            </div>
-            <div id="col-checkboxes-container" style="display:flex;flex-direction:column;gap:0.35rem;font-size:0.78rem;color:var(--text-main);max-height:220px;overflow-y:auto;">
-              <!-- Generated dynamically -->
-            </div>
-          </div>
-        </div>
+
+
 
         <!-- Column Focus Jump Dropdown -->
         <select class="eval-filter-select" id="sheet-column-focus-select" onchange="onFocusColumnChange(this.value)" title="Jump directly to column">
@@ -275,7 +218,7 @@
     <div class="sheet-institutional-banner" id="sheet-institutional-banner">
       <div class="banner-row row-1" id="hdr-banner-line1">
         <div style="display:flex;align-items:center;justify-content:center;gap:0.45rem;position:relative;">
-          <h3 class="banner-editable-inst" id="hdr-banner-inst" contenteditable="false" spellcheck="false" title="Institution Header (Click Edit button in top bar to modify)">Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026 Session</h3>
+          <h3 class="banner-editable-inst" id="hdr-banner-inst" contenteditable="false" spellcheck="false" title="Institution Header (Click Edit button in top bar to modify)">Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet</h3>
           <span class="banner-edit-indicator" id="hdr-banner-inst-indicator" style="display:none;" title="Editable in Edit Mode">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </span>
@@ -334,26 +277,8 @@
           </div>
         </div>
 
-        <!-- PANE 5: ATTENDANCE MATRIX LEDGER (REMOVED PER USER REQUEST) -->
-        <div class="sheet-pane" id="pane-attendance" style="display:none !important;" aria-hidden="true">
-          <div id="attendance-table-container"></div>
-        </div>
-
       </div>
     </div>
-
-    <!-- Bottom Status Bar (Hidden per user request) -->
-    <footer class="sheets-bottom-status-bar" style="display:none !important;" aria-hidden="true">
-      <div class="status-bar-left">
-        <span>● Connected to VidyaOS ERP Cloud</span>
-        <span id="sb-enrolled-count">Enrolled: 0</span>
-        <span id="sb-class-avg">Class Avg: —</span>
-      </div>
-      <div class="status-bar-right">
-        <span>Academic Year: <strong id="sb-academic-year">2026-27</strong></span>
-        <span>Institutional Standard Replica</span>
-      </div>
-    </footer>
 
   </main>
 
@@ -735,8 +660,8 @@
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
-            <span class="btn-text-full">Edit Student</span>
-            <span class="btn-text-short">Edit</span>
+            <span class="btn-text-full">Edit Scores Form</span>
+            <span class="btn-text-short">Scores</span>
           </button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="openAddRowModal(); toggleFloatingToolsDrawer(false);" style="font-weight:700;font-size:0.75rem;padding:0.25rem 0.6rem;">+ Student</button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="openAddColumnModal(); toggleFloatingToolsDrawer(false);" style="font-weight:700;font-size:0.75rem;padding:0.25rem 0.6rem;">+ Column</button>

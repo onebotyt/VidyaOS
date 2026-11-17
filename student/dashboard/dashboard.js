@@ -388,8 +388,10 @@ function renderGoogleClassCards() {
   grid.innerHTML = visible.map((c, index) => {
     const paletteClass = `palette-${index % 6}`;
     const isTheory = (c.component || '').toUpperCase() === 'THEORY';
-    const compLabel = isTheory ? 'Theory' : 'Practical';
-    const code = c.subject_code || (c.subject_name || '').slice(0, 6).toUpperCase();
+    const isDual = (c.component || '').toUpperCase().includes('PRACTICAL') && (c.component || '').toUpperCase().includes('THEORY');
+    const compLabel = isDual ? 'Theory + Practical' : (isTheory ? 'Theory' : 'Practical');
+    const shortBadge = c.subject_short_name || c.subject_code || (c.subject_name || '').slice(0, 6).toUpperCase();
+    const code = c.subject_code || shortBadge;
     const teacherInitials = getInitials(c.teacher_name || 'Faculty');
 
     // Find matching attendance record
@@ -407,6 +409,7 @@ function renderGoogleClassCards() {
           <div class="gc-card-header-top">
             <div class="gc-card-header-tags">
               <span class="gc-card-code-tag">${escapeHtml(code)}</span>
+              ${c.subject_short_name ? `<span class="gc-card-code-tag" style="background:rgba(255,255,255,0.25);">${escapeHtml(c.subject_short_name)}</span>` : ''}
               <span class="gc-component-tag">${compLabel}</span>
             </div>
             <div class="gc-card-header-right-meta">
@@ -414,20 +417,20 @@ function renderGoogleClassCards() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
               </button>
               <div class="gc-menu-dropdown gc-menu-header" id="card-menu-student-${c.id}">
-                <button type="button" class="gc-menu-item danger" onclick="openDeleteSubjectCardModal(${c.id}, '${escapeHtml(c.name || c.subject_name).replace(/'/g, "\\'")}')" title="Delete Subject Card">
+                <button type="button" class="gc-menu-item danger" onclick="openDeleteSubjectCardModal(${c.id}, '${escapeHtml(c.name || c.subject_name).replace(/'/g, "\\'")}')" title="Hide Subject Card">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                  <span>Delete Subject Card</span>
+                  <span>Hide Subject Card</span>
                 </button>
               </div>
             </div>
           </div>
 
           <div>
-            <a href="/student/group-detail.html?id=${c.id}" class="gc-card-title" title="${escapeHtml(c.subject_name || c.name)}">
+            <a href="/student/group-detail/index.html?id=${c.id}" class="gc-card-title" title="${escapeHtml(c.subject_name || c.name)}">
               ${escapeHtml(c.name || c.subject_name || 'Subject Class')}
             </a>
             <div class="gc-card-teacher" title="Instructor: ${escapeHtml(c.teacher_name || 'Faculty')}">
-              ${escapeHtml(c.teacher_name || 'Course Instructor')} • Sem ${c.semester || 1}
+              ${escapeHtml(c.teacher_name || 'Course Instructor')} • Year ${c.year || Math.ceil((c.semester||1)/2)} • Sem ${c.semester || 1}
             </div>
           </div>
 
@@ -438,7 +441,7 @@ function renderGoogleClassCards() {
         </header>
 
         <!-- Card Body with Live Attendance Telemetry -->
-        <div class="gc-card-body" onclick="window.location.href='/student/group-detail.html?id=${c.id}'" style="cursor:pointer;">
+        <div class="gc-card-body" onclick="window.location.href='/student/group-detail/index.html?id=${c.id}'" style="cursor:pointer;">
           <div class="gc-card-att-box">
             <div class="gc-card-att-top">
               <span class="gc-card-att-pct" style="color: ${isSafe ? 'var(--status-present)' : 'var(--status-absent)'};">
@@ -460,7 +463,7 @@ function renderGoogleClassCards() {
           </div>
 
           <div class="gc-card-coursework-row" onclick="event.stopPropagation()">
-            <a href="/student/group-detail.html?id=${c.id}&tab=classwork" class="gc-coursework-pill ${(c.pending_work_count > 0) ? 'gc-coursework-pending' : ''}" title="View Coursework Assignments">
+            <a href="/student/group-detail/index.html?id=${c.id}&tab=classwork" class="gc-coursework-pill ${(c.pending_work_count > 0) ? 'gc-coursework-pending' : ''}" title="View Coursework Assignments">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
@@ -469,7 +472,7 @@ function renderGoogleClassCards() {
               ${(c.pending_work_count > 0) ? '<span class="gc-pill-dot"></span>' : ''}
             </a>
 
-            <a href="/student/group-detail.html?id=${c.id}&tab=classwork" class="gc-coursework-pill" title="View Class Tests & Exam Marks">
+            <a href="/student/group-detail/index.html?id=${c.id}&tab=classwork" class="gc-coursework-pill" title="View Class Tests & Exam Marks">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="9 11 12 14 22 4"></polyline>
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
@@ -482,7 +485,7 @@ function renderGoogleClassCards() {
         ${isStaff ? `
         <!-- Staff Navigation Quick Links Grid (Students, Classwork, Resources, NBA, Theory Classes, Laboratory Classes, Student Performance, Direct Assessment, Indirect Assessment) -->
         <div class="card-quick-links-grid" onclick="event.stopPropagation()">
-          <a href="/student/group-detail.html?id=${c.id}&tab=people" class="card-quick-link" title="Classmates & Teachers">
+          <a href="/student/group-detail/index.html?id=${c.id}&tab=people" class="card-quick-link" title="Classmates & Teachers">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
@@ -492,7 +495,7 @@ function renderGoogleClassCards() {
             <span>Students</span>
           </a>
 
-          <a href="/student/group-detail.html?id=${c.id}&tab=classwork" class="card-quick-link ${(c.pending_work_count > 0) ? 'has-pending' : ''}" title="Classwork & Assignments">
+          <a href="/student/group-detail/index.html?id=${c.id}&tab=classwork" class="card-quick-link ${(c.pending_work_count > 0) ? 'has-pending' : ''}" title="Classwork & Assignments">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
@@ -503,7 +506,7 @@ function renderGoogleClassCards() {
             <span>Classwork</span>
           </a>
 
-          <a href="/student/group-detail.html?id=${c.id}&tab=resources" class="card-quick-link" title="Class Resources & Documents">
+          <a href="/student/group-detail/index.html?id=${c.id}&tab=resources" class="card-quick-link" title="Class Resources & Documents">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
             </svg>
@@ -611,7 +614,7 @@ function renderDrawerClasses() {
   container.innerHTML = studentDashboardState.classes.map((c, i) => {
     const color = dotColors[i % dotColors.length];
     return `
-      <a href="/student/group-detail.html?id=${c.id}" class="gc-drawer-link" style="font-size:0.84rem;padding:0.5rem 1.5rem;">
+      <a href="/student/group-detail/index.html?id=${c.id}" class="gc-drawer-link" style="font-size:0.84rem;padding:0.5rem 1.5rem;">
         <span class="gc-class-dot" style="background: ${color}; width:10px; height:10px; border-radius:50%; flex-shrink:0;"></span>
         <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(c.name || c.subject_name)}</span>
       </a>
@@ -847,7 +850,7 @@ async function handleStudentJoinSubmit(e) {
       closeJoinModal();
       const joinedId = res.data?.id || res.data?.group_id;
       if (joinedId) {
-        window.location.href = `/student/group-detail.html?id=${joinedId}`;
+        window.location.href = `/student/group-detail/index.html?id=${joinedId}`;
         return;
       }
       await loadEnrolledClasses();

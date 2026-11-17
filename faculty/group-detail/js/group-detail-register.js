@@ -48,7 +48,7 @@
 
       if (groupRegisters.length === 0) {
         try {
-          const listRes = await apiFetch('/api/v1/faculty/registers');
+          const listRes = await apiFetch('/faculty/registers');
           if (listRes && listRes.success && Array.isArray(listRes.data)) {
             groupRegisters = listRes.data.filter(r => (groupId && r.group_id === groupId) || (S.group?.subject_id && r.subject_id === S.group?.subject_id));
           }
@@ -78,7 +78,7 @@
 
       classRegState.registerId = regId;
       const qStr = month ? ('?month=' + encodeURIComponent(month)) : '';
-      const res = await apiFetch('/api/v1/faculty/registers/' + regId + qStr);
+      const res = await apiFetch('/faculty/registers/' + regId + qStr);
       if (res && res.success && res.data) {
         classRegState.registerData = res.data.register;
         classRegState.gridData = res.data.grid;
@@ -1523,7 +1523,7 @@
     let regId = classRegState.registerId || grp.register_id;
     if (!regId) {
       try {
-        const listRes = await apiFetch('/api/v1/faculty/registers');
+        const listRes = await apiFetch('/faculty/registers');
         if (listRes && listRes.success && Array.isArray(listRes.data)) {
           const found = listRes.data.find(r => r.group_id === Number(S.groupId) || r.subject_id === grp.subject_id);
           if (found) regId = found.id;

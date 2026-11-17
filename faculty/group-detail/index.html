@@ -171,9 +171,6 @@
         <span>Marks</span>
         <span class="tab-badge" id="tab-marks-count">0</span>
       </button>
-      <button type="button" class="gc-nav-tab" id="tab-btn-sheets" onclick="switchTab('sheets')" role="tab" aria-selected="false">
-        <span>Sheets</span>
-      </button>
       <button type="button" class="gc-nav-tab student-only-tab" id="tab-btn-attendance" onclick="switchTab('attendance')" role="tab" aria-selected="false" style="display:none;">
         <span>Attendance</span>
       </button>
@@ -209,13 +206,17 @@
             <div class="sidebar-card-hdr">Quick Actions</div>
             <div class="sidebar-card-body" style="padding:.5rem .75rem">
               <div class="quick-action-list">
-                <button class="qa-item" onclick="switchTab('classwork');setTimeout(openCreateAssignmentModal,100)">
+                <button class="qa-item" id="qa-item-assignment" onclick="switchTab('classwork');setTimeout(openCreateAssignmentModal,100)">
                   <span class="qa-icon" data-faculty-icon="plus" data-size="16"></span>
                   <span>Create Assignment</span>
                 </button>
-                <button class="qa-item" onclick="switchTab('classwork');setTimeout(openScheduleTestModal,100)">
+                <button class="qa-item" id="qa-item-test" onclick="switchTab('classwork');setTimeout(openScheduleTestModal,100)">
                   <span class="qa-icon" data-faculty-icon="fileText" data-size="16"></span>
                   <span>Schedule Class Test</span>
+                </button>
+                <button class="qa-item" id="qa-item-practical" onclick="switchTab('classwork');setTimeout(openCreatePracticalModal,100)" style="display:none;">
+                  <span class="qa-icon" data-faculty-icon="plus" data-size="16"></span>
+                  <span>Create Lab Practical</span>
                 </button>
                 <button class="qa-item" onclick="openSheetStudio('evaluation')">
                   <span class="qa-icon" data-faculty-icon="sheets" data-size="16"></span>
@@ -440,7 +441,7 @@
                   <span>Create</span>
                 </button>
                 <div class="cw-dd-menu" id="cw-dd-menu" style="display:none">
-                  <div class="cw-dd-item" onclick="openCreateAssignmentModal();closeCWDrop()">
+                  <div class="cw-dd-item" id="cw-dd-assignment-item" onclick="openCreateAssignmentModal();closeCWDrop()">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                     <span>Assignment</span>
                   </div>
@@ -448,19 +449,19 @@
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/><line x1="6.5" y1="15" x2="17.5" y2="15"/></svg>
                     <span>Lab Practical</span>
                   </div>
-                  <div class="cw-dd-item" onclick="openFinalDocsModal();closeCWDrop()">
+                  <div class="cw-dd-item" id="cw-dd-finaldocs-item" onclick="openFinalDocsModal();closeCWDrop()">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                     <span>Final Documents Request</span>
                   </div>
-                  <div class="cw-dd-item" onclick="openScheduleTestModal();closeCWDrop()">
+                  <div class="cw-dd-item" id="cw-dd-test-item" onclick="openScheduleTestModal();closeCWDrop()">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
                     <span>Class Test</span>
                   </div>
-                  <div class="cw-dd-item" onclick="openCreateUnitModal();closeCWDrop()">
+                  <div class="cw-dd-item" id="cw-dd-unit-item" onclick="openCreateUnitModal();closeCWDrop()">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                     <span>Unit / Topic</span>
                   </div>
-                  <div class="cw-dd-item" onclick="showToast('Material coming soon');closeCWDrop()">
+                  <div class="cw-dd-item" id="cw-dd-material-item" onclick="showToast('Material coming soon');closeCWDrop()">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
                     <span>Material</span>
                   </div>
@@ -931,15 +932,15 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div class="dropdown-menu marks-create-dropdown-menu" id="marks-create-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);min-width:180px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);box-shadow:var(--shadow-md);z-index:100;padding:0.35rem 0;">
-                <button type="button" class="dropdown-item" onclick="openScheduleTestModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
+                <button type="button" class="dropdown-item" id="marks-dd-test-item" onclick="openScheduleTestModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="m9 14 2 2 4-4"/></svg>
                   <span>Class Test</span>
                 </button>
-                <button type="button" class="dropdown-item" onclick="openCreateAssignmentModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
+                <button type="button" class="dropdown-item" id="marks-dd-assignment-item" onclick="openCreateAssignmentModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                   <span>Assignment</span>
                 </button>
-                <button type="button" class="dropdown-item" onclick="openCreatePracticalModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
+                <button type="button" class="dropdown-item" id="marks-dd-practical-item" onclick="openCreatePracticalModal();toggleMarksCreateDropdown(false)" style="display:flex;align-items:center;gap:0.6rem;width:100%;padding:0.55rem 1rem;background:none;border:none;text-align:left;font-size:0.84rem;font-weight:600;color:var(--text-main);cursor:pointer;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.17 19.14A2 2 0 0 0 5.86 22h12.28a2 2 0 0 0 1.69-2.86L14 9.31V2"/></svg>
                   <span>Lab Practical</span>
                 </button>
@@ -1344,71 +1345,8 @@
     </div>
 
     <!-- ══════════════════════════════════════════════════════════════
-         TAB 5: UNIFIED SHEETS STUDIO (Evaluation, Tests, Coursework & Attendance)
+         TAB: STUDENT ATTENDANCE (Course-specific attendance telemetry)
          ══════════════════════════════════════════════════════════════ -->
-    <div id="tab-sheets" class="tab-pane" style="display:none">
-      <div class="classroom-sheets-layout">
-        <!-- Banner to Launch Full Advanced Sheets Studio -->
-        <div class="card" style="padding: 0.85rem 1.25rem; margin-bottom: 1rem; border: 1.5px solid var(--color-primary); background: var(--color-primary-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);flex-shrink:0;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-            <div>
-              <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">Unified Sheets Studio (Full Advanced Portal)</div>
-              <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">Includes Edit/Save mode, question-wise score matrix, Zoom &amp; continuous Auto-Fit, dynamic column visibility, and spreadsheet export.</div>
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="openSheetStudio()" style="font-weight: 800; font-size: 0.82rem; padding: 0.35rem 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
-            <span>Launch Advanced Sheets Studio ⇲</span>
-          </button>
-        </div>
-
-        <!-- Control Bar: Sheet Type Dropdown, Search, Export -->
-        <div class="card" style="padding: 0.75rem 1.25rem; margin-bottom: 1rem; border: 1px solid var(--border-color); background: var(--bg-card); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.65rem;">
-
-          <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-            <select class="form-select sheet-select-dropdown" id="class-sheet-type-dropdown" onchange="switchClassroomSheetType(this.value)" style="font-weight: 700; font-size: 0.84rem; padding: 0.35rem 0.85rem; border-radius: var(--radius-sm); border: 1.5px solid var(--color-primary); background: var(--bg-surface); color: var(--text-main); cursor: pointer;" title="Select Sheet Mode">
-              <option value="evaluation" selected>1. Master Evaluation Sheet (UT + Coursework + Attendance)</option>
-              <option value="tests">2. Class Test Marksheet</option>
-              <option value="assignments">3. Assignment &amp; Coursework Marksheet</option>
-            </select>
-            <div id="class-sheet-subcontrols" style="display:inline-flex;align-items:center;gap:0.4rem;"></div>
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <input type="text" id="class-sheet-search-input" placeholder="Search students..." oninput="onClassSheetSearch(this.value)" style="padding: 0.3rem 0.65rem; font-size: 0.8rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main); width: 160px;">
-            <div style="position:relative;display:inline-block;" id="class-export-dropdown-wrapper">
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-class-sheet-export-dropdown" onclick="toggleClassroomSheetExportMenu()" style="font-weight:700;font-size:0.78rem;display:inline-flex;align-items:center;gap:0.35rem;" title="Export Active Sheet">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <span>Export</span> ▾
-              </button>
-              <div id="class-sheet-export-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:200;min-width:210px;padding:0.35rem 0;">
-                <button type="button" class="dropdown-item" onclick="exportClassroomSheet('xlsx')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-                  <span style="color:var(--status-present);font-weight:800;">.XLSX</span> Excel Spreadsheet
-                </button>
-                <button type="button" class="dropdown-item" onclick="exportClassroomSheet('pdf')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-                  <span style="color:var(--status-absent);font-weight:800;">.PDF</span> Printable PDF Document
-                </button>
-                <button type="button" class="dropdown-item" onclick="exportClassroomSheet('doc')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-                  <span style="color:var(--color-primary);font-weight:800;">.DOC</span> Word Document
-                </button>
-                <button type="button" class="dropdown-item" onclick="exportClassroomSheet('csv')" style="display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.45rem 0.85rem;background:none;border:none;color:var(--text-main);font-size:0.8rem;font-weight:600;text-align:left;cursor:pointer;">
-                  <span style="color:var(--text-muted);font-weight:800;">.CSV</span> Raw Data Values
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sheets Viewport Container -->
-        <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem; border: 1px solid var(--border-color); background: var(--bg-card);">
-          <div class="sheets-viewport-wrap" id="class-sheets-viewport" style="overflow-x: auto; min-height: 420px; padding: 0.5rem;">
-            <div style="padding:3rem 1rem;text-align:center;color:var(--text-muted)">Loading classroom spreadsheet...</div>
-          </div>
-        </div>
     <!-- ══════════════════════════════════════════════════════════════
          TAB: STUDENT ATTENDANCE (Course-specific attendance telemetry)
          ══════════════════════════════════════════════════════════════ -->
@@ -2899,13 +2837,13 @@
   </button>
 
   <div class="cw-mobile-fab-menu" id="cw-mobile-fab-menu" style="display:none;">
-    <button type="button" class="cw-fab-menu-item" onclick="openCreateAssignmentModal();toggleCwFabMenu(false)">
+    <button type="button" class="cw-fab-menu-item" id="cw-fab-assignment-item" onclick="openCreateAssignmentModal();toggleCwFabMenu(false)">
       <span>Assignment</span>
       <span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:var(--text-white);align-items:center;justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       </span>
     </button>
-    <button type="button" class="cw-fab-menu-item" onclick="openScheduleTestModal();toggleCwFabMenu(false)">
+    <button type="button" class="cw-fab-menu-item" id="cw-fab-test-item" onclick="openScheduleTestModal();toggleCwFabMenu(false)">
       <span>Class Test</span>
       <span style="display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:var(--text-white);align-items:center;justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
@@ -3029,7 +2967,6 @@
   <script src="/faculty/group-detail/js/group-detail-people.js?v=20261031_v4"></script>
   <script src="/faculty/group-detail/js/group-detail-classwork.js?v=20261031_v4"></script>
   <script src="/faculty/group-detail/js/group-detail-register.js?v=20261031_v4"></script>
-  <script src="/faculty/group-detail/js/group-detail-sheets.js?v=20261031_v4"></script>
   <script src="/faculty/group-detail/group-detail.js?v=20261031_v4"></script>
 </body>
 </html>

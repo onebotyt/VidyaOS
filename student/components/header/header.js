@@ -22,14 +22,13 @@
   }
 
   const STUDENT_APPS = [
-    { label: 'Classes', href: '/student/dashboard.html', icon: 'classes' },
-    { label: 'Attendance', href: '/student/attendance.html', icon: 'attendance' },
-    { label: 'Timetable', href: '/student/timetable.html', icon: 'timetable' },
-    { label: 'Tasks', href: '/student/assignments.html', icon: 'assignments' },
-    { label: 'Marks', href: '/student/scores.html', icon: 'scores' },
+    { label: 'Classes', href: '/student/dashboard/index.html', icon: 'classes' },
+    { label: 'Attendance', href: '/student/attendance/index.html', icon: 'attendance' },
+    { label: 'Timetable', href: '/student/timetable/index.html', icon: 'timetable' },
+    { label: 'Tasks', href: '/student/assignments/index.html', icon: 'assignments' },
+    { label: 'Marks', href: '/student/scores/index.html', icon: 'scores' },
     { label: 'Leave', href: '/student/leave/index.html', icon: 'leave' },
-    { label: 'NBA Dossier', href: '/student/nba/index.html', icon: 'classes' },
-    { label: 'Profile', href: '/student/profile.html', icon: 'profile' }
+    { label: 'Profile', href: '/student/profile/index.html', icon: 'profile' }
   ];
 
   function getPageBadgeText() {
@@ -60,10 +59,10 @@
     const isDashboard = window.location.pathname.includes('/dashboard') || window.location.pathname === '/student/' || window.location.pathname === '/student';
 
     const actionButtonHtml = isDashboard
-      ? `<button type="button" class="gc-create-btn" onclick="typeof openStudentJoinModal === 'function' ? openStudentJoinModal() : (window.location.href='/student/dashboard.html')" title="Join class using 6-character code">
+      ? `<button type="button" class="gc-create-btn" onclick="typeof openStudentJoinModal === 'function' ? openStudentJoinModal() : (window.location.href='/student/dashboard/index.html')" title="Join class using 6-character code">
            <span>+</span> <span class="btn-text">Join Class</span>
          </button>`
-      : `<a href="/student/dashboard.html" class="student-nav-action-btn" title="Return to Classes Hub">
+      : `<a href="/student/dashboard/index.html" class="student-nav-action-btn" title="Return to Classes Hub">
            <span>←</span> <span class="btn-text">Classes Hub</span>
          </a>`;
 
@@ -81,7 +80,7 @@
           <button type="button" class="gc-menu-btn" id="btn-menu-toggle" onclick="toggleStudentDrawer()" title="Main Menu" aria-label="Toggle Navigation Drawer">
             ${getIcon('menu', { width: 20, height: 20 })}
           </button>
-          <a href="/student/dashboard.html" class="gc-brand-link" title="VidyaOS Student Workspace">
+          <a href="/student/dashboard/index.html" class="gc-brand-link" title="VidyaOS Student Workspace">
             <div class="gc-brand-icon">
               ${getIcon('brand', { width: 22, height: 22 })}
             </div>
@@ -133,11 +132,11 @@
           <div class="profile-popover-divider"></div>
           
           <div class="profile-popover-links">
-            <a href="/student/profile.html" class="profile-popover-item">
+            <a href="/student/profile/index.html" class="profile-popover-item">
               ${getIcon('profile', { width: 17, height: 17 })}
               <span>My Full Profile</span>
             </a>
-            <a href="/student/dashboard.html" class="profile-popover-item">
+            <a href="/student/dashboard/index.html" class="profile-popover-item">
               ${getIcon('classes', { width: 17, height: 17 })}
               <span>Enrolled Classes</span>
             </a>

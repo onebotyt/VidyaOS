@@ -52,7 +52,7 @@
 
   // 3. Date Formatting Helpers
   function formatDisplayDate(dateStr) {
-    if (!dateStr) return '';
+    if (!dateStr || dateStr.startsWith('0000')) return '--';
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return dateStr;
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -60,7 +60,7 @@
   }
 
   function calculateDays(fromDateStr, toDateStr) {
-    if (!fromDateStr || !toDateStr) return 1;
+    if (!fromDateStr || !toDateStr || fromDateStr.startsWith('0000') || toDateStr.startsWith('0000')) return 1;
     const d1 = new Date(fromDateStr);
     const d2 = new Date(toDateStr);
     if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return 1;
@@ -188,9 +188,11 @@
     tbody.innerHTML = rows.map((l, index) => {
       const avatarColor = getAvatarColorClass(index);
       const initials = getInitials(l.student_name);
-      const daysCount = calculateDays(l.from_date, l.to_date);
-      const formattedFrom = formatDisplayDate(l.from_date);
-      const formattedTo = formatDisplayDate(l.to_date);
+      const fromDate = l.from_date || l.start_date;
+      const toDate = l.to_date || l.end_date;
+      const daysCount = calculateDays(fromDate, toDate);
+      const formattedFrom = formatDisplayDate(fromDate);
+      const formattedTo = formatDisplayDate(toDate);
 
       // Category Pill type
       const lType = (l.leave_type || 'Medical').toLowerCase();
@@ -239,15 +241,17 @@
         actionsHtml = `
           <div class="leave-action-buttons">
             <button type="button" class="leave-btn-approve" onclick="decideLeave(${l.id}, 'APPROVED')" title="Approve Leave Application" aria-label="Approve">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
+              <span>Approve</span>
             </button>
             <button type="button" class="leave-btn-reject" onclick="openRejectModal(${l.id})" title="Reject Leave Application" aria-label="Reject">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
+              <span>Reject</span>
             </button>
           </div>
         `;
@@ -287,6 +291,7 @@
               <span class="date-from-text">${formattedFrom}</span>
               <span class="date-to-text">– ${formattedTo}</span>
             </div>
+            <span class="td-days">${daysCount} ${daysCount === 1 ? 'Day' : 'Days'}</span>
           </td>
           <td class="td-days">${daysCount}</td>
           <td class="td-reason">

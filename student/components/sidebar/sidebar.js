@@ -26,7 +26,7 @@
     return '';
   }
 
-  // Primary Navigation Registry (All 8 Student Modules)
+  // Primary Navigation Registry (All 7 Verified Student Modules)
   const NAV_ITEMS = [
     { key: 'classes', label: 'Classes Hub', shortLabel: 'Classes', href: '/student/dashboard/index.html', icon: 'classes' },
     { key: 'attendance', label: 'My Attendance', shortLabel: 'Attend', href: '/student/attendance/index.html', icon: 'attendance' },
@@ -34,8 +34,7 @@
     { key: 'assignments', label: 'Coursework & Tasks', shortLabel: 'Tasks', href: '/student/assignments/index.html', icon: 'assignments' },
     { key: 'scores', label: 'Marks & Scores', shortLabel: 'Scores', href: '/student/scores/index.html', icon: 'scores' },
     { key: 'leave', label: 'Leave Applications', shortLabel: 'Leave', href: '/student/leave/index.html', icon: 'leave' },
-    { key: 'nba', label: 'NBA Course Dossier', shortLabel: 'NBA', href: '/student/nba/index.html', icon: 'dossier' },
-    { key: 'profile', label: 'Student Profile', shortLabel: 'Profile', href: '/student/profile/index.html', icon: 'profile' }
+    { key: 'profile', label: 'Profile & Dossier', shortLabel: 'Profile', href: '/student/profile/index.html', icon: 'profile' }
   ];
 
   // 5 Canonical Mobile Bottom Tabs
@@ -43,7 +42,7 @@
     { key: 'classes', label: 'Classes', href: '/student/dashboard/index.html', icon: 'classes' },
     { key: 'attendance', label: 'Attendance', href: '/student/attendance/index.html', icon: 'attendance' },
     { key: 'timetable', label: 'Routine', href: '/student/timetable/index.html', icon: 'timetable' },
-    { key: 'assignments', label: 'Tasks', href: '/student/assignments/index.html', icon: 'assignments' },
+    { key: 'scores', label: 'Scores', href: '/student/scores/index.html', icon: 'scores' },
     { key: 'profile', label: 'Profile', href: '/student/profile/index.html', icon: 'profile' }
   ];
 
@@ -54,7 +53,6 @@
     if (p.includes('/assignments')) return 'assignments';
     if (p.includes('/scores')) return 'scores';
     if (p.includes('/leave')) return 'leave';
-    if (p.includes('/nba') || p.includes('/assessment-process') || p.includes('/direct-assessment') || p.includes('/indirect-assessment') || p.includes('/student-performance')) return 'nba';
     if (p.includes('/profile')) return 'profile';
     return 'classes';
   }

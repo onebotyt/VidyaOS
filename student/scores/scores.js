@@ -1,13 +1,15 @@
 /**
  * ══════════════════════════════════════════════════════════════
- * PAGE LOGIC: STUDENT SCORES (Responsive Table + Mobile Card View)
+ * PAGE LOGIC: STUDENT SCORES & DECOUPLED ACADEMIC ASSESSMENTS
  * frontend/student/scores/scores.js
  * ══════════════════════════════════════════════════════════════
  */
 
 guardRoute(['STUDENT']);
 
-let allExamScores = [];
+let allScores = [];
+let activeSemFilter = 'ALL';
+let activeTypeFilter = 'ALL';
 
 async function init() {
   await loadProfileHeader();
@@ -19,13 +21,22 @@ async function loadProfileHeader() {
     const res = await fetchApi('/students/me', { suppressToast: true });
     if (res && res.success && res.data) {
       const s = res.data;
-      document.getElementById('scores-student-name').textContent = s.full_name || 'Student';
-      document.getElementById('scores-cohort-badge').textContent = `Year ${s.year || 1} • Sem ${s.semester || 1}`;
-      document.getElementById('scores-dept-info').textContent = `${s.department_name || 'Department'} (${s.branch_code || s.department_code || ''}) • ${s.academic_year_label || 'Current Session'}`;
-      document.getElementById('scores-roll-no').textContent = s.class_roll_no ? `${s.class_roll_no}` : '—';
-      document.getElementById('scores-reg-no').textContent = s.registration_no || '—';
-      document.getElementById('scores-enrollment-no').textContent = s.official_enrollment_no || '—';
-      document.getElementById('student-id-card').style.display = 'block';
+      const nameEl = document.getElementById('scores-student-name');
+      const cohortBadge = document.getElementById('scores-cohort-badge');
+      const deptEl = document.getElementById('scores-dept-info');
+      const rollEl = document.getElementById('scores-roll-no');
+      const regEl = document.getElementById('scores-reg-no');
+      const enrollEl = document.getElementById('scores-enrollment-no');
+
+      if (nameEl) nameEl.textContent = s.full_name || 'Student';
+      if (cohortBadge) cohortBadge.textContent = `Year ${s.year || 1} • Sem ${s.semester || 1}`;
+      if (deptEl) deptEl.textContent = `${s.department_name || 'Department'} (${s.branch_code || s.department_code || ''}) • ${s.academic_year_label || 'Current Session'}`;
+      if (rollEl) rollEl.textContent = s.class_roll_no ? `${s.class_roll_no}` : '—';
+      if (regEl) regEl.textContent = s.registration_no || '—';
+      if (enrollEl) enrollEl.textContent = s.official_enrollment_no || '—';
+      
+      const card = document.getElementById('student-id-card');
+      if (card) card.style.display = 'block';
     }
   } catch (err) {
     console.warn('Could not load student profile header:', err);
@@ -35,13 +46,80 @@ async function loadProfileHeader() {
 async function loadScores() {
   const wrap = document.getElementById('scores-wrap');
   try {
-    const res = await fetchApi('/exams');
-    allExamScores = res && res.success && Array.isArray(res.data) ? res.data : [];
+    let combined = [];
+
+    // 1. Fetch decoupled persistent academic assessments from student dossier
+    try {
+      const dossierRes = await fetchApi('/students/me/dossier', { suppressToast: true });
+      if (dossierRes && dossierRes.success && dossierRes.data && Array.isArray(dossierRes.data.assessments)) {
+        dossierRes.data.assessments.forEach(a => {
+          combined.push({
+            id: a.assessment_id || a.id,
+            title: a.title || 'Assessment',
+            type: (a.type || 'EXAM').toUpperCase(),
+            semester: a.semester ? Number(a.semester) : null,
+            year: a.year ? Number(a.year) : null,
+            subject_name: a.subject_name || 'General Course',
+            subject_code: a.subject_code || '',
+            marks_obtained: a.marks_obtained !== null && a.marks_obtained !== undefined ? Number(a.marks_obtained) : null,
+            max_marks: Number(a.max_marks || 0),
+            submission_status: a.submission_status || 'GRADED',
+            date: a.submitted_at || a.created_at || null,
+            remarks: a.remarks || ''
+          });
+        });
+      }
+    } catch (e) {
+      console.warn('Could not fetch student dossier assessments:', e);
+    }
+
+    // 2. Fetch /exams as fallback or complementary source
+    try {
+      const examsRes = await fetchApi('/exams', { suppressToast: true });
+      if (examsRes && examsRes.success && Array.isArray(examsRes.data)) {
+        examsRes.data.forEach(ex => {
+          const already = combined.some(c => String(c.id) === String(ex.id) || (c.title === ex.name && c.subject_name === ex.subject_name));
+          if (!already) {
+            combined.push({
+              id: ex.id,
+              title: ex.name || 'Assessment',
+              type: 'EXAM',
+              semester: ex.semester ? Number(ex.semester) : null,
+              year: ex.year ? Number(ex.year) : null,
+              subject_name: ex.subject_name || 'General Course',
+              subject_code: ex.subject_code || '',
+              marks_obtained: ex.marks_obtained !== null && ex.marks_obtained !== undefined ? Number(ex.marks_obtained) : null,
+              max_marks: Number(ex.max_marks || 0),
+              submission_status: ex.marks_obtained !== null && ex.marks_obtained !== undefined ? 'GRADED' : 'PENDING',
+              date: ex.exam_date || null,
+              remarks: ex.remarks || ''
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Could not fetch exams:', e);
+    }
+
+    allScores = combined;
+    updateCounts();
     updateScoresKpis();
-    renderScoresList(allExamScores);
+    filterScoresView();
   } catch (err) {
-    wrap.innerHTML = `<div class="card" style="color: var(--status-absent); padding: 1.5rem;">Failed to load test scores: ${escapeHtml(err.message)}</div>`;
+    if (wrap) {
+      wrap.innerHTML = `<div class="card" style="color: var(--status-absent); padding: 1.5rem;">Failed to load test scores: ${escapeHtml(err.message)}</div>`;
+    }
   }
+}
+
+function updateCounts() {
+  const countAll = document.getElementById('count-all');
+  const countExams = document.getElementById('count-exams');
+  const countAssignments = document.getElementById('count-assignments');
+
+  if (countAll) countAll.textContent = String(allScores.length);
+  if (countExams) countExams.textContent = String(allScores.filter(s => s.type === 'EXAM').length);
+  if (countAssignments) countAssignments.textContent = String(allScores.filter(s => s.type === 'ASSIGNMENT').length);
 }
 
 function updateScoresKpis() {
@@ -49,9 +127,9 @@ function updateScoresKpis() {
   const avgEl = document.getElementById('kpi-scores-avg');
   const bestEl = document.getElementById('kpi-scores-best');
 
-  if (totalEl) totalEl.textContent = String(allExamScores.length);
+  if (totalEl) totalEl.textContent = String(allScores.length);
 
-  const graded = allExamScores.filter(ex => ex.marks_obtained !== null && ex.marks_obtained !== undefined && Number(ex.max_marks) > 0);
+  const graded = allScores.filter(ex => ex.marks_obtained !== null && ex.marks_obtained !== undefined && Number(ex.max_marks) > 0);
   if (!graded.length) {
     if (avgEl) avgEl.textContent = 'Pending';
     if (bestEl) bestEl.textContent = '—';
@@ -66,17 +144,49 @@ function updateScoresKpis() {
   if (bestEl) bestEl.textContent = `${Math.round(best)}%`;
 }
 
+function setSemesterFilter(sem) {
+  activeSemFilter = sem;
+  const buttons = document.querySelectorAll('#semester-filters button');
+  buttons.forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-sem') === String(sem));
+  });
+  filterScoresView();
+}
+
+function setTypeFilter(type) {
+  activeTypeFilter = type;
+  const buttons = document.querySelectorAll('#type-filters button');
+  buttons.forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-type') === String(type));
+  });
+  filterScoresView();
+}
+
 function filterScoresView() {
   const q = (document.getElementById('scores-search-input')?.value || '').trim().toLowerCase();
-  if (!q) {
-    renderScoresList(allExamScores);
-    return;
+  
+  let filtered = allScores;
+
+  // Filter by Semester
+  if (activeSemFilter !== 'ALL') {
+    const semNum = Number(activeSemFilter);
+    filtered = filtered.filter(item => item.semester === semNum);
   }
-  const filtered = allExamScores.filter(ex =>
-    String(ex.name || '').toLowerCase().includes(q) ||
-    String(ex.subject_name || '').toLowerCase().includes(q) ||
-    String(ex.subject_code || '').toLowerCase().includes(q)
-  );
+
+  // Filter by Type
+  if (activeTypeFilter !== 'ALL') {
+    filtered = filtered.filter(item => item.type === activeTypeFilter);
+  }
+
+  // Filter by Search Query
+  if (q) {
+    filtered = filtered.filter(item =>
+      String(item.title || '').toLowerCase().includes(q) ||
+      String(item.subject_name || '').toLowerCase().includes(q) ||
+      String(item.subject_code || '').toLowerCase().includes(q)
+    );
+  }
+
   renderScoresList(filtered);
 }
 
@@ -85,7 +195,7 @@ function renderScoresList(list) {
   if (!wrap) return;
 
   if (!list.length) {
-    wrap.innerHTML = `<div class="card" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No matching exam or unit test scores found.</div>`;
+    wrap.innerHTML = `<div class="card" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">No matching assessments or test scores found for the selected criteria.</div>`;
     return;
   }
 
@@ -94,9 +204,9 @@ function renderScoresList(list) {
       <table class="scores-table">
         <thead>
           <tr>
-            <th>Test / Examination</th>
+            <th>Test / Assessment</th>
             <th>Subject &amp; Code</th>
-            <th>Exam Date</th>
+            <th>Type &amp; Date</th>
             <th>Percentage</th>
             <th style="text-align: right;">Score Obtained</th>
           </tr>
@@ -106,18 +216,26 @@ function renderScoresList(list) {
             const hasScore = ex.marks_obtained !== null && ex.marks_obtained !== undefined;
             const pct = hasScore && ex.max_marks ? Math.round((Number(ex.marks_obtained) / Number(ex.max_marks)) * 100) : null;
             const isGood = pct !== null && pct >= 40;
-            const dateStr = ex.exam_date ? new Date(ex.exam_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+            const dateStr = ex.date ? new Date(ex.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+            const isExam = ex.type === 'EXAM';
             return `
               <tr>
-                <td data-label="Examination" style="font-weight: 700; color: var(--text-main);">
-                  <div>${escapeHtml(ex.name || 'Assessment')}</div>
-                  ${ex.remarks ? `<div style="font-size:0.75rem; color:var(--text-muted); font-weight:500; margin-top:2px;">Note: ${escapeHtml(ex.remarks)}</div>` : ''}
+                <td data-label="Assessment" style="font-weight: 700; color: var(--text-main);">
+                  <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                    <span>${escapeHtml(ex.title || 'Assessment')}</span>
+                    ${ex.semester ? `<span class="badge-sem">Sem ${ex.semester}</span>` : ''}
+                    <span class="badge-type ${isExam ? 'type-exam' : 'type-assignment'}">${isExam ? 'EXAM' : 'ASSIGNMENT'}</span>
+                  </div>
+                  ${ex.remarks ? `<div style="font-size:0.75rem; color:var(--text-muted); font-weight:500; margin-top:3px;">Note: ${escapeHtml(ex.remarks)}</div>` : ''}
                 </td>
                 <td data-label="Subject">
-                  <span>${escapeHtml(ex.subject_name || 'Subject')}</span>
-                  ${ex.subject_code ? `<span class="code-badge" style="margin-left:0.35rem;">${escapeHtml(ex.subject_code)}</span>` : ''}
+                  <div style="font-weight: 600; color: var(--text-main);">${escapeHtml(ex.subject_name || 'Subject')}</div>
+                  ${ex.subject_code ? `<span class="code-badge" style="margin-top: 2px; font-size: 0.74rem;">${escapeHtml(ex.subject_code)}</span>` : ''}
                 </td>
-                <td data-label="Exam Date">${dateStr}</td>
+                <td data-label="Type & Date">
+                  <div style="font-size: 0.85rem; color: var(--text-main); font-weight: 600;">${dateStr}</div>
+                  <div style="font-size: 0.74rem; color: var(--text-muted); text-transform: capitalize;">${escapeHtml(String(ex.submission_status || 'Graded').toLowerCase())}</div>
+                </td>
                 <td data-label="Percentage">
                   ${pct !== null ? `
                     <div class="score-pct-wrap">
@@ -138,7 +256,9 @@ function renderScoresList(list) {
   `;
 }
 
-var escapeHtml = window.escapeHtml || (typeof esc !== 'undefined' ? esc : (s => s));
+var escapeHtml = window.escapeHtml || (typeof esc !== 'undefined' ? esc : (s => s ? String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]) : ''));
 window.filterScoresView = filterScoresView;
+window.setSemesterFilter = setSemesterFilter;
+window.setTypeFilter = setTypeFilter;
 
 init();

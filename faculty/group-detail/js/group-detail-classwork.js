@@ -25,7 +25,7 @@
 
 async function loadAssignments() {
   try {
-    const r = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments');
+    const r = await apiFetch('/teaching-groups/' + S.groupId + '/assignments');
     S.assignments = r.data || [];
   } catch {
     S.assignments = [];
@@ -38,7 +38,7 @@ async function loadAssignments() {
 
 async function loadTests() {
   try {
-    const r = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests');
+    const r = await apiFetch('/teaching-groups/' + S.groupId + '/tests');
     S.tests = r.data || [];
   } catch {
     S.tests = [];
@@ -698,16 +698,28 @@ function renderCWList() {
   });
   const mappedTests = (S.tests || []).map(t => ({ ...t, _type: 'test' }));
 
+  const compStr = String((S.group && (S.group.component || S.group.group_component || S.group.subject_component)) || 'THEORY').toUpperCase();
+  const hasTheory = compStr.includes('THEORY') || !compStr.includes('PRACTICAL');
+  const hasPractical = compStr.includes('PRACTICAL');
+  const isTheoryOnly = hasTheory && !hasPractical;
+  const isPracticalOnly = !hasTheory && hasPractical;
+
   if (f === 'all') {
-    items = items.concat(mappedAssigns).concat(mappedTests);
+    if (isPracticalOnly) {
+      items = mappedAssigns.filter(a => a._type === 'practical' || a._type === 'finaldocs');
+    } else if (isTheoryOnly) {
+      items = mappedAssigns.filter(a => a._type !== 'practical').concat(mappedTests);
+    } else {
+      items = items.concat(mappedAssigns).concat(mappedTests);
+    }
   } else if (f === 'assignments') {
-    items = mappedAssigns.filter(a => a._type === 'assignment');
+    items = hasTheory ? mappedAssigns.filter(a => a._type === 'assignment') : [];
   } else if (f === 'practicals') {
-    items = mappedAssigns.filter(a => a._type === 'practical');
+    items = hasPractical ? mappedAssigns.filter(a => a._type === 'practical') : [];
   } else if (f === 'finaldocs') {
     items = mappedAssigns.filter(a => a._type === 'finaldocs');
   } else if (f === 'tests') {
-    items = mappedTests;
+    items = hasTheory ? mappedTests : [];
   }
 
   // Filter by Unit
@@ -1121,7 +1133,7 @@ async function submitCreateAssignment() {
     title = `Assignment ${numVal}: ${title}`;
   }
   try {
-    await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments', {
+    await apiFetch('/teaching-groups/' + S.groupId + '/assignments', {
       method: 'POST',
       body: JSON.stringify({ title, description: desc, due_date: due || null, max_marks: marks, unit_name })
     });
@@ -1166,7 +1178,7 @@ async function submitCreatePractical() {
     btn.textContent = 'Publishing...';
   }
   try {
-    await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments', {
+    await apiFetch('/teaching-groups/' + S.groupId + '/assignments', {
       method: 'POST',
       body: JSON.stringify({
         title,
@@ -1369,7 +1381,7 @@ async function submitScheduleTest() {
       }));
 
   try {
-    await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests', {
+    await apiFetch('/teaching-groups/' + S.groupId + '/tests', {
       method: 'POST',
       body: JSON.stringify({
         name,
@@ -1507,7 +1519,7 @@ async function submitCreateFinalDocs() {
     btn.textContent = 'Publishing...';
   }
   try {
-    await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments', {
+    await apiFetch('/teaching-groups/' + S.groupId + '/assignments', {
       method: 'POST',
       body: JSON.stringify({
         title,
@@ -1795,7 +1807,7 @@ async function submitEditWork() {
 
   try {
     if (isTest) {
-      await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + id, {
+      await apiFetch('/teaching-groups/' + S.groupId + '/tests/' + id, {
         method: 'PUT',
         body: JSON.stringify({
           name: title,
@@ -1818,7 +1830,7 @@ async function submitEditWork() {
       if (type === 'finaldocs') {
         bodyPayload.questions = S.editFinalDocReqs;
       }
-      await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments/' + id, {
+      await apiFetch('/teaching-groups/' + S.groupId + '/assignments/' + id, {
         method: 'PUT',
         body: JSON.stringify(bodyPayload)
       });
@@ -1934,7 +1946,7 @@ async function toggleWorkSubmissionsExpand(id, type) {
     let data = null;
 
     if (isTest) {
-      const sr = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + id + '/scores');
+      const sr = await apiFetch('/teaching-groups/' + S.groupId + '/tests/' + id + '/scores');
       const scoreMap = {};
       (sr.data || []).forEach(s => { scoreMap[s.student_id] = s; });
 
@@ -1966,7 +1978,7 @@ async function toggleWorkSubmissionsExpand(id, type) {
         roster
       };
     } else {
-      const res = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments/' + id + '/submissions');
+      const res = await apiFetch('/teaching-groups/' + S.groupId + '/assignments/' + id + '/submissions');
       data = res.data;
     }
 
@@ -2587,7 +2599,7 @@ async function loadWorkInstRoster(id, type) {
     let data = null;
 
     if (isTest) {
-      const sr = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + id + '/scores');
+      const sr = await apiFetch('/teaching-groups/' + S.groupId + '/tests/' + id + '/scores');
       const scoreMap = {};
       (sr.data || []).forEach(s => { scoreMap[s.student_id] = s; });
       const testObj = S.tests.find(t => t.id === id);
@@ -2617,7 +2629,7 @@ async function loadWorkInstRoster(id, type) {
         roster
       };
     } else {
-      const res = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments/' + id + '/submissions');
+      const res = await apiFetch('/teaching-groups/' + S.groupId + '/assignments/' + id + '/submissions');
       data = res.data;
     }
 
@@ -2920,6 +2932,10 @@ function renderAllMarksTables() {
   renderMarksTable();
   renderAssignmentMarksTable();
   renderPracticalMarksTable();
+  if (typeof applyClassroomComponentScope === 'function') {
+    applyClassroomComponentScope(S.group);
+  }
+  filterMarksCategory(S.marksCategoryFilter || 'all');
 }
 
 function renderMarksTable() {
@@ -3148,6 +3164,10 @@ function renderPracticalMarksTable() {
 
 function filterMarksCategory(cat) {
   S.marksCategoryFilter = cat || 'all';
+  const compStr = String((S.group && (S.group.component || S.group.group_component || S.group.subject_component)) || 'THEORY').toUpperCase();
+  const hasTheory = compStr.includes('THEORY') || !compStr.includes('PRACTICAL');
+  const hasPractical = compStr.includes('PRACTICAL');
+
   ['all', 'tests', 'assignments', 'practicals'].forEach(c => {
     const btn = ById('btn-marks-cat-' + c);
     if (btn) btn.classList.toggle('active', c === S.marksCategoryFilter);
@@ -3155,9 +3175,9 @@ function filterMarksCategory(cat) {
   const secTests = ById('marks-tests-section');
   const secAssign = ById('marks-assignments-section');
   const secPracticals = ById('marks-practicals-section');
-  if (secTests) secTests.style.display = (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'tests') ? '' : 'none';
-  if (secAssign) secAssign.style.display = (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'assignments') ? '' : 'none';
-  if (secPracticals) secPracticals.style.display = (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'practicals') ? '' : 'none';
+  if (secTests) secTests.style.display = hasTheory && (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'tests') ? '' : 'none';
+  if (secAssign) secAssign.style.display = hasTheory && (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'assignments') ? '' : 'none';
+  if (secPracticals) secPracticals.style.display = hasPractical && (S.marksCategoryFilter === 'all' || S.marksCategoryFilter === 'practicals') ? '' : 'none';
 
   // If a specific category tab is clicked, automatically uncollapse it so teacher sees the work
   if (S.marksCategoryFilter !== 'all') {
@@ -3372,7 +3392,7 @@ async function openMarksModal(test) {
   let scores = {};
   let attMeta = null;
   try {
-    const sr = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + test.id + '/scores');
+    const sr = await apiFetch('/teaching-groups/' + S.groupId + '/tests/' + test.id + '/scores');
     (sr.data || []).forEach(s => { scores[s.student_id] = s; });
     attMeta = sr.meta || null;
   } catch {}
@@ -3553,7 +3573,7 @@ function updateGlobalInstituteHeader(newText, sessionKey) {
 
   if (typeof apiFetch === 'function') {
     const ayId = S.group?.academic_year_id;
-    apiFetch('/api/v1/faculty/session-header', {
+    apiFetch('/faculty/session-header', {
       method: 'PUT',
       body: JSON.stringify({ header: clean, academic_year_id: ayId })
     }).catch(() => {});
@@ -4200,7 +4220,7 @@ async function saveMarksEntry() {
   });
 
   try {
-    await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/tests/' + test.id + '/scores', {
+    await apiFetch('/teaching-groups/' + S.groupId + '/tests/' + test.id + '/scores', {
       method: 'POST',
       body: JSON.stringify({
         scores: entries,
@@ -4269,7 +4289,7 @@ async function openAssignmentMarksModal(assign) {
   }
 
   try {
-    const res = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments/' + assign.id + '/submissions');
+    const res = await apiFetch('/teaching-groups/' + S.groupId + '/assignments/' + assign.id + '/submissions');
     const roster = res?.data?.roster || [];
     // Ensure all enrolled group members are represented
     const memberMap = {};
@@ -4547,7 +4567,7 @@ async function saveAssignmentMarksEntry() {
   }));
 
   try {
-    await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/assignments/' + assign.id + '/scores', {
+    await apiFetch('/teaching-groups/' + S.groupId + '/assignments/' + assign.id + '/scores', {
       method: 'POST',
       body: JSON.stringify({ scores })
     });

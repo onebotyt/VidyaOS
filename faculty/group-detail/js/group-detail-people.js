@@ -11,7 +11,7 @@
 
   async function loadMembers() {
   try {
-    const r = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/members');
+    const r = await apiFetch('/teaching-groups/' + S.groupId + '/members');
     S.members = r.data || [];
     renderPeople();
     if (ById('tab-people-count')) ById('tab-people-count').textContent = S.members.length;
@@ -61,7 +61,7 @@ async function addStudentByEnroll() {
     return;
   }
   try {
-    await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/members', {
+    await apiFetch('/teaching-groups/' + S.groupId + '/members', {
       method: 'POST',
       body: JSON.stringify({ official_enrollment_no: eno })
     });
@@ -85,7 +85,7 @@ function requestRemoveStudent(sid) {
     id: sid,
     name: name,
     execute: async () => {
-      await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/members/' + sid, { method: 'DELETE' });
+      await apiFetch('/teaching-groups/' + S.groupId + '/members/' + sid, { method: 'DELETE' });
       toast(name + ' removed from group');
       await loadMembers();
     }
@@ -117,7 +117,7 @@ async function openAddUnenrolledModal() {
   if (ById('search-unenrolled-input')) ById('search-unenrolled-input').value = '';
   openModal('modal-add-unenrolled');
   try {
-    const res = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/unenrolled-students');
+    const res = await apiFetch('/teaching-groups/' + S.groupId + '/unenrolled-students');
     if (res.success) {
       unenrolledList = res.data || [];
       renderUnenrolledStudents();
@@ -193,7 +193,7 @@ async function submitBatchEnrollUnenrolled() {
 
 async function executeEnrollBatch(studentIds) {
   try {
-    const res = await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/members', {
+    const res = await apiFetch('/teaching-groups/' + S.groupId + '/members', {
       method: 'POST',
       body: JSON.stringify({ student_ids: studentIds })
     });
@@ -223,7 +223,7 @@ function openArchiveModal() {
 
 async function executeArchive() {
   try {
-    await apiFetch('/api/v1/teaching-groups/' + S.groupId + '/archive', { method: 'POST' });
+    await apiFetch('/teaching-groups/' + S.groupId + '/archive', { method: 'POST' });
     toast('Group archived!');
     closeModal('modal-archive');
     setTimeout(() => location.href = '/faculty/groups.html', 1500);
@@ -254,7 +254,7 @@ async function submitEditGroup(e) {
   const component = ById('edit-group-component')?.value || 'THEORY';
   const total_units = parseInt(ById('edit-group-total-units')?.value) || 5;
   try {
-    const res = await apiFetch('/api/v1/teaching-groups/' + S.groupId, {
+    const res = await apiFetch('/teaching-groups/' + S.groupId, {
       method: 'PUT',
       body: JSON.stringify({ name, subject_name, component, total_units })
     });

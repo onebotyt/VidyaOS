@@ -19,10 +19,10 @@
    */
   function getAccessToken() {
     try {
-      return localStorage.getItem('access_token') || 
-             localStorage.getItem('token') || 
-             localStorage.getItem('authToken') || 
-             '';
+      return localStorage.getItem('access_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('authToken') ||
+        '';
     } catch (_) {
       return '';
     }
@@ -88,9 +88,13 @@
       headers
     };
 
+    let normPath = endpoint;
+    if (normPath.startsWith(API_BASE)) {
+      normPath = normPath.slice(API_BASE.length);
+    }
     const url = endpoint.startsWith('http://') || endpoint.startsWith('https://')
       ? endpoint
-      : `${API_BASE}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+      : `${API_BASE}${normPath.startsWith('/') ? normPath : '/' + normPath}`;
 
     try {
       const response = await fetch(url, config);
@@ -131,11 +135,11 @@
         const defaultMsg = isSleep
           ? 'Cloud server is waking up from idle sleep (Render instance). Reconnecting...'
           : `Request failed with status ${response.status}`;
-        
+
         const errObj = (data && data.error)
           ? Object.assign(data.error, { status: response.status, message: data.error.message || defaultMsg })
           : { message: defaultMsg, status: response.status };
-        
+
         throw errObj;
       }
 
@@ -168,7 +172,7 @@
       const newToken = data.access_token || data.token || data.data?.access_token || data.data?.token;
       if (newToken) {
         localStorage.setItem('access_token', newToken);
-        try { localStorage.setItem('token', newToken); } catch (_) {}
+        try { localStorage.setItem('token', newToken); } catch (_) { }
         if (data.refresh_token) {
           localStorage.setItem('refresh_token', data.refresh_token);
         }
@@ -189,7 +193,7 @@
       localStorage.removeItem('user');
       localStorage.removeItem('auth_user');
       sessionStorage.clear();
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // Export FacultyAPI namespace and fetchApi
@@ -197,15 +201,15 @@
     fetch: fetchApi,
     request: fetchApi,
     get: (ep, opt = {}) => fetchApi(ep, { ...opt, method: 'GET' }),
-    post: (ep, body, opt = {}) => fetchApi(ep, { 
-      ...opt, 
-      method: 'POST', 
-      body: body instanceof FormData ? body : JSON.stringify(body) 
+    post: (ep, body, opt = {}) => fetchApi(ep, {
+      ...opt,
+      method: 'POST',
+      body: body instanceof FormData ? body : JSON.stringify(body)
     }),
-    put: (ep, body, opt = {}) => fetchApi(ep, { 
-      ...opt, 
-      method: 'PUT', 
-      body: body instanceof FormData ? body : JSON.stringify(body) 
+    put: (ep, body, opt = {}) => fetchApi(ep, {
+      ...opt,
+      method: 'PUT',
+      body: body instanceof FormData ? body : JSON.stringify(body)
     }),
     delete: (ep, opt = {}) => fetchApi(ep, { ...opt, method: 'DELETE' }),
     getToken: getAccessToken,

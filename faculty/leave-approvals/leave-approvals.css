@@ -75,143 +75,84 @@
   font-weight: 600;
 }
 
-/* ── 3. Hero Card Banner ── */
-.leave-hero-banner {
-  background: linear-gradient(135deg, hsl(210 100% 97%), hsl(215 90% 98%));
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 1.75rem 2rem;
+/* ── 3. Compact Header Bar (Hero Card Removed) ── */
+.leave-compact-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 8px hsl(217 91% 60% / 0.05);
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
 }
 
-[data-theme='dark'] .leave-hero-banner {
-  background: linear-gradient(135deg, hsl(220 30% 15%), hsl(220 25% 12%));
-  border-color: hsl(220 20% 24%);
-}
-
-.leave-hero-content {
+.leave-header-main {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  max-width: 480px;
-  z-index: 2;
+  gap: 0.15rem;
 }
 
-.leave-hero-badge {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-  background: var(--color-primary-light, hsl(215 90% 95%));
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-}
-
-.leave-hero-title {
-  font-size: 1.75rem;
+.leave-title {
+  font-size: 1.45rem;
   font-weight: 800;
   color: var(--text-main);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   line-height: 1.2;
   margin: 0;
 }
 
-.leave-hero-subtitle {
-  font-size: 0.92rem;
+.leave-subtitle {
+  font-size: 0.84rem;
   color: var(--text-muted);
-  line-height: 1.45;
-  margin: 0;
+  line-height: 1.35;
 }
 
-/* Center Vector Illustration Graphic */
-.leave-hero-graphic {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  opacity: 0.85;
-  z-index: 1;
-}
-
-[data-theme='dark'] .leave-hero-graphic {
-  opacity: 0.35;
-}
-
-/* Right Floating Department Card */
-.leave-dept-card {
+.leave-dept-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm, 8px);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 0.85rem 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  box-shadow: 0 4px 14px hsl(0 0% 0% / 0.06);
-  z-index: 2;
-  flex-shrink: 0;
-}
-
-.leave-dept-icon-circle {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--color-primary-light, hsl(215 90% 95%));
-  color: var(--color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.leave-dept-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.leave-dept-label {
-  font-size: 0.72rem;
+  color: var(--text-main);
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  box-shadow: var(--shadow-xs, var(--shadow-sm));
 }
 
-.leave-dept-name {
-  font-size: 1.05rem;
+.leave-dept-pill svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.leave-dept-pill .dept-name {
   font-weight: 700;
   color: var(--text-main);
-  line-height: 1.3;
 }
 
-.leave-dept-meta {
-  font-size: 0.76rem;
+.leave-dept-pill .dept-sep {
+  color: var(--border-color);
+}
+
+.leave-dept-pill .dept-meta {
   color: var(--text-muted);
-  margin-top: 1px;
+  font-weight: 500;
 }
 
-@media (max-width: 900px) {
-  .leave-hero-banner {
+@media (max-width: 768px) {
+  .leave-compact-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.5rem;
   }
-  .leave-hero-graphic {
-    display: none;
+  .leave-title {
+    font-size: 1.25rem;
   }
-  .leave-dept-card {
+  .leave-dept-pill {
     width: 100%;
     box-sizing: border-box;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
   }
 }
 
@@ -637,6 +578,11 @@
   padding: 0;
 }
 
+.leave-btn-approve span,
+.leave-btn-reject span {
+  display: none;
+}
+
 .leave-btn-approve {
   background: var(--status-present-bg, hsl(142 75% 94%));
   color: var(--status-present, hsl(142 71% 45%));
@@ -834,4 +780,267 @@
   justify-content: flex-end;
   gap: 0.65rem;
   background: var(--bg-surface);
+}
+
+/* ── 8. Mobile Compact UI & Card Layout Transformation (<768px) ── */
+@media (max-width: 768px) {
+  .leave-page-container {
+    padding: 0.75rem 0.85rem 2rem;
+    gap: 0.75rem;
+  }
+
+  .leave-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .leave-tabs-cluster {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+    gap: 0.35rem;
+  }
+
+  .leave-tabs-cluster::-webkit-scrollbar {
+    display: none;
+  }
+
+  .leave-tab-btn {
+    padding: 0.38rem 0.75rem;
+    font-size: 0.78rem;
+    border-radius: 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .leave-tab-counter {
+    min-width: 17px;
+    height: 17px;
+    font-size: 0.68rem;
+    padding: 0 4px;
+  }
+
+  .leave-search-filter-cluster {
+    width: 100%;
+    gap: 0.45rem;
+  }
+
+  .leave-search-field {
+    flex: 1;
+  }
+
+  .leave-search-input {
+    width: 100%;
+    height: 36px;
+    font-size: 0.82rem;
+    padding-left: 2.1rem;
+    border-radius: 8px;
+  }
+
+  .leave-search-icon {
+    left: 0.65rem;
+    width: 14px;
+    height: 14px;
+  }
+
+  .leave-filter-action-btn {
+    height: 36px;
+    padding: 0 0.75rem;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+
+  /* Table Card becomes flat card list on mobile */
+  .leave-table-card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .leave-table-responsive {
+    overflow: visible;
+  }
+
+  .leave-data-table,
+  .leave-data-table tbody,
+  .leave-data-table tr,
+  .leave-data-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .leave-data-table thead {
+    display: none;
+  }
+
+  .leave-data-table tbody tr {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    padding: 0.85rem;
+    box-shadow: 0 1px 4px hsl(0 0% 0% / 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    position: relative;
+  }
+
+  .leave-data-table td {
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  .td-cb {
+    display: none !important;
+  }
+
+  .td-student {
+    padding-right: 5.5rem !important; /* Space for absolute status badge */
+  }
+
+  .student-cell-wrap {
+    gap: 0.55rem;
+  }
+
+  .student-avatar-circle {
+    width: 34px;
+    height: 34px;
+    font-size: 0.82rem;
+  }
+
+  .student-name-text {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .student-roll-text {
+    font-size: 0.74rem;
+  }
+
+  .td-status {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+  }
+
+  .leave-status-badge {
+    padding: 2px 7px;
+    font-size: 0.72rem;
+    border-radius: 6px;
+  }
+
+  .td-class {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+  }
+
+  .class-cell-wrap {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 0.4rem;
+  }
+
+  .td-type {
+    display: inline-block;
+  }
+
+  .leave-type-pill {
+    padding: 2px 7px;
+    font-size: 0.72rem;
+  }
+
+  .td-dates {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-surface);
+    padding: 0.35rem 0.6rem !important;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.78rem;
+  }
+
+  .date-range-wrap {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 0.25rem;
+    font-weight: 600;
+  }
+
+  .td-days {
+    display: inline-block;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .td-reason {
+    font-size: 0.82rem;
+    color: var(--text-main);
+    background: var(--bg-surface);
+    padding: 0.45rem 0.65rem !important;
+    border-radius: 8px;
+    border-left: 3px solid var(--color-primary);
+    line-height: 1.4;
+  }
+
+  .reason-text {
+    max-width: 100%;
+    white-space: normal;
+    text-overflow: unset;
+    overflow: visible;
+  }
+
+  .td-actions {
+    display: flex;
+    padding-top: 0.45rem !important;
+    border-top: 1px dashed var(--border-color) !important;
+  }
+
+  .leave-action-buttons {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .leave-btn-approve,
+  .leave-btn-reject {
+    flex: 1;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    gap: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.75rem;
+  }
+
+  .leave-btn-approve span,
+  .leave-btn-reject span {
+    display: inline !important;
+  }
+
+  .leave-reviewed-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .leave-card-footer {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .leave-counter-label {
+    font-size: 0.78rem;
+  }
 }

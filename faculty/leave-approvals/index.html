@@ -49,45 +49,22 @@
           <span class="leave-crumb-current">Leave Requests</span>
         </nav>
 
-        <!-- 2. Hero Card Banner -->
-        <section class="leave-hero-banner" aria-label="Leave Management Banner">
-          <div class="leave-hero-content">
-            <div class="leave-hero-badge">LEAVE MANAGEMENT</div>
-            <h1 class="leave-hero-title">Leave Requests</h1>
-            <p class="leave-hero-subtitle">Approve or reject student leave applications for your classes.</p>
+        <!-- 2. Compact Header Bar (Hero Card Removed) -->
+        <div class="leave-compact-header">
+          <div class="leave-header-main">
+            <h1 class="leave-title">Leave Requests</h1>
+            <span class="leave-subtitle">Approve or reject student leave applications</span>
           </div>
 
-          <!-- Hero Center Illustration Graphic -->
-          <div class="leave-hero-graphic" aria-hidden="true">
-            <svg class="leave-hero-svg" width="140" height="90" viewBox="0 0 160 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Soft Foliage Plant -->
-              <path d="M25 80C22 65 28 50 38 42C39 55 35 70 25 80Z" fill="hsl(215 90% 88%)" />
-              <path d="M30 80C34 68 44 58 52 54C49 66 42 76 30 80Z" fill="hsl(215 85% 80%)" />
-              <!-- Document Sheet -->
-              <rect x="45" y="15" width="70" height="75" rx="10" fill="hsl(0 0% 100%)" stroke="hsl(215 80% 85%)" stroke-width="2.5" />
-              <line x1="58" y1="32" x2="90" y2="32" stroke="hsl(217 91% 60%)" stroke-width="3" stroke-linecap="round" />
-              <line x1="58" y1="44" x2="82" y2="44" stroke="hsl(215 60% 80%)" stroke-width="2.5" stroke-linecap="round" />
-              <line x1="58" y1="56" x2="72" y2="56" stroke="hsl(215 60% 80%)" stroke-width="2.5" stroke-linecap="round" />
-              <!-- Floating Clock Badge -->
-              <circle cx="102" cy="65" r="18" fill="hsl(0 0% 100%)" stroke="hsl(217 91% 60%)" stroke-width="3" />
-              <polyline points="102 55 102 65 110 65" stroke="hsl(217 91% 60%)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          <div class="leave-dept-pill" id="leave-dept-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
             </svg>
+            <span class="dept-name" id="leave-dept-name">Information Technology</span>
+            <span class="dept-sep">•</span>
+            <span class="dept-meta" id="leave-dept-meta">Faculty ID: IT-HOD-01 | Role: HOD</span>
           </div>
-
-          <!-- Right Floating Department Card -->
-          <div class="leave-dept-card">
-            <div class="leave-dept-icon-circle">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
-              </svg>
-            </div>
-            <div class="leave-dept-info">
-              <span class="leave-dept-label">Department</span>
-              <span class="leave-dept-name" id="leave-dept-name">Information Technology</span>
-              <span class="leave-dept-meta" id="leave-dept-meta">Faculty ID: F002 | Role: HOD</span>
-            </div>
-          </div>
-        </section>
+        </div>
 
         <!-- 3. Segmented Filter Tabs & Search Controls Bar -->
         <section class="leave-controls-bar" aria-label="Filter and Search Controls">

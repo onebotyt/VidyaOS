@@ -224,7 +224,7 @@ function populateSidebarStats() {
 
 async function loadAttStat(rid) {
   try {
-    const r = await apiFetch('/api/v1/attendance/registers/' + rid + '/summary');
+    const r = await apiFetch('/attendance/registers/' + rid + '/summary');
     const pct = r.data?.avg_attendance_pct ?? null;
     if (ById('stat-attendance')) {
       ById('stat-attendance').textContent = pct != null ? parseFloat(pct).toFixed(1) + '%' : '--';
@@ -257,11 +257,7 @@ function renderBanner(g) {
   if (ById('banner-year-chip')) ById('banner-year-chip').textContent = 'Year ' + Math.ceil((g.semester || 1) / 2);
   if (ById('banner-ay-chip')) ById('banner-ay-chip').textContent = g.academic_year_label || '';
 
-  const compStr = String(g.component || '').toUpperCase();
-  const hasPractical = compStr.includes('PRACTICAL');
-  if (ById('cwcat-practicals')) ById('cwcat-practicals').style.display = hasPractical ? '' : 'none';
-  if (ById('cw-dd-practical-item')) ById('cw-dd-practical-item').style.display = hasPractical ? '' : 'none';
-  if (ById('cw-fab-practical-item')) ById('cw-fab-practical-item').style.display = hasPractical ? '' : 'none';
+  applyClassroomComponentScope(g);
   if (ById('banner-subtitle')) {
     const semTxt = g.semester ? ('Sem ' + g.semester) : '';
     const deptTxt = g.department_name ? (' • ' + g.department_name) : '';
@@ -293,7 +289,74 @@ function renderBanner(g) {
   }
 }
 
+function applyClassroomComponentScope(g) {
+  if (!g) g = S.group || {};
+  const compStr = String(g.component || g.group_component || g.subject_component || 'THEORY').toUpperCase();
+  const hasTheory = compStr.includes('THEORY') || !compStr.includes('PRACTICAL');
+  const hasPractical = compStr.includes('PRACTICAL');
+  const isTheoryOnly = hasTheory && !hasPractical;
+  const isPracticalOnly = !hasTheory && hasPractical;
+  const isBoth = hasTheory && hasPractical;
+
+  // 1. Classwork Categories (Left Rail)
+  if (ById('cwcat-practicals')) ById('cwcat-practicals').style.display = hasPractical ? '' : 'none';
+  if (ById('cwcat-assignments')) ById('cwcat-assignments').style.display = hasTheory ? '' : 'none';
+  if (ById('cwcat-tests')) ById('cwcat-tests').style.display = hasTheory ? '' : 'none';
+
+  // 2. Classwork Create Dropdown
+  if (ById('cw-dd-practical-item')) ById('cw-dd-practical-item').style.display = hasPractical ? '' : 'none';
+  if (ById('cw-dd-assignment-item')) ById('cw-dd-assignment-item').style.display = hasTheory ? '' : 'none';
+  if (ById('cw-dd-test-item')) ById('cw-dd-test-item').style.display = hasTheory ? '' : 'none';
+
+  // 3. Classwork Mobile FAB Menu
+  if (ById('cw-fab-practical-item')) ById('cw-fab-practical-item').style.display = hasPractical ? '' : 'none';
+  if (ById('cw-fab-assignment-item')) ById('cw-fab-assignment-item').style.display = hasTheory ? '' : 'none';
+  if (ById('cw-fab-test-item')) ById('cw-fab-test-item').style.display = hasTheory ? '' : 'none';
+
+  // 4. Stream Tab Quick Action Buttons
+  if (ById('qa-item-assignment')) ById('qa-item-assignment').style.display = hasTheory ? '' : 'none';
+  if (ById('qa-item-test')) ById('qa-item-test').style.display = hasTheory ? '' : 'none';
+  if (ById('qa-item-practical')) ById('qa-item-practical').style.display = hasPractical ? '' : 'none';
+
+  // 5. Marks Tab Filters
+  if (ById('btn-marks-cat-practicals')) ById('btn-marks-cat-practicals').style.display = hasPractical ? '' : 'none';
+  if (ById('btn-marks-cat-assignments')) ById('btn-marks-cat-assignments').style.display = hasTheory ? '' : 'none';
+  if (ById('btn-marks-cat-tests')) ById('btn-marks-cat-tests').style.display = hasTheory ? '' : 'none';
+
+  // 6. Marks Create Dropdown
+  if (ById('marks-dd-practical-item')) ById('marks-dd-practical-item').style.display = hasPractical ? '' : 'none';
+  if (ById('marks-dd-assignment-item')) ById('marks-dd-assignment-item').style.display = hasTheory ? '' : 'none';
+  if (ById('marks-dd-test-item')) ById('marks-dd-test-item').style.display = hasTheory ? '' : 'none';
+
+  // 7. Marks Sections
+  const secTests = ById('marks-tests-section');
+  const secAssign = ById('marks-assignments-section');
+  const secPracticals = ById('marks-practicals-section');
+  if (secPracticals && !hasPractical) secPracticals.style.display = 'none';
+  if (secTests && !hasTheory) secTests.style.display = 'none';
+  if (secAssign && !hasTheory) secAssign.style.display = 'none';
+
+  // 8. If active filters point to hidden categories, re-align them
+  if (isPracticalOnly) {
+    if (S.cwFilter === 'assignments' || S.cwFilter === 'tests') {
+      if (typeof filterCW === 'function') filterCW('practicals');
+    }
+    if (S.marksCategoryFilter === 'assignments' || S.marksCategoryFilter === 'tests') {
+      if (typeof filterMarksCategory === 'function') filterMarksCategory('practicals');
+    }
+  } else if (isTheoryOnly) {
+    if (S.cwFilter === 'practicals') {
+      if (typeof filterCW === 'function') filterCW('all');
+    }
+    if (S.marksCategoryFilter === 'practicals') {
+      if (typeof filterMarksCategory === 'function') filterMarksCategory('all');
+    }
+  }
+}
+window.applyClassroomComponentScope = applyClassroomComponentScope;
+
 function switchTab(tab, subOption) {
+  applyClassroomComponentScope(S.group);
   if (typeof closeAnnouncementDetail === 'function') {
     closeAnnouncementDetail();
   }
@@ -304,9 +367,16 @@ function switchTab(tab, subOption) {
     closeWorkInstructionsView();
   }
 
-  const validTabs = ['stream', 'classwork', 'people', 'register', 'marks', 'sheets', 'attendance'];
+  const validTabs = ['stream', 'classwork', 'people', 'register', 'marks', 'attendance'];
+  if (tab === 'sheets') {
+    const gid = S.groupId || new URLSearchParams(window.location.search).get('id') || 1;
+    let url = '/faculty/sheets.html?id=' + encodeURIComponent(gid);
+    if (subOption) url += '&sheet=' + encodeURIComponent(subOption);
+    window.location.href = url;
+    return;
+  }
   if (!validTabs.includes(tab)) tab = 'stream';
-  if (S.isStudent && (tab === 'register' || tab === 'marks' || tab === 'sheets')) {
+  if (S.isStudent && (tab === 'register' || tab === 'marks')) {
     tab = 'attendance';
   }
 
@@ -383,8 +453,6 @@ function switchTab(tab, subOption) {
   if (tab === 'register') {
     document.body.classList.remove('mobile-full-ledger');
     if (typeof loadClassRegister === 'function') loadClassRegister();
-  } else if (tab === 'sheets') {
-    if (typeof loadClassSheets === 'function') loadClassSheets(subOption);
   } else if (tab === 'marks') {
     if (typeof renderAllMarksTables === 'function') renderAllMarksTables();
   } else if (tab === 'attendance' && S.isStudent) {
@@ -394,7 +462,7 @@ function switchTab(tab, subOption) {
 
 async function loadGroup() {
   try {
-    const r = await apiFetch('/api/v1/teaching-groups/' + S.groupId);
+    const r = await apiFetch('/teaching-groups/' + S.groupId);
     if (r && r.data) {
       S.group = r.data;
       renderBanner(S.group);

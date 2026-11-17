@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>My Test Scores &amp; Marks — Student Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/student/components/core/reset.css">
   <link rel="stylesheet" href="/student/components/core/variables.css">
   <link rel="stylesheet" href="/student/components/student-base.css">
@@ -14,6 +18,7 @@
   <link rel="stylesheet" href="/student/components/sidebar/sidebar.css">
   <link rel="stylesheet" href="/student/scores/scores.css?v=20261116">
 </head>
+
 <body class="page-layout">
   <div id="student-header-mount"></div>
   <div id="student-sidebar-mount"></div>
@@ -21,11 +26,13 @@
 
   <main class="container" style="padding-top: 1.5rem; padding-bottom: 3.5rem; max-width: 1080px;">
     <!-- Student Identity Card -->
-    <div id="student-id-card" class="card" style="display: none; margin-bottom: 1.25rem; border-left: 4px solid var(--color-primary);">
+    <div id="student-id-card" class="card"
+      style="display: none; margin-bottom: 1.25rem; border-left: 4px solid var(--color-primary);">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem;">
         <div>
           <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.25rem;">
-            <h2 id="scores-student-name" style="font-size: 1.12rem; font-weight: 800; margin: 0; color: var(--text-main);">Student Name</h2>
+            <h2 id="scores-student-name"
+              style="font-size: 1.12rem; font-weight: 800; margin: 0; color: var(--text-main);">Student Name</h2>
             <span id="scores-cohort-badge" class="badge badge-sem">Cohort</span>
           </div>
           <div id="scores-dept-info" style="font-size: 0.82rem; color: var(--text-muted);">Department / Course</div>
@@ -73,8 +80,41 @@
     </div>
 
     <!-- Search & Filter Toolbar -->
-    <div class="scores-toolbar">
-      <input type="search" id="scores-search-input" class="form-control" placeholder="Search by exam name, subject, or code..." oninput="filterScoresView()">
+    <div class="scores-filter-container">
+      <!-- Semester Filter Pills -->
+      <div class="segmented-filter-scroll-wrap">
+        <div class="segmented-filter" id="semester-filters">
+          <button type="button" class="active" data-sem="ALL" onclick="setSemesterFilter('ALL')">All Semesters</button>
+          <button type="button" data-sem="1" onclick="setSemesterFilter('1')">Sem 1</button>
+          <button type="button" data-sem="2" onclick="setSemesterFilter('2')">Sem 2</button>
+          <button type="button" data-sem="3" onclick="setSemesterFilter('3')">Sem 3</button>
+          <button type="button" data-sem="4" onclick="setSemesterFilter('4')">Sem 4</button>
+          <button type="button" data-sem="5" onclick="setSemesterFilter('5')">Sem 5</button>
+          <button type="button" data-sem="6" onclick="setSemesterFilter('6')">Sem 6</button>
+        </div>
+      </div>
+
+      <!-- Type Filter & Search Bar Row -->
+      <div class="scores-secondary-toolbar">
+        <div class="segmented-filter" id="type-filters">
+          <button type="button" class="active" data-type="ALL" onclick="setTypeFilter('ALL')">All (<span
+              id="count-all">0</span>)</button>
+          <button type="button" data-type="EXAM" onclick="setTypeFilter('EXAM')">Exams &amp; Tests (<span
+              id="count-exams">0</span>)</button>
+          <button type="button" data-type="ASSIGNMENT" onclick="setTypeFilter('ASSIGNMENT')">Assignments (<span
+              id="count-assignments">0</span>)</button>
+        </div>
+
+        <div class="scores-search-wrap">
+          <svg class="scores-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="search" id="scores-search-input" class="form-control"
+            placeholder="Search assessments, subjects..." oninput="filterScoresView()">
+        </div>
+      </div>
     </div>
 
     <div id="scores-wrap">
@@ -93,4 +133,5 @@
   <script src="/student/components/sidebar/sidebar.js"></script>
   <script src="/student/scores/scores.js?v=20261116"></script>
 </body>
+
 </html>

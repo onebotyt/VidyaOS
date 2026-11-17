@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!S.groupId) {
     showToast('Invalid class ID specified. Redirecting...', 'error');
-    setTimeout(() => { window.location.href = '/student/dashboard.html'; }, 1500);
+    setTimeout(() => { window.location.href = '/student/dashboard/index.html'; }, 1500);
     return;
   }
 
@@ -1368,7 +1368,7 @@ async function loadDrawerEnrolledClasses() {
       ];
 
       container.innerHTML = res.data.map((c, i) => `
-        <a href="/student/group-detail.html?id=${c.id}" class="gc-drawer-link" style="font-size:0.84rem; padding:0.5rem 1.5rem; ${Number(c.id) === Number(S.groupId) ? 'background:var(--color-primary-light); font-weight:700; color:var(--color-primary);' : ''}">
+        <a href="/student/group-detail/index.html?id=${c.id}" class="gc-drawer-link" style="font-size:0.84rem; padding:0.5rem 1.5rem; ${Number(c.id) === Number(S.groupId) ? 'background:var(--color-primary-light); font-weight:700; color:var(--color-primary);' : ''}">
           <span style="background:${dotColors[i % dotColors.length]}; width:10px; height:10px; border-radius:50%; flex-shrink:0;"></span>
           <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(c.name || c.subject_name)}</span>
         </a>

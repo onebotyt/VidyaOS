@@ -112,7 +112,7 @@ function renderDrawerClasses(classes) {
     const color = dotColors[idx % dotColors.length];
     const name = c.name || c.subject_name || 'Classroom';
     return `
-      <a href="/student/group-detail.html?id=${c.id}" class="gc-drawer-class-item">
+      <a href="/student/group-detail/index.html?id=${c.id}" class="gc-drawer-class-item">
         <span class="gc-drawer-class-dot" style="background:${color};"></span>
         <span class="gc-drawer-class-name" title="${escapeHtml(name)}">${escapeHtml(name)}</span>
       </a>
@@ -267,8 +267,8 @@ function renderAssignedPane(items) {
 function renderAssignedRow(item) {
   const isTest = (item.item_kind === 'TEST');
   const targetUrl = item.group_id
-    ? `/student/group-detail.html?id=${item.group_id}&work=${item.id}&kind=${item.item_kind}`
-    : `/student/group-detail.html?id=1`;
+    ? `/student/group-detail/index.html?id=${item.group_id}&work=${item.id}&kind=${item.item_kind}`
+    : `/student/group-detail/index.html?id=1`;
 
   const dueText = item.clean_due_date
     ? `Due ${formatDateRelative(item.clean_due_date)}`
@@ -354,8 +354,8 @@ function renderMissingPane(items) {
 function renderMissingRow(item) {
   const isTest = (item.item_kind === 'TEST');
   const targetUrl = item.group_id
-    ? `/student/group-detail.html?id=${item.group_id}&work=${item.id}&kind=${item.item_kind}`
-    : `/student/group-detail.html?id=1`;
+    ? `/student/group-detail/index.html?id=${item.group_id}&work=${item.id}&kind=${item.item_kind}`
+    : `/student/group-detail/index.html?id=1`;
 
   const dueText = item.clean_due_date
     ? `Due ${item.clean_due_date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}, ${item.clean_due_date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
@@ -440,8 +440,8 @@ function renderDonePane(items) {
 function renderDoneRow(item) {
   const isTest = (item.item_kind === 'TEST');
   const targetUrl = item.group_id
-    ? `/student/group-detail.html?id=${item.group_id}&work=${item.id}&kind=${item.item_kind}`
-    : `/student/group-detail.html?id=1`;
+    ? `/student/group-detail/index.html?id=${item.group_id}&work=${item.id}&kind=${item.item_kind}`
+    : `/student/group-detail/index.html?id=1`;
 
   const score = isTest ? item.marks_obtained : item.my_marks;
   const max = item.max_marks || (isTest ? 20 : 10);

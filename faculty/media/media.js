@@ -607,7 +607,7 @@
               <span class="omni-sub">Ledger view, daily sessions, and PIN roll call studio</span>
             </div>
           </div>
-          <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/students.html')">
+          <div class="omnisearch-action-item" onclick="navigateFromOmni('/faculty/students/index.html')">
             <span class="omni-item-icon">${window.getSvgIcon('students', 18)}</span>
             <div class="omni-item-text">
               <span class="omni-title">Department Students Directory</span>
@@ -647,7 +647,7 @@
         html += `<div class="omnisearch-group-title">STUDENTS (${data.students.length})</div>`;
         data.students.forEach(s => {
           html += `
-            <div class="omnisearch-item" onclick="navigateFromOmni('/faculty/students.html?search=${encodeURIComponent(s.official_enrollment_no || s.class_roll_no || s.full_name)}')">
+            <div class="omnisearch-item" onclick="navigateFromOmni('/faculty/students/index.html?search=${encodeURIComponent(s.official_enrollment_no || s.class_roll_no || s.full_name)}')">
               <span class="omni-item-icon">${window.getSvgIcon('user', 16)}</span>
               <div class="omni-item-text">
                 <span class="omni-title">${escapeHtml(s.full_name)}</span>
