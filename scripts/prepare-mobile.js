@@ -85,6 +85,58 @@ function injectMobileBridge(dir) {
 console.log('[Mobile Build] Injecting mobile-bridge into HTML entry points...');
 injectMobileBridge(WWW_DIR);
 
+// Generate direct mobile entry point at www/index.html (bypasses marketing landing page)
+const mobileIndexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>VidyaOS</title>
+  <script src="/mobile-bridge.js"></script>
+  <script>
+    (function () {
+      try {
+        const token = localStorage.getItem('access_token') || localStorage.getItem('token') || localStorage.getItem('authToken');
+        const userRaw = localStorage.getItem('user') || localStorage.getItem('auth_user') || localStorage.getItem('currentUser');
+        if (token && userRaw) {
+          const user = typeof userRaw === 'string' ? JSON.parse(userRaw) : userRaw;
+          const role = (user.role || (Array.isArray(user.roles) ? user.roles[0] : '') || '').toLowerCase();
+          if (role === 'student') {
+            window.location.replace('/student/dashboard/index.html');
+            return;
+          } else if (role === 'teacher' || role === 'faculty' || role === 'hod') {
+            window.location.replace('/faculty/classes/index.html');
+            return;
+          } else if (role === 'admin') {
+            window.location.replace('/admin/academic-structure/index.html');
+            return;
+          }
+        }
+      } catch (_) {}
+      window.location.replace('/login/index.html');
+    })();
+  </script>
+  <style>
+    body {
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      color: #94a3b8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div>Launching VidyaOS...</div>
+</body>
+</html>`;
+
+fs.writeFileSync(path.join(WWW_DIR, 'index.html'), mobileIndexHtml, 'utf8');
+console.log('[Mobile Build] Created direct mobile sign-in entry point at www/index.html');
+
 // Stamp current version into mobile-bridge.js in www
 let appVersion = '1.0.1';
 try {

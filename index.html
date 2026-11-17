@@ -4,6 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VidyaOS — Institutional Campus & Academic Operating System</title>
+  <script>
+    /* Direct Mobile App Entry: Bypass landing page inside native Capacitor app */
+    (function () {
+      const isMobileApp = (
+        typeof window !== 'undefined' && (
+          window.Capacitor?.isNativePlatform?.() ||
+          window.location.protocol === 'capacitor:' ||
+          window.location.protocol === 'file:' ||
+          (window.Capacitor && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+        )
+      );
+
+      if (isMobileApp) {
+        try {
+          const token = localStorage.getItem('access_token') || localStorage.getItem('token') || localStorage.getItem('authToken');
+          const userRaw = localStorage.getItem('user') || localStorage.getItem('auth_user') || localStorage.getItem('currentUser');
+          if (token && userRaw) {
+            const user = typeof userRaw === 'string' ? JSON.parse(userRaw) : userRaw;
+            const role = (user.role || (Array.isArray(user.roles) ? user.roles[0] : '') || '').toLowerCase();
+            if (role === 'student') {
+              window.location.replace('/student/dashboard/index.html');
+              return;
+            } else if (role === 'teacher' || role === 'faculty' || role === 'hod') {
+              window.location.replace('/faculty/classes/index.html');
+              return;
+            } else if (role === 'admin') {
+              window.location.replace('/admin/academic-structure/index.html');
+              return;
+            }
+          }
+        } catch (_) {}
+        window.location.replace('/login/index.html');
+      }
+    })();
+  </script>
   <meta name="description" content="Next-generation institutional campus management platform: Day 1-31 biometric attendance registers, ESP32 hardware synchronization, live roll call PINs, and role-based academic portals.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
