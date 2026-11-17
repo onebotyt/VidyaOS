@@ -49,8 +49,15 @@
     }
 
     try {
-      const res = await api.get('/teaching-groups?status=TRASH');
-      const data = res.data || res;
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+      const res = await fetch('/api/v1/teaching-groups?status=TRASH', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+      const resJson = await res.json();
+      const data = resJson.data || resJson;
       state.trashedGroups = Array.isArray(data) ? data : (data.groups || data.classes || []);
       renderTrashCards();
     } catch (err) {
