@@ -85,4 +85,22 @@ function injectMobileBridge(dir) {
 console.log('[Mobile Build] Injecting mobile-bridge into HTML entry points...');
 injectMobileBridge(WWW_DIR);
 
-console.log('[Mobile Build] âœ… Capacitor www directory prepared successfully!');
+// Stamp current version into mobile-bridge.js in www
+let appVersion = '1.0.1';
+try {
+  const vData = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, 'app-version.json'), 'utf8'));
+  if (vData.version) appVersion = vData.version;
+} catch (_) {}
+
+const bridgePath = path.join(WWW_DIR, 'mobile-bridge.js');
+if (fs.existsSync(bridgePath)) {
+  let bridgeContent = fs.readFileSync(bridgePath, 'utf8');
+  bridgeContent = bridgeContent.replace(
+    /window\.VIDYAOS_APP_VERSION = .*?;/g,
+    `window.VIDYAOS_APP_VERSION = '${appVersion}';`
+  );
+  fs.writeFileSync(bridgePath, bridgeContent, 'utf8');
+  console.log(`[Mobile Build] Stamped version ${appVersion} into mobile-bridge.js`);
+}
+
+console.log('[Mobile Build] ✅ Capacitor www directory prepared successfully!');

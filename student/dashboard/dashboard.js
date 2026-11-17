@@ -396,8 +396,8 @@ function renderGoogleClassCards() {
     const teacherInitials = getInitials(c.teacher_name || 'Faculty');
 
     // Find matching attendance record
-    const subMatch = studentDashboardState.subjectAttendance[(code || '').toUpperCase()] || 
-                     studentDashboardState.subjectAttendance[(c.subject_name || '').toUpperCase()];
+    const subMatch = studentDashboardState.subjectAttendance[(code || '').toUpperCase()] ||
+      studentDashboardState.subjectAttendance[(c.subject_name || '').toUpperCase()];
     const pct = subMatch ? subMatch.percentage : 100;
     const attended = subMatch ? subMatch.attended : 0;
     const conducted = subMatch ? subMatch.conducted : 0;
@@ -431,7 +431,7 @@ function renderGoogleClassCards() {
               ${escapeHtml(c.name || c.subject_name || 'Subject Class')}
             </a>
             <div class="gc-card-teacher" title="Instructor: ${escapeHtml(c.teacher_name || 'Faculty')}">
-              ${escapeHtml(c.teacher_name || 'Course Instructor')} • Year ${c.year || Math.ceil((c.semester||1)/2)} • Sem ${c.semester || 1}
+              ${escapeHtml(c.teacher_name || 'Course Instructor')} • Year ${c.year || Math.ceil((c.semester || 1) / 2)} • Sem ${c.semester || 1}
             </div>
           </div>
 
@@ -670,7 +670,7 @@ function toggleTheme() {
   document.documentElement.setAttribute('data-theme', next);
   try {
     localStorage.setItem('theme', next);
-  } catch {}
+  } catch { }
 }
 
 /**
@@ -775,7 +775,7 @@ async function openCameraQrModal() {
               const raw = barcodes[0].rawValue;
               handleDetectedQrCode(raw);
             }
-          } catch (_) {}
+          } catch (_) { }
         }, 400);
       }
     } else {
@@ -889,7 +889,7 @@ async function loadInstitutionBranding() {
     if (cached) {
       applyInstitutionSettings(JSON.parse(cached));
     }
-  } catch (_) {}
+  } catch (_) { }
 
   try {
     const fetchFn = typeof fetchApi === 'function' ? fetchApi : async (url) => {
@@ -1268,7 +1268,7 @@ function ensureDeleteSubjectCardModal() {
   document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-window.openDeleteSubjectCardModal = function(id, name) {
+window.openDeleteSubjectCardModal = function (id, name) {
   pendingDeleteCardId = id;
   pendingDeleteCardName = name;
   ensureDeleteSubjectCardModal();
@@ -1281,7 +1281,7 @@ window.openDeleteSubjectCardModal = function(id, name) {
   }
 };
 
-window.closeDeleteSubjectCardModal = function(e) {
+window.closeDeleteSubjectCardModal = function (e) {
   if (e && e.target !== e.currentTarget && !e.target.classList.contains('gc-modal-close') && !e.target.classList.contains('btn-secondary')) return;
   const modal = document.getElementById('delete-subject-card-modal');
   if (modal) {
@@ -1292,7 +1292,7 @@ window.closeDeleteSubjectCardModal = function(e) {
   pendingDeleteCardName = '';
 };
 
-window.executeDeleteSubjectCard = function() {
+window.executeDeleteSubjectCard = function () {
   if (!pendingDeleteCardId) return;
   const targetId = pendingDeleteCardId;
   const targetName = pendingDeleteCardName;
@@ -1326,7 +1326,7 @@ window.executeDeleteSubjectCard = function() {
   }
 };
 
-window.restoreHiddenSubjectCards = function() {
+window.restoreHiddenSubjectCards = function () {
   localStorage.removeItem('vidya_hidden_subject_cards');
   renderEnrolledClasses();
   if (typeof showToast === 'function') {
@@ -1334,7 +1334,7 @@ window.restoreHiddenSubjectCards = function() {
   }
 };
 
-window.promptStudentEditSubject = function(subjectName) {
+window.promptStudentEditSubject = function (subjectName) {
   const msg = `Permission Restricted: Editing "${subjectName}" requires instructor or administrator authority.`;
   if (typeof showToast === 'function') {
     showToast(msg, 'warning');
@@ -1345,7 +1345,7 @@ window.promptStudentEditSubject = function(subjectName) {
   }
 };
 
-window.toggleStudentCardMenu = function(e, menuKey) {
+window.toggleStudentCardMenu = function (e, menuKey) {
   e.stopPropagation();
   const menuId = `card-menu-${menuKey}`;
   const menu = document.getElementById(menuId);

@@ -9,6 +9,9 @@
 (function () {
   'use strict';
 
+  // Current Client App Version (Stamped during CI/CD build)
+  window.VIDYAOS_APP_VERSION = '1.0.1';
+
   // 1. Cloud Backend URL
   const CLOUD_BACKEND_URL = 'https://vidyaos-backend.onrender.com';
   const GITHUB_REPO = 'onebotyt/VidyaOS';

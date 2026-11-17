@@ -1,6 +1,5 @@
 # Node & Dependency Dirs
 node_modules/
-package-lock.json
 
 # Local Environment Overrides
 .env
