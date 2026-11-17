@@ -49,15 +49,22 @@
     }
 
     try {
-      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
-      const res = await fetch('/api/v1/teaching-groups?status=TRASH', {
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json'
-        }
-      });
-      const resJson = await res.json();
-      const data = resJson.data || resJson;
+      let data = [];
+      if (window.api && typeof window.api.get === 'function') {
+        const res = await window.api.get('/teaching-groups?status=TRASH');
+        data = (res && res.data) ? res.data : res;
+      } else {
+        const token = localStorage.getItem('access_token') || localStorage.getItem('token') || localStorage.getItem('authToken');
+        const res = await fetch('/api/v1/teaching-groups?status=TRASH', {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const resJson = await res.json();
+        data = resJson.data || resJson;
+      }
       state.trashedGroups = Array.isArray(data) ? data : (data.groups || data.classes || []);
       renderTrashCards();
     } catch (err) {
@@ -219,21 +226,24 @@
     if (!groupId) return;
 
     try {
-      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
-      const res = await fetch(`/api/v1/teaching-groups/${groupId}/restore`, {
-        method: 'POST',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json'
-        }
-      });
-      const data = await res.json();
-      if (res.ok && (data.success !== false)) {
-        showToast('Classroom restored successfully! Reactivated in My Classes.');
-        loadTrash();
+      if (window.api && typeof window.api.post === 'function') {
+        await window.api.post(`/teaching-groups/${groupId}/restore`, {});
       } else {
-        throw new Error(data.error?.message || 'Restore failed');
+        const token = localStorage.getItem('access_token') || localStorage.getItem('token') || localStorage.getItem('authToken');
+        const res = await fetch(`/api/v1/teaching-groups/${groupId}/restore`, {
+          method: 'POST',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+          throw new Error(data.error?.message || 'Restore failed');
+        }
       }
+      showToast('Classroom restored successfully! Reactivated in My Classes.');
+      loadTrash();
     } catch (err) {
       console.error('[Trash] Restore error:', err);
       showToast(err.message || 'Error restoring class. Please try again.', 'error');
@@ -282,23 +292,25 @@
     }
 
     try {
-      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
-      const res = await fetch(`/api/v1/teaching-groups/${groupId}/permanent`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json'
-        }
-      });
-      const data = await res.json();
-      closePermanentDeleteModal();
-
-      if (res.ok && (data.success !== false)) {
-        showToast('Classroom permanently purged from system.');
-        loadTrash();
+      if (window.api && typeof window.api.delete === 'function') {
+        await window.api.delete(`/teaching-groups/${groupId}/permanent`);
       } else {
-        throw new Error(data.error?.message || 'Permanent deletion failed');
+        const token = localStorage.getItem('access_token') || localStorage.getItem('token') || localStorage.getItem('authToken');
+        const res = await fetch(`/api/v1/teaching-groups/${groupId}/permanent`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+          throw new Error(data.error?.message || 'Permanent deletion failed');
+        }
       }
+      closePermanentDeleteModal();
+      showToast('Classroom permanently purged from system.');
+      loadTrash();
     } catch (err) {
       console.error('[Trash] Permanent deletion error:', err);
       closePermanentDeleteModal();

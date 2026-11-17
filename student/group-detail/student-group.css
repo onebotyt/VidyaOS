@@ -41,12 +41,16 @@ body.viewing-work-details #student-work-details-view {
 }
 
 /* Mobile duplicate navigation bars must remain completely hidden (delegated to universal components) */
-.mobile-class-app-bar,
-.student-mobile-bottom-nav {
+.mobile-class-app-bar {
   display: none !important;
 }
 
-/* Desktop (> 768px): Show PC layout */
+/* Suppress global student 5-module bottom dock on group-detail, so classroom tab dock takes its place */
+.student-mobile-bottom-bar {
+  display: none !important;
+}
+
+/* Desktop (> 768px): Show PC layout & hide mobile classroom bottom tabs */
 @media (min-width: 769px) {
   .pc-work-details-container {
     display: block !important;
@@ -54,13 +58,18 @@ body.viewing-work-details #student-work-details-view {
 
   .mobile-cw-unit-section,
   .mobile-work-details-view,
-  .mobile-options-dropdown {
+  .mobile-options-dropdown,
+  .student-mobile-bottom-nav {
     display: none !important;
   }
 }
 
 /* Mobile (<= 768px): Show mobile classroom work details */
 @media (max-width: 768px) {
+
+  body.classroom-page {
+    padding-bottom: 76px !important;
+  }
 
   .student-tabs-nav,
   .pc-unit-section,
@@ -1871,18 +1880,18 @@ body.viewing-work-details #student-work-details-view {
 
   /* Mobile Bottom Navigation Bar with Pill Active (Image 3) */
   .student-mobile-bottom-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background: var(--bg-card);
-    border-top: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
-    z-index: 1000;
-    align-items: center;
-    justify-content: space-around;
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 64px !important;
+    background: var(--bg-card) !important;
+    border-top: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-sm) !important;
+    z-index: 1000 !important;
+    align-items: center !important;
+    justify-content: space-around !important;
   }
 
   .mobile-bottom-nav-item {
