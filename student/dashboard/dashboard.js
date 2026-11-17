@@ -205,7 +205,7 @@ async function loadStudentDashboard() {
     if (sessRes && sessRes.success && Array.isArray(sessRes.data) && sessRes.data.length > 0) {
       currentActiveSession = sessRes.data[0];
       const banner = document.getElementById('active-session-banner');
-      if (banner) banner.style.display = 'block';
+      if (banner) banner.style.display = 'none'; // Keep hidden; attendance submission handled via mobile FAB & studio
 
       const subEl = document.getElementById('active-session-subject');
       if (subEl) subEl.innerText = `${currentActiveSession.subject_code || ''} — ${currentActiveSession.subject_name || 'Active Session'}`;
@@ -897,13 +897,13 @@ async function loadInstitutionBranding() {
       const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
       return res.json();
     };
-    const res = await fetchFn('/settings');
+    const res = await fetchFn('/settings/institution');
     if (res && res.success && res.data) {
       localStorage.setItem('institutionSettings', JSON.stringify(res.data));
       applyInstitutionSettings(res.data);
     }
-  } catch (err) {
-    console.warn('Could not refresh institution settings:', err.message);
+  } catch (_) {
+    // Non-critical: defaults or cached settings already applied
   }
 }
 

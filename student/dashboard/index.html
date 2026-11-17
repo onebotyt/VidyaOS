@@ -31,7 +31,7 @@
   <!-- Main Container -->
   <main class="page-main-container container" style="max-width:1380px;padding-top:1.5rem;padding-bottom:3.5rem;">
     <!-- Compatibility Markers for Active Session Checks -->
-    <div id="active-session-banner" style="display: none;" aria-hidden="true">
+    <div id="active-session-banner" style="display: none !important;" aria-hidden="true">
       <span id="active-session-subject"></span>
       <span id="active-session-info"></span>
       <button id="open-self-attendance-btn" onclick="openSelfAttendanceModal()"></button>
@@ -43,19 +43,14 @@
         <div class="hero-logo" id="hero-logo-slot">
           <img src="/images/collegelogo.jpeg" alt="Institution Logo" onerror="this.onerror=null;this.src='/images/collegelogo.jpeg';">
         </div>
-        <div>
-          <h1 class="hero-title" id="hero-inst-title">Government Polytechnic College</h1>
-          <div class="hero-student-meta" style="font-size: 0.84rem; color: var(--text-muted); margin-top: 0.2rem; display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-            <span id="student-name" style="font-weight: 600; color: var(--text-main);">Welcome, Student</span>
-            <span style="opacity: 0.6;">•</span>
-            <span id="student-cohort-info">Information Technology</span>
-          </div>
-        </div>
+        <h1 class="hero-title" id="hero-inst-title">Government Polytechnic College</h1>
       </div>
       <div class="hero-banner" id="hero-banner-slot">
         <img src="/images/campus-nainital.jpg" alt="College Campus" onerror="this.onerror=null;this.style.display='none';">
       </div>
       <!-- Backward compatibility contract element -->
+      <span id="student-name" style="display:none;" aria-hidden="true">Welcome, Student</span>
+      <span id="student-cohort-info" style="display:none;" aria-hidden="true">Information Technology</span>
       <span id="student-roll-badge" style="display:none;" aria-hidden="true">Roll: -- • UBTER Reg: --</span>
       <span id="header-student-name" style="display:none;" aria-hidden="true">Student Portal</span>
     </section>
@@ -73,7 +68,7 @@
             <span>My Enrolled Classes</span>
             <span class="classes-count-badge" id="count-classes-badge">0</span>
           </h2>
-          <button type="button" class="btn btn-primary btn-sm" onclick="openStudentJoinModal()"
+          <button type="button" class="btn btn-primary btn-sm btn-join-class-header" onclick="openStudentJoinModal()"
             style="display:inline-flex;align-items:center;gap:0.35rem;">
             <span style="font-weight:700;font-size:1.1rem;line-height:1;">+</span> <span>Join Class</span>
           </button>

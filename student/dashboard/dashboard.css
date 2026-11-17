@@ -92,8 +92,15 @@
   }
 }
 
-.student-hero-banner {
+.student-hero-banner,
+#active-session-banner {
   display: none !important;
+}
+
+@media (max-width: 768px) {
+  .btn-join-class-header {
+    display: none !important;
+  }
 }
 
 /* ─── Section Header & Filter Toolbar ─────────────────────── */
