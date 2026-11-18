@@ -273,7 +273,8 @@ async function initiateGoogleSignUp() {
   const originalText = btnText ? btnText.textContent : 'Sign up with Google (Auto-Fill)';
   if (btnText) btnText.textContent = 'Opening Google Sign-In...';
   try {
-    const res = await fetch('/api/v1/auth/google/url?mode=STUDENT_REGISTER').then(r => r.json());
+    const origin = window.location.origin;
+    const res = await fetch(`/api/v1/auth/google/url?mode=STUDENT_REGISTER&origin=${encodeURIComponent(origin)}`).then(r => r.json());
     if (res && res.success && res.data && res.data.url) {
       const width = 500, height = 650;
       const left = window.screenX + (window.outerWidth - width) / 2;
@@ -394,8 +395,17 @@ function selectGoogleAccount(email, customName, googleSub) {
   if (badge) badge.style.display = 'flex';
   if (btnText) btnText.innerHTML = 'Account Linked with Google ' + (window.getSvgIcon ? window.getSvgIcon('check', 14) : '');
 
+  const pwLabel = document.querySelector('label[for="stu-password"]');
+  const confLabel = document.querySelector('label[for="stu-confirm"]');
+  if (pwLabel) pwLabel.innerHTML = 'Create Password <span style="font-size:0.75rem;font-weight:normal;color:var(--reg-muted)">(Optional with Google Sign-In)</span>';
+  if (confLabel) confLabel.innerHTML = 'Confirm Password <span style="font-size:0.75rem;font-weight:normal;color:var(--reg-muted)">(Optional)</span>';
+  const pwInput = document.getElementById('stu-password');
+  const confInput = document.getElementById('stu-confirm');
+  if (pwInput) pwInput.removeAttribute('required');
+  if (confInput) confInput.removeAttribute('required');
+
   closeGoogleCard();
-  showAlert('Google account linked! Please complete your academic and password details.', 'success');
+  showAlert('Google account linked! Please complete your academic details.', 'success');
 }
 
 /* ── Form Submissions ── */
@@ -418,7 +428,8 @@ async function handleStudentSubmit(e) {
   const confirm = document.getElementById('stu-confirm')?.value;
   const submitBtn = document.getElementById('stu-submit-btn');
 
-  if (!fullName || !enrollNo || !email || !deptId || !semester || !password) {
+  const isGoogle = Boolean(S.googleRegistrationData?.sub);
+  if (!fullName || !enrollNo || !email || !deptId || !semester || (!isGoogle && !password)) {
     showAlert('Please fill in all required fields marked with *', 'danger');
     return;
   }
@@ -426,11 +437,11 @@ async function handleStudentSubmit(e) {
     showAlert('If entering a mobile number, it must be a valid 10-digit Indian mobile number.', 'danger');
     return;
   }
-  if (password.length < 8) {
+  if (password && password.length < 8) {
     showAlert('Password must be at least 8 characters long', 'danger');
     return;
   }
-  if (password !== confirm) {
+  if (password && password !== confirm) {
     showAlert('Password and Confirm Password do not match', 'danger');
     return;
   }
@@ -443,7 +454,7 @@ async function handleStudentSubmit(e) {
       official_enrollment_no: enrollNo,
       registration_no: ubterNo,
       email,
-      password,
+      password: password || undefined,
       department_id: Number(deptId),
       semester: Number(semester),
       phone: phone || null,
