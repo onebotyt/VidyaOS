@@ -41,7 +41,13 @@
               Connect department ESP32 nodes (AS608 + 0.96" OLED + W25Q32 4MB Flash + 2S 7.4V Battery), register student fingerprints into the portable MySQL template vault, and restore templates to replacement devices in one click.
             </p>
           </div>
-          <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+          <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;">
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <label for="dept-switcher-select" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); white-space:nowrap;">Dept:</label>
+              <select id="dept-switcher-select" class="form-select form-select-sm" style="max-width:210px; font-weight:600;" onchange="onSwitchDepartment(this.value)">
+                <option value="">Loading Departments...</option>
+              </select>
+            </div>
             <a href="/faculty/students/index.html" class="btn btn-secondary btn-sm">← Department Roster</a>
             <button type="button" class="btn btn-secondary btn-sm" onclick="loadEsp32Overview()">↻ Refresh Telemetry</button>
             <button type="button" class="btn btn-primary btn-sm" onclick="openRegisterDeviceModal()">+ Connect New ESP32</button>
@@ -164,6 +170,58 @@
           </aside>
         </div>
 
+        <!-- Wi-Fi Connectivity & Multi-Network Failover -->
+        <section class="card" style="margin-top: 1.35rem;">
+          <div class="esp-section-header" style="margin-bottom: 1rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
+                <h2 class="esp-section-title">Wi-Fi Connectivity &amp; Multi-Network Failover</h2>
+                <span class="esp-crypto-badge" id="wifi-active-badge">CONNECTING...</span>
+              </div>
+              <p class="esp-section-sub">
+                Scan nearby classroom access points, register backup Wi-Fi networks with automatic failover, or switch terminals to high-speed campus routers.
+              </p>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-scan-wifi" onclick="triggerScanNearbyWifi()">
+                🔍 Scan Nearby Wi-Fi
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-add-wifi-manual" onclick="openAddWifiModal()">
+                + Add Wi-Fi Manually
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi" onclick="triggerWifiFallback()">
+                🔄 Fallback to Default Wi-Fi
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()">
+                ⚠️ Emergency Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Stored Wi-Fi Networks Table -->
+          <div class="table-responsive">
+            <table class="esp-table" id="wifi-networks-table">
+              <thead>
+                <tr>
+                  <th>Network SSID</th>
+                  <th>Security / Type</th>
+                  <th>Signal Strength (RSSI)</th>
+                  <th>Priority / Default Status</th>
+                  <th>Added On</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="wifi-networks-tbody">
+                <tr>
+                  <td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">
+                    Select an active terminal above to view configured Wi-Fi networks.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         <!-- Student Fingerprint Registration & Portable Cloud Template Vault -->
         <section class="card" style="margin-top: 1.35rem;">
           <div class="esp-section-header" style="margin-bottom: 1rem;">
@@ -239,6 +297,12 @@
       </div>
       <form onsubmit="submitRegisterEspDevice(event)">
         <div class="form-group">
+          <label class="form-label">Department <span style="color:var(--status-absent);">*</span></label>
+          <select id="esp-dept-input" class="form-select" required>
+            <option value="">Select Department...</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label class="form-label">ESP32 Hardware UID <span style="color:var(--status-absent);">*</span></label>
           <input type="text" id="esp-uid-input" class="form-control" placeholder="e.g. ESP32-IT-LAB-01" required style="font-family:var(--font-family-mono); text-transform:uppercase;">
         </div>
@@ -297,6 +361,85 @@
         <button type="button" class="btn btn-secondary" onclick="copyEspConfigCode()">Copy `config.h`</button>
         <button type="button" class="btn btn-primary" onclick="closeEspConfigModal()">Done</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: SCAN NEARBY WI-FI NETWORKS -->
+  <div id="scan-wifi-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" style="max-width:560px; width:100%;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <div>
+          <h2 style="font-size:1.12rem; font-weight:800; margin:0;">Nearby Wi-Fi Networks</h2>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Scanned directly by the ESP32 radio chip in real-time.</p>
+        </div>
+        <button type="button" onclick="closeScanWifiModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+        <span style="font-size:0.78rem; font-weight:700; color:var(--text-muted);">DETECTED ACCESS POINTS:</span>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerScanNearbyWifi(true)">↻ Rescan</button>
+      </div>
+
+      <div id="scanned-wifi-list" class="scanned-wifi-grid">
+        <div style="text-align:center; padding:2rem; color:var(--text-muted);">Scanning 2.4GHz Wi-Fi channels...</div>
+      </div>
+
+      <!-- Password entry for selected scanned network -->
+      <form id="scanned-wifi-form" onsubmit="submitConnectScannedWifi(event)" style="border-top:1px solid var(--border-color); padding-top:0.9rem;">
+        <div class="form-group">
+          <label class="form-label">Selected Network SSID <span style="color:var(--status-absent);">*</span></label>
+          <input type="text" id="scanned-wifi-ssid" class="form-control" placeholder="Select a network above or type SSID" required style="font-family:var(--font-family-mono);">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Wi-Fi Password / WPA Key</label>
+          <input type="password" id="scanned-wifi-password" class="form-control" placeholder="Leave blank if open Wi-Fi network">
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem;">
+          <input type="checkbox" id="scanned-wifi-is-default" style="cursor:pointer;">
+          <label for="scanned-wifi-is-default" style="font-size:0.82rem; font-weight:600; cursor:pointer;">Set as Primary Default Wi-Fi (Auto-fallback destination)</label>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.65rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeScanWifiModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Connect &amp; Switch Terminal Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ADD WI-FI NETWORK MANUALLY -->
+  <div id="add-wifi-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" style="max-width:500px; width:100%;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <div>
+          <h2 style="font-size:1.12rem; font-weight:800; margin:0;">Add Wi-Fi Network Manually</h2>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Pre-configure hidden or upcoming router credentials.</p>
+        </div>
+        <button type="button" onclick="closeAddWifiModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+      <form onsubmit="submitAddWifiManual(event)">
+        <div class="form-group">
+          <label class="form-label">Network SSID (Router Name) <span style="color:var(--status-absent);">*</span></label>
+          <input type="text" id="manual-wifi-ssid" class="form-control" placeholder="e.g. IT_DEPT_FACULTY_5G" required style="font-family:var(--font-family-mono);">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Wi-Fi Password</label>
+          <input type="password" id="manual-wifi-password" class="form-control" placeholder="Router WPA2/WPA3 password">
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1.15rem;">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; font-weight:600; cursor:pointer;">
+            <input type="checkbox" id="manual-wifi-is-default">
+            <span>Set as Primary Default Network</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; font-weight:600; cursor:pointer;">
+            <input type="checkbox" id="manual-wifi-switch-now" checked>
+            <span>Switch ESP32 to this network immediately</span>
+          </label>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.65rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeAddWifiModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Wi-Fi Network</button>
+        </div>
+      </form>
     </div>
   </div>
 

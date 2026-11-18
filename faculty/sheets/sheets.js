@@ -3996,16 +3996,25 @@ function triggerAutoSaveIndicator(isSaving = false) {
 /* ══════════════════════════════════════════════════════════════
    EXPORT ACTIVE SHEET ENGINE
    ══════════════════════════════════════════════════════════════ */
-function toggleExportMenu() {
+function toggleExportMenu(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
   const m = document.getElementById('export-dropdown-menu');
   if (!m) return;
-  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+  const isHidden = m.style.display === 'none' || !m.classList.contains('open');
+  if (isHidden) {
+    m.classList.add('open');
+    m.style.display = 'flex';
+  } else {
+    m.classList.remove('open');
+    m.style.display = 'none';
+  }
 }
 
 document.addEventListener('click', (e) => {
   const btn = document.getElementById('btn-export-dropdown');
   const menu = document.getElementById('export-dropdown-menu');
   if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+    menu.classList.remove('open');
     menu.style.display = 'none';
   }
 });
@@ -4216,13 +4225,160 @@ async function exportTableToRealXlsx(tableOrClone, filename, sheetTitle) {
   }
 }
 
-function exportCurrentSheet(format) {
-  const menu = document.getElementById('export-dropdown-menu');
-  if (menu) menu.style.display = 'none';
-
-  if (format === 'pdf') {
+function printActiveSheetDirect(activeTableId, sheetTitle) {
+  const tableEl = document.getElementById(activeTableId);
+  if (!tableEl) {
     window.print();
     return;
+  }
+
+  // 1. Get institutional banner
+  const bannerEl = document.getElementById('sheet-institutional-banner');
+  let bannerHtml = '';
+  if (bannerEl) {
+    const bannerClone = bannerEl.cloneNode(true);
+    bannerClone.querySelectorAll('.banner-edit-indicator').forEach(el => el.remove());
+    bannerClone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    bannerHtml = bannerClone.innerHTML;
+  } else {
+    bannerHtml = `<h3>${sheetTitle}</h3>`;
+  }
+
+  // 2. Clone active table and clean interactive controls
+  const tableClone = tableEl.cloneNode(true);
+  tableClone.querySelectorAll('input').forEach(inp => {
+    const span = document.createElement('span');
+    span.textContent = inp.value || '';
+    inp.parentNode.replaceChild(span, inp);
+  });
+  tableClone.querySelectorAll('select').forEach(sel => {
+    const span = document.createElement('span');
+    span.textContent = sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : sel.value;
+    sel.parentNode.replaceChild(span, sel);
+  });
+  tableClone.querySelectorAll('button, .no-print, .btn, .btn-icon-minimal').forEach(el => el.remove());
+
+  // 3. Complete standalone printable HTML
+  const printHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${sheetTitle}</title>
+  <style>
+    @page { size: landscape; margin: 8mm 10mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0; padding: 10px; color: #0f172a; background: #ffffff;
+      -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+    }
+    .print-banner {
+      text-align: center; border: 1.5px solid #1e293b; border-radius: 4px;
+      padding: 8px 12px; margin-bottom: 12px; background-color: #f8fafc;
+      page-break-after: avoid;
+    }
+    .print-banner h3 { margin: 0 0 4px 0; font-size: 13pt; font-weight: 800; color: #0f172a; }
+    .print-banner .banner-row { margin: 2px 0; }
+    .print-banner .row-2 { font-size: 10pt; font-weight: 700; color: #1e293b; }
+    .print-banner .row-3 { font-size: 9pt; font-weight: 600; color: #475569; }
+    table {
+      width: 100%; border-collapse: collapse; margin: 0 0 16px 0;
+      font-size: 8pt; color: #0f172a; page-break-inside: auto;
+    }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    tr { page-break-inside: avoid; page-break-after: auto; }
+    th, td {
+      border: 1px solid #475569; padding: 4px 6px; text-align: center;
+      vertical-align: middle; font-size: 8pt; line-height: 1.25; position: static !important;
+    }
+    th { background-color: #f1f5f9; font-weight: 700; color: #0f172a; }
+    th.excel-hdr-blue, tr.excel-hdr-blue th { background-color: #e0f2fe !important; color: #0369a1 !important; font-weight: 700; }
+    th.excel-hdr-tan, tr.excel-hdr-tan th { background-color: #fef3c7 !important; color: #b45309 !important; font-weight: 700; }
+    th.excel-hdr-sub, tr.excel-hdr-sub th { background-color: #f1f5f9 !important; color: #475569 !important; }
+    .dyn-student-cell { text-align: left; }
+    .dyn-student-name { font-weight: 700; color: #0f172a; font-size: 8pt; }
+    .dyn-student-meta { font-size: 7pt; color: #64748b; }
+    .excel-summary-lbl { background-color: #f8fafc !important; font-weight: 800; text-align: right; padding-right: 8px; }
+    .excel-summary-avg { background-color: #f1f5f9 !important; font-weight: 800; }
+    .sheet-print-signatures {
+      display: flex; justify-content: space-between; margin-top: 35px;
+      padding: 0 25px; page-break-inside: avoid;
+    }
+    .sig-box { text-align: center; min-width: 190px; }
+    .sig-line { border-bottom: 1.5px solid #1e293b; margin-bottom: 6px; height: 40px; }
+    .sig-title { font-weight: 700; font-size: 9pt; color: #0f172a; }
+    .sig-sub { font-size: 7.5pt; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="print-banner">
+    ${bannerHtml}
+  </div>
+  ${tableClone.outerHTML}
+  <div class="sheet-print-signatures">
+    <div class="sig-box">
+      <div class="sig-line"></div>
+      <div class="sig-title">Subject Faculty Signature</div>
+      <div class="sig-sub">Evaluator / Teacher In-Charge</div>
+    </div>
+    <div class="sig-box">
+      <div class="sig-line"></div>
+      <div class="sig-title">Head of Department (HOD)</div>
+      <div class="sig-sub">Department Seal &amp; Verification</div>
+    </div>
+    <div class="sig-box">
+      <div class="sig-line"></div>
+      <div class="sig-title">Principal / Controller of Exams</div>
+      <div class="sig-sub">Institutional Approval &amp; Record</div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  try {
+    const iframe = document.createElement('iframe');
+    iframe.id = 'sheet-print-frame';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.zIndex = '-9999';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(printHtml);
+    doc.close();
+
+    setTimeout(() => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } catch (printErr) {
+        console.warn('Iframe print error, falling back to window.print():', printErr);
+        window.print();
+      }
+      setTimeout(() => {
+        try {
+          if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        } catch (_) {}
+      }, 3000);
+    }, 300);
+  } catch (err) {
+    console.warn('Isolated print failed, invoking direct window.print():', err);
+    window.print();
+  }
+}
+
+function exportCurrentSheet(format) {
+  const menu = document.getElementById('export-dropdown-menu');
+  if (menu) {
+    menu.classList.remove('open');
+    menu.style.display = 'none';
   }
 
   let activeTableId = 'table-master-evaluation';
@@ -4246,6 +4402,11 @@ function exportCurrentSheet(format) {
     activeTableId = 'table-practicals-marksheet';
     filename = 'Practical_and_Lab_Work_Marksheet';
     sheetTitle = 'Practical & Lab Work Marksheet';
+  }
+
+  if (format === 'pdf') {
+    printActiveSheetDirect(activeTableId, sheetTitle);
+    return;
   }
 
   const table = document.getElementById(activeTableId);

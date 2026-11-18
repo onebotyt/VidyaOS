@@ -270,6 +270,12 @@
       return null;
     }
 
+    const isAdmin = userRoles.includes('SYSTEM_ADMIN') || userRoles.includes('ADMIN');
+    if (isAdmin && (window.location.pathname.endsWith('/faculty/dashboard/index.html') || window.location.pathname.endsWith('/faculty/dashboard/') || window.location.pathname.endsWith('/faculty/dashboard'))) {
+      window.location.replace('/admin/dashboard/index.html');
+      return null;
+    }
+
     return user;
   }
 

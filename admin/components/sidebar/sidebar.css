@@ -55,6 +55,7 @@
     margin-left: 72px !important;
     width: calc(100% - 72px) !important;
     max-width: calc(100% - 72px) !important;
+    padding-top: 60px !important;
     min-height: calc(100dvh - 60px) !important;
     box-sizing: border-box !important;
     transition: none !important;
@@ -806,7 +807,7 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   transition: opacity 0.22s ease !important;
 }
 
-.admin-sidebar.desktop-open ~ #sidebar-backdrop,
+.admin-sidebar.desktop-open~#sidebar-backdrop,
 #sidebar-backdrop.active,
 #sidebar-backdrop.open {
   display: block !important;
@@ -861,6 +862,7 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   .sidebar-nav-short-label {
     display: none !important;
   }
+
   .sidebar-nav-label {
     display: block !important;
   }
@@ -1094,8 +1096,9 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    padding-top: calc(58px + max(42px, env(safe-area-inset-top, 0px))) !important;
     min-height: calc(100vh - 56px);
-    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(72px + max(18px, env(safe-area-inset-bottom, 0px))) !important;
   }
 
   /* Hide rail elements, redundant 'Navigation' drawer headers, and old mobile topbar */
@@ -1459,6 +1462,7 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
 
 /* ── 8. Desktop Rail Toggle Expand/Collapse Button ── */
 @media (min-width: 769px) {
+
   /* Collapsed Rail mode: 56x52 squircle button */
   .admin-sidebar:not(.desktop-open) .sidebar-rail-toggle-item,
   .admin-app-layout.sidebar-collapsed .sidebar-rail-toggle-item {

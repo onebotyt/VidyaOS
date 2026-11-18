@@ -35,22 +35,22 @@ const ROOT = __dirname;
 // ─── MIME types ──────────────────────────────────────────────────────────────
 const MIME = {
   '.html': 'text/html; charset=utf-8',
-  '.css':  'text/css',
-  '.js':   'application/javascript',
+  '.css': 'text/css',
+  '.js': 'application/javascript',
   '.json': 'application/json',
-  '.png':  'image/png',
-  '.jpg':  'image/jpeg',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.gif':  'image/gif',
-  '.svg':  'image/svg+xml',
-  '.ico':  'image/x-icon',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
   '.woff': 'font/woff',
-  '.woff2':'font/woff2',
-  '.ttf':  'font/ttf',
-  '.otf':  'font/otf',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
+  '.otf': 'font/otf',
   '.webp': 'image/webp',
-  '.mp4':  'video/mp4',
-  '.pdf':  'application/pdf',
+  '.mp4': 'video/mp4',
+  '.pdf': 'application/pdf',
 };
 
 // ─── Static rewrites (mirrors vercel.json) ───────────────────────────────────
@@ -62,54 +62,59 @@ const STATIC_REWRITES = [
   // (no rewrite needed — direct paths work)
 
   // Login
-  [/^\/login\/?$/,                      '/login/index.html'],
-  [/^\/login\.html$/,                   '/login/index.html'],
-  [/^\/register\/?$/,                   '/login/register/index.html'],
-  [/^\/register\.html$/,                '/login/register/index.html'],
-  [/^\/login\/register\/?$/,            '/login/register/index.html'],
-  [/^\/login\/register\.html$/,         '/login/register/index.html'],
+  [/^\/login\/?$/, '/login/index.html'],
+  [/^\/login\.html$/, '/login/index.html'],
+  [/^\/register\/?$/, '/login/register/index.html'],
+  [/^\/register\.html$/, '/login/register/index.html'],
+  [/^\/login\/register\/?$/, '/login/register/index.html'],
+  [/^\/login\/register\.html$/, '/login/register/index.html'],
   [/^\/login\/student-register\.html$/, '/login/register/index.html?role=student'],
   [/^\/login\/faculty-register\.html$/, '/login/register/index.html?role=faculty'],
-  [/^\/login\/student-register$/,       '/login/register/index.html?role=student'],
-  [/^\/login\/faculty-register$/,       '/login/register/index.html?role=faculty'],
+  [/^\/login\/student-register$/, '/login/register/index.html?role=student'],
+  [/^\/login\/faculty-register$/, '/login/register/index.html?role=faculty'],
 
   // Admin
-  [/^\/admin\/?$/,                      '/admin/dashboard/index.html'],
+  [/^\/admin\/?$/, '/admin/dashboard/index.html'],
   [/^\/admin\/academic_structure\.html$/, '/admin/academic-structure/index.html'],
-  [/^\/admin\/audit_logs\.html$/,       '/admin/audit-logs/index.html'],
-  [/^\/admin\/departments\/?$/,         '/admin/academic-structure/index.html?tab=departments'],
-  [/^\/admin\/departments\.html$/,      '/admin/academic-structure/index.html?tab=departments'],
+  [/^\/admin\/audit_logs\.html$/, '/admin/audit-logs/index.html'],
+  [/^\/admin\/departments\/?$/, '/admin/academic-structure/index.html?tab=departments'],
+  [/^\/admin\/departments\.html$/, '/admin/academic-structure/index.html?tab=departments'],
   [/^\/admin\/faculty-management(\.html)?\/?$/, '/admin/faculty-management/index.html'],
-  [/^\/admin\/faculty(\.html)?\/?$/,            '/admin/faculty-management/index.html'],
-  [/^\/admin\/hod(-management)?(\.html)?\/?$/,  '/admin/faculty-management/index.html'],
-  [/^\/admin\/faculty\/(.+)$/,                  '/admin/faculty-management/$1'],
+  [/^\/admin\/faculty(\.html)?\/?$/, '/admin/faculty-management/index.html'],
+  [/^\/admin\/hod(-management)?(\.html)?\/?$/, '/admin/faculty-management/index.html'],
+  [/^\/admin\/faculty\/(.+)$/, '/admin/faculty-management/$1'],
 
   // Faculty
-  [/^\/faculty\/?$/,                    '/faculty/dashboard/index.html'],
-  [/^\/faculty\/dashboard(\.html)?\/?$/,'/faculty/dashboard/index.html'],
-  [/^\/faculty\/classes(\.html)?\/?$/,  '/faculty/classes/index.html'],
-  [/^\/faculty\/groups(\.html)?\/?$/,   '/faculty/classes/index.html'],
-  [/^\/faculty\/analytics\/?$/,         '/faculty/reports/index.html?tab=analytics'],
-  [/^\/faculty\/assignments\/?$/,       '/faculty/registers/index.html?tab=assignments'],
-  [/^\/faculty\/tests\/?$/,             '/faculty/registers/index.html?tab=marks'],
-  [/^\/faculty\/marks\/?$/,             '/faculty/registers/index.html?tab=marks'],
+  [/^\/faculty\/?$/, '/faculty/dashboard/index.html'],
+  [/^\/faculty\/dashboard(\.html)?\/?$/, '/faculty/dashboard/index.html'],
+  [/^\/faculty\/classes(\.html)?\/?$/, '/faculty/classes/index.html'],
+  [/^\/faculty\/groups(\.html)?\/?$/, '/faculty/classes/index.html'],
+  [/^\/faculty\/analytics\/?$/, '/faculty/reports/index.html?tab=analytics'],
+  [/^\/faculty\/assignments\/?$/, '/faculty/registers/index.html?tab=assignments'],
+  [/^\/faculty\/tests\/?$/, '/faculty/registers/index.html?tab=marks'],
+  [/^\/faculty\/marks\/?$/, '/faculty/registers/index.html?tab=marks'],
   [/^\/faculty\/attendance\/quick\/?$/, '/faculty/registers/index.html'],
   [/^\/faculty\/classwork\/create(\.html)?\/?$/, '/faculty/classwork/create/index.html'],
 
   // Student
-  [/^\/student\/dashboard\/?$/,         '/student/dashboard/index.html'],
-  [/^\/student\/attendance\/?$/,        '/student/attendance/index.html'],
-  [/^\/student\/assignments\/?$/,       '/student/assignments/index.html'],
-  [/^\/student\/scores\/?$/,            '/student/scores/index.html'],
-  [/^\/student\/timetable\/?$/,         '/student/timetable/index.html'],
-  [/^\/student\/leave\/?$/,             '/student/leave/index.html'],
-  [/^\/student\/profile\/?$/,           '/student/profile/index.html'],
+  [/^\/student\/dashboard\/?$/, '/student/dashboard/index.html'],
+  [/^\/student\/attendance\/?$/, '/student/attendance/index.html'],
+  [/^\/student\/assignments\/?$/, '/student/assignments/index.html'],
+  [/^\/student\/scores\/?$/, '/student/scores/index.html'],
+  [/^\/student\/timetable\/?$/, '/student/timetable/index.html'],
+  [/^\/student\/leave\/?$/, '/student/leave/index.html'],
+  [/^\/student\/profile\/?$/, '/student/profile/index.html'],
   [/^\/faculty\/group[ -]detail(\/index\.html)?\/?$/, '/faculty/group-detail/index.html'],
   [/^\/student\/group[ -]detail(\/index\.html)?\/?$/, '/student/group-detail/index.html'],
+  [/^\/faculty\/student[ -_]performance(\/index\.html)?\/?$/, '/faculty/student-performance/index.html'],
+  [/^\/faculty\/direct[ -_]assessment(\/index\.html)?\/?$/, '/faculty/direct-assessment/index.html'],
+  [/^\/faculty\/indirect[ -_]assessment(\/index\.html)?\/?$/, '/faculty/indirect-assessment/index.html'],
+  [/^\/faculty\/assessment[ -_]process(\/index\.html)?\/?$/, '/faculty/assessment-process/index.html'],
+  [/^\/faculty\/course[ -_]file(\/index\.html)?\/?$/, '/faculty/course-file/index.html'],
 
   // Generic section/:page pattern
-  [/^\/(admin|faculty|student)\/([a-zA-Z0-9_-]+)\/?$/, '/$1/$2/index.html'],
-  [/^\/(admin|faculty|student)\/([a-zA-Z0-9_-]+)\.html$/, '/$1/$2/index.html'],
+  [/^\/(admin|faculty|student)\/([a-zA-Z0-9_ -]+)\/?$/, '/$1/$2/index.html'],
+  [/^\/(admin|faculty|student)\/([a-zA-Z0-9_ -]+)\.html$/, '/$1/$2/index.html'],
 ];
 
 // ─── Resolve request path via rewrites ───────────────────────────────────────
@@ -178,8 +183,8 @@ const server = http.createServer((req, res) => {
   let reqPath = parsed.pathname;
   try {
     reqPath = decodeURIComponent(reqPath);
-  } catch (_) {}
-  const query   = parsed.query || '';
+  } catch (_) { }
+  const query = parsed.query || '';
 
   // 1. Proxy API and uploads to backend
   if (reqPath.startsWith('/api/') || reqPath.startsWith('/uploads/')) {

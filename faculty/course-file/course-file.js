@@ -77,23 +77,30 @@
       if (dropEmail) dropEmail.innerText = user.email || '';
       if (dropRole) dropRole.innerText = state.isHodOrAdmin ? 'HOD / Admin' : 'Faculty Member';
 
-      // Parse Query Params
+      // Parse Query Params - Support all common aliases
       const params = new URLSearchParams(window.location.search);
-      const urlGroupId = params.get('group_id') || params.get('id');
-      const urlSubjectId = params.get('subject_id');
-      const urlRegisterId = params.get('register_id');
+      const urlGroupId = params.get('group_id') || params.get('groupId') || params.get('class_id') || params.get('classId') || params.get('id');
+      const urlSubjectId = params.get('subject_id') || params.get('subjectId');
+      const urlRegisterId = params.get('register_id') || params.get('registerId');
 
       if (urlGroupId) state.currentGroupId = parseInt(urlGroupId, 10);
       if (urlSubjectId) state.currentSubjectId = parseInt(urlSubjectId, 10);
       if (urlRegisterId) state.currentRegisterId = parseInt(urlRegisterId, 10);
 
-      // 1. Load Teacher's Active Classes for Class Switcher in background
-      loadAvailableClasses().catch(e => console.warn('Could not load classes list:', e));
+      // 1. First load teacher's active classes to populate selector and find fallback class
+      await loadAvailableClasses();
 
-      // 2. Load Course File Dossier
+      // 2. If no class was passed in URL, default to first available active class
+      if (!state.currentGroupId && state.allClasses && state.allClasses.length > 0) {
+        state.currentGroupId = state.allClasses[0].id;
+        const selector = document.getElementById('select-class-switch');
+        if (selector) selector.value = String(state.currentGroupId);
+      }
+
+      // 3. Load Course File Dossier
       await loadCourseFileDossier();
 
-      // 3. Handle Deep-linked Document and Action (?doc=...&action=...)
+      // 4. Handle Deep-linked Document and Action (?doc=...&action=...)
       handleDeepLinkAction(params);
 
     } catch (err) {
@@ -172,6 +179,12 @@
       const res = await apiFetch('/teaching-groups?status=ACTIVE');
       if (res && res.success && Array.isArray(res.data)) {
         state.allClasses = res.data;
+
+        // If no groupId set, pick first available class
+        if (!state.currentGroupId && state.allClasses.length > 0) {
+          state.currentGroupId = state.allClasses[0].id;
+        }
+
         const selector = document.getElementById('select-class-switch');
         if (selector) {
           if (state.allClasses.length === 0) {
@@ -179,14 +192,9 @@
             return;
           }
 
-          // If no groupId in URL, pick the first class
-          if (!state.currentGroupId && state.allClasses.length > 0) {
-            state.currentGroupId = state.allClasses[0].id;
-          }
-
           selector.innerHTML = state.allClasses.map(c => `
             <option value="${c.id}" ${c.id === state.currentGroupId ? 'selected' : ''}>
-              ${escapeHtml(c.subject_name || c.name)} (Sem ${c.semester})
+              ${escapeHtml(c.subject_name || c.name)} (Sem ${c.semester || '--'})
             </option>
           `).join('');
         }
@@ -196,9 +204,72 @@
     }
   }
 
+  // Render Empty State when no classes exist
+  function renderEmptyClassState(customMsg) {
+    const titleEl = document.getElementById('cf-hero-title');
+    const semEl = document.getElementById('cf-hero-sem');
+    const compEl = document.getElementById('cf-hero-component');
+    const ayEl = document.getElementById('cf-hero-ay');
+    const codeEl = document.getElementById('cf-hero-code');
+    const deptEl = document.getElementById('cf-hero-dept');
+    const teacherEl = document.getElementById('cf-hero-teacher');
+    const statusBadge = document.getElementById('cf-hero-status-badge');
+    const scoreEl = document.getElementById('cf-meter-score');
+    const pctEl = document.getElementById('cf-meter-pct');
+    const barEl = document.getElementById('cf-meter-bar');
+    const capEl = document.getElementById('cf-meter-caption');
+    const container = document.getElementById('cf-cards-grid');
+
+    if (titleEl) titleEl.innerText = customMsg || 'No Active Classes Found';
+    if (semEl) semEl.innerText = 'Semester --';
+    if (compEl) compEl.innerText = 'THEORY';
+    if (ayEl) ayEl.innerText = 'AY 2026-27';
+    if (codeEl) codeEl.innerText = '--';
+    if (deptEl) deptEl.innerText = 'Academic Dept';
+    if (teacherEl) teacherEl.innerText = state.currentUser?.full_name || 'Faculty Member';
+    if (statusBadge) {
+      statusBadge.innerText = 'NO CLASSES';
+      statusBadge.className = 'badge badge-late';
+    }
+    if (scoreEl) scoreEl.innerText = '0 / 18';
+    if (pctEl) pctEl.innerText = '0%';
+    if (barEl) barEl.style.width = '0%';
+    if (capEl) capEl.innerText = 'No Active Course Selected';
+
+    if (container) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1.5rem; background: var(--bg-card); border: 1.5px dashed var(--border-color); border-radius: var(--radius-lg); margin-top: 1rem;">
+          <div style="width: 56px; height: 56px; margin: 0 auto 1.25rem; border-radius: 50%; background: var(--bg-surface-hover); display: flex; align-items: center; justify-content: center; color: var(--color-primary);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">No Course File Data Available</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); max-width: 480px; margin: 0 auto 1.5rem; line-height: 1.5;">
+            ${escapeHtml(customMsg || 'You do not have any active teaching groups assigned for this academic session. Once a class is assigned or created, NBA compliance dossier slots will appear here automatically.')}
+          </p>
+          <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/faculty/classes/index.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.2rem; font-weight: 600; text-decoration: none; border-radius: var(--radius-md);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Go to Classroom</span>
+            </a>
+            <a href="/faculty/dashboard/index.html" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.2rem; font-weight: 600; text-decoration: none; border-radius: var(--radius-md);">
+              <span>Faculty Dashboard</span>
+            </a>
+          </div>
+        </div>
+      `;
+    }
+  }
+
   // Load Course File Dossier from Backend
   async function loadCourseFileDossier() {
-    if (!state.currentGroupId && !state.currentSubjectId) return;
+    if (!state.currentGroupId && !state.currentSubjectId) {
+      renderEmptyClassState();
+      return;
+    }
 
     try {
       const queryParam = state.currentGroupId 
@@ -213,10 +284,12 @@
         renderCategoryCounts();
       } else {
         showToast(res?.error?.message || 'Failed to load course file', 'error');
+        renderEmptyClassState(res?.error?.message || 'Unable to load course file');
       }
     } catch (err) {
       console.error('Error fetching course file dossier:', err);
       showToast('Error loading course file dossier', 'error');
+      renderEmptyClassState('Error loading course file dossier');
     }
   }
 
@@ -554,11 +627,20 @@
   };
 
   // Switch Active Class
-  window.onSwitchClass = function (groupId) {
+  window.onSwitchClass = async function (groupId) {
     if (!groupId) return;
+    state.currentGroupId = parseInt(groupId, 10);
     const url = new URL(window.location.href);
-    url.searchParams.set('group_id', groupId);
-    window.location.href = url.toString();
+    url.searchParams.set('groupId', groupId);
+    window.history.replaceState({}, '', url.toString());
+
+    // Sync select dropdown
+    const selector = document.getElementById('select-class-switch');
+    if (selector && selector.value !== String(groupId)) {
+      selector.value = String(groupId);
+    }
+
+    await loadCourseFileDossier();
   };
 
   // Open Direct Upload Modal

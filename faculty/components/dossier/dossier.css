@@ -31,6 +31,57 @@
   }
 }
 
+/* Interactive Teaching Group Class Switcher */
+.cf-class-selector-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.cf-selector-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.cf-select-class {
+  padding: 0.42rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  max-width: 280px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cf-select-class:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.btn-primary {
+  background: var(--color-primary) !important;
+  color: var(--text-white) !important;
+  border: 1px solid var(--color-primary) !important;
+}
+
+.btn-primary span,
+.btn-primary svg {
+  color: var(--text-white) !important;
+  stroke: var(--text-white) !important;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+}
+
 /* Main Layout Container */
 .cf-main-container {
   max-width: 1280px;
@@ -634,39 +685,240 @@
 }
 
 .cf-card-btn.primary {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--text-white);
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--text-white) !important;
+}
+
+.cf-card-btn.primary span,
+.cf-card-btn.primary svg {
+  color: var(--text-white) !important;
+  stroke: var(--text-white) !important;
 }
 
 .cf-card-btn.primary:hover {
-  background: var(--color-primary-hover);
+  background: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+}
+
+.cf-card-btn.success {
+  background: var(--status-present-bg) !important;
+  border-color: var(--status-present) !important;
+  color: var(--status-present) !important;
+}
+
+.cf-card-btn.success span,
+.cf-card-btn.success svg {
+  color: var(--status-present) !important;
+  stroke: var(--status-present) !important;
+}
+
+.cf-card-btn.success:hover {
+  background: var(--status-present) !important;
+  color: var(--text-white) !important;
+}
+
+.cf-card-btn.success:hover span,
+.cf-card-btn.success:hover svg {
+  color: var(--text-white) !important;
+  stroke: var(--text-white) !important;
 }
 
 .cf-card-btn.danger {
-  color: var(--status-absent);
-  border-color: var(--border-color);
+  color: var(--status-absent) !important;
+  border-color: var(--border-color) !important;
+  background: var(--bg-card);
+}
+
+.cf-card-btn.danger span,
+.cf-card-btn.danger svg {
+  color: var(--status-absent) !important;
+  stroke: var(--status-absent) !important;
 }
 
 .cf-card-btn.danger:hover {
-  background: var(--status-absent-bg);
-  border-color: var(--status-absent);
+  background: var(--status-absent-bg) !important;
+  border-color: var(--status-absent) !important;
+}
+
+/* Backward-compatible Doc Card Styling */
+.cf-doc-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.15rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.cf-doc-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-focus);
+}
+
+.cf-doc-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cf-doc-number-badge {
+  font-family: var(--font-family-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0.3rem 0.55rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+
+.cf-doc-card.uploaded .cf-doc-number-badge {
+  background: var(--status-present-bg);
+  border-color: var(--status-present);
+  color: var(--status-present);
+}
+
+.cf-doc-status-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.cf-doc-status-badge.status-uploaded {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border: 1px solid var(--status-present);
+}
+
+.cf-doc-status-badge.status-pending {
+  background: var(--status-late-bg);
+  color: var(--status-late);
+  border: 1px solid var(--status-late);
+}
+
+.cf-doc-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cf-doc-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.cf-doc-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.cf-doc-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
 }
 
 /* Responsive Card layout on mobile */
 @media (max-width: 768px) {
-  .cf-artifact-card {
-    flex-direction: column;
-    align-items: flex-start;
+  .cf-main-container {
+    padding: 0.75rem 0.75rem calc(84px + env(safe-area-inset-bottom, 0px)) !important;
     gap: 0.85rem;
   }
-  .cf-card-actions {
-    width: 100%;
-    justify-content: flex-start;
+
+  .cf-hero-card {
+    padding: 1rem;
+    gap: 0.85rem;
   }
-  .cf-card-btn {
+
+  .cf-actions-left {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .cf-actions-left .cf-class-selector-wrap {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .cf-actions-left .cf-select-class {
     flex: 1;
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.8rem;
+    height: 38px;
+  }
+
+  .cf-actions-left .btn-primary {
+    grid-column: 1 / -1;
+    height: 38px;
+  }
+
+  .cf-actions-left .btn {
+    padding: 0.42rem 0.6rem;
+    font-size: 0.78rem;
     justify-content: center;
+    min-height: 36px;
+  }
+
+  .cf-artifact-card,
+  .cf-doc-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 0.85rem 1rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .cf-card-main-content {
+    align-items: flex-start !important;
+    gap: 0.65rem !important;
+  }
+
+  .cf-card-actions,
+  .cf-doc-card-footer {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    gap: 0.45rem !important;
+  }
+
+  .cf-card-actions .cf-card-btn,
+  .cf-doc-card-footer .cf-card-btn,
+  .cf-card-actions .btn {
+    flex: 1 1 auto;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem !important;
+    padding: 0.44rem 0.65rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    min-height: 36px;
+    box-sizing: border-box;
   }
 }
 
@@ -674,7 +926,7 @@
 .cf-modal-overlay {
   position: fixed;
   inset: 0;
-  background: hsl(0 0% 0% / 0.55);
+  background: var(--modal-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -920,6 +1172,7 @@
 
 /* Print Sheet */
 @media print {
+
   .faculty-top-header,
   .cf-filter-section,
   .cf-hero-actions,
@@ -928,10 +1181,12 @@
   .toast-container {
     display: none !important;
   }
+
   .cf-main-container {
     padding: 0;
     max-width: 100%;
   }
+
   .cf-hero-card,
   .cf-artifact-card {
     box-shadow: none;
@@ -972,6 +1227,57 @@
   .cf-back-btn span {
     display: none;
   }
+}
+
+/* Interactive Teaching Group Class Switcher */
+.cf-class-selector-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.cf-selector-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.cf-select-class {
+  padding: 0.42rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  max-width: 280px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cf-select-class:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.btn-primary {
+  background: var(--color-primary) !important;
+  color: var(--text-white) !important;
+  border: 1px solid var(--color-primary) !important;
+}
+
+.btn-primary span,
+.btn-primary svg {
+  color: var(--text-white) !important;
+  stroke: var(--text-white) !important;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
 }
 
 /* Main Layout Container */
@@ -1444,6 +1750,7 @@
     align-items: flex-start;
     gap: 0.75rem;
   }
+
   .cf-card-actions {
     width: 100%;
     justify-content: flex-start;
@@ -1477,8 +1784,15 @@
 }
 
 @keyframes cfModalFadeIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .cf-modal-header {
@@ -1645,4 +1959,3 @@
   border-color: var(--border-focus);
   box-shadow: 0 0 0 2px var(--color-primary-light);
 }
-

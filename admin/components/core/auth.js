@@ -255,11 +255,18 @@
     }
 
     const normalizedAllowed = allowedRoles.map(r => String(r).toUpperCase());
+    if (normalizedAllowed.includes('SYSTEM_ADMIN') && !normalizedAllowed.includes('ADMIN')) {
+      normalizedAllowed.push('ADMIN');
+    }
+    if (normalizedAllowed.includes('ADMIN') && !normalizedAllowed.includes('SYSTEM_ADMIN')) {
+      normalizedAllowed.push('SYSTEM_ADMIN');
+    }
     const userRoles = [];
     if (Array.isArray(user.roles)) {
       user.roles.forEach(r => userRoles.push(String(r).toUpperCase()));
     }
     if (user.role) userRoles.push(String(user.role).toUpperCase());
+    if (user.is_admin) { userRoles.push('SYSTEM_ADMIN', 'ADMIN'); }
     
 
     const isAuthorized = userRoles.some(r => normalizedAllowed.includes(r));

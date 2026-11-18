@@ -1564,6 +1564,9 @@
       }
     }
 
+    if (sess) {
+      sess.id = sess.id || sess.session_id;
+    }
     _classRollSession = sess;
 
     // Ensure session is open
@@ -1709,6 +1712,82 @@
         btn.style.color = 'var(--status-absent)';
         btn.style.border = '1px solid var(--status-absent)';
         btn.textContent = 'Absent';
+      }
+    }
+  }
+
+  async function submitClassRollCall() {
+    const regId = classRegState.registerId;
+    if (!regId) {
+      toast('Register not found');
+      return;
+    }
+    const S = getS();
+    const dateVal = ById('class-sync-date')?.value || classRegState.selectedDate || new Date().toISOString().slice(0, 10);
+    const isLive = ById('class-rc-tab-live')?.classList.contains('active');
+    const saveBtn = ById('btn-save-class-rollcall');
+    const origHtml = saveBtn ? saveBtn.innerHTML : '';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerText = 'Saving...';
+    }
+
+    try {
+      let presentStudentIds = [];
+      if (isLive) {
+        const sessId = _classRollSession?.id || _classRollSession?.session_id;
+        if (sessId) {
+          const cRes = await apiFetch(`/api/v1/attendance/sessions/${sessId}/self-attendance`);
+          if (cRes && cRes.success && Array.isArray(cRes.data)) {
+            presentStudentIds = cRes.data.map(req => Number(req.student_id)).filter(Boolean);
+          }
+        }
+        if (!presentStudentIds.length) {
+          toast('No students have checked in via QR or PIN yet.');
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = origHtml;
+          }
+          return;
+        }
+      } else {
+        const students = (classRegState.gridData?.students && classRegState.gridData.students.length)
+          ? classRegState.gridData.students
+          : (S.members || []);
+
+        students.forEach(st => {
+          const sid = st.student_id || st.id;
+          const btn = ById(`rc-btn-toggle-${sid}`);
+          const isAbsent = btn && btn.textContent.trim().toLowerCase() === 'absent';
+          if (!isAbsent) {
+            presentStudentIds.push(Number(sid));
+          }
+        });
+      }
+
+      const res = await apiFetch(`/api/v1/attendance/registers/${regId}/confirm-day-attendance`, {
+        method: 'POST',
+        body: JSON.stringify({
+          date: dateVal,
+          student_ids: presentStudentIds
+        })
+      });
+
+      if (res && res.success) {
+        toast(`Confirmed attendance for ${presentStudentIds.length} students on ${dateVal}!`);
+        closeClassRollCallModal();
+        if (typeof loadClassRegister === 'function') {
+          await loadClassRegister(classRegState.currentMonth);
+        }
+      } else {
+        toast(res?.error?.message || 'Failed to save attendance');
+      }
+    } catch (err) {
+      toast('Error saving attendance: ' + err.message);
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = origHtml;
       }
     }
   }
@@ -1984,6 +2063,7 @@
   window.closeClassRollCallModal = closeClassRollCallModal;
   window.switchClassRollCallMode = switchClassRollCallMode;
   window.toggleRollCallStudent = toggleRollCallStudent;
+  window.submitClassRollCall = submitClassRollCall;
   window.confirmDeletePeriod = confirmDeletePeriod;
   window.confirmDeleteCurrentPeriod = confirmDeleteCurrentPeriod;
   window.openAttendanceExportModal = openAttendanceExportModal;

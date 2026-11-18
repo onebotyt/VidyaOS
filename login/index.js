@@ -56,11 +56,12 @@ function purgeAllStoredAuth() {
   try {
     const u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('currentUser') || 'null');
     if (!u) return;
-    const roles = u.roles || [];
-    if (roles.includes('SYSTEM_ADMIN')) { window.location.replace('/admin/dashboard/index.html'); return; }
-    if (roles.includes('STUDENT')) { window.location.replace('/student/dashboard/index.html'); return; }
+    const roles = Array.isArray(u.roles) ? u.roles : [];
+    const isAdmin = roles.includes('SYSTEM_ADMIN') || roles.includes('ADMIN') || u.role === 'SYSTEM_ADMIN' || u.role === 'ADMIN' || Boolean(u.is_admin);
+    if (isAdmin) { window.location.replace('/admin/dashboard/index.html'); return; }
+    if (roles.includes('STUDENT') || u.role === 'STUDENT') { window.location.replace('/student/dashboard/index.html'); return; }
     const isMobile = window.innerWidth <= 768;
-    const isHod = roles.includes('HOD') || Boolean(u.is_hod);
+    const isHod = roles.includes('HOD') || u.role === 'HOD' || Boolean(u.is_hod);
     if (isMobile && isHod) {
       window.location.replace('/faculty/classes/index.html');
       return;
@@ -217,11 +218,12 @@ function getVidyaDeviceId() {
 
 /* ── Post-login redirect ── */
 function redirectAfterLogin(user) {
-  const roles = user.roles || [];
-  if (roles.includes('SYSTEM_ADMIN')) { window.location.href = '/admin/dashboard/index.html'; return; }
-  if (roles.includes('STUDENT')) { window.location.href = '/student/dashboard/index.html'; return; }
+  const roles = Array.isArray(user.roles) ? user.roles : [];
+  const isAdmin = roles.includes('SYSTEM_ADMIN') || roles.includes('ADMIN') || user.role === 'SYSTEM_ADMIN' || user.role === 'ADMIN' || Boolean(user.is_admin);
+  if (isAdmin) { window.location.href = '/admin/dashboard/index.html'; return; }
+  if (roles.includes('STUDENT') || user.role === 'STUDENT') { window.location.href = '/student/dashboard/index.html'; return; }
   const isMobile = window.innerWidth <= 768;
-  const isHod = roles.includes('HOD') || Boolean(user.is_hod);
+  const isHod = roles.includes('HOD') || user.role === 'HOD' || Boolean(user.is_hod);
   if (isMobile && isHod) {
     window.location.href = '/faculty/classes/index.html';
     return;

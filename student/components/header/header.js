@@ -172,7 +172,7 @@
           if (res && res.success && res.data) {
             profileData = res.data;
           }
-        } catch (_) {}
+        } catch (_) { }
       }
 
       const name = profileData?.full_name || user?.full_name || user?.name || user?.username || 'Student';
@@ -287,7 +287,7 @@
     document.documentElement.setAttribute('data-theme', next);
     try {
       localStorage.setItem('theme', next);
-    } catch (_) {}
+    } catch (_) { }
     updateThemeIcon();
   }
 
@@ -308,7 +308,7 @@
       try {
         localStorage.removeItem('vidyaos_token');
         localStorage.removeItem('vidyaos_user');
-      } catch (_) {}
+      } catch (_) { }
       window.location.href = '/login/';
     }
   }

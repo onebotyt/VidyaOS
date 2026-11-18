@@ -46,6 +46,11 @@
     const parts = cleanName.split(/\s+/).filter(Boolean);
     const initial = parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : (cleanName[0] || 'F').toUpperCase();
 
+    const isAdmin = Boolean(user && (
+      (Array.isArray(user.roles) && (user.roles.includes('SYSTEM_ADMIN') || user.roles.includes('ADMIN'))) ||
+      user.role === 'SYSTEM_ADMIN' || user.role === 'ADMIN' || user.is_admin
+    ));
+
     const isHod = Boolean(user && (
       (Array.isArray(user.roles) && user.roles.includes('HOD')) ||
       user.role === 'HOD' ||
@@ -61,13 +66,17 @@
     document.querySelectorAll('#dropdown-full-name, #popover-user-name').forEach(el => el.textContent = name);
     document.querySelectorAll('#dropdown-email, #popover-user-email').forEach(el => el.textContent = email);
     document.querySelectorAll('#dropdown-role-pill').forEach(el => {
-      el.textContent = isHod ? 'Head of Department' : 'Faculty Member';
+      el.textContent = isAdmin ? 'System Administrator' : (isHod ? 'Head of Department' : 'Faculty Member');
     });
 
     // Brand link destination
     const brandLink = document.getElementById('header-brand-link');
     if (brandLink) {
-      brandLink.href = (window.innerWidth <= 768 && isHod) ? '/faculty/classes/index.html' : '/faculty/dashboard/index.html';
+      if (isAdmin) {
+        brandLink.href = '/admin/dashboard/index.html';
+      } else {
+        brandLink.href = (window.innerWidth <= 768 && isHod) ? '/faculty/classes/index.html' : '/faculty/dashboard/index.html';
+      }
     }
 
     // Custom avatar image if uploaded
@@ -172,13 +181,17 @@
     }
 
     const user = getUser();
+    const isAdmin = Boolean(user && (
+      (Array.isArray(user.roles) && (user.roles.includes('SYSTEM_ADMIN') || user.roles.includes('ADMIN'))) ||
+      user.role === 'SYSTEM_ADMIN' || user.role === 'ADMIN' || user.is_admin
+    ));
     const isHod = Boolean(user && (
       (Array.isArray(user.roles) && user.roles.includes('HOD')) ||
       user.role === 'HOD' ||
       user.is_hod === true ||
       user.is_hod === 1
     ));
-    const homeHref = (isHod && window.innerWidth <= 768) ? '/faculty/classes/index.html' : '/faculty/dashboard/index.html';
+    const homeHref = isAdmin ? '/admin/dashboard/index.html' : ((isHod && window.innerWidth <= 768) ? '/faculty/classes/index.html' : '/faculty/dashboard/index.html');
 
     const headerHtml = `
       <header class="faculty-top-header admin-top-header" id="faculty-header" aria-label="Faculty Header Bar">

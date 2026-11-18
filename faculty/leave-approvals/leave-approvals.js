@@ -32,7 +32,7 @@
   function initHeroDeptInfo() {
     let u = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
     if (!u) {
-      try { u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('auth_user') || 'null'); } catch (_) {}
+      try { u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('auth_user') || 'null'); } catch (_) { }
     }
     const dName = document.getElementById('leave-dept-name');
     const dMeta = document.getElementById('leave-dept-meta');
@@ -283,8 +283,8 @@
     if (inp) { inp.focus(); inp.select(); }
   };
 
-  window.prevPage = function () {};
-  window.nextPage = function () {};
+  window.prevPage = function () { };
+  window.nextPage = function () { };
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {

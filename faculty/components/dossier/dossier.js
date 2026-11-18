@@ -76,6 +76,7 @@
       currentGroupId: null,
       currentSubjectId: null,
       currentRegisterId: null,
+      allClasses: [],
       dossierData: null,
       currentCategory: 'all',
       searchQuery: '',
@@ -98,37 +99,103 @@
           user.is_hod
         );
 
+        // Parse Query Params - Support all common aliases
         const params = new URLSearchParams(window.location.search);
-        const urlGroupId = params.get('group_id') || params.get('groupId') || params.get('id');
-        const urlSubjectId = params.get('subject_id');
-        const urlRegisterId = params.get('register_id');
+        const urlGroupId = params.get('group_id') || params.get('groupId') || params.get('class_id') || params.get('classId') || params.get('id');
+        const urlSubjectId = params.get('subject_id') || params.get('subjectId');
+        const urlRegisterId = params.get('register_id') || params.get('registerId');
 
         if (urlGroupId) state.currentGroupId = parseInt(urlGroupId, 10);
         if (urlSubjectId) state.currentSubjectId = parseInt(urlSubjectId, 10);
         if (urlRegisterId) state.currentRegisterId = parseInt(urlRegisterId, 10);
 
         setupDropzone();
+
+        // Load available classes for switcher & fallback
+        await loadAvailableClasses();
+
+        // If no group specified in URL, fallback to first active class
+        if (!state.currentGroupId && !state.currentSubjectId && state.allClasses?.length > 0) {
+          const g = cfg.preferPractical
+            ? (state.allClasses.find(x => (x.component || '').toUpperCase() === 'PRACTICAL') || state.allClasses[0])
+            : state.allClasses[0];
+          state.currentGroupId = g.id;
+          state.currentRegisterId = g.register_id || null;
+          renderClassSelector();
+        }
+
         await loadDossier();
       } catch (err) {
         console.error(`Initialization error in ${prefix}:`, err);
       }
     });
 
-    async function loadDossier() {
-      if (!state.currentGroupId && !state.currentSubjectId) {
-        try {
-          const groupsRes = await apiFetch('/teaching-groups?status=ACTIVE');
-          if (groupsRes && groupsRes.success && groupsRes.data?.length > 0) {
-            const g = cfg.preferPractical
-              ? (groupsRes.data.find(x => (x.component || '').toUpperCase() === 'PRACTICAL') || groupsRes.data[0])
-              : groupsRes.data[0];
-            state.currentGroupId = g.id;
-            state.currentRegisterId = g.register_id || null;
-          }
-        } catch (_) {}
+    async function loadAvailableClasses() {
+      try {
+        const groupsRes = await apiFetch('/teaching-groups?status=ACTIVE');
+        if (groupsRes && groupsRes.success && Array.isArray(groupsRes.data)) {
+          state.allClasses = groupsRes.data;
+          renderClassSelector();
+        }
+      } catch (err) {
+        console.warn('Could not load teaching groups for class selector:', err);
+      }
+    }
+
+    function renderClassSelector() {
+      const select = document.getElementById('select-class-switch');
+      if (!select) return;
+      if (!state.allClasses || state.allClasses.length === 0) {
+        select.innerHTML = '<option value="">No Active Classes</option>';
+        return;
+      }
+      select.innerHTML = state.allClasses.map(g => `
+        <option value="${g.id}" ${g.id === state.currentGroupId ? 'selected' : ''}>
+          ${escapeHtml(g.subject_name || g.name || 'Class ' + g.id)} (${escapeHtml(g.component || 'Theory')})
+        </option>
+      `).join('');
+    }
+
+    window.onSwitchClass = async function (groupId) {
+      if (!groupId) return;
+      state.currentGroupId = parseInt(groupId, 10);
+      const url = new URL(window.location.href);
+      url.searchParams.set('groupId', groupId);
+      window.history.replaceState({}, '', url.toString());
+
+      const selector = document.getElementById('select-class-switch');
+      if (selector && selector.value !== String(groupId)) {
+        selector.value = String(groupId);
       }
 
-      if (!state.currentGroupId && !state.currentSubjectId) return;
+      await loadDossier();
+    };
+
+    function renderEmptyState(customMsg) {
+      const grid = document.getElementById(`${prefix}-cards-grid`);
+      if (grid) {
+        grid.innerHTML = `
+          <div class="empty-state-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+            <div style="font-size: 2.2rem; margin-bottom: 0.75rem; opacity: 0.85;">📂</div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main);">${escapeHtml(customMsg || 'No Active Teaching Classes Found')}</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 440px; margin: 0 auto 1.25rem; line-height: 1.4;">
+              Please select an active teaching group from the dropdown or visit Classroom to manage your assigned subjects.
+            </p>
+            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+              <a href="/faculty/classes/index.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.2rem; font-size: 0.82rem; font-weight: 600; text-decoration: none; border-radius: var(--radius-sm);">
+                <span>Go to Classroom</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function loadDossier() {
+      if (!state.currentGroupId && !state.currentSubjectId) {
+        renderEmptyState('No Active Classes Assigned');
+        return;
+      }
 
       try {
         const queryParam = state.currentGroupId
@@ -137,6 +204,7 @@
         const res = await apiFetch(`${apiBase}${queryParam}`);
         if (!res || !res.success || !res.data) {
           notify(res?.error?.message || `Failed to load ${label} dossier.`, 'error');
+          renderEmptyState(res?.error?.message || `Unable to load ${label} dossier`);
           return;
         }
         state.dossierData = res.data;
@@ -148,6 +216,7 @@
         updateCategoryCounts();
       } catch (err) {
         console.error(`loadDossier (${prefix}) error:`, err);
+        renderEmptyState(`Error loading ${label} dossier`);
       }
     }
 
@@ -240,48 +309,101 @@
         );
       }
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="empty-state-card" style="grid-column: 1 / -1;"><h3>No Matching ${escapeHtml(label)} Items</h3></div>`;
+        grid.innerHTML = `<div class="empty-state-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg);"><h3 style="color:var(--text-main); margin-bottom: 0.5rem;">No Matching ${escapeHtml(label)} Items</h3><p style="color:var(--text-muted); font-size:0.85rem;">Try clearing your search query or selecting a different category tab.</p></div>`;
         return;
       }
 
       grid.innerHTML = filtered.map(item => {
         const doc = item.document;
         const isUploaded = Boolean(doc && doc.file_path);
-        const tag = escapeHtml(item.section || (item.category ? item.category.toUpperCase() : sectionTag));
+        const isComplete = isUploaded || item.is_completed;
+        const hasSystemData = item.has_system_data;
+        const tag = escapeHtml(item.section || (item.category ? item.category.toUpperCase().replace(/_/g, ' ') : sectionTag));
+
+        const statusBadgeHtml = isUploaded
+          ? `<span class="badge badge-present" style="font-size:0.72rem;">Uploaded (${formatBytes(doc.file_size)})</span>`
+          : (hasSystemData
+            ? `<span class="badge badge-sem" style="font-size:0.72rem;">Live DB Synced</span>`
+            : `<span class="badge badge-late" style="font-size:0.72rem;">Action Required</span>`);
+
+        const sectionBadgeHtml = tag
+          ? `<span class="badge" style="background:var(--bg-surface);border:1px solid var(--border-color);font-size:0.68rem;color:var(--text-muted);font-weight:600;">${tag}</span>`
+          : '';
+
+        let statusBoxHtml = '';
+        if (doc) {
+          statusBoxHtml = `
+            <div class="cf-card-status-box">
+              <div class="cf-doc-info-left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--status-present);flex-shrink:0;">
+                  <path d="M14 2H6a2 2 0 0 1-2 2v16a2 2 0 0 1 2 2h12a2 2 0 0 1 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span class="cf-doc-filename" title="${escapeHtml(doc.file_name)}">${escapeHtml(doc.file_name)}</span>
+              </div>
+              <span class="cf-doc-meta">${formatBytes(doc.file_size)} &bull; ${formatDateTime(doc.updated_at || doc.created_at)}</span>
+            </div>
+          `;
+        } else {
+          statusBoxHtml = `
+            <div class="cf-doc-empty-placeholder" style="margin-top:0.35rem;font-size:0.76rem;color:var(--text-muted);display:flex;align-items:center;gap:0.35rem;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.7;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>Awaiting PDF upload (.pdf)</span>
+            </div>
+          `;
+        }
+
+        let actionsHtml = '';
+        if (isUploaded) {
+          actionsHtml = `
+            <button type="button" class="cf-card-btn success" onclick="openPreviewModal('${escapeHtml(doc.file_path)}', '${escapeHtml(item.title).replace(/'/g, "\\'")}', '${escapeHtml(doc.file_name).replace(/'/g, "\\'")}')" title="Preview document in viewer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              <span>View</span>
+            </button>
+            <a href="${escapeHtml(doc.file_path)}" download="${escapeHtml(doc.file_name)}" class="cf-card-btn" title="Download PDF document">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Download</span>
+            </a>
+            <button type="button" class="cf-card-btn" onclick="openUploadModal('${escapeHtml(item.key)}', '${escapeHtml(item.title).replace(/'/g, "\\'")}', true)" title="Replace with updated PDF">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span>Replace</span>
+            </button>
+            <button type="button" class="cf-card-btn danger" onclick="openDeleteModal('${escapeHtml(item.key)}', '${escapeHtml(item.title).replace(/'/g, "\\'")}')" title="Delete uploaded document">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Delete</span>
+            </button>
+          `;
+        } else {
+          actionsHtml = `
+            <button type="button" class="cf-card-btn primary" onclick="openUploadModal('${escapeHtml(item.key)}', '${escapeHtml(item.title).replace(/'/g, "\\'")}', false)" title="Upload PDF document">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span>Upload PDF</span>
+            </button>
+          `;
+        }
+
         return `
-          <article class="cf-doc-card ${isUploaded ? 'uploaded' : 'pending'}" data-item-key="${escapeHtml(item.key)}">
-            <div class="cf-doc-card-header">
-              <div class="cf-doc-number-badge">
-                <span>#${item.num}</span>
-                <span class="cf-section-tag">${tag}</span>
-              </div>
-              <div class="cf-doc-status-badge ${isUploaded ? 'status-uploaded' : 'status-pending'}">
-                ${isUploaded ? 'Uploaded' : 'Action Required'}
-              </div>
-            </div>
-            <div class="cf-doc-card-body">
-              <h3 class="cf-doc-title">${escapeHtml(item.title)}</h3>
-              <p class="cf-doc-desc">${escapeHtml(item.desc || '')}</p>
-              ${isUploaded ? `
-                <div class="cf-doc-file-info">
-                  <div class="cf-doc-filename" title="${escapeHtml(doc.file_name)}"><span>${escapeHtml(doc.file_name)}</span></div>
-                  <div class="cf-doc-meta"><span>${formatBytes(doc.file_size)}</span> &bull; <span>${formatDateTime(doc.updated_at || doc.created_at)}</span></div>
+          <div class="cf-artifact-card ${isComplete ? 'is-complete uploaded' : 'pending'}" data-item-key="${escapeHtml(item.key)}" id="card-artifact-${escapeHtml(item.key)}">
+            <div class="cf-card-main-content">
+              <span class="cf-card-num">#${item.num}</span>
+              <div class="cf-card-header-info">
+                <div class="cf-card-title-row">
+                  <span class="cf-card-title">${escapeHtml(item.title)}</span>
+                  ${statusBadgeHtml}
+                  ${sectionBadgeHtml}
                 </div>
-              ` : `<div class="cf-doc-empty-placeholder"><span>Awaiting PDF upload (.pdf)</span></div>`}
+                ${item.desc ? `<p class="cf-card-desc" style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">${escapeHtml(item.desc)}</p>` : ''}
+                ${statusBoxHtml}
+              </div>
             </div>
-            <div class="cf-doc-card-footer">
-              ${isUploaded ? `
-                <div class="btn-group-row">
-                  <button type="button" class="btn btn-sm btn-outline" onclick="openPreviewModal('${escapeHtml(doc.file_path)}', '${escapeHtml(item.title).replace(/'/g, "\\'")}', '${escapeHtml(doc.file_name).replace(/'/g, "\\'")}')">View</button>
-                  <a href="${escapeHtml(doc.file_path)}" download="${escapeHtml(doc.file_name)}" class="btn btn-sm btn-outline">Download</a>
-                  <button type="button" class="btn btn-sm btn-secondary" onclick="openUploadModal('${escapeHtml(item.key)}', '${escapeHtml(item.title).replace(/'/g, "\\'")}', true)">Replace</button>
-                  <button type="button" class="btn btn-sm btn-danger-ghost" onclick="openDeleteModal('${escapeHtml(item.key)}', '${escapeHtml(item.title).replace(/'/g, "\\'")}')">Delete</button>
-                </div>
-              ` : `
-                <button type="button" class="btn btn-sm btn-primary btn-block" onclick="openUploadModal('${escapeHtml(item.key)}', '${escapeHtml(item.title).replace(/'/g, "\\'")}', false)">Upload PDF</button>
-              `}
+            <div class="cf-card-actions">
+              ${actionsHtml}
             </div>
-          </article>
+          </div>
         `;
       }).join('');
     }
@@ -492,12 +614,23 @@
       }
     };
 
+    // Backward-compatibility aliases
+    window.openDirectUploadModal = function (itemKey, itemTitle) {
+      window.openUploadModal(itemKey, itemTitle, false);
+    };
+    window.previewDocument = function (filePath, title, fileName) {
+      window.openPreviewModal(filePath, title, fileName);
+    };
+    window.deleteUploadedDocument = function (itemKey, itemTitle) {
+      window.openDeleteModal(itemKey, itemTitle);
+    };
+
     if (printFnName) {
       window[printFnName] = function () { window.print(); };
     }
   }
 
-  
+
   function mountClassDeliveryDossier(cfg) {
     const prefix = cfg.prefix; // 'tc' or 'lc'
     const apiBase = cfg.apiBase; // '/theory-classes' or '/lab-classes'
@@ -532,9 +665,9 @@
         );
 
         const params = new URLSearchParams(window.location.search);
-        const urlGroupId = params.get('group_id') || params.get('id');
-        const urlSubjectId = params.get('subject_id');
-        const urlRegisterId = params.get('register_id');
+        const urlGroupId = params.get('group_id') || params.get('groupId') || params.get('class_id') || params.get('classId') || params.get('id');
+        const urlSubjectId = params.get('subject_id') || params.get('subjectId');
+        const urlRegisterId = params.get('register_id') || params.get('registerId');
 
         if (urlGroupId) state.currentGroupId = parseInt(urlGroupId, 10);
         if (urlSubjectId) state.currentSubjectId = parseInt(urlSubjectId, 10);
@@ -557,7 +690,7 @@
             state.currentGroupId = g.id;
             state.currentRegisterId = g.register_id || null;
           }
-        } catch (_) {}
+        } catch (_) { }
       }
       if (!state.currentGroupId && !state.currentSubjectId) return;
 
@@ -600,8 +733,8 @@
         statusBadge.innerText = (rec.status || 'IN_PROGRESS').replace(/_/g, ' ');
         statusBadge.className = 'badge ' + (
           rec.status === 'APPROVED' ? 'badge-present' :
-          rec.status === 'REVISION_REQUESTED' ? 'badge-absent' :
-          rec.status === 'AUDITED' ? 'badge-late' : 'badge-sem'
+            rec.status === 'REVISION_REQUESTED' ? 'badge-absent' :
+              rec.status === 'AUDITED' ? 'badge-late' : 'badge-sem'
         );
       }
 
@@ -675,8 +808,8 @@
         const statusBadgeHtml = doc
           ? `<span class="badge badge-present" style="font-size:0.7rem;">Uploaded (${formatBytes(doc.file_size)})</span>`
           : (hasSystemData
-              ? `<span class="badge badge-sem" style="font-size:0.7rem;">Live DB Synced</span>`
-              : `<span class="badge badge-late" style="font-size:0.7rem;">Action Required</span>`);
+            ? `<span class="badge badge-sem" style="font-size:0.7rem;">Live DB Synced</span>`
+            : `<span class="badge badge-late" style="font-size:0.7rem;">Action Required</span>`);
 
         const docInfoHtml = doc ? `
           <div class="cf-card-status-box">

@@ -207,7 +207,7 @@ function switchStudentTab(tabName) {
     const url = new URL(window.location.href);
     url.searchParams.set('tab', tabName);
     window.history.replaceState({}, '', url.toString());
-  } catch (_) {}
+  } catch (_) { }
 
   // Scroll smoothly to top of workspace
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -634,7 +634,7 @@ function renderPcWorkCard(item) {
   const statusLabel = isSubmitted ? 'Handed in' : 'Assigned';
   const statusClass = isSubmitted ? 'pc-status-label is-submitted' : 'pc-status-label';
 
-  const dueDateStr = item.due_date 
+  const dueDateStr = item.due_date
     ? new Date(item.due_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ', ' + new Date(item.due_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
     : 'No due date';
 
@@ -830,7 +830,7 @@ function openStudentWorkDetails(item, itemKind) {
   const isSubmitted = Boolean(sub && sub.is_submitted);
 
   // Formatted Date strings
-  const dueStr = item.due_date 
+  const dueStr = item.due_date
     ? new Date(item.due_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ', ' + new Date(item.due_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
     : 'No due date';
   const mDueStr = item.due_date
@@ -1178,7 +1178,7 @@ async function loadSubjectAttendance() {
       // Find matching group or code
       const code = (S.group?.subject_code || '').toUpperCase();
       const match = subRes.data.find(s => Number(s.group_id) === Number(S.groupId)) ||
-                    subRes.data.find(s => (s.subject_code || '').toUpperCase() === code);
+        subRes.data.find(s => (s.subject_code || '').toUpperCase() === code);
       S.attendanceSubject = match || null;
       renderAttendanceTelemetry();
     }
@@ -1432,14 +1432,14 @@ function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'light';
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  try { localStorage.setItem('theme', next); } catch (_) {}
+  try { localStorage.setItem('theme', next); } catch (_) { }
 }
 
 function initThemeState() {
   try {
     const saved = localStorage.getItem('theme');
     if (saved) document.documentElement.setAttribute('data-theme', saved);
-  } catch (_) {}
+  } catch (_) { }
 }
 
 function initOutsideClickListeners() {

@@ -98,11 +98,14 @@
       const res = await api('/hod/trash/students');
       if (res && res.success && Array.isArray(res.data)) {
         trashStudents = res.data;
-        updateCounts();
-        if (currentYearFilter === 'TRASH') renderTable();
+      } else {
+        trashStudents = [];
       }
-    } catch (err) {
-      console.warn('[Students] Trash check error:', err.message);
+      updateCounts();
+      if (currentYearFilter === 'TRASH') renderTable();
+    } catch (_) {
+      trashStudents = [];
+      updateCounts();
     }
   }
 

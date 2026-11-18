@@ -6,6 +6,10 @@
  */
 
 /* ── 1. Top Navigation Bar with Safe Area Support ── */
+#faculty-header-mount {
+  display: contents !important;
+}
+
 .faculty-top-header,
 #faculty-header,
 .gc-navbar.admin-top-header,
@@ -19,7 +23,7 @@
   justify-content: space-between !important;
   padding: 0 1.25rem !important;
   box-sizing: border-box !important;
-  position: sticky !important;
+  position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
@@ -32,12 +36,13 @@
 }
 
 @media (max-width: 768px) {
+
   .faculty-top-header,
   #faculty-header,
   .gc-navbar.admin-top-header,
   .admin-top-header {
-    height: calc(56px + max(36px, env(safe-area-inset-top, 0px))) !important;
-    padding-top: max(36px, env(safe-area-inset-top, 0px)) !important;
+    height: calc(58px + max(42px, env(safe-area-inset-top, 0px))) !important;
+    padding-top: max(42px, env(safe-area-inset-top, 0px)) !important;
     padding-bottom: 0.35rem !important;
     padding-left: max(0.85rem, env(safe-area-inset-left, 0px)) !important;
     padding-right: max(0.85rem, env(safe-area-inset-right, 0px)) !important;
@@ -266,8 +271,15 @@
 }
 
 @keyframes headerSlideIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Profile Dropdown Specifics */
@@ -478,6 +490,7 @@
 
 /* ── 5. Responsive Mobile (<= 768px) ── */
 @media (max-width: 768px) {
+
   .faculty-top-header,
   #faculty-header,
   .gc-navbar.admin-top-header,

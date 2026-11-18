@@ -9,10 +9,18 @@
   'use strict';
 
   // 1. Auth Guard
+  const curUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const curRoles = curUser && Array.isArray(curUser.roles) ? curUser.roles : [];
+  const isSysAdmin = curRoles.includes('SYSTEM_ADMIN') || curRoles.includes('ADMIN') || curUser?.role === 'SYSTEM_ADMIN' || curUser?.role === 'ADMIN' || Boolean(curUser?.is_admin);
+  if (isSysAdmin) {
+    window.location.replace('/admin/dashboard/index.html');
+    return;
+  }
+
   if (typeof requireFacultyAuth === 'function') {
-    requireFacultyAuth(['TEACHER', 'HOD', 'SYSTEM_ADMIN']);
+    requireFacultyAuth(['TEACHER', 'HOD']);
   } else if (typeof guardRoute === 'function') {
-    guardRoute({ roles: ['TEACHER', 'HOD', 'SYSTEM_ADMIN'] });
+    guardRoute({ roles: ['TEACHER', 'HOD'] });
   }
 
   const DEFAULTS = {
