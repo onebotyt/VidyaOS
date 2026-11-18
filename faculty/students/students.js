@@ -430,8 +430,8 @@
         </td>
         <td style="text-align: right;">
           <div class="stu-actions-cell" style="gap: 0.35rem;">
-            <button type="button" class="btn-stu-compact" style="padding: 0.25rem 0.55rem; font-size: 0.74rem;" onclick="approveStudentRequest(${req.id})">Approve</button>
-            <button type="button" class="btn-kebab" style="color: var(--status-absent);" title="Reject" onclick="rejectStudentRequest(${req.id})">&times;</button>
+            <button type="button" class="btn-stu-compact" style="padding: 0.25rem 0.55rem; font-size: 0.74rem;" onclick="approveStudentRequest(${req.id}, '${esc(req.official_enrollment_no || '')}', this)">Approve</button>
+            <button type="button" class="btn-kebab" style="color: var(--status-absent);" title="Reject" onclick="rejectStudentRequest(${req.id}, this)">&times;</button>
           </div>
         </td>
       </tr>
@@ -925,28 +925,54 @@
     }
   }
 
-  async function approveStudentRequest(id) {
+  async function approveStudentRequest(id, officialEnrollmentNo, btnEl) {
+    if (btnEl) {
+      btnEl.disabled = true;
+      btnEl.textContent = 'Approving...';
+    }
     try {
-      const res = await api(`/hod/registrations/student/${id}/approve`, { method: 'POST' });
+      const payload = officialEnrollmentNo ? { official_enrollment_no: officialEnrollmentNo } : {};
+      const res = await api(`/hod/registrations/student/${id}/approve`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
       if (res && res.success) {
         notify('Student enrollment approved!', 'success');
-        loadStudentsRoster();
-        loadPendingStudents();
-      } else throw new Error(res?.error?.message || 'Approval failed');
+        await Promise.all([loadStudentsRoster(), loadPendingStudents()]);
+      } else {
+        throw new Error(res?.error?.message || 'Approval failed');
+      }
     } catch (err) {
       notify(err.message, 'error');
+      if (btnEl) {
+        btnEl.disabled = false;
+        btnEl.textContent = 'Approve';
+      }
     }
   }
 
-  async function rejectStudentRequest(id) {
+  async function rejectStudentRequest(id, btnEl) {
+    const reason = prompt('Please enter rejection reason (optional):', 'Criteria not met');
+    if (reason === null) return;
+    if (btnEl) {
+      btnEl.disabled = true;
+    }
     try {
-      const res = await api(`/hod/registrations/student/${id}/reject`, { method: 'POST' });
+      const res = await api(`/hod/registrations/student/${id}/reject`, {
+        method: 'POST',
+        body: JSON.stringify({ rejection_reason: reason })
+      });
       if (res && res.success) {
         notify('Student enrollment declined', 'info');
         loadPendingStudents();
-      } else throw new Error(res?.error?.message || 'Rejection failed');
+      } else {
+        throw new Error(res?.error?.message || 'Rejection failed');
+      }
     } catch (err) {
       notify(err.message, 'error');
+      if (btnEl) {
+        btnEl.disabled = false;
+      }
     }
   }
 
