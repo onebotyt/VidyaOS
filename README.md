@@ -387,6 +387,14 @@ npm run dev
 
 ---
 
+## 👥 Contributors & Collaboration
+
+- **Lead Architect**: `@onebotyt`
+- **Mobile Development**: `@onebotyt-mobile` (Termux Android Native Workspace)
+- **Contributors**: `@AkashK-Repo`
+
+---
+
 <div align="center">
   <p>© 2026 VidyaOS — Institutional Campus Operating System</p>
   <p><em>Frontend Portal · Decoupled · Zero Build Step · Instant Vercel Deploy</em></p>
