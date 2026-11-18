@@ -1046,10 +1046,17 @@
       return;
     }
 
+    const defaultSem = students[0]?.semester || 1;
+    const defaultYear = students[0]?.year || Math.ceil(defaultSem / 2);
+
     try {
       const res = await api('/hod/students/bulk', {
         method: 'POST',
-        body: JSON.stringify({ students })
+        body: JSON.stringify({
+          year: defaultYear,
+          semester: defaultSem,
+          students
+        })
       });
       if (res && res.success) {
         notify(`Successfully imported ${students.length} students!`, 'success');
