@@ -10,14 +10,14 @@
 #faculty-header,
 .gc-navbar.admin-top-header,
 .admin-top-header {
-  height: calc(60px + env(safe-area-inset-top, 0px)) !important;
+  height: 60px !important;
   min-height: 60px !important;
   background: var(--bg-card) !important;
   border-bottom: 1px solid var(--border-color) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: env(safe-area-inset-top, 0px) 1.25rem 0 !important;
+  padding: 0 1.25rem !important;
   box-sizing: border-box !important;
   position: sticky !important;
   top: 0 !important;
@@ -36,8 +36,14 @@
   #faculty-header,
   .gc-navbar.admin-top-header,
   .admin-top-header {
-    height: calc(58px + env(safe-area-inset-top, 0px)) !important;
-    padding: env(safe-area-inset-top, 0px) max(0.85rem, env(safe-area-inset-right, 0px)) 0 max(0.85rem, env(safe-area-inset-left, 0px)) !important;
+    height: calc(56px + max(36px, env(safe-area-inset-top, 0px))) !important;
+    padding-top: max(36px, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 0.35rem !important;
+    padding-left: max(0.85rem, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(0.85rem, env(safe-area-inset-right, 0px)) !important;
+    background: var(--bg-surface) !important;
+    border-bottom: 1.5px solid var(--border-color) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07) !important;
   }
 }
 

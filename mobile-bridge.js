@@ -85,6 +85,20 @@
   // 4. In-App Auto-Update Checker
   async function checkForAppUpdates() {
     try {
+      // Strictly restrict update checks and banner notifications to native Android APK
+      // Never show mobile update banner on desktop web browser
+      const isRealNativeApp = (
+        typeof window !== 'undefined' && (
+          Boolean(window.Capacitor?.isNativePlatform?.()) ||
+          window.location.protocol === 'capacitor:' ||
+          window.location.protocol === 'file:' ||
+          window.VIDYAOS_FORCE_NATIVE === true
+        )
+      );
+      if (!isRealNativeApp) {
+        return;
+      }
+
       const currentVersion = window.VIDYAOS_APP_VERSION || '1.0.0';
       const res = await fetch(GITHUB_VERSION_URL + '?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) return;

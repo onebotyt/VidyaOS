@@ -57,7 +57,7 @@ function purgeAllStoredAuth() {
     const u = JSON.parse(localStorage.getItem('user') || localStorage.getItem('currentUser') || 'null');
     if (!u) return;
     const roles = u.roles || [];
-    if (roles.includes('SYSTEM_ADMIN')) { window.location.replace('/admin/academic-structure/index.html'); return; }
+    if (roles.includes('SYSTEM_ADMIN')) { window.location.replace('/admin/dashboard/index.html'); return; }
     if (roles.includes('STUDENT')) { window.location.replace('/student/dashboard/index.html'); return; }
     const isMobile = window.innerWidth <= 768;
     const isHod = roles.includes('HOD') || Boolean(u.is_hod);
@@ -218,7 +218,7 @@ function getVidyaDeviceId() {
 /* ── Post-login redirect ── */
 function redirectAfterLogin(user) {
   const roles = user.roles || [];
-  if (roles.includes('SYSTEM_ADMIN')) { window.location.href = '/admin/academic-structure/index.html'; return; }
+  if (roles.includes('SYSTEM_ADMIN')) { window.location.href = '/admin/dashboard/index.html'; return; }
   if (roles.includes('STUDENT')) { window.location.href = '/student/dashboard/index.html'; return; }
   const isMobile = window.innerWidth <= 768;
   const isHod = roles.includes('HOD') || Boolean(user.is_hod);
@@ -393,6 +393,24 @@ document.getElementById('activation-form').addEventListener('submit', async (e) 
 
 /* ── Google OAuth ── */
 async function handleGoogleSignIn() {
+  const isNative = (
+    typeof window !== 'undefined' && (
+      Boolean(window.Capacitor?.isNativePlatform?.()) ||
+      window.location.protocol === 'capacitor:' ||
+      window.location.protocol === 'file:' ||
+      window.VIDYAOS_FORCE_NATIVE === true
+    )
+  );
+
+  if (isNative) {
+    if (typeof showToast === 'function') {
+      showToast('Google Sign-In is available via the Web Portal. On mobile, please log in with your email and password.', 'info');
+    } else {
+      alert('Google Sign-In is available via the Web Portal. On mobile, please log in with your email and password.');
+    }
+    return;
+  }
+
   const btn = document.getElementById('google-signin-btn');
   const txt = document.getElementById('google-btn-text');
   btn.disabled = true;

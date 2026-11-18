@@ -104,7 +104,8 @@ const STATIC_REWRITES = [
   [/^\/student\/timetable\/?$/,         '/student/timetable/index.html'],
   [/^\/student\/leave\/?$/,             '/student/leave/index.html'],
   [/^\/student\/profile\/?$/,           '/student/profile/index.html'],
-  [/^\/student\/group-detail\/?$/,      '/student/group-detail/index.html'],
+  [/^\/faculty\/group[ -]detail(\/index\.html)?\/?$/, '/faculty/group-detail/index.html'],
+  [/^\/student\/group[ -]detail(\/index\.html)?\/?$/, '/student/group-detail/index.html'],
 
   // Generic section/:page pattern
   [/^\/(admin|faculty|student)\/([a-zA-Z0-9_-]+)\/?$/, '/$1/$2/index.html'],
@@ -174,7 +175,10 @@ function proxyToBackend(req, res) {
 // ─── Main request handler ─────────────────────────────────────────────────────
 const server = http.createServer((req, res) => {
   const parsed = url.parse(req.url);
-  const reqPath = parsed.pathname;
+  let reqPath = parsed.pathname;
+  try {
+    reqPath = decodeURIComponent(reqPath);
+  } catch (_) {}
   const query   = parsed.query || '';
 
   // 1. Proxy API and uploads to backend

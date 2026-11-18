@@ -353,12 +353,12 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: calc(var(--student-bottom-bar-height, 64px) + env(safe-area-inset-bottom, 0px));
-  background-color: var(--bg-card);
-  border-top: 1px solid var(--border-color);
+  height: calc(var(--student-bottom-bar-height, 64px) + max(16px, env(safe-area-inset-bottom, 0px)));
+  background-color: var(--bg-surface);
+  border-top: 1.5px solid var(--border-color);
   z-index: 999;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  box-shadow: 0 -3px 14px rgba(0, 0, 0, 0.06);
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.08);
 }
 
 @media (max-width: 768px) {

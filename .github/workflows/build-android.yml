@@ -51,24 +51,7 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "TAG_NAME=v${VERSION}" >> $GITHUB_ENV
           echo "BUILD_NUM=${BUILD_NUM}" >> $GITHUB_ENV
-
-          # 1. Update app-version.json for In-App OTA Updates
-          cat <<EOF > app-version.json
-          {
-            "version": "${VERSION}",
-            "buildNumber": ${BUILD_NUM},
-            "releaseDate": "$(date -u +'%Y-%m-%d')",
-            "appName": "VidyaOS",
-            "apkUrl": "https://github.com/${{ github.repository }}/releases/latest/download/VidyaOS.apk",
-            "releaseNotes": "Automated build ${VERSION} with instant cloud sync and mobile attendance studio."
-          }
-          EOF
-
-          # 2. Update package.json version
-          node -e "const pkg = require('./package.json'); pkg.version = '${VERSION}'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
-
-          # 3. Update Android Gradle versionCode and versionName
-          node -e "const fs = require('fs'); let g = fs.readFileSync('android/app/build.gradle', 'utf8'); g = g.replace(/versionCode \d+/, 'versionCode ${BUILD_NUM}').replace(/versionName \".*?\"/, 'versionName \"${VERSION}\"'); fs.writeFileSync('android/app/build.gradle', g);"
+          node scripts/bump-version.js "${BUILD_NUM}"
 
       - name: Install Node Dependencies
         run: npm install

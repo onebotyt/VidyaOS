@@ -11,14 +11,14 @@
   top: 0;
   left: 0;
   right: 0;
-  height: calc(var(--student-nav-height, 60px) + env(safe-area-inset-top, 0px));
+  height: var(--student-nav-height, 60px);
   min-height: 60px;
   background-color: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: env(safe-area-inset-top, 0px) 1rem 0;
+  padding: 0 1rem;
   box-sizing: border-box;
   z-index: 1000;
   box-shadow: var(--shadow-sm);
@@ -27,8 +27,14 @@
 
 @media (max-width: 768px) {
   .gc-navbar, .student-top-navbar {
-    height: calc(58px + env(safe-area-inset-top, 0px));
-    padding: env(safe-area-inset-top, 0px) max(0.85rem, env(safe-area-inset-right, 0px)) 0 max(0.85rem, env(safe-area-inset-left, 0px));
+    height: calc(56px + max(36px, env(safe-area-inset-top, 0px))) !important;
+    padding-top: max(36px, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 0.35rem !important;
+    padding-left: max(0.85rem, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(0.85rem, env(safe-area-inset-right, 0px)) !important;
+    background: var(--bg-surface) !important;
+    border-bottom: 1.5px solid var(--border-color) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07) !important;
   }
 }
 
