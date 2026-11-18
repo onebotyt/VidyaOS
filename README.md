@@ -389,9 +389,47 @@ npm run dev
 
 ## 👥 Contributors & Collaboration
 
-- **Lead Architect**: `@onebotyt`
-- **Mobile Development**: `@onebotyt-mobile` (Termux Android Native Workspace)
-- **Contributors**: `@AkashK-Repo`
+- **Lead Architect (Dev 1)**: `@onebotyt`
+- **Frontend Contributor (Dev 2)**: `@AkashK-Repo`
+- **Mobile Development (Dev 3)**: `@onebotyt-mobile` (Termux Android Native Workspace)
+
+---
+
+## 🚀 3-Developer Git Collaboration Guide
+
+To prevent merge collisions when 3 developers work on the same repository concurrently:
+
+### 1. Always Pull Before Starting Work
+```bash
+git pull --rebase origin main
+```
+
+### 2. Work on Isolated Feature Branches
+Do **not** commit directly to `main`. Create a scoped branch for your task:
+```bash
+# Developer 2 (Frontend Features)
+git checkout -b dev2/<feature-name>
+
+# Developer 3 (Mobile & Native App)
+git checkout -b dev3/<mobile-feature-name>
+
+# General Feature
+git checkout -b feature/<feature-name>
+```
+
+### 3. Push Feature Branch & Open a PR
+```bash
+git add -A
+git commit -m "feat(scope): concise description of changes"
+git push -u origin dev2/<feature-name>
+```
+Open a Pull Request on GitHub to review and merge into `main`.
+
+### 4. Branch Rules & Invariants
+- 🚫 **Never force push (`git push --force`) to `main`**.
+- 🎨 **Theme Tokens**: Use CSS variables (`var(--bg-primary)`, `var(--text-primary)`). Do not write hardcoded hex `#fff` colors.
+- 📱 **Mobile Safe Area**: Maintain safe insets (`env(safe-area-inset-top)`) for Android notch clearance.
+- 🔄 **Rebase Before Merge**: If `main` has progressed, run `git pull --rebase origin main` on your branch to resolve conflicts cleanly before opening or merging a PR.
 
 ---
 
