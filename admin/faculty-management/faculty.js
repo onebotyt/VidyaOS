@@ -538,6 +538,10 @@ try {
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             <span>Reset Password</span>
                           </button>
+                          <button type="button" class="fac-kebab-item primary" onclick="openAssignHodForTeacher(${f.teacher_id}, '${escHtml(f.full_name)}', ${f.department_id || 'null'}, '${escHtml(f.department_name || '')}'); closeAllKebabMenus();">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+                            <span>Assign HOD</span>
+                          </button>
                           <div class="fac-kebab-divider"></div>
                           <button type="button" class="fac-kebab-item ${f.status === 'ACTIVE' ? 'warning' : 'primary'}" onclick="openSuspendSafetyModal(${f.teacher_id}, '${escHtml(f.full_name)}', '${f.status}'); closeAllKebabMenus();">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
@@ -601,6 +605,10 @@ try {
                   <button type="button" class="fac-kebab-item" onclick="openResetFacultyPasswordModal(${f.teacher_id}, '${escHtml(f.full_name)}', '${escHtml(f.gmail)}'); closeAllKebabMenus();">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     <span>Reset Password</span>
+                  </button>
+                  <button type="button" class="fac-kebab-item primary" onclick="openAssignHodForTeacher(${f.teacher_id}, '${escHtml(f.full_name)}', ${f.department_id || 'null'}, '${escHtml(f.department_name || '')}'); closeAllKebabMenus();">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+                    <span>Assign HOD</span>
                   </button>
                   <div class="fac-kebab-divider"></div>
                   <button type="button" class="fac-kebab-item ${f.status === 'ACTIVE' ? 'warning' : 'primary'}" onclick="openSuspendSafetyModal(${f.teacher_id}, '${escHtml(f.full_name)}', '${f.status}'); closeAllKebabMenus();">
@@ -2668,6 +2676,256 @@ try {
       }
     }
     window.submitRemoveSafetyConfirm = submitRemoveSafetyConfirm;
+
+    // ─── HOD ASSIGNMENT MODALS & FLOWS (SEARCH & TYPED CONFIRMATION) ───────────
+    let assignHodTarget = { teacherId: null, name: '', deptId: null, deptName: '' };
+    let selectedHodSearchCandidate = null;
+
+    function populateHodTargetDeptDropdown(selectedDeptId) {
+      const select = document.getElementById('hod-target-department');
+      if (!select) return;
+      select.innerHTML = '<option value="">— Choose Academic Department —</option>' + 
+        departments.map(d => `<option value="${d.id}" ${selectedDeptId == d.id ? 'selected' : ''}>${escHtml(d.name)} (${escHtml(d.code)})</option>`).join('');
+    }
+
+    /**
+     * Triggered from 3-dot kebab menu on any faculty card or row
+     */
+    function openAssignHodForTeacher(teacherId, name, deptId, deptName) {
+      // Find candidate in allFacultyList
+      const candidate = allFacultyList.find(f => f.teacher_id === teacherId) || { teacher_id: teacherId, full_name: name, department_id: deptId, department_name: deptName };
+      
+      // If department is known, prefill directly into confirmation modal
+      if (candidate.department_id) {
+        const deptObj = departments.find(d => d.id === candidate.department_id);
+        const resolvedDeptName = deptObj ? deptObj.name : (deptName || 'Department');
+        openAssignHodSafetyModal(candidate.teacher_id, candidate.full_name, candidate.department_id, resolvedDeptName);
+      } else {
+        // If department is unset, open search modal with this candidate preselected so admin picks department
+        openSearchAssignHodModal();
+        selectHodCandidate(candidate);
+      }
+    }
+    window.openAssignHodForTeacher = openAssignHodForTeacher;
+
+    /**
+     * Search & Assign HOD Modal logic
+     */
+    function openSearchAssignHodModal() {
+      selectedHodSearchCandidate = null;
+      const input = document.getElementById('hod-search-input');
+      const resultsWrap = document.getElementById('hod-search-results-list');
+      const deptSection = document.getElementById('hod-assign-dept-section');
+      const proceedBtn = document.getElementById('btn-proceed-to-confirm-hod');
+      const errEl = document.getElementById('hod-search-assign-error');
+
+      if (input) input.value = '';
+      if (resultsWrap) {
+        resultsWrap.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 1.5rem;">Type a name, email, employee ID, or phone to search faculty.</div>';
+      }
+      if (deptSection) deptSection.style.display = 'none';
+      if (proceedBtn) proceedBtn.style.display = 'none';
+      if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
+      populateHodTargetDeptDropdown(null);
+      showModal('search-assign-hod-modal');
+      setTimeout(() => input && input.focus(), 100);
+    }
+    window.openSearchAssignHodModal = openSearchAssignHodModal;
+
+    function closeSearchAssignHodModal() {
+      hideModal('search-assign-hod-modal');
+    }
+    window.closeSearchAssignHodModal = closeSearchAssignHodModal;
+
+    let hodSearchTimeout = null;
+    function handleHodLiveSearch() {
+      clearTimeout(hodSearchTimeout);
+      hodSearchTimeout = setTimeout(async () => {
+        const input = document.getElementById('hod-search-input');
+        const query = input ? input.value.trim() : '';
+        const resultsWrap = document.getElementById('hod-search-results-list');
+        if (!resultsWrap) return;
+
+        if (query.length < 1) {
+          resultsWrap.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 1.5rem;">Type a name, email, employee ID, or phone to search faculty.</div>';
+          return;
+        }
+
+        try {
+          resultsWrap.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 1rem;">Searching faculty...</div>';
+          const res = await apiFetch(`${API}/admin/faculty/search?search=${encodeURIComponent(query)}`);
+          const list = (res && res.data) ? res.data : [];
+
+          if (!list.length) {
+            resultsWrap.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 1.5rem;">No faculty found matching "' + escHtml(query) + '".</div>';
+            return;
+          }
+
+          resultsWrap.innerHTML = list.map(f => {
+            const initial = (f.full_name || 'F').charAt(0).toUpperCase();
+            const deptText = f.department_name ? `${f.department_name} (${f.department_code})` : 'Cross-Department / Common';
+            const empText = f.employee_id ? `ID: ${f.employee_id}` : 'No EMP ID';
+            const phoneText = f.phone ? ` • 📞 ${f.phone}` : '';
+            const emailText = f.email || '';
+            const isHod = f.is_current_hod ? '<span style="background: rgba(245, 158, 11, 0.15); color: #d97706; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-left: 0.4rem;">Current HOD</span>' : '';
+
+            return `
+              <div class="hod-search-item" onclick="selectHodCandidate(${JSON.stringify(f).replace(/"/g, '&quot;')})">
+                <div class="hod-candidate-details">
+                  <div class="hod-candidate-avatar">${initial}</div>
+                  <div>
+                    <div class="hod-candidate-name">${escHtml(cleanFacultyDisplayName(f.full_name))} ${isHod}</div>
+                    <div class="hod-candidate-meta"><span>${escHtml(deptText)}</span> • <span style="font-family: monospace;">${escHtml(emailText)}</span> • <span>${escHtml(empText)}</span>${escHtml(phoneText)}</div>
+                  </div>
+                </div>
+                <div>
+                  <button type="button" class="btn btn-secondary btn-xs" style="pointer-events: none;">Select</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } catch (err) {
+          resultsWrap.innerHTML = `<div style="text-align: center; color: var(--status-absent); font-size: 0.82rem; padding: 1rem;">Search error: ${escHtml(err.message)}</div>`;
+        }
+      }, 250);
+    }
+    window.handleHodLiveSearch = handleHodLiveSearch;
+
+    function selectHodCandidate(candidate) {
+      selectedHodSearchCandidate = candidate;
+      const deptSection = document.getElementById('hod-assign-dept-section');
+      const cardEl = document.getElementById('selected-hod-candidate-card');
+      const proceedBtn = document.getElementById('btn-proceed-to-confirm-hod');
+
+      if (!deptSection || !cardEl) return;
+
+      const initial = (candidate.full_name || 'F').charAt(0).toUpperCase();
+      const empText = candidate.employee_id ? `EMP ID: ${candidate.employee_id}` : '';
+      const emailText = candidate.email || candidate.gmail || '';
+
+      cardEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.65rem; background: var(--bg-card); padding: 0.65rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <div class="hod-candidate-avatar">${initial}</div>
+          <div style="flex: 1;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main);">${escHtml(cleanFacultyDisplayName(candidate.full_name))}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">${escHtml(emailText)} ${empText ? '• ' + escHtml(empText) : ''}</div>
+          </div>
+        </div>
+      `;
+
+      populateHodTargetDeptDropdown(candidate.department_id);
+      deptSection.style.display = 'block';
+      if (proceedBtn) proceedBtn.style.display = 'inline-flex';
+    }
+    window.selectHodCandidate = selectHodCandidate;
+
+    function proceedToConfirmHodAssignment() {
+      if (!selectedHodSearchCandidate) return;
+      const select = document.getElementById('hod-target-department');
+      const errEl = document.getElementById('hod-search-assign-error');
+      const deptId = select ? select.value : '';
+
+      if (!deptId) {
+        if (errEl) {
+          errEl.textContent = 'Please select a department to assign this faculty as HOD.';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      const deptObj = departments.find(d => d.id == deptId);
+      const deptName = deptObj ? deptObj.name : 'Department';
+
+      closeSearchAssignHodModal();
+      openAssignHodSafetyModal(selectedHodSearchCandidate.teacher_id, selectedHodSearchCandidate.full_name, deptId, deptName);
+    }
+    window.proceedToConfirmHodAssignment = proceedToConfirmHodAssignment;
+
+    /**
+     * Typed Safety Confirmation Modal for HOD Assignment
+     */
+    function openAssignHodSafetyModal(teacherId, name, deptId, deptName) {
+      assignHodTarget = { teacherId, name, deptId, deptName };
+
+      const nameEl = document.getElementById('assign-hod-target-name');
+      const deptEl = document.getElementById('assign-hod-target-dept');
+      const inputEl = document.getElementById('assign-hod-confirm-input');
+      const btn = document.getElementById('btn-confirm-safety-assign-hod');
+      const errEl = document.getElementById('assign-hod-safety-error');
+
+      if (nameEl) nameEl.textContent = name || 'Faculty';
+      if (deptEl) deptEl.textContent = deptName || 'Selected Department';
+      if (inputEl) inputEl.value = '';
+      if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.45';
+        btn.style.cursor = 'not-allowed';
+      }
+
+      showModal('safety-assign-hod-modal');
+      setTimeout(() => inputEl && inputEl.focus(), 100);
+    }
+    window.openAssignHodSafetyModal = openAssignHodSafetyModal;
+
+    function closeAssignHodSafetyModal() {
+      hideModal('safety-assign-hod-modal');
+    }
+    window.closeAssignHodSafetyModal = closeAssignHodSafetyModal;
+
+    function checkAssignHodSafetyInput() {
+      const inputEl = document.getElementById('assign-hod-confirm-input');
+      const btn = document.getElementById('btn-confirm-safety-assign-hod');
+      if (!inputEl || !btn) return;
+      const val = inputEl.value.trim().toUpperCase();
+      if (val === 'CONFIRM') {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.45';
+        btn.style.cursor = 'not-allowed';
+      }
+    }
+    window.checkAssignHodSafetyInput = checkAssignHodSafetyInput;
+
+    async function submitAssignHodSafetyConfirm() {
+      if (!assignHodTarget.teacherId || !assignHodTarget.deptId) return;
+      const btn = document.getElementById('btn-confirm-safety-assign-hod');
+      const errEl = document.getElementById('assign-hod-safety-error');
+      if (errEl) errEl.style.display = 'none';
+
+      try {
+        if (btn) { btn.disabled = true; btn.textContent = 'Appointing HOD...'; }
+        const res = await apiFetch(`${API}/admin/hods/assign-existing`, {
+          method: 'POST',
+          body: JSON.stringify({
+            teacher_id: parseInt(assignHodTarget.teacherId, 10),
+            department_id: parseInt(assignHodTarget.deptId, 10)
+          })
+        });
+
+        if (res && res.success) {
+          closeAssignHodSafetyModal();
+          showToast(res.message || `Successfully appointed ${assignHodTarget.name} as HOD of ${assignHodTarget.deptName}!`, 'success');
+          await loadAllFaculty();
+          await loadHODs();
+        } else {
+          throw new Error(res.message || 'Failed to appoint HOD');
+        }
+      } catch (err) {
+        if (errEl) {
+          errEl.textContent = err.message || 'Error appointing HOD.';
+          errEl.style.display = 'block';
+        }
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Confirm Appointment'; }
+      }
+    }
+    window.submitAssignHodSafetyConfirm = submitAssignHodSafetyConfirm;
 
     // ─── Trash & Restore Handlers (30-day retention) ─────────────
     let trashFacultyList = [];

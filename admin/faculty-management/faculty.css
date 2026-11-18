@@ -35,7 +35,140 @@
 }
 
 
-/* ── 2. STATUS CARD 4 IN ROW (2 ROWS) & ACTION BAR ────────── */
+/* ── 2. HEADLINE & ACTION TOOLBAR ────────────────────────────── */
+.fac-header-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.fac-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.fac-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm, 6px);
+}
+
+.fac-header-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.fac-page-headline {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.fac-page-subtext {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0 0;
+}
+
+.fac-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fac-assign-hod-main-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  color: var(--color-primary, #3b82f6);
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.fac-assign-hod-main-btn:hover {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: var(--color-primary, #3b82f6);
+}
+
+@media (max-width: 768px) {
+  .fac-header-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  .fac-header-right {
+    justify-content: flex-start;
+  }
+}
+
+/* ── Candidate card inside HOD search modal ────────────────────── */
+.hod-search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hod-search-item:hover {
+  border-color: var(--color-primary, #3b82f6);
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.hod-search-item.selected {
+  border-color: var(--color-primary, #3b82f6);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.hod-candidate-details {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.hod-candidate-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-primary, #3b82f6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.hod-candidate-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.hod-candidate-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
 .fac-status-section {
   display: flex;
   flex-direction: column;
