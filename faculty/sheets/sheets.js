@@ -401,10 +401,49 @@ async function switchSheetTab(sheetName, updateUrl = true) {
     window.history.pushState({}, '', url);
   }
 
-  await loadSheetData(sheetName);
+  // Seamlessly switch active Excel worksheet in EXCEL_WB.sheets!
+  let targetIdx = -1;
+  if (Array.isArray(EXCEL_WB.sheets) && EXCEL_WB.sheets.length > 0) {
+    if (sheetName === 'evaluation') {
+      targetIdx = EXCEL_WB.sheets.findIndex(s => s.type === 'evaluation' || (s.name && (s.name.toLowerCase().includes('master') || s.name.toLowerCase().includes('evaluation'))));
+      if (targetIdx === -1) targetIdx = 0;
+    } else if (sheetName === 'tests') {
+      targetIdx = EXCEL_WB.sheets.findIndex(s => s.type === 'tests' || (s.name && s.name.toLowerCase().includes('test')));
+      if (targetIdx === -1 && EXCEL_WB.sheets.length > 1) targetIdx = 1;
+    } else if (sheetName === 'assignments') {
+      targetIdx = EXCEL_WB.sheets.findIndex(s => s.type === 'assignments' || (s.name && s.name.toLowerCase().includes('assignment')));
+      if (targetIdx === -1 && EXCEL_WB.sheets.length > 2) targetIdx = 2;
+    } else if (sheetName === 'practicals') {
+      targetIdx = EXCEL_WB.sheets.findIndex(s => s.type === 'practicals' || (s.name && (s.name.toLowerCase().includes('practical') || s.name.toLowerCase().includes('lab'))));
+      if (targetIdx === -1 && EXCEL_WB.sheets.length > 3) targetIdx = 3;
+    }
+
+    if (targetIdx >= 0 && targetIdx < EXCEL_WB.sheets.length) {
+      EXCEL_WB.activeSheetIndex = targetIdx;
+      renderSheetTabs();
+      renderExcelGrid(true);
+      updateFormulaBarUI();
+    }
+  }
+
+  updateBannerForSheet(sheetName);
   if (S.autoFit) {
     setTimeout(() => fitSheetToScreen(false), 40);
   }
+}
+
+function updateBannerForSheet(sheetType) {
+  const line2 = document.getElementById('hdr-banner-line2');
+  if (!line2) return;
+  const subjName = S.group?.subject_name || S.group?.name || 'Class';
+  const labelMap = {
+    evaluation: 'Master Evaluation Ledger',
+    tests: 'Class Tests & Internal Assessment Marksheet',
+    assignments: 'Coursework & Continuous Assessment Assignments',
+    practicals: 'Practical & Laboratory Examination Records'
+  };
+  const title = labelMap[sheetType] || 'Marks Evaluation Sheet';
+  line2.textContent = `Internal Evaluation - ${title} | Subject : ${subjName}`;
 }
 
 // Purged legacy renderSheetSubToolbar
@@ -4981,34 +5020,38 @@ function renderSubsheetControls() {
 }
 
 function switchPracticalSubsheet(val) {
-  if (val === 'ALL') {
-    switchSheetTab('practicals');
-  } else {
-    switchSheetTab('practicals');
-    showToast(`Viewing Lab Experiment ${val}`, 'info');
-  }
+  switchSheetTab('practicals');
 }
 
 function switchTestSubsheet(val) {
-  if (val === 'ALL') {
-    S.currentTestViewMode = 'ALL';
-    switchSheetTab('tests');
-    loadTestSheetData();
-    showToast('Viewing All Unit Tests Combined Ledger with Total and UT Avg', 'info');
-  } else {
-    S.currentTestViewMode = 'SINGLE';
-    S.currentTestId = Number(val);
-    switchSheetTab('tests');
-    loadTestSheetData();
+  switchSheetTab('tests');
+  if (val && val !== 'ALL') {
+    const sheet = getActiveSheet();
+    if (sheet) {
+      for (let c = 3; c < sheet.colsCount; c++) {
+        const h = String(getCell(sheet, 0, c).v || '');
+        if (h.includes(String(val)) || (S.tests && S.tests.find(t => String(t.id) === String(val) && h.includes(t.title || t.name)))) {
+          selectEntireColumn(c);
+          break;
+        }
+      }
+    }
   }
 }
 
 function switchAssignmentSubsheet(val) {
-  if (val === 'ALL') {
-    switchSheetTab('assignments');
-  } else {
-    switchSheetTab('assignments');
-    showToast(`Viewing Assignment ${val}`, 'info');
+  switchSheetTab('assignments');
+  if (val && val !== 'ALL') {
+    const sheet = getActiveSheet();
+    if (sheet) {
+      for (let c = 3; c < sheet.colsCount; c++) {
+        const h = String(getCell(sheet, 0, c).v || '');
+        if (h.includes(String(val)) || (S.assignments && S.assignments.find(a => String(a.id) === String(val) && h.includes(a.title || a.name)))) {
+          selectEntireColumn(c);
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -7263,6 +7306,30 @@ function renderSheetTabs() {
 function switchWorksheet(idx) {
   if (idx < 0 || idx >= EXCEL_WB.sheets.length) return;
   EXCEL_WB.activeSheetIndex = idx;
+  const sheet = EXCEL_WB.sheets[idx];
+
+  let sheetType = sheet.type;
+  if (!sheetType) {
+    const n = (sheet.name || '').toLowerCase();
+    if (n.includes('test')) sheetType = 'tests';
+    else if (n.includes('assignment')) sheetType = 'assignments';
+    else if (n.includes('practical') || n.includes('lab')) sheetType = 'practicals';
+    else sheetType = 'evaluation';
+  }
+  S.activeSheet = sheetType;
+
+  const dropdown = document.getElementById('sheet-selector-dropdown');
+  if (dropdown && dropdown.value !== sheetType) {
+    dropdown.value = sheetType;
+  }
+
+  const url = new URL(window.location);
+  url.searchParams.set('sheet', sheetType);
+  if (S.groupId) url.searchParams.set('id', S.groupId);
+  window.history.pushState({}, '', url);
+
+  renderSubsheetControls();
+  updateBannerForSheet(sheetType);
   renderSheetTabs();
   renderExcelGrid(true);
   updateFormulaBarUI();

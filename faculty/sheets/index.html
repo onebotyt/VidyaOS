@@ -634,6 +634,17 @@
     <!-- Compatibility Bar for Search & Filters -->
     <div class="studio-bar studio-bar-3 eval-filter-toolbar excel-search-bar" id="studio-bar-3">
       <div style="display:flex;align-items:center;gap:0.35rem;flex-wrap:nowrap;flex:1 1 auto;min-width:0;">
+        <!-- Primary Academic Sheet Switcher (Master Evaluation, Tests, Assignments, Practicals) -->
+        <div class="sheet-select-wrapper" style="display:inline-flex;align-items:center;gap:0.35rem;flex-shrink:0;">
+          <select class="sheet-select-dropdown excel-sheet-select" id="sheet-selector-dropdown" onchange="switchSheetDropdown(this.value)" title="Choose Active Academic Spreadsheet">
+            <option value="evaluation">📋 1. Master Evaluation Sheet</option>
+            <option value="tests">📝 2. Class Test Marksheet</option>
+            <option value="assignments">📚 3. Assignment Marksheet</option>
+            <option value="practicals">🔬 4. Practical &amp; Lab Work Marksheet</option>
+          </select>
+        </div>
+        <div id="subsheet-selector-container" class="subsheet-selector-container"></div>
+
         <div class="eval-search-input-wrap">
           <svg class="eval-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
@@ -655,15 +666,6 @@
         <select class="eval-filter-select" id="sheet-column-focus-select" onchange="onFocusColumnChange(this.value)" title="Jump directly to column">
           <option value="">Column Focus ▾</option>
         </select>
-
-        <!-- Compatibility Dropdown for legacy sheet switcher if needed -->
-        <select class="sheet-select-dropdown" id="sheet-selector-dropdown" onchange="switchSheetDropdown(this.value)" style="display:none;" title="Choose Active Spreadsheet">
-          <option value="evaluation">1. Master Evaluation Sheet</option>
-          <option value="tests">2. Class Test Marksheet</option>
-          <option value="assignments">3. Assignment Marksheet</option>
-          <option value="practicals">4. Practical &amp; Lab Work Marksheet</option>
-        </select>
-        <div id="subsheet-selector-container" class="subsheet-selector-container" style="display:none;"></div>
         <div class="pc-screen-toolbar" id="pc-screen-toolbar" style="display:none;"></div>
       </div>
 
