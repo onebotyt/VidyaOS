@@ -139,15 +139,16 @@
     } catch (_) { }
 
     try {
-      const fetchFn = typeof fetchApi === 'function' ? fetchApi : async (url) => {
+      const fetchFn = typeof fetchApi === 'function' ? fetchApi : async (url, opts = {}) => {
         const token = localStorage.getItem('token') || localStorage.getItem('access_token');
         const res = await fetch(`/api/v1${url}`, {
-          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+          ...opts
         });
         return await res.json();
       };
 
-      const res = await fetchFn('/auth/me');
+      const res = await fetchFn('/auth/me', { suppressToast: true });
       if (res && res.success && res.data) {
         user = res.data;
         localStorage.setItem('user', JSON.stringify(user));
@@ -191,51 +192,66 @@
     const elSubjects = document.getElementById('kpi-total-subjects');
     const elRegisters = document.getElementById('kpi-active-registers');
 
-    const fetchFn = typeof fetchApi === 'function' ? fetchApi : async (url) => {
+    const fetchFn = typeof fetchApi === 'function' ? fetchApi : async (url, opts = {}) => {
       const token = localStorage.getItem('token') || localStorage.getItem('access_token');
       const res = await fetch(`/api/v1${url}`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        ...opts
       });
       return await res.json();
     };
 
-    // Attempt HOD department aggregated metrics
+    let user = {};
     try {
-      const res = await fetchFn('/hod/dashboard');
-      if (res && res.success && res.data) {
-        const counts = res.data.counts || {};
-        if (elFaculty) elFaculty.textContent = counts.teachers ?? 0;
-        if (elStudents) elStudents.textContent = counts.students ?? 0;
-        if (elSubjects) elSubjects.textContent = counts.subjects ?? 0;
-        if (elRegisters) elRegisters.textContent = counts.activeRegisters ?? 0;
+      user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+    } catch (_) {}
 
-        // Sync backward compatibility IDs
-        const syncMap = {
-          'kpi-dept-faculty': counts.teachers ?? 0,
-          'kpi-dept-students': counts.students ?? 0,
-          'kpi-dept-subjects': counts.subjects ?? 0,
-          'kpi-dept-registers': counts.activeRegisters ?? 0,
-          'stat-total-students': counts.students ?? 0,
-          'stat-total-subjects': counts.subjects ?? 0
-        };
-        Object.entries(syncMap).forEach(([id, val]) => {
-          const el = document.getElementById(id);
-          if (el) el.textContent = val;
-        });
+    const isHod = Boolean(
+      user.is_hod === 1 ||
+      user.is_hod === true ||
+      user.role === 'HOD' ||
+      (Array.isArray(user.roles) && user.roles.includes('HOD'))
+    );
 
-        if (res.data.deptInfo?.name) {
-          const deptEl = document.getElementById('dash-dept-name');
-          if (deptEl) deptEl.textContent = res.data.deptInfo.name;
+    // Attempt HOD department aggregated metrics if user is an HOD
+    if (isHod) {
+      try {
+        const res = await fetchFn('/hod/dashboard', { suppressToast: true });
+        if (res && res.success && res.data) {
+          const counts = res.data.counts || {};
+          if (elFaculty) elFaculty.textContent = counts.teachers ?? 0;
+          if (elStudents) elStudents.textContent = counts.students ?? 0;
+          if (elSubjects) elSubjects.textContent = counts.subjects ?? 0;
+          if (elRegisters) elRegisters.textContent = counts.activeRegisters ?? 0;
+
+          // Sync backward compatibility IDs
+          const syncMap = {
+            'kpi-dept-faculty': counts.teachers ?? 0,
+            'kpi-dept-students': counts.students ?? 0,
+            'kpi-dept-subjects': counts.subjects ?? 0,
+            'kpi-dept-registers': counts.activeRegisters ?? 0,
+            'stat-total-students': counts.students ?? 0,
+            'stat-total-subjects': counts.subjects ?? 0
+          };
+          Object.entries(syncMap).forEach(([id, val]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+          });
+
+          if (res.data.deptInfo?.name) {
+            const deptEl = document.getElementById('dash-dept-name');
+            if (deptEl) deptEl.textContent = res.data.deptInfo.name;
+          }
+          return;
         }
-        return;
-      }
-    } catch (_) { }
+      } catch (_) { }
+    }
 
     // Fallback: Teacher Personal Registers and Classes
     try {
       const [regRes, grpRes] = await Promise.allSettled([
-        fetchFn('/faculty/registers'),
-        fetchFn('/teaching-groups?status=ACTIVE')
+        fetchFn('/faculty/registers', { suppressToast: true }),
+        fetchFn('/teaching-groups?status=ACTIVE', { suppressToast: true })
       ]);
 
       let regCount = 0;
@@ -277,7 +293,7 @@
   /**
    * 7. INITIALIZE ON DOM READY
    */
-  function init() {
+  async function init() {
     // If URL has ?tab=classes, redirect cleanly to Classroom page
     const params = new URLSearchParams(window.location.search);
     if (params.get('tab') === 'classes') {
@@ -286,7 +302,7 @@
     }
 
     loadInstitutionBranding();
-    loadUserAndDepartment();
+    await loadUserAndDepartment();
     loadTeachingClassesCount();
     loadDashboardKpis();
   }

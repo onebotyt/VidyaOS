@@ -117,10 +117,22 @@
       }
     });
     document.querySelectorAll('.hero-inst-logo-val, #hero-inst-logo').forEach(el => {
-      if (el.tagName === 'IMG') el.src = logoUrl;
+      if (el.tagName === 'IMG') {
+        el.src = logoUrl;
+        el.onerror = function() {
+          this.onerror = null;
+          this.src = '/images/collegelogo.jpeg';
+        };
+      }
     });
     document.querySelectorAll('.hero-campus-photo-val, #hero-campus-img').forEach(el => {
-      if (el.tagName === 'IMG') el.src = bannerUrl;
+      if (el.tagName === 'IMG') {
+        el.src = bannerUrl;
+        el.onerror = function() {
+          this.onerror = null;
+          this.src = '/images/campus-nainital.jpg';
+        };
+      }
     });
   }
 
