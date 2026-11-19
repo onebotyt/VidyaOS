@@ -399,20 +399,33 @@ async function handleStudentSubmit(e) {
     enrollNo = null;
   } else {
     if (!enrollNo) {
-      if (enrollError) enrollError.textContent = 'Official Enrollment Number is required (or check "Enrollment Number Not Available").';
-      showAlert('Please enter your 11-digit official enrollment number or check "Enrollment Number Not Available".', 'danger');
+      if (enrollError) enrollError.textContent = 'UBTER Enrollment Number is required (or check "Enrollment Number Not Available").';
+      showAlert('Please enter your 11-digit official UBTER enrollment number or check "Enrollment Number Not Available".', 'danger');
       enrollInput?.focus();
       return;
     }
     if (enrollNo.length !== 11 || !/^\d{11}$/.test(enrollNo)) {
-      if (enrollError) enrollError.textContent = 'Official Enrollment Number must be exactly 11 numeric digits.';
-      showAlert('Official Enrollment Number must be exactly 11 numeric digits (0–9).', 'danger');
+      if (enrollError) enrollError.textContent = 'UBTER Enrollment Number must be exactly 11 numeric digits.';
+      showAlert('UBTER Enrollment Number must be exactly 11 numeric digits (0–9).', 'danger');
       enrollInput?.focus();
       return;
     }
   }
 
-  const ubterNo = document.getElementById('stu-ubter')?.value.trim().toUpperCase() || null;
+  const ubterInput = document.getElementById('stu-ubter');
+  const ubterError = document.getElementById('stu-ubter-error');
+  if (ubterError) ubterError.textContent = '';
+  const rawUbter = ubterInput?.value.trim().toUpperCase() || '';
+  let ubterNo = rawUbter || null;
+  if (rawUbter) {
+    if (rawUbter.length > 8) {
+      if (ubterError) ubterError.textContent = 'UBTER Registration number cannot exceed 8 characters.';
+      showAlert('UBTER Registration Number cannot exceed 8 characters/digits.', 'danger');
+      ubterInput?.focus();
+      return;
+    }
+  }
+
   const rollNoInput = rollInput?.value.trim();
   let classRollNo = undefined;
   if (rollNoInput) {
@@ -550,7 +563,7 @@ function showSuccessView(info) {
         stuEnrollInput.placeholder = '11-digit numeric enrollment';
         stuEnrollInput.setAttribute('required', 'required');
         if (stuEnrollReq) stuEnrollReq.style.display = 'inline';
-        if (stuEnrollHint) stuEnrollHint.textContent = 'Enter your 11-digit official enrollment number.';
+        if (stuEnrollHint) stuEnrollHint.textContent = 'Enter your 11-digit official UBTER enrollment number.';
         if (stuEnrollError) stuEnrollError.textContent = '';
       }
     });
@@ -569,11 +582,32 @@ function showSuccessView(info) {
       if (chkEnrollNotAvailable && chkEnrollNotAvailable.checked) return;
       const val = e.target.value.trim();
       if (val && val.length !== 11) {
-        if (stuEnrollError) stuEnrollError.textContent = 'Enrollment number must be exactly 11 numeric digits.';
+        if (stuEnrollError) stuEnrollError.textContent = 'UBTER Enrollment number must be exactly 11 numeric digits.';
         stuEnrollInput.classList.add('has-error');
       } else if (stuEnrollError) {
         stuEnrollError.textContent = '';
         stuEnrollInput.classList.remove('has-error');
+      }
+    });
+  }
+
+  // UBTER Reg number max 8 characters enforcement
+  const stuUbterInput = document.getElementById('stu-ubter');
+  const stuUbterError = document.getElementById('stu-ubter-error');
+  if (stuUbterInput) {
+    stuUbterInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.toUpperCase().slice(0, 8);
+      if (stuUbterError) stuUbterError.textContent = '';
+      stuUbterInput.classList.remove('has-error');
+    });
+    stuUbterInput.addEventListener('blur', (e) => {
+      const val = e.target.value.trim();
+      if (val && val.length > 8) {
+        if (stuUbterError) stuUbterError.textContent = 'UBTER Registration number cannot exceed 8 characters.';
+        stuUbterInput.classList.add('has-error');
+      } else if (stuUbterError) {
+        stuUbterError.textContent = '';
+        stuUbterInput.classList.remove('has-error');
       }
     });
   }

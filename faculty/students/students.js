@@ -306,7 +306,6 @@
                 <a href="#" class="stu-name-cell" onclick="viewStudentDetails(${studentId}); return false;">${esc(name)}</a>
                 ${statusChip}
               </div>
-              ${enrollSub}
             </div>
           </td>
           <td>

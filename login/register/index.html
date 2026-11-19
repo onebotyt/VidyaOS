@@ -112,14 +112,14 @@
           </div>
           <div class="field">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.25rem; margin-bottom:0.35rem;">
-              <label class="lbl" for="stu-enroll" style="margin-bottom:0;">Enrollment No. <span class="req" id="stu-enroll-req">*</span></label>
+              <label class="lbl" for="stu-enroll" style="margin-bottom:0;">UBTER Enrollment No. <span class="req" id="stu-enroll-req">*</span></label>
               <label class="chk-enroll-box">
                 <input type="checkbox" id="chk-enroll-not-available">
                 <span>Enrollment Number Not Available</span>
               </label>
             </div>
             <input type="text" id="stu-enroll" class="inp mono" placeholder="11-digit numeric enrollment" maxlength="11" autocomplete="off" required>
-            <p class="inp-hint" id="stu-enroll-hint">Enter your 11-digit official enrollment number.</p>
+            <p class="inp-hint" id="stu-enroll-hint">Enter your 11-digit official UBTER enrollment number.</p>
             <p class="inp-error" id="stu-enroll-error"></p>
           </div>
         </div>
@@ -127,8 +127,9 @@
         <div class="field-row">
           <div class="field">
             <label class="lbl" for="stu-ubter">UBTER Reg. No. <span class="opt">(optional)</span></label>
-            <input type="text" id="stu-ubter" class="inp mono" placeholder="e.g. R230104001" autocomplete="off" style="text-transform:uppercase;">
-            <p class="inp-hint">Used for sign-in &amp; verification if enrollment no. is not yet issued.</p>
+            <input type="text" id="stu-ubter" class="inp mono" placeholder="e.g. 24101054 (max 8 digits)" maxlength="8" autocomplete="off" style="text-transform:uppercase;">
+            <p class="inp-hint">Used for sign-in &amp; verification if enrollment no. is not yet issued (maximum 8 digits).</p>
+            <p class="inp-error" id="stu-ubter-error"></p>
           </div>
           <div class="field">
             <label class="lbl" for="stu-class-roll-no">Class Roll No. <span class="opt">(optional)</span></label>
