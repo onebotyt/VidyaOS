@@ -4,7 +4,7 @@
    Compact, Zero-Hardcoded-Hex, Full Theme Token Compliance
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Modal Visibility & Transitions (Fix for lack of visual feedback) */
+/* Modal Visibility & Transitions (Fix for lack of visual feedback & overflow bounds) */
 .modal-backdrop.open,
 .modal-backdrop.active,
 .modal-backdrop[style*="display: flex"] {
@@ -12,6 +12,10 @@
   opacity: 1 !important;
   pointer-events: auto !important;
   visibility: visible !important;
+  overflow-y: auto !important;
+  padding: 1.5rem 1rem !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
 }
 
 .modal-backdrop.open .modal-card,
@@ -24,6 +28,9 @@
 .modal-card {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
   transform: scale(0.96) translateY(8px);
+  max-height: calc(100vh - 3.5rem) !important;
+  overflow-y: auto !important;
+  margin: auto !important;
 }
 
 /* Page Header */
@@ -941,5 +948,75 @@
 
 .btn-danger:hover {
   background: var(--status-absent);
-  color: var(--text-light, #ffffff);
+  color: var(--text-light, var(--bg-card));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIVE REMOTE ESP32 SYSTEM LOGS (OVER-THE-INTERNET MONITORING)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.esp-terminal-log-feed {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.75rem 0.95rem;
+  max-height: 280px;
+  overflow-y: auto;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.esp-log-row {
+  display: flex;
+  gap: 0.55rem;
+  align-items: baseline;
+  padding: 0.22rem 0;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.esp-log-row:last-child {
+  border-bottom: none;
+}
+
+.esp-log-time {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.esp-log-tag {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.esp-log-level-badge {
+  font-size: 0.64rem;
+  font-weight: 800;
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.esp-log-level-badge.INFO {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.esp-log-level-badge.WARN {
+  background: var(--status-late-bg);
+  color: var(--status-late);
+}
+
+.esp-log-level-badge.ERROR {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+.esp-log-msg {
+  color: var(--text-main);
+  word-break: break-word;
+  flex: 1;
 }

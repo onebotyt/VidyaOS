@@ -323,6 +323,30 @@
             </div>
           </section>
         </div>
+
+        <!-- Live Remote ESP32 System Logs & Internet Diagnostics -->
+        <section class="card" style="margin-top: 1rem;">
+          <div class="esp-section-header" style="margin-bottom:0.65rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <h3 style="font-size:0.95rem; font-weight:800; margin:0;">Live Remote ESP32 System Logs</h3>
+              <p style="font-size:0.74rem; color:var(--text-muted); margin:0.15rem 0 0 0;">Real-time diagnostics transmitted over the internet from ESP32 nodes (Wi-Fi, AS608, OTA, battery &amp; errors).</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+              <select id="esp-log-level-filter" class="form-select" style="font-size:0.75rem; padding:0.2rem 0.5rem; width:auto;" onchange="loadDeviceRemoteLogs()">
+                <option value="ALL">All Levels</option>
+                <option value="INFO">INFO</option>
+                <option value="WARN">WARN</option>
+                <option value="ERROR">ERROR</option>
+              </select>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadDeviceRemoteLogs()" title="Refresh logs from cloud">&#8635; Refresh</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="clearDeviceRemoteLogs()" title="Clear remote logs">Clear</button>
+              <span class="esp-status-pill online" id="esp-log-status-pill">&#9679; LIVE CLOUD FEED</span>
+            </div>
+          </div>
+          <div id="esp-remote-logs-feed" class="esp-terminal-log-feed">
+            <div style="color:var(--text-muted); font-size:0.76rem; text-align:center; padding:1.5rem;">Connecting to remote ESP32 log stream...</div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -385,15 +409,8 @@
       </div>
 
       <form id="register-esp-form" onsubmit="submitRegisterEspDevice(event)">
-        <div class="form-group">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label class="form-label">Department <span style="color:var(--status-absent);">*</span></label>
-            <span id="esp-dept-locked-badge" style="display:none; font-size:0.72rem; color:var(--text-muted); font-weight:700;">&#128274; Locked to Your Department</span>
-          </div>
-          <select id="esp-dept-input" class="form-select" required>
-            <option value="">Select Department...</option>
-          </select>
-        </div>
+        <!-- Auto-resolved from active department session -->
+        <input type="hidden" id="esp-dept-input" value="">
         <div class="form-group">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <label class="form-label" style="margin-bottom:0;">ESP32 Hardware UID <span
@@ -499,12 +516,14 @@
           <label class="form-label" for="scanned-wifi-ssid">Selected Network SSID <span style="color:var(--status-absent);">*</span></label>
           <input type="text" id="scanned-wifi-ssid" name="esp_selected_wifi_ssid" class="form-control"
             autocomplete="off" autocapitalize="off" spellcheck="false"
+            readonly onfocus="this.removeAttribute('readonly');"
             placeholder="Select a network above or type SSID" required style="font-family:var(--font-family-mono);">
         </div>
         <div class="form-group">
           <label class="form-label" for="scanned-wifi-password">Wi-Fi Password / WPA Key</label>
           <input type="password" id="scanned-wifi-password" name="esp_selected_wifi_key" class="form-control"
             autocomplete="new-password"
+            readonly onfocus="this.removeAttribute('readonly');"
             placeholder="Leave blank if open Wi-Fi network">
         </div>
         <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.85rem;">

@@ -344,6 +344,11 @@ async function loadEsp32Overview(deptIdOverride) {
     if (selectedDeviceId) {
       await loadDeviceWifiNetworks(selectedDeviceId);
     }
+
+    await loadDeviceRemoteLogs();
+    if (!remoteLogsPollingTimer) {
+      remoteLogsPollingTimer = setInterval(loadDeviceRemoteLogs, 4000);
+    }
   } catch (err) {
     console.error('[ESP32 Portal] Failed to load overview:', err);
     renderLoadError(err.message);
@@ -468,6 +473,7 @@ function onSelectActiveDevice(deviceId) {
   setOledSimMode('standby');
   if (selectedDeviceId) {
     loadDeviceWifiNetworks(selectedDeviceId);
+    loadDeviceRemoteLogs();
   }
 }
 
@@ -961,6 +967,64 @@ function renderCommandQueue(commands = []) {
   `).join('');
 }
 
+// ─── Live Remote ESP32 System Logs (Over-The-Internet Cloud Feed) ───────────
+let remoteLogsPollingTimer = null;
+
+async function loadDeviceRemoteLogs() {
+  const targetId = selectedDeviceId || (espOverviewData?.devices && espOverviewData.devices[0]?.id);
+  const feed = document.getElementById('esp-remote-logs-feed');
+  if (!feed) return;
+
+  if (!targetId) {
+    feed.innerHTML = `<div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.76rem;">No active ESP32 terminal selected.</div>`;
+    return;
+  }
+
+  const levelFilter = document.getElementById('esp-log-level-filter')?.value || 'ALL';
+
+  try {
+    const res = await fetchApi(`/devices/hod/${targetId}/logs?level=${encodeURIComponent(levelFilter)}&limit=100`);
+    if (res && res.success && Array.isArray(res.data)) {
+      if (res.data.length === 0) {
+        feed.innerHTML = `<div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.76rem;">No remote logs received yet. ESP32 diagnostics will stream here over the internet automatically.</div>`;
+        return;
+      }
+
+      feed.innerHTML = res.data.map(log => {
+        const timeStr = log.created_at ? new Date(log.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--:--:--';
+        const lvl = (log.log_level || 'INFO').toUpperCase();
+        return `
+          <div class="esp-log-row">
+            <span class="esp-log-time">[${escHtml(timeStr)}]</span>
+            <span class="esp-log-level-badge ${escHtml(lvl)}">${escHtml(lvl)}</span>
+            <span class="esp-log-tag">[${escHtml(log.tag || 'SYS')}]</span>
+            <span class="esp-log-msg">${escHtml(log.message || '')}</span>
+          </div>
+        `;
+      }).join('');
+      feed.scrollTop = feed.scrollHeight;
+    }
+  } catch (err) {
+    console.warn('[ESP32 Portal] Remote log fetch failed:', err.message);
+  }
+}
+
+async function clearDeviceRemoteLogs() {
+  const targetId = selectedDeviceId || (espOverviewData?.devices && espOverviewData.devices[0]?.id);
+  if (!targetId) return;
+  if (!confirm('Clear all remote diagnostic logs for this terminal?')) return;
+
+  try {
+    const res = await fetchApi(`/devices/hod/${targetId}/logs`, { method: 'DELETE' });
+    if (res && res.success) {
+      showToast('Remote logs cleared.', 'info');
+      await loadDeviceRemoteLogs();
+    }
+  } catch (err) {
+    showToast('Failed to clear logs: ' + err.message, 'error');
+  }
+}
+
 // ─── Pair Device Modal & Auto-Detection ────────────────────────────────────
 let espDetectTimer = null;
 let espDetectProgress = 0;
@@ -993,13 +1057,10 @@ function openRegisterDeviceModal() {
     nameInput.value = `${deptName} Biometric Node`;
   }
 
-  // Enforce HOD department lock
-  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-  const isSysAdmin = user && (user.role === 'SYSTEM_ADMIN' || user.role === 'ADMIN');
+  // Auto-populate hidden department input from active session
   const deptInput = document.getElementById('esp-dept-input');
-  if (deptInput && !isSysAdmin && currentDepartmentId) {
-    deptInput.value = String(currentDepartmentId);
-    deptInput.disabled = true;
+  if (deptInput) {
+    deptInput.value = String(currentDepartmentId || espOverviewData?.department?.id || 1);
   }
 
   startEspDetectionScan();
@@ -1158,12 +1219,9 @@ function generateRandomHexSecret() {
 
 async function submitRegisterEspDevice(e) {
   e.preventDefault();
-  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-  const isSysAdmin = user && (user.role === 'SYSTEM_ADMIN' || user.role === 'ADMIN');
-
-  let deptId = document.getElementById('esp-dept-input').value;
-  if (!isSysAdmin && currentDepartmentId) {
-    deptId = currentDepartmentId;
+  let deptId = document.getElementById('esp-dept-input')?.value || currentDepartmentId || espOverviewData?.department?.id;
+  if (!deptId) {
+    deptId = currentDepartmentId || 1;
   }
 
   const uid = document.getElementById('esp-uid-input').value.trim().toUpperCase();
@@ -1172,8 +1230,8 @@ async function submitRegisterEspDevice(e) {
   const sem = document.getElementById('esp-sem-input').value;
   const secret = document.getElementById('esp-secret-input').value.trim();
 
-  if (!deptId || !uid || !name) {
-    showToast('Please fill all required fields.', 'error');
+  if (!uid || !name) {
+    showToast('Please provide device UID and terminal location name.', 'error');
     return;
   }
 
@@ -1374,6 +1432,10 @@ async function triggerScanNearbyWifi(forceRescan = false) {
 
   const modal = document.getElementById('scan-wifi-modal');
   const list = document.getElementById('scanned-wifi-list');
+  const ssidInput = document.getElementById('scanned-wifi-ssid');
+  const passInput = document.getElementById('scanned-wifi-password');
+  if (ssidInput) ssidInput.value = '';
+  if (passInput) passInput.value = '';
   if (modal) {
     modal.classList.add('open');
     modal.style.display = 'flex';
@@ -1741,5 +1803,7 @@ window.closeOtaUpdateModal = closeOtaUpdateModal;
 window.onOtaSourceChange = onOtaSourceChange;
 window.submitOtaUpdate = submitOtaUpdate;
 window.setOledSimMode = setOledSimMode;
+window.loadDeviceRemoteLogs = loadDeviceRemoteLogs;
+window.clearDeviceRemoteLogs = clearDeviceRemoteLogs;
 
 document.addEventListener('DOMContentLoaded', loadEsp32Overview);
