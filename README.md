@@ -389,15 +389,16 @@ npm run dev
 
 ## 👥 Contributors & Collaboration
 
-- **Lead Architect (Dev 1)**: `@onebotyt`
-- **Frontend Contributor (Dev 2)**: `@AkashK-Repo`
-- **Mobile Development (Dev 3)**: `@onebotyt-mobile` (Termux Android Native Workspace)
+- **Lead Architect (Dev 1)**: [@onebotyt](https://github.com/onebotyt)
+- **Frontend Contributor (Dev 2)**: [@AkashK-Repo](https://github.com/AkashK-Repo)
+- **Mobile Development (Dev 3)**: [@onebotyt-mobile](https://github.com/onebotyt-mobile) (Termux Android Native Workspace)
+- **Contributor (Dev 4)**: [@Surendra-singh885](https://github.com/Surendra-singh885)
 
 ---
 
-## 🚀 3-Developer Git Collaboration Guide
+## 🚀 4-Developer Git Collaboration Guide
 
-To prevent merge collisions when 3 developers work on the same repository concurrently:
+To prevent merge collisions when developers work on the same repository concurrently:
 
 ### 1. Always Pull Before Starting Work
 ```bash
@@ -412,6 +413,9 @@ git checkout -b dev2/<feature-name>
 
 # Developer 3 (Mobile & Native App)
 git checkout -b dev3/<mobile-feature-name>
+
+# Developer 4 (Features & Integrations)
+git checkout -b dev4/<feature-name>
 
 # General Feature
 git checkout -b feature/<feature-name>
