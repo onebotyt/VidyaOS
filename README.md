@@ -391,7 +391,7 @@ npm run dev
 
 - **Lead Architect (Dev 1)**: [@onebotyt](https://github.com/onebotyt)
 - **Frontend Contributor (Dev 2)**: [@AkashK-Repo](https://github.com/AkashK-Repo)
-- **Mobile Development (Dev 3)**: [@onebotyt-mobile](https://github.com/onebotyt-mobile) (Termux Android Native Workspace)
+- **Full-Stack & Mobile Contributor (Dev 3)**: [@onebotyt-mobile](https://github.com/onebotyt-mobile) (Mobile Antigravity CLI / Termux Workspace & Full-Stack Development)
 - **Contributor (Dev 4)**: [@Surendra-singh885](https://github.com/Surendra-singh885)
 
 ---
