@@ -40,6 +40,15 @@
     return clean.slice(0, 2).toUpperCase() || 'ST';
   }
 
+  function formatEnrollmentDisplay(val, status, isHtml = true) {
+    const hasVal = Boolean(val && String(val).trim() !== '' && String(val).trim() !== '—');
+    const isUnassigned = !hasVal || status === 'Not Assigned';
+    if (isUnassigned) {
+      return isHtml ? '<span class="stu-badge-unassigned">Not Assigned</span>' : 'Not Assigned';
+    }
+    return isHtml ? `<span class="stu-code-mono">${esc(val)}</span>` : esc(val);
+  }
+
   async function api(url, opts = {}) {
     if (typeof fetchApi === 'function') return await fetchApi(url, opts);
     const token = localStorage.getItem('token') || localStorage.getItem('access_token');
@@ -271,7 +280,11 @@
 
     tbody.innerHTML = list.map((st, idx) => {
       const roll = st.class_roll_no || st.roll_number || (idx + 1);
-      const enroll = st.official_enrollment_no || '—';
+      const enrollFormatted = formatEnrollmentDisplay(st.official_enrollment_no, st.enrollment_no_status, true);
+      const hasEnroll = Boolean(st.official_enrollment_no && String(st.official_enrollment_no).trim() !== '' && st.enrollment_no_status !== 'Not Assigned');
+      const enrollSub = hasEnroll
+        ? `<span class="stu-sub-mono">${esc(st.official_enrollment_no)}</span>`
+        : `<span class="stu-sub-mono" style="color:var(--status-late); font-weight:600;">Not Assigned</span>`;
       const name = st.full_name || 'Student';
       const studentId = st.student_id || st.id;
       const isInactive = st.enrollment_status === 'TRANSFERRED' || st.enrollment_status === 'WITHDRAWN';
@@ -286,14 +299,14 @@
       return `
         <tr>
           <td><span class="stu-roll-badge">${roll}</span></td>
-          <td class="col-enrollment"><span class="stu-code-mono">${esc(enroll)}</span></td>
+          <td class="col-enrollment">${enrollFormatted}</td>
           <td>
             <div class="stu-name-wrap">
               <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
                 <a href="#" class="stu-name-cell" onclick="viewStudentDetails(${studentId}); return false;">${esc(name)}</a>
                 ${statusChip}
               </div>
-              <span class="stu-sub-mono">${esc(enroll)}</span>
+              ${enrollSub}
             </div>
           </td>
           <td>
@@ -310,6 +323,10 @@
                   <button type="button" class="stu-menu-item" onclick="viewStudentDetails(${studentId})">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     <span>View Details</span>
+                  </button>
+                  <button type="button" class="stu-menu-item" onclick="openEditStudentModal(${studentId})">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    <span>Edit Student</span>
                   </button>
                   ${isInactive ? `
                   <button type="button" class="stu-menu-item" onclick="reactivateStudentAction(${studentId}, '${esc(name)}')">
@@ -515,7 +532,16 @@
     document.getElementById('detail-stu-name').textContent = st.full_name || 'Student';
     document.getElementById('detail-stu-roll').textContent = `Roll #${roll}`;
     document.getElementById('detail-stu-cohort').textContent = `Year ${yr} ${sem ? '(' + sem + ')' : ''}`;
-    document.getElementById('detail-stu-enroll').textContent = st.official_enrollment_no || '—';
+    
+    const enrollEl = document.getElementById('detail-stu-enroll');
+    if (enrollEl) {
+      if (st.official_enrollment_no && String(st.official_enrollment_no).trim() !== '' && st.enrollment_no_status !== 'Not Assigned') {
+        enrollEl.innerHTML = `<span style="font-family: var(--font-family-mono); color: var(--color-primary); font-weight: 700;">${esc(st.official_enrollment_no)}</span>`;
+      } else {
+        enrollEl.innerHTML = `<span class="stu-badge-unassigned">Not Assigned</span>`;
+      }
+    }
+
     document.getElementById('detail-stu-reg').textContent = st.registration_no || '—';
     document.getElementById('detail-stu-att').textContent = pct;
     document.getElementById('detail-stu-dept').textContent = st.department_name || st.department_code || 'Department Roster';
@@ -560,6 +586,13 @@
     const modal = document.getElementById('modal-student-details');
     if (modal) modal.style.display = 'none';
     currentDetailStudentId = null;
+  }
+
+  function detailEditStudent() {
+    if (!currentDetailStudentId) return;
+    const sId = currentDetailStudentId;
+    closeStudentDetailsModal();
+    openEditStudentModal(sId);
   }
 
   function detailResetPassword() {
@@ -1357,6 +1390,208 @@
     }
   }
 
+  // 10B. Edit Student Modal
+  function openEditStudentModal(id) {
+    closeAllMenus();
+    const st = allStudents.find(s => (s.student_id || s.id) === id);
+    if (!st) {
+      notify('Student record not found.', 'danger');
+      return;
+    }
+
+    const modal = document.getElementById('modal-edit-student');
+    if (!modal) return;
+
+    document.getElementById('edit-stu-id').value = id;
+    document.getElementById('edit-stu-avatar').textContent = getInitials(st.full_name);
+    document.getElementById('edit-stu-name').value = st.full_name || '';
+
+    const chkNotAvail = document.getElementById('edit-chk-enroll-not-available');
+    const enrollInput = document.getElementById('edit-stu-enroll');
+    const enrollReq = document.getElementById('edit-stu-enroll-req');
+    const enrollHint = document.getElementById('edit-stu-enroll-hint');
+    const enrollErr = document.getElementById('edit-stu-enroll-error');
+    const rollErr = document.getElementById('edit-stu-roll-error');
+    const alertBox = document.getElementById('edit-stu-alert');
+
+    if (enrollErr) enrollErr.textContent = '';
+    if (rollErr) rollErr.textContent = '';
+    if (alertBox) { alertBox.style.display = 'none'; alertBox.textContent = ''; }
+
+    const isUnassigned = !st.official_enrollment_no || st.enrollment_no_status === 'Not Assigned';
+    if (chkNotAvail) chkNotAvail.checked = isUnassigned;
+
+    if (isUnassigned) {
+      if (enrollInput) {
+        enrollInput.value = '';
+        enrollInput.disabled = true;
+        enrollInput.placeholder = 'Not Assigned';
+        enrollInput.removeAttribute('required');
+      }
+      if (enrollReq) enrollReq.style.display = 'none';
+      if (enrollHint) enrollHint.textContent = 'Enrollment status is set to "Not Assigned".';
+    } else {
+      if (enrollInput) {
+        enrollInput.value = st.official_enrollment_no;
+        enrollInput.disabled = false;
+        enrollInput.placeholder = '11-digit numeric enrollment';
+        enrollInput.setAttribute('required', 'required');
+      }
+      if (enrollReq) enrollReq.style.display = 'inline';
+      if (enrollHint) enrollHint.textContent = 'Enter exactly 11 numeric digits (0–9).';
+    }
+
+    const regInput = document.getElementById('edit-stu-reg');
+    if (regInput) regInput.value = st.registration_no || '';
+
+    const rollInput = document.getElementById('edit-stu-roll');
+    if (rollInput) rollInput.value = (st.class_roll_no != null && String(st.class_roll_no) !== '') ? String(st.class_roll_no) : (st.roll_number != null ? String(st.roll_number) : '');
+
+    const semSelect = document.getElementById('edit-stu-sem');
+    if (semSelect) {
+      const semVal = st.semester || (st.year ? st.year * 2 - 1 : 1);
+      semSelect.value = String(semVal);
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  function closeEditStudentModal() {
+    const modal = document.getElementById('modal-edit-student');
+    if (modal) modal.style.display = 'none';
+  }
+
+  async function submitEditStudent(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const alertBox = document.getElementById('edit-stu-alert');
+    const enrollErr = document.getElementById('edit-stu-enroll-error');
+    const rollErr = document.getElementById('edit-stu-roll-error');
+    const saveBtn = document.getElementById('btn-save-edit-student');
+
+    if (alertBox) { alertBox.style.display = 'none'; alertBox.textContent = ''; }
+    if (enrollErr) enrollErr.textContent = '';
+    if (rollErr) rollErr.textContent = '';
+
+    const studentId = parseInt(document.getElementById('edit-stu-id')?.value, 10);
+    const fullName = document.getElementById('edit-stu-name')?.value.trim();
+    const chkNotAvail = Boolean(document.getElementById('edit-chk-enroll-not-available')?.checked);
+    const enrollInput = document.getElementById('edit-stu-enroll');
+    const regNo = document.getElementById('edit-stu-reg')?.value.trim().toUpperCase() || null;
+    const rollInput = document.getElementById('edit-stu-roll')?.value.trim();
+    const semester = parseInt(document.getElementById('edit-stu-sem')?.value, 10);
+
+    if (!studentId) {
+      notify('Invalid student ID.', 'danger');
+      return;
+    }
+    if (!fullName) {
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'var(--status-absent-bg, rgba(239, 68, 68, 0.1))';
+        alertBox.style.color = 'var(--status-absent, #ef4444)';
+        alertBox.textContent = 'Full Name is required.';
+      }
+      return;
+    }
+
+    let officialEnroll = null;
+    if (chkNotAvail) {
+      officialEnroll = null;
+    } else {
+      const cleanEnroll = (enrollInput?.value || '').trim().replace(/\D/g, '');
+      if (!cleanEnroll) {
+        if (enrollErr) enrollErr.textContent = 'Official Enrollment Number is required (or check "Enrollment Number Not Available").';
+        enrollInput?.focus();
+        return;
+      }
+      if (cleanEnroll.length !== 11 || !/^\d{11}$/.test(cleanEnroll)) {
+        if (enrollErr) enrollErr.textContent = 'Official Enrollment Number must be exactly 11 numeric digits (0–9).';
+        enrollInput?.focus();
+        return;
+      }
+      officialEnroll = cleanEnroll;
+    }
+
+    let classRoll = null;
+    if (rollInput) {
+      const cleanRoll = rollInput.replace(/\D/g, '');
+      if (!/^\d{1,2}$/.test(cleanRoll)) {
+        if (rollErr) rollErr.textContent = 'Class roll number must be numeric and maximum 2 digits.';
+        document.getElementById('edit-stu-roll')?.focus();
+        return;
+      }
+      classRoll = parseInt(cleanRoll, 10);
+    }
+
+    try {
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving Changes...';
+      }
+
+      const res = await api('/hod/students/' + studentId, {
+        method: 'PUT',
+        body: JSON.stringify({
+          full_name: fullName,
+          official_enrollment_no: officialEnroll,
+          enrollment_not_available: chkNotAvail,
+          registration_no: regNo,
+          class_roll_no: classRoll,
+          semester: semester
+        })
+      });
+
+      if (res && res.success) {
+        // Update local student model in allStudents for immediate UI responsiveness
+        const idx = allStudents.findIndex(s => (s.student_id || s.id) === studentId);
+        if (idx !== -1) {
+          allStudents[idx].full_name = fullName;
+          allStudents[idx].official_enrollment_no = officialEnroll;
+          allStudents[idx].enrollment_no_status = chkNotAvail ? 'Not Assigned' : 'ASSIGNED';
+          allStudents[idx].registration_no = regNo;
+          allStudents[idx].class_roll_no = classRoll;
+          allStudents[idx].roll_number = classRoll;
+          allStudents[idx].semester = semester;
+          allStudents[idx].year = Math.ceil(semester / 2);
+        }
+
+        closeEditStudentModal();
+        notify('Student details updated successfully.', 'success');
+        renderTable();
+
+        // If View Details modal was active for this student, refresh it immediately
+        if (currentDetailStudentId === studentId) {
+          viewStudentDetails(studentId);
+        }
+      } else {
+        const msg = res?.error?.message || 'Failed to update student details.';
+        if (alertBox) {
+          alertBox.style.display = 'block';
+          alertBox.style.background = 'var(--status-absent-bg, rgba(239, 68, 68, 0.1))';
+          alertBox.style.color = 'var(--status-absent, #ef4444)';
+          alertBox.textContent = msg;
+        } else {
+          notify(msg, 'danger');
+        }
+      }
+    } catch (err) {
+      const msg = err.message || 'Network error updating student details.';
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'var(--status-absent-bg, rgba(239, 68, 68, 0.1))';
+        alertBox.style.color = 'var(--status-absent, #ef4444)';
+        alertBox.textContent = msg;
+      } else {
+        notify(msg, 'danger');
+      }
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Changes';
+      }
+    }
+  }
+
   // 11. Bulk CSV Modal
   function openBulkModal() {
     const m = document.getElementById('modal-bulk-csv');
@@ -1486,6 +1721,68 @@
     const bulkForm = document.getElementById('form-bulk-csv');
     if (bulkForm) bulkForm.addEventListener('submit', submitBulkCsv);
 
+    // Edit Student Form Listeners
+    const editChkNotAvail = document.getElementById('edit-chk-enroll-not-available');
+    const editEnrollInput = document.getElementById('edit-stu-enroll');
+    const editEnrollReq = document.getElementById('edit-stu-enroll-req');
+    const editEnrollHint = document.getElementById('edit-stu-enroll-hint');
+    const editEnrollErr = document.getElementById('edit-stu-enroll-error');
+    const editRollInput = document.getElementById('edit-stu-roll');
+    const editRollErr = document.getElementById('edit-stu-roll-error');
+
+    if (editChkNotAvail && editEnrollInput) {
+      editChkNotAvail.addEventListener('change', () => {
+        if (editChkNotAvail.checked) {
+          editEnrollInput.value = '';
+          editEnrollInput.disabled = true;
+          editEnrollInput.placeholder = 'Not Assigned';
+          editEnrollInput.removeAttribute('required');
+          if (editEnrollReq) editEnrollReq.style.display = 'none';
+          if (editEnrollHint) editEnrollHint.textContent = 'Enrollment status is set to "Not Assigned".';
+          if (editEnrollErr) editEnrollErr.textContent = '';
+        } else {
+          editEnrollInput.disabled = false;
+          editEnrollInput.placeholder = '11-digit numeric enrollment';
+          editEnrollInput.setAttribute('required', 'required');
+          if (editEnrollReq) editEnrollReq.style.display = 'inline';
+          if (editEnrollHint) editEnrollHint.textContent = 'Enter exactly 11 numeric digits (0–9).';
+        }
+      });
+    }
+
+    if (editEnrollInput) {
+      editEnrollInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
+        if (editEnrollErr && e.target.value.length === 11) {
+          editEnrollErr.textContent = '';
+        }
+      });
+      editEnrollInput.addEventListener('blur', (e) => {
+        if (editChkNotAvail && editChkNotAvail.checked) return;
+        const val = e.target.value.trim();
+        if (val && val.length !== 11) {
+          if (editEnrollErr) editEnrollErr.textContent = 'Official Enrollment Number must be exactly 11 numeric digits (0–9).';
+        } else if (editEnrollErr) {
+          editEnrollErr.textContent = '';
+        }
+      });
+    }
+
+    if (editRollInput) {
+      editRollInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 2);
+        if (editRollErr) editRollErr.textContent = '';
+      });
+      editRollInput.addEventListener('blur', (e) => {
+        const val = e.target.value.trim();
+        if (val && !/^\d{1,2}$/.test(val)) {
+          if (editRollErr) editRollErr.textContent = 'Class roll number must be numeric and maximum 2 digits.';
+        } else if (editRollErr) {
+          editRollErr.textContent = '';
+        }
+      });
+    }
+
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.stu-menu-wrap')) {
         closeAllMenus();
@@ -1497,6 +1794,10 @@
   window.toggleStudentMenu = toggleStudentMenu;
   window.viewStudentDetails = viewStudentDetails;
   window.closeStudentDetailsModal = closeStudentDetailsModal;
+  window.openEditStudentModal = openEditStudentModal;
+  window.closeEditStudentModal = closeEditStudentModal;
+  window.detailEditStudent = detailEditStudent;
+  window.submitEditStudent = submitEditStudent;
   window.detailResetPassword = detailResetPassword;
   window.detailDeleteStudent = detailDeleteStudent;
   window.detailTransferStudent = detailTransferStudent;

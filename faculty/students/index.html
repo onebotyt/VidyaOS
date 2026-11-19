@@ -339,6 +339,7 @@
 
       <div class="stu-details-footer">
         <button type="button" class="btn-stu-outline" onclick="closeStudentDetailsModal()">Close</button>
+        <button type="button" class="btn-stu-compact" id="detail-btn-edit" onclick="detailEditStudent()">Edit Student</button>
         <button type="button" class="btn-stu-outline" id="detail-btn-transfer" onclick="detailTransferStudent()">Transfer</button>
         <button type="button" class="btn-stu-outline" id="detail-btn-withdraw" onclick="detailWithdrawStudent()">Withdraw</button>
         <button type="button" class="btn-stu-compact" id="detail-btn-reactivate" style="display:none;" onclick="detailReactivateStudent()">Re-Activate</button>
@@ -346,6 +347,98 @@
         <button type="button" class="btn-stu-compact danger" id="detail-btn-delete"
           onclick="detailDeleteStudent()">Remove Student</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Student Details -->
+  <div id="modal-edit-student" class="stu-modal-backdrop" style="display:none;"
+    onclick="if(event.target===this)closeEditStudentModal()">
+    <div class="stu-modal-card" style="max-width: 520px;">
+      <div class="stu-modal-header">
+        <div class="stu-modal-title-group">
+          <div class="stu-modal-avatar" id="edit-stu-avatar">ED</div>
+          <div>
+            <h2 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0;">Edit Student Details</h2>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Update institutional academic credentials &amp; cohort assignment</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" onclick="closeEditStudentModal()">&times;</button>
+      </div>
+
+      <form id="form-edit-student" onsubmit="submitEditStudent(event)" style="padding:1.25rem; display:flex; flex-direction:column; gap:0.85rem;">
+        <input type="hidden" id="edit-stu-id" value="">
+
+        <!-- 1. Full Name -->
+        <div>
+          <label for="edit-stu-name" style="display:block; font-size:0.76rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">
+            Full Name <span style="color:var(--status-absent);">*</span>
+          </label>
+          <input type="text" id="edit-stu-name" required placeholder="e.g. Aarav Sharma"
+            style="width:100%; padding:0.55rem 0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.86rem; box-sizing:border-box;">
+        </div>
+
+        <!-- 2. Official Enrollment Number with Not Available checkbox -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.25rem; margin-bottom:0.25rem;">
+            <label for="edit-stu-enroll" style="font-size:0.76rem; font-weight:700; color:var(--text-main); margin-bottom:0;">
+              Official Enrollment # <span id="edit-stu-enroll-req" style="color:var(--status-absent);">*</span>
+            </label>
+            <label class="chk-enroll-box">
+              <input type="checkbox" id="edit-chk-enroll-not-available">
+              <span>Enrollment Number Not Available</span>
+            </label>
+          </div>
+          <input type="text" id="edit-stu-enroll" placeholder="11-digit numeric enrollment" maxlength="11" autocomplete="off"
+            style="width:100%; padding:0.55rem 0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.86rem; box-sizing:border-box; font-family:var(--font-family-mono);">
+          <p class="inp-hint" id="edit-stu-enroll-hint" style="font-size:0.72rem; color:var(--text-muted); margin:0.25rem 0 0 0;">Enter exactly 11 numeric digits (0–9).</p>
+          <p class="inp-error" id="edit-stu-enroll-error" style="font-size:0.72rem; color:var(--status-absent); margin:0.25rem 0 0 0; min-height:1rem;"></p>
+        </div>
+
+        <!-- 3. Registration Number (UBTER Reg. #) -->
+        <div>
+          <label for="edit-stu-reg" style="display:block; font-size:0.76rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">
+            Registration Number (UBTER Reg. #) <span style="font-size:0.72rem; font-weight:normal; color:var(--text-muted);">(optional)</span>
+          </label>
+          <input type="text" id="edit-stu-reg" placeholder="e.g. 24101054001 or R230104001" autocomplete="off"
+            style="width:100%; padding:0.55rem 0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.86rem; box-sizing:border-box; font-family:var(--font-family-mono); text-transform:uppercase;">
+          <p style="font-size:0.72rem; color:var(--text-muted); margin:0.25rem 0 0 0;">Used for institutional university registration identification.</p>
+        </div>
+
+        <!-- 4. Class Roll Number & 5. Year / Semester -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+          <div>
+            <label for="edit-stu-roll" style="display:block; font-size:0.76rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">
+              Class Roll Number <span style="font-size:0.72rem; font-weight:normal; color:var(--text-muted);">(max 2 digits)</span>
+            </label>
+            <input type="text" id="edit-stu-roll" placeholder="e.g. 05 (max 2 digits)" maxlength="2" autocomplete="off"
+              style="width:100%; padding:0.55rem 0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.86rem; box-sizing:border-box; font-family:var(--font-family-mono);">
+            <p class="inp-error" id="edit-stu-roll-error" style="font-size:0.72rem; color:var(--status-absent); margin:0.25rem 0 0 0; min-height:1rem;"></p>
+          </div>
+          <div>
+            <label for="edit-stu-sem" style="display:block; font-size:0.76rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">
+              Year / Semester <span style="color:var(--status-absent);">*</span>
+            </label>
+            <select id="edit-stu-sem" required
+              style="width:100%; padding:0.55rem 0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.86rem; box-sizing:border-box;">
+              <option value="1">Sem 1 (Year 1)</option>
+              <option value="2">Sem 2 (Year 1)</option>
+              <option value="3">Sem 3 (Year 2)</option>
+              <option value="4">Sem 4 (Year 2)</option>
+              <option value="5">Sem 5 (Year 3)</option>
+              <option value="6">Sem 6 (Year 3)</option>
+              <option value="7">Sem 7 (Year 4)</option>
+              <option value="8">Sem 8 (Year 4)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="edit-stu-alert" style="display:none; padding:0.5rem 0.75rem; border-radius:6px; font-size:0.78rem; font-weight:600;"></div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.65rem; margin-top:0.4rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
+          <button type="button" class="btn-stu-outline" onclick="closeEditStudentModal()">Cancel</button>
+          <button type="submit" class="btn-stu-compact" id="btn-save-edit-student">Save Changes</button>
+        </div>
+      </form>
     </div>
   </div>
 

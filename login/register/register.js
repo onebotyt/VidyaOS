@@ -385,10 +385,47 @@ async function handleStudentSubmit(e) {
   }
 
   const fullName = document.getElementById('stu-name')?.value.trim();
-  let enrollNo = document.getElementById('stu-enroll')?.value.trim().toUpperCase() || '';
+  const isEnrollNotAvailable = Boolean(document.getElementById('chk-enroll-not-available')?.checked);
+  const enrollInput = document.getElementById('stu-enroll');
+  const enrollError = document.getElementById('stu-enroll-error');
+  const rollInput = document.getElementById('stu-class-roll-no');
+  const rollError = document.getElementById('stu-roll-error');
+
+  if (enrollError) enrollError.textContent = '';
+  if (rollError) rollError.textContent = '';
+
+  let enrollNo = enrollInput?.value.trim().replace(/\D/g, '') || '';
+  if (isEnrollNotAvailable) {
+    enrollNo = null;
+  } else {
+    if (!enrollNo) {
+      if (enrollError) enrollError.textContent = 'Official Enrollment Number is required (or check "Enrollment Number Not Available").';
+      showAlert('Please enter your 11-digit official enrollment number or check "Enrollment Number Not Available".', 'danger');
+      enrollInput?.focus();
+      return;
+    }
+    if (enrollNo.length !== 11 || !/^\d{11}$/.test(enrollNo)) {
+      if (enrollError) enrollError.textContent = 'Official Enrollment Number must be exactly 11 numeric digits.';
+      showAlert('Official Enrollment Number must be exactly 11 numeric digits (0–9).', 'danger');
+      enrollInput?.focus();
+      return;
+    }
+  }
+
   const ubterNo = document.getElementById('stu-ubter')?.value.trim().toUpperCase() || null;
-  const rollNoInput = document.getElementById('stu-class-roll-no')?.value.trim();
-  const classRollNo = rollNoInput ? parseInt(rollNoInput, 10) : undefined;
+  const rollNoInput = rollInput?.value.trim();
+  let classRollNo = undefined;
+  if (rollNoInput) {
+    const cleanRoll = rollNoInput.replace(/\D/g, '');
+    if (!/^\d{1,2}$/.test(cleanRoll)) {
+      if (rollError) rollError.textContent = 'Class roll number must be numeric and maximum 2 digits.';
+      showAlert('Class Roll Number must be numeric and maximum 2 digits (e.g. 01 to 99).', 'danger');
+      rollInput?.focus();
+      return;
+    }
+    classRollNo = parseInt(cleanRoll, 10);
+  }
+
   const email = document.getElementById('stu-email')?.value.trim();
   const deptId = document.getElementById('stu-dept')?.value;
   const semester = document.getElementById('stu-sem')?.value;
@@ -397,14 +434,9 @@ async function handleStudentSubmit(e) {
   const confirm = document.getElementById('stu-confirm')?.value;
   const submitBtn = document.getElementById('stu-submit-btn');
 
-  // If student does not have enrolment no, their account can also use UBTER registration no
-  if (!enrollNo && ubterNo) {
-    enrollNo = ubterNo;
-  }
-
   const isGoogle = Boolean(S.googleRegistrationData?.sub);
-  if (!fullName || !enrollNo || !email || !deptId || !semester || (!isGoogle && !password)) {
-    showAlert('Please fill in all required fields (Name, Enrollment No. or UBTER Reg. No., Branch, Semester, Gmail).', 'danger');
+  if (!fullName || !email || !deptId || !semester || (!isGoogle && !password)) {
+    showAlert('Please fill in all required fields (Name, Branch, Semester, Gmail' + (isGoogle ? '' : ', Password') + ').', 'danger');
     return;
   }
   if (phone && (phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone))) {
@@ -425,7 +457,8 @@ async function handleStudentSubmit(e) {
     submitBtn.innerHTML = 'Submitting… <span class="arrow">→</span>';
     const payload = {
       full_name: fullName,
-      official_enrollment_no: enrollNo,
+      official_enrollment_no: isEnrollNotAvailable ? null : enrollNo,
+      enrollment_not_available: isEnrollNotAvailable,
       registration_no: ubterNo,
       class_roll_no: classRollNo,
       email,
@@ -448,8 +481,8 @@ async function handleStudentSubmit(e) {
         name: fullName,
         role: 'Student',
         email,
-        detailLabel: 'Enrollment / UBTER No.',
-        detailValue: enrollNo,
+        detailLabel: 'Enrollment Status',
+        detailValue: isEnrollNotAvailable ? 'Not Assigned' : (enrollNo || (ubterNo ? 'UBTER: ' + ubterNo : 'Not Assigned')),
         dept: document.getElementById('stu-dept').options[document.getElementById('stu-dept').selectedIndex]?.text
       });
     } else {
@@ -492,5 +525,77 @@ function showSuccessView(info) {
   const qSub = params.get('google_sub');
   if (qEmail && qEmail.includes('@')) {
     selectGoogleAccount(qEmail, qName, qSub);
+  }
+
+  // Enrollment Number Not Available toggle
+  const chkEnrollNotAvailable = document.getElementById('chk-enroll-not-available');
+  const stuEnrollInput = document.getElementById('stu-enroll');
+  const stuEnrollReq = document.getElementById('stu-enroll-req');
+  const stuEnrollHint = document.getElementById('stu-enroll-hint');
+  const stuEnrollError = document.getElementById('stu-enroll-error');
+
+  if (chkEnrollNotAvailable && stuEnrollInput) {
+    chkEnrollNotAvailable.addEventListener('change', () => {
+      if (chkEnrollNotAvailable.checked) {
+        stuEnrollInput.value = '';
+        stuEnrollInput.disabled = true;
+        stuEnrollInput.placeholder = 'Not Assigned';
+        stuEnrollInput.removeAttribute('required');
+        if (stuEnrollReq) stuEnrollReq.style.display = 'none';
+        if (stuEnrollHint) stuEnrollHint.textContent = 'Enrollment status will be registered as "Not Assigned".';
+        if (stuEnrollError) stuEnrollError.textContent = '';
+        stuEnrollInput.classList.remove('has-error');
+      } else {
+        stuEnrollInput.disabled = false;
+        stuEnrollInput.placeholder = '11-digit numeric enrollment';
+        stuEnrollInput.setAttribute('required', 'required');
+        if (stuEnrollReq) stuEnrollReq.style.display = 'inline';
+        if (stuEnrollHint) stuEnrollHint.textContent = 'Enter your 11-digit official enrollment number.';
+        if (stuEnrollError) stuEnrollError.textContent = '';
+      }
+    });
+  }
+
+  // Enrollment Number numeric 11-digit enforcement
+  if (stuEnrollInput) {
+    stuEnrollInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
+      if (stuEnrollError && e.target.value.length === 11) {
+        stuEnrollError.textContent = '';
+        stuEnrollInput.classList.remove('has-error');
+      }
+    });
+    stuEnrollInput.addEventListener('blur', (e) => {
+      if (chkEnrollNotAvailable && chkEnrollNotAvailable.checked) return;
+      const val = e.target.value.trim();
+      if (val && val.length !== 11) {
+        if (stuEnrollError) stuEnrollError.textContent = 'Enrollment number must be exactly 11 numeric digits.';
+        stuEnrollInput.classList.add('has-error');
+      } else if (stuEnrollError) {
+        stuEnrollError.textContent = '';
+        stuEnrollInput.classList.remove('has-error');
+      }
+    });
+  }
+
+  // Class roll number numeric max 2 digits enforcement
+  const stuRollInput = document.getElementById('stu-class-roll-no');
+  const stuRollError = document.getElementById('stu-roll-error');
+  if (stuRollInput) {
+    stuRollInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 2);
+      if (stuRollError) stuRollError.textContent = '';
+      stuRollInput.classList.remove('has-error');
+    });
+    stuRollInput.addEventListener('blur', (e) => {
+      const val = e.target.value.trim();
+      if (val && !/^\d{1,2}$/.test(val)) {
+        if (stuRollError) stuRollError.textContent = 'Class roll number must be numeric and maximum 2 digits.';
+        stuRollInput.classList.add('has-error');
+      } else if (stuRollError) {
+        stuRollError.textContent = '';
+        stuRollInput.classList.remove('has-error');
+      }
+    });
   }
 })();

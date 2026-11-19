@@ -225,6 +225,30 @@
     label.lbl .req { color: var(--reg-danger); font-size: 0.85em; }
     label.lbl .opt { color: var(--reg-placeholder); font-weight: 400; font-size: 0.9em; }
 
+    .chk-enroll-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--reg-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .chk-enroll-box input[type="checkbox"] {
+      accent-color: var(--reg-accent);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+    .inp-error {
+      font-size: 0.73rem;
+      color: var(--reg-danger);
+      font-weight: 600;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
     .inp {
       width: 100%;
       padding: 0.65rem 0.85rem;

@@ -1377,3 +1377,37 @@ button:disabled.btn-disabled-loading,
   border: 1px dashed var(--border-color);
   border-radius: 8px;
 }
+
+/* Unassigned Enrollment Badge & Form Utilities (100% Theme Token Compliant) */
+.stu-badge-unassigned {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: var(--status-late-bg);
+  color: var(--status-late);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.chk-enroll-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.chk-enroll-box input[type="checkbox"] {
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary);
+}
+
