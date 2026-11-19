@@ -531,7 +531,7 @@
     document.getElementById('detail-stu-name').textContent = st.full_name || 'Student';
     document.getElementById('detail-stu-roll').textContent = `Roll #${roll}`;
     document.getElementById('detail-stu-cohort').textContent = `Year ${yr} ${sem ? '(' + sem + ')' : ''}`;
-    
+
     const enrollEl = document.getElementById('detail-stu-enroll');
     if (enrollEl) {
       if (st.official_enrollment_no && String(st.official_enrollment_no).trim() !== '' && st.enrollment_no_status !== 'Not Assigned') {
