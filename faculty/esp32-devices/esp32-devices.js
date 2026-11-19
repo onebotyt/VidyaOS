@@ -749,8 +749,8 @@ function renderStudentsBiometricTable() {
               <button type="button" class="btn btn-secondary btn-sm" style="border-color:var(--status-present); color:var(--status-present);" onclick="simulateStudentBiometric(${st.student_id}, 'MARK_ATTENDANCE')" title="Test attendance scan & OLED display for this student">
                 ✓ Test Scan
               </button>
-              <button type="button" class="btn btn-secondary btn-sm" style="color:var(--status-absent);" onclick="removeStudentCloudTemplate(${st.student_id})" title="Delete cloud template">
-                ✕
+              <button type="button" class="btn btn-danger btn-sm" onclick="removeStudentCloudTemplate(${st.student_id}, '${escHtml(st.full_name)}', '${st.class_roll_no || ''}')" title="Remove student biometric template from cloud vault & ESP32 hardware slots">
+                🗑️ Remove Biometric
               </button>
             ` : ''}
           </div>
@@ -884,18 +884,35 @@ async function simulateStudentBiometric(studentId, actionType = 'ENROLL_TEMPLATE
   }
 }
 
-async function removeStudentCloudTemplate(studentId) {
-  if (!confirm('Are you sure you want to delete this student\'s stored fingerprint template from MySQL?')) return;
+async function removeStudentCloudTemplate(studentId, studentName = 'Student', rollNo = '') {
+  const rollLabel = rollNo ? ` (Roll #${rollNo})` : '';
+  const confirmMsg = `Are you sure you want to remove biometric data for "${studentName}"${rollLabel}?\n\nThis will permanently delete the 512-byte template from the MySQL cloud vault and clear the hardware slot.`;
+  if (!confirm(confirmMsg)) return;
+
   try {
     const res = await fetchApi(`/devices/hod/template/${studentId}`, { method: 'DELETE' });
     if (res && res.success) {
-      showToast('Student template removed from cloud vault.', 'info');
+      showToast(`Biometric template for "${studentName}" removed from cloud vault.`, 'success');
+      
+      // Provide visual simulated hardware feedback
+      updateOledScreen({
+        statusLeft: 'BIOMETRIC REMOVED',
+        statusRight: 'VAULT SYNC',
+        headline: 'TEMPLATE CLEARED',
+        line1: studentName,
+        line2: rollNo ? `Roll: #${rollNo}` : 'Hardware Slot Freed',
+        line3: 'Vault & Roster Synced',
+        leds: [false, true, false],
+        isClock: false
+      });
+      playBeep(800, 300);
+
       await loadEsp32Overview();
     } else {
       showToast(res?.message || 'Failed to remove template.', 'error');
     }
   } catch (err) {
-    showToast('Error removing template.', 'error');
+    showToast('Error removing template: ' + err.message, 'error');
   }
 }
 
@@ -1361,7 +1378,34 @@ async function triggerScanNearbyWifi(forceRescan = false) {
     modal.classList.add('open');
     modal.style.display = 'flex';
   }
-  if (list) list.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">🔍 Command dispatched to ESP32 radio... Scanning 2.4GHz channels...</div>`;
+
+  // Display Animated Radar Spectrum Scanner in Modal
+  if (list) {
+    list.innerHTML = `
+      <div class="wifi-radar-scanner-box">
+        <div class="wifi-radar-circle">
+          <div class="wifi-radar-sweep"></div>
+          <div class="wifi-radar-blip" style="top:25%; left:65%; animation-delay:0.3s;"></div>
+          <div class="wifi-radar-blip" style="top:60%; left:30%; animation-delay:0.9s;"></div>
+          <div class="wifi-radar-blip" style="top:70%; left:75%; animation-delay:1.4s;"></div>
+        </div>
+        <div class="wifi-radar-title">Scanning 2.4GHz Wi-Fi Airwaves...</div>
+        <div class="wifi-radar-desc">ESP32 radio listening for SSIDs across Channels 1–13</div>
+      </div>
+    `;
+  }
+
+  // Sync Live Simulated Hardware OLED Console with animated scanner state
+  updateOledScreen({
+    statusLeft: 'SCANNING 2.4G',
+    statusRight: 'CH 1-13',
+    headline: 'WI-FI SCANNER',
+    line1: 'Scanning Airwaves...',
+    line2: 'Detecting Nearby APs',
+    line3: 'Transmitting Report',
+    leds: [false, false, true],
+    isClock: false
+  });
 
   try {
     const res = await fetchApi(`/devices/hod/${selectedDeviceId}/wifi/scan`, { method: 'POST' });
@@ -1377,17 +1421,26 @@ async function triggerScanNearbyWifi(forceRescan = false) {
     wifiScanPollingTimer = setInterval(async () => {
       attempts++;
       const scansRes = await fetchApi(`/devices/hod/${selectedDeviceId}/wifi/scans`);
-      if (scansRes && scansRes.success && scansRes.data && scansRes.data.scans && scansRes.data.scans.length > 0) {
+      const scanList = Array.isArray(scansRes?.data) ? scansRes.data : (scansRes?.data?.scans || []);
+
+      if (scansRes && scansRes.success && scanList.length > 0) {
         clearInterval(wifiScanPollingTimer);
-        renderScannedWifiList(scansRes.data.scans);
-      } else if (attempts >= 4) {
+        renderScannedWifiList(scanList);
+
+        // Update simulated OLED display to reflect discovered network count
+        updateOledScreen({
+          statusLeft: 'SCAN COMPLETE',
+          statusRight: `${scanList.length} APs`,
+          headline: 'WI-FI DISCOVERY',
+          line1: `Found ${scanList.length} Networks`,
+          line2: scanList[0]?.ssid || 'Airwaves Synced',
+          line3: 'Ready to Associate',
+          leds: [true, false, false],
+          isClock: false
+        });
+      } else if (attempts >= 8) {
         clearInterval(wifiScanPollingTimer);
-        // Fallback default list if hardware is in test bench mode
-        renderScannedWifiList([
-          { ssid: 'Airtel_Ruby', bssid: 'F4:92:BF:31:82:1A', rssi: -52, channel: 6, encryption_type: 'WPA2_PSK' },
-          { ssid: 'CAMPUS_WIFI_HIGH_SPEED', bssid: '00:14:D1:E8:4A:21', rssi: -64, channel: 1, encryption_type: 'WPA2_PSK' },
-          { ssid: 'IT_FACULTY_ROUTER_2G', bssid: 'A4:2B:B0:10:99:C2', rssi: -71, channel: 11, encryption_type: 'WPA2_PSK' }
-        ]);
+        renderScannedWifiList([]);
       }
     }, 1200);
   } catch (err) {
@@ -1399,13 +1452,15 @@ function renderScannedWifiList(scans) {
   const list = document.getElementById('scanned-wifi-list');
   if (!list) return;
 
-  if (!scans.length) {
-    list.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">Zero nearby access points detected.</div>`;
+  if (!scans || !scans.length) {
+    list.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--text-muted);">Zero nearby access points detected. Ensure ESP32 is powered on and within radio range.</div>`;
     return;
   }
 
   list.innerHTML = scans.map(sc => {
     const rssi = sc.rssi != null ? sc.rssi : -70;
+    const authType = sc.auth_mode || sc.encryption_type || 'WPA2_PSK';
+    const isOpen = authType === 'OPEN';
     let signalClass = 'medium';
     if (rssi >= -60) signalClass = 'strong';
     else if (rssi < -75) signalClass = 'weak';
@@ -1417,7 +1472,7 @@ function renderScannedWifiList(scans) {
           <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Ch ${sc.channel || 1} • ${escHtml(sc.bssid || 'AP')}</div>
         </div>
         <div style="display:flex; align-items:center; gap:0.4rem;">
-          <span class="wifi-security-badge ${sc.encryption_type !== 'OPEN' ? 'secure' : ''}">${escHtml(sc.encryption_type || 'WPA2_PSK')}</span>
+          <span class="wifi-security-badge ${!isOpen ? 'secure' : ''}">${escHtml(authType)}</span>
           <span class="wifi-signal-pill ${signalClass}">📶 ${rssi} dBm</span>
           <button type="button" class="btn btn-secondary btn-sm" style="padding:0.18rem 0.48rem;" onclick="event.stopPropagation(); selectScannedWifi('${escHtml(sc.ssid)}')">Select</button>
         </div>

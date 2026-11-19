@@ -489,16 +489,22 @@
       </div>
 
       <!-- Password entry for selected scanned network -->
-      <form id="scanned-wifi-form" onsubmit="submitConnectScannedWifi(event)"
+      <form id="scanned-wifi-form" autocomplete="off" onsubmit="submitConnectScannedWifi(event)"
         style="border-top:1px solid var(--border-color); padding-top:0.75rem; margin-top:0.5rem;">
+        <!-- Hidden dummy inputs to consume browser password autofill heuristic -->
+        <input type="text" style="display:none !important;" tabindex="-1" aria-hidden="true" autocomplete="false">
+        <input type="password" style="display:none !important;" tabindex="-1" aria-hidden="true" autocomplete="false">
+
         <div class="form-group">
-          <label class="form-label">Selected Network SSID <span style="color:var(--status-absent);">*</span></label>
-          <input type="text" id="scanned-wifi-ssid" class="form-control"
+          <label class="form-label" for="scanned-wifi-ssid">Selected Network SSID <span style="color:var(--status-absent);">*</span></label>
+          <input type="text" id="scanned-wifi-ssid" name="esp_selected_wifi_ssid" class="form-control"
+            autocomplete="off" autocapitalize="off" spellcheck="false"
             placeholder="Select a network above or type SSID" required style="font-family:var(--font-family-mono);">
         </div>
         <div class="form-group">
-          <label class="form-label">Wi-Fi Password / WPA Key</label>
-          <input type="password" id="scanned-wifi-password" class="form-control"
+          <label class="form-label" for="scanned-wifi-password">Wi-Fi Password / WPA Key</label>
+          <input type="password" id="scanned-wifi-password" name="esp_selected_wifi_key" class="form-control"
+            autocomplete="new-password"
             placeholder="Leave blank if open Wi-Fi network">
         </div>
         <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.85rem;">
