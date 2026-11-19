@@ -645,21 +645,38 @@
         `;
       }
 
+      // Status Box (if uploaded or metadata)
+      let docStatusBoxHtml = '';
+      if (doc && doc.file_path) {
+        docStatusBoxHtml = `
+          <div class="cf-card-status-box">
+            <div class="cf-doc-info-left">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--status-present);flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <span class="cf-doc-filename" title="${escapeHtml(doc.file_name || 'Document.pdf')}">${escapeHtml(doc.file_name || 'Document.pdf')}</span>
+              <span class="cf-doc-meta">(${formatBytes(doc.file_size || 0)})</span>
+            </div>
+            ${doc.updated_at ? `<span class="cf-doc-meta">${formatDate(doc.updated_at)}</span>` : ''}
+          </div>
+        `;
+      }
+
+      const modBadgeLabel = item.module_label || item.category_label || item.category || 'Dossier';
+
       return `
-        <div class="cf-card ${isComplete ? 'complete' : ''}" id="artifact-card-${item.key}">
-          <div class="cf-card-header">
-            <div class="cf-card-seq-badge">#${itemNum}</div>
-            <div class="cf-card-tags">
-              <span class="cf-card-cat-tag">${escapeHtml(item.module_label || item.category_label || item.category || 'Dossier')}</span>
-              ${statusBadgeHtml}
+        <div class="cf-artifact-card cf-card ${isComplete ? 'is-complete complete' : ''}" id="artifact-card-${item.key}">
+          <div class="cf-card-main-content">
+            <div class="cf-card-num">#${itemNum}</div>
+            <div class="cf-card-header-info">
+              <div class="cf-card-title-row">
+                <h4 class="cf-card-title">${escapeHtml(item.title)}</h4>
+                <span class="badge" style="background:var(--bg-surface);border:1px solid var(--border-color);font-size:0.7rem;font-weight:600;">${escapeHtml(modBadgeLabel)}</span>
+                ${statusBadgeHtml}
+              </div>
+              ${docStatusBoxHtml}
             </div>
           </div>
-          <h4 class="cf-card-title">${escapeHtml(item.title)}</h4>
-          <p class="cf-card-desc">${escapeHtml(item.desc || 'Standard institutional academic dossier artifact.')}</p>
-          <div class="cf-card-footer">
-            <div class="cf-card-actions">
-              ${actionsHtml}
-            </div>
+          <div class="cf-card-actions">
+            ${actionsHtml}
           </div>
         </div>
       `;
@@ -796,9 +813,7 @@
   // ══════════════════════════════════════════════════════════════
 
   window.openCombineExportModal = function () {
-    const modal = document.getElementById('modal-combine-export');
-    if (!modal) return;
-    modal.style.display = 'flex';
+    openModal('modal-combine-export');
     updateMergeModalPreview();
   };
 
@@ -1356,12 +1371,20 @@
   // Generic modal openers
   window.openModal = function (modalId) {
     const m = document.getElementById(modalId);
-    if (m) m.style.display = 'flex';
+    if (m) {
+      m.classList.add('open');
+      m.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
   };
 
   window.closeModal = function (modalId) {
     const m = document.getElementById(modalId);
-    if (m) m.style.display = 'none';
+    if (m) {
+      m.classList.remove('open');
+      m.style.display = 'none';
+      document.body.style.overflow = '';
+    }
   };
 
 })();

@@ -467,7 +467,8 @@
   gap: 0.75rem;
 }
 
-.cf-artifact-card {
+.cf-artifact-card,
+.cf-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -482,7 +483,8 @@
   position: relative;
 }
 
-.cf-artifact-card:hover {
+.cf-artifact-card:hover,
+.cf-card:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
   border-color: var(--border-focus);
@@ -497,7 +499,8 @@
   min-width: 0;
 }
 
-.cf-card-num {
+.cf-card-num,
+.cf-card-seq-badge {
   font-family: var(--font-family-mono);
   font-size: 0.78rem;
   font-weight: 800;
@@ -510,7 +513,12 @@
   margin-top: 0;
 }
 
-.cf-artifact-card.is-complete .cf-card-num {
+.cf-artifact-card.is-complete .cf-card-num,
+.cf-artifact-card.complete .cf-card-num,
+.cf-card.is-complete .cf-card-num,
+.cf-card.complete .cf-card-num,
+.cf-card.is-complete .cf-card-seq-badge,
+.cf-card.complete .cf-card-seq-badge {
   background: var(--status-present-bg);
   border-color: var(--status-present);
   color: var(--status-present);
@@ -692,10 +700,12 @@
   inset: 0;
   z-index: 2000;
   display: none;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 2.5rem 1rem 3rem;
   box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal.open {
@@ -714,13 +724,14 @@
 }
 
 .modal-dialog {
+  margin: auto;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg), 0 20px 45px hsl(0 0% 0% / 0.28);
   width: 100%;
   max-width: 620px;
-  max-height: calc(100vh - 3rem);
+  max-height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -728,6 +739,53 @@
   z-index: 2;
   box-sizing: border-box;
   animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Compact Scope Selector Cards in Combine-Export Modal */
+.compact-scope-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.compact-scope-card:hover {
+  border-color: var(--border-focus);
+}
+
+.compact-scope-card:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--bg-surface-hover, var(--bg-surface));
+}
+
+.compact-scope-card input[type="radio"] {
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+}
+
+.compact-scope-card strong {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-main);
+  line-height: 1.25;
+}
+
+.compact-scope-card span {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.compact-merge-preview-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
 }
 
 @keyframes modalPopIn {
