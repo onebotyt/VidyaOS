@@ -3618,6 +3618,74 @@ span.excel-hdr-num-badge {
   display: inline-block;
 }
 
+.excel-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 2500;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
+  padding: 0.35rem 0;
+  min-width: 175px;
+  display: flex;
+  flex-direction: column;
+}
+
+.excel-dropdown-menu[style*="display: none"],
+.excel-dropdown-menu.hidden {
+  display: none !important;
+}
+
+.excel-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--text-main);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.excel-menu-item:hover {
+  background: var(--bg-surface);
+  color: hsl(142, 70%, 35%);
+}
+
+.excel-menu-item .excel-icon {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  width: 18px;
+  text-align: center;
+}
+
+.excel-menu-item:hover .excel-icon {
+  color: hsl(142, 70%, 35%);
+}
+
+.excel-menu-item.text-danger {
+  color: var(--status-absent, #dc2626);
+}
+
+.excel-menu-item.text-danger:hover {
+  background: var(--status-absent-bg, rgba(220, 38, 38, 0.08));
+  color: var(--status-absent, #dc2626);
+}
+
+.excel-menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.35rem 0;
+}
+
 .excel-mini-menu {
   position: absolute;
   top: calc(100% + 2px);

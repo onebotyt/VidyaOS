@@ -486,8 +486,17 @@ function applySheetFilterAndSearch() {
 /* ══════════════════════════════════════════════════════════════
    EXCEL SHEET SEARCH, FILTER, AND SORT ENGINE
    ══════════════════════════════════════════════════════════════ */
+function isMarksRow(sheet, r) {
+  if (!sheet || r < 0) return false;
+  const c0 = String(getCell(sheet, r, 0).v || getCell(sheet, r, 0).raw || '').toLowerCase();
+  const c1 = String(getCell(sheet, r, 1).v || getCell(sheet, r, 1).raw || '').toLowerCase();
+  const c2 = String(getCell(sheet, r, 2).v || getCell(sheet, r, 2).raw || '').toLowerCase();
+  const c3 = String(getCell(sheet, r, 3).v || getCell(sheet, r, 3).raw || '').toLowerCase();
+  return c0.includes('max') || c0.includes('marks') || c1.includes('max') || c2.includes('max') || c3.includes('max');
+}
+
 function checkRowMatchesFilters(sheet, r) {
-  if (!sheet) return true;
+  if (!sheet || r === 0 || isMarksRow(sheet, r)) return true;
 
   // 1. Search Query Match (any cell in row)
   if (S.searchQuery) {
@@ -559,6 +568,10 @@ function applyExcelGridFilters() {
   const trList = tbody.querySelectorAll('tr[data-row]');
   trList.forEach(tr => {
     const r = parseInt(tr.dataset.row, 10);
+    if (r === 0 || isMarksRow(sheet, r)) {
+      tr.style.display = '';
+      return;
+    }
     const nameCell = getCell(sheet, r, 2);
     const rollCell = getCell(sheet, r, 0);
     const isStudentRow = Boolean((nameCell && (nameCell.v || nameCell.raw)) || (rollCell && (rollCell.v || rollCell.raw)));
@@ -634,8 +647,14 @@ function sortSheetByMode(mode) {
     sortDir = mode === 'ATT_DESC' ? 'desc' : 'asc';
   }
 
+  let firstStudentR = 1;
+  if (isMarksRow(sheet, 1)) {
+    firstStudentR = 2;
+  }
+
   const rows = [];
-  for (let r = 1; r < sheet.rowsCount; r++) {
+  for (let r = firstStudentR; r < sheet.rowsCount; r++) {
+    if (isMarksRow(sheet, r)) continue;
     const nameVal = getCell(sheet, r, 2).v;
     const rollVal = getCell(sheet, r, 0).v;
     if (!nameVal && !rollVal) continue; // skip empty rows
@@ -661,7 +680,7 @@ function sortSheetByMode(mode) {
   });
 
   rows.forEach((rowObj, newIdx) => {
-    const targetR = newIdx + 1;
+    const targetR = newIdx + firstStudentR;
     rowObj.rowCells.forEach((cell, col) => {
       setCell(sheet, targetR, col, cell);
     });
@@ -740,6 +759,7 @@ function updateFilterModalSummary() {
 
   if (sheet && sheet.rowsCount > 1) {
     for (let r = 1; r < sheet.rowsCount; r++) {
+      if (isMarksRow(sheet, r)) continue;
       const nameCell = getCell(sheet, r, 2);
       const rollCell = getCell(sheet, r, 0);
       if ((nameCell && (nameCell.v || nameCell.raw)) || (rollCell && (rollCell.v || rollCell.raw))) {
@@ -7630,56 +7650,182 @@ async function exportCurrentSheet(format) {
       workbook.lastModifiedBy = 'Faculty Member';
       workbook.created = new Date();
 
+      const banner1 = document.getElementById('hdr-banner-line1')?.textContent?.trim() || 'Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026-27 (Winter Session)';
+      const banner2 = document.getElementById('hdr-banner-line2')?.textContent?.trim() || (S.group ? `Internal Evaluation | Subject : ${S.group.name || S.group.subject_name || 'Subject'}` : 'Internal Evaluation Sheet');
+      const banner3 = document.getElementById('hdr-banner-cohort')?.textContent?.trim() || 'Information Technology | Semester 5';
+
       EXCEL_WB.sheets.forEach(wsData => {
         const worksheet = workbook.addWorksheet(wsData.name || 'Sheet');
 
-        // Column Widths
-        const maxCols = Math.max(wsData.colsCount || 26, 15);
-        for (let c = 0; c < maxCols; c++) {
-          const w = wsData.colWidths[c];
-          if (w) worksheet.getColumn(c + 1).width = Math.round(w / 8);
+        // 1. Find the highest column index that actually has data in this worksheet
+        let maxDataCol = 0;
+        for (let c = 0; c < (wsData.colsCount || 26); c++) {
+          for (let r = 0; r < (wsData.rowsCount || 50); r++) {
+            const cellVal = getCell(wsData, r, c).v;
+            if (cellVal !== '' && cellVal !== null && cellVal !== undefined) {
+              if (c > maxDataCol) maxDataCol = c;
+            }
+          }
+        }
+        maxDataCol = Math.max(maxDataCol, 3); // at least 4 columns (A, B, C, D)
+
+        // 2. Check if this worksheet already has the institutional banner embedded
+        const cell0_0 = String(getCell(wsData, 0, 0).v || getCell(wsData, 0, 0).raw || '');
+        const alreadyHasBanner = cell0_0.includes('Polytechnic') || cell0_0.includes('Institute') || cell0_0.includes('Uttarakhand');
+        const bannerOffset = alreadyHasBanner ? 0 : 3;
+
+        // 3. Prepend Institutional Header rows if not already present
+        if (!alreadyHasBanner) {
+          // Banner Row 1: Institution & Session
+          const r1 = worksheet.getRow(1);
+          r1.height = 28;
+          const c1 = r1.getCell(1);
+          c1.value = banner1;
+          c1.font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FF0F172A' } };
+          c1.alignment = { horizontal: 'center', vertical: 'middle' };
+          c1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+          worksheet.mergeCells(1, 1, 1, maxDataCol + 1);
+
+          // Banner Row 2: Department & Subject
+          const r2 = worksheet.getRow(2);
+          r2.height = 22;
+          const c2 = r2.getCell(1);
+          c2.value = banner2;
+          c2.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FF1E293B' } };
+          c2.alignment = { horizontal: 'center', vertical: 'middle' };
+          c2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+          worksheet.mergeCells(2, 1, 2, maxDataCol + 1);
+
+          // Banner Row 3: Cohort & Semester
+          const r3 = worksheet.getRow(3);
+          r3.height = 20;
+          const c3 = r3.getCell(1);
+          c3.value = banner3;
+          c3.font = { name: 'Segoe UI', size: 9, bold: true, color: { argb: 'FF475569' } };
+          c3.alignment = { horizontal: 'center', vertical: 'middle' };
+          c3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+          worksheet.mergeCells(3, 1, 3, maxDataCol + 1);
+
+          // Borders for banner rows
+          for (let bRow = 1; bRow <= 3; bRow++) {
+            const bRowObj = worksheet.getRow(bRow);
+            for (let c = 1; c <= maxDataCol + 1; c++) {
+              bRowObj.getCell(c).border = {
+                top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+              };
+            }
+          }
         }
 
-        // Iterate rows & cells
+        // 4. Track column max lengths for perfect auto-width calculation
+        const colMaxLengths = new Array(maxDataCol + 1).fill(10);
+        colMaxLengths[0] = 10; // Roll #
+        colMaxLengths[1] = 18; // Enrollment No
+        colMaxLengths[2] = 26; // Student Name
+
+        // 5. Populate Data Rows & Cells
         const maxRows = Math.max(wsData.rowsCount || 50, 20);
         for (let r = 0; r < maxRows; r++) {
-          const rowObj = worksheet.getRow(r + 1);
-          for (let c = 0; c < maxCols; c++) {
+          let rowHasData = false;
+          for (let c = 0; c <= maxDataCol; c++) {
             const cell = getCell(wsData, r, c);
             if (cell.raw !== '' && cell.raw !== null && cell.raw !== undefined) {
-              const excelCell = rowObj.getCell(c + 1);
+              rowHasData = true;
+              break;
+            }
+          }
+          if (!rowHasData && r >= 30) continue; // skip excessive trailing empty rows
+
+          const excelR = r + 1 + bannerOffset;
+          const rowObj = worksheet.getRow(excelR);
+          const isHeader = r === 0;
+          const isMarks = r === 1 && isMarksRow(wsData, 1);
+          rowObj.height = isHeader ? 26 : isMarks ? 22 : 20;
+
+          for (let c = 0; c <= maxDataCol; c++) {
+            const cell = getCell(wsData, r, c);
+            const excelCell = rowObj.getCell(c + 1);
+
+            const strLen = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || '')).length;
+            if (strLen > colMaxLengths[c] && !isMarks) {
+              colMaxLengths[c] = Math.min(strLen + 3, 35);
+            }
+
+            if (cell.raw !== '' && cell.raw !== null && cell.raw !== undefined) {
               if (cell.f) {
+                let adjustedFormula = cell.f.replace(/^=/, '');
+                if (bannerOffset > 0) {
+                  // Shift cell row references in formulas (e.g. D3 -> D6)
+                  adjustedFormula = adjustedFormula.replace(/([A-Z]+)(\d+)/g, (match, colLetters, rowNumber) => {
+                    return `${colLetters}${parseInt(rowNumber, 10) + bannerOffset}`;
+                  });
+                }
                 excelCell.value = {
-                  formula: cell.f.replace(/^=/, ''),
+                  formula: adjustedFormula,
                   result: cell.v
                 };
-              } else if (!isNaN(Number(cell.v)) && cell.v !== '') {
+              } else if (!isNaN(Number(cell.v)) && cell.v !== '' && !String(cell.v).startsWith('0')) {
                 excelCell.value = Number(cell.v);
               } else {
                 excelCell.value = cell.v !== undefined ? cell.v : cell.raw;
               }
+            }
 
-              // Styling
-              if (cell.s) {
-                if (cell.s.bold) excelCell.font = { bold: true };
-                if (cell.s.align) excelCell.alignment = { horizontal: cell.s.align };
+            // Cell styling & borders
+            excelCell.border = {
+              top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+              bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+              left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+              right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+            };
+
+            if (isHeader) {
+              excelCell.font = { name: 'Segoe UI', bold: true, size: 10, color: { argb: 'FF0F172A' } };
+              excelCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+              excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+            } else if (isMarks) {
+              excelCell.font = { name: 'Segoe UI', bold: true, size: 9, color: { argb: 'FF334155' } };
+              excelCell.alignment = { horizontal: 'center', vertical: 'middle' };
+              excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
+            } else {
+              const align = c === 2 ? 'left' : 'center';
+              excelCell.font = { name: 'Segoe UI', size: 10, bold: cell.s?.bold || false, color: { argb: 'FF1E293B' } };
+              excelCell.alignment = { horizontal: cell.s?.align || align, vertical: 'middle' };
+              if (cell.s?.bg) {
+                excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
               }
             }
           }
           rowObj.commit();
         }
 
-        // Apply merges
+        // 6. Set auto column widths up to maxDataCol
+        for (let c = 0; c <= maxDataCol; c++) {
+          worksheet.getColumn(c + 1).width = Math.max(colMaxLengths[c] || 12, 12);
+        }
+
+        // 7. Apply sheet cell merges (shifted if banner prepended)
         if (Array.isArray(wsData.merges)) {
           wsData.merges.forEach(m => {
-            worksheet.mergeCells(m.s.r + 1, m.s.c + 1, m.e.r + 1, m.e.c + 1);
+            const startR = m.s.r + 1 + bannerOffset;
+            const startC = m.s.c + 1;
+            const endR = m.e.r + 1 + bannerOffset;
+            const endC = Math.min(m.e.c + 1, maxDataCol + 1);
+            if (endC >= startC && endR >= startR) {
+              try {
+                worksheet.mergeCells(startR, startC, endR, endC);
+              } catch (_) { }
+            }
           });
         }
       });
 
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      triggerBrowserDownload(blob, EXCEL_WB.name || 'VidyaOS_Evaluation.xlsx');
+      triggerBrowserDownload(blob, EXCEL_WB.name || 'VidyaOS_Evaluation_Sheet.xlsx');
     } catch (err) {
       console.error('Failed to export Excel workbook:', err);
       alert('Error creating Excel file. Please try again.');
@@ -7698,11 +7844,36 @@ async function exportCurrentSheet(format) {
 }
 
 function generateActiveSheetCSV(sheet) {
+  let maxDataCol = 0;
+  for (let c = 0; c < sheet.colsCount; c++) {
+    for (let r = 0; r < sheet.rowsCount; r++) {
+      const v = getCell(sheet, r, c).v;
+      if (v !== '' && v !== null && v !== undefined) {
+        if (c > maxDataCol) maxDataCol = c;
+      }
+    }
+  }
+  maxDataCol = Math.max(maxDataCol, 3);
+
+  const banner1 = document.getElementById('hdr-banner-line1')?.textContent?.trim() || 'Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026-27 (Winter Session)';
+  const banner2 = document.getElementById('hdr-banner-line2')?.textContent?.trim() || (S.group ? `Internal Evaluation | Subject : ${S.group.name || S.group.subject_name || 'Subject'}` : 'Internal Evaluation');
+  const banner3 = document.getElementById('hdr-banner-cohort')?.textContent?.trim() || 'Information Technology | Semester 5';
+
+  const cell0_0 = String(getCell(sheet, 0, 0).v || getCell(sheet, 0, 0).raw || '');
+  const alreadyHasBanner = cell0_0.includes('Polytechnic') || cell0_0.includes('Institute');
+
   const rows = [];
+  if (!alreadyHasBanner) {
+    rows.push(`"${banner1.replace(/"/g, '""')}"`);
+    rows.push(`"${banner2.replace(/"/g, '""')}"`);
+    rows.push(`"${banner3.replace(/"/g, '""')}"`);
+    rows.push('');
+  }
+
   for (let r = 0; r < sheet.rowsCount; r++) {
     const row = [];
     let hasData = false;
-    for (let c = 0; c < sheet.colsCount; c++) {
+    for (let c = 0; c <= maxDataCol; c++) {
       const cell = getCell(sheet, r, c);
       const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.raw;
       if (val !== '' && val !== null && val !== undefined) hasData = true;
@@ -7715,14 +7886,50 @@ function generateActiveSheetCSV(sheet) {
 }
 
 function exportSheetToWordDoc(sheet) {
-  let tableHtml = '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;font-family:Arial;">';
+  let maxDataCol = 0;
+  for (let c = 0; c < sheet.colsCount; c++) {
+    for (let r = 0; r < sheet.rowsCount; r++) {
+      const v = getCell(sheet, r, c).v;
+      if (v !== '' && v !== null && v !== undefined) {
+        if (c > maxDataCol) maxDataCol = c;
+      }
+    }
+  }
+  maxDataCol = Math.max(maxDataCol, 3);
+
+  const banner1 = document.getElementById('hdr-banner-line1')?.textContent?.trim() || 'Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026-27 (Winter Session)';
+  const banner2 = document.getElementById('hdr-banner-line2')?.textContent?.trim() || (S.group ? `Internal Evaluation | Subject : ${S.group.name || S.group.subject_name || 'Subject'}` : 'Internal Evaluation');
+  const banner3 = document.getElementById('hdr-banner-cohort')?.textContent?.trim() || 'Information Technology | Semester 5';
+
+  const cell0_0 = String(getCell(sheet, 0, 0).v || getCell(sheet, 0, 0).raw || '');
+  const alreadyHasBanner = cell0_0.includes('Polytechnic') || cell0_0.includes('Institute');
+
+  let tableHtml = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-family:Segoe UI,Arial,sans-serif;font-size:11px;width:100%;">';
+
+  if (!alreadyHasBanner) {
+    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#0f172a;font-size:13px;padding:8px;text-align:center;">${escapeHtml(banner1)}</th></tr>`;
+    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#1e293b;font-size:11px;padding:5px;text-align:center;">${escapeHtml(banner2)}</th></tr>`;
+    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#475569;font-size:10px;padding:4px;text-align:center;">${escapeHtml(banner3)}</th></tr>`;
+  }
+
   for (let r = 0; r < sheet.rowsCount; r++) {
-    tableHtml += '<tr>';
-    for (let c = 0; c < sheet.colsCount; c++) {
+    let hasData = false;
+    for (let c = 0; c <= maxDataCol; c++) {
+      const v = getCell(sheet, r, c).v;
+      if (v !== '' && v !== null && v !== undefined) { hasData = true; break; }
+    }
+    if (!hasData) continue;
+
+    const isHeader = r === 0;
+    const isMarks = r === 1 && isMarksRow(sheet, 1);
+    const bg = isHeader ? 'background:#e2e8f0;font-weight:bold;text-align:center;' : isMarks ? 'background:#f1f5f9;font-weight:bold;text-align:center;' : '';
+
+    tableHtml += `<tr style="${bg}">`;
+    for (let c = 0; c <= maxDataCol; c++) {
       const cell = getCell(sheet, r, c);
       const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.raw;
-      const isHeader = r === 0;
-      tableHtml += `<${isHeader ? 'th' : 'td'}>${escapeHtml(val)}</${isHeader ? 'th' : 'td'}>`;
+      const align = c === 2 && !isHeader && !isMarks ? 'text-align:left;' : 'text-align:center;';
+      tableHtml += `<${isHeader ? 'th' : 'td'} style="${align}padding:5px;">${escapeHtml(val)}</${isHeader ? 'th' : 'td'}>`;
     }
     tableHtml += '</tr>';
   }
@@ -7750,6 +7957,63 @@ function triggerExcelImport() {
   if (fileInput) fileInput.click();
 }
 
+function extractWorksheetMerges(worksheet) {
+  const merges = [];
+  const rawList = [];
+
+  if (worksheet.model && Array.isArray(worksheet.model.merges)) {
+    rawList.push(...worksheet.model.merges);
+  } else if (worksheet._merges) {
+    if (Array.isArray(worksheet._merges)) {
+      rawList.push(...worksheet._merges);
+    } else if (typeof worksheet._merges === 'object') {
+      rawList.push(...Object.values(worksheet._merges));
+    }
+  }
+
+  rawList.forEach(m => {
+    let rangeStr = '';
+    if (typeof m === 'string') {
+      rangeStr = m;
+    } else if (m && typeof m === 'object') {
+      if (m.range) rangeStr = m.range;
+      else if (m.model && m.model.range) rangeStr = m.model.range;
+      else if (m.tl && m.br) rangeStr = `${m.tl}:${m.br}`;
+      else if (m.top !== undefined && m.left !== undefined) {
+        merges.push({
+          s: { r: m.top - 1, c: m.left - 1 },
+          e: { r: (m.bottom || m.top) - 1, c: (m.right || m.left) - 1 }
+        });
+        return;
+      }
+    }
+
+    if (rangeStr && rangeStr.includes(':')) {
+      const parts = rangeStr.split(':');
+      const start = parseExcelCellCoord(parts[0]);
+      const end = parseExcelCellCoord(parts[1]);
+      if (start && end) {
+        merges.push({
+          s: { r: Math.min(start.r, end.r), c: Math.min(start.c, end.c) },
+          e: { r: Math.max(start.r, end.r), c: Math.max(start.c, end.c) }
+        });
+      }
+    }
+  });
+
+  return merges;
+}
+
+function parseExcelCellCoord(coordStr) {
+  if (!coordStr) return null;
+  const match = String(coordStr).trim().toUpperCase().match(/^([A-Z]+)(\d+)$/);
+  if (!match) return null;
+  return {
+    c: letterToCol(match[1]),
+    r: parseInt(match[2], 10) - 1
+  };
+}
+
 async function handleExcelFileImport(e) {
   const file = e.target.files?.[0];
   if (!file) return;
@@ -7769,27 +8033,88 @@ async function handleExcelFileImport(e) {
 
       EXCEL_WB.sheets = [];
       workbook.eachSheet((worksheet, sheetId) => {
-        const sheetObj = createDefaultExcelSheet(worksheet.name, {
-          rowsCount: Math.max(worksheet.rowCount, 40),
-          colsCount: Math.max(worksheet.columnCount, 20)
+        // 1. Extract worksheet merges
+        const merges = extractWorksheetMerges(worksheet);
+
+        // 2. Build fast lookup of absorbed cells in merges to prevent duplicating values
+        const absorbedMap = new Set();
+        merges.forEach(m => {
+          for (let r = m.s.r; r <= m.e.r; r++) {
+            for (let c = m.s.c; c <= m.e.c; c++) {
+              if (r !== m.s.r || c !== m.s.c) {
+                absorbedMap.add(`${r}_${c}`);
+              }
+            }
+          }
         });
 
+        // 3. Determine max row and column bounds
+        let maxRow = Math.max(worksheet.rowCount || 0, 40);
+        let maxCol = Math.max(worksheet.columnCount || 0, 20);
+
+        const sheetObj = createDefaultExcelSheet(worksheet.name, {
+          rowsCount: maxRow,
+          colsCount: maxCol,
+          merges: merges
+        });
+
+        // 4. Import column widths
+        if (worksheet.columns) {
+          worksheet.columns.forEach((col, idx) => {
+            if (col && col.width) {
+              sheetObj.colWidths[idx] = Math.max(Math.round(col.width * 8), 60);
+            }
+          });
+        }
+
+        // 5. Populate cell data, skipping duplicate values on absorbed cells
         worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+          const r = rowNumber - 1;
+          if (row.height) {
+            sheetObj.rowHeights[r] = Math.round(row.height * 1.33);
+          }
+
           row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
-            const r = rowNumber - 1;
             const c = colNumber - 1;
+            const isAbsorbed = absorbedMap.has(`${r}_${c}`);
+
+            if (isAbsorbed) {
+              // Non-top-left cell in a merge: clear value so it does not repeat across columns
+              setCell(sheetObj, r, c, { raw: '', v: '', f: null });
+              return;
+            }
+
             let val = cell.value;
             let formula = null;
 
-            if (typeof val === 'object' && val !== null && val.formula) {
-              formula = '=' + val.formula;
-              val = val.result !== undefined ? val.result : '';
+            if (typeof val === 'object' && val !== null) {
+              if (val.formula) {
+                formula = '=' + val.formula;
+                val = val.result !== undefined ? val.result : '';
+              } else if (val.text) {
+                val = val.text;
+              } else if (val.richText && Array.isArray(val.richText)) {
+                val = val.richText.map(t => t.text).join('');
+              }
+            }
+
+            const style = {};
+            if (cell.font) {
+              if (cell.font.bold) style.bold = true;
+              if (cell.font.italic) style.italic = true;
+              if (cell.font.underline) style.underline = true;
+            }
+            if (cell.alignment) {
+              if (cell.alignment.horizontal) style.align = cell.alignment.horizontal;
+              if (cell.alignment.vertical) style.vAlign = cell.alignment.vertical;
+              if (cell.alignment.wrapText) style.wrap = true;
             }
 
             setCell(sheetObj, r, c, {
               raw: formula || String(val ?? ''),
               f: formula,
-              v: val
+              v: val,
+              s: Object.keys(style).length ? style : undefined
             });
           });
         });
@@ -7797,10 +8122,13 @@ async function handleExcelFileImport(e) {
         EXCEL_WB.sheets.push(sheetObj);
       });
 
-      EXCEL_WB.name = file.name;
-      document.getElementById('excel-workbook-title').textContent = file.name;
-      switchWorksheet(0);
-      alert(`Imported ${EXCEL_WB.sheets.length} worksheet(s) successfully.`);
+      if (EXCEL_WB.sheets.length > 0) {
+        EXCEL_WB.name = file.name;
+        const titleEl = document.getElementById('excel-workbook-title');
+        if (titleEl) titleEl.textContent = file.name;
+        switchWorksheet(0);
+        alert(`Imported ${EXCEL_WB.sheets.length} worksheet(s) successfully.`);
+      }
     } catch (err) {
       console.error('Failed to import Excel file:', err);
       alert('Could not read this Excel file.');
@@ -7835,13 +8163,15 @@ function importCSVToSheet(csvText, sheetName) {
 function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   const key = `vidyaos_excel_wb_${S.groupId || 'default'}`;
 
-  // If faculty has existing edits saved locally for this subject, load them unless force refresh requested
+  // If faculty has existing edits saved locally for this subject, load them unless force refresh requested or obsolete
   if (!forceRefresh) {
     try {
       const saved = localStorage.getItem(key);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length > 0) {
+        const s0 = parsed?.sheets?.[0];
+        const hasObsoleteGrade = s0 && (getCell(s0, 0, 7)?.v === 'Grade' || String(getCell(s0, 0, 3)?.v || '').includes('(10)'));
+        if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length > 0 && !hasObsoleteGrade) {
           EXCEL_WB.name = parsed.name || EXCEL_WB.name;
           EXCEL_WB.sheets = parsed.sheets;
           EXCEL_WB.activeSheetIndex = 0;
@@ -7879,22 +8209,32 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   }
 
   EXCEL_WB.sheets = [];
-  const totalRows = Math.max(students.length + 5, 45);
+  const totalRows = Math.max(students.length + 6, 45);
 
-  // SHEET 1: Master Evaluation Sheet
+  // SHEET 1: Master Evaluation Sheet (Theory + Practical scaled grand total)
   const evalSheet = createDefaultExcelSheet('Master Evaluation', {
     type: 'evaluation',
     rowsCount: totalRows,
-    colsCount: 14
+    colsCount: 14,
+    frozenRows: 2,
+    frozenCols: 3
   });
 
-  const evalHeaders = ['Roll #', 'Enrollment No', 'Student Name', 'Assignment Avg (10)', 'UT Avg (20)', 'Attendance %', 'Total Score (40)', 'Grade'];
+  // Separate Header Row (Row 0)
+  const evalHeaders = ['Roll #', 'Enrollment No', 'Student Name', 'Assignment Avg', 'UT Avg', 'Attendance %', 'Total Marks'];
   evalHeaders.forEach((h, c) => {
     setCell(evalSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   });
 
+  // Separate Max Marks Row (Row 1)
+  const evalMarks = ['Max Marks ->', '', '', 10, 20, '100%', 40];
+  evalMarks.forEach((m, c) => {
+    setCell(evalSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+  });
+
+  // Student rows starting at Row 2 (Excel row 3)
   students.forEach((stu, idx) => {
-    const r = idx + 1;
+    const r = idx + 2;
     const roll = stu.class_roll_no || (idx + 1);
     const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '';
     const name = stu.full_name || stu.student_name || stu.name || '';
@@ -7921,41 +8261,45 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     setCell(evalSheet, r, 4, { raw: examAvg, v: examAvg, s: { align: 'center' } });
     setCell(evalSheet, r, 5, { raw: attPct, v: attPct, s: { align: 'center' } });
 
-    // Formulas for Total & Grade
+    // Formula for Total Marks (Max 40)
     const totalFormula = `=ROUND(D${r + 1} + E${r + 1} + (F${r + 1} * 0.1), 1)`;
-    const gradeFormula = `=IF(G${r + 1}>=30,"Distinction",IF(G${r + 1}>=24,"First",IF(G${r + 1}>=16,"Pass","Fail")))`;
-
     setCell(evalSheet, r, 6, { raw: totalFormula, f: totalFormula, s: { bold: true, align: 'center' } });
-    setCell(evalSheet, r, 7, { raw: gradeFormula, f: gradeFormula, s: { bold: true, align: 'center' } });
   });
 
   EXCEL_WB.sheets.push(evalSheet);
 
   // SHEET 2: Class Test Marksheet
   const testCols = (Array.isArray(S.tests) && S.tests.length)
-    ? S.tests.map((t, idx) => ({ title: `${t.name || t.title || 'Unit Test ' + (idx + 1)} (${t.max_marks || 20})`, max: t.max_marks || 20 }))
+    ? S.tests.map((t, idx) => ({ title: (t.name || t.title || 'Unit Test ' + (idx + 1)).replace(/\s*\(\d+\)$/, ''), max: t.max_marks || 20 }))
     : [
-      { title: 'Unit Test 1 (20)', max: 20 },
-      { title: 'Unit Test 2 (20)', max: 20 },
-      { title: 'Unit Test 3 (20)', max: 20 }
+      { title: 'Unit Test 1', max: 20 },
+      { title: 'Unit Test 2', max: 20 },
+      { title: 'Unit Test 3', max: 20 }
     ];
 
   const testSheet = createDefaultExcelSheet('Class Tests', {
     type: 'tests',
     rowsCount: totalRows,
-    colsCount: Math.max(testCols.length + 5, 12)
+    colsCount: Math.max(testCols.length + 5, 12),
+    frozenRows: 2,
+    frozenCols: 3
   });
 
-  const testHeaders = ['Roll #', 'Enrollment No', 'Student Name', ...testCols.map(t => t.title), 'Average (20)'];
+  const testHeaders = ['Roll #', 'Enrollment No', 'Student Name', ...testCols.map(t => t.title), 'UT Avg'];
   testHeaders.forEach((h, c) => {
     setCell(testSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+  });
+
+  const testMarks = ['Max Marks ->', '', '', ...testCols.map(t => t.max), 20];
+  testMarks.forEach((m, c) => {
+    setCell(testSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
   });
 
   const lastTestColLetter = colToLetter(3 + testCols.length - 1);
   const avgColIdx = 3 + testCols.length;
 
   students.forEach((stu, idx) => {
-    const r = idx + 1;
+    const r = idx + 2;
     const roll = stu.class_roll_no || (idx + 1);
     const enroll = stu.official_enrollment_no || stu.enrollment_no || '';
     const name = stu.full_name || stu.student_name || stu.name || '';
@@ -7982,29 +8326,36 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
 
   // SHEET 3: Assignment Marksheet
   const assignCols = (Array.isArray(S.assignments) && S.assignments.length)
-    ? S.assignments.map((a, idx) => ({ title: `${a.title || 'Assignment ' + (idx + 1)} (${a.max_marks || 10})`, max: a.max_marks || 10 }))
+    ? S.assignments.map((a, idx) => ({ title: (a.title || 'Assignment ' + (idx + 1)).replace(/\s*\(\d+\)$/, ''), max: a.max_marks || 10 }))
     : [
-      { title: 'Assignment 1 (10)', max: 10 },
-      { title: 'Assignment 2 (10)', max: 10 },
-      { title: 'Assignment 3 (10)', max: 10 }
+      { title: 'Assignment 1', max: 10 },
+      { title: 'Assignment 2', max: 10 },
+      { title: 'Assignment 3', max: 10 }
     ];
 
   const assignSheet = createDefaultExcelSheet('Assignments', {
     type: 'assignments',
     rowsCount: totalRows,
-    colsCount: Math.max(assignCols.length + 5, 12)
+    colsCount: Math.max(assignCols.length + 5, 12),
+    frozenRows: 2,
+    frozenCols: 3
   });
 
-  const assignHeaders = ['Roll #', 'Enrollment No', 'Student Name', ...assignCols.map(a => a.title), 'Average (10)'];
+  const assignHeaders = ['Roll #', 'Enrollment No', 'Student Name', ...assignCols.map(a => a.title), 'Assignment Avg'];
   assignHeaders.forEach((h, c) => {
     setCell(assignSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+  });
+
+  const assignMarks = ['Max Marks ->', '', '', ...assignCols.map(a => a.max), 10];
+  assignMarks.forEach((m, c) => {
+    setCell(assignSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
   });
 
   const lastAssignColLetter = colToLetter(3 + assignCols.length - 1);
   const assignAvgColIdx = 3 + assignCols.length;
 
   students.forEach((stu, idx) => {
-    const r = idx + 1;
+    const r = idx + 2;
     const roll = stu.class_roll_no || (idx + 1);
     const enroll = stu.official_enrollment_no || stu.enrollment_no || '';
     const name = stu.full_name || stu.student_name || stu.name || '';
@@ -8033,16 +8384,23 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   const practicalSheet = createDefaultExcelSheet('Practicals', {
     type: 'practicals',
     rowsCount: totalRows,
-    colsCount: 12
+    colsCount: 12,
+    frozenRows: 2,
+    frozenCols: 3
   });
 
-  const practicalHeaders = ['Roll #', 'Enrollment No', 'Student Name', 'Lab Experiment 1 (10)', 'Lab Experiment 2 (10)', 'Viva Voce (10)', 'Average (10)'];
+  const practicalHeaders = ['Roll #', 'Enrollment No', 'Student Name', 'Lab Experiment 1', 'Lab Experiment 2', 'Viva Voce', 'Practical Total'];
   practicalHeaders.forEach((h, c) => {
     setCell(practicalSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   });
 
+  const practicalMarks = ['Max Marks ->', '', '', 10, 10, 10, 30];
+  practicalMarks.forEach((m, c) => {
+    setCell(practicalSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+  });
+
   students.forEach((stu, idx) => {
-    const r = idx + 1;
+    const r = idx + 2;
     const roll = stu.class_roll_no || (idx + 1);
     const enroll = stu.official_enrollment_no || stu.enrollment_no || '';
     const name = stu.full_name || stu.student_name || stu.name || '';
