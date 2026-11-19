@@ -432,18 +432,23 @@ async function switchSheetTab(sheetName, updateUrl = true) {
   }
 }
 
-function updateBannerForSheet(sheetType) {
+function updateBannerForSheet(sheetTypeOrName) {
   const line2 = document.getElementById('hdr-banner-line2');
   if (!line2) return;
   const subjName = S.group?.subject_name || S.group?.name || 'Class';
-  const labelMap = {
-    evaluation: 'Master Evaluation Ledger',
-    tests: 'Class Tests & Internal Assessment Marksheet',
-    assignments: 'Coursework & Continuous Assessment Assignments',
-    practicals: 'Practical & Laboratory Examination Records'
-  };
-  const title = labelMap[sheetType] || 'Marks Evaluation Sheet';
-  line2.textContent = `Internal Evaluation - ${title} | Subject : ${subjName}`;
+  let title = 'Marks Evaluation Sheet';
+  if (sheetTypeOrName === 'evaluation' || sheetTypeOrName === 'Master Evaluation') {
+    title = 'Consolidated (Theory+Practical)';
+  } else if (sheetTypeOrName === 'tests' || sheetTypeOrName === 'Unit Tests - Consolidated') {
+    title = 'Unit Test - Consolidated';
+  } else if (sheetTypeOrName === 'assignments' || sheetTypeOrName === 'Assignments') {
+    title = 'Assignment';
+  } else if (sheetTypeOrName === 'practicals' || sheetTypeOrName === 'Practicals') {
+    title = 'Practical & Laboratory Examination Records';
+  } else if (typeof sheetTypeOrName === 'string') {
+    title = `Unit Test - ${sheetTypeOrName}`;
+  }
+  line2.textContent = `Department (${S.group?.department_code || 'IT'}) | Internal Evaluation - ${title} | Subject : ${subjName}`;
 }
 
 // Purged legacy renderSheetSubToolbar
@@ -492,11 +497,17 @@ function isMarksRow(sheet, r) {
   const c1 = String(getCell(sheet, r, 1).v || getCell(sheet, r, 1).raw || '').toLowerCase();
   const c2 = String(getCell(sheet, r, 2).v || getCell(sheet, r, 2).raw || '').toLowerCase();
   const c3 = String(getCell(sheet, r, 3).v || getCell(sheet, r, 3).raw || '').toLowerCase();
-  return c0.includes('max') || c0.includes('marks') || c1.includes('max') || c2.includes('max') || c3.includes('max');
+  return c0.includes('marks') || c0.includes('question') || c0.includes('unit test no') || c0.includes('assignment no') || c0.includes('max') || c1.includes('max') || c2.includes('max') || c3.includes('max');
+}
+
+function isSignoffRow(sheet, r) {
+  if (!sheet || r < 0) return false;
+  const c0 = String(getCell(sheet, r, 0).v || getCell(sheet, r, 0).raw || '').toLowerCase();
+  return c0.includes('subject teacher') || c0.includes('teacher') || c0.includes('principal') || c0.includes('head of');
 }
 
 function checkRowMatchesFilters(sheet, r) {
-  if (!sheet || r === 0 || isMarksRow(sheet, r)) return true;
+  if (!sheet || r === 0 || isMarksRow(sheet, r) || isSignoffRow(sheet, r)) return true;
 
   // 1. Search Query Match (any cell in row)
   if (S.searchQuery) {
@@ -4975,23 +4986,42 @@ function renderSubsheetControls() {
   if (!container) return;
 
   if (S.activeSheet === 'tests') {
-    const tests = S.tests || [];
-    const testOptions = tests.map((t, idx) => {
-      const shortCode = getTestShortHeader(t, idx);
-      const tName = t.title || t.name || 'Unit Test';
-      return `
+    const singleTestSheets = (EXCEL_WB.sheets || []).filter(s => s.type === 'single-test');
+    const activeSheetObj = getActiveSheet();
+    const activeVal = activeSheetObj && activeSheetObj.type === 'single-test' ? (activeSheetObj.shortName || activeSheetObj.testId || activeSheetObj.name) : 'ALL';
+
+    let testOptions = '';
+    if (singleTestSheets.length > 0) {
+      testOptions = singleTestSheets.map((s, idx) => {
+        const val = s.shortName || s.testId || `UT${idx + 1}`;
+        const isSel = (String(activeVal) === String(val) || (activeSheetObj && activeSheetObj.name === s.name));
+        const displayName = s.name.startsWith('UT') ? `${s.name}: Unit Test ${idx + 1}` : s.name;
+        return `<option value="${esc(val)}" ${isSel ? 'selected' : ''}>${esc(displayName)} (20M)</option>`;
+      }).join('');
+    } else if (Array.isArray(S.tests) && S.tests.length) {
+      testOptions = S.tests.map((t, idx) => {
+        const shortCode = getTestShortHeader(t, idx);
+        const tName = t.title || t.name || 'Unit Test';
+        return `
             <option value="${t.id}" ${S.currentTestViewMode !== 'ALL' && String(t.id) === String(S.currentTestId) ? 'selected' : ''}>
               ${esc(shortCode)}: ${esc(tName)} (${t.max_marks || 20}M)
             </option>
           `;
-    }).join('');
+      }).join('');
+    } else {
+      testOptions = `
+        <option value="UT1" ${activeVal === 'UT1' ? 'selected' : ''}>UT1: Unit Test 1 (20M)</option>
+        <option value="UT2" ${activeVal === 'UT2' ? 'selected' : ''}>UT2: Unit Test 2 (20M)</option>
+        <option value="UT3" ${activeVal === 'UT3' ? 'selected' : ''}>UT3: Unit Test 3 (20M)</option>
+      `;
+    }
 
     container.innerHTML = `
-          <select class="subsheet-select-dropdown" id="subsheet-test-select" onchange="switchTestSubsheet(this.value)" title="Switch Unit Test or Combined View">
-            <option value="ALL" ${S.currentTestViewMode === 'ALL' ? 'selected' : ''}>All Unit Tests Combined</option>
-            ${testOptions || '<option value="">No tests scheduled</option>'}
-          </select>
-        `;
+      <select class="subsheet-select-dropdown" id="subsheet-test-select" onchange="switchTestSubsheet(this.value)" title="Switch Unit Test or Combined View">
+        <option value="ALL" ${activeVal === 'ALL' ? 'selected' : ''}>All Unit Tests Combined</option>
+        ${testOptions}
+      </select>
+    `;
   } else if (S.activeSheet === 'assignments') {
     const assignments = S.theoryAssignments || [];
     const aOptions = assignments.map((a, idx) => {
@@ -5044,15 +5074,39 @@ function switchPracticalSubsheet(val) {
 }
 
 function switchTestSubsheet(val) {
-  switchSheetTab('tests');
-  if (val && val !== 'ALL') {
-    const sheet = getActiveSheet();
-    if (sheet) {
-      for (let c = 3; c < sheet.colsCount; c++) {
-        const h = String(getCell(sheet, 0, c).v || '');
-        if (h.includes(String(val)) || (S.tests && S.tests.find(t => String(t.id) === String(val) && h.includes(t.title || t.name)))) {
-          selectEntireColumn(c);
-          break;
+  if (!val || val === 'ALL') {
+    // Switch to Unit Tests - Consolidated
+    const idx = EXCEL_WB.sheets.findIndex(s => s.type === 'tests' && !s.testId);
+    if (idx !== -1) {
+      switchWorksheet(idx);
+    } else {
+      switchSheetTab('tests');
+    }
+  } else {
+    // Switch to single-test sheet matching testId, shortName, or name
+    const idx = EXCEL_WB.sheets.findIndex(s => 
+      s.type === 'single-test' && (
+        String(s.testId) === String(val) ||
+        String(s.shortName) === String(val) ||
+        s.name === String(val) ||
+        s.name === `UT${val}` ||
+        s.name === `Unit Test ${val}` ||
+        s.name.startsWith(String(val))
+      )
+    );
+    if (idx !== -1) {
+      switchWorksheet(idx);
+    } else {
+      switchSheetTab('tests');
+      // If column exists in active sheet, select it
+      const sheet = getActiveSheet();
+      if (sheet) {
+        for (let c = 3; c < sheet.colsCount; c++) {
+          const h = String(getCell(sheet, 0, c).v || '');
+          if (h.includes(String(val))) {
+            selectEntireColumn(c);
+            break;
+          }
         }
       }
     }
@@ -6095,7 +6149,7 @@ function buildCellInlineStyle(s) {
   if (s.bg) styles.push(`background-color:${s.bg}`);
   if (s.align) styles.push(`text-align:${s.align}`);
   if (s.vAlign) styles.push(`vertical-align:${s.vAlign}`);
-  if (s.wrap) styles.push('white-space:normal;word-break:break-word');
+  if (s.wrap) styles.push('white-space:pre-wrap;word-break:break-word');
 
   if (s.border === 'all') styles.push('border:1px solid var(--text-main)');
   else if (s.border === 'outside') styles.push('outline:1px solid var(--text-main)');
@@ -7331,25 +7385,31 @@ function switchWorksheet(idx) {
   let sheetType = sheet.type;
   if (!sheetType) {
     const n = (sheet.name || '').toLowerCase();
-    if (n.includes('test')) sheetType = 'tests';
+    if (n.includes('test') || n.startsWith('ut')) sheetType = 'tests';
     else if (n.includes('assignment')) sheetType = 'assignments';
     else if (n.includes('practical') || n.includes('lab')) sheetType = 'practicals';
     else sheetType = 'evaluation';
   }
-  S.activeSheet = sheetType;
+
+  // If this is a single-test, the top dropdown maps to 'tests'
+  if (sheetType === 'single-test') {
+    S.activeSheet = 'tests';
+  } else {
+    S.activeSheet = sheetType;
+  }
 
   const dropdown = document.getElementById('sheet-selector-dropdown');
-  if (dropdown && dropdown.value !== sheetType) {
-    dropdown.value = sheetType;
+  if (dropdown && dropdown.value !== S.activeSheet) {
+    dropdown.value = S.activeSheet;
   }
 
   const url = new URL(window.location);
-  url.searchParams.set('sheet', sheetType);
+  url.searchParams.set('sheet', S.activeSheet);
   if (S.groupId) url.searchParams.set('id', S.groupId);
   window.history.pushState({}, '', url);
 
   renderSubsheetControls();
-  updateBannerForSheet(sheetType);
+  updateBannerForSheet(sheetType === 'single-test' ? sheet.name : sheetType);
   renderSheetTabs();
   renderExcelGrid(true);
   updateFormulaBarUI();
@@ -8033,6 +8093,11 @@ async function handleExcelFileImport(e) {
 
       EXCEL_WB.sheets = [];
       workbook.eachSheet((worksheet, sheetId) => {
+        // Skip auxiliary DataSheet tab as requested by faculty
+        if (worksheet.name && worksheet.name.toLowerCase().trim() === 'datasheet') {
+          return;
+        }
+
         // 1. Extract worksheet merges
         const merges = extractWorksheetMerges(worksheet);
 
@@ -8052,7 +8117,28 @@ async function handleExcelFileImport(e) {
         let maxRow = Math.max(worksheet.rowCount || 0, 40);
         let maxCol = Math.max(worksheet.columnCount || 0, 20);
 
+        const wsLower = (worksheet.name || '').toLowerCase().trim();
+        let sType = undefined;
+        let sShort = undefined;
+        let sTestId = undefined;
+        if (/^ut\d+$/i.test(wsLower)) {
+          sType = 'single-test';
+          sShort = worksheet.name.toUpperCase();
+          sTestId = parseInt(worksheet.name.replace(/\D/g, ''), 10) || 1;
+        } else if (wsLower.includes('consolidated') || wsLower.includes('unittest') || wsLower.includes('unit test')) {
+          sType = 'tests';
+        } else if (wsLower.includes('eval') || wsLower.includes('master')) {
+          sType = 'evaluation';
+        } else if (wsLower.includes('assign')) {
+          sType = 'assignments';
+        } else if (wsLower.includes('pract') || wsLower.includes('lab')) {
+          sType = 'practicals';
+        }
+
         const sheetObj = createDefaultExcelSheet(worksheet.name, {
+          type: sType,
+          shortName: sShort,
+          testId: sTestId,
           rowsCount: maxRow,
           colsCount: maxCol,
           merges: merges
@@ -8170,8 +8256,11 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
       if (saved) {
         const parsed = JSON.parse(saved);
         const s0 = parsed?.sheets?.[0];
+        const s0Text = String(getCell(s0, 0, 0)?.v || getCell(s0, 0, 0)?.raw || '');
+        const hasBrokenBannerInGrid = s0Text.includes('Polytechnic') || s0Text.includes('Institute') || s0Text.includes('Uttarakhand');
+        const hasSingleTests = Array.isArray(parsed?.sheets) && parsed.sheets.some(s => s.type === 'single-test');
         const hasObsoleteGrade = s0 && (getCell(s0, 0, 7)?.v === 'Grade' || String(getCell(s0, 0, 3)?.v || '').includes('(10)'));
-        if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length > 0 && !hasObsoleteGrade) {
+        if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length > 0 && !hasObsoleteGrade && !hasBrokenBannerInGrid && hasSingleTests) {
           EXCEL_WB.name = parsed.name || EXCEL_WB.name;
           EXCEL_WB.sheets = parsed.sheets;
           EXCEL_WB.activeSheetIndex = 0;
@@ -8209,9 +8298,13 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   }
 
   EXCEL_WB.sheets = [];
-  const totalRows = Math.max(students.length + 6, 45);
+  const totalRows = Math.max(students.length + 8, 45);
+  const signoffR = students.length + 3;
+  const teacherName = S.group?.teacher_name || S.group?.faculty_name || (typeof currentUser !== 'undefined' && currentUser?.name) || 'Subject Teacher';
 
-  // SHEET 1: Master Evaluation Sheet (Theory + Practical scaled grand total)
+  // ══════════════════════════════════════════════════════════════
+  // SHEET 1: Master Evaluation (Theory + Practical consolidated) — Image 4
+  // ══════════════════════════════════════════════════════════════
   const evalSheet = createDefaultExcelSheet('Master Evaluation', {
     type: 'evaluation',
     rowsCount: totalRows,
@@ -8219,24 +8312,30 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     frozenRows: 2,
     frozenCols: 3
   });
+  evalSheet.colWidths[0] = 60;  // SR. NO.
+  evalSheet.colWidths[1] = 130; // ROLL NO.
+  evalSheet.colWidths[2] = 200; // STUDENT NAME
+  for (let c = 3; c <= 12; c++) evalSheet.colWidths[c] = 95;
 
-  // Separate Header Row (Row 0)
-  const evalHeaders = ['Roll #', 'Enrollment No', 'Student Name', 'Assignment Avg', 'UT Avg', 'Attendance %', 'Total Marks'];
+  const evalHeaders = [
+    'SR. NO.', 'ROLL NO.', 'STUDENT NAME',
+    'Assignment (Average)', 'UTs Total (Best 4 Average)', 'Attendance', 'Problem Solving Skills / Project', 'TOTAL',
+    'Lab Record File', 'Creative Work (Model/Chart/Project)', 'Attendance', 'Viva Voce', 'TOTAL'
+  ];
   evalHeaders.forEach((h, c) => {
     setCell(evalSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   });
 
-  // Separate Max Marks Row (Row 1)
-  const evalMarks = ['Max Marks ->', '', '', 10, 20, '100%', 40];
+  const evalMarks = ['Marks -->', '', '', 10, 10, 5, 5, 30, 10, 10, 5, 5, 30];
   evalMarks.forEach((m, c) => {
     setCell(evalSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
   });
 
-  // Student rows starting at Row 2 (Excel row 3)
   students.forEach((stu, idx) => {
     const r = idx + 2;
+    const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
-    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '';
+    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
     const name = stu.full_name || stu.student_name || stu.name || '';
     const attPct = Math.round(Number(stu.attendance_percentage || 85));
 
@@ -8247,173 +8346,310 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
       if (valid.length) assignAvg = Math.round((valid.reduce((a, b) => a + Number(b), 0) / valid.length) * 10) / 10;
     }
 
-    let examAvg = 16.0;
-    if (stu.exam_avg !== undefined) examAvg = Number(stu.exam_avg);
+    let utAvg = 1.75;
+    if (stu.exam_avg !== undefined) utAvg = Math.round(Number(stu.exam_avg) * 0.1 * 100) / 100;
     else if (Array.isArray(stu.exam_scores) && stu.exam_scores.length) {
       const valid = stu.exam_scores.filter(v => v !== '' && v !== null && !isNaN(v));
-      if (valid.length) examAvg = Math.round((valid.reduce((a, b) => a + Number(b), 0) / valid.length) * 10) / 10;
+      if (valid.length) utAvg = Math.round((valid.reduce((a, b) => a + Number(b), 0) / valid.length) * 0.1 * 100) / 100;
     }
 
-    setCell(evalSheet, r, 0, { raw: roll, v: roll, s: { align: 'center' } });
+    const attMarks = Math.min(5, Math.round((attPct / 20) * 10) / 10);
+    const probSkills = 4;
+    const labRecord = 9;
+    const creativeWork = 8.5;
+    const vivaVoce = 4;
+
+    setCell(evalSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
     setCell(evalSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
     setCell(evalSheet, r, 2, { raw: name, v: name, s: { bold: true, align: 'left' } });
     setCell(evalSheet, r, 3, { raw: assignAvg, v: assignAvg, s: { align: 'center' } });
-    setCell(evalSheet, r, 4, { raw: examAvg, v: examAvg, s: { align: 'center' } });
-    setCell(evalSheet, r, 5, { raw: attPct, v: attPct, s: { align: 'center' } });
+    setCell(evalSheet, r, 4, { raw: utAvg, v: utAvg, s: { align: 'center' } });
+    setCell(evalSheet, r, 5, { raw: attMarks, v: attMarks, s: { align: 'center' } });
+    setCell(evalSheet, r, 6, { raw: probSkills, v: probSkills, s: { align: 'center' } });
 
-    // Formula for Total Marks (Max 40)
-    const totalFormula = `=ROUND(D${r + 1} + E${r + 1} + (F${r + 1} * 0.1), 1)`;
-    setCell(evalSheet, r, 6, { raw: totalFormula, f: totalFormula, s: { bold: true, align: 'center' } });
+    // Theory Total formula: =ROUND(D3 + E3 + F3 + G3, 2)
+    const theoryFormula = `=ROUND(D${r + 1} + E${r + 1} + F${r + 1} + G${r + 1}, 2)`;
+    setCell(evalSheet, r, 7, { raw: theoryFormula, f: theoryFormula, s: { bold: true, align: 'center' } });
+
+    setCell(evalSheet, r, 8, { raw: labRecord, v: labRecord, s: { align: 'center' } });
+    setCell(evalSheet, r, 9, { raw: creativeWork, v: creativeWork, s: { align: 'center' } });
+    setCell(evalSheet, r, 10, { raw: attMarks, v: attMarks, s: { align: 'center' } });
+    setCell(evalSheet, r, 11, { raw: vivaVoce, v: vivaVoce, s: { align: 'center' } });
+
+    // Practical Total formula: =ROUND(I3 + J3 + K3 + L3, 2)
+    const practicalFormula = `=ROUND(I${r + 1} + J${r + 1} + K${r + 1} + L${r + 1}, 2)`;
+    setCell(evalSheet, r, 12, { raw: practicalFormula, f: practicalFormula, s: { bold: true, align: 'center' } });
   });
+
+  setCell(evalSheet, signoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
+  setCell(evalSheet, signoffR, 7, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
+  setCell(evalSheet, signoffR, 12, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
 
   EXCEL_WB.sheets.push(evalSheet);
 
-  // SHEET 2: Class Test Marksheet
-  const testCols = (Array.isArray(S.tests) && S.tests.length)
-    ? S.tests.map((t, idx) => ({ title: (t.name || t.title || 'Unit Test ' + (idx + 1)).replace(/\s*\(\d+\)$/, ''), max: t.max_marks || 20 }))
-    : [
-      { title: 'Unit Test 1', max: 20 },
-      { title: 'Unit Test 2', max: 20 },
-      { title: 'Unit Test 3', max: 20 }
-    ];
-
-  const testSheet = createDefaultExcelSheet('Class Tests', {
+  // ══════════════════════════════════════════════════════════════
+  // SHEET 2: Combined Unit Tests (1..10 + Final Total Best 4 Avg) — Image 3
+  // ══════════════════════════════════════════════════════════════
+  const testSheet = createDefaultExcelSheet('Unit Tests - Consolidated', {
     type: 'tests',
     rowsCount: totalRows,
-    colsCount: Math.max(testCols.length + 5, 12),
+    colsCount: 15,
     frozenRows: 2,
     frozenCols: 3
   });
+  testSheet.colWidths[0] = 60;
+  testSheet.colWidths[1] = 130;
+  testSheet.colWidths[2] = 200;
+  for (let c = 3; c <= 12; c++) testSheet.colWidths[c] = 55;
+  testSheet.colWidths[13] = 140;
 
-  const testHeaders = ['Roll #', 'Enrollment No', 'Student Name', ...testCols.map(t => t.title), 'UT Avg'];
+  const testHeaders = ['SR. NO.', 'ROLL NO.', 'STUDENT NAME', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Final Total (Best 4 Avg)'];
   testHeaders.forEach((h, c) => {
     setCell(testSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   });
 
-  const testMarks = ['Max Marks ->', '', '', ...testCols.map(t => t.max), 20];
+  const testMarks = ['Unit Test No. -->', '', '', 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10];
   testMarks.forEach((m, c) => {
     setCell(testSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
   });
 
-  const lastTestColLetter = colToLetter(3 + testCols.length - 1);
-  const avgColIdx = 3 + testCols.length;
-
   students.forEach((stu, idx) => {
     const r = idx + 2;
+    const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
-    const enroll = stu.official_enrollment_no || stu.enrollment_no || '';
+    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
     const name = stu.full_name || stu.student_name || stu.name || '';
 
-    setCell(testSheet, r, 0, { raw: roll, v: roll, s: { align: 'center' } });
+    setCell(testSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
     setCell(testSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
     setCell(testSheet, r, 2, { raw: name, v: name, s: { bold: true, align: 'left' } });
 
-    testCols.forEach((tc, cIdx) => {
-      let mark = 16;
-      if (Array.isArray(stu.exam_scores) && stu.exam_scores[cIdx] !== undefined && stu.exam_scores[cIdx] !== '') {
-        mark = Number(stu.exam_scores[cIdx]);
-      } else {
-        mark = Math.min(tc.max, Math.round(14 + (idx % 6)));
+    for (let tIdx = 0; tIdx < 10; tIdx++) {
+      let mark = 0;
+      if (Array.isArray(stu.exam_scores) && stu.exam_scores[tIdx] !== undefined && stu.exam_scores[tIdx] !== '') {
+        mark = Number(stu.exam_scores[tIdx]);
+      } else if (tIdx < 3) {
+        mark = Math.round((14 + ((idx + tIdx) % 6)));
       }
-      setCell(testSheet, r, 3 + cIdx, { raw: mark, v: mark, s: { align: 'center' } });
-    });
+      setCell(testSheet, r, 3 + tIdx, { raw: mark, v: mark, s: { align: 'center' } });
+    }
 
-    const avgFormula = `=ROUND(AVERAGE(D${r + 1}:${lastTestColLetter}${r + 1}), 1)`;
-    setCell(testSheet, r, avgColIdx, { raw: avgFormula, f: avgFormula, s: { bold: true, align: 'center' } });
+    const best4Formula = `=ROUND(AVERAGE(D${r + 1}:G${r + 1}) * 0.5, 2)`;
+    setCell(testSheet, r, 13, { raw: best4Formula, f: best4Formula, s: { bold: true, align: 'center' } });
   });
+
+  setCell(testSheet, signoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
+  setCell(testSheet, signoffR, 6, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
+  setCell(testSheet, signoffR, 13, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
 
   EXCEL_WB.sheets.push(testSheet);
 
-  // SHEET 3: Assignment Marksheet
-  const assignCols = (Array.isArray(S.assignments) && S.assignments.length)
-    ? S.assignments.map((a, idx) => ({ title: (a.title || 'Assignment ' + (idx + 1)).replace(/\s*\(\d+\)$/, ''), max: a.max_marks || 10 }))
-    : [
-      { title: 'Assignment 1', max: 10 },
-      { title: 'Assignment 2', max: 10 },
-      { title: 'Assignment 3', max: 10 }
-    ];
+  // ══════════════════════════════════════════════════════════════
+  // SHEETS 3..K: Single Unit Test Sheets (UT1, UT2, UT3) — Image 2
+  // ══════════════════════════════════════════════════════════════
+  const testsToGenerate = (Array.isArray(S.tests) && S.tests.length) ? S.tests : [
+    { id: 1, name: 'Unit Test 1', max_marks: 20 },
+    { id: 2, name: 'Unit Test 2', max_marks: 20 },
+    { id: 3, name: 'Unit Test 3', max_marks: 20 }
+  ];
 
+  testsToGenerate.forEach((t, tIdx) => {
+    const tNum = tIdx + 1;
+    const sName = `UT${tNum}`;
+    const singleTestSheet = createDefaultExcelSheet(sName, {
+      type: 'single-test',
+      testId: t.id || tNum,
+      shortName: sName,
+      rowsCount: totalRows,
+      colsCount: 10,
+      frozenRows: 2,
+      frozenCols: 3
+    });
+    singleTestSheet.colWidths[0] = 60;
+    singleTestSheet.colWidths[1] = 130;
+    singleTestSheet.colWidths[2] = 200;
+    singleTestSheet.colWidths[3] = 55;
+    singleTestSheet.colWidths[4] = 55;
+    singleTestSheet.colWidths[5] = 55;
+    singleTestSheet.colWidths[6] = 55;
+    singleTestSheet.colWidths[7] = 75;
+    singleTestSheet.colWidths[8] = 340;
+
+    const singleHeaders = [
+      'SR. NO.', 'ROLL NO.', 'STUDENT NAME',
+      '1', '2', '3', '4', 'Total',
+      'Unit Test Details (Mode : OFFLINE, Posted in Google Classroom as well)'
+    ];
+    singleHeaders.forEach((h, c) => {
+      setCell(singleTestSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+    });
+
+    const questionRow = [
+      'Question No. -->', '', '',
+      5, 5, 5, 5, 20,
+      `UNIT TEST ${tNum} | Maximum Marks : 20 | Time : 50 minutes`
+    ];
+    questionRow.forEach((q, c) => {
+      setCell(singleTestSheet, 1, c, { raw: q, v: q, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+    });
+
+    const testInstructions = `Instructions :\n1. Students must write answers only on the A4 answer sheets.\n2. Attempt to all 4 questions.\n3. This question paper carrying a total of 20 marks. Each question is of 5 marks.\n4. The time duration for this test is 50 minutes.\n5. Students must read all questions carefully before answering.\n6. Answers should be clear, neat and to the point.\n7. Use of unfair means is strictly prohibited.\n8. Write the question number clearly before answering each question.`;
+    setCell(singleTestSheet, 2, 8, { raw: testInstructions, v: testInstructions, s: { align: 'left', wrap: true } });
+
+    const testQuestions = `Unit Test ${tNum} Questions :\n1. What is process control block draw and brief there block diagram.\n2. What is language process explain the all types of language processors.\n3. A program is a set of _______.\n4. Converts a program written in assembly language into its equivalent binary form.`;
+    setCell(singleTestSheet, 12, 8, { raw: testQuestions, v: testQuestions, s: { align: 'left', wrap: true } });
+
+    students.forEach((stu, idx) => {
+      const r = idx + 2;
+      const srNo = idx + 1;
+      const roll = stu.class_roll_no || (idx + 1);
+      const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
+      const name = stu.full_name || stu.student_name || stu.name || '';
+
+      setCell(singleTestSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
+      setCell(singleTestSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
+      setCell(singleTestSheet, r, 2, { raw: name, v: name, s: { bold: true, align: 'left' } });
+
+      const qBase = (idx + tIdx) % 3;
+      const q1 = Math.min(5, 3.5 + (qBase * 0.5));
+      const q2 = Math.min(5, 4.0 + (qBase * 0.5));
+      const q3 = Math.min(5, 3.0 + (qBase * 0.5));
+      const q4 = Math.min(5, 4.0 + (qBase * 0.5));
+
+      setCell(singleTestSheet, r, 3, { raw: q1, v: q1, s: { align: 'center' } });
+      setCell(singleTestSheet, r, 4, { raw: q2, v: q2, s: { align: 'center' } });
+      setCell(singleTestSheet, r, 5, { raw: q3, v: q3, s: { align: 'center' } });
+      setCell(singleTestSheet, r, 6, { raw: q4, v: q4, s: { align: 'center' } });
+
+      const sumFormula = `=SUM(D${r + 1}:G${r + 1})`;
+      setCell(singleTestSheet, r, 7, { raw: sumFormula, f: sumFormula, s: { bold: true, align: 'center' } });
+    });
+
+    setCell(singleTestSheet, signoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
+    setCell(singleTestSheet, signoffR, 4, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
+    setCell(singleTestSheet, signoffR, 7, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
+
+    EXCEL_WB.sheets.push(singleTestSheet);
+  });
+
+  // ══════════════════════════════════════════════════════════════
+  // SHEET 4: Coursework Assignments Marksheet
+  // ══════════════════════════════════════════════════════════════
   const assignSheet = createDefaultExcelSheet('Assignments', {
     type: 'assignments',
     rowsCount: totalRows,
-    colsCount: Math.max(assignCols.length + 5, 12),
+    colsCount: 11,
     frozenRows: 2,
     frozenCols: 3
   });
+  assignSheet.colWidths[0] = 60;
+  assignSheet.colWidths[1] = 130;
+  assignSheet.colWidths[2] = 200;
+  for (let c = 3; c <= 7; c++) assignSheet.colWidths[c] = 55;
+  assignSheet.colWidths[8] = 130;
+  assignSheet.colWidths[9] = 340;
 
-  const assignHeaders = ['Roll #', 'Enrollment No', 'Student Name', ...assignCols.map(a => a.title), 'Assignment Avg'];
+  const assignHeaders = [
+    'SR. NO.', 'ROLL NO.', 'STUDENT NAME',
+    '1', '2', '3', '4', '5', 'Total (Average)',
+    'Assignment Details (Mode : OFFLINE, Posted in Google Classroom as classwork)'
+  ];
   assignHeaders.forEach((h, c) => {
     setCell(assignSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   });
 
-  const assignMarks = ['Max Marks ->', '', '', ...assignCols.map(a => a.max), 10];
+  const assignMarks = ['Assignment No. -->', '', '', 10, 10, 10, 10, 10, 10, 'Continuous Assessment Coursework'];
   assignMarks.forEach((m, c) => {
     setCell(assignSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
   });
 
-  const lastAssignColLetter = colToLetter(3 + assignCols.length - 1);
-  const assignAvgColIdx = 3 + assignCols.length;
+  const assignDetailsText = `Assignment Details (Mode: OFFLINE & Google Classroom):\nAssignment 1: Data Structures Overview & Algorithm Complexity\nAssignment 2: Array Implementations and String Manipulation\nAssignment 3: Singly and Doubly Linked Lists Applications\nAssignment 4: Stack & Queue Memory Allocation and Polish Notation\nAssignment 5: Binary Search Trees & Graph Traversal Operations`;
+  setCell(assignSheet, 2, 9, { raw: assignDetailsText, v: assignDetailsText, s: { align: 'left', wrap: true } });
 
   students.forEach((stu, idx) => {
     const r = idx + 2;
+    const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
-    const enroll = stu.official_enrollment_no || stu.enrollment_no || '';
+    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
     const name = stu.full_name || stu.student_name || stu.name || '';
 
-    setCell(assignSheet, r, 0, { raw: roll, v: roll, s: { align: 'center' } });
+    setCell(assignSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
     setCell(assignSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
     setCell(assignSheet, r, 2, { raw: name, v: name, s: { bold: true, align: 'left' } });
 
-    assignCols.forEach((ac, cIdx) => {
+    for (let aIdx = 0; aIdx < 5; aIdx++) {
       let mark = 8.5;
-      if (Array.isArray(stu.assignment_scores) && stu.assignment_scores[cIdx] !== undefined && stu.assignment_scores[cIdx] !== '') {
-        mark = Number(stu.assignment_scores[cIdx]);
+      if (Array.isArray(stu.assignment_scores) && stu.assignment_scores[aIdx] !== undefined && stu.assignment_scores[aIdx] !== '') {
+        mark = Number(stu.assignment_scores[aIdx]);
       } else {
-        mark = Math.min(ac.max, Math.round((7.5 + (idx % 3)) * 10) / 10);
+        mark = Math.min(10, Math.round((7.5 + ((idx + aIdx) % 3)) * 10) / 10);
       }
-      setCell(assignSheet, r, 3 + cIdx, { raw: mark, v: mark, s: { align: 'center' } });
-    });
+      setCell(assignSheet, r, 3 + aIdx, { raw: mark, v: mark, s: { align: 'center' } });
+    }
 
-    const avgFormula = `=ROUND(AVERAGE(D${r + 1}:${lastAssignColLetter}${r + 1}), 1)`;
-    setCell(assignSheet, r, assignAvgColIdx, { raw: avgFormula, f: avgFormula, s: { bold: true, align: 'center' } });
+    const avgFormula = `=ROUND(AVERAGE(D${r + 1}:H${r + 1}), 1)`;
+    setCell(assignSheet, r, 8, { raw: avgFormula, f: avgFormula, s: { bold: true, align: 'center' } });
   });
+
+  setCell(assignSheet, signoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
+  setCell(assignSheet, signoffR, 5, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
+  setCell(assignSheet, signoffR, 8, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
 
   EXCEL_WB.sheets.push(assignSheet);
 
-  // SHEET 4: Practicals & Lab Work
+  // ══════════════════════════════════════════════════════════════
+  // SHEET 5: Practicals & Lab Work
+  // ══════════════════════════════════════════════════════════════
   const practicalSheet = createDefaultExcelSheet('Practicals', {
     type: 'practicals',
     rowsCount: totalRows,
-    colsCount: 12,
+    colsCount: 9,
     frozenRows: 2,
     frozenCols: 3
   });
+  practicalSheet.colWidths[0] = 60;
+  practicalSheet.colWidths[1] = 130;
+  practicalSheet.colWidths[2] = 200;
+  practicalSheet.colWidths[3] = 120;
+  practicalSheet.colWidths[4] = 140;
+  practicalSheet.colWidths[5] = 95;
+  practicalSheet.colWidths[6] = 95;
+  practicalSheet.colWidths[7] = 95;
 
-  const practicalHeaders = ['Roll #', 'Enrollment No', 'Student Name', 'Lab Experiment 1', 'Lab Experiment 2', 'Viva Voce', 'Practical Total'];
+  const practicalHeaders = ['SR. NO.', 'ROLL NO.', 'STUDENT NAME', 'Lab Record File', 'Creative Work (Model/Chart/Project)', 'Attendance', 'Viva Voce', 'TOTAL'];
   practicalHeaders.forEach((h, c) => {
     setCell(practicalSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   });
 
-  const practicalMarks = ['Max Marks ->', '', '', 10, 10, 10, 30];
+  const practicalMarks = ['Marks -->', '', '', 10, 10, 5, 5, 30];
   practicalMarks.forEach((m, c) => {
     setCell(practicalSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
   });
 
   students.forEach((stu, idx) => {
     const r = idx + 2;
+    const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
-    const enroll = stu.official_enrollment_no || stu.enrollment_no || '';
+    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
     const name = stu.full_name || stu.student_name || stu.name || '';
+    const attPct = Math.round(Number(stu.attendance_percentage || 85));
+    const attMarks = Math.min(5, Math.round((attPct / 20) * 10) / 10);
 
-    setCell(practicalSheet, r, 0, { raw: roll, v: roll, s: { align: 'center' } });
+    setCell(practicalSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
     setCell(practicalSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
     setCell(practicalSheet, r, 2, { raw: name, v: name, s: { bold: true, align: 'left' } });
     setCell(practicalSheet, r, 3, { raw: 9, v: 9, s: { align: 'center' } });
     setCell(practicalSheet, r, 4, { raw: 8.5, v: 8.5, s: { align: 'center' } });
-    setCell(practicalSheet, r, 5, { raw: 9, v: 9, s: { align: 'center' } });
-    const avgFormula = `=ROUND(AVERAGE(D${r + 1}:F${r + 1}), 1)`;
-    setCell(practicalSheet, r, 6, { raw: avgFormula, f: avgFormula, s: { bold: true, align: 'center' } });
+    setCell(practicalSheet, r, 5, { raw: attMarks, v: attMarks, s: { align: 'center' } });
+    setCell(practicalSheet, r, 6, { raw: 4.5, v: 4.5, s: { align: 'center' } });
+
+    const totalFormula = `=ROUND(D${r + 1} + E${r + 1} + F${r + 1} + G${r + 1}, 2)`;
+    setCell(practicalSheet, r, 7, { raw: totalFormula, f: totalFormula, s: { bold: true, align: 'center' } });
   });
+
+  setCell(practicalSheet, signoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
+  setCell(practicalSheet, signoffR, 4, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
+  setCell(practicalSheet, signoffR, 7, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
 
   EXCEL_WB.sheets.push(practicalSheet);
 
