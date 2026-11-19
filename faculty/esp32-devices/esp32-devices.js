@@ -61,7 +61,7 @@ function playPiezoBuzzerSequence(notes) {
       osc.stop(offset + durMs / 1000);
       offset += (durMs + gapMs) / 1000;
     });
-  } catch (_) {}
+  } catch (_) { }
 }
 
 function updateOledScreen({ statusLeft, statusRight, headline, line1, line2, line3, leds = [false, false, false] }) {
@@ -210,7 +210,7 @@ function manageCommandPolling(commands = []) {
             renderCommandQueue(res.data.commands || []);
             manageCommandPolling(res.data.commands || []);
           }
-        } catch (_) {}
+        } catch (_) { }
       }, 3500);
     }
   } else {
@@ -763,7 +763,7 @@ async function detectViaWebSerial() {
 
     let serialBuffer = '';
     const timeout = setTimeout(async () => {
-      try { await reader.cancel(); } catch(e){}
+      try { await reader.cancel(); } catch (e) { }
     }, 3000);
 
     while (true) {

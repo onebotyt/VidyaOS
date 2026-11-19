@@ -246,9 +246,9 @@
             </a>
           </div>
 
-          <!-- Dedicated Module Action Tiles (All 6 Standard Core Pillars) -->
+          <!-- Dedicated Module Action Tiles (All 6 Standard Core Pillars Unified into Course File Dossier) -->
           <div class="class-module-tiles-grid">
-            <a href="/faculty/theory-classes/index.html?groupId=${g.id}" class="module-action-tile" title="Theory Classes, Syllabus & Lesson Plans">
+            <a href="/faculty/course-file/index.html?groupId=${g.id}&type=theory" class="module-action-tile" title="Theory Classes, Syllabus & Lesson Plans">
               <span class="module-tile-icon icon-theory">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -260,7 +260,7 @@
               <span class="module-tile-label">Theory Classes</span>
             </a>
 
-            <a href="/faculty/lab-classes/index.html?groupId=${g.id}" class="module-action-tile" title="Laboratory Classes & Practicals">
+            <a href="/faculty/course-file/index.html?groupId=${g.id}&type=lab" class="module-action-tile" title="Laboratory Classes & Practicals">
               <span class="module-tile-icon icon-lab">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M10 2v7.31L4.62 18.2A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.8L14 9.31V2"></path>
@@ -271,7 +271,7 @@
               <span class="module-tile-label">Laboratory</span>
             </a>
 
-            <a href="/faculty/course-file/index.html?groupId=${g.id}" class="module-action-tile" title="NBA Academic Dossier & CO-PO Mapping">
+            <a href="/faculty/course-file/index.html?groupId=${g.id}&type=nba" class="module-action-tile" title="NBA Academic Dossier & CO-PO Mapping">
               <span class="module-tile-icon icon-nba">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
@@ -282,7 +282,7 @@
               <span class="module-tile-label">NBA</span>
             </a>
 
-            <a href="/faculty/student-performance/index.html?groupId=${g.id}" class="module-action-tile" title="Student Performance Analytics & Tracking">
+            <a href="/faculty/course-file/index.html?groupId=${g.id}&type=performance" class="module-action-tile" title="Student Performance Analytics & Tracking">
               <span class="module-tile-icon icon-perf">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -293,7 +293,7 @@
               <span class="module-tile-label">Student Performance</span>
             </a>
 
-            <a href="/faculty/direct-assessment/index.html?groupId=${g.id}" class="module-action-tile" title="Direct Assessment">
+            <a href="/faculty/course-file/index.html?groupId=${g.id}&type=direct" class="module-action-tile" title="Direct Assessment">
               <span class="module-tile-icon icon-direct">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
@@ -304,7 +304,7 @@
               <span class="module-tile-label">Direct Assessment</span>
             </a>
 
-            <a href="/faculty/indirect-assessment/index.html?groupId=${g.id}" class="module-action-tile" title="Indirect Assessment">
+            <a href="/faculty/course-file/index.html?groupId=${g.id}&type=indirect" class="module-action-tile" title="Indirect Assessment">
               <span class="module-tile-icon icon-indirect">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>

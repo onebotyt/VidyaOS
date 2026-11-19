@@ -85,8 +85,34 @@
             </select>
           </div>
 
-          <button type="button" class="btn btn-primary" onclick="printDossierIndex()"
-            title="Print complete institutional NBA/NAAC index and cover sheet">
+          <!-- Academic Dossier Module Switcher Dropdown -->
+          <div class="cf-class-selector-wrap" id="cf-type-selector-wrap">
+            <label for="select-dossier-type" class="cf-selector-label">Module / Dossier:</label>
+            <select id="select-dossier-type" class="cf-select-class form-control" onchange="onSwitchDossierType(this.value)" aria-label="Select Academic Dossier Module">
+              <option value="theory">Theory Classes (Syllabus, Lesson Plans, Log)</option>
+              <option value="lab">Laboratory (Manuals, Practicals, Journals)</option>
+              <option value="nba">NBA Course File (CO-PO, 18 Criteria Dossier)</option>
+              <option value="performance">Student Performance (Advanced &amp; Slow Learners)</option>
+              <option value="direct">Direct Assessment (Test &amp; Assignment Attainment)</option>
+              <option value="indirect">Indirect Assessment (Surveys &amp; Feedback)</option>
+              <option value="all">All Documents (Consolidated Classroom Dossier)</option>
+            </select>
+          </div>
+
+          <!-- Combine & Export All Documents Action Button -->
+          <button type="button" class="btn btn-primary btn-combine-export" id="btn-combine-export" onclick="openCombineExportModal()"
+            title="Merge all uploaded documents into one consolidated institutional PDF dossier">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span>Combine &amp; Export All</span>
+          </button>
+
+          <button type="button" class="btn btn-outline" onclick="printDossierIndex()"
+            title="Print complete institutional dossier index and cover sheet">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -594,6 +620,63 @@
           <button type="submit" class="btn btn-primary">Submit Audit Sign-Off</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal 9: Combine & Export Documents Modal -->
+  <div class="modal" id="modal-combine-export" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-combine-export')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Combine &amp; Export Classroom Documents</h3>
+          <p class="modal-subtitle">Merge individual uploaded PDFs into one consolidated institutional dossier with title page &amp; index</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-combine-export')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label" style="font-weight: 700; color: var(--text-main);">Export &amp; Merge Scope</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-top: 0.35rem;">
+            <label style="display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.85rem; background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+              <input type="radio" name="export-merge-scope" id="scope-current-module" value="current" checked style="margin-top: 3px;" onchange="updateMergeModalPreview()">
+              <div>
+                <strong style="display: block; font-size: 0.9rem; color: var(--text-main);" id="lbl-scope-current">Current Module Documents</strong>
+                <span style="font-size: 0.8rem; color: var(--text-muted);" id="sub-scope-current">Only documents belonging to active module</span>
+              </div>
+            </label>
+            <label style="display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.85rem; background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+              <input type="radio" name="export-merge-scope" id="scope-all-modules" value="all" style="margin-top: 3px;" onchange="updateMergeModalPreview()">
+              <div>
+                <strong style="display: block; font-size: 0.9rem; color: var(--text-main);">All 6 Classroom Modules Combined</strong>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Theory + Lab + NBA + Performance + Direct + Indirect</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Document Checklist Summary Card -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-main);" id="merge-summary-count">Analyzing documents...</span>
+            <span class="badge" id="merge-summary-badge" style="background: var(--status-present-bg); color: var(--status-present);">0 Uploaded</span>
+          </div>
+          <div id="merge-docs-checklist-preview" style="max-height: 180px; overflow-y: auto; font-size: 0.82rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.35rem;">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; background: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary);">
+          ℹ️ <strong>Institutional Audit Notice:</strong> The compiled PDF includes an Uttarakhand Government Institute of Polytechnic, Nainital cover sheet, Department and Teacher metadata, and a Table of Contents index referencing each document's starting page number.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-combine-export')">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-start-merge-export" onclick="executeCombineExport()">
+          <span id="merge-btn-spinner" style="display:none; margin-right: 0.4rem;">⏳</span>
+          <span id="merge-btn-text">Merge &amp; Download Combined PDF</span>
+        </button>
+      </div>
     </div>
   </div>
 

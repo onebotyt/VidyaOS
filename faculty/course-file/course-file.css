@@ -1155,3 +1155,29 @@
     max-width: calc(100vw - 2rem) !important;
   }
 }
+
+/* Combine Export & Module Dropdown Additions (Zero Hardcoded Hex Colors) */
+.btn-combine-export {
+  background: var(--color-primary) !important;
+  color: var(--text-white) !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-combine-export:hover {
+  background: var(--color-primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+#cf-type-selector-wrap .cf-select-class {
+  max-width: 340px;
+  font-weight: 700;
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+  color: var(--text-main);
+}
