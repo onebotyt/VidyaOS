@@ -3052,18 +3052,20 @@
 }
 
 .excel-ribbon-panels {
-  min-height: 74px;
-  max-height: 86px;
+  min-height: 82px;
+  max-height: 88px;
   background: var(--bg-card);
   display: flex;
   align-items: stretch;
   position: relative;
+  overflow-y: hidden !important;
 }
 
 .excel-ribbon-panel {
   display: none;
   width: 100%;
   overflow-x: auto;
+  overflow-y: hidden !important;
   padding: 0.35rem 0.65rem;
   gap: 0.6rem;
   scrollbar-width: thin;
@@ -3077,12 +3079,29 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
   padding: 0 0.45rem;
   border-right: 1px solid var(--border-color);
   flex-shrink: 0;
+  overflow-y: hidden !important;
 }
 .excel-tool-group:last-child {
   border-right: none;
+}
+
+.excel-tool-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.excel-tool-vgroup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.22rem;
 }
 
 .excel-group-label {
@@ -3092,8 +3111,9 @@
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-top: 0.2rem;
+  margin-top: 0.15rem;
   user-select: none;
+  line-height: 1;
 }
 
 .excel-tool-row {
@@ -3703,4 +3723,108 @@
   .excel-status-stats {
     display: none;
   }
+}
+
+/* Clipboard Horizontal Layout */
+.excel-clipboard-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.excel-cut-copy-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* Custom Excel Context Menu */
+.excel-context-menu {
+  position: fixed;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  z-index: 10000;
+  min-width: 220px;
+  padding: 0.35rem 0;
+  font-size: 0.78rem;
+  user-select: none;
+  font-family: inherit;
+}
+
+.excel-ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.38rem 0.85rem;
+  cursor: pointer;
+  color: var(--text-main);
+  font-weight: 600;
+  transition: background 0.1s ease;
+}
+
+.excel-ctx-item:hover {
+  background: var(--bg-hover);
+  color: var(--color-primary);
+}
+
+.excel-ctx-item.text-danger:hover {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+.excel-ctx-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.3rem 0;
+}
+
+.excel-ctx-item .ctx-icon {
+  width: 16px;
+  text-align: center;
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.excel-ctx-item .ctx-shortcut {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-family-mono);
+}
+
+/* Grid & Viewport Scrolling Strict Containment */
+.excel-viewport-wrap {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.excel-viewport-wrap .sheet-scale-wrapper {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.excel-grid-workspace {
+  flex: 1 1 0 !important;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch;
+  background: var(--bg-card);
+  user-select: none;
 }

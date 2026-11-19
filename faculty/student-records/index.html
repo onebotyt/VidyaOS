@@ -173,7 +173,8 @@
               <span class="rec-meta-badge" id="rec-work-badge">All Class Work</span>
             </div>
             <div class="rec-section-actions">
-              <button type="button" id="btn-export-records" class="btn-rec-export-section" onclick="openClassworkExportModal()" title="Export or View Evaluation Sheets">
+              <button type="button" id="btn-export-records" class="btn-rec-export-section"
+                onclick="openClassworkExportModal()" title="Export or View Evaluation Sheets">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>
@@ -918,17 +919,20 @@
   <div id="modal-export-records" class="rec-modal-backdrop" style="display:none;"
     onclick="if(event.target===this)closeClassworkExportModal()">
     <div class="rec-modal-card rec-export-modal-card">
-      <div class="rec-modal-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.85rem; margin-bottom:1rem;">
+      <div class="rec-modal-header"
+        style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.85rem; margin-bottom:1rem;">
         <div>
           <h3 style="margin:0; font-size:1.15rem; color:var(--text-main); font-weight:700;">Export & View Classwork</h3>
-          <p style="margin:0.25rem 0 0 0; font-size:0.82rem; color:var(--text-muted);">Select classwork assessment type and semester to view or export evaluation sheets.</p>
+          <p style="margin:0.25rem 0 0 0; font-size:0.82rem; color:var(--text-muted);">Select classwork assessment type
+            and semester to view or export evaluation sheets.</p>
         </div>
         <button type="button" class="btn-modal-close" onclick="closeClassworkExportModal()">&times;</button>
       </div>
 
       <div class="rec-modal-body" style="display:flex; flex-direction:column; gap:1.1rem;">
         <div>
-          <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
+          <label
+            style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
             Classwork Assessment Type
           </label>
           <select id="export-classwork-type" onchange="onExportClassworkTypeChange(this.value)"
@@ -942,7 +946,8 @@
         </div>
 
         <div>
-          <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
+          <label
+            style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
             Semester Filter
           </label>
           <select id="export-classwork-semester"
@@ -957,7 +962,8 @@
         </div>
 
         <div>
-          <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
+          <label
+            style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
             Export Format
           </label>
           <div style="display:flex; gap:0.75rem;">
@@ -978,14 +984,16 @@
 
         <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:0.75rem;">
           <button type="button" class="btn-rec-outline" onclick="closeClassworkExportModal()">Cancel</button>
-          <button type="button" class="btn-rec-secondary" id="btn-view-sheet" onclick="triggerViewClassworkSheet()" title="View evaluation sheet on PC">
+          <button type="button" class="btn-rec-secondary" id="btn-view-sheet" onclick="triggerViewClassworkSheet()"
+            title="View evaluation sheet on PC">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
             <span>View</span>
           </button>
-          <button type="button" class="btn-rec-solid" id="btn-export-sheet" onclick="triggerExportClassworkSheet()" title="Download evaluation sheet in selected format">
+          <button type="button" class="btn-rec-solid" id="btn-export-sheet" onclick="triggerExportClassworkSheet()"
+            title="Download evaluation sheet in selected format">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
@@ -1008,13 +1016,16 @@
           <span id="preview-sheet-subtitle" class="rec-sheet-modal-subtitle">Non-Editable Institutional Ledger</span>
         </div>
         <div class="rec-sheet-header-actions">
-          <button type="button" id="btn-preview-export-excel" class="btn-sheet-action-pill" onclick="downloadPreviewSheet('xlsx')" title="Download formatted Excel workbook">
+          <button type="button" id="btn-preview-export-excel" class="btn-sheet-action-pill"
+            onclick="downloadPreviewSheet('xlsx')" title="Download formatted Excel workbook">
             <span>Excel (.xlsx)</span>
           </button>
-          <button type="button" id="btn-preview-export-pdf" class="btn-sheet-action-pill" onclick="downloadPreviewSheet('pdf')" title="Download print-isolated PDF">
+          <button type="button" id="btn-preview-export-pdf" class="btn-sheet-action-pill"
+            onclick="downloadPreviewSheet('pdf')" title="Download print-isolated PDF">
             <span>PDF (.pdf)</span>
           </button>
-          <button type="button" id="btn-preview-export-word" class="btn-sheet-action-pill" onclick="downloadPreviewSheet('docx')" title="Download Word Document">
+          <button type="button" id="btn-preview-export-word" class="btn-sheet-action-pill"
+            onclick="downloadPreviewSheet('docx')" title="Download Word Document">
             <span>Word (.docx)</span>
           </button>
           <button type="button" class="btn-modal-close" onclick="closeSheetPreviewModal()">&times;</button>

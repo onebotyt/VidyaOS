@@ -644,8 +644,8 @@
           </thead>
           <tbody>
             ${roster.map((r, rIdx) => {
-              const isAb = Boolean(r.is_absent);
-              return `
+        const isAb = Boolean(r.is_absent);
+        return `
                 <tr class="${isAb ? 'is-absent' : ''}">
                   <td class="col-sr cell-read-only">${rIdx + 1}</td>
                   <td class="col-roll cell-read-only" style="font-weight:700; color:var(--color-primary);">${escapeHtml(String(r.class_roll_no || rIdx + 1))}</td>
@@ -658,9 +658,9 @@
                     </div>
                   </td>
                   ${questions.map((q, qIdx) => {
-                    const score = isAb ? 0 : (r.question_scores ? r.question_scores[qIdx] : 0);
-                    return `<td class="col-test cell-read-only">${score}</td>`;
-                  }).join('')}
+          const score = isAb ? 0 : (r.question_scores ? r.question_scores[qIdx] : 0);
+          return `<td class="col-test cell-read-only">${score}</td>`;
+        }).join('')}
                   <td class="col-total cell-read-only" style="font-weight:800; ${isAb ? 'color:var(--status-absent);' : ''}">${isAb ? '0 (AB)' : r.total_marks}</td>
                   ${rIdx === 0 ? `
                     <td rowspan="${roster.length || 1}" class="col-side-panel">
@@ -679,7 +679,7 @@
                   ` : ''}
                 </tr>
               `;
-            }).join('')}
+      }).join('')}
           </tbody>
           <tfoot>
             <tr class="excel-summary-row">
@@ -750,9 +750,9 @@
               <td class="col-enroll cell-read-only" style="font-family:var(--font-family-mono); font-size:0.76rem; color:var(--text-muted);">${escapeHtml(r.official_enrollment_no || '—')}</td>
               <td class="col-name" style="font-weight:700;">${escapeHtml(r.full_name)}</td>
               ${items.map(it => {
-                const score = (r.scores && r.scores[it.id] !== undefined) ? r.scores[it.id] : 0;
-                return `<td class="col-test cell-read-only">${score}</td>`;
-              }).join('')}
+      const score = (r.scores && r.scores[it.id] !== undefined) ? r.scores[it.id] : 0;
+      return `<td class="col-test cell-read-only">${score}</td>`;
+    }).join('')}
               <td class="col-total cell-read-only" style="font-weight:800;">${r.total_marks}</td>
               <td class="col-total cell-read-only" style="font-weight:800; color:${r.average_pct < 50 ? 'var(--status-absent)' : 'var(--status-present)'};">${r.average_pct}%</td>
             </tr>
@@ -791,8 +791,8 @@
     wb.created = new Date();
     const ws = wb.addWorksheet(sheetData.meta.short_title || 'Evaluation Sheet');
 
-    const colCount = sheetData.type === 'SINGLE_TEST' 
-      ? 5 + (sheetData.test?.questions?.length || 4) + 1 
+    const colCount = sheetData.type === 'SINGLE_TEST'
+      ? 5 + (sheetData.test?.questions?.length || 4) + 1
       : 5 + (sheetData.items?.length || 1) + 2;
 
     const r1 = ws.addRow([`${sheetData.meta.institution_name} | ${sheetData.meta.session_label}`]);
