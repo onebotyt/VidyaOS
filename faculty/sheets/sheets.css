@@ -3619,23 +3619,23 @@ span.excel-hdr-num-badge {
 }
 
 .excel-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 2500;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
-  padding: 0.35rem 0;
-  min-width: 175px;
-  display: flex;
-  flex-direction: column;
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 0 !important;
+  z-index: 2500 !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm, 4px) !important;
+  box-shadow: 0 8px 24px var(--shadow-lg, hsla(0, 0%, 0%, 0.18)) !important;
+  padding: 0.35rem 0 !important;
+  min-width: 175px !important;
+  display: none !important;
+  flex-direction: column !important;
 }
 
-.excel-dropdown-menu[style*="display: none"],
-.excel-dropdown-menu.hidden {
-  display: none !important;
+.excel-dropdown-menu.open,
+.excel-dropdown-menu.is-open {
+  display: flex !important;
 }
 
 .excel-menu-item {
@@ -3946,11 +3946,16 @@ span.excel-hdr-num-badge {
   z-index: 15;
 }
 
+.excel-grid-table tbody tr {
+  height: 24px;
+}
+
 /* Data Cells */
 .excel-cell {
   border-right: 1px solid var(--table-border-subtle, var(--border-color));
   border-bottom: 1px solid var(--table-border-subtle, var(--border-color));
   padding: 0.18rem 0.4rem;
+  height: 24px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4316,4 +4321,279 @@ span.excel-hdr-num-badge {
   -webkit-overflow-scrolling: touch;
   background: var(--bg-card);
   user-select: none;
+}
+
+/* Excel Status Bar Zoom Controls */
+.excel-status-zoom-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--border-color);
+}
+
+.excel-status-zoom-btn {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-main);
+  cursor: pointer;
+  border-radius: var(--radius-sm, 4px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.15s ease;
+}
+
+.excel-status-zoom-btn:hover {
+  background: var(--bg-surface-hover);
+}
+
+.excel-status-zoom-slider {
+  width: 80px;
+  height: 4px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.excel-status-zoom-pct {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-main);
+  min-width: 38px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.1rem 0.25rem;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.excel-status-zoom-pct:hover {
+  background: var(--bg-surface-hover);
+  color: var(--color-primary);
+}
+
+/* College Banner Toggle Button State */
+#btn-toggle-college-banner.active {
+  background: var(--color-primary);
+  color: var(--text-white);
+  border-color: var(--color-primary);
+}
+
+/* Formatting Template Manager Styles */
+.excel-template-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.excel-template-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  transition: all 0.15s ease;
+}
+
+.excel-template-card:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-surface-hover);
+}
+
+.excel-template-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.excel-template-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.excel-template-meta {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.excel-template-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Freeze Panes Table Classes */
+.excel-grid-table.freeze-top-row thead th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  box-shadow: 0 2px 4px var(--shadow-sm, hsla(0, 0%, 0%, 0.08)) !important;
+}
+
+.excel-grid-table.freeze-first-col thead th:first-child,
+.excel-grid-table.freeze-first-col tbody td:first-child {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 45 !important;
+  box-shadow: 2px 0 4px var(--shadow-sm, hsla(0, 0%, 0%, 0.08)) !important;
+}
+
+/* Single-Row Institutional Header Banner */
+.sheet-banner-single-row {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0.22rem 0.6rem;
+  background: var(--col-att-group-bg, var(--bg-surface-secondary));
+  color: var(--col-att-group-color, var(--text-main));
+  border: 1px solid var(--table-border-strong, var(--border-color));
+  border-bottom: 2px solid var(--color-primary);
+  border-radius: var(--radius-sm, 4px);
+  margin-bottom: 0.25rem;
+  box-sizing: border-box;
+  font-size: 0.76rem;
+  font-weight: 700;
+  user-select: text;
+}
+
+.sheet-banner-single-row .banner-row-single {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.sheet-banner-single-row .banner-seg {
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm, 3px);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+
+.sheet-banner-single-row .banner-seg-inst {
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.sheet-banner-single-row .banner-seg-subject {
+  font-weight: 700;
+}
+
+.sheet-banner-single-row .banner-seg-cohort {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sheet-banner-single-row .banner-seg-divider {
+  color: var(--border-color);
+  font-weight: 400;
+  user-select: none;
+}
+
+.sheet-banner-single-row .banner-seg.is-editing {
+  background: var(--bg-card);
+  box-shadow: 0 0 0 2px var(--color-primary);
+  cursor: text;
+}
+
+.sheet-banner-single-row .banner-edit-pencil-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem;
+  border-radius: var(--radius-sm, 3px);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.sheet-banner-single-row .banner-edit-pencil-btn:hover {
+  color: var(--color-primary);
+  background: var(--bg-surface-hover);
+}
+
+/* Header Text Wrapping & Dynamic Row Sizing */
+.excel-grid-table thead tr th,
+.excel-grid-table tbody td.excel-hdr-cell,
+.excel-grid-table tbody td[data-row="0"],
+.excel-grid-table thead th.excel-col-th {
+  white-space: normal !important;
+  word-break: break-word !important;
+  line-height: 1.18 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Excel Rich Tooltip / Help Box */
+.excel-rich-tooltip {
+  position: fixed;
+  z-index: 99999;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 5px);
+  box-shadow: 0 6px 20px var(--shadow-lg, hsla(0, 0%, 0%, 0.18));
+  padding: 0.65rem 0.85rem;
+  width: 250px;
+  max-width: 280px;
+  pointer-events: none;
+  font-family: inherit;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  display: none;
+}
+
+.excel-rich-tooltip.visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.excel-rich-tooltip-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.excel-rich-tooltip-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 4px);
+  padding: 0.45rem;
+  margin-bottom: 0.45rem;
+}
+
+.excel-rich-tooltip-desc {
+  font-size: 0.73rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.excel-rich-tooltip-footer {
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
