@@ -221,12 +221,12 @@ function setOledSimMode(mode) {
 
     case 'enroll':
       updateOledScreen({
-        statusLeft: '🔒 ENROLL MODE',
-        statusRight: 'STEP 1/2',
+        statusLeft: 'ENROLL MODE',
+        statusRight: 'Slot #1',
         headline: 'ENROLL FINGERPRINT',
-        line1: 'Priya Sharma',
-        line2: 'Roll No: #2024IT012',
-        line3: 'Place Finger on AS608...',
+        line1: 'Amit Kumar',
+        line2: 'Roll: #1 (2024IT011)',
+        line3: '1. Place Finger',
         leds: [false, false, true],
         isClock: false
       });
@@ -321,7 +321,11 @@ async function loadEsp32Overview(deptIdOverride) {
     const sel = document.getElementById('active-device-select');
     if (sel) {
       sel.innerHTML = devices.length
-        ? devices.map(d => `<option value="${d.id}" ${Number(d.id) === Number(selectedDeviceId) ? 'selected' : ''}>${escHtml(d.name || d.device_name || 'ESP32 Terminal')} (${escHtml(d.device_uid || d.device_uuid)})</option>`).join('')
+        ? devices.map(d => {
+            const devName = d.name || d.device_name || 'IT Lab Biometric Terminal 01';
+            const devUid = d.device_uid || d.device_uuid || 'ESP32-IT-LAB-01';
+            return `<option value="${d.id}" ${Number(d.id) === Number(selectedDeviceId) ? 'selected' : ''}>${escHtml(devName)} (${escHtml(devUid)})</option>`;
+          }).join('')
         : `<option value="">No ESP32 Connected Yet</option>`;
       if (selectedDeviceId) sel.value = String(selectedDeviceId);
     }
@@ -488,8 +492,8 @@ function renderDevicesList(devices) {
     const volts = d.battery_voltage ? Number(d.battery_voltage).toFixed(2) : '7.85';
     const battPct = d.battery_pct != null ? d.battery_pct : 84;
     const secretPreview = d.secret_key ? `${d.secret_key.slice(0, 10)}...${d.secret_key.slice(-6)}` : 'AES-256 Configured';
-    const devUid = d.device_uid || d.device_uuid || 'ESP32-NODE';
-    const devName = d.name || d.device_name || 'Biometric Terminal';
+    const devUid = d.device_uid || d.device_uuid || 'ESP32-IT-LAB-01';
+    const devName = d.name || d.device_name || 'IT Lab Biometric Terminal 01';
     const isOnline = Boolean(d.is_online);
 
     return `
@@ -582,6 +586,25 @@ async function checkDeviceConnection(deviceId) {
     showToast('Failed to ping device: ' + err.message, 'error');
   }
 }
+
+async function checkActiveEspConnection() {
+  const targetId = selectedDeviceId || (espOverviewData?.devices && espOverviewData.devices[0]?.id);
+  if (!targetId) {
+    showToast('No ESP32 terminal paired yet. Please add an ESP terminal.', 'warning');
+    return;
+  }
+  const btn = document.getElementById('btn-check-esp-connect');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Checking...';
+  }
+  await checkDeviceConnection(targetId);
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = '📡 Check ESP Connected';
+  }
+}
+window.checkActiveEspConnection = checkActiveEspConnection;
 
 // ─── Over-The-Air (OTA) Wireless Firmware Updater ──────────────────────────
 function openOtaUpdateModal(deviceId) {
@@ -746,12 +769,12 @@ async function queueEnrollCommandForStudent(studentId, fullName, rollNo) {
   }
 
   updateOledScreen({
-    statusLeft: '🔒 ENROLL MODE',
-    statusRight: 'STEP 1/2',
+    statusLeft: 'ENROLL MODE',
+    statusRight: 'Slot #1',
     headline: 'ENROLL FINGERPRINT',
     line1: fullName,
-    line2: `Roll No: #${rollNo || '—'}`,
-    line3: 'Place Finger on AS608...',
+    line2: `Roll: #${rollNo || '1'}`,
+    line3: '1. Place Finger',
     leds: [false, false, true],
     isClock: false
   });
@@ -931,6 +954,26 @@ function openRegisterDeviceModal() {
   if (modal) {
     modal.classList.add('open');
     modal.style.display = 'flex';
+  }
+
+  // Visual button feedback
+  const btn = document.getElementById('btn-add-esp-terminal');
+  if (btn) {
+    btn.style.transform = 'scale(0.96)';
+    setTimeout(() => { if (btn) btn.style.transform = ''; }, 200);
+  }
+
+  // Pre-fill suggested UID & Name for fast onboarding
+  const uidInput = document.getElementById('esp-uid-input');
+  if (uidInput && !uidInput.value) {
+    const nextNum = (espOverviewData?.devices?.length || 0) + 1;
+    const deptCode = espOverviewData?.department?.code || 'IT';
+    uidInput.value = `ESP32-${deptCode}-LAB-${String(nextNum).padStart(2, '0')}`;
+  }
+  const nameInput = document.getElementById('esp-name-input');
+  if (nameInput && !nameInput.value) {
+    const deptName = espOverviewData?.department?.name || 'IT Department';
+    nameInput.value = `${deptName} Biometric Node`;
   }
 
   // Enforce HOD department lock
