@@ -178,11 +178,41 @@
           </div>
         </div>
 
+        <!-- Trash Bin Bulk Actions Bar (Sticky/Top) -->
+        <div id="trash-bulk-bar" class="trash-bulk-bar" style="display: none;">
+          <div class="trash-bulk-info">
+            <span class="trash-bulk-badge" id="trash-selected-count">0</span>
+            <span class="trash-bulk-label">students selected</span>
+          </div>
+          <div class="trash-bulk-actions">
+            <button type="button" class="btn-stu-compact btn-bulk-restore" onclick="confirmBulkRestore()" title="Restore selected students to active roster">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+              <span>Restore Selected</span>
+            </button>
+            <button type="button" class="btn-stu-compact danger btn-bulk-delete" onclick="confirmBulkPermanentDelete()" title="Permanently delete selected students">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>Delete Permanently</span>
+            </button>
+            <button type="button" class="btn-stu-outline" onclick="clearTrashSelection()" style="height: 32px; padding: 0 0.65rem; font-size: 0.76rem;">
+              <span>Clear</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Student Table Card -->
         <div class="stu-table-card">
           <table class="stu-table">
             <thead>
               <tr id="stu-thead-tr">
+                <th id="th-trash-check" style="width: 38px; text-align: center; display: none;">
+                  <input type="checkbox" id="check-all-trash" class="stu-checkbox" onchange="toggleSelectAllTrash(this.checked)" title="Select all trashed students">
+                </th>
                 <th style="width: 55px;">Roll #</th>
                 <th class="col-enrollment" id="th-enrollment">Enrollment</th>
                 <th>Student Name</th>
@@ -417,6 +447,48 @@
           <button type="submit" class="btn-stu-compact">Import Students</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal: Trash Confirmation Dialog (Restore / Permanent Delete) -->
+  <div id="modal-trash-confirm" class="stu-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeTrashConfirmModal()">
+    <div class="stu-modal-card" style="max-width: 440px;">
+      <div class="stu-modal-header">
+        <strong id="trash-confirm-title" style="font-size:1.05rem; color:var(--text-main);">Confirm Action</strong>
+        <button type="button" class="btn-modal-close" onclick="closeTrashConfirmModal()">&times;</button>
+      </div>
+      <div style="padding: 1.25rem;">
+        <div style="display: flex; align-items: flex-start; gap: 0.85rem; margin-bottom: 1rem;">
+          <div id="trash-confirm-icon" class="trash-confirm-icon-box"></div>
+          <div>
+            <h4 id="trash-confirm-heading" style="margin: 0 0 0.35rem 0; font-size: 0.95rem; color: var(--text-main); font-weight: 700;"></h4>
+            <p id="trash-confirm-desc" style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;"></p>
+          </div>
+        </div>
+        <div id="trash-confirm-warning" style="display:none; padding: 0.65rem 0.75rem; border-radius: 8px; font-size: 0.76rem; margin-bottom: 1rem;"></div>
+        <div style="display:flex; justify-content:flex-end; gap:0.65rem;">
+          <button type="button" class="btn-stu-outline" onclick="closeTrashConfirmModal()">Cancel</button>
+          <button type="button" id="trash-confirm-btn" class="btn-stu-compact">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Bulk Import Success Popup -->
+  <div id="modal-bulk-success" class="stu-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeBulkSuccessModal()">
+    <div class="stu-modal-card stu-success-popup-card" style="max-width: 460px; text-align: center; padding: 1.75rem 1.5rem;">
+      <div class="stu-success-circle-icon">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <h3 id="bulk-success-title" style="margin: 0.85rem 0 0.35rem; font-size: 1.25rem; font-weight: 800; color: var(--text-main);">Students Added Successfully!</h3>
+      <p id="bulk-success-desc" style="margin: 0 0 1.25rem; font-size: 0.86rem; color: var(--text-muted); line-height: 1.45;"></p>
+      <div id="bulk-success-details" style="display:none; margin-bottom: 1.25rem; max-height: 140px; overflow-y: auto; text-align: left; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-surface); font-size: 0.78rem;"></div>
+      <div style="display:flex; justify-content:center; gap:0.65rem;">
+        <button type="button" class="btn-stu-compact" style="min-width: 140px;" onclick="closeBulkSuccessModal()">View Roster</button>
+      </div>
     </div>
   </div>
 

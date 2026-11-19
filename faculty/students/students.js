@@ -21,6 +21,7 @@
   let allStudents = [];
   let pendingStudents = [];
   let trashStudents = [];
+  let selectedTrashIds = new Set();
   let currentYearFilter = 'ALL';
   let studentRegOpen = false;
   let currentDetailStudentId = null;
@@ -209,12 +210,20 @@
     if (!tbody) return;
 
     // Toggle table header based on Trash mode
+    const isTrash = currentYearFilter === 'TRASH';
     const thRetention = document.getElementById('th-retention');
     const thEnrollment = document.getElementById('th-enrollment');
-    if (thRetention) thRetention.style.display = currentYearFilter === 'TRASH' ? '' : 'none';
-    if (thEnrollment) thEnrollment.style.display = currentYearFilter === 'TRASH' ? 'none' : '';
+    const thTrashCheck = document.getElementById('th-trash-check');
+    const thActions = document.getElementById('th-actions');
 
-    if (currentYearFilter === 'TRASH') {
+    if (thRetention) thRetention.style.display = isTrash ? '' : 'none';
+    if (thEnrollment) thEnrollment.style.display = isTrash ? 'none' : '';
+    if (thTrashCheck) thTrashCheck.style.display = isTrash ? '' : 'none';
+    if (thActions) thActions.style.width = isTrash ? '150px' : '65px';
+
+    updateTrashBulkBar();
+
+    if (isTrash) {
       renderTrashTable(tbody, searchVal);
       return;
     }
@@ -346,15 +355,27 @@
       );
     }
 
+    const masterCheck = document.getElementById('check-all-trash');
+
     if (list.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="4" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+          <td colspan="5" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
             No students currently in the Trash Bin.
           </td>
         </tr>
       `;
+      if (masterCheck) {
+        masterCheck.checked = false;
+        masterCheck.disabled = true;
+      }
       return;
+    }
+
+    if (masterCheck) {
+      masterCheck.disabled = false;
+      const allSelected = list.length > 0 && list.every(s => selectedTrashIds.has(Number(s.student_id || s.id)));
+      masterCheck.checked = allSelected;
     }
 
     tbody.innerHTML = list.map((st, idx) => {
@@ -362,10 +383,14 @@
       const enroll = st.official_enrollment_no || '—';
       const name = st.full_name || 'Student';
       const daysLeft = st.days_left != null ? st.days_left : 30;
-      const studentId = st.student_id || st.id;
+      const studentId = Number(st.student_id || st.id);
+      const isChecked = selectedTrashIds.has(studentId);
 
       return `
-        <tr>
+        <tr class="${isChecked ? 'row-selected' : ''}">
+          <td style="width: 38px; text-align: center;">
+            <input type="checkbox" class="stu-checkbox trash-row-check" data-id="${studentId}" ${isChecked ? 'checked' : ''} onchange="toggleTrashSelect(${studentId}, this.checked)">
+          </td>
           <td><span class="stu-roll-badge" style="opacity: 0.7;">${roll}</span></td>
           <td>
             <div class="stu-name-wrap">
@@ -384,10 +409,14 @@
             </span>
           </td>
           <td style="text-align: right;">
-            <div class="stu-actions-cell">
-              <button type="button" class="btn-restore-compact" onclick="restoreStudentMember(${studentId}, '${esc(name)}')" title="Restore student data">
+            <div class="stu-actions-cell" style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+              <button type="button" class="btn-restore-compact" onclick="confirmSingleRestore(${studentId}, '${esc(name)}')" title="Restore student to active roster">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
                 <span>Restore</span>
+              </button>
+              <button type="button" class="btn-delete-compact" onclick="confirmSinglePermanentDelete(${studentId}, '${esc(name)}')" title="Permanently delete from database">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Delete</span>
               </button>
             </div>
           </td>
@@ -901,13 +930,286 @@
       const res = await api(`/hod/trash/students/${id}/restore`, { method: 'POST' });
       if (res && res.success) {
         notify(`${name} restored successfully!`, 'success');
+        selectedTrashIds.delete(Number(id));
         await Promise.all([loadStudentsRoster(), loadTrashStudents()]);
+        renderTable();
       } else {
         throw new Error(res?.error?.message || 'Restore failed');
       }
     } catch (err) {
       notify(err.message, 'error');
     }
+  }
+
+  // ── Trash Selection & Bulk Operations ─────────────────────────
+  function toggleTrashSelect(studentId, isChecked) {
+    const id = Number(studentId);
+    if (isChecked) {
+      selectedTrashIds.add(id);
+    } else {
+      selectedTrashIds.delete(id);
+    }
+    updateTrashBulkBar();
+
+    const masterCheck = document.getElementById('check-all-trash');
+    if (masterCheck) {
+      const searchVal = (document.getElementById('student-search')?.value || '').toLowerCase().trim();
+      let list = trashStudents;
+      if (searchVal) {
+        list = list.filter(s =>
+          (s.full_name || '').toLowerCase().includes(searchVal) ||
+          String(s.class_roll_no || '').includes(searchVal) ||
+          (s.official_enrollment_no || '').toLowerCase().includes(searchVal) ||
+          (s.email || '').toLowerCase().includes(searchVal)
+        );
+      }
+      masterCheck.checked = list.length > 0 && list.every(s => selectedTrashIds.has(Number(s.student_id || s.id)));
+    }
+  }
+
+  function toggleSelectAllTrash(isChecked) {
+    const searchVal = (document.getElementById('student-search')?.value || '').toLowerCase().trim();
+    let list = trashStudents;
+    if (searchVal) {
+      list = list.filter(s =>
+        (s.full_name || '').toLowerCase().includes(searchVal) ||
+        String(s.class_roll_no || '').includes(searchVal) ||
+        (s.official_enrollment_no || '').toLowerCase().includes(searchVal) ||
+        (s.email || '').toLowerCase().includes(searchVal)
+      );
+    }
+
+    list.forEach(s => {
+      const id = Number(s.student_id || s.id);
+      if (isChecked) {
+        selectedTrashIds.add(id);
+      } else {
+        selectedTrashIds.delete(id);
+      }
+    });
+
+    document.querySelectorAll('.trash-row-check').forEach(cb => {
+      const id = Number(cb.dataset.id);
+      cb.checked = selectedTrashIds.has(id);
+    });
+
+    updateTrashBulkBar();
+  }
+
+  function clearTrashSelection() {
+    selectedTrashIds.clear();
+    const masterCheck = document.getElementById('check-all-trash');
+    if (masterCheck) masterCheck.checked = false;
+    document.querySelectorAll('.trash-row-check').forEach(cb => { cb.checked = false; });
+    updateTrashBulkBar();
+  }
+
+  function updateTrashBulkBar() {
+    const bulkBar = document.getElementById('trash-bulk-bar');
+    const countBadge = document.getElementById('trash-selected-count');
+    if (!bulkBar) return;
+
+    const count = selectedTrashIds.size;
+    if (countBadge) countBadge.textContent = count;
+
+    if (currentYearFilter === 'TRASH' && count > 0) {
+      bulkBar.style.display = 'flex';
+    } else {
+      bulkBar.style.display = 'none';
+    }
+  }
+
+  // ── Trash Confirmation Modal ─────────────────────────────────
+  function openTrashConfirmModal({ title, iconType, heading, desc, warningText, confirmText, confirmClass, onConfirm }) {
+    const modal = document.getElementById('modal-trash-confirm');
+    if (!modal) return;
+
+    const titleEl = document.getElementById('trash-confirm-title');
+    if (titleEl) titleEl.textContent = title || 'Confirm Action';
+
+    const iconBox = document.getElementById('trash-confirm-icon');
+    if (iconBox) {
+      iconBox.className = 'trash-confirm-icon-box ' + (iconType || 'restore');
+      if (iconType === 'danger') {
+        iconBox.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+      } else {
+        iconBox.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>`;
+      }
+    }
+
+    const headingEl = document.getElementById('trash-confirm-heading');
+    if (headingEl) headingEl.textContent = heading || '';
+
+    const descEl = document.getElementById('trash-confirm-desc');
+    if (descEl) descEl.textContent = desc || '';
+
+    const warnEl = document.getElementById('trash-confirm-warning');
+    if (warnEl) {
+      if (warningText) {
+        warnEl.textContent = warningText;
+        warnEl.style.display = 'block';
+      } else {
+        warnEl.style.display = 'none';
+      }
+    }
+
+    const btnConfirm = document.getElementById('trash-confirm-btn');
+    if (btnConfirm) {
+      btnConfirm.textContent = confirmText || 'Confirm';
+      btnConfirm.className = 'btn-stu-compact' + (confirmClass ? ' ' + confirmClass : '');
+      btnConfirm.onclick = () => {
+        closeTrashConfirmModal();
+        if (typeof onConfirm === 'function') onConfirm();
+      };
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  function closeTrashConfirmModal() {
+    const modal = document.getElementById('modal-trash-confirm');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function confirmSingleRestore(studentId, name) {
+    openTrashConfirmModal({
+      title: 'Restore Student',
+      iconType: 'restore',
+      heading: `Restore ${name}?`,
+      desc: 'This will restore the student back to the active department roster.',
+      confirmText: 'Yes, Restore',
+      onConfirm: () => restoreStudentMember(studentId, name)
+    });
+  }
+
+  function confirmSinglePermanentDelete(studentId, name) {
+    openTrashConfirmModal({
+      title: 'Delete Permanently',
+      iconType: 'danger',
+      heading: `Permanently delete ${name}?`,
+      desc: 'This student and all associated records, attendance, and credentials will be permanently erased.',
+      warningText: '⚠️ This action is IRREVERSIBLE and cannot be undone!',
+      confirmText: 'Yes, Delete Permanently',
+      confirmClass: 'danger',
+      onConfirm: () => executeSinglePermanentDelete(studentId, name)
+    });
+  }
+
+  async function executeSinglePermanentDelete(studentId, name) {
+    try {
+      const res = await api(`/hod/trash/students/${studentId}/permanent`, { method: 'DELETE' });
+      if (res && res.success) {
+        notify(`${name} permanently deleted from Trash.`, 'success');
+        selectedTrashIds.delete(Number(studentId));
+        await loadTrashStudents();
+        renderTable();
+      } else {
+        throw new Error(res?.error?.message || 'Failed to permanently delete student');
+      }
+    } catch (err) {
+      notify(err.message, 'error');
+    }
+  }
+
+  function confirmBulkRestore() {
+    if (selectedTrashIds.size === 0) {
+      notify('No students selected', 'error');
+      return;
+    }
+    const count = selectedTrashIds.size;
+    openTrashConfirmModal({
+      title: 'Bulk Restore Students',
+      iconType: 'restore',
+      heading: `Restore ${count} selected student(s)?`,
+      desc: `All ${count} selected students will be restored back to their active department rosters.`,
+      confirmText: `Yes, Restore (${count})`,
+      onConfirm: () => executeBulkRestore()
+    });
+  }
+
+  async function executeBulkRestore() {
+    const ids = Array.from(selectedTrashIds);
+    try {
+      const res = await api('/hod/trash/students/bulk-restore', {
+        method: 'POST',
+        body: JSON.stringify({ ids })
+      });
+      if (res && res.success) {
+        notify(`Successfully restored ${res.restored_count || ids.length} student(s)!`, 'success');
+        clearTrashSelection();
+        await Promise.all([loadStudentsRoster(), loadTrashStudents()]);
+        renderTable();
+      } else {
+        throw new Error(res?.error?.message || 'Failed to bulk restore students');
+      }
+    } catch (err) {
+      notify(err.message, 'error');
+    }
+  }
+
+  function confirmBulkPermanentDelete() {
+    if (selectedTrashIds.size === 0) {
+      notify('No students selected', 'error');
+      return;
+    }
+    const count = selectedTrashIds.size;
+    openTrashConfirmModal({
+      title: 'Bulk Delete Permanently',
+      iconType: 'danger',
+      heading: `Permanently delete ${count} selected student(s)?`,
+      desc: `All records, biometric sessions, and profiles for the ${count} selected students will be permanently wiped from the database.`,
+      warningText: '⚠️ DANGER: This action is permanent and completely IRREVERSIBLE!',
+      confirmText: `Yes, Delete (${count})`,
+      confirmClass: 'danger',
+      onConfirm: () => executeBulkPermanentDelete()
+    });
+  }
+
+  async function executeBulkPermanentDelete() {
+    const ids = Array.from(selectedTrashIds);
+    try {
+      const res = await api('/hod/trash/students/bulk-delete', {
+        method: 'POST',
+        body: JSON.stringify({ ids })
+      });
+      if (res && res.success) {
+        notify(`Permanently deleted ${res.deleted_count || ids.length} student(s) from Trash.`, 'success');
+        clearTrashSelection();
+        await loadTrashStudents();
+        renderTable();
+      } else {
+        throw new Error(res?.error?.message || 'Failed to permanently delete students');
+      }
+    } catch (err) {
+      notify(err.message, 'error');
+    }
+  }
+
+  // ── Success Celebration Modal ────────────────────────────────
+  function showBulkSuccessModal(count, details = null) {
+    const modal = document.getElementById('modal-bulk-success');
+    if (!modal) return;
+
+    const titleEl = document.getElementById('bulk-success-title');
+    const descEl = document.getElementById('bulk-success-desc');
+    const detailsEl = document.getElementById('bulk-success-details');
+
+    if (titleEl) titleEl.textContent = 'Students Added Successfully!';
+    if (descEl) descEl.textContent = `Successfully imported ${count} student(s) into the department roster.`;
+
+    if (details && detailsEl) {
+      detailsEl.innerHTML = details;
+      detailsEl.style.display = 'block';
+    } else if (detailsEl) {
+      detailsEl.style.display = 'none';
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  function closeBulkSuccessModal() {
+    const modal = document.getElementById('modal-bulk-success');
+    if (modal) modal.style.display = 'none';
   }
 
   async function reindexRoll() {
@@ -1003,6 +1305,20 @@
       return;
     }
 
+    const submitBtn = document.querySelector('#form-add-student button[type="submit"]');
+    const cancelBtn = document.querySelector('#form-add-student button.btn-stu-outline');
+    const origHtml = submitBtn ? submitBtn.innerHTML : 'Enroll Student';
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('btn-disabled-loading');
+      submitBtn.innerHTML = `
+        <svg class="stu-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+        <span>Enrolling Student...</span>
+      `;
+    }
+    if (cancelBtn) cancelBtn.disabled = true;
+
     try {
       const res = await api('/hod/students', {
         method: 'POST',
@@ -1018,15 +1334,26 @@
         })
       });
       if (res && res.success) {
-        notify('Student enrolled successfully!', 'success');
         closeAddModal();
         document.getElementById('form-add-student')?.reset();
-        loadStudentsRoster();
+        showBulkSuccessModal(1);
+        const titleEl = document.getElementById('bulk-success-title');
+        const descEl = document.getElementById('bulk-success-desc');
+        if (titleEl) titleEl.textContent = 'Student Enrolled Successfully!';
+        if (descEl) descEl.textContent = `${full_name} (${official_enrollment_no}) has been enrolled into the department roster.`;
+        await loadStudentsRoster();
       } else {
         throw new Error(res?.error?.message || 'Failed to add student');
       }
     } catch (err) {
       notify(err.message, 'error');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('btn-disabled-loading');
+        submitBtn.innerHTML = origHtml;
+      }
+      if (cancelBtn) cancelBtn.disabled = false;
     }
   }
 
@@ -1075,6 +1402,20 @@
     const defaultSem = students[0]?.semester || 1;
     const defaultYear = students[0]?.year || Math.ceil(defaultSem / 2);
 
+    const submitBtn = document.querySelector('#form-bulk-csv button[type="submit"]');
+    const cancelBtn = document.querySelector('#form-bulk-csv button.btn-stu-outline');
+    const origHtml = submitBtn ? submitBtn.innerHTML : 'Import Students';
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('btn-disabled-loading');
+      submitBtn.innerHTML = `
+        <svg class="stu-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+        <span>Importing Students...</span>
+      `;
+    }
+    if (cancelBtn) cancelBtn.disabled = true;
+
     try {
       const res = await api('/hod/students/bulk', {
         method: 'POST',
@@ -1085,15 +1426,33 @@
         })
       });
       if (res && res.success) {
-        notify(`Successfully imported ${students.length} students!`, 'success');
         closeBulkModal();
-        document.getElementById('bulk-csv-text').value = '';
-        loadStudentsRoster();
+        const csvArea = document.getElementById('bulk-csv-text');
+        if (csvArea) csvArea.value = '';
+
+        let detailMsg = null;
+        if (res.skipped_count || (res.errors && res.errors.length)) {
+          detailMsg = `<strong>Enrolled:</strong> ${res.enrolled_count || students.length} student(s)<br>`;
+          if (res.skipped_count) detailMsg += `<strong>Skipped (duplicates):</strong> ${res.skipped_count}<br>`;
+          if (res.errors && res.errors.length) {
+            detailMsg += `<strong>Notes:</strong><br>${res.errors.map(err => `&bull; ${esc(err.message || err)}`).join('<br>')}`;
+          }
+        }
+
+        showBulkSuccessModal(res.enrolled_count || students.length, detailMsg);
+        await loadStudentsRoster();
       } else {
         throw new Error(res?.error?.message || 'Bulk upload failed');
       }
     } catch (err) {
       notify(err.message, 'error');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('btn-disabled-loading');
+        submitBtn.innerHTML = origHtml;
+      }
+      if (cancelBtn) cancelBtn.disabled = false;
     }
   }
 
@@ -1104,6 +1463,9 @@
         document.querySelectorAll('.stu-pill').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentYearFilter = btn.dataset.year || 'ALL';
+        if (currentYearFilter !== 'TRASH') {
+          clearTrashSelection();
+        }
         renderTable();
       });
     });
@@ -1158,6 +1520,17 @@
   window.rejectStudentRequest = rejectStudentRequest;
   window.switchToPendingTab = switchToPendingTab;
   window.switchToTrashTab = switchToTrashTab;
+
+  // Trash & Bulk Modal Exports
+  window.toggleTrashSelect = toggleTrashSelect;
+  window.toggleSelectAllTrash = toggleSelectAllTrash;
+  window.clearTrashSelection = clearTrashSelection;
+  window.confirmBulkRestore = confirmBulkRestore;
+  window.confirmBulkPermanentDelete = confirmBulkPermanentDelete;
+  window.confirmSingleRestore = confirmSingleRestore;
+  window.confirmSinglePermanentDelete = confirmSinglePermanentDelete;
+  window.closeTrashConfirmModal = closeTrashConfirmModal;
+  window.closeBulkSuccessModal = closeBulkSuccessModal;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

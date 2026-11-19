@@ -671,6 +671,29 @@ input:checked+.slider:before {
   transform: translateY(-1px);
 }
 
+.btn-delete-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.75rem;
+  border-radius: 7px;
+  background: var(--status-absent-bg);
+  border: 1px solid var(--status-absent);
+  color: var(--status-absent);
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.btn-delete-compact:hover {
+  background: var(--status-absent);
+  color: var(--text-white);
+  transform: translateY(-1px);
+}
+
 .badge-retention {
   display: inline-flex;
   align-items: center;
@@ -1066,10 +1089,154 @@ input:checked+.slider:before {
     display: none !important;
   }
 
-  .btn-restore-compact {
+  .btn-restore-compact,
+  .btn-delete-compact {
     padding: 0.25rem 0.55rem;
     font-size: 0.7rem;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+ * TRASH BIN BULK ACTIONS, CHECKBOXES & ANIMATIONS
+ * 100% Theme Token Compliant
+ * ══════════════════════════════════════════════════════════════ */
+
+/* Spinner Animation */
+@keyframes stuSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.stu-spinner {
+  animation: stuSpin 0.75s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Button Disabled / Loading State */
+.btn-disabled-loading,
+button:disabled.btn-disabled-loading,
+.btn-stu-compact:disabled,
+.btn-stu-outline:disabled {
+  opacity: 0.65 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+  filter: grayscale(0.2);
+}
+
+/* Custom Checkbox */
+.stu-checkbox {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  border-radius: 4px;
+  vertical-align: middle;
+}
+.col-trash-check {
+  width: 40px;
+  text-align: center;
+}
+
+/* Trash Bulk Actions Bar */
+.trash-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  margin-bottom: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  animation: slideDownFade 0.2s ease;
+  flex-wrap: wrap;
+}
+
+@keyframes slideDownFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.trash-bulk-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trash-bulk-badge {
+  background: var(--color-primary);
+  color: var(--text-white);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.trash-bulk-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.trash-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Trash Confirmation Modal */
+.trash-confirm-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.trash-confirm-icon-box.restore {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.trash-confirm-icon-box.danger {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+}
+
+#trash-confirm-warning {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+  border: 1px solid var(--status-absent);
+}
+
+/* Success Celebration Popup */
+.stu-success-popup-card {
+  animation: stuBounceIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes stuBounceIn {
+  0% { transform: scale(0.85); opacity: 0; }
+  70% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.stu-success-circle-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border: 2px solid var(--status-present);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
 }
 
 /* Status Chips for Active, Transferred & Withdrawn Students */
