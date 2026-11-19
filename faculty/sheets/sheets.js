@@ -132,6 +132,24 @@ function safeDiv(num, den, fallback = 0) {
   return (d > 0 && !isNaN(d) && !isNaN(n)) ? (n / d) : fallback;
 }
 
+function sortStudentsList(list) {
+  if (!Array.isArray(list)) return [];
+  const copy = [...list];
+  return copy.sort((a, b) => {
+    const rollA = parseInt(a.class_roll_no || a.roll_no || a.roll || a.id || 0, 10);
+    const rollB = parseInt(b.class_roll_no || b.roll_no || b.roll || b.id || 0, 10);
+    if (!isNaN(rollA) && !isNaN(rollB) && rollA !== rollB) {
+      return rollA - rollB;
+    }
+    const nameA = String(a.full_name || a.student_name || a.name || '').toLowerCase();
+    const nameB = String(b.full_name || b.student_name || b.name || '').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+}
+if (typeof window !== 'undefined') {
+  window.sortStudentsList = sortStudentsList;
+}
+
 async function initSheetsStudio() {
   try {
     if (typeof requireFacultyAuth === 'function') {
@@ -367,6 +385,7 @@ async function onSwitchGroup(newGroupId) {
   await loadGroupMetadata(S.groupId);
   renderGroupSwitcherOptions();
   renderSheetSelectorDropdownOptions();
+  await switchSheetTab(S.activeSheet || 'evaluation', false);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -579,7 +598,7 @@ function applyExcelGridFilters() {
   const trList = tbody.querySelectorAll('tr[data-row]');
   trList.forEach(tr => {
     const r = parseInt(tr.dataset.row, 10);
-    if (r === 0 || isMarksRow(sheet, r)) {
+    if (r === 0 || isMarksRow(sheet, r) || isSignoffRow(sheet, r)) {
       tr.style.display = '';
       return;
     }
@@ -8260,7 +8279,12 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
         const hasBrokenBannerInGrid = s0Text.includes('Polytechnic') || s0Text.includes('Institute') || s0Text.includes('Uttarakhand');
         const hasSingleTests = Array.isArray(parsed?.sheets) && parsed.sheets.some(s => s.type === 'single-test');
         const hasObsoleteGrade = s0 && (getCell(s0, 0, 7)?.v === 'Grade' || String(getCell(s0, 0, 3)?.v || '').includes('(10)'));
-        if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length > 0 && !hasObsoleteGrade && !hasBrokenBannerInGrid && hasSingleTests) {
+        const hasStudentRow = s0 && (
+          Boolean(getCell(s0, 2, 2)?.v || getCell(s0, 2, 2)?.raw) ||
+          Boolean(getCell(s0, 2, 0)?.v || getCell(s0, 2, 0)?.raw)
+        );
+
+        if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length >= 4 && !hasObsoleteGrade && !hasBrokenBannerInGrid && hasSingleTests && hasStudentRow) {
           EXCEL_WB.name = parsed.name || EXCEL_WB.name;
           EXCEL_WB.sheets = parsed.sheets;
           EXCEL_WB.activeSheetIndex = 0;
@@ -8271,8 +8295,8 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
 
           const tally = document.getElementById('sheet-visible-tally');
           if (tally) {
-            const rowCount = parsed.sheets[0]?.rowsCount || 0;
-            tally.textContent = `Subject: ${S.group?.name || 'Class'} (${rowCount} rows)`;
+            const studentCount = parsed.sheets[0]?.rowsCount ? Math.max(0, parsed.sheets[0].rowsCount - 8) : 0;
+            tally.textContent = `Showing ${studentCount} of ${studentCount} students`;
           }
           return;
         }
@@ -8290,11 +8314,23 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     studentList = S.members;
   }
 
+  // If classroom does not have members enrolled yet, supply default student rows so sheet is NEVER blank
+  if (!studentList || studentList.length === 0) {
+    studentList = Array.from({ length: 15 }, (_, i) => ({
+      class_roll_no: i + 1,
+      official_enrollment_no: `2024${S.group?.department_code || 'IT'}${String(i + 1).padStart(3, '0')}`,
+      full_name: '',
+      attendance_percentage: 100,
+      assignment_scores: [0, 0, 0, 0, 0],
+      exam_scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    }));
+  }
+
   const students = sortStudentsList(studentList);
 
   const tally = document.getElementById('sheet-visible-tally');
   if (tally) {
-    tally.textContent = students.length > 0 ? `Showing ${students.length} students` : '0 students enrolled (Add students or input data)';
+    tally.textContent = `Showing ${students.length} of ${students.length} students`;
   }
 
   EXCEL_WB.sheets = [];
@@ -8337,27 +8373,29 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const roll = stu.class_roll_no || (idx + 1);
     const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
     const name = stu.full_name || stu.student_name || stu.name || '';
-    const attPct = Math.round(Number(stu.attendance_percentage || 85));
+    const attPct = Math.round(Number(stu.attendance_percentage !== undefined && stu.attendance_percentage !== null ? stu.attendance_percentage : 0));
 
-    let assignAvg = 8.5;
-    if (stu.assignment_avg !== undefined) assignAvg = Number(stu.assignment_avg);
-    else if (Array.isArray(stu.assignment_scores) && stu.assignment_scores.length) {
+    let assignAvg = 0;
+    if (stu.assignment_avg !== undefined && stu.assignment_avg !== null && stu.assignment_avg !== '') {
+      assignAvg = Number(stu.assignment_avg);
+    } else if (Array.isArray(stu.assignment_scores) && stu.assignment_scores.length) {
       const valid = stu.assignment_scores.filter(v => v !== '' && v !== null && !isNaN(v));
       if (valid.length) assignAvg = Math.round((valid.reduce((a, b) => a + Number(b), 0) / valid.length) * 10) / 10;
     }
 
-    let utAvg = 1.75;
-    if (stu.exam_avg !== undefined) utAvg = Math.round(Number(stu.exam_avg) * 0.1 * 100) / 100;
-    else if (Array.isArray(stu.exam_scores) && stu.exam_scores.length) {
+    let utAvg = 0;
+    if (stu.exam_avg !== undefined && stu.exam_avg !== null && stu.exam_avg !== '') {
+      utAvg = Math.round(Number(stu.exam_avg) * 0.1 * 100) / 100;
+    } else if (Array.isArray(stu.exam_scores) && stu.exam_scores.length) {
       const valid = stu.exam_scores.filter(v => v !== '' && v !== null && !isNaN(v));
       if (valid.length) utAvg = Math.round((valid.reduce((a, b) => a + Number(b), 0) / valid.length) * 0.1 * 100) / 100;
     }
 
-    const attMarks = Math.min(5, Math.round((attPct / 20) * 10) / 10);
-    const probSkills = 4;
-    const labRecord = 9;
-    const creativeWork = 8.5;
-    const vivaVoce = 4;
+    const attMarks = (attPct > 0) ? Math.min(5, Math.round((attPct / 20) * 10) / 10) : 0;
+    const probSkills = (stu.problem_solving_marks !== undefined && stu.problem_solving_marks !== null) ? Number(stu.problem_solving_marks) : 0;
+    const labRecord = (stu.lab_record_marks !== undefined && stu.lab_record_marks !== null) ? Number(stu.lab_record_marks) : 0;
+    const creativeWork = (stu.creative_work_marks !== undefined && stu.creative_work_marks !== null) ? Number(stu.creative_work_marks) : 0;
+    const vivaVoce = (stu.viva_voce_marks !== undefined && stu.viva_voce_marks !== null) ? Number(stu.viva_voce_marks) : 0;
 
     setCell(evalSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
     setCell(evalSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
@@ -8426,10 +8464,8 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
 
     for (let tIdx = 0; tIdx < 10; tIdx++) {
       let mark = 0;
-      if (Array.isArray(stu.exam_scores) && stu.exam_scores[tIdx] !== undefined && stu.exam_scores[tIdx] !== '') {
+      if (Array.isArray(stu.exam_scores) && stu.exam_scores[tIdx] !== undefined && stu.exam_scores[tIdx] !== '' && !isNaN(stu.exam_scores[tIdx])) {
         mark = Number(stu.exam_scores[tIdx]);
-      } else if (tIdx < 3) {
-        mark = Math.round((14 + ((idx + tIdx) % 6)));
       }
       setCell(testSheet, r, 3 + tIdx, { raw: mark, v: mark, s: { align: 'center' } });
     }
@@ -8510,11 +8546,10 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
       setCell(singleTestSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
       setCell(singleTestSheet, r, 2, { raw: name, v: name, s: { bold: true, align: 'left' } });
 
-      const qBase = (idx + tIdx) % 3;
-      const q1 = Math.min(5, 3.5 + (qBase * 0.5));
-      const q2 = Math.min(5, 4.0 + (qBase * 0.5));
-      const q3 = Math.min(5, 3.0 + (qBase * 0.5));
-      const q4 = Math.min(5, 4.0 + (qBase * 0.5));
+      const q1 = (Array.isArray(stu.question_marks) && stu.question_marks[0] !== undefined) ? Number(stu.question_marks[0]) : 0;
+      const q2 = (Array.isArray(stu.question_marks) && stu.question_marks[1] !== undefined) ? Number(stu.question_marks[1]) : 0;
+      const q3 = (Array.isArray(stu.question_marks) && stu.question_marks[2] !== undefined) ? Number(stu.question_marks[2]) : 0;
+      const q4 = (Array.isArray(stu.question_marks) && stu.question_marks[3] !== undefined) ? Number(stu.question_marks[3]) : 0;
 
       setCell(singleTestSheet, r, 3, { raw: q1, v: q1, s: { align: 'center' } });
       setCell(singleTestSheet, r, 4, { raw: q2, v: q2, s: { align: 'center' } });
@@ -8578,11 +8613,9 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     setCell(assignSheet, r, 2, { raw: name, v: name, s: { bold: true, align: 'left' } });
 
     for (let aIdx = 0; aIdx < 5; aIdx++) {
-      let mark = 8.5;
-      if (Array.isArray(stu.assignment_scores) && stu.assignment_scores[aIdx] !== undefined && stu.assignment_scores[aIdx] !== '') {
+      let mark = 0;
+      if (Array.isArray(stu.assignment_scores) && stu.assignment_scores[aIdx] !== undefined && stu.assignment_scores[aIdx] !== '' && !isNaN(stu.assignment_scores[aIdx])) {
         mark = Number(stu.assignment_scores[aIdx]);
-      } else {
-        mark = Math.min(10, Math.round((7.5 + ((idx + aIdx) % 3)) * 10) / 10);
       }
       setCell(assignSheet, r, 3 + aIdx, { raw: mark, v: mark, s: { align: 'center' } });
     }
@@ -8632,16 +8665,20 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const roll = stu.class_roll_no || (idx + 1);
     const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
     const name = stu.full_name || stu.student_name || stu.name || '';
-    const attPct = Math.round(Number(stu.attendance_percentage || 85));
-    const attMarks = Math.min(5, Math.round((attPct / 20) * 10) / 10);
+    const attPct = Math.round(Number(stu.attendance_percentage !== undefined && stu.attendance_percentage !== null ? stu.attendance_percentage : 0));
+    const attMarks = (attPct > 0) ? Math.min(5, Math.round((attPct / 20) * 10) / 10) : 0;
+
+    const labRecord = (stu.lab_record_marks !== undefined && stu.lab_record_marks !== null) ? Number(stu.lab_record_marks) : 0;
+    const creativeWork = (stu.creative_work_marks !== undefined && stu.creative_work_marks !== null) ? Number(stu.creative_work_marks) : 0;
+    const vivaVoce = (stu.viva_voce_marks !== undefined && stu.viva_voce_marks !== null) ? Number(stu.viva_voce_marks) : 0;
 
     setCell(practicalSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
     setCell(practicalSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
     setCell(practicalSheet, r, 2, { raw: name, v: name, s: { bold: true, align: 'left' } });
-    setCell(practicalSheet, r, 3, { raw: 9, v: 9, s: { align: 'center' } });
-    setCell(practicalSheet, r, 4, { raw: 8.5, v: 8.5, s: { align: 'center' } });
+    setCell(practicalSheet, r, 3, { raw: labRecord, v: labRecord, s: { align: 'center' } });
+    setCell(practicalSheet, r, 4, { raw: creativeWork, v: creativeWork, s: { align: 'center' } });
     setCell(practicalSheet, r, 5, { raw: attMarks, v: attMarks, s: { align: 'center' } });
-    setCell(practicalSheet, r, 6, { raw: 4.5, v: 4.5, s: { align: 'center' } });
+    setCell(practicalSheet, r, 6, { raw: vivaVoce, v: vivaVoce, s: { align: 'center' } });
 
     const totalFormula = `=ROUND(D${r + 1} + E${r + 1} + F${r + 1} + G${r + 1}, 2)`;
     setCell(practicalSheet, r, 7, { raw: totalFormula, f: totalFormula, s: { bold: true, align: 'center' } });
