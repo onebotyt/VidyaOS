@@ -120,7 +120,7 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" id="rec-search-input" placeholder="Search by student name, roll #, enrollment #, or email..."
+              <input type="text" id="rec-search-input" placeholder="Search by student, roll #, work or subject (e.g. 1 girdhardhami assinment java)..."
                 oninput="onSearchInput(this.value)">
             </div>
             <button type="button" class="btn-rec-clear" onclick="resetFilters()">Reset Filters</button>
@@ -640,10 +640,62 @@
             <span id="preview-doc-meta" style="font-size:0.75rem; color:var(--text-muted);">In-Browser Inspection • Read Only</span>
           </div>
         </div>
-        <button type="button" class="btn-rec-modal-close" onclick="closeDocumentPreview()" title="Close Preview">✕</button>
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <a id="preview-doc-download-btn" href="#" download="" class="btn-rec-doc btn-rec-download" style="padding:0.35rem 0.75rem; font-size:0.8rem; display:inline-flex;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download</span>
+          </a>
+          <button type="button" class="btn-rec-modal-close" onclick="closeDocumentPreview()" title="Close Preview">✕</button>
+        </div>
       </div>
       <div id="preview-doc-body" style="flex:1; width:100%; height:100%; background:var(--bg-surface-secondary); display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;">
         <!-- Populated dynamically: iframe for PDF, img for images, or preview container -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Mobile Marks Breakdown Table Modal -->
+  <div id="modal-marks-mobile" class="rec-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeMobileMarksModal()">
+    <div class="rec-modal-card modal-marks-card">
+      <div class="rec-modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.75rem;">
+        <div>
+          <h3 id="mob-marks-title" style="margin:0; font-size:1.05rem; font-weight:800; color:var(--text-main);">Marks Details</h3>
+          <span id="mob-marks-student" style="font-size:0.8rem; color:var(--text-muted);">Student Evaluation Score</span>
+        </div>
+        <button type="button" class="btn-rec-modal-close" onclick="closeMobileMarksModal()">&times;</button>
+      </div>
+
+      <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:8px; padding:0.75rem; margin-bottom:1rem;">
+        <div class="modal-marks-row">
+          <span class="modal-marks-label">Assessment</span>
+          <span class="modal-marks-val" id="mob-marks-assessment">--</span>
+        </div>
+        <div class="modal-marks-row">
+          <span class="modal-marks-label">Score / Maximum</span>
+          <span class="modal-marks-val" id="mob-marks-score" style="color:var(--color-primary); font-size:1rem;">--</span>
+        </div>
+        <div class="modal-marks-row">
+          <span class="modal-marks-label">Percentage</span>
+          <span class="modal-marks-val" id="mob-marks-pct">--</span>
+        </div>
+        <div class="modal-marks-row">
+          <span class="modal-marks-label">Submission Status</span>
+          <span class="modal-marks-val" id="mob-marks-status">--</span>
+        </div>
+        <div class="modal-marks-row">
+          <span class="modal-marks-label">Teacher Feedback</span>
+          <span class="modal-marks-val" id="mob-marks-feedback" style="font-weight:normal; max-width:60%; text-align:right;">--</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+        <button type="button" class="btn-rec-solid" id="mob-marks-open-dossier" style="width:100%; justify-content:center;">
+          Open Complete Academic Dossier
+        </button>
       </div>
     </div>
   </div>

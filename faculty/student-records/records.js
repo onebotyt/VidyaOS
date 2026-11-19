@@ -167,8 +167,12 @@
 
       if (json && json.success && json.data) {
         state.students = json.data;
+        state.isWorkSearch = Boolean(json.meta?.is_work_search);
+        state.searchMeta = json.meta || null;
         renderStudentRecords(json.data);
       } else {
+        state.isWorkSearch = false;
+        state.searchMeta = null;
         renderStudentRecords([]);
       }
     } catch (err) {
@@ -181,15 +185,59 @@
     const tbody = document.getElementById('rec-table-body');
     const countEl = document.getElementById('rec-records-count');
     const cohortTag = document.getElementById('rec-active-cohort-tag');
+    const thead = document.querySelector('#rec-students-table thead');
 
+    const isWorkSearch = Boolean(state.isWorkSearch || (students && students.length > 0 && students[0].is_work_item));
+
+    // 1. Dynamic Table Header Transformation
+    if (thead) {
+      if (isWorkSearch) {
+        thead.innerHTML = `
+          <tr>
+            <th style="width: 70px;">Roll #</th>
+            <th class="col-enrollment">Enrollment No</th>
+            <th>Student Name</th>
+            <th class="col-cohort">Cohort</th>
+            <th class="col-batch">Batch</th>
+            <th style="width: 175px; text-align: center;">Document</th>
+            <th style="width: 135px; text-align: center;">Marks</th>
+          </tr>
+        `;
+      } else {
+        thead.innerHTML = `
+          <tr>
+            <th style="width: 70px;">Roll #</th>
+            <th class="col-enrollment">Enrollment No</th>
+            <th>Student Name</th>
+            <th class="col-cohort">Cohort</th>
+            <th class="col-batch">Batch</th>
+            <th>Attendance</th>
+            <th style="width: 70px; text-align: center;">Actions</th>
+          </tr>
+        `;
+      }
+    }
+
+    // 2. Dynamic Count & Meta Tags
     if (countEl) {
-      countEl.textContent = `Showing ${students.length} student${students.length === 1 ? '' : 's'}`;
+      if (isWorkSearch) {
+        const wt = state.searchMeta?.work_type ? state.searchMeta.work_type.toLowerCase() : 'coursework';
+        const subj = state.searchMeta?.subject ? ` for ${state.searchMeta.subject.toUpperCase()}` : '';
+        countEl.textContent = `Showing ${students.length} ${wt} record${students.length === 1 ? '' : 's'}${subj}`;
+      } else {
+        countEl.textContent = `Showing ${students.length} student${students.length === 1 ? '' : 's'}`;
+      }
     }
 
     if (cohortTag) {
       let desc = 'All Cohorts';
-      if (state.filters.semester) desc = `Semester ${state.filters.semester}`;
-      else if (state.filters.year) desc = `Year ${state.filters.year}`;
+      if (isWorkSearch) {
+        desc = `Work Search • ${state.searchMeta?.work_type || 'Items'}`;
+      } else if (state.filters.semester) {
+        desc = `Semester ${state.filters.semester}`;
+      } else if (state.filters.year) {
+        desc = `Year ${state.filters.year}`;
+      }
       if (state.filters.batch) desc += ` • Batch ${state.filters.batch}`;
       cohortTag.textContent = desc;
     }
@@ -200,13 +248,80 @@
       tbody.innerHTML = `
         <tr>
           <td colspan="7" class="rec-empty-cell">
-            No student records found matching the active filters.
+            ${isWorkSearch ? 'No student coursework records found matching the active search query.' : 'No student records found matching the active filters.'}
           </td>
         </tr>
       `;
       return;
     }
 
+    // 3. Render Work Search Rows (Item-level View)
+    if (isWorkSearch) {
+      tbody.innerHTML = students.map((item, idx) => {
+        const roll = item.class_roll_no || idx + 1;
+        const enroll = item.official_enrollment_no || '--';
+        const name = item.full_name || 'Student';
+        const cohort = item.current_semester ? `Y${item.current_year || Math.ceil(item.current_semester / 2)} • Sem ${item.current_semester}` : '--';
+        const batch = item.batch_label || '--';
+        const workTitle = item.assessment_title || 'Coursework Item';
+        const subName = item.subject_name || '';
+        const docPath = item.file_path;
+        const docName = item.original_filename || `${roll}_${slugifyToken(name)}_${slugifyToken(workTitle)}.pdf`;
+        const hasDoc = Boolean(docPath);
+        const marks = item.marks_obtained;
+        const maxMarks = item.max_marks || 100;
+        const marksText = marks !== null && marks !== undefined ? `${marks} / ${maxMarks}` : 'Ungraded';
+
+        return `
+          <tr id="work-item-row-${item.assessment_id}-${item.student_id}">
+            <td class="rec-roll-cell">${escapeHtml(String(roll))}</td>
+            <td class="col-enrollment rec-enroll-cell">${escapeHtml(enroll)}</td>
+            <td>
+              <div class="rec-name-cell">
+                <span class="rec-student-name">${escapeHtml(name)}</span>
+                <span class="rec-work-badge" title="${escapeHtml(workTitle)}">
+                  ${escapeHtml(workTitle)}${subName ? ` • ${escapeHtml(subName)}` : ''}
+                </span>
+              </div>
+            </td>
+            <td class="col-cohort">${cohort}</td>
+            <td class="col-batch">${escapeHtml(batch)}</td>
+            <td class="rec-doc-cell" style="text-align: center;">
+              ${hasDoc ? `
+                <div class="rec-doc-actions">
+                  <button type="button" class="btn-rec-doc btn-rec-view" onclick="openDocumentPreview('${escapeHtml(docPath)}', '${escapeHtml(docName)}', '${escapeHtml(name)}', '${escapeHtml(workTitle)}')" title="Preview file without downloading">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>View</span>
+                  </button>
+                  <a href="${escapeHtml(docPath)}" download="${escapeHtml(docName)}" class="btn-rec-doc btn-rec-download" title="Download ${escapeHtml(docName)}">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Download</span>
+                  </a>
+                </div>
+              ` : `
+                <span class="rec-doc-pending">No submission</span>
+              `}
+            </td>
+            <td class="rec-marks-cell" style="text-align: center;">
+              <button type="button" class="btn-rec-marks" onclick="handleMarksClick(${item.student_id}, ${item.assessment_id}, '${escapeHtml(name)}', '${escapeHtml(workTitle)}', ${marks !== null && marks !== undefined ? marks : 'null'}, ${maxMarks}, '${escapeHtml(item.submission_status || 'PENDING')}', '${escapeHtml(item.feedback || '')}')" title="Click to view marks breakdown">
+                <span class="marks-score ${marks !== null && marks !== undefined ? 'has-score' : 'pending-score'}">${marksText}</span>
+                <span class="marks-mode-hint">${window.innerWidth < 769 ? 'Table (Mobile)' : 'Sheet (PC)'}</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      return;
+    }
+
+    // 4. Render Normal Default Roster Rows
     tbody.innerHTML = students.map((s, idx) => {
       const roll = s.class_roll_no || idx + 1;
       const enroll = s.official_enrollment_no || '--';
@@ -286,6 +401,121 @@
       `;
     }).join('');
   }
+
+  function slugifyToken(str) {
+    if (!str) return 'item';
+    return String(str).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 15);
+  }
+
+  // Document In-Browser Preview
+  window.openDocumentPreview = function (filePath, fileName, studentName, assessmentTitle) {
+    const modal = document.getElementById('modal-document-preview');
+    const titleEl = document.getElementById('preview-doc-title');
+    const metaEl = document.getElementById('preview-doc-meta');
+    const bodyEl = document.getElementById('preview-doc-body');
+    const dlBtn = document.getElementById('preview-doc-download-btn');
+    if (!modal || !bodyEl) return;
+
+    if (titleEl) titleEl.textContent = fileName || 'Document Preview';
+    if (metaEl) metaEl.textContent = `Submitted by ${studentName || 'Student'} • ${assessmentTitle || 'Coursework'}`;
+    if (dlBtn) {
+      dlBtn.href = filePath;
+      dlBtn.download = fileName || 'document.pdf';
+    }
+
+    const cleanPath = (filePath || '').split('?')[0];
+    const ext = cleanPath.split('.').pop().toLowerCase();
+
+    if (ext === 'pdf') {
+      bodyEl.innerHTML = `
+        <iframe src="${filePath}#toolbar=1" style="width:100%; height:100%; border:none; background:#ffffff;"></iframe>
+      `;
+    } else if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext)) {
+      bodyEl.innerHTML = `
+        <div style="padding:1.5rem; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+          <img src="${filePath}" alt="${escapeHtml(fileName)}" style="max-width:100%; max-height:100%; border-radius:8px; object-fit:contain; box-shadow:0 4px 20px rgba(0,0,0,0.15);" />
+        </div>
+      `;
+    } else {
+      bodyEl.innerHTML = `
+        <div style="text-align:center; padding:3rem 1.5rem; color:var(--text-main);">
+          <div style="font-size:3.5rem; margin-bottom:1rem;">📄</div>
+          <h4 style="margin:0 0 0.5rem 0; font-size:1.1rem; font-weight:700;">${escapeHtml(fileName)}</h4>
+          <p style="color:var(--text-muted); margin:0 0 1.5rem 0; font-size:0.88rem;">Direct in-browser preview is not supported for this file format.</p>
+          <a href="${filePath}" download="${escapeHtml(fileName)}" class="btn-rec-doc btn-rec-download" style="padding:0.6rem 1.25rem; font-size:0.9rem; display:inline-flex;">
+            Download File (${ext.toUpperCase()})
+          </a>
+        </div>
+      `;
+    }
+
+    modal.style.display = 'flex';
+  };
+
+  window.closeDocumentPreview = function () {
+    const modal = document.getElementById('modal-document-preview');
+    if (modal) modal.style.display = 'none';
+    const bodyEl = document.getElementById('preview-doc-body');
+    if (bodyEl) bodyEl.innerHTML = '';
+  };
+
+  // Marks Click Handler (Mobile Table vs PC Excel Sheet)
+  window.handleMarksClick = function (studentId, assessmentId, studentName, assessmentTitle, marks, maxMarks, status, feedback) {
+    if (window.innerWidth < 769) {
+      // Mobile: Show Marks Table modal!
+      openMobileMarksModal({ studentId, assessmentId, studentName, assessmentTitle, marks, maxMarks, status, feedback });
+    } else {
+      // PC: Open comprehensive Dossier & Excel Sheets Studio!
+      openStudentDossier(studentId, 'tests');
+    }
+  };
+
+  window.openMobileMarksModal = function (details) {
+    const modal = document.getElementById('modal-marks-mobile');
+    if (!modal) return;
+
+    const studentEl = document.getElementById('mob-marks-student');
+    const assessEl = document.getElementById('mob-marks-assessment');
+    const scoreEl = document.getElementById('mob-marks-score');
+    const pctEl = document.getElementById('mob-marks-pct');
+    const statusEl = document.getElementById('mob-marks-status');
+    const feedbackEl = document.getElementById('mob-marks-feedback');
+    const dossierBtn = document.getElementById('mob-marks-open-dossier');
+
+    if (studentEl) studentEl.textContent = details.studentName || 'Student';
+    if (assessEl) assessEl.textContent = details.assessmentTitle || 'Coursework Item';
+    if (scoreEl) {
+      if (details.marks !== null && details.marks !== undefined) {
+        scoreEl.textContent = `${details.marks} / ${details.maxMarks}`;
+      } else {
+        scoreEl.textContent = 'Ungraded';
+      }
+    }
+    if (pctEl) {
+      if (details.marks !== null && details.marks !== undefined && details.maxMarks > 0) {
+        const pct = Math.round((details.marks * 100) / details.maxMarks);
+        pctEl.textContent = `${pct}%`;
+      } else {
+        pctEl.textContent = '--';
+      }
+    }
+    if (statusEl) statusEl.textContent = details.status || 'SUBMITTED';
+    if (feedbackEl) feedbackEl.textContent = details.feedback || 'No teacher feedback recorded.';
+
+    if (dossierBtn) {
+      dossierBtn.onclick = function () {
+        closeMobileMarksModal();
+        openStudentDossier(details.studentId, 'tests');
+      };
+    }
+
+    modal.style.display = 'flex';
+  };
+
+  window.closeMobileMarksModal = function () {
+    const modal = document.getElementById('modal-marks-mobile');
+    if (modal) modal.style.display = 'none';
+  };
 
   // 3. Dropdown Menu Toggle with Dynamic Flip-up
   window.toggleRecordKebab = function (e, id) {

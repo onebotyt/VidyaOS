@@ -1056,6 +1056,9 @@ async function executeStudentWorkUpload(file) {
 
     const formData = new FormData();
     formData.append('file', file);
+    if (S.activeChecklistItem) {
+      formData.append('checklist_item', S.activeChecklistItem);
+    }
 
     const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     const res = await fetch(`/api/v1/assignments/${S.activeModalWork.id}/submit`, {
@@ -1068,11 +1071,14 @@ async function executeStudentWorkUpload(file) {
     if (data && data.success) {
       showToast('Work turned in successfully!', 'success');
 
-      // Update active work item state
+      // Update active work item state with standardized filename returned from server
+      const serverFileName = data.data?.original_filename || file.name;
+      const serverFilePath = data.data?.file_path || `/uploads/submissions/${file.name}`;
+
       S.activeModalWork.my_submission = {
         is_submitted: 1,
-        file_path: data.data?.file_path || `/uploads/submissions/${file.name}`,
-        original_filename: file.name,
+        file_path: serverFilePath,
+        original_filename: serverFileName,
         status: 'SUBMITTED'
       };
 
