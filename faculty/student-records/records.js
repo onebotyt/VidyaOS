@@ -146,7 +146,7 @@
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" class="rec-loading-cell">
+          <td colspan="6" class="rec-loading-cell">
             <div class="rec-spinner"></div>
             <span>Fetching academic records...</span>
           </td>
@@ -211,7 +211,7 @@
       if (!students || students.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" class="rec-empty-cell">
+            <td colspan="6" class="rec-empty-cell">
               No student records found matching the active filters.
             </td>
           </tr>
@@ -224,11 +224,6 @@
           const reg = s.registration_no ? `Reg: ${s.registration_no}` : '';
           const cohort = s.current_semester ? `Y${s.current_year || Math.ceil(s.current_semester / 2)} • Sem ${s.current_semester}` : '--';
           const batch = s.batch_label || (s.admission_year ? `Batch ${s.admission_year}` : '--');
-          const attPct = typeof s.attendance_percentage === 'number' ? s.attendance_percentage : 100;
-
-          let badgeClass = '';
-          if (attPct < 75) badgeClass = 'low';
-          else if (attPct < 80) badgeClass = 'warning';
 
           return `
             <tr id="student-row-${s.id}">
@@ -242,9 +237,6 @@
               </td>
               <td class="col-cohort">${cohort}</td>
               <td class="col-batch">${escapeHtml(batch)}</td>
-              <td>
-                <span class="rec-att-badge ${badgeClass}">${attPct}%</span>
-              </td>
               <td class="rec-action-cell">
                 <button type="button" class="rec-kebab-btn" onclick="toggleRecordKebab(event, ${s.id})" title="Actions" aria-label="Actions">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
