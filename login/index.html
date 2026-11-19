@@ -14,10 +14,16 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/login/index.css?v=20261119">
+  <link rel="stylesheet" href="/login/mobile-login.css?v=20261119">
   <script src="/mobile-bridge.js"></script>
 </head>
 
 <body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       DESKTOP VIEW (PC / Tablets > 768px: UGIP Nainital Showcase)
+       ══════════════════════════════════════════════════════════ -->
+  <div id="desktop-login-view" class="desktop-login-layout">
 
   <!-- Campus Himalayan Slideshow Background -->
   <div class="bg" role="img" aria-label="Government Polytechnic Nainital campus and Himalayan views">
@@ -194,6 +200,24 @@
           <button type="submit" class="signin" id="submit-btn">
             <span id="submit-text">Sign In</span> <span id="signin-icon" aria-hidden="true">→</span>
           </button>
+
+          <!-- Desktop App Actions: APK Download & GitHub Profile (Girdhardhami) -->
+          <div class="desktop-app-actions">
+            <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="app-action-btn apk-btn" target="_blank" download title="Download latest VidyaOS Android APK">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Download APK</span>
+            </a>
+            <a href="https://github.com/girdhardhami" class="app-action-btn github-btn" target="_blank" rel="noopener noreferrer" title="View Girdhardhami GitHub profile">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <span>Girdhardhami</span>
+            </a>
+          </div>
         </form>
 
         <p class="reg">New to VidyaOS? <a href="/login/register/index.html" id="reg-student-link">Create an account →</a></p>
@@ -204,6 +228,188 @@
   <footer class="bar">
     <div>© 2026 Government Polytechnic Nainital (UGIP) &amp; VidyaOS. All rights reserved.</div>
   </footer>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MOBILE VIEW (Smartphones <= 768px: UGIP Nainital Design)
+       ══════════════════════════════════════════════════════════ -->
+  <div id="mobile-login-view" class="mobile-login-layout">
+    <div class="m-background"></div>
+
+    <main class="m-page">
+      <div class="m-container">
+
+        <!-- BRAND HEADER -->
+        <header class="m-header">
+          <div class="m-logo">
+            <svg viewBox="0 0 48 48" fill="none">
+              <path d="M4 17.5L24 7L44 17.5L24 28L4 17.5Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M11 22V32L24 39L37 32V22" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M44 18V32" stroke="currentColor" stroke-width="3"/>
+              <circle cx="44" cy="35" r="2.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="m-brand">
+            <div class="m-brand-name">VidyaOS</div>
+            <div class="m-brand-subtitle">
+              Institutional Campus &amp;<br>
+              Academic Operating System
+            </div>
+          </div>
+        </header>
+
+        <!-- COLLEGE HERO -->
+        <section class="m-hero">
+          <h1 class="m-college-name">
+            <span>UGIP</span> Nainital
+          </h1>
+          <p class="m-state">Uttarakhand</p>
+          <div class="m-nba-badge">
+            <span>✦</span>
+            COMPLETELY ADHERED TO
+            <strong>NBA GUIDELINES</strong>
+          </div>
+        </section>
+
+        <!-- LOGIN CARD -->
+        <section class="m-login-section">
+          <div class="m-login-card">
+            <div class="m-card-header">
+              <div>
+                <h2 class="m-welcome">Welcome back</h2>
+                <p class="m-description">
+                  Sign in with your institutional email<br>
+                  to access VidyaOS
+                </p>
+              </div>
+              <div class="m-cap-icon">
+                <svg viewBox="0 0 80 80" fill="none">
+                  <path d="M5 29L40 11L75 29L40 47L5 29Z" fill="currentColor"/>
+                  <path d="M16 38V54L40 67L64 54V38L40 50L16 38Z" fill="currentColor"/>
+                  <path d="M74 30V55" stroke="currentColor" stroke-width="4"/>
+                  <path d="M68 58H80V66H68Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+
+            <form id="mobile-login-form" autocomplete="on" novalidate>
+              <!-- EMAIL / IDENTIFIER -->
+              <div class="m-form-group">
+                <label class="m-label" for="m-identifier">
+                  Institutional Email / Mobile
+                </label>
+                <div class="m-input-box">
+                  <svg class="m-input-icon" viewBox="0 0 24 24" fill="none">
+                    <rect x="2.5" y="4.5" width="19" height="15" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M3.5 6L12 13L20.5 6" stroke="currentColor" stroke-width="1.8"/>
+                  </svg>
+                  <input
+                    type="text"
+                    id="m-identifier"
+                    name="identifier"
+                    placeholder="e.g. student@ugipnainital.ac.in"
+                    autocomplete="username"
+                    required
+                  >
+                </div>
+                <p class="m-hint">e.g. student@ugipnainital.ac.in or registered mobile</p>
+              </div>
+
+              <!-- PASSWORD -->
+              <div class="m-password-heading">
+                <label class="m-label" for="m-password">Password</label>
+                <a href="#" class="m-forgot" id="m-forgotPassword" onclick="handleForgotPassword(); return false;">Forgot password?</a>
+              </div>
+              <div class="m-input-box">
+                <svg class="m-input-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="5" y="10" width="14" height="12" rx="2"/>
+                  <path d="M8 10V7A4 4 0 0 1 16 7V10" fill="none" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <input
+                  type="password"
+                  id="m-password"
+                  name="password"
+                  placeholder="Enter your password"
+                  autocomplete="current-password"
+                  required
+                >
+                <button
+                  type="button"
+                  class="m-toggle-password"
+                  id="m-togglePassword"
+                  aria-label="Show password"
+                  aria-pressed="false"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M2 12S5.6 6 12 6S22 12 22 12S18.4 18 12 18S2 12 2 12Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- SIGN IN BUTTON -->
+              <button type="submit" id="m-submit-btn" class="m-sign-in">
+                <span id="m-submit-text">Sign In</span>
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M4 12H19M13 6L19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+
+              <!-- APP ACTIONS: APK DOWNLOAD & GITHUB PROFILE (Girdhardhami) -->
+              <div class="m-actions-row">
+                <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="m-action-btn m-btn-apk" target="_blank" download title="Download latest VidyaOS Android APK">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Download APK</span>
+                </a>
+                <a href="https://github.com/girdhardhami" class="m-action-btn m-btn-github" target="_blank" rel="noopener noreferrer" title="View Girdhardhami GitHub profile">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                  <span>Girdhardhami</span>
+                </a>
+              </div>
+
+              <!-- STATUS / ERROR MESSAGE -->
+              <p class="m-message" id="m-message" role="status" aria-live="polite"></p>
+
+              <!-- REGISTRATION LINKS -->
+              <div class="m-footer-links">
+                <a href="/login/register/index.html">New to VidyaOS? Create an account / Register &rarr;</a>
+                <a href="/login/register/index.html?role=faculty" class="m-sublink">Faculty &amp; HOD Application Form &rarr;</a>
+              </div>
+            </form>
+
+            <!-- CAMPUS FOOTER -->
+            <div class="m-campus-footer">
+              <svg class="m-building-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 21V5L12 2L21 5V21H15V15H9V21H3ZM6 8H9V6H6V8ZM6 13H9V11H6V13ZM15 8H18V6H15V8ZM15 13H18V11H15V13Z"/>
+              </svg>
+              <div class="m-footer-divider"></div>
+              <div>
+                <div class="m-footer-title">
+                  UGIP Nainital, Uttarakhand
+                </div>
+                <div class="m-footer-subtitle">
+                  Completely Adhered to NBA Guidelines
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- COPYRIGHT -->
+        <footer class="m-copyright">
+          © 2026 UGIP Nainital. All rights reserved.
+        </footer>
+
+      </div>
+    </main>
+  </div>
 
   <!-- ══ FIRST-TIME ACTIVATION MODAL ══ -->
   <div class="modal-overlay" id="activation-modal" role="dialog" aria-modal="true" aria-labelledby="act-title">

@@ -332,12 +332,99 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     }
 
     // Unified security message on any credential failure
-    showInlineMsg('invalid credentials check id and password ', 'err');
+    const genericAuthError = 'Invalid credentials. Please check your username/email and password.';
+    showInlineMsg(genericAuthError, 'err');
     try {
-      if (typeof showToast === 'function') showToast('invalid credentials check id and password ', 'error');
+      if (typeof showToast === 'function') showToast(genericAuthError, 'error');
     } catch (_) { }
   }
 });
+
+/* ── Mobile Login Handlers (UGIP Nainital Layout) ── */
+(function setupMobileLoginForm() {
+  const mToggleBtn = document.getElementById('m-togglePassword');
+  const mPasswordInput = document.getElementById('m-password');
+  if (mToggleBtn && mPasswordInput) {
+    mToggleBtn.addEventListener('click', () => {
+      const show = mPasswordInput.type === 'password';
+      mPasswordInput.type = show ? 'text' : 'password';
+      mToggleBtn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      mToggleBtn.setAttribute('aria-pressed', String(show));
+      mToggleBtn.innerHTML = show
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+             <path d="M3 3L21 21M10.6 10.6A2 2 0 0 0 13.4 13.4M9.9 5.2A10.8 10.8 0 0 1 12 5C18.4 5 22 12 22 12S18.4 19 12 19C10.9 19 9.9 18.8 9 18.5" stroke-linecap="round"/>
+           </svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+             <path d="M2 12S5.6 6 12 6S22 12 22 12S18.4 18 12 18S2 12 2 12Z"/>
+             <circle cx="12" cy="12" r="3"/>
+           </svg>`;
+    });
+  }
+
+  const mLoginForm = document.getElementById('mobile-login-form');
+  if (mLoginForm) {
+    mLoginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = (document.getElementById('m-identifier')?.value || '').trim();
+      const pw = document.getElementById('m-password')?.value || '';
+      if (!id || !pw) return;
+
+      const btn = document.getElementById('m-submit-btn');
+      const text = document.getElementById('m-submit-text');
+      const msg = document.getElementById('m-message');
+      if (btn) btn.disabled = true;
+      if (text) text.textContent = 'Verifying...';
+      if (msg) {
+        msg.textContent = '';
+        msg.className = 'm-message';
+      }
+
+      try {
+        const deviceId = getVidyaDeviceId();
+        const res = await executeLoginWithRetry({
+          email: id, phone: id, credential: id,
+          identifier: id, username: id, enrollment_no: id,
+          password: pw,
+          device_id: deviceId
+        });
+
+        if (res.success) {
+          if (res.data.must_change_password) {
+            currentActivationToken = res.data.activation_token;
+            document.getElementById('act-name').textContent = res.data.user?.full_name || res.data.user?.email || 'Faculty';
+            document.getElementById('act-email').textContent = res.data.user?.email || 'your account';
+            document.getElementById('activation-modal').style.display = 'flex';
+            if (btn) btn.disabled = false;
+            if (text) text.textContent = 'Sign In';
+            return;
+          }
+          setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
+          if (msg) {
+            msg.textContent = 'Login successful! Redirecting...';
+            msg.className = 'm-message success';
+          }
+          try { if (typeof showToast === 'function') showToast('Login successful! Redirecting…', 'success'); } catch (_) { }
+          setTimeout(() => redirectAfterLogin(res.data.user), 350);
+        }
+      } catch (err) {
+        if (btn) btn.disabled = false;
+        if (text) text.textContent = 'Sign In';
+
+        const genericError = 'Invalid credentials. Please check your username/email and password.';
+        const isRestricted = err?.code === 'FORBIDDEN' || err?.message?.toLowerCase().includes('suspend') || err?.message?.toLowerCase().includes('restrict');
+        const errMsg = isRestricted ? (err.message || 'Account access has been restricted. Please contact administration.') : genericError;
+
+        if (msg) {
+          msg.textContent = errMsg;
+          msg.className = 'm-message error';
+        }
+        try {
+          if (typeof showToast === 'function') showToast(errMsg, 'error');
+        } catch (_) { }
+      }
+    });
+  }
+})();
 
 /* ── Force login (session takeover) ── */
 async function submitForceLogin() {
@@ -584,5 +671,73 @@ function handleForgotPassword() {
   const msg = params.get('message');
   if (msg) showInlineMsg(decodeURIComponent(msg), 'ok');
   const errMsg = params.get('error');
-  if (errMsg) showInlineMsg('invalid credentials check id and password ', 'err');
+  if (errMsg) showInlineMsg('Invalid credentials. Please check your username/email and password.', 'err');
 })();
+
+/* ── Dynamic College Campus Banner (Fetched from Admin Settings) ── */
+function resolveBrandingUrl(url, fallback) {
+  if (!url) return fallback;
+  if (typeof window !== 'undefined' && (window.VIDYAOS_IS_NATIVE || window.VIDYAOS_FORCE_NATIVE)) {
+    if (url.startsWith('/uploads')) {
+      return (window.VIDYAOS_CLOUD_BACKEND || 'https://vidyaos-backend.onrender.com') + url;
+    }
+  }
+  return url;
+}
+
+async function loadDynamicCampusBanner() {
+  function applyBanner(bannerUrl) {
+    if (!bannerUrl) return;
+    const resolvedUrl = resolveBrandingUrl(bannerUrl, '/login/campus.jpg');
+
+    // 1. Mobile top background (.m-background)
+    const mBg = document.querySelector('.m-background') || document.querySelector('.background');
+    if (mBg) {
+      mBg.style.backgroundImage = `linear-gradient(to bottom, rgba(255, 255, 255, 0.12) 0%, rgba(237, 244, 255, 0.35) 25%, rgba(237, 244, 255, 0.94) 53%, #edf4ff 75%), url("${resolvedUrl}")`;
+    }
+
+    // 2. Desktop slideshow first slide (.slide.s1)
+    const dSlide1 = document.querySelector('.slide.s1');
+    if (dSlide1) {
+      dSlide1.style.backgroundImage = `url("${resolvedUrl}")`;
+    }
+  }
+
+  // A. Paint instantly from localStorage cache if available
+  try {
+    const cached = JSON.parse(localStorage.getItem('institutionSettings') || localStorage.getItem('adminSettings') || '{}');
+    if (cached.institution_banner_url || cached.banner_url) {
+      applyBanner(cached.institution_banner_url || cached.banner_url);
+    }
+  } catch (_) {}
+
+  // B. Fetch live settings from backend branding API
+  try {
+    const res = await fetch('/api/v1/auth/branding').then(r => r.json());
+    if (res.success && res.data) {
+      const banner = res.data.institution_banner_url;
+      if (banner) {
+        applyBanner(banner);
+        try {
+          const prev = JSON.parse(localStorage.getItem('institutionSettings') || '{}');
+          localStorage.setItem('institutionSettings', JSON.stringify({ ...prev, ...res.data }));
+        } catch (_) {}
+      }
+    }
+  } catch (_) {
+    // Fallback: attempt admin settings
+    try {
+      const res = await fetch('/api/v1/admin/settings').then(r => r.json());
+      if (res.success && res.data?.institution_banner_url) {
+        applyBanner(res.data.institution_banner_url);
+      }
+    } catch (_) {}
+  }
+}
+
+// Call on load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadDynamicCampusBanner);
+} else {
+  loadDynamicCampusBanner();
+}
