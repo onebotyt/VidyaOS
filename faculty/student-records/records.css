@@ -1623,15 +1623,14 @@
 
 .btn-rec-marks {
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.65rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 6px;
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
   cursor: pointer;
-  min-width: 85px;
+  min-width: 75px;
   transition: all 0.2s ease;
 }
 
@@ -1641,7 +1640,7 @@
 }
 
 .btn-rec-marks .marks-score {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -1651,12 +1650,236 @@
 }
 
 .btn-rec-marks .marks-mode-hint {
-  font-size: 0.66rem;
+  display: none !important;
+}
+
+/* Section 2: Showing Records Header & Export */
+.rec-records-header-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-rec-export-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.95rem;
+  background: var(--color-primary);
+  color: var(--text-on-primary, #ffffff);
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.82rem;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-rec-export-section:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Export Modal */
+.rec-export-modal-card {
+  max-width: 520px;
+  width: 92%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Sheet Preview Studio Modal */
+.rec-sheet-preview-modal-card {
+  max-width: 1450px;
+  width: 96vw;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.rec-sheet-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.rec-sheet-header-title-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.rec-sheet-modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.rec-sheet-modal-subtitle {
+  font-size: 0.78rem;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 1px;
+}
+
+.rec-sheet-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-sheet-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-sheet-action-pill:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.rec-sheet-preview-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding: 1.25rem;
+  background: var(--bg-app);
+}
+
+.rec-sheet-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+/* Excel Sheet Table Design (Image 3 & Image 4) */
+.rec-sheet-table-scroll table.excel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.rec-sheet-table-scroll table.excel-table th,
+.rec-sheet-table-scroll table.excel-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.35rem 0.5rem;
+}
+
+.rec-sheet-table-scroll tr.excel-hdr-blue th {
+  background: var(--col-att-group-bg, var(--color-primary-light)) !important;
+  color: var(--col-att-group-color, var(--color-primary)) !important;
+  font-weight: 800;
+  text-align: center;
+  padding: 0.4rem 0.6rem;
+}
+
+.rec-sheet-table-scroll tr.excel-hdr-blue.row-1 th h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.rec-sheet-table-scroll tr.excel-hdr-tan th {
+  background: var(--chip-hod-bg, var(--bg-surface-secondary)) !important;
+  color: var(--text-main) !important;
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.rec-sheet-table-scroll tr.excel-hdr-sub th {
+  background: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.rec-sheet-table-scroll tr.excel-hdr-numbers th {
+  background: var(--bg-surface-secondary) !important;
+  color: var(--text-muted) !important;
+  font-weight: 700;
+  font-size: 0.74rem;
+  text-align: center;
+}
+
+.rec-sheet-table-scroll .excel-hdr-num-badge {
+  display: inline-block;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.rec-sheet-table-scroll .col-side-panel {
+  vertical-align: top;
+  background: var(--bg-card);
+}
+
+.rec-sheet-table-scroll .excel-side-content {
+  padding: 0.75rem 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.rec-sheet-table-scroll .excel-side-sec-title {
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+}
+
+.rec-sheet-table-scroll .excel-side-instructions {
+  margin: 0 0 0.75rem 1rem;
+  padding: 0;
+  color: var(--text-secondary);
+}
+
+.rec-sheet-table-scroll .excel-side-questions {
+  margin-bottom: 0.75rem;
+  color: var(--text-main);
+}
+
+.rec-sheet-table-scroll .sheet-note-red {
+  color: var(--status-absent);
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.rec-sheet-table-scroll .cell-read-only {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.rec-sheet-table-scroll .excel-summary-row {
+  background: var(--bg-surface-secondary);
+  font-weight: 800;
 }
 
 /* Mobile Marks Modal */

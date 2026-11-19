@@ -165,74 +165,39 @@
 
       const json = await api(`/student-records?${params.toString()}`);
 
-      if (json && json.success && json.data) {
-        state.students = json.data;
+      if (json && json.success) {
+        state.students = json.students || (json.meta?.is_work_search ? [] : json.data) || [];
+        state.records = json.records || (json.meta?.is_work_search ? json.data : []) || [];
         state.isWorkSearch = Boolean(json.meta?.is_work_search);
         state.searchMeta = json.meta || null;
-        renderStudentRecords(json.data);
+        renderStudentRecords(state.students, state.records);
       } else {
+        state.students = [];
+        state.records = [];
         state.isWorkSearch = false;
         state.searchMeta = null;
-        renderStudentRecords([]);
+        renderStudentRecords([], []);
       }
     } catch (err) {
       console.error('Failed to load students:', err);
-      renderStudentRecords([]);
+      renderStudentRecords([], []);
     }
   }
 
-  function renderStudentRecords(students) {
+  function renderStudentRecords(students, records = []) {
+    // 1. SECTION 1: Showing Students
     const tbody = document.getElementById('rec-table-body');
-    const countEl = document.getElementById('rec-records-count');
+    const stuCountEl = document.getElementById('rec-students-count') || document.getElementById('rec-records-count');
     const cohortTag = document.getElementById('rec-active-cohort-tag');
-    const thead = document.querySelector('#rec-students-table thead');
 
-    const isWorkSearch = Boolean(state.isWorkSearch || (students && students.length > 0 && students[0].is_work_item));
-
-    // 1. Dynamic Table Header Transformation
-    if (thead) {
-      if (isWorkSearch) {
-        thead.innerHTML = `
-          <tr>
-            <th style="width: 70px;">Roll #</th>
-            <th class="col-enrollment">Enrollment No</th>
-            <th>Student Name</th>
-            <th class="col-cohort">Cohort</th>
-            <th class="col-batch">Batch</th>
-            <th style="width: 175px; text-align: center;">Document</th>
-            <th style="width: 135px; text-align: center;">Marks</th>
-          </tr>
-        `;
-      } else {
-        thead.innerHTML = `
-          <tr>
-            <th style="width: 70px;">Roll #</th>
-            <th class="col-enrollment">Enrollment No</th>
-            <th>Student Name</th>
-            <th class="col-cohort">Cohort</th>
-            <th class="col-batch">Batch</th>
-            <th>Attendance</th>
-            <th style="width: 70px; text-align: center;">Actions</th>
-          </tr>
-        `;
-      }
-    }
-
-    // 2. Dynamic Count & Meta Tags
-    if (countEl) {
-      if (isWorkSearch) {
-        const wt = state.searchMeta?.work_type ? state.searchMeta.work_type.toLowerCase() : 'coursework';
-        const subj = state.searchMeta?.subject ? ` for ${state.searchMeta.subject.toUpperCase()}` : '';
-        countEl.textContent = `Showing ${students.length} ${wt} record${students.length === 1 ? '' : 's'}${subj}`;
-      } else {
-        countEl.textContent = `Showing ${students.length} student${students.length === 1 ? '' : 's'}`;
-      }
+    if (stuCountEl) {
+      stuCountEl.textContent = `Showing ${students.length} student${students.length === 1 ? '' : 's'}`;
     }
 
     if (cohortTag) {
       let desc = 'All Cohorts';
-      if (isWorkSearch) {
-        desc = `Work Search • ${state.searchMeta?.work_type || 'Items'}`;
+      if (state.filters.search && state.filters.search.trim()) {
+        desc = `Search • ${escapeHtml(state.filters.search.trim())}`;
       } else if (state.filters.semester) {
         desc = `Semester ${state.filters.semester}`;
       } else if (state.filters.year) {
@@ -242,164 +207,197 @@
       cohortTag.textContent = desc;
     }
 
-    if (!tbody) return;
-
-    if (!students || students.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7" class="rec-empty-cell">
-            ${isWorkSearch ? 'No student coursework records found matching the active search query.' : 'No student records found matching the active filters.'}
-          </td>
-        </tr>
-      `;
-      return;
-    }
-
-    // 3. Render Work Search Rows (Item-level View)
-    if (isWorkSearch) {
-      tbody.innerHTML = students.map((item, idx) => {
-        const roll = item.class_roll_no || idx + 1;
-        const enroll = item.official_enrollment_no || '--';
-        const name = item.full_name || 'Student';
-        const cohort = item.current_semester ? `Y${item.current_year || Math.ceil(item.current_semester / 2)} • Sem ${item.current_semester}` : '--';
-        const batch = item.batch_label || '--';
-        const workTitle = item.assessment_title || 'Coursework Item';
-        const subName = item.subject_name || '';
-        const docPath = item.file_path;
-        const docName = item.original_filename || `${roll}_${slugifyToken(name)}_${slugifyToken(workTitle)}.pdf`;
-        const hasDoc = Boolean(docPath);
-        const marks = item.marks_obtained;
-        const maxMarks = item.max_marks || 100;
-        const marksText = marks !== null && marks !== undefined ? `${marks} / ${maxMarks}` : 'Ungraded';
-
-        return `
-          <tr id="work-item-row-${item.assessment_id}-${item.student_id}">
-            <td class="rec-roll-cell">${escapeHtml(String(roll))}</td>
-            <td class="col-enrollment rec-enroll-cell">${escapeHtml(enroll)}</td>
-            <td>
-              <div class="rec-name-cell">
-                <span class="rec-student-name">${escapeHtml(name)}</span>
-                <span class="rec-work-badge" title="${escapeHtml(workTitle)}">
-                  ${escapeHtml(workTitle)}${subName ? ` • ${escapeHtml(subName)}` : ''}
-                </span>
-              </div>
-            </td>
-            <td class="col-cohort">${cohort}</td>
-            <td class="col-batch">${escapeHtml(batch)}</td>
-            <td class="rec-doc-cell" style="text-align: center;">
-              ${hasDoc ? `
-                <div class="rec-doc-actions">
-                  <button type="button" class="btn-rec-doc btn-rec-view" onclick="openDocumentPreview('${escapeHtml(docPath)}', '${escapeHtml(docName)}', '${escapeHtml(name)}', '${escapeHtml(workTitle)}')" title="Preview file without downloading">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    <span>View</span>
-                  </button>
-                  <a href="${escapeHtml(docPath)}" download="${escapeHtml(docName)}" class="btn-rec-doc btn-rec-download" title="Download ${escapeHtml(docName)}">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="7 10 12 15 17 10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    <span>Download</span>
-                  </a>
-                </div>
-              ` : `
-                <span class="rec-doc-pending">No submission</span>
-              `}
-            </td>
-            <td class="rec-marks-cell" style="text-align: center;">
-              <button type="button" class="btn-rec-marks" onclick="handleMarksClick(${item.student_id}, ${item.assessment_id}, '${escapeHtml(name)}', '${escapeHtml(workTitle)}', ${marks !== null && marks !== undefined ? marks : 'null'}, ${maxMarks}, '${escapeHtml(item.submission_status || 'PENDING')}', '${escapeHtml(item.feedback || '')}')" title="Click to view marks breakdown">
-                <span class="marks-score ${marks !== null && marks !== undefined ? 'has-score' : 'pending-score'}">${marksText}</span>
-                <span class="marks-mode-hint">${window.innerWidth < 769 ? 'Table (Mobile)' : 'Sheet (PC)'}</span>
-              </button>
+    if (tbody) {
+      if (!students || students.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="rec-empty-cell">
+              No student records found matching the active filters.
             </td>
           </tr>
         `;
-      }).join('');
-      return;
+      } else {
+        tbody.innerHTML = students.map((s, idx) => {
+          const roll = s.class_roll_no || idx + 1;
+          const enroll = s.official_enrollment_no || '--';
+          const name = s.full_name || 'Unnamed Student';
+          const reg = s.registration_no ? `Reg: ${s.registration_no}` : '';
+          const cohort = s.current_semester ? `Y${s.current_year || Math.ceil(s.current_semester / 2)} • Sem ${s.current_semester}` : '--';
+          const batch = s.batch_label || (s.admission_year ? `Batch ${s.admission_year}` : '--');
+          const attPct = typeof s.attendance_percentage === 'number' ? s.attendance_percentage : 100;
+
+          let badgeClass = '';
+          if (attPct < 75) badgeClass = 'low';
+          else if (attPct < 80) badgeClass = 'warning';
+
+          return `
+            <tr id="student-row-${s.id}">
+              <td class="rec-roll-cell">${escapeHtml(String(roll))}</td>
+              <td class="col-enrollment rec-enroll-cell">${escapeHtml(enroll)}</td>
+              <td>
+                <div class="rec-name-cell">
+                  <span class="rec-student-name">${escapeHtml(name)}</span>
+                  ${reg ? `<span class="rec-student-reg">${escapeHtml(reg)}</span>` : ''}
+                </div>
+              </td>
+              <td class="col-cohort">${cohort}</td>
+              <td class="col-batch">${escapeHtml(batch)}</td>
+              <td>
+                <span class="rec-att-badge ${badgeClass}">${attPct}%</span>
+              </td>
+              <td class="rec-action-cell">
+                <button type="button" class="rec-kebab-btn" onclick="toggleRecordKebab(event, ${s.id})" title="Actions" aria-label="Actions">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <circle cx="12" cy="12" r="2"></circle>
+                    <circle cx="12" cy="19" r="2"></circle>
+                  </svg>
+                </button>
+                <div class="rec-dropdown-menu" id="rec-dropdown-${s.id}">
+                  <button type="button" class="rec-dropdown-item" onclick="openStudentDossier(${s.id})">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>View Academic Dossier</span>
+                  </button>
+                  <button type="button" class="rec-dropdown-item" onclick="quickExportBioData(${s.id})">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Export Personal Details (Bio-Data)</span>
+                  </button>
+                  <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'excel')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>Export Dossier (.xlsx)</span>
+                  </button>
+                  <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'doc')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    <span>Export Dossier (.doc)</span>
+                  </button>
+                  <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'pdf')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                      <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    <span>Export / Print Dossier (PDF)</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
 
-    // 4. Render Normal Default Roster Rows
-    tbody.innerHTML = students.map((s, idx) => {
-      const roll = s.class_roll_no || idx + 1;
-      const enroll = s.official_enrollment_no || '--';
-      const name = s.full_name || 'Unnamed Student';
-      const reg = s.registration_no ? `Reg: ${s.registration_no}` : '';
-      const cohort = s.current_semester ? `Y${s.current_year || Math.ceil(s.current_semester / 2)} • Sem ${s.current_semester}` : '--';
-      const batch = s.batch_label || (s.admission_year ? `Batch ${s.admission_year}` : '--');
-      const attPct = typeof s.attendance_percentage === 'number' ? s.attendance_percentage : 100;
+    // 2. SECTION 2: Showing Records
+    const secRecords = document.getElementById('sec-showing-records');
+    const recCountEl = document.getElementById('rec-records-count');
+    const workBadgeEl = document.getElementById('rec-work-badge');
+    const workTbody = document.getElementById('rec-work-table-body');
 
-      let badgeClass = '';
-      if (attPct < 75) badgeClass = 'low';
-      else if (attPct < 80) badgeClass = 'warning';
+    const hasActiveSearch = Boolean(state.filters.search && state.filters.search.trim());
 
-      return `
-        <tr id="student-row-${s.id}">
-          <td class="rec-roll-cell">${escapeHtml(String(roll))}</td>
-          <td class="col-enrollment rec-enroll-cell">${escapeHtml(enroll)}</td>
-          <td>
-            <div class="rec-name-cell">
-              <span class="rec-student-name">${escapeHtml(name)}</span>
-              ${reg ? `<span class="rec-student-reg">${escapeHtml(reg)}</span>` : ''}
-            </div>
-          </td>
-          <td class="col-cohort">${cohort}</td>
-          <td class="col-batch">${escapeHtml(batch)}</td>
-          <td>
-            <span class="rec-att-badge ${badgeClass}">${attPct}%</span>
-          </td>
-          <td class="rec-action-cell">
-            <button type="button" class="rec-kebab-btn" onclick="toggleRecordKebab(event, ${s.id})" title="Actions" aria-label="Actions">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="5" r="2"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-                <circle cx="12" cy="19" r="2"></circle>
-              </svg>
-            </button>
-            <div class="rec-dropdown-menu" id="rec-dropdown-${s.id}">
-              <button type="button" class="rec-dropdown-item" onclick="openStudentDossier(${s.id})">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                <span>View Academic Dossier</span>
-              </button>
-              <button type="button" class="rec-dropdown-item" onclick="quickExportStudentProfile(${s.id}, 'pdf')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>Export Personal Details (Bio-Data)</span>
-              </button>
-              <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'excel')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                <span>Export Dossier (.xlsx)</span>
-              </button>
-              <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'doc')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                </svg>
-                <span>Export Dossier (.doc)</span>
-              </button>
-              <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'pdf')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                  <rect x="6" y="14" width="12" height="8"></rect>
-                </svg>
-                <span>Export / Print Dossier (PDF)</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
+    if (secRecords && workTbody) {
+      if (records && records.length > 0) {
+        secRecords.style.display = 'block';
+
+        if (recCountEl) {
+          const wt = state.searchMeta?.work_type ? state.searchMeta.work_type.toLowerCase() : 'coursework';
+          const subj = state.searchMeta?.subject ? ` for ${state.searchMeta.subject.toUpperCase()}` : '';
+          recCountEl.textContent = `Showing ${records.length} ${wt} record${records.length === 1 ? '' : 's'}${subj}`;
+        }
+
+        if (workBadgeEl) {
+          workBadgeEl.textContent = state.searchMeta?.work_type ? `Work Search • ${state.searchMeta.work_type}` : 'All Class Work';
+        }
+
+        workTbody.innerHTML = records.map((item, idx) => {
+          const roll = item.class_roll_no || idx + 1;
+          const enroll = item.official_enrollment_no || '--';
+          const name = item.full_name || 'Student';
+          const cohort = item.current_semester ? `Y${item.current_year || Math.ceil(item.current_semester / 2)} • Sem ${item.current_semester}` : '--';
+          const batch = item.batch_label || '--';
+          const workTitle = item.assessment_title || 'Coursework Item';
+          const subName = item.subject_name || '';
+          const docPath = item.file_path;
+          const docName = item.original_filename || `${roll}_${slugifyToken(name)}_${slugifyToken(workTitle)}.pdf`;
+          const hasDoc = Boolean(docPath);
+          const marks = item.marks_obtained;
+          const maxMarks = item.max_marks || 100;
+          const marksText = marks !== null && marks !== undefined ? `${marks} / ${maxMarks}` : 'Ungraded';
+
+          return `
+            <tr id="work-item-row-${item.assessment_id}-${item.student_id}">
+              <td class="rec-roll-cell">${escapeHtml(String(roll))}</td>
+              <td class="col-enrollment rec-enroll-cell">${escapeHtml(enroll)}</td>
+              <td>
+                <div class="rec-name-cell">
+                  <span class="rec-student-name">${escapeHtml(name)}</span>
+                  <span class="rec-work-badge" title="${escapeHtml(workTitle)}">
+                    ${escapeHtml(workTitle)}${subName ? ` • ${escapeHtml(subName)}` : ''}
+                  </span>
+                </div>
+              </td>
+              <td class="col-cohort">${cohort}</td>
+              <td class="col-batch">${escapeHtml(batch)}</td>
+              <td class="rec-doc-cell" style="text-align: center;">
+                ${hasDoc ? `
+                  <div class="rec-doc-actions">
+                    <button type="button" class="btn-rec-doc btn-rec-view" onclick="openDocumentPreview('${escapeHtml(docPath)}', '${escapeHtml(docName)}', '${escapeHtml(name)}', '${escapeHtml(workTitle)}')" title="Preview file without downloading">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <span>View</span>
+                    </button>
+                    <a href="${escapeHtml(docPath)}" download="${escapeHtml(docName)}" class="btn-rec-doc btn-rec-download" title="Download ${escapeHtml(docName)}">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                      <span>Download</span>
+                    </a>
+                  </div>
+                ` : `
+                  <span class="rec-doc-pending">No submission</span>
+                `}
+              </td>
+              <td class="rec-marks-cell" style="text-align: center;">
+                <button type="button" class="btn-rec-marks" onclick="handleMarksClick(${item.student_id}, ${item.assessment_id}, '${escapeHtml(name)}', '${escapeHtml(workTitle)}', ${marks !== null && marks !== undefined ? marks : 'null'}, ${maxMarks}, '${escapeHtml(item.submission_status || 'PENDING')}', '${escapeHtml(item.feedback || '')}')" title="Click to view evaluation sheet">
+                  <span class="marks-score ${marks !== null && marks !== undefined ? 'has-score' : 'pending-score'}">${marksText}</span>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } else if (hasActiveSearch) {
+        secRecords.style.display = 'block';
+        if (recCountEl) recCountEl.textContent = 'Showing 0 records';
+        if (workBadgeEl) workBadgeEl.textContent = 'No Records Found';
+        workTbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="rec-empty-cell">
+              No coursework records found matching the active search query.
+            </td>
+          </tr>
+        `;
+      } else {
+        secRecords.style.display = 'none';
+      }
+    }
   }
 
   function slugifyToken(str) {
@@ -465,10 +463,507 @@
       // Mobile: Show Marks Table modal!
       openMobileMarksModal({ studentId, assessmentId, studentName, assessmentTitle, marks, maxMarks, status, feedback });
     } else {
-      // PC: Open comprehensive Dossier & Excel Sheets Studio!
-      openStudentDossier(studentId, 'tests');
+      // PC: Open High-Fidelity Evaluation Sheet Studio!
+      const lower = (assessmentTitle || '').toLowerCase();
+      let cwType = 'TEST_1';
+      if (lower.includes('assignment') || lower.includes('assinment')) cwType = 'ASSIGNMENT';
+      else if (lower.includes('lab') || lower.includes('practical')) cwType = 'PRACTICAL';
+      else if (lower.includes('test 2') || lower.includes('ut2')) cwType = 'TEST_2';
+
+      window.openClassworkViewDirect(cwType, state.filters.semester || 5);
     }
   };
+
+  /* ══════════════════════════════════════════════════════════════
+     CLASSWORK EVALUATION SHEETS & MULTI-FORMAT EXPORT STUDIO
+     ══════════════════════════════════════════════════════════════ */
+
+  window.openClassworkExportModal = function () {
+    const modal = document.getElementById('modal-export-records');
+    if (!modal) return;
+    const semSelect = document.getElementById('export-classwork-semester');
+    if (semSelect && state.filters.semester) {
+      semSelect.value = state.filters.semester;
+    }
+    modal.style.display = 'flex';
+  };
+
+  window.closeClassworkExportModal = function () {
+    const modal = document.getElementById('modal-export-records');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.onExportClassworkTypeChange = function (val) {
+    // Dynamic reaction if needed
+  };
+
+  window.openClassworkViewDirect = async function (type = 'TEST_1', sem = 5) {
+    try {
+      showToast('Loading evaluation sheet studio...', 'info');
+      const json = await api(`/student-records/classwork-sheet?semester=${sem}&classwork_type=${type}`);
+      if (json && json.success && json.data) {
+        window.renderSheetPreview(json.data);
+        const modal = document.getElementById('modal-sheet-preview');
+        if (modal) modal.style.display = 'flex';
+      } else {
+        showToast('Unable to load evaluation sheet data', 'error');
+      }
+    } catch (err) {
+      console.error('Failed to load classwork sheet:', err);
+      showToast('Error loading evaluation sheet: ' + err.message, 'error');
+    }
+  };
+
+  window.triggerViewClassworkSheet = async function () {
+    const typeSelect = document.getElementById('export-classwork-type');
+    const semSelect = document.getElementById('export-classwork-semester');
+    const classworkType = typeSelect ? typeSelect.value : 'TEST_1';
+    const semester = semSelect ? semSelect.value : (state.filters.semester || '5');
+
+    window.closeClassworkExportModal();
+    await window.openClassworkViewDirect(classworkType, semester);
+  };
+
+  window.triggerExportClassworkSheet = async function () {
+    const typeSelect = document.getElementById('export-classwork-type');
+    const semSelect = document.getElementById('export-classwork-semester');
+    const classworkType = typeSelect ? typeSelect.value : 'TEST_1';
+    const semester = semSelect ? semSelect.value : (state.filters.semester || '5');
+
+    let fmt = 'xlsx';
+    const fmtRadio = document.querySelector('input[name="export-classwork-fmt"]:checked');
+    if (fmtRadio) fmt = fmtRadio.value;
+
+    window.closeClassworkExportModal();
+
+    try {
+      showToast(`Generating ${fmt.toUpperCase()} evaluation sheet...`, 'info');
+      const json = await api(`/student-records/classwork-sheet?semester=${semester}&classwork_type=${classworkType}`);
+      if (json && json.success && json.data) {
+        await window.executeClassworkExport(fmt, json.data);
+      } else {
+        showToast('Unable to generate export data', 'error');
+      }
+    } catch (err) {
+      console.error('Failed to export classwork sheet:', err);
+      showToast('Export failed: ' + err.message, 'error');
+    }
+  };
+
+  window.closeSheetPreviewModal = function () {
+    const modal = document.getElementById('modal-sheet-preview');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.downloadPreviewSheet = async function (format) {
+    if (!state.activePreviewSheetData) {
+      showToast('No active evaluation sheet loaded', 'warning');
+      return;
+    }
+    await window.executeClassworkExport(format, state.activePreviewSheetData);
+  };
+
+  window.renderSheetPreview = function (sheetData) {
+    state.activePreviewSheetData = sheetData;
+    const titleEl = document.getElementById('preview-sheet-title');
+    const subtitleEl = document.getElementById('preview-sheet-subtitle');
+    const container = document.getElementById('sheet-preview-container');
+    if (!container) return;
+
+    if (titleEl) {
+      titleEl.textContent = sheetData.meta.title || 'Internal Evaluation Sheet';
+    }
+    if (subtitleEl) {
+      subtitleEl.textContent = `${sheetData.meta.institution_name} • ${sheetData.meta.session_label} • Sem ${sheetData.meta.semester}`;
+    }
+
+    container.innerHTML = window.generateEvaluationSheetHtml(sheetData);
+  };
+
+  window.generateEvaluationSheetHtml = function (sheetData) {
+    if (!sheetData) return '<div style="padding:2rem;text-align:center;">No data available</div>';
+
+    const meta = sheetData.meta || {};
+    const roster = sheetData.roster || [];
+
+    // Case 1: Single Unit Test (Image 3 design)
+    if (sheetData.type === 'SINGLE_TEST') {
+      const test = sheetData.test || {};
+      const questions = test.questions || [];
+      const instructions = test.instructions || [];
+      const details = test.details || {};
+      const totalCols = 5 + questions.length + 1 + 1;
+
+      return `
+        <table class="excel-table sheet-table" id="table-sheet-preview-single-test">
+          <thead>
+            <tr class="excel-hdr-blue row-1">
+              <th colspan="${totalCols}">
+                <h3>${escapeHtml(meta.institution_name)} | ${escapeHtml(meta.session_label)}</h3>
+              </th>
+            </tr>
+            <tr class="excel-hdr-blue row-2">
+              <th colspan="${totalCols}">
+                Internal Evaluation - ${escapeHtml(test.title)} | Subject : ${escapeHtml(meta.subject_name)}
+              </th>
+            </tr>
+            <tr class="excel-hdr-blue row-3">
+              <th colspan="${totalCols}">
+                ${escapeHtml(meta.department_code)} Year ${meta.year} | Semester ${meta.semester}
+              </th>
+            </tr>
+
+            <tr class="excel-hdr-tan">
+              <th rowspan="2" class="col-sr" style="width:50px; vertical-align:middle;">SR. NO.</th>
+              <th rowspan="2" class="col-roll" style="width:80px; vertical-align:middle;">ROLL NO.</th>
+              <th rowspan="2" class="col-reg" style="width:120px; vertical-align:middle;">REG. NO.</th>
+              <th rowspan="2" class="col-enroll" style="width:120px; vertical-align:middle;">ENROLLMENT NO.</th>
+              <th rowspan="2" class="col-name" style="width:200px; vertical-align:middle;">STUDENT NAME</th>
+              <th colspan="${questions.length}" class="col-test" style="text-align:center;">${escapeHtml(test.short_title)} (${escapeHtml(test.title)})</th>
+              <th rowspan="2" class="col-total" style="width:70px; vertical-align:middle; text-align:center;">Total</th>
+              <th class="col-side-panel" style="min-width:380px; text-align:center;">Unit Test Details (Mode : ${escapeHtml(details.mode || 'OFFLINE')})</th>
+            </tr>
+
+            <tr class="excel-hdr-sub">
+              ${questions.map(q => `
+                <th class="col-test" style="min-width:50px; font-weight:800; text-align:center;">Q${q.num}</th>
+              `).join('')}
+              <th class="excel-meta-bar col-side-panel" style="font-size:0.74rem; font-weight:700; padding:0.35rem 0.6rem; text-align:center;">
+                Maximum Marks : ${test.max_marks} | Time : ${escapeHtml(details.time || '50 Minutes')} | Date : ${escapeHtml(details.date || '15/10/2026')}
+              </th>
+            </tr>
+
+            <tr class="excel-hdr-numbers">
+              <th class="col-sr">—</th>
+              <th class="col-roll">—</th>
+              <th class="col-reg">—</th>
+              <th class="col-enroll">—</th>
+              <th class="col-name" style="text-align:right; padding-right:0.6rem; font-weight:700;">Max Marks &rarr;</th>
+              ${questions.map(q => `
+                <th class="col-test" style="text-align:center; color:var(--color-primary); font-weight:800;">${q.max}</th>
+              `).join('')}
+              <th class="col-total" style="text-align:center;">
+                <span class="excel-hdr-num-badge">${test.max_marks}</span>
+              </th>
+              <th class="col-side-panel" style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-align:center; padding:0.25rem 0.6rem;">
+                ${escapeHtml(details.subNote || 'Question Max Marks Row (Auto Calculated & Live Editable)')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${roster.map((r, rIdx) => {
+              const isAb = Boolean(r.is_absent);
+              return `
+                <tr class="${isAb ? 'is-absent' : ''}">
+                  <td class="col-sr cell-read-only">${rIdx + 1}</td>
+                  <td class="col-roll cell-read-only" style="font-weight:700; color:var(--color-primary);">${escapeHtml(String(r.class_roll_no || rIdx + 1))}</td>
+                  <td class="col-reg cell-read-only" style="font-family:var(--font-family-mono); font-size:0.76rem; color:var(--text-muted);">${escapeHtml(r.registration_no || '—')}</td>
+                  <td class="col-enroll cell-read-only" style="font-family:var(--font-family-mono); font-size:0.76rem; color:var(--text-muted);">${escapeHtml(r.official_enrollment_no || '—')}</td>
+                  <td class="col-name" style="font-weight:700;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span>${escapeHtml(r.full_name)}</span>
+                      <span style="font-size:0.7rem; color:${isAb ? 'var(--status-absent)' : 'var(--status-present)'};">${isAb ? 'Absent' : 'Present'}</span>
+                    </div>
+                  </td>
+                  ${questions.map((q, qIdx) => {
+                    const score = isAb ? 0 : (r.question_scores ? r.question_scores[qIdx] : 0);
+                    return `<td class="col-test cell-read-only">${score}</td>`;
+                  }).join('')}
+                  <td class="col-total cell-read-only" style="font-weight:800; ${isAb ? 'color:var(--status-absent);' : ''}">${isAb ? '0 (AB)' : r.total_marks}</td>
+                  ${rIdx === 0 ? `
+                    <td rowspan="${roster.length || 1}" class="col-side-panel">
+                      <div class="excel-side-content">
+                        <div class="excel-side-sec-title">Instructions :</div>
+                        <ol class="excel-side-instructions">
+                          ${instructions.map(ins => `<li style="margin-bottom:0.25rem;">${escapeHtml(ins)}</li>`).join('')}
+                        </ol>
+                        <div class="excel-side-sec-title" style="margin-top:0.85rem;">Questions :</div>
+                        <div class="excel-side-questions">
+                          ${questions.map(q => `<div style="margin-bottom:0.35rem;"><strong>Q${q.num}:</strong> <span>${escapeHtml(q.text)}</span> <strong>(${q.max} Marks)</strong></div>`).join('')}
+                        </div>
+                        <div class="sheet-note-red">${escapeHtml(details.noteRed || 'NOTE : All marked as RED were absent.')}</div>
+                      </div>
+                    </td>
+                  ` : ''}
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+          <tfoot>
+            <tr class="excel-summary-row">
+              <td colspan="5" style="text-align:right; font-weight:700;">Average of the class (Only present students)</td>
+              <td colspan="${questions.length + 1}" style="text-align:center; font-weight:800; color:var(--color-primary);">${meta.class_average} / ${test.max_marks}</td>
+              <td style="text-align:center; font-size:0.76rem; font-weight:700; color:var(--text-muted);">
+                Present: ${meta.present_count} &nbsp;|&nbsp; Absent: ${meta.absent_count} &nbsp;|&nbsp; Total: ${meta.total_students}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+    }
+
+    // Case 2, 3, 4: All Tests, Assignments, or Labs (Image 4 design)
+    const items = sheetData.items || [];
+    const totalCols = 5 + items.length + 2;
+
+    return `
+      <table class="excel-table sheet-table" id="table-sheet-preview-multi">
+        <thead>
+          <tr class="excel-hdr-blue row-1">
+            <th colspan="${totalCols}">
+              <h3>${escapeHtml(meta.institution_name)} | ${escapeHtml(meta.session_label)}</h3>
+            </th>
+          </tr>
+          <tr class="excel-hdr-blue row-2">
+            <th colspan="${totalCols}">
+              Department (${escapeHtml(meta.department_code)}) | ${escapeHtml(meta.title)} | Subject : ${escapeHtml(meta.subject_name)}
+            </th>
+          </tr>
+          <tr class="excel-hdr-blue row-3">
+            <th colspan="${totalCols}">
+              ${escapeHtml(meta.department_code)} Year ${meta.year} | Semester ${meta.semester}
+            </th>
+          </tr>
+
+          <!-- Tan Header Row -->
+          <tr class="excel-hdr-tan">
+            <th class="col-sr" style="width:50px;">SR. NO.</th>
+            <th class="col-roll" style="width:80px;">ROLL NO.</th>
+            <th class="col-reg" style="width:120px;">REG. NO.</th>
+            <th class="col-enroll" style="width:120px;">ENROLLMENT NO.</th>
+            <th class="col-name" style="min-width:200px;">STUDENT NAME</th>
+            ${items.map(it => `<th class="col-test" title="${escapeHtml(it.title)}">${escapeHtml(it.short_title)}</th>`).join('')}
+            <th class="col-total" style="width:90px; font-weight:800;">Total Marks</th>
+            <th class="col-total" style="width:80px; font-weight:800;">Average %</th>
+          </tr>
+
+          <!-- Numbers Row -->
+          <tr class="excel-hdr-numbers">
+            <th class="col-sr">—</th>
+            <th class="col-roll">—</th>
+            <th class="col-reg">—</th>
+            <th class="col-enroll">—</th>
+            <th class="col-name" style="text-align:right; padding-right:0.6rem; font-weight:700;">Max Marks &rarr;</th>
+            ${items.map(it => `<th class="col-test" style="text-align:center; color:var(--color-primary); font-weight:800;">${it.max_marks}</th>`).join('')}
+            <th class="col-total" style="text-align:center;"><span class="excel-hdr-num-badge">${meta.total_max}</span></th>
+            <th class="col-total" style="text-align:center;">100%</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${roster.map((r, rIdx) => `
+            <tr>
+              <td class="col-sr cell-read-only">${rIdx + 1}</td>
+              <td class="col-roll cell-read-only" style="font-weight:700; color:var(--color-primary);">${escapeHtml(String(r.class_roll_no || rIdx + 1))}</td>
+              <td class="col-reg cell-read-only" style="font-family:var(--font-family-mono); font-size:0.76rem; color:var(--text-muted);">${escapeHtml(r.registration_no || '—')}</td>
+              <td class="col-enroll cell-read-only" style="font-family:var(--font-family-mono); font-size:0.76rem; color:var(--text-muted);">${escapeHtml(r.official_enrollment_no || '—')}</td>
+              <td class="col-name" style="font-weight:700;">${escapeHtml(r.full_name)}</td>
+              ${items.map(it => {
+                const score = (r.scores && r.scores[it.id] !== undefined) ? r.scores[it.id] : 0;
+                return `<td class="col-test cell-read-only">${score}</td>`;
+              }).join('')}
+              <td class="col-total cell-read-only" style="font-weight:800;">${r.total_marks}</td>
+              <td class="col-total cell-read-only" style="font-weight:800; color:${r.average_pct < 50 ? 'var(--status-absent)' : 'var(--status-present)'};">${r.average_pct}%</td>
+            </tr>
+          `).join('')}
+        </tbody>
+        <tfoot>
+          <tr class="excel-summary-row">
+            <td colspan="5" style="text-align:right; font-weight:700;">Class Average:</td>
+            ${(meta.col_averages || []).map(avg => `<td class="col-test cell-read-only" style="font-weight:800; color:var(--color-primary);">${avg}</td>`).join('')}
+            <td class="col-total cell-read-only" style="font-weight:800;">${meta.class_avg_total}</td>
+            <td class="col-total cell-read-only" style="font-weight:800; color:var(--status-present);">${meta.class_avg_pct}%</td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+  };
+
+  window.executeClassworkExport = async function (format, sheetData) {
+    if (!sheetData) return;
+    if (format === 'xlsx') {
+      await exportClassworkExcel(sheetData);
+    } else if (format === 'pdf') {
+      exportClassworkPdf(sheetData);
+    } else if (format === 'docx' || format === 'doc') {
+      exportClassworkWord(sheetData);
+    }
+  };
+
+  async function exportClassworkExcel(sheetData) {
+    if (typeof ExcelJS === 'undefined') {
+      showToast('Excel library loading, please try again', 'info');
+      return;
+    }
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'VidyaOS';
+    wb.created = new Date();
+    const ws = wb.addWorksheet(sheetData.meta.short_title || 'Evaluation Sheet');
+
+    const colCount = sheetData.type === 'SINGLE_TEST' 
+      ? 5 + (sheetData.test?.questions?.length || 4) + 1 
+      : 5 + (sheetData.items?.length || 1) + 2;
+
+    const r1 = ws.addRow([`${sheetData.meta.institution_name} | ${sheetData.meta.session_label}`]);
+    r1.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } };
+    r1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E40AF' } };
+    r1.alignment = { horizontal: 'center' };
+    ws.mergeCells(1, 1, 1, colCount);
+
+    const r2 = ws.addRow([`${sheetData.meta.title} | Subject : ${sheetData.meta.subject_name}`]);
+    r2.font = { bold: true, size: 10, color: { argb: 'FFFFFFFF' } };
+    r2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2563EB' } };
+    r2.alignment = { horizontal: 'center' };
+    ws.mergeCells(2, 1, 2, colCount);
+
+    const r3 = ws.addRow([`${sheetData.meta.department_code} Year ${sheetData.meta.year} | Semester ${sheetData.meta.semester}`]);
+    r3.font = { bold: true, size: 9, color: { argb: 'FFFFFFFF' } };
+    r3.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3B82F6' } };
+    r3.alignment = { horizontal: 'center' };
+    ws.mergeCells(3, 1, 3, colCount);
+
+    if (sheetData.type === 'SINGLE_TEST') {
+      const qList = sheetData.test?.questions || [];
+      const hdr = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', ...qList.map(q => `Q${q.num}`), 'Total'];
+      const rHdr = ws.addRow(hdr);
+      rHdr.font = { bold: true };
+      rHdr.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF59E0B' } };
+
+      const maxHdr = ['—', '—', '—', '—', 'Max Marks ->', ...qList.map(q => q.max), sheetData.test.max_marks];
+      const rMax = ws.addRow(maxHdr);
+      rMax.font = { bold: true };
+      rMax.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
+
+      sheetData.roster.forEach((st, idx) => {
+        const row = [
+          idx + 1,
+          st.class_roll_no || idx + 1,
+          st.registration_no || '—',
+          st.official_enrollment_no || '—',
+          st.full_name,
+          ...(st.question_scores || [0, 0, 0, 0]),
+          st.is_absent ? '0 (AB)' : st.total_marks
+        ];
+        ws.addRow(row);
+      });
+    } else {
+      const items = sheetData.items || [];
+      const hdr = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', ...items.map(it => it.short_title), 'Total Marks', 'Average %'];
+      const rHdr = ws.addRow(hdr);
+      rHdr.font = { bold: true };
+      rHdr.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF59E0B' } };
+
+      const maxHdr = ['—', '—', '—', '—', 'Max Marks ->', ...items.map(it => it.max_marks), sheetData.meta.total_max, '100%'];
+      const rMax = ws.addRow(maxHdr);
+      rMax.font = { bold: true };
+      rMax.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
+
+      sheetData.roster.forEach((st, idx) => {
+        const scores = items.map(it => (st.scores && st.scores[it.id] !== undefined ? st.scores[it.id] : 0));
+        const row = [
+          idx + 1,
+          st.class_roll_no || idx + 1,
+          st.registration_no || '—',
+          st.official_enrollment_no || '—',
+          st.full_name,
+          ...scores,
+          st.total_marks,
+          `${st.average_pct}%`
+        ];
+        ws.addRow(row);
+      });
+    }
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${slugifyToken(sheetData.meta.title)}_Sem${sheetData.meta.semester}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Excel evaluation sheet downloaded successfully', 'success');
+  }
+
+  function exportClassworkPdf(sheetData) {
+    const tableHtml = window.generateEvaluationSheetHtml(sheetData);
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${escapeHtml(sheetData.meta.title)}</title>
+        <style>
+          @page { size: landscape; margin: 10mm; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; color: #0f172a; }
+          table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+          th, td { border: 1px solid #cbd5e1; padding: 4px 6px; text-align: left; }
+          .excel-hdr-blue th { background: #dbeafe !important; color: #1e3a8a !important; text-align: center; }
+          .excel-hdr-tan th { background: #fef3c7 !important; color: #78350f !important; text-align: center; font-weight: bold; }
+          .excel-hdr-sub th { background: #f8fafc !important; text-align: center; font-weight: bold; }
+          .excel-hdr-numbers th { background: #f1f5f9 !important; text-align: center; font-weight: bold; }
+          .cell-read-only { text-align: center; }
+          .excel-summary-row { background: #f8fafc; font-weight: bold; }
+          .col-side-panel { font-size: 7.5pt; vertical-align: top; }
+        </style>
+      </head>
+      <body>
+        ${tableHtml}
+      </body>
+      </html>
+    `);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => document.body.removeChild(iframe), 1200);
+    }, 400);
+    showToast('PDF print preview launched', 'info');
+  }
+
+  function exportClassworkWord(sheetData) {
+    const tableHtml = window.generateEvaluationSheetHtml(sheetData);
+    const content = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'><title>${escapeHtml(sheetData.meta.title)}</title>
+      <style>
+        body { font-family: Calibri, Arial, sans-serif; font-size: 9.5pt; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #999; padding: 4px 6px; }
+        .excel-hdr-blue th { background-color: #dbeafe; color: #1e3a8a; text-align: center; }
+        .excel-hdr-tan th { background-color: #fef3c7; color: #78350f; text-align: center; font-weight: bold; }
+        .excel-hdr-numbers th { background-color: #f1f5f9; text-align: center; font-weight: bold; }
+        .cell-read-only { text-align: center; }
+      </style>
+      </head>
+      <body>
+        ${tableHtml}
+      </body>
+      </html>
+    `;
+    const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${slugifyToken(sheetData.meta.title)}_Sem${sheetData.meta.semester}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Word evaluation sheet downloaded successfully', 'success');
+  }
 
   window.openMobileMarksModal = function (details) {
     const modal = document.getElementById('modal-marks-mobile');

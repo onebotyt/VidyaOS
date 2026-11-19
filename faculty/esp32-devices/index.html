@@ -50,7 +50,7 @@
             </div>
             <a href="/faculty/students/index.html" class="btn btn-secondary btn-sm">← Department Roster</a>
             <button type="button" class="btn btn-secondary btn-sm" onclick="loadEsp32Overview()">↻ Refresh Telemetry</button>
-            <button type="button" class="btn btn-primary btn-sm" onclick="openRegisterDeviceModal()">+ Connect New ESP32</button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-add-esp-terminal" onclick="openRegisterDeviceModal()">+ Add ESP Terminal</button>
           </div>
         </div>
 
@@ -290,12 +290,56 @@
 
   <!-- MODAL 1: CONNECT / PAIR NEW ESP32 BIOMETRIC TERMINAL -->
   <div id="register-esp-modal" class="modal-backdrop" style="display:none;">
-    <div class="modal-card" style="max-width:520px; width:100%;">
+    <div class="modal-card" style="max-width:540px; width:100%;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <h2 style="font-size:1.15rem; font-weight:800; margin:0;">Connect ESP32 Biometric Terminal</h2>
+        <div>
+          <h2 style="font-size:1.15rem; font-weight:800; margin:0;">Connect ESP32 Biometric Terminal</h2>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Auto-detect hardware or manually pair ESP32 + AS608 biometric node</p>
+        </div>
         <button type="button" onclick="closeRegisterDeviceModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
       </div>
-      <form onsubmit="submitRegisterEspDevice(event)">
+
+      <!-- ESP32 AUTO-DETECTION & ANIMATED LOADING BAR -->
+      <div class="esp-detect-card" id="esp-detect-card">
+        <div class="esp-detect-top">
+          <div class="esp-detect-title-wrap">
+            <span class="esp-pulse-dot" id="esp-detect-pulse"></span>
+            <div>
+              <span class="esp-detect-title">ESP32 Hardware Auto-Detection</span>
+              <div class="esp-detect-sub" id="esp-detect-sub">Scanning 2.4GHz Wi-Fi LAN &amp; USB Serial ports...</div>
+            </div>
+          </div>
+          <span class="esp-status-pill pending" id="esp-detect-pill">● SCANNING...</span>
+        </div>
+
+        <!-- Animated Loading Bar -->
+        <div class="esp-loading-bar-wrap" id="esp-loading-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="esp-loading-bar-fill" id="esp-loading-bar-fill" style="width: 0%;"></div>
+        </div>
+
+        <div class="esp-detect-footer">
+          <span class="esp-detect-stat-text" id="esp-detect-stat-text">0% • Initializing RF receiver...</span>
+          <div class="esp-detect-actions">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-rescan" onclick="startEspDetectionScan()" style="display:none; font-size:0.75rem; padding:0.2rem 0.55rem;">↻ Rescan</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-usb" onclick="detectViaWebSerial()" style="font-size:0.75rem; padding:0.2rem 0.55rem;" title="Detect ESP32 connected via USB cable">🔌 USB Serial</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-sim" onclick="simulateEspDetection()" style="font-size:0.75rem; padding:0.2rem 0.55rem;" title="Simulate detection of nearby ESP32 node">⚡ Detect Now</button>
+          </div>
+        </div>
+
+        <!-- Detected Device Details Banner (Shown when ESP detected) -->
+        <div class="esp-detected-banner" id="esp-detected-banner" style="display:none;">
+          <div class="esp-detected-info">
+            <span class="esp-detected-icon">✓</span>
+            <div>
+              <strong id="esp-detected-name">ESP32 Biometric Terminal Detected</strong>
+              <div id="esp-detected-details" style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-family-mono);">UID: ESP32-IT-LAB-01 • IP: 192.168.1.105 • AS608 OK</div>
+            </div>
+          </div>
+          <span class="esp-status-pill online">READY TO PAIR</span>
+        </div>
+      </div>
+
+      <form id="register-esp-form" onsubmit="submitRegisterEspDevice(event)">
         <div class="form-group">
           <label class="form-label">Department <span style="color:var(--status-absent);">*</span></label>
           <select id="esp-dept-input" class="form-select" required>
@@ -303,8 +347,11 @@
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">ESP32 Hardware UID <span style="color:var(--status-absent);">*</span></label>
-          <input type="text" id="esp-uid-input" class="form-control" placeholder="e.g. ESP32-IT-LAB-01" required style="font-family:var(--font-family-mono); text-transform:uppercase;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label class="form-label" style="margin-bottom:0;">ESP32 Hardware UID <span style="color:var(--status-absent);">*</span></label>
+            <span id="esp-uid-auto-tag" style="display:none; font-size:0.72rem; color:var(--status-present); font-weight:700;">✓ AUTO-DETECTED</span>
+          </div>
+          <input type="text" id="esp-uid-input" class="form-control" placeholder="e.g. ESP32-IT-LAB-01" required style="font-family:var(--font-family-mono); text-transform:uppercase; margin-top:0.35rem;">
         </div>
         <div class="form-group">
           <label class="form-label">Terminal Location / Classroom Name <span style="color:var(--status-absent);">*</span></label>
@@ -340,7 +387,7 @@
         </div>
         <div style="display:flex; justify-content:flex-end; gap:0.65rem; margin-top:1.25rem;">
           <button type="button" class="btn btn-secondary" onclick="closeRegisterDeviceModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Pair ESP32 to Department</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-pair-esp">Add &amp; Pair ESP Terminal</button>
         </div>
       </form>
     </div>

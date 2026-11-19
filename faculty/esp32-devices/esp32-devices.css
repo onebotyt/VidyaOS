@@ -467,3 +467,227 @@
     color: var(--text-muted);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ESP32 HARDWARE AUTO-DETECTION & ANIMATED LOADING BAR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.esp-detect-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 12px);
+  padding: 0.95rem 1.05rem;
+  margin-bottom: 1.15rem;
+  transition: all 0.25s ease;
+}
+
+.esp-detect-card.detected {
+  border-color: var(--status-present);
+  background: var(--color-primary-light);
+}
+
+.esp-detect-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.esp-detect-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.esp-pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--status-pending);
+  box-shadow: 0 0 0 0 var(--status-pending);
+  animation: espPulseRing 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  flex-shrink: 0;
+}
+
+.esp-pulse-dot.detected {
+  background: var(--status-present);
+  box-shadow: 0 0 0 0 var(--status-present);
+  animation: espPulseRingGreen 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes espPulseRing {
+  0% {
+    box-shadow: 0 0 0 0 var(--status-pending);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes espPulseRingGreen {
+  0% {
+    box-shadow: 0 0 0 0 var(--status-present);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.esp-detect-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: block;
+}
+
+.esp-detect-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Loading Animation Bar */
+.esp-loading-bar-wrap {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0.55rem 0;
+}
+
+.esp-loading-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--primary-color) 45%,
+    var(--status-present) 100%
+  );
+  background-size: 200% 100%;
+  position: relative;
+  transition: width 0.35s ease, background 0.4s ease;
+  animation: espLoadingShimmer 1.8s linear infinite;
+}
+
+.esp-loading-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.28) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.28) 50%,
+    rgba(255, 255, 255, 0.28) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 16px 16px;
+  animation: espStripeMove 1s linear infinite;
+}
+
+.esp-loading-bar-fill.detected {
+  background: var(--status-present);
+  animation: none;
+}
+
+.esp-loading-bar-fill.detected::after {
+  display: none;
+}
+
+@keyframes espLoadingShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes espStripeMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 16px 0;
+  }
+}
+
+.esp-detect-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+
+.esp-detect-stat-text {
+  font-size: 0.74rem;
+  font-family: var(--font-family-mono, monospace);
+  color: var(--text-muted);
+}
+
+.esp-detect-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.esp-detected-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg-card);
+  border: 1px solid var(--status-present);
+  animation: espFadeIn 0.3s ease;
+}
+
+.esp-detected-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.esp-detected-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--status-present);
+  color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+@keyframes espFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

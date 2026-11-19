@@ -129,12 +129,12 @@
           </div>
         </div>
 
-        <!-- Student Records Data Section -->
-        <div class="rec-table-card">
+        <!-- SECTION 1: Showing Students -->
+        <div class="rec-table-card" id="sec-showing-students">
           <!-- Table Header Meta -->
           <div class="rec-table-meta">
             <div class="rec-meta-info">
-              <span id="rec-records-count">Showing 0 students</span>
+              <span id="rec-students-count">Showing 0 students</span>
               <span class="rec-meta-badge" id="rec-active-cohort-tag">All Cohorts</span>
             </div>
           </div>
@@ -159,6 +159,49 @@
                     <div class="rec-spinner"></div>
                     <span>Loading student records...</span>
                   </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Showing Records -->
+        <div class="rec-table-card" id="sec-showing-records" style="display: none; margin-top: 1.5rem;">
+          <!-- Section Header Meta with Export Button -->
+          <div class="rec-table-meta rec-records-header-meta">
+            <div class="rec-meta-info">
+              <span id="rec-records-count">Showing 0 records</span>
+              <span class="rec-meta-badge" id="rec-work-badge">All Class Work</span>
+            </div>
+            <div class="rec-section-actions">
+              <button type="button" id="btn-export-records" class="btn-rec-export-section" onclick="openClassworkExportModal()" title="Export or View Evaluation Sheets">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Table for Student Coursework / Class Work Items -->
+          <div class="rec-table-wrap">
+            <table class="rec-table" id="rec-work-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Roll #</th>
+                  <th class="col-enrollment">Enrollment No</th>
+                  <th>Student Name</th>
+                  <th class="col-cohort">Cohort</th>
+                  <th class="col-batch">Batch</th>
+                  <th style="width: 175px; text-align: center;">Document</th>
+                  <th style="width: 135px; text-align: center;">Marks</th>
+                </tr>
+              </thead>
+              <tbody id="rec-work-table-body">
+                <tr>
+                  <td colspan="7" class="rec-empty-cell">Search a student to view coursework and academic records.</td>
                 </tr>
               </tbody>
             </table>
@@ -869,6 +912,121 @@
           <button type="submit" class="btn-rec-solid">Download Cohort Records</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal: Classwork Evaluation Sheets Export & View Studio -->
+  <div id="modal-export-records" class="rec-modal-backdrop" style="display:none;"
+    onclick="if(event.target===this)closeClassworkExportModal()">
+    <div class="rec-modal-card rec-export-modal-card">
+      <div class="rec-modal-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:0.85rem; margin-bottom:1rem;">
+        <div>
+          <h3 style="margin:0; font-size:1.15rem; color:var(--text-main); font-weight:700;">Export & View Classwork</h3>
+          <p style="margin:0.25rem 0 0 0; font-size:0.82rem; color:var(--text-muted);">Select classwork assessment type and semester to view or export evaluation sheets.</p>
+        </div>
+        <button type="button" class="btn-modal-close" onclick="closeClassworkExportModal()">&times;</button>
+      </div>
+
+      <div class="rec-modal-body" style="display:flex; flex-direction:column; gap:1.1rem;">
+        <div>
+          <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
+            Classwork Assessment Type
+          </label>
+          <select id="export-classwork-type" onchange="onExportClassworkTypeChange(this.value)"
+            style="width:100%; padding:0.65rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem;">
+            <option value="ALL_TESTS">All Unit Tests (Test 1 to N Combined)</option>
+            <option value="TEST_1" selected>Unit Test 1 (Database Systems Architecture)</option>
+            <option value="TEST_2">Unit Test 2 (Advanced SQL & Relational Models)</option>
+            <option value="ASSIGNMENT">Theory Coursework & Assignments</option>
+            <option value="PRACTICAL">Practical / Lab Journal Records</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
+            Semester Filter
+          </label>
+          <select id="export-classwork-semester"
+            style="width:100%; padding:0.65rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.88rem;">
+            <option value="5" selected>Semester 5 (IT Year 3)</option>
+            <option value="1">Semester 1 (IT Year 1)</option>
+            <option value="2">Semester 2 (IT Year 1)</option>
+            <option value="3">Semester 3 (IT Year 2)</option>
+            <option value="4">Semester 4 (IT Year 2)</option>
+            <option value="6">Semester 6 (IT Year 3)</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.82rem; font-weight:700; color:var(--text-main); margin-bottom:0.4rem;">
+            Export Format
+          </label>
+          <div style="display:flex; gap:0.75rem;">
+            <label class="rec-format-label">
+              <input type="radio" name="export-classwork-fmt" value="xlsx" id="fmt-xlsx" checked>
+              <span>Excel (.xlsx)</span>
+            </label>
+            <label class="rec-format-label">
+              <input type="radio" name="export-classwork-fmt" value="pdf" id="fmt-pdf">
+              <span>PDF (.pdf)</span>
+            </label>
+            <label class="rec-format-label">
+              <input type="radio" name="export-classwork-fmt" value="docx" id="fmt-docx">
+              <span>Word (.docx)</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:0.75rem;">
+          <button type="button" class="btn-rec-outline" onclick="closeClassworkExportModal()">Cancel</button>
+          <button type="button" class="btn-rec-secondary" id="btn-view-sheet" onclick="triggerViewClassworkSheet()" title="View evaluation sheet on PC">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>View</span>
+          </button>
+          <button type="button" class="btn-rec-solid" id="btn-export-sheet" onclick="triggerExportClassworkSheet()" title="Download evaluation sheet in selected format">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Export</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: High-Fidelity Evaluation Sheet View Studio -->
+  <div id="modal-sheet-preview" class="rec-modal-backdrop" style="display:none;"
+    onclick="if(event.target===this)closeSheetPreviewModal()">
+    <div class="rec-modal-card rec-sheet-preview-modal-card">
+      <div class="rec-modal-header rec-sheet-preview-header">
+        <div class="rec-sheet-header-title-box">
+          <h2 id="preview-sheet-title" class="rec-sheet-modal-title">Internal Evaluation Sheet</h2>
+          <span id="preview-sheet-subtitle" class="rec-sheet-modal-subtitle">Non-Editable Institutional Ledger</span>
+        </div>
+        <div class="rec-sheet-header-actions">
+          <button type="button" id="btn-preview-export-excel" class="btn-sheet-action-pill" onclick="downloadPreviewSheet('xlsx')" title="Download formatted Excel workbook">
+            <span>Excel (.xlsx)</span>
+          </button>
+          <button type="button" id="btn-preview-export-pdf" class="btn-sheet-action-pill" onclick="downloadPreviewSheet('pdf')" title="Download print-isolated PDF">
+            <span>PDF (.pdf)</span>
+          </button>
+          <button type="button" id="btn-preview-export-word" class="btn-sheet-action-pill" onclick="downloadPreviewSheet('docx')" title="Download Word Document">
+            <span>Word (.docx)</span>
+          </button>
+          <button type="button" class="btn-modal-close" onclick="closeSheetPreviewModal()">&times;</button>
+        </div>
+      </div>
+
+      <div class="rec-modal-body rec-sheet-preview-body">
+        <div id="sheet-preview-container" class="rec-sheet-table-scroll">
+          <!-- Dynamically populated evaluation sheet table -->
+        </div>
+      </div>
     </div>
   </div>
 
