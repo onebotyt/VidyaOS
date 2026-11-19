@@ -36,11 +36,8 @@
 
   <!-- ── ROLE SWITCHER ── -->
   <div class="role-switcher" role="tablist" aria-label="Select registration role">
-    <button type="button" class="rs-btn active" id="tab-student" onclick="switchRole('student')" role="tab" aria-selected="true">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg> Student
-    </button>
-    <button type="button" class="rs-btn" id="tab-faculty" onclick="switchRole('faculty')" role="tab" aria-selected="false">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Faculty &amp; HOD
+    <button type="button" class="rs-btn active" id="tab-student" role="tab" aria-selected="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg> Student Registration
     </button>
   </div>
 
@@ -106,7 +103,7 @@
           </div>
         </div>
 
-        <p class="section-label">Personal Information</p>
+        <p class="section-label">Personal &amp; Academic Identity</p>
 
         <div class="field-row">
           <div class="field">
@@ -114,31 +111,39 @@
             <input type="text" id="stu-name" class="inp" placeholder="e.g. Aarav Sharma" required autocomplete="name">
           </div>
           <div class="field">
-            <label class="lbl" for="stu-enroll">Enrollment No. <span class="req">*</span></label>
-            <input type="text" id="stu-enroll" class="inp mono" placeholder="e.g. 2024IT001" required autocomplete="off" style="text-transform:uppercase;">
-            <p class="inp-hint">Issued by university / college.</p>
+            <label class="lbl" for="stu-enroll">Enrollment No. <span class="opt">(or UBTER Reg. No.)</span></label>
+            <input type="text" id="stu-enroll" class="inp mono" placeholder="e.g. 2024IT001" autocomplete="off" style="text-transform:uppercase;">
+            <p class="inp-hint">Official enrollment number. If not yet assigned, provide UBTER Reg. No. below.</p>
           </div>
         </div>
 
         <div class="field-row">
           <div class="field">
-            <label class="lbl" for="stu-ubter">UBTER Reg. No. <span class="opt">(optional)</span></label>
+            <label class="lbl" for="stu-ubter">UBTER Reg. No. <span class="opt">(or Enrollment No.)</span></label>
             <input type="text" id="stu-ubter" class="inp mono" placeholder="e.g. R230104001" autocomplete="off" style="text-transform:uppercase;">
+            <p class="inp-hint">Used for sign-in &amp; verification if enrollment no. is not yet issued.</p>
           </div>
+          <div class="field">
+            <label class="lbl" for="stu-class-roll-no">Class Roll No. <span class="opt">(optional)</span></label>
+            <input type="number" id="stu-class-roll-no" class="inp" placeholder="e.g. 15" min="1" max="999" autocomplete="off">
+            <p class="inp-hint">Assigned class roll number in your branch.</p>
+          </div>
+        </div>
+
+        <div class="field-row">
           <div class="field">
             <label class="lbl" for="stu-email">Gmail Address <span class="req">*</span></label>
             <input type="email" id="stu-email" class="inp" placeholder="student@gmail.com" required autocomplete="email">
             <p class="inp-hint">Used for sign-in &amp; alerts.</p>
           </div>
-        </div>
-
-        <div class="field">
-          <label class="lbl" for="stu-phone">Mobile Number <span class="opt">(optional)</span></label>
-          <div class="phone-row">
-            <span class="phone-cc">+91</span>
-            <input type="tel" id="stu-phone" class="inp" placeholder="10-digit mobile" maxlength="10" pattern="[6-9][0-9]{9}" autocomplete="tel" style="flex:1;">
+          <div class="field">
+            <label class="lbl" for="stu-phone">Mobile Number <span class="opt">(optional)</span></label>
+            <div class="phone-row">
+              <span class="phone-cc">+91</span>
+              <input type="tel" id="stu-phone" class="inp" placeholder="10-digit mobile" maxlength="10" pattern="[6-9][0-9]{9}" autocomplete="tel" style="flex:1;">
+            </div>
+            <p class="inp-hint">Used for attendance alerts &amp; institutional notifications.</p>
           </div>
-          <p class="inp-hint">Used for attendance alerts and institutional notifications.</p>
         </div>
 
         <p class="section-label">Set Password</p>
@@ -164,87 +169,6 @@
 
         <button type="submit" id="stu-submit-btn" class="btn-submit">
           Submit Registration <span class="arrow">→</span>
-        </button>
-      </form>
-    </div>
-
-    <!-- ═══════════════════════════════════════════
-         FACULTY & HOD REGISTRATION
-         ═══════════════════════════════════════════ -->
-    <div id="faculty-section" class="tab-section">
-      <form id="faculty-form" novalidate onsubmit="handleFacultySubmit(event)">
-
-        <p class="section-label">Account Role</p>
-        <div class="type-grid">
-          <button type="button" id="fac-btn-role-teacher" class="type-card active" onclick="setFacultyType('FACULTY')">
-            <div class="type-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Faculty Member</div>
-            <div class="type-card-sub">Department or Common Faculty</div>
-          </button>
-          <button type="button" id="fac-btn-role-hod" class="type-card" onclick="setFacultyType('HOD')">
-            <div class="type-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg> Head of Department</div>
-            <div class="type-card-sub">Department Leadership</div>
-          </button>
-        </div>
-
-        <!-- Routing Callout -->
-        <div class="callout" id="fac-routing-banner">
-          <span class="callout-icon" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
-          <div class="callout-text">
-            <strong id="fac-routing-target">Department HOD Review</strong>
-            <span id="fac-routing-desc">Your registration will be submitted to the Head of Department for authorization.</span>
-          </div>
-        </div>
-
-        <p class="section-label">Personal Information</p>
-
-        <div class="field-row">
-          <div class="field">
-            <label class="lbl" for="fac-name">Full Name <span class="req">*</span></label>
-            <input type="text" id="fac-name" class="inp" placeholder="e.g. Dr. Ramesh Joshi" required autocomplete="name">
-          </div>
-          <div class="field">
-            <label class="lbl" for="fac-email">Institutional Gmail <span class="req">*</span></label>
-            <input type="email" id="fac-email" class="inp" placeholder="ramesh.joshi@gmail.com" required autocomplete="email">
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="lbl" for="fac-dept">Department / Affiliation <span class="req">*</span></label>
-          <div class="inp-wrap">
-            <select id="fac-dept" class="inp" required onchange="handleFacultyDeptChange()">
-              <option value="">— Loading departments…</option>
-            </select>
-          </div>
-          <p id="fac-dept-hint" class="inp-hint">Select your institutional department or Common Faculty.</p>
-        </div>
-
-        <div class="field">
-          <label class="lbl" for="fac-phone">Mobile Number <span class="opt">(optional)</span></label>
-          <div class="phone-row">
-            <span class="phone-cc">+91</span>
-            <input type="tel" id="fac-phone" class="inp" placeholder="10-digit mobile" maxlength="10" pattern="[6-9][0-9]{9}" autocomplete="tel" style="flex:1;">
-          </div>
-          <p class="inp-hint">Used for institutional communications and notifications.</p>
-        </div>
-
-        <p class="section-label">Credentials</p>
-
-        <div class="field-row">
-          <div class="field">
-            <label class="lbl" for="fac-empid">Employee ID <span class="opt">(optional)</span></label>
-            <input type="text" id="fac-empid" class="inp mono" placeholder="e.g. FAC-2026-042" autocomplete="off">
-          </div>
-          <div class="field">
-            <label class="lbl" for="fac-password">Create Password <span class="req">*</span></label>
-            <div class="pw-field">
-              <input type="password" id="fac-password" class="inp" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password" style="padding-right:2.2rem;">
-              <button type="button" class="pw-eye" onclick="togglePwVisibility('fac-password', this)" aria-label="Toggle password" style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
-            </div>
-          </div>
-        </div>
-
-        <button type="submit" id="fac-submit-btn" class="btn-submit">
-          Submit Application <span class="arrow">→</span>
         </button>
       </form>
     </div>

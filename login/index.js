@@ -1,7 +1,7 @@
 /**
  * ══════════════════════════════════════════════════════════════
- * PAGE LOGIC: INDEX
- * frontend/login/index/index.js
+ * PAGE LOGIC: INDEX (UGIP Nainital PC-First Login)
+ * frontend/login/index.js
  * ══════════════════════════════════════════════════════════════
  */
 
@@ -25,7 +25,6 @@ function purgeAllStoredAuth() {
 
 /* ── Redirect if already logged in ── */
 (function checkExistingSession() {
-  // If user explicitly logged out or has a logout reason parameter, NEVER auto-redirect and wipe any stale tokens
   try {
     const params = new URLSearchParams(window.location.search);
     if (sessionStorage.getItem('vidya_logged_out_flag') || params.has('reason') || params.has('logged_out')) {
@@ -40,13 +39,12 @@ function purgeAllStoredAuth() {
     return;
   }
 
-  // Client-side JWT expiration check: prevents bounce loop & flickering
+  // Client-side JWT expiration check
   try {
     const parts = token.split('.');
     if (parts.length === 3) {
       const payload = JSON.parse(atob(parts[1]));
       if (payload.exp && (payload.exp * 1000) <= Date.now()) {
-        // Token is expired! Purge and do not auto-redirect
         purgeAllStoredAuth();
         return;
       }
@@ -69,9 +67,6 @@ function purgeAllStoredAuth() {
     window.location.replace('/faculty/dashboard/index.html');
   } catch (_) { }
 })();
-
-/* ── Dark mode ── */
-document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
 
 /* ── State ── */
 let currentActivationToken = null;
@@ -96,9 +91,7 @@ let currentActivationToken = null;
     }
 
     if (notice) {
-      // Ensure stale tokens are purged so reload or auto-checks don't loop
       purgeAllStoredAuth();
-
       const sb = document.getElementById('status-alert-banner');
       if (sb) {
         const titleEl = document.getElementById('status-alert-title');
@@ -116,7 +109,7 @@ let currentActivationToken = null;
   } catch (_) { }
 })();
 
-/* ── Background Server Wake-Up Pre-Warming (Cloud Cold-Start Prevention) ── */
+/* ── Background Server Wake-Up Pre-Warming ── */
 (function wakeUpServerPreWarm() {
   function pingHealth() {
     try {
@@ -124,13 +117,11 @@ let currentActivationToken = null;
       fetch('https://vidyaos-backend.onrender.com/api/v1/health', { mode: 'no-cors', cache: 'no-store' }).catch(() => { });
     } catch (_) { }
   }
-  // Ping immediately on load
   pingHealth();
-  // Maintain keep-alive while login page remains open
-  setInterval(pingHealth, 120000); // every 2 minutes
+  setInterval(pingHealth, 120000);
 })();
 
-/* ── Cold-Start Retry Engine (Handles Render 15-min idle sleep gracefully) ── */
+/* ── Cold-Start Retry Engine ── */
 async function executeLoginWithRetry(payload, maxAttempts = 15) {
   const text = document.getElementById('submit-text');
   const sb = document.getElementById('status-alert-banner');
@@ -183,26 +174,37 @@ async function executeLoginWithRetry(payload, maxAttempts = 15) {
   }
 }
 
-/* ── Role compatibility (Unified single login for all roles) ── */
-function setRole(role) {
-  hideBanners();
-}
-
 function hideBanners() {
   const cb = document.getElementById('conflict-banner');
   const pb = document.getElementById('pending-banner');
   const sb = document.getElementById('status-alert-banner');
+  const msg = document.getElementById('msg');
   if (cb) cb.style.display = 'none';
   if (pb) pb.style.display = 'none';
   if (sb) sb.style.display = 'none';
+  if (msg) { msg.textContent = ''; msg.className = 'msg'; }
 }
 
-/* ── Password toggle ── */
+function showInlineMsg(text, type = 'err') {
+  const msg = document.getElementById('msg');
+  if (!msg) return;
+  msg.textContent = text;
+  msg.className = 'msg ' + (type === 'ok' ? 'ok' : 'err');
+}
+
+/* ── Password Toggle ── */
 function togglePw() {
   const inp = document.getElementById('password');
   const btn = document.getElementById('pw-toggle-btn');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  btn.innerHTML = inp.type === 'password' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+  if (!inp) return;
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  if (btn) {
+    btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    btn.innerHTML = show
+      ? '<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'
+      : '<svg viewBox="0 0 24 24"><path d="M1.500 12S5.500 5 12 5s10.500 7 10.500 7-4 7-10.500 7S1.500 12 1.500 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+  }
 }
 
 /* ── Device ID ── */
@@ -231,31 +233,40 @@ function redirectAfterLogin(user) {
   window.location.href = '/faculty/dashboard/index.html';
 }
 
-/* ── Form reset helper ── */
 function resetSubmitBtn() {
   const btn = document.getElementById('submit-btn');
   const text = document.getElementById('submit-text');
+  const icon = document.getElementById('signin-icon');
   if (btn) btn.disabled = false;
-  if (text) text.textContent = 'Sign In →';
+  if (text) text.textContent = 'Sign In';
+  if (icon) icon.innerHTML = '→';
 }
 
 /* ── Input events: hide banners ── */
-document.getElementById('identifier').addEventListener('input', hideBanners);
-document.getElementById('password').addEventListener('input', hideBanners);
-document.getElementById('identifier').addEventListener('focus', hideBanners);
-document.getElementById('password').addEventListener('focus', hideBanners);
+['identifier', 'password'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('input', hideBanners);
+    el.addEventListener('focus', hideBanners);
+  }
+});
 
 /* ── Main login submit ── */
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const id = document.getElementById('identifier').value.trim();
   const pw = document.getElementById('password').value;
-  if (!id || !pw) return;
+  if (!id || !pw) {
+    showInlineMsg('invalid credentials check id and password ', 'err');
+    return;
+  }
 
   const btn = document.getElementById('submit-btn');
   const text = document.getElementById('submit-text');
+  const icon = document.getElementById('signin-icon');
   btn.disabled = true;
-  text.textContent = 'Verifying...';
+  text.textContent = 'Verifying…';
+  if (icon) icon.innerHTML = '<span class="spinner"></span>';
   hideBanners();
 
   try {
@@ -263,12 +274,14 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const res = await executeLoginWithRetry({
       email: id, phone: id, credential: id,
       identifier: id, username: id, enrollment_no: id,
+      official_enrollment_no: id, registration_no: id,
       password: pw,
       device_id: deviceId
     });
 
     if (res.success) {
       hideBanners();
+      showInlineMsg('Sign-in verified! Redirecting…', 'ok');
       if (res.data.must_change_password) {
         currentActivationToken = res.data.activation_token;
         document.getElementById('act-name').textContent = res.data.user?.full_name || res.data.user?.email || 'Faculty';
@@ -278,7 +291,6 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         return;
       }
       setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
-      try { if (typeof showToast === 'function') showToast('Login successful! Redirecting…', 'success'); } catch (_) { }
       setTimeout(() => redirectAfterLogin(res.data.user), 350);
     }
   } catch (err) {
@@ -292,7 +304,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
       if (pb) {
         const bodyEl = document.getElementById('pending-banner-text');
         if (bodyEl && err.message) {
-          bodyEl.textContent = err.message + " You will be able to sign in as soon as your account is approved.";
+          bodyEl.textContent = err.message + ' You will be able to sign in once approved.';
         }
         pb.style.display = 'block';
       }
@@ -318,8 +330,11 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
       }
       return;
     }
+
+    // Unified security message on any credential failure
+    showInlineMsg('invalid credentials check id and password ', 'err');
     try {
-      if (typeof showToast === 'function') showToast(err?.message || 'Invalid credentials. Please try again.', 'error');
+      if (typeof showToast === 'function') showToast('invalid credentials check id and password ', 'error');
     } catch (_) { }
   }
 });
@@ -343,11 +358,11 @@ async function submitForceLogin() {
     if (res.success) {
       hideBanners();
       setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
-      try { if (typeof showToast === 'function') showToast('Previous session disconnected. Signing in…', 'success'); } catch (_) { }
+      showInlineMsg('Previous session disconnected. Signing in…', 'ok');
       setTimeout(() => redirectAfterLogin(res.data.user), 350);
     }
   } catch (err) {
-    try { if (typeof showToast === 'function') showToast(err?.message || 'Force login failed.', 'error'); } catch (_) { }
+    showInlineMsg('invalid credentials check id and password ', 'err');
     btn.disabled = false;
     btn.textContent = 'Disconnect Other Device & Sign In Here';
   }
@@ -360,7 +375,7 @@ document.getElementById('activation-form').addEventListener('submit', async (e) 
   const confPw = document.getElementById('act-confirm-pw').value;
 
   if (newPw !== confPw) {
-    try { if (typeof showToast === 'function') showToast('Passwords do not match!', 'error'); } catch (_) { }
+    alert('Passwords do not match!');
     return;
   }
 
@@ -381,19 +396,19 @@ document.getElementById('activation-form').addEventListener('submit', async (e) 
 
     if (r.success) {
       setAuthSession(r.data.access_token, r.data.user, r.data.refresh_token);
-      try { if (typeof showToast === 'function') showToast('Account activated! Welcome to VidyaOS.', 'success'); } catch (_) { }
-      setTimeout(() => redirectAfterLogin(r.data.user), 600);
+      alert('Account activated! Welcome to VidyaOS.');
+      setTimeout(() => redirectAfterLogin(r.data.user), 400);
     } else {
       throw { message: r.error?.message || 'Activation failed' };
     }
   } catch (err) {
-    try { if (typeof showToast === 'function') showToast(err?.message || 'Activation failed', 'error'); } catch (_) { }
+    alert(err?.message || 'Activation failed');
     btn.disabled = false;
     text.textContent = 'Save & Enter Portal →';
   }
 });
 
-/* ── Google OAuth ── */
+/* ── Google OAuth & Chooser Modal ── */
 async function handleGoogleSignIn() {
   const isNative = (
     typeof window !== 'undefined' && (
@@ -405,11 +420,7 @@ async function handleGoogleSignIn() {
   );
 
   if (isNative) {
-    if (typeof showToast === 'function') {
-      showToast('Google Sign-In is available via the Web Portal. On mobile, please log in with your email and password.', 'info');
-    } else {
-      alert('Google Sign-In is available via the Web Portal. On mobile, please log in with your email and password.');
-    }
+    alert('Google Sign-In is available via the Web Portal. On mobile, please log in with your email or ID and password.');
     return;
   }
 
@@ -417,6 +428,7 @@ async function handleGoogleSignIn() {
   const txt = document.getElementById('google-btn-text');
   btn.disabled = true;
   txt.textContent = 'Connecting…';
+
   try {
     const res = await fetchApi('/auth/google/url?mode=LOGIN');
     if (res.configured && res.data?.url) {
@@ -426,13 +438,112 @@ async function handleGoogleSignIn() {
       const popup = window.open(res.data.url, 'vidyaos_google_login', `width=${w},height=${h},left=${l},top=${t},status=0,menubar=0,toolbar=0`);
       if (popup) popup.focus(); else window.location.href = res.data.url;
     } else {
-      try { if (typeof showToast === 'function') showToast('Google OAuth not configured. Please use email login.', 'info'); } catch (_) { }
+      // Fallback to Google Account Chooser modal
+      openGoogleSignInModal();
     }
   } catch (_) {
-    try { if (typeof showToast === 'function') showToast('Google sign-in unavailable. Please use email login.', 'info'); } catch (_) { }
+    openGoogleSignInModal();
   } finally {
     btn.disabled = false;
     txt.textContent = 'Continue with Google';
+  }
+}
+
+function openGoogleSignInModal() {
+  const modal = document.getElementById('google-signin-modal');
+  const errBox = document.getElementById('google-login-card-error');
+  if (errBox) errBox.style.display = 'none';
+  document.getElementById('google-accounts-view').style.display = 'block';
+  document.getElementById('google-input-view').style.display = 'none';
+
+  const accountList = document.getElementById('google-account-list');
+  const candidateEmails = [
+    'student.it01@college.edu',
+    'admin@gmail.com',
+    'prof.sharma@college.edu'
+  ];
+
+  accountList.innerHTML = candidateEmails.map(email => {
+    const initial = email.charAt(0).toUpperCase();
+    const displayName = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return `<li class="google-account-item" onclick="loginWithGoogleEmail('${email}')">
+      <div class="google-account-avatar">${initial}</div>
+      <div class="google-account-details">
+        <div class="google-account-name">${displayName}</div>
+        <div class="google-account-email">${email}</div>
+      </div>
+      <span style="font-size:11px;font-weight:700;color:#2563eb;">Sign In</span>
+    </li>`;
+  }).join('');
+
+  modal.style.display = 'flex';
+}
+
+function closeGoogleSignInModal() {
+  const modal = document.getElementById('google-signin-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function showGoogleEmailInput() {
+  document.getElementById('google-accounts-view').style.display = 'none';
+  document.getElementById('google-input-view').style.display = 'block';
+  const inp = document.getElementById('google-manual-email');
+  if (inp) { inp.value = ''; inp.focus(); }
+}
+
+function showGoogleAccountList() {
+  document.getElementById('google-input-view').style.display = 'none';
+  document.getElementById('google-accounts-view').style.display = 'block';
+}
+
+function submitGoogleManualLogin() {
+  const inp = document.getElementById('google-manual-email');
+  const email = inp ? inp.value.trim() : '';
+  if (!email || !email.includes('@')) {
+    const errBox = document.getElementById('google-login-card-error');
+    if (errBox) {
+      errBox.textContent = 'Please enter a valid Google email address.';
+      errBox.style.display = 'block';
+    }
+    return;
+  }
+  loginWithGoogleEmail(email);
+}
+
+async function loginWithGoogleEmail(email) {
+  const errBox = document.getElementById('google-login-card-error');
+  if (errBox) errBox.style.display = 'none';
+
+  try {
+    const deviceId = getVidyaDeviceId();
+    const res = await fetch('/api/v1/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id_token: 'google_' + email.toLowerCase(),
+        device_id: deviceId
+      })
+    }).then(r => r.json());
+
+    if (res.success && res.data?.access_token) {
+      closeGoogleSignInModal();
+      setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
+      showInlineMsg('Google login successful! Redirecting…', 'ok');
+      setTimeout(() => redirectAfterLogin(res.data.user), 350);
+    } else {
+      const msg = res.error?.message || 'invalid credentials check id and password ';
+      if (errBox) {
+        errBox.textContent = msg;
+        errBox.style.display = 'block';
+      } else {
+        alert(msg);
+      }
+    }
+  } catch (err) {
+    if (errBox) {
+      errBox.textContent = err.message || 'invalid credentials check id and password ';
+      errBox.style.display = 'block';
+    }
   }
 }
 
@@ -441,19 +552,17 @@ window.addEventListener('message', (event) => {
     const { payload } = event.data;
     if (payload?.access_token) {
       setAuthSession(payload.access_token, payload.user, payload.refresh_token);
-      try { if (typeof showToast === 'function') showToast('Google login successful!', 'success'); } catch (_) { }
+      showInlineMsg('Google login successful! Redirecting…', 'ok');
       setTimeout(() => redirectAfterLogin(payload.user), 400);
     }
   } else if (event.data?.type === 'GOOGLE_AUTH_ERROR') {
-    try { if (typeof showToast === 'function') showToast(event.data.message || 'Google authentication failed', 'error'); } catch (_) { }
+    showInlineMsg(event.data.message || 'invalid credentials check id and password ', 'err');
   }
 });
 
-/* ── Forgot password ── */
+/* ── Forgot Password ── */
 function handleForgotPassword() {
-  try {
-    if (typeof showToast === 'function') showToast('To reset your password, contact your HOD or System Administrator.', 'info');
-  } catch (_) { }
+  alert('To reset your password, contact your Department HOD or System Administrator.');
 }
 
 /* ── Check URL parameters for pending status or messages ── */
@@ -473,12 +582,7 @@ function handleForgotPassword() {
     }
   }
   const msg = params.get('message');
-  if (msg) {
-    try { if (typeof showToast === 'function') showToast(decodeURIComponent(msg), 'info'); } catch (_) { }
-  }
+  if (msg) showInlineMsg(decodeURIComponent(msg), 'ok');
   const errMsg = params.get('error');
-  if (errMsg) {
-    try { if (typeof showToast === 'function') showToast(decodeURIComponent(errMsg), 'error'); } catch (_) { }
-  }
+  if (errMsg) showInlineMsg('invalid credentials check id and password ', 'err');
 })();
-

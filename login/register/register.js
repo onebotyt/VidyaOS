@@ -99,57 +99,24 @@ function checkStrength(prefix) {
 
 /* ── Switch Role Tabs ── */
 function switchRole(role) {
-  S.currentRole = role;
+  S.currentRole = 'student';
   hideAlert();
-  const isStu = role === 'student';
   const tabStu = document.getElementById('tab-student');
-  const tabFac = document.getElementById('tab-faculty');
   if (tabStu) {
-    tabStu.classList.toggle('active', isStu);
-    tabStu.setAttribute('aria-selected', isStu ? 'true' : 'false');
-  }
-  if (tabFac) {
-    tabFac.classList.toggle('active', !isStu);
-    tabFac.setAttribute('aria-selected', !isStu ? 'true' : 'false');
+    tabStu.classList.add('active');
+    tabStu.setAttribute('aria-selected', 'true');
   }
   const secStu = document.getElementById('student-section');
-  const secFac = document.getElementById('faculty-section');
-  if (secStu) secStu.classList.toggle('active', isStu);
-  if (secFac) secFac.classList.toggle('active', !isStu);
+  if (secStu) secStu.classList.add('active');
 
   const heading = document.getElementById('page-heading');
   const sub = document.getElementById('page-subheading');
-  if (isStu) {
-    if (heading) heading.textContent = 'Student Registration';
-    if (sub) sub.textContent = 'Submit your enrollment request to your Department Faculty';
-  } else {
-    if (heading) heading.textContent = 'Faculty & HOD Onboarding';
-    if (sub) sub.textContent = 'Create your teaching or departmental leadership account';
-  }
-}
+  if (heading) heading.textContent = 'Student Registration';
+  if (sub) sub.textContent = 'Submit your enrollment request to your Department Faculty';
 
-/* ── Faculty Account Type ── */
-function setFacultyType(type) {
-  S.facultyType = type;
-  const isHod = type === 'HOD';
-  const btnTeacher = document.getElementById('fac-btn-role-teacher');
-  const btnHod = document.getElementById('fac-btn-role-hod');
-  if (btnTeacher) btnTeacher.classList.toggle('active', !isHod);
-  if (btnHod) btnHod.classList.toggle('active', isHod);
-
-  const targetEl = document.getElementById('fac-routing-target');
-  const descEl = document.getElementById('fac-routing-desc');
-  const deptHint = document.getElementById('fac-dept-hint');
-  if (isHod) {
-    if (targetEl) targetEl.textContent = 'Institutional Administration Review';
-    if (descEl) descEl.textContent = 'Your HOD registration will be submitted directly to the System Administrator.';
-    if (deptHint) deptHint.textContent = 'Department selection is mandatory for HOD appointments.';
-  } else {
-    if (targetEl) targetEl.textContent = 'Department HOD Review';
-    if (descEl) descEl.textContent = 'Your registration will be submitted to the Head of Department for authorization.';
-    if (deptHint) deptHint.textContent = 'Select your institutional department or Common Faculty.';
+  if (role === 'faculty' || role === 'teacher' || role === 'hod') {
+    showAlert('Faculty and HOD accounts cannot self-register. Faculty accounts are provisioned exclusively by Institutional Administrators and Department HODs.', 'warning');
   }
-  populateFacultyDepartments();
 }
 
 /* ── Department Data Loading ── */
@@ -160,7 +127,6 @@ async function loadDepartments() {
     if (res && res.success && Array.isArray(res.data)) S.departments = res.data;
   } catch (_) { S.departments = []; }
   populateStudentDepartments();
-  populateFacultyDepartments();
 }
 
 function populateStudentDepartments() {
@@ -373,6 +339,7 @@ function submitGoogleEmail() {
 }
 
 function selectGoogleAccount(email, customName, googleSub) {
+  closeGoogleCard();
   const cleanEmail = email.trim().toLowerCase();
   const displayName = customName || cleanEmail.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   S.googleRegistrationData = {
@@ -418,8 +385,10 @@ async function handleStudentSubmit(e) {
   }
 
   const fullName = document.getElementById('stu-name')?.value.trim();
-  const enrollNo = document.getElementById('stu-enroll')?.value.trim().toUpperCase();
+  let enrollNo = document.getElementById('stu-enroll')?.value.trim().toUpperCase() || '';
   const ubterNo = document.getElementById('stu-ubter')?.value.trim().toUpperCase() || null;
+  const rollNoInput = document.getElementById('stu-class-roll-no')?.value.trim();
+  const classRollNo = rollNoInput ? parseInt(rollNoInput, 10) : undefined;
   const email = document.getElementById('stu-email')?.value.trim();
   const deptId = document.getElementById('stu-dept')?.value;
   const semester = document.getElementById('stu-sem')?.value;
@@ -428,9 +397,14 @@ async function handleStudentSubmit(e) {
   const confirm = document.getElementById('stu-confirm')?.value;
   const submitBtn = document.getElementById('stu-submit-btn');
 
+  // If student does not have enrolment no, their account can also use UBTER registration no
+  if (!enrollNo && ubterNo) {
+    enrollNo = ubterNo;
+  }
+
   const isGoogle = Boolean(S.googleRegistrationData?.sub);
   if (!fullName || !enrollNo || !email || !deptId || !semester || (!isGoogle && !password)) {
-    showAlert('Please fill in all required fields marked with *', 'danger');
+    showAlert('Please fill in all required fields (Name, Enrollment No. or UBTER Reg. No., Branch, Semester, Gmail).', 'danger');
     return;
   }
   if (phone && (phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone))) {
@@ -453,6 +427,7 @@ async function handleStudentSubmit(e) {
       full_name: fullName,
       official_enrollment_no: enrollNo,
       registration_no: ubterNo,
+      class_roll_no: classRollNo,
       email,
       password: password || undefined,
       department_id: Number(deptId),
@@ -473,7 +448,7 @@ async function handleStudentSubmit(e) {
         name: fullName,
         role: 'Student',
         email,
-        detailLabel: 'Enrollment No.',
+        detailLabel: 'Enrollment / UBTER No.',
         detailValue: enrollNo,
         dept: document.getElementById('stu-dept').options[document.getElementById('stu-dept').selectedIndex]?.text
       });
@@ -485,74 +460,6 @@ async function handleStudentSubmit(e) {
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = 'Submit Registration <span class="arrow">→</span>';
-  }
-}
-
-async function handleFacultySubmit(e) {
-  e.preventDefault();
-  hideAlert();
-  const fullName = document.getElementById('fac-name')?.value.trim();
-  const email = document.getElementById('fac-email')?.value.trim();
-  const rawDept = document.getElementById('fac-dept')?.value;
-  const phone = (document.getElementById('fac-phone')?.value || '').replace(/\D/g, '');
-  const empId = document.getElementById('fac-empid')?.value.trim() || null;
-  const password = document.getElementById('fac-password')?.value;
-  const submitBtn = document.getElementById('fac-submit-btn');
-
-  if (!fullName || !email || !password) {
-    showAlert('Please fill in all required fields marked with *', 'danger');
-    return;
-  }
-  if (S.facultyType === 'HOD' && (!rawDept || rawDept === 'COMMON')) {
-    showAlert('Department selection is required for HOD appointments.', 'danger');
-    return;
-  }
-  if (phone && (phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone))) {
-    showAlert('If entering a mobile number, it must be a valid 10-digit Indian mobile number.', 'danger');
-    return;
-  }
-  if (password.length < 8) {
-    showAlert('Password must be at least 8 characters long', 'danger');
-    return;
-  }
-
-  try {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = 'Submitting… <span class="arrow">→</span>';
-    const payload = {
-      full_name: fullName,
-      email,
-      password,
-      account_type: S.facultyType,
-      department_id: rawDept === 'COMMON' ? null : (rawDept ? Number(rawDept) : null),
-      phone: phone || null,
-      employee_id: empId
-    };
-
-    const res = await fetch('/api/v1/auth/faculty/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).then(r => r.json());
-
-    if (res && res.success) {
-      showSuccessView({
-        title: S.facultyType === 'HOD' ? 'HOD Application Submitted!' : 'Faculty Registration Submitted!',
-        name: fullName,
-        role: S.facultyType === 'HOD' ? 'Head of Department (HOD)' : 'Faculty Member',
-        email,
-        detailLabel: 'Employee ID',
-        detailValue: empId || 'N/A',
-        dept: rawDept === 'COMMON' ? 'Common Faculty' : (document.getElementById('fac-dept').options[document.getElementById('fac-dept').selectedIndex]?.text || 'N/A')
-      });
-    } else {
-      showAlert(res?.error?.message || 'Application failed. Please try again.', 'danger');
-    }
-  } catch (err) {
-    showAlert(err.message || 'Network error submitting application.', 'danger');
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = 'Submit Application <span class="arrow">→</span>';
   }
 }
 
@@ -575,11 +482,9 @@ function showSuccessView(info) {
   loadDepartments();
   const params = new URLSearchParams(window.location.search);
   const roleParam = (params.get('role') || '').toLowerCase();
+  switchRole('student');
   if (roleParam === 'faculty' || roleParam === 'teacher' || roleParam === 'hod') {
-    switchRole('faculty');
-    if (roleParam === 'hod') setFacultyType('HOD');
-  } else {
-    switchRole('student');
+    showAlert('Faculty and HOD accounts cannot self-register. Faculty accounts are provisioned exclusively by Institutional Administrators and Department HODs.', 'warning');
   }
 
   const qEmail = params.get('google_email');
