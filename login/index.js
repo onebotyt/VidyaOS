@@ -735,9 +735,30 @@ async function loadDynamicCampusBanner() {
   }
 }
 
+// Ensure APK download buttons are strictly hidden when running inside the mobile APK
+function hideApkButtonsInNativeApp() {
+  const isNativeApp = (
+    window.VIDYAOS_IS_NATIVE === true ||
+    window.VIDYAOS_FORCE_NATIVE === true ||
+    Boolean(window.Capacitor?.isNativePlatform?.()) ||
+    Boolean(window.Capacitor) ||
+    window.location.protocol === 'capacitor:' ||
+    window.location.protocol === 'file:'
+  );
+  if (isNativeApp) {
+    document.querySelectorAll('.apk-btn, .m-btn-apk').forEach(el => {
+      el.style.setProperty('display', 'none', 'important');
+    });
+  }
+}
+
 // Call on load
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadDynamicCampusBanner);
+  document.addEventListener('DOMContentLoaded', () => {
+    loadDynamicCampusBanner();
+    hideApkButtonsInNativeApp();
+  });
 } else {
   loadDynamicCampusBanner();
+  hideApkButtonsInNativeApp();
 }
