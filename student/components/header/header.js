@@ -98,9 +98,32 @@
             <span id="student-theme-icon">${getIcon('moon', { width: 17, height: 17 })}</span>
           </button>
 
+          <!-- Notification Bell Button -->
+          <button type="button" class="gc-icon-btn header-bell-btn" onclick="toggleStudentNotifications(event)" id="btn-student-bell" title="Notifications" aria-label="Notifications" style="position:relative;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="header-bell-badge" id="student-bell-count" style="display:none;">0</span>
+          </button>
+
           <!-- Round User Avatar -->
           <div class="gc-user-avatar" id="gc-user-avatar" onclick="toggleStudentProfile(event)" title="Student Account" aria-haspopup="true" aria-expanded="false">
             ST
+          </div>
+        </div>
+
+        <!-- Notifications Dropdown -->
+        <div class="header-notifications-dropdown" id="student-notifications-dropdown" aria-hidden="true" onclick="event.stopPropagation()">
+          <div class="notif-dropdown-header">
+            <span class="notif-header-title">Notifications</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="notif-header-badge" id="student-notif-header-badge">0 New</span>
+              <button type="button" class="notif-mark-all-btn" onclick="markAllStudentNotificationsAsRead(event)" style="background:transparent; border:none; color:var(--color-primary); font-size:0.75rem; font-weight:600; cursor:pointer;">Mark all read</button>
+            </div>
+          </div>
+          <div class="notif-items-list" id="student-notif-items-list">
+            <div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading notifications...</div>
           </div>
         </div>
 
@@ -239,6 +262,121 @@
   }
 
   /**
+   * Toggles Notifications Dropdown
+   */
+  function toggleStudentNotifications(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const dropdown = document.getElementById('student-notifications-dropdown');
+    if (!dropdown) return;
+
+    toggleStudentProfile(false);
+    const apps = document.getElementById('student-apps-dropdown');
+    if (apps) apps.classList.remove('open');
+
+    const isOpen = dropdown.classList.contains('open');
+    if (isOpen) {
+      dropdown.classList.remove('open');
+    } else {
+      dropdown.classList.add('open');
+      fetchStudentNotifications();
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatRelativeTime(dateInput) {
+    if (!dateInput) return '';
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return '';
+    const now = new Date();
+    const diffSec = Math.floor((now - date) / 1000);
+    if (diffSec < 60) return 'Just now';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour}h ago`;
+    const diffDay = Math.floor(diffHour / 24);
+    if (diffDay < 7) return `${diffDay}d ago`;
+    return date.toLocaleDateString();
+  }
+
+  async function fetchStudentNotifications() {
+    try {
+      const res = await fetch('/api/v1/notifications?limit=15', { credentials: 'include' });
+      if (!res.ok) return;
+      const json = await res.json();
+      const items = json.data?.items || json.data || [];
+      const unreadCount = json.data?.unreadCount !== undefined ? json.data.unreadCount : (json.unreadCount || 0);
+
+      const badge = document.getElementById('student-bell-count');
+      if (badge) {
+        if (unreadCount > 0) {
+          badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.textContent = '0';
+          badge.style.display = 'none';
+        }
+      }
+
+      const badgeHeader = document.getElementById('student-notif-header-badge');
+      if (badgeHeader) {
+        badgeHeader.textContent = unreadCount > 0 ? `${unreadCount} New` : 'All Read';
+      }
+
+      const list = document.getElementById('student-notif-items-list');
+      if (list) {
+        if (!items || items.length === 0) {
+          list.innerHTML = `<div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No new notifications</div>`;
+        } else {
+          list.innerHTML = items.map(n => `
+            <div class="notif-item ${!n.is_read ? 'unread' : ''}" onclick="handleStudentNotificationClick('${n.id}', '${n.link_url || ''}')" style="display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:8px; margin-bottom:6px; cursor:pointer; background:var(--bg-surface); border:1px solid var(--border-color);">
+              <div class="notif-item-body" style="flex:1; min-width:0;">
+                <div class="notif-item-title" style="font-size:0.82rem; font-weight:600; color:var(--text-main);">${escapeHtml(n.title)}</div>
+                <div class="notif-item-sub" style="font-size:0.72rem; color:var(--text-muted); margin-top:2px; line-height:1.3;">${escapeHtml(n.message)}</div>
+                <div class="notif-item-time" style="font-size:0.68rem; color:var(--text-muted); margin-top:3px;">${formatRelativeTime(n.created_at)}</div>
+              </div>
+              ${!n.is_read ? '<span style="width:7px; height:7px; border-radius:50%; background:var(--color-primary); flex-shrink:0; margin-top:5px;"></span>' : ''}
+            </div>
+          `).join('');
+        }
+      }
+    } catch (_) {}
+  }
+
+  async function handleStudentNotificationClick(id, linkUrl) {
+    try {
+      await fetch(`/api/v1/notifications/${id}/read`, { method: 'PUT', credentials: 'include' });
+    } catch (_) {}
+    if (linkUrl && linkUrl.trim()) {
+      window.location.href = linkUrl;
+    } else {
+      fetchStudentNotifications();
+    }
+  }
+
+  async function markAllStudentNotificationsAsRead(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    try {
+      await fetch('/api/v1/notifications/mark-all-read', { method: 'PUT', credentials: 'include' });
+      fetchStudentNotifications();
+    } catch (_) {}
+  }
+
+  window.toggleStudentNotifications = toggleStudentNotifications;
+  window.handleStudentNotificationClick = handleStudentNotificationClick;
+  window.markAllStudentNotificationsAsRead = markAllStudentNotificationsAsRead;
+  window.fetchStudentNotifications = fetchStudentNotifications;
+
+  /**
    * Toggles Apps Launcher
    */
   function toggleStudentApps(e) {
@@ -326,6 +464,12 @@
     if (profile && profile.classList.contains('open') && !profile.contains(e.target) && !avatar?.contains(e.target)) {
       profile.classList.remove('open');
     }
+
+    const notif = document.getElementById('student-notifications-dropdown');
+    const notifBtn = document.getElementById('btn-student-bell');
+    if (notif && notif.classList.contains('open') && !notif.contains(e.target) && !notifBtn?.contains(e.target)) {
+      notif.classList.remove('open');
+    }
   });
 
   document.addEventListener('keydown', (e) => {
@@ -335,6 +479,8 @@
       if (apps) apps.classList.remove('open');
       const profile = document.getElementById('student-profile-popover');
       if (profile) profile.classList.remove('open');
+      const notif = document.getElementById('student-notifications-dropdown');
+      if (notif) notif.classList.remove('open');
     }
   });
 
@@ -352,10 +498,16 @@
   window.toggleUserProfile = toggleStudentProfile;
   window.toggleTheme = toggleStudentTheme;
 
+  function initStudentHeader() {
+    mountStudentHeader();
+    fetchStudentNotifications();
+    setInterval(fetchStudentNotifications, 20000);
+  }
+
   // Auto-mount
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mountStudentHeader);
+    document.addEventListener('DOMContentLoaded', initStudentHeader);
   } else {
-    mountStudentHeader();
+    initStudentHeader();
   }
 })();

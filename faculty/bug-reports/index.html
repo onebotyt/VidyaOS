@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Report a Bug & Technical Support — VidyaOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/faculty/components/core/reset.css">
+  <link rel="stylesheet" href="/faculty/components/core/variables.css">
+  <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261029">
+  <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
+  <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
+  <link rel="stylesheet" href="/faculty/bug-reports/bug-reports.css?v=20261119">
+  <script>
+    (function () {
+      try {
+        if (window.innerWidth >= 769) {
+          document.documentElement.classList.add('sidebar-collapsed');
+        }
+      } catch (_) { }
+    })();
+  </script>
+</head>
+
+<body class="page-layout">
+  <div class="faculty-app-layout" id="faculty-app-layout">
+    <div class="faculty-main-wrap">
+      <!-- Top Header Mount Anchor -->
+      <div id="faculty-header-mount"></div>
+
+      <main class="page-main-container container bug-reports-container">
+        <!-- Header Section -->
+        <div class="bug-header-section">
+          <h1 class="bug-page-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m8 2 1.88 1.88M14.12 3.88 16 2M9 7.13v-1a3.003 3.003 0 1 1 6 0v1M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6M12 20v-9M6.53 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M18 13h4M17.2 17c2.1.1 3.8 1.9 3.8 4"/>
+            </svg>
+            <span>Technical Bug Reporting & Support</span>
+          </h1>
+          <p class="bug-page-subtitle">Report website bugs, technical glitches, or malfunctions directly to the system administrators.</p>
+        </div>
+
+        <!-- Exclusivity Notice Banner -->
+        <div class="bug-notice-banner" role="alert">
+          <span class="bug-notice-icon" aria-hidden="true">⚠️</span>
+          <div class="bug-notice-content">
+            <strong>Technical Issues Only:</strong> This portal is exclusively for reporting software bugs, technical glitches, errors, and website malfunctions occurring within VidyaOS.
+            It must <em>not</em> be used for general academic grievances, student marks disputes, or personal complaints.
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="bug-tabs-bar" role="tablist">
+          <button type="button" class="bug-tab-btn active" id="tab-btn-submit" onclick="switchBugTab('submit')" role="tab" aria-selected="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            <span>Report a Bug</span>
+          </button>
+          <button type="button" class="bug-tab-btn" id="tab-btn-my-reports" onclick="switchBugTab('my-reports')" role="tab" aria-selected="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>My Bug Reports</span>
+            <span class="bug-tab-badge" id="badge-my-count">0</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: Report a Bug Form -->
+        <section id="panel-submit-bug" class="bug-tab-panel" role="tabpanel">
+          <div class="bug-form-card">
+            <form id="form-report-bug" onsubmit="handleBugReportSubmit(event)" novalidate>
+              <div class="bug-form-grid">
+                <!-- 1. Issue Title -->
+                <div class="form-group-full">
+                  <label class="bug-form-label" for="bug-title">Issue Title <span class="req">*</span></label>
+                  <input type="text" id="bug-title" name="issue_title" class="bug-form-input" placeholder="e.g. Attendance scan button failing on Faculty Register" required maxlength="255">
+                  <div class="bug-form-hint">Brief title summarizing the problem you encountered.</div>
+                </div>
+
+                <!-- 2. Issue Category -->
+                <div>
+                  <label class="bug-form-label" for="bug-category">Issue Category <span class="req">*</span></label>
+                  <select id="bug-category" name="issue_category" class="bug-form-select" required>
+                    <option value="" disabled selected>— Select Category —</option>
+                    <option value="Login / Authentication Problem">Login / Authentication Problem</option>
+                    <option value="Registration Problem">Registration Problem</option>
+                    <option value="Dashboard Error">Dashboard Error</option>
+                    <option value="Student Management Error">Student Management Error</option>
+                    <option value="Faculty Management Error">Faculty Management Error</option>
+                    <option value="Attendance Error">Attendance Error</option>
+                    <option value="Assignment / Notes Error">Assignment / Notes Error</option>
+                    <option value="File Upload / Download Problem">File Upload / Download Problem</option>
+                    <option value="Page Not Loading">Page Not Loading</option>
+                    <option value="Button / Functionality Not Working">Button / Functionality Not Working</option>
+                    <option value="UI / Design Problem">UI / Design Problem</option>
+                    <option value="Other Technical Issue">Other Technical Issue</option>
+                  </select>
+                </div>
+
+                <!-- Auto Captured Info Preview -->
+                <div>
+                  <label class="bug-form-label">Reporting As</label>
+                  <input type="text" id="bug-user-preview" class="bug-form-input" disabled style="opacity:0.8; background:var(--bg-surface-hover, var(--bg-surface));">
+                </div>
+
+                <!-- 3. Describe the Problem -->
+                <div class="form-group-full">
+                  <label class="bug-form-label" for="bug-description">Describe the Problem <span class="req">*</span></label>
+                  <textarea id="bug-description" name="description" class="bug-form-textarea" placeholder="Describe the technical issue you are experiencing in detail..." required></textarea>
+                  <div class="bug-form-hint">Explain step-by-step what you clicked, what occurred, and any error message displayed on screen.</div>
+                </div>
+
+                <!-- 4. Upload Screenshot (Mandatory) -->
+                <div>
+                  <label class="bug-form-label">Upload Screenshot <span class="req">*</span></label>
+                  <input type="file" id="input-screenshot" accept="image/png, image/jpeg, image/jpg" style="display:none;" onchange="handleScreenshotSelect(event)">
+                  <div class="bug-upload-box" id="dropzone-screenshot" onclick="document.getElementById('input-screenshot').click()">
+                    <div class="bug-upload-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                    </div>
+                    <div class="bug-upload-title">Choose Screenshot or Drag & Drop</div>
+                    <div class="bug-upload-sub">PNG, JPG, or JPEG (Max 10MB) • Mandatory</div>
+                  </div>
+                  <!-- Screenshot Preview -->
+                  <div id="preview-screenshot" class="bug-preview-box" style="display:none;">
+                    <div class="bug-preview-left">
+                      <img id="thumb-screenshot" class="bug-preview-thumb" alt="Screenshot Preview">
+                      <div class="bug-preview-meta">
+                        <span id="name-screenshot" class="bug-preview-name"></span>
+                        <span id="size-screenshot" class="bug-preview-size"></span>
+                      </div>
+                    </div>
+                    <button type="button" class="btn-remove-file" onclick="clearScreenshot(event)" title="Remove Screenshot">&times;</button>
+                  </div>
+                  <div id="error-screenshot" style="color:var(--status-absent); font-size:0.75rem; margin-top:4px; display:none;">At least one screenshot is mandatory.</div>
+                </div>
+
+                <!-- 5. Upload Screen Recording (Optional) -->
+                <div>
+                  <label class="bug-form-label">Upload Screen Recording (Optional)</label>
+                  <input type="file" id="input-recording" accept="video/mp4, video/webm" style="display:none;" onchange="handleRecordingSelect(event)">
+                  <div class="bug-upload-box" id="dropzone-recording" onclick="document.getElementById('input-recording').click()">
+                    <div class="bug-upload-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                      </svg>
+                    </div>
+                    <div class="bug-upload-title">Choose Video or Drag & Drop</div>
+                    <div class="bug-upload-sub">MP4 or WebM (Max 50MB) • Optional</div>
+                  </div>
+                  <!-- Video Preview -->
+                  <div id="preview-recording" class="bug-preview-box" style="display:none;">
+                    <div class="bug-preview-left">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-primary); flex-shrink:0;">
+                        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                      </svg>
+                      <div class="bug-preview-meta">
+                        <span id="name-recording" class="bug-preview-name"></span>
+                        <span id="size-recording" class="bug-preview-size"></span>
+                      </div>
+                    </div>
+                    <button type="button" class="btn-remove-file" onclick="clearRecording(event)" title="Remove Recording">&times;</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="bug-form-actions">
+                <button type="submit" id="btn-submit-bug" class="btn-submit-bug">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                  <span id="btn-submit-text">Submit Bug Report</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- TAB 2: My Bug Reports List -->
+        <section id="panel-my-reports" class="bug-tab-panel" role="tabpanel" style="display:none;">
+          <div class="bug-table-card">
+            <div style="padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-color);">
+              <span style="font-weight:700; font-size:0.95rem; color:var(--text-main);">My Submitted Reports</span>
+              <button type="button" class="btn-view-report" onclick="loadMyReports()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:4px;">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                <span>Refresh</span>
+              </button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="bug-table">
+                <thead>
+                  <tr>
+                    <th>Report ID</th>
+                    <th>Issue Title</th>
+                    <th>Category</th>
+                    <th>Submitted On</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="my-reports-tbody">
+                  <tr>
+                    <td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">
+                      Loading your reports...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal: View Bug Report Details -->
+  <div class="bug-modal-overlay" id="modal-view-report" onclick="if(event.target===this)closeViewModal()">
+    <div class="bug-modal-card" role="dialog" aria-labelledby="view-modal-title">
+      <div class="bug-modal-header">
+        <div class="bug-modal-title" id="view-modal-title">
+          <span class="report-id-chip" id="detail-report-id">BR-101</span>
+          <span id="detail-status-slot"></span>
+        </div>
+        <button type="button" class="btn-modal-close" onclick="closeViewModal()" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="bug-modal-body">
+        <h3 id="detail-issue-title" style="margin:0; font-size:1.15rem; font-weight:800; color:var(--text-main);"></h3>
+
+        <div class="bug-detail-grid">
+          <div>
+            <div class="detail-item-label">Category</div>
+            <div class="detail-item-value" id="detail-category"></div>
+          </div>
+          <div>
+            <div class="detail-item-label">Submitted At</div>
+            <div class="detail-item-value" id="detail-submitted-at"></div>
+          </div>
+          <div>
+            <div class="detail-item-label">Submitted By</div>
+            <div class="detail-item-value" id="detail-user-name"></div>
+          </div>
+          <div>
+            <div class="detail-item-label">Department</div>
+            <div class="detail-item-value" id="detail-department"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="detail-item-label" style="margin-bottom:6px;">Problem Description</div>
+          <div id="detail-description" style="padding:1rem; background:var(--bg-surface); border:1px solid var(--border-color); border-radius:10px; font-size:0.88rem; line-height:1.5; color:var(--text-main); white-space:pre-wrap;"></div>
+        </div>
+
+        <!-- Screenshot Attachment -->
+        <div id="detail-screenshot-wrap">
+          <div class="detail-item-label" style="margin-bottom:6px;">Screenshot Attachment</div>
+          <a id="detail-screenshot-link" target="_blank" rel="noopener noreferrer" style="display:inline-block;">
+            <img id="detail-screenshot-img" style="max-width:100%; max-height:260px; border-radius:8px; border:1px solid var(--border-color); object-fit:contain;" alt="Attached Screenshot">
+          </a>
+        </div>
+
+        <!-- Video Attachment -->
+        <div id="detail-video-wrap" style="display:none;">
+          <div class="detail-item-label" style="margin-bottom:6px;">Screen Recording Attachment</div>
+          <video id="detail-video-player" class="bug-video-player" controls preload="metadata"></video>
+        </div>
+
+        <!-- Admin Response or Rejection Reason -->
+        <div id="detail-admin-response-box" class="callout-box callout-box-admin" style="display:none;">
+          <div class="callout-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <span>Admin Response:</span>
+          </div>
+          <div id="detail-admin-response-text"></div>
+        </div>
+
+        <div id="detail-rejection-box" class="callout-box callout-box-rejected" style="display:none;">
+          <div class="callout-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            <span>Rejection Reason:</span>
+          </div>
+          <div id="detail-rejection-text"></div>
+        </div>
+      </div>
+      <div class="bug-modal-footer">
+        <button type="button" class="btn-view-report" onclick="closeViewModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Submission Success Celebratory Dialog -->
+  <div class="bug-modal-overlay" id="modal-submit-success">
+    <div class="bug-modal-card" style="max-width:440px; text-align:center; padding:2rem;">
+      <div class="celebrate-circle">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h3 style="margin:0 0 0.5rem; font-size:1.25rem; font-weight:800; color:var(--text-main);">Bug Report Submitted!</h3>
+      <p style="margin:0 0 1.25rem; font-size:0.88rem; color:var(--text-muted); line-height:1.4;">
+        Your technical report has been received by system administrators under Report ID <strong id="success-report-id" class="report-id-chip" style="font-size:0.9rem;"></strong>.
+      </p>
+      <button type="button" class="btn-submit-bug" style="width:100%; justify-content:center;" onclick="closeSuccessModal()">
+        <span>View My Bug Reports</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="/faculty/components/core/api.js"></script>
+  <script src="/faculty/components/core/auth.js"></script>
+  <script src="/faculty/components/icons.js?v=20261116"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
+  <script src="/faculty/components/header/header.js?v=20261116"></script>
+  <script src="/faculty/bug-reports/bug-reports.js?v=20261119"></script>
+</body>
+
+</html>

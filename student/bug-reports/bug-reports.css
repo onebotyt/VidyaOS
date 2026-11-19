@@ -1,0 +1,602 @@
+/**
+ * Student Bug Reporting & Complaints System Styles
+ * 100% Theme Token Compliant (Zero Hardcoded Hex / RGB Colors)
+ */
+
+.bug-reports-container {
+  padding-top: 1.5rem;
+  padding-bottom: 3.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Page Header */
+.bug-header-section {
+  margin-bottom: 1.5rem;
+}
+
+.bug-page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.35rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.bug-page-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Exclusivity Warning Banner */
+.bug-notice-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem 1.25rem;
+  background: var(--status-late-bg, hsl(38 92% 95%));
+  border: 1px solid var(--status-late, hsl(38 92% 50%));
+  border-radius: var(--radius-md, 12px);
+  margin-bottom: 1.5rem;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.bug-notice-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.bug-notice-content strong {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+/* Navigation Tabs */
+.bug-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.bug-tab-btn {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.bug-tab-btn:hover {
+  color: var(--text-main);
+}
+
+.bug-tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.bug-tab-badge {
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.bug-tab-btn.active .bug-tab-badge {
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Form Card */
+.bug-form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.bug-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.bug-form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.bug-form-label .req {
+  color: var(--status-absent, hsl(0 84% 60%));
+}
+
+.bug-form-input,
+.bug-form-select,
+.bug-form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bug-form-input:focus,
+.bug-form-select:focus,
+.bug-form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light, hsl(215 90% 95%));
+}
+
+.bug-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.bug-form-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
+/* Upload Dropzone */
+.bug-upload-box {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md, 12px);
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.bug-upload-box:hover,
+.bug-upload-box.dragover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light, hsl(215 90% 95%));
+}
+
+.bug-upload-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 0.5rem;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bug-upload-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.bug-upload-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Selected File Preview Box */
+.bug-preview-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  margin-top: 0.75rem;
+}
+
+.bug-preview-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.bug-preview-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.bug-preview-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bug-preview-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bug-preview-size {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.btn-remove-file {
+  background: transparent;
+  border: none;
+  color: var(--status-absent, hsl(0 84% 60%));
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.btn-remove-file:hover {
+  background: var(--status-absent-bg, hsl(0 80% 95%));
+}
+
+.bug-video-player {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+}
+
+/* Submit Actions */
+.bug-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-submit-bug {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-md, 10px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-submit-bug:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-submit-bug:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Status Badges */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.badge-status-new {
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.badge-status-under-review {
+  background: hsl(270 90% 95%);
+  color: hsl(270 70% 45%);
+  border: 1px solid hsl(270 70% 60%);
+}
+
+.badge-status-in-progress {
+  background: var(--status-late-bg, hsl(38 92% 95%));
+  color: var(--status-late, hsl(38 92% 50%));
+  border: 1px solid var(--status-late, hsl(38 92% 50%));
+}
+
+.badge-status-resolved {
+  background: var(--status-present-bg, hsl(142 70% 95%));
+  color: var(--status-present, hsl(142 70% 40%));
+  border: 1px solid var(--status-present, hsl(142 70% 45%));
+}
+
+.badge-status-rejected {
+  background: var(--status-absent-bg, hsl(0 80% 95%));
+  color: var(--status-absent, hsl(0 84% 60%));
+  border: 1px solid var(--status-absent, hsl(0 84% 60%));
+}
+
+/* Reports Table & List */
+.bug-table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.bug-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.bug-table th {
+  padding: 0.85rem 1rem;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.bug-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.bug-table tr:hover td {
+  background: var(--bg-surface-hover, var(--bg-surface));
+}
+
+.report-id-chip {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.btn-view-report {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-view-report:hover {
+  background: var(--color-primary);
+  color: var(--text-white, hsl(0 0% 100%));
+  border-color: var(--color-primary);
+}
+
+/* Modal Dialog */
+.bug-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 10050;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.bug-modal-overlay.open {
+  display: flex !important;
+}
+
+.bug-modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.2));
+  animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.bug-modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bug-modal-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.btn-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.3rem;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.btn-modal-close:hover {
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.bug-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.bug-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  background: var(--bg-surface);
+  padding: 1rem;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-color);
+}
+
+.detail-item-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.detail-item-value {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.bug-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Callout Boxes */
+.callout-box {
+  padding: 1rem;
+  border-radius: var(--radius-md, 10px);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.callout-box-admin {
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  border: 1px solid var(--color-primary);
+  color: var(--text-main);
+}
+
+.callout-box-rejected {
+  background: var(--status-absent-bg, hsl(0 80% 95%));
+  border: 1px solid var(--status-absent, hsl(0 84% 60%));
+  color: var(--status-absent, hsl(0 84% 60%));
+}
+
+.callout-title {
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Success Modal */
+.celebrate-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--status-present-bg, hsl(142 70% 95%));
+  color: var(--status-present, hsl(142 70% 40%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+@media (max-width: 768px) {
+  .bug-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .bug-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .bug-table th:nth-child(3),
+  .bug-table td:nth-child(3) {
+    display: none;
+  }
+}

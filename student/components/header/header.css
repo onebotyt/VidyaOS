@@ -375,3 +375,98 @@
     display: none !important;
   }
 }
+
+/* ─── Notifications Dropdown & Bell Badge ────────────────────── */
+.header-bell-btn {
+  position: relative !important;
+}
+
+.header-bell-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--status-absent, hsl(0 84% 60%));
+  color: var(--text-white, hsl(0 0% 100%));
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--bg-card);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.header-notifications-dropdown {
+  position: fixed;
+  top: calc(var(--student-nav-height, 60px) + 8px);
+  right: 4.5rem;
+  width: 340px;
+  max-width: calc(100vw - 2rem);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.1));
+  padding: 0.75rem;
+  display: none;
+  flex-direction: column;
+  z-index: 10002;
+  animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.header-notifications-dropdown.open,
+.header-notifications-dropdown.show {
+  display: flex !important;
+}
+
+.notif-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notif-header-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.notif-header-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light, hsl(215 90% 95%));
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.notif-mark-all-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.notif-mark-all-btn:hover {
+  background: var(--color-primary-light, hsl(215 90% 95%));
+}
+
+.notif-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.5rem;
+  max-height: 360px;
+  overflow-y: auto;
+}

@@ -40,7 +40,8 @@
     logout: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
     bell: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`,
     search: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
-    institution: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>`
+    institution: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>`,
+    bugReports: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 2 1.88 1.88M14.12 3.88 16 2M9 7.13v-1a3.003 3.003 0 1 1 6 0v1M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6M12 20v-9M6.53 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M18 13h4M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>`
   };
 
   // Navigation module registry for Admin portal
@@ -49,7 +50,8 @@
     { key: 'academics', label: 'Academic Structure', shortLabel: 'Structure', href: '/admin/academic-structure/index.html', icon: 'academicStructure' },
     { key: 'faculty', label: 'Faculty Management', shortLabel: 'Faculty', href: '/admin/faculty-management/index.html', icon: 'hodManagement' },
     { key: 'settings', label: 'System Settings', shortLabel: 'Settings', href: '/admin/settings/index.html', icon: 'settings' },
-    { key: 'audit', label: 'Audit Logs', shortLabel: 'Audit', href: '/admin/audit-logs/index.html', icon: 'audit' }
+    { key: 'audit', label: 'Audit Logs', shortLabel: 'Audit', href: '/admin/audit-logs/index.html', icon: 'audit' },
+    { key: 'bug-reports', label: 'Bug Reports / Complaints', shortLabel: 'Bugs', href: '/admin/bug-reports/index.html', icon: 'bugReports' }
   ];
 
   // Mobile Bottom Navigation Tabs (5 Canonical Tabs Matching Mobile App Reference)

@@ -152,8 +152,104 @@
     if (!notif) return;
     const isShown = notif.classList.contains('show');
     closeAllPopovers();
-    if (!isShown) notif.classList.add('show');
+    if (!isShown) {
+      notif.classList.add('show');
+      fetchNotifications();
+    }
   }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatRelativeTime(dateInput) {
+    if (!dateInput) return '';
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return '';
+    const now = new Date();
+    const diffSec = Math.floor((now - date) / 1000);
+    if (diffSec < 60) return 'Just now';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour}h ago`;
+    const diffDay = Math.floor(diffHour / 24);
+    if (diffDay < 7) return `${diffDay}d ago`;
+    return date.toLocaleDateString();
+  }
+
+  async function fetchNotifications() {
+    try {
+      const res = await fetch('/api/v1/notifications?limit=15', { credentials: 'include' });
+      if (!res.ok) return;
+      const json = await res.json();
+      const items = json.data?.items || json.data || [];
+      const unreadCount = json.data?.unreadCount !== undefined ? json.data.unreadCount : (json.unreadCount || 0);
+
+      const badge = document.getElementById('header-bell-count');
+      if (badge) {
+        if (unreadCount > 0) {
+          badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.textContent = '0';
+          badge.style.display = 'none';
+        }
+      }
+
+      const badgeHeader = document.getElementById('notif-header-badge');
+      if (badgeHeader) {
+        badgeHeader.textContent = unreadCount > 0 ? `${unreadCount} New` : 'All Read';
+      }
+
+      const list = document.getElementById('notif-items-list');
+      if (list) {
+        if (!items || items.length === 0) {
+          list.innerHTML = `<div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No new notifications</div>`;
+        } else {
+          list.innerHTML = items.map(n => `
+            <div class="notif-item ${!n.is_read ? 'unread' : ''}" onclick="handleNotificationClick('${n.id}', '${n.link_url || ''}')">
+              <div class="notif-item-body">
+                <div class="notif-item-title">${escapeHtml(n.title)}</div>
+                <div class="notif-item-sub">${escapeHtml(n.message)}</div>
+                <div class="notif-item-time" style="font-size:0.68rem; color:var(--text-muted); margin-top:3px;">${formatRelativeTime(n.created_at)}</div>
+              </div>
+              ${!n.is_read ? '<span style="width:7px; height:7px; border-radius:50%; background:var(--color-primary); flex-shrink:0; margin-top:5px;"></span>' : ''}
+            </div>
+          `).join('');
+        }
+      }
+    } catch (_) {}
+  }
+
+  async function handleNotificationClick(id, linkUrl) {
+    try {
+      await fetch(`/api/v1/notifications/${id}/read`, { method: 'PUT', credentials: 'include' });
+    } catch (_) {}
+    if (linkUrl && linkUrl.trim()) {
+      window.location.href = linkUrl;
+    } else {
+      fetchNotifications();
+    }
+  }
+
+  async function markAllNotificationsAsRead(e) {
+    if (e) e.stopPropagation();
+    try {
+      await fetch('/api/v1/notifications/mark-all-read', { method: 'PUT', credentials: 'include' });
+      fetchNotifications();
+    } catch (_) {}
+  }
+
+  window.handleNotificationClick = handleNotificationClick;
+  window.markAllNotificationsAsRead = markAllNotificationsAsRead;
+  window.fetchNotifications = fetchNotifications;
 
   function toggleAppsLauncher(e) {
     if (e) e.stopPropagation();
@@ -230,22 +326,20 @@
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
-            <span class="header-bell-badge" id="header-bell-count">3</span>
+            <span class="header-bell-badge" id="header-bell-count" style="display:none;">0</span>
           </button>
 
           <!-- Notifications Dropdown -->
           <div class="header-notifications-dropdown" id="header-notifications-dropdown">
             <div class="notif-dropdown-header">
               <span class="notif-header-title">Notifications</span>
-              <span class="notif-header-badge">3 New</span>
-            </div>
-            <div class="notif-items-list">
-              <div class="notif-item">
-                <div class="notif-item-body">
-                  <div class="notif-item-title">Attendance Matrix Synchronized</div>
-                  <div class="notif-item-sub">ESP32 terminal batch logged 42 scans</div>
-                </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="notif-header-badge" id="notif-header-badge">0 New</span>
+                <button type="button" class="notif-mark-all-btn" onclick="markAllNotificationsAsRead(event)" style="background:transparent; border:none; color:var(--color-primary); font-size:0.75rem; font-weight:600; cursor:pointer;">Mark all read</button>
               </div>
+            </div>
+            <div class="notif-items-list" id="notif-items-list">
+              <div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading notifications...</div>
             </div>
           </div>
 
@@ -323,13 +417,16 @@
   window.mountFacultyHeader = mountFacultyHeader;
 
   const currentTheme = localStorage.getItem('theme') || localStorage.getItem('vidya_theme') || 'light';
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      mountFacultyHeader();
-      updateThemeIcon(currentTheme);
-    });
-  } else {
+  function initHeader() {
     mountFacultyHeader();
     updateThemeIcon(currentTheme);
+    fetchNotifications();
+    setInterval(fetchNotifications, 20000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeader);
+  } else {
+    initHeader();
   }
 })();
