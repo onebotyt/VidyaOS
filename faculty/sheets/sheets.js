@@ -80,6 +80,29 @@ if (typeof window !== 'undefined') {
   window.S = S;
 }
 
+var EXCEL_WB = window.EXCEL_WB = window.EXCEL_WB || {
+  name: 'VidyaOS_Marks_Evaluation.xlsx',
+  activeSheetIndex: 0,
+  sheets: [],
+  selectedRange: { r1: 0, c1: 0, r2: 0, c2: 0 },
+  activeCell: { r: 0, c: 0 },
+  isEditing: false,
+  clipboard: null,
+  undoStack: [],
+  redoStack: [],
+  isFillDragging: false,
+  fillStart: null,
+  fillEnd: null,
+  isSelecting: false,
+  selectStart: null,
+  gridlines: true,
+  formulaBarVisible: true,
+  headersVisible: true,
+  bannerVisible: true,
+  signaturesVisible: false,
+  autoFit: true
+};
+
 function isPracticalCoursework(item) {
   if (!item) return false;
   const t = String(item.type || item.assignment_type || item.category || '').toUpperCase();
@@ -556,7 +579,9 @@ async function onSwitchGroup(newGroupId, force = false) {
   const url = new URL(window.location);
   url.searchParams.set('groupId', S.groupId);
   url.searchParams.delete('view');
-  window.history.pushState({}, '', url);
+  if (!document.getElementById('office-home-screen')) {
+    window.history.pushState({}, '', url);
+  }
 
   await loadGroupMetadata(S.groupId);
   renderGroupSwitcherOptions();
@@ -594,7 +619,7 @@ async function switchSheetTab(sheetName, updateUrl = true) {
   }
   renderSubsheetControls();
 
-  if (updateUrl) {
+  if (updateUrl && !document.getElementById('office-home-screen')) {
     const url = new URL(window.location);
     url.searchParams.set('sheet', sheetName);
     if (S.groupId) url.searchParams.set('id', S.groupId);
@@ -1305,7 +1330,7 @@ function setSheetViewMode(mode, notify = true) {
   }
 }
 
-let touchPinchInitialized = false;
+var touchPinchInitialized = false;
 function setupTouchPinchZoom() {
   if (touchPinchInitialized) return;
   const viewport = document.getElementById('sheets-viewport');
@@ -5783,29 +5808,10 @@ window.closeExcelContextMenu = closeExcelContextMenu;
    EXCEL ENGINE & ADVANCED SPREADSHEET APPLICATION MODULE
    ══════════════════════════════════════════════════════════════ */
 
-const EXCEL_WB = {
-  name: 'VidyaOS_Marks_Evaluation.xlsx',
-  activeSheetIndex: 0,
-  sheets: [],
-  selectedRange: { r1: 0, c1: 0, r2: 0, c2: 0 },
-  activeCell: { r: 0, c: 0 },
-  isEditing: false,
-  clipboard: null,
-  undoStack: [],
-  redoStack: [],
-  isFillDragging: false,
-  fillStart: null,
-  fillEnd: null,
-  isSelecting: false,
-  selectStart: null,
-  gridlines: true,
-  formulaBarVisible: true,
-  headersVisible: true,
-  bannerVisible: true,
-  signaturesVisible: false,
-  autoFit: true
-};
-
+/* EXCEL_WB initialized at top of file */
+if (!EXCEL_WB.name) {
+  EXCEL_WB.name = 'VidyaOS_Marks_Evaluation.xlsx';
+}
 window.EXCEL_WB = EXCEL_WB;
 
 /* ── Coordinate and Cell Helpers ── */
@@ -8876,8 +8882,8 @@ async function exportCurrentSheet(format) {
   toggleExportMenu();
 }
 
-function exportSheetToPdf(sheet) {
-  if (!sheet) return;
+function generateSheetPrintableHtml(sheet) {
+  if (!sheet) return '';
 
   let maxDataCol = 0;
   for (let c = 0; c < sheet.colsCount; c++) {
@@ -8928,9 +8934,22 @@ function exportSheetToPdf(sheet) {
   }
   colGroupHtml += '</colgroup>';
 
-  const instBanner = document.getElementById('hdr-banner-inst')?.textContent?.trim() || 'Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026-27 (Winter Session)';
-  const subjectBanner = document.getElementById('hdr-banner-line2')?.textContent?.trim() || (S.group ? `Internal Evaluation | Subject : ${S.group.name || S.group.subject_name || 'Subject'}` : 'Internal Evaluation');
-  const cohortBanner = document.getElementById('hdr-banner-cohort')?.textContent?.trim() || 'Information Technology | Semester 5';
+  const instBanner = document.getElementById('hdr-banner-inst')?.textContent?.trim() ||
+    (localStorage.getItem('vidyaos_inst_header_banner') || 'Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026-27 (Winter Session)');
+  const grpName = S.group?.name || S.group?.subject_name || 'Subject';
+  const subCode = S.group?.subject_code || '';
+  const grpCode = subCode && !grpName.includes(subCode) ? ` [${subCode}]` : '';
+  const grpDept = S.group?.department_name || 'Information Technology';
+  const grpSem = S.group?.semester || S.group?.current_semester || 5;
+  const sheetKindName = sheet.type === 'tests' ? 'Unit Tests Consolidated Summary' :
+    sheet.type === 'single-test' ? (sheet.name || 'Unit Test') :
+    sheet.type === 'assignments' ? 'Assignments Continuous Evaluation' :
+    sheet.type === 'practicals' ? 'Practicals & Lab Records' : 'Consolidated Internal Evaluation';
+
+  const subjectBanner = document.getElementById('hdr-banner-line2')?.textContent?.trim() ||
+    `Department (${S.group?.department_code || 'IT'}) | ${sheetKindName} | Subject : ${grpName}${grpCode}`;
+  const cohortBanner = document.getElementById('hdr-banner-cohort')?.textContent?.trim() ||
+    `${grpDept} | Semester ${grpSem}`;
 
   const mergeMap = new Map();
   if (Array.isArray(sheet.merges)) {
@@ -8949,7 +8968,8 @@ function exportSheetToPdf(sheet) {
     });
   }
 
-  let tableRowsHtml = '';
+  let theadRowsHtml = '';
+  let tbodyRowsHtml = '';
   for (let r = 0; r <= maxDataRow; r++) {
     let rowHasData = false;
     for (let c = 0; c <= maxDataCol; c++) {
@@ -8964,7 +8984,7 @@ function exportSheetToPdf(sheet) {
     const isHeader = (r === 0);
     const isSubHeader = (r === 1 && !isMarksRow(sheet, 1));
     const isMarks = (r === 1 && isMarksRow(sheet, 1));
-    tableRowsHtml += '<tr>';
+    let rowHtml = '<tr>';
 
     for (let c = 0; c <= maxDataCol; c++) {
       const mInfo = mergeMap.get(`${r},${c}`);
@@ -8983,22 +9003,29 @@ function exportSheetToPdf(sheet) {
       const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8.5pt'));
       const fontFamily = cell.s?.fontFamily ? `font-family:${cell.s.fontFamily};` : '';
 
-      tableRowsHtml += `<td${spanAttrs} style="padding:3px 2px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #94a3b8;font-size:${fontSize};${fontFamily}white-space:pre-wrap;word-break:break-word;overflow:hidden;box-sizing:border-box;">${escapeHtml(val)}</td>`;
+      rowHtml += `<td${spanAttrs} style="padding:2.5px 2px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:0.75pt solid #475569;font-size:${fontSize};${fontFamily}line-height:1.15;white-space:pre-wrap;word-break:break-word;overflow:hidden;box-sizing:border-box;">${escapeHtml(val)}</td>`;
     }
-    tableRowsHtml += '</tr>';
+    rowHtml += '</tr>';
+
+    if (r <= 2) {
+      theadRowsHtml += rowHtml;
+    } else {
+      tbodyRowsHtml += rowHtml;
+    }
   }
 
   const printHtml = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
   <title>${escapeHtml(sheet.name || 'Evaluation_Sheet')} - Print</title>
   <style>
     @page {
       size: A4 landscape;
-      margin: 6mm 4mm;
+      margin: 6mm 5mm 6mm 5mm;
     }
-    body {
+    html, body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
@@ -9007,24 +9034,65 @@ function exportSheetToPdf(sheet) {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+    @media screen {
+      body {
+        background: #e2e8f0;
+        padding: 12px;
+        min-width: 960px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+      }
+      .pdf-sheet-page {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        padding: 12px 14px;
+        width: 100%;
+        max-width: 1080px;
+        box-sizing: border-box;
+      }
+    }
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+      .pdf-sheet-page {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
     .pdf-banner {
       text-align: center;
-      margin-bottom: 6px;
-      border-bottom: 2px solid #0284c7;
-      padding-bottom: 3px;
+      margin-bottom: 5px;
+      border-bottom: 1.5pt solid #0284c7;
+      padding-bottom: 2px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
     .pdf-banner-line1 {
-      font-size: 10pt;
+      font-size: 10.5pt;
       font-weight: 800;
       color: #0369a1;
+      letter-spacing: 0.25px;
+      text-transform: uppercase;
     }
     .pdf-banner-line2 {
       font-size: 8.5pt;
       font-weight: 700;
+      color: #0f172a;
       margin-top: 1px;
     }
     .pdf-banner-line3 {
       font-size: 7.5pt;
+      font-weight: 600;
       color: #475569;
       margin-top: 1px;
     }
@@ -9035,52 +9103,75 @@ function exportSheetToPdf(sheet) {
       table-layout: fixed;
       page-break-inside: auto;
     }
+    thead {
+      display: table-header-group;
+    }
+    tbody {
+      display: table-row-group;
+    }
     tr {
       page-break-inside: avoid;
       page-break-after: auto;
     }
     td, th {
       box-sizing: border-box;
-      padding: 3px 2px;
+      padding: 2.5px 2px;
       overflow: hidden;
       word-break: break-word;
+      border: 0.75pt solid #475569;
+      line-height: 1.15;
     }
     .pdf-signatures {
-      margin-top: 16px;
+      margin-top: 14px;
       display: flex;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 24px;
       font-size: 8pt;
       font-weight: 700;
       page-break-inside: avoid;
+      break-inside: avoid;
     }
     .pdf-sig-block {
       text-align: center;
-      border-top: 1px dashed #64748b;
+      border-top: 1px dashed #475569;
       padding-top: 3px;
       min-width: 120px;
     }
   </style>
 </head>
 <body>
-  <div class="pdf-banner">
-    <div class="pdf-banner-line1">${escapeHtml(instBanner)}</div>
-    <div class="pdf-banner-line2">${escapeHtml(subjectBanner)}</div>
-    <div class="pdf-banner-line3">${escapeHtml(cohortBanner)}</div>
-  </div>
-  <table>
-    ${colGroupHtml}
-    <tbody>
-      ${tableRowsHtml}
-    </tbody>
-  </table>
-  <div class="pdf-signatures">
-    <div class="pdf-sig-block">Subject Teacher</div>
-    <div class="pdf-sig-block">Head of the Department</div>
-    <div class="pdf-sig-block">Principal</div>
+  <div class="pdf-sheet-page">
+    <div class="pdf-banner">
+      <div class="pdf-banner-line1">${escapeHtml(instBanner)}</div>
+      <div class="pdf-banner-line2">${escapeHtml(subjectBanner)}</div>
+      <div class="pdf-banner-line3">${escapeHtml(cohortBanner)}</div>
+    </div>
+    <table>
+      ${colGroupHtml}
+      <thead>
+        ${theadRowsHtml}
+      </thead>
+      <tbody>
+        ${tbodyRowsHtml}
+      </tbody>
+    </table>
+    <div class="pdf-signatures">
+      <div class="pdf-sig-block">Subject Teacher</div>
+      <div class="pdf-sig-block">Head of the Department</div>
+      <div class="pdf-sig-block">Principal</div>
+    </div>
   </div>
 </body>
 </html>`;
+
+  return printHtml;
+}
+window.generateSheetPrintableHtml = generateSheetPrintableHtml;
+
+function exportSheetToPdf(sheet) {
+  if (!sheet) return;
+  const printHtml = generateSheetPrintableHtml(sheet);
+  if (!printHtml) return;
 
   let iframe = document.getElementById('excel-print-iframe');
   if (iframe) iframe.remove();
@@ -11119,25 +11210,26 @@ function renderOfficeSubjectsGrid(filterQuery = '') {
             <span class="office-code-chip">${escapeHtml(grp.subject_code || ('SUB' + grp.id))}</span>
             <span class="office-sem-chip">${escapeHtml(grp.class_name || '')} ${grp.semester ? '• Sem ' + grp.semester : ''}</span>
           </div>
+          <span class="office-card-pdf-pill">A4 PDF</span>
         </div>
         <h3 class="office-subject-name" title="${escapeHtml(grp.subject_name || 'Subject')}">${escapeHtml(grp.subject_name || 'Academic Subject')}</h3>
       </div>
       <div class="office-subject-actions-panel">
-        <div class="office-actions-label">Open Worksheet:</div>
+        <div class="office-actions-label">Open Worksheet (PDF):</div>
         <div class="office-sheet-quick-actions">
-          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'evaluation', this)" title="Consolidated Internal Evaluation">
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'evaluation', this)" title="Consolidated Internal Evaluation (A4 PDF)">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
             <span>Master Evaluation</span>
           </button>
-          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'tests', this)" title="Unit Tests (UT1..UT10)">
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'tests', this)" title="Unit Tests UT1..UT10 (A4 PDF)">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             <span>Class Tests (UT1-10)</span>
           </button>
-          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'assignments', this)" title="Assignments Ledger">
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'assignments', this)" title="Assignments Ledger (A4 PDF)">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            <span>Coursework</span>
+            <span>Assignments</span>
           </button>
-          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'practicals', this)" title="Practicals & Laboratory Records">
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'practicals', this)" title="Practicals & Laboratory Records (A4 PDF)">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.69 19.3A2 2 0 0 0 6.44 22h11.12a2 2 0 0 0 1.75-2.7L14 9.31V2"/></svg>
             <span>Practicals &amp; Labs</span>
           </button>
@@ -11162,8 +11254,9 @@ function filterOfficeSubjects(query) {
 
 function openOfficeHomeScreen() {
   const scr = document.getElementById('office-home-screen');
-  if (!scr) return;
-  scr.style.display = 'flex';
+  const hdr = document.getElementById('faculty-header');
+  if (scr) scr.style.display = 'flex';
+  if (hdr) hdr.classList.add('in-home-view');
   renderOfficeRecentList();
   renderOfficeSubjectsGrid();
   const searchInput = document.getElementById('office-subject-search') || document.getElementById('office-home-search');
@@ -11172,7 +11265,9 @@ function openOfficeHomeScreen() {
 
 function closeOfficeHomeScreen() {
   const scr = document.getElementById('office-home-screen');
+  const hdr = document.getElementById('faculty-header');
   if (scr) scr.style.display = 'none';
+  if (hdr) hdr.classList.remove('in-home-view');
 }
 
 function toggleOfficeHomeScreen() {
@@ -11189,6 +11284,31 @@ async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
   if (clickedEl && clickedEl.classList) {
     clickedEl.classList.add('office-btn-pulse');
   }
+
+  // ── ON MOBILE (<= 768px): LOAD IN-APP PDF VIEWER OR TEST SELECTOR MODAL ──
+  if (window.innerWidth <= 768) {
+    if (sheetKey === 'tests') {
+      if (typeof window.openMobileTestSelectorModal === 'function') {
+        window.openMobileTestSelectorModal(groupId);
+        return;
+      }
+    }
+    if (typeof window.viewSheetOnMobile === 'function') {
+      window.viewSheetOnMobile(groupId, sheetKey);
+      return;
+    }
+  }
+
+  // ── ON DESKTOP FROM INDEX.HTML: CLEANLY REDIRECT TO EDITOR ──
+  if (window.location.pathname.includes('index.html')) {
+    const params = new URLSearchParams();
+    if (groupId) params.set('groupId', groupId);
+    if (sheetKey && sheetKey !== 'blank') params.set('sheet', sheetKey);
+    if (sheetKey === 'blank') params.set('sheet', 'blank');
+    window.location.href = `/faculty/sheets/editor.html?${params.toString()}`;
+    return;
+  }
+
   const sheetNames = {
     evaluation: 'Master Evaluation Sheet',
     tests: 'Class Tests Marksheet',
@@ -11763,3 +11883,8 @@ window.filterOfficeSubjects = filterOfficeSubjects;
 window.openBlankWorkbookFromHome = openBlankWorkbookFromHome;
 window.createNewWorksheetFromHome = createNewWorksheetFromHome;
 window.openSubjectSheetDirect = openSubjectSheetDirect;
+window.EXCEL_WB = EXCEL_WB;
+window.exportSheetToPdf = exportSheetToPdf;
+window.loadGroupMetadata = loadGroupMetadata;
+window.loadSubjectAcademicContext = loadGroupMetadata;
+window.hydrateAcademicSheetsFromGroup = hydrateAcademicSheetsFromGroup;

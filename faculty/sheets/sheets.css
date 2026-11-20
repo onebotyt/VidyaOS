@@ -5534,3 +5534,545 @@ span.excel-hdr-num-badge {
     transform: scale(1) translateY(0);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE OFFICE REDESIGN: SUBJECT CARDS ONLY & IN-VIEW PDF VIEWER
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Clean up top header bar on mobile */
+  #faculty-header.in-home-view .office-hub-top-title,
+  #faculty-header .office-hub-top-title,
+  #faculty-header .header-nav-divider {
+    display: none !important;
+  }
+
+  /* Remove sub text from Office Studio hero card */
+  .office-hero-sub {
+    display: none !important;
+  }
+
+  /* Hide templates section, recent workbooks sidebar, editor launch buttons, and blank sheets */
+  .office-templates-section {
+    display: none !important;
+  }
+
+  .office-recent-sidebar-card {
+    display: none !important;
+  }
+
+  .office-hero-actions button,
+  #btn-office-open-file,
+  #btn-office-open-editor {
+    display: none !important;
+  }
+
+  .office-sheet-btn-blank {
+    display: none !important;
+  }
+
+  .office-hub-layout {
+    display: block !important;
+  }
+
+  .office-subjects-main-pane {
+    width: 100% !important;
+  }
+
+  .office-subjects-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .office-home-screen {
+    padding: 0.5rem 0.65rem 4rem 0.65rem !important;
+  }
+
+  .office-home-container {
+    max-width: 100% !important;
+    gap: 0.75rem !important;
+  }
+
+  .office-hero-section,
+  .office-home-hero {
+    padding: 0.75rem 0.95rem !important;
+    gap: 0.55rem !important;
+    border-radius: var(--radius-lg, 14px) !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .office-hero-title-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .office-search-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    background: var(--bg-surface) !important;
+    border-radius: 10px !important;
+  }
+}
+
+.office-hero-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.office-mobile-pdf-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.16rem 0.55rem;
+  background: hsla(217, 91%, 60%, 0.12);
+  color: var(--color-primary, #2563eb);
+  border: 1px solid hsla(217, 91%, 60%, 0.25);
+  border-radius: 999px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.office-card-pdf-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.45rem;
+  background: hsla(217, 91%, 60%, 0.1);
+  color: var(--color-primary, #2563eb);
+  border: 1px solid hsla(217, 91%, 60%, 0.2);
+  border-radius: 4px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* ── MOBILE TEST SHEET SELECTOR BOTTOM SHEET MODAL ── */
+.mobile-test-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10000 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  animation: officeFadeIn 0.2s ease-out;
+}
+
+.mobile-test-modal-sheet {
+  background: var(--bg-surface, #ffffff);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-bottom: none;
+  max-height: 84vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.2);
+  animation: officeSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.mobile-test-modal-handle {
+  width: 44px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-color, #cbd5e1);
+  margin: 10px auto 4px auto;
+}
+
+.mobile-test-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1.15rem 0.65rem 1.15rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.mobile-test-modal-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+}
+
+.mobile-test-modal-sub {
+  margin: 2px 0 0 0;
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
+}
+
+.mobile-test-modal-close {
+  background: var(--bg-surface-hover, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mobile-test-list-body {
+  padding: 0.75rem 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(84vh - 90px);
+}
+
+.mobile-test-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 10px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  gap: 0.6rem;
+  transition: all 0.15s ease;
+}
+
+.mobile-test-row:active {
+  border-color: var(--color-primary, #2563eb);
+  background: var(--bg-surface-hover, #f8fafc);
+}
+
+.mobile-test-row-main {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.mobile-test-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: var(--chip-faculty-bg, #eff6ff);
+  color: var(--color-primary, #2563eb);
+  font-size: 0.76rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mobile-test-badge.is-all {
+  background: hsl(270 95% 95%);
+  color: hsl(270 80% 50%);
+}
+
+.mobile-test-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mobile-test-name {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-test-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 1px;
+}
+
+.mobile-test-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.mobile-test-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.38rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-main, #0f172a);
+}
+
+.mobile-test-action-btn.btn-view {
+  background: var(--color-primary, #2563eb);
+  color: #ffffff;
+  border-color: var(--color-primary, #2563eb);
+}
+
+.mobile-test-action-btn.btn-dl {
+  padding: 0.38rem 0.5rem;
+  color: var(--color-primary, #2563eb);
+  background: var(--chip-faculty-bg, #eff6ff);
+  border-color: hsla(217, 91%, 60%, 0.2);
+}
+
+/* ── MOBILE IN-APP SHEET VIEWER FULLSCREEN MODAL ── */
+.mobile-sheet-viewer-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 99999 !important;
+  background: #0f172a !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: officeFadeIn 0.2s ease-out;
+}
+
+.mobile-sheet-viewer-header {
+  background: var(--bg-surface, #ffffff);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.85rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.mobile-viewer-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.4rem 0.65rem;
+  background: var(--bg-surface-hover, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mobile-viewer-title-box {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.mobile-viewer-title {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--text-main, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-viewer-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-viewer-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  background: var(--color-primary, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px hsla(217, 91%, 60%, 0.25);
+}
+
+.mobile-viewer-tip-bar {
+  background: #1e293b;
+  color: #cbd5e1;
+  font-size: 0.68rem;
+  padding: 0.35rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.mobile-viewer-tip-bar svg {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.mobile-viewer-frame-wrap {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #cbd5e1;
+  position: relative;
+}
+
+.mobile-viewer-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.mobile-viewer-browser-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.65rem;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.mobile-viewer-browser-btn:active {
+  background: var(--bg-surface-hover, #f1f5f9);
+  border-color: var(--color-primary, #2563eb);
+  color: var(--color-primary, #2563eb);
+}
+
+.mobile-viewer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.85rem;
+  background: #1e293b;
+  color: #cbd5e1;
+  font-size: 0.7rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobile-viewer-zoom-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 0.15rem 0.25rem;
+}
+
+.mobile-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  color: #f8fafc;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.mobile-zoom-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mobile-zoom-val {
+  background: transparent;
+  border: none;
+  color: #38bdf8;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0 0.35rem;
+  cursor: pointer;
+  min-width: 38px;
+  text-align: center;
+}
+
+.mobile-viewer-tip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.65rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-viewer-tip svg {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .mobile-test-modal-sheet {
+  background: var(--bg-surface, #1e293b);
+  border-color: var(--border-color, #334155);
+}
+
+[data-theme="dark"] .mobile-test-row {
+  background: var(--bg-card, #0f172a);
+  border-color: var(--border-color, #334155);
+}
+
+[data-theme="dark"] .mobile-sheet-viewer-header {
+  background: var(--bg-surface, #1e293b);
+  border-color: var(--border-color, #334155);
+}
+
+[data-theme="dark"] .mobile-viewer-back-btn,
+[data-theme="dark"] .mobile-viewer-browser-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+.mobile-viewer-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: #f1f5f9;
+}
+
+@keyframes officeSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
