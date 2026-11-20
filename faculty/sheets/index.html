@@ -193,143 +193,136 @@
       </header>
 
       <!-- ══════════════════════════════════════════════════════════════
-       OFFICE STUDIO EXCEL START / HOME SCREEN (IMAGE 2)
+       OFFICE STUDIO MODERN START / HOME SCREEN & SUBJECTS HUB
        ══════════════════════════════════════════════════════════════ -->
       <div class="office-home-screen" id="office-home-screen" style="display:none;">
-        <!-- Left Classic Excel Green Sidebar: Brand, Recent Workbooks, Open File -->
-        <aside class="office-home-sidebar">
-          <div class="office-home-brand">
-            <div class="office-logo-icon">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <rect width="32" height="32" rx="6" fill="#107c41"/>
-                <path d="M7 7h18v18H7z" fill="#fff" opacity="0.15"/>
-                <path d="M12 11l8 10M20 11l-8 10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="office-brand-meta">
-              <h1 class="office-brand-title">Office Studio</h1>
-              <span class="office-brand-sub">Excel Spreadsheets</span>
-            </div>
-          </div>
+        <div class="office-home-container">
 
-          <!-- Recent Section (Image 2) -->
-          <div class="office-recent-section">
-            <div class="office-section-header">
-              <span class="office-section-title">Recent</span>
+          <!-- Top Hero & Search Bar -->
+          <header class="office-home-hero">
+            <div class="office-hero-brand">
+              <div class="office-hero-icon-pill">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                <span class="office-hero-xls-badge">XLS</span>
+              </div>
+              <div class="office-hero-titles">
+                <h1 class="office-hero-heading">Office Studio</h1>
+                <p class="office-hero-sub">Academic evaluation spreadsheets, marks registers, and coursework documents</p>
+              </div>
             </div>
-            <div class="office-recent-list" id="office-recent-list">
-              <!-- Dynamically populated from localStorage -->
+
+            <div class="office-hero-actions">
+              <div class="office-search-box">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="office-subject-search" placeholder="Search your subjects, classes, or templates..." oninput="filterOfficeSubjects(this.value)">
+              </div>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-office-open-file" onclick="triggerExcelImport()" title="Import XLSX / CSV from device">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>Open File</span>
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" onclick="closeOfficeHomeScreen()" title="Return to active spreadsheet editor">
+                <span>Spreadsheet Editor →</span>
+              </button>
             </div>
-          </div>
+          </header>
 
-          <div class="office-sidebar-footer">
-            <button type="button" class="office-sidebar-action-btn" id="btn-office-open-file" onclick="triggerExcelImport()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span>Open Other Workbooks</span>
-            </button>
-            <button type="button" class="office-sidebar-action-btn" id="btn-office-continue-editor" onclick="closeOfficeHomeScreen()" style="display:none;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-              <span>Return to Active Sheet</span>
-            </button>
-          </div>
-        </aside>
-
-        <!-- Right Main Area: Template Quick Starts & Subject Hub with Sheet Options -->
-        <main class="office-home-content">
-          <!-- Top Search & Quick Actions -->
-          <div class="office-content-topbar">
-            <div class="office-search-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" id="office-subject-search" placeholder="Search your subjects, classes, or templates..." oninput="filterOfficeSubjects(this.value)">
-            </div>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="closeOfficeHomeScreen()" title="Close Home and return to spreadsheet editor">
-              <span>Go to Spreadsheet Editor →</span>
-            </button>
-          </div>
-
-          <!-- Quick Templates Row (Matching Image 2 tiles) -->
-          <div class="office-templates-row">
-            <div class="office-template-card" onclick="createNewWorksheetFromHome()">
-              <div class="template-card-preview blank-grid-preview">
-                <div class="preview-mini-grid">
-                  <div class="mini-cell active-cell"></div>
-                  <div class="mini-cell"></div>
-                  <div class="mini-cell"></div>
-                  <div class="mini-cell"></div>
+          <!-- Quick Templates Bar (Compact VidyaOS Cards) -->
+          <section class="office-templates-section">
+            <div class="office-section-mini-label">QUICK TEMPLATES &amp; NEW WORKBOOKS</div>
+            <div class="office-templates-row">
+              <div class="office-template-card" onclick="createNewWorksheetFromHome()">
+                <div class="template-card-icon-wrap template-icon-blank">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                </div>
+                <div class="template-card-info">
+                  <span class="template-title">Blank Workbook</span>
+                  <span class="template-sub">Clean grid with formulas</span>
                 </div>
               </div>
-              <div class="template-card-footer">
-                <span class="template-title">Blank workbook</span>
-              </div>
-            </div>
 
-            <div class="office-template-card" onclick="openSubjectSheetDirect(null, 0)">
-              <div class="template-card-preview institutional-preview">
-                <div class="preview-header-bar theory-bg">THEORY</div>
-                <div class="preview-header-bar prac-bg">PRACTICAL</div>
+              <div class="office-template-card" onclick="openSubjectSheetDirect(null, 0)">
+                <div class="template-card-icon-wrap template-icon-eval">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                </div>
+                <div class="template-card-info">
+                  <span class="template-title">Master Evaluation</span>
+                  <span class="template-sub">Theory + Practical split</span>
+                </div>
               </div>
-              <div class="template-card-footer">
-                <span class="template-title">Master Evaluation</span>
-                <span class="template-sub">Consolidated (Theory+Practical)</span>
-              </div>
-            </div>
 
-            <div class="office-template-card" onclick="openSubjectSheetDirect(null, 1)">
-              <div class="template-card-preview test-preview">
-                <div class="preview-header-bar ut-bg">UNIT TESTS</div>
-                <span class="preview-badge">UT1..UT10</span>
+              <div class="office-template-card" onclick="openSubjectSheetDirect(null, 1)">
+                <div class="template-card-icon-wrap template-icon-tests">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="template-card-info">
+                  <span class="template-title">Class Test Marksheet</span>
+                  <span class="template-sub">Unit Tests 1..10 roster</span>
+                </div>
               </div>
-              <div class="template-card-footer">
-                <span class="template-title">Class Test Marksheet</span>
-                <span class="template-sub">Unit Tests &amp; Exams</span>
-              </div>
-            </div>
 
-            <div class="office-template-card" onclick="openSubjectSheetDirect(null, 'assignments')">
-              <div class="template-card-preview assign-preview">
-                <div class="preview-header-bar assign-bg">COURSEWORK</div>
-                <span class="preview-badge">Ledger</span>
+              <div class="office-template-card" onclick="openSubjectSheetDirect(null, 'assignments')">
+                <div class="template-card-icon-wrap template-icon-assign">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <div class="template-card-info">
+                  <span class="template-title">Coursework Assignments</span>
+                  <span class="template-sub">Classwork &amp; submissions</span>
+                </div>
               </div>
-              <div class="template-card-footer">
-                <span class="template-title">Assignments Roster</span>
-                <span class="template-sub">Classwork &amp; Submissions</span>
-              </div>
-            </div>
 
-            <div class="office-template-card" onclick="openSubjectSheetDirect(null, 'practicals')">
-              <div class="template-card-preview lab-preview">
-                <div class="preview-header-bar lab-bg">LAB WORK</div>
-                <span class="preview-badge">Viva</span>
-              </div>
-              <div class="template-card-footer">
-                <span class="template-title">Practicals Lab</span>
-                <span class="template-sub">Lab File &amp; Viva Voce</span>
+              <div class="office-template-card" onclick="openSubjectSheetDirect(null, 'practicals')">
+                <div class="template-card-icon-wrap template-icon-prac">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.69 19.3A2 2 0 0 0 6.44 22h11.12a2 2 0 0 0 1.75-2.7L14 9.31V2"/></svg>
+                </div>
+                <div class="template-card-info">
+                  <span class="template-title">Practicals &amp; Labs</span>
+                  <span class="template-sub">Lab record &amp; viva voce</span>
+                </div>
               </div>
             </div>
+          </section>
+
+          <!-- Main Dual Hub: Recent Sheets & Subjects Cards -->
+          <div class="office-hub-layout">
+            <!-- Left: Recent Sheets Column -->
+            <aside class="office-recent-sidebar-card">
+              <div class="office-sidebar-card-header">
+                <div class="sidebar-header-left">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Recent Workbooks</span>
+                </div>
+              </div>
+              <div class="office-recent-list" id="office-recent-list">
+                <!-- Dynamically populated from localStorage -->
+              </div>
+            </aside>
+
+            <!-- Right: Teaching Subjects Grid -->
+            <main class="office-subjects-main-pane">
+              <div class="office-section-header-row">
+                <div class="office-section-title-wrap">
+                  <h2 class="office-section-title">Teaching Subjects &amp; Academic Workbooks</h2>
+                  <p class="office-section-subtitle">Select a subject below to open its pre-configured evaluation register</p>
+                </div>
+                <span class="office-subject-counter" id="office-subject-counter">Loading subjects...</span>
+              </div>
+
+              <div class="office-subjects-grid" id="office-subjects-grid">
+                <!-- Dynamically populated from S.allGroups -->
+              </div>
+            </main>
           </div>
 
-          <!-- Quick Access Boxes for Subjects -->
-          <div class="office-subjects-section">
-            <div class="office-section-header-row">
-              <div class="office-section-title-wrap">
-                <h2 class="office-section-title">Teaching Subjects &amp; Academic Workbooks</h2>
-                <p class="office-section-subtitle">Select any subject below to access its marks evaluation, unit tests, coursework, or practicals.</p>
-              </div>
-              <span class="office-subject-counter" id="office-subject-counter">Loading subjects...</span>
-            </div>
-
-            <div class="office-subjects-grid" id="office-subjects-grid">
-              <!-- Dynamically populated from S.allGroups -->
-            </div>
-          </div>
-        </main>
+        </div>
       </div>
 
       <!-- Studio Main Content Layout -->

@@ -9851,11 +9851,11 @@ function renderOfficeRecentList() {
   const recents = getOfficeRecentWorkbooks();
 
   if (!recents.length) {
-    const sampleRecents = (S.allGroups || []).slice(0, 4).map(grp => ({
+    const sampleRecents = (S.allGroups || []).slice(0, 5).map(grp => ({
       title: `${grp.subject_code || 'SUB'} - ${grp.subject_name || 'Evaluation'}`,
       sheetKey: 'evaluation',
       groupId: grp.id,
-      path: `Faculty > Office Studio > ${grp.class_name || 'Semester'}`,
+      path: `${grp.class_name || 'Academic Class'} ${grp.semester ? '• Sem ' + grp.semester : ''}`,
       timestamp: Date.now() - 3600000
     }));
     if (sampleRecents.length) {
@@ -9864,21 +9864,25 @@ function renderOfficeRecentList() {
   }
 
   if (!recents.length) {
-    listEl.innerHTML = `<div style="padding: 1rem 0; font-size: 0.82rem; opacity: 0.7;">No recent workbooks found. Select a subject to get started.</div>`;
+    listEl.innerHTML = `<div class="office-recent-empty">No recent sheets. Select a subject to get started.</div>`;
     return;
   }
 
   listEl.innerHTML = recents.map(item => `
     <div class="office-recent-item" onclick="selectSubjectAndSheet(${item.groupId}, '${item.sheetKey}')" title="${escapeHtml(item.title)}">
-      <div class="office-recent-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 4h7v5h5v11H6V4zm2 8h8v2H8v-2zm0 4h8v2H8v-2z"/>
+      <div class="recent-icon-wrap">
+        <svg class="recent-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
         </svg>
       </div>
-      <div class="office-recent-meta">
-        <div class="office-recent-name">${escapeHtml(item.title)}</div>
-        <div class="office-recent-path">${escapeHtml(item.path || 'VidyaOS > Office Studio')}</div>
+      <div class="recent-item-meta">
+        <span class="recent-item-name">${escapeHtml(item.title)}</span>
+        <span class="recent-item-sub">${escapeHtml(item.path || 'VidyaOS > Office Studio')}</span>
       </div>
+      <svg class="recent-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
     </div>
   `).join('');
 }
@@ -9894,52 +9898,53 @@ function renderOfficeSubjectsGrid(filterQuery = '') {
     return hay.includes(query);
   });
 
+  const counterEl = document.getElementById('office-subject-counter');
+  if (counterEl) {
+    counterEl.textContent = `${groups.length} ${groups.length === 1 ? 'Subject' : 'Subjects'} Active`;
+  }
+
   if (!groups.length) {
-    gridEl.innerHTML = `<div style="grid-column: 1 / -1; padding: 2.5rem; text-align: center; color: var(--text-muted); background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: 8px;">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.5rem; opacity: 0.6;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <div style="font-weight: 600; font-size: 0.95rem;">No subjects matching "${escapeHtml(filterQuery)}"</div>
-      <div style="font-size: 0.8rem; margin-top: 0.25rem;">Try searching by subject name, code, or class.</div>
+    gridEl.innerHTML = `<div class="office-empty-subjects">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <div class="empty-title">No subjects found matching "${escapeHtml(filterQuery)}"</div>
+      <div class="empty-sub">Try searching by subject name, code, or class.</div>
     </div>`;
     return;
   }
 
   gridEl.innerHTML = groups.map(grp => `
     <div class="office-subject-card" data-group-id="${grp.id}">
-      <div class="office-subject-header">
-        <div class="office-subject-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-          </svg>
+      <div class="office-subject-card-top">
+        <div class="office-subject-badges">
+          <span class="office-code-chip">${escapeHtml(grp.subject_code || ('SUB' + grp.id))}</span>
+          <span class="office-sem-chip">${escapeHtml(grp.class_name || '')} ${grp.semester ? '• Sem ' + grp.semester : ''}</span>
         </div>
-        <div class="office-subject-meta">
-          <span class="office-subject-code">${escapeHtml(grp.subject_code || ('SUB' + grp.id))}</span>
-          <h3 class="office-subject-title">${escapeHtml(grp.subject_name || 'Academic Subject')}</h3>
-          <span class="office-subject-dept">${escapeHtml(grp.class_name || '')} ${grp.semester ? '• Semester ' + grp.semester : ''}</span>
-        </div>
+        <h3 class="office-subject-name" title="${escapeHtml(grp.subject_name || 'Subject')}">${escapeHtml(grp.subject_name || 'Academic Subject')}</h3>
       </div>
-      <div class="office-subject-body">
-        <div class="office-subject-badge">Select a Worksheet to Open:</div>
+      <div class="office-subject-actions-panel">
+        <div class="office-actions-label">Open Worksheet:</div>
         <div class="office-sheet-quick-actions">
-          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'evaluation')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-            Master Evaluation Sheet
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'evaluation')" title="Consolidated Internal Evaluation">
+            <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <span>Master Evaluation</span>
           </button>
-          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'tests')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            Class Test Marksheets (UT1-UT10)
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'tests')" title="Unit Tests (UT1..UT10)">
+            <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Class Tests (UT1-10)</span>
           </button>
-          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'assignments')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            Coursework & Assignments
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'assignments')" title="Assignments Ledger">
+            <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <span>Coursework</span>
           </button>
-          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'practicals')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.69 19.3A2 2 0 0 0 6.44 22h11.12a2 2 0 0 0 1.75-2.7L14 9.31V2"/></svg>
-            Practicals & Lab Records
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'practicals')" title="Practicals & Laboratory Records">
+            <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.69 19.3A2 2 0 0 0 6.44 22h11.12a2 2 0 0 0 1.75-2.7L14 9.31V2"/></svg>
+            <span>Practicals &amp; Labs</span>
           </button>
-          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'blank')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New Blank Worksheet
+          <button type="button" class="office-sheet-btn office-sheet-btn-blank" onclick="selectSubjectAndSheet(${grp.id}, 'blank')" title="New Blank Worksheet">
+            <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>+ Blank Sheet</span>
           </button>
         </div>
       </div>
