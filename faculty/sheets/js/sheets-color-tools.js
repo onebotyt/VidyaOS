@@ -2,6 +2,11 @@
    EXCEL STUDIO: COLOR FORMATTING, PALETTES & COLOR TEMPLATES SUITE
    ══════════════════════════════════════════════════════════════ */
 
+function isPopupOpen(popup) {
+  if (!popup) return false;
+  return popup.classList.contains('is-open') || popup.style.display === 'flex';
+}
+
 function positionFloatingDropdown(popup, button) {
   if (!popup) return;
 
@@ -10,6 +15,11 @@ function positionFloatingDropdown(popup, button) {
     document.body.appendChild(popup);
   }
 
+  // Make popup active and layoutable to reliably measure dimensions
+  popup.classList.add('is-open');
+  popup.style.setProperty('display', 'flex', 'important');
+  popup.style.setProperty('visibility', 'hidden', 'important');
+
   const rect = button && typeof button.getBoundingClientRect === 'function' ? button.getBoundingClientRect() : null;
   const popupW = popup.offsetWidth || 340;
   const popupH = popup.offsetHeight || 380;
@@ -17,8 +27,8 @@ function positionFloatingDropdown(popup, button) {
   let leftPos = 10;
   let topPos = 108;
 
-  if (rect && (rect.width > 0 || rect.height > 0) && (rect.left > 0 || rect.top > 0)) {
-    // Dynamically align left with trigger button, bounding strictly inside window viewport
+  if (rect && (rect.width > 0 || rect.height > 0)) {
+    // Align left with trigger button, bounding strictly inside window viewport
     leftPos = rect.left;
     if (leftPos + popupW > window.innerWidth - 16) {
       leftPos = Math.max(10, window.innerWidth - popupW - 16);
@@ -45,121 +55,80 @@ function positionFloatingDropdown(popup, button) {
   popup.style.setProperty('left', `${leftPos}px`, 'important');
   popup.style.setProperty('overflow-y', 'auto', 'important');
   popup.style.setProperty('z-index', '99999999', 'important');
+  popup.style.removeProperty('visibility');
 
-  // Ensure scroll is reset to very top so header and top cards are fully visible
+  // Reset scroll to top
   popup.scrollTop = 0;
-  requestAnimationFrame(() => {
-    if (popup) popup.scrollTop = 0;
-  });
-}
-
-function toggleColorPalette(type, event) {
-  if (event) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  const fillPalette = document.getElementById('palette-fill-color');
-  const fontPalette = document.getElementById('palette-font-color');
-  const condMenu = document.getElementById('excel-conditional-menu');
-  const templMenu = document.getElementById('excel-templates-menu');
-
-  if (condMenu) condMenu.style.display = 'none';
-  if (templMenu) templMenu.style.display = 'none';
-
-  if (type === 'fill') {
-    if (fontPalette) fontPalette.style.display = 'none';
-    if (fillPalette) {
-      const isVisible = fillPalette.style.display === 'flex';
-      if (isVisible) {
-        fillPalette.style.display = 'none';
-      } else {
-        const triggerBtn = (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-fill-color-picker');
-        fillPalette.style.display = 'flex';
-        positionFloatingDropdown(fillPalette, triggerBtn);
-      }
-    }
-  } else if (type === 'font') {
-    if (fillPalette) fillPalette.style.display = 'none';
-    if (fontPalette) {
-      const isVisible = fontPalette.style.display === 'flex';
-      if (isVisible) {
-        fontPalette.style.display = 'none';
-      } else {
-        const triggerBtn = (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-font-color-picker');
-        fontPalette.style.display = 'flex';
-        positionFloatingDropdown(fontPalette, triggerBtn);
-      }
-    }
-  }
-}
-
-function toggleConditionalFormattingMenu(event) {
-  if (event) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  const fillPalette = document.getElementById('palette-fill-color');
-  const fontPalette = document.getElementById('palette-font-color');
-  const condMenu = document.getElementById('excel-conditional-menu');
-  const templMenu = document.getElementById('excel-templates-menu');
-
-  if (fillPalette) fillPalette.style.display = 'none';
-  if (fontPalette) fontPalette.style.display = 'none';
-  if (templMenu) templMenu.style.display = 'none';
-
-  if (condMenu) {
-    const isVisible = condMenu.style.display === 'flex';
-    if (isVisible) {
-      condMenu.style.display = 'none';
-    } else {
-      const triggerBtn = (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-conditional-formatting');
-      condMenu.style.display = 'flex';
-      positionFloatingDropdown(condMenu, triggerBtn);
-    }
-  }
-}
-
-function toggleColorTemplatesMenu(event) {
-  if (event) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  const fillPalette = document.getElementById('palette-fill-color');
-  const fontPalette = document.getElementById('palette-font-color');
-  const condMenu = document.getElementById('excel-conditional-menu');
-  const templMenu = document.getElementById('excel-templates-menu');
-
-  if (fillPalette) fillPalette.style.display = 'none';
-  if (fontPalette) fontPalette.style.display = 'none';
-  if (condMenu) condMenu.style.display = 'none';
-
-  if (templMenu) {
-    const isVisible = templMenu.style.display === 'flex';
-    if (isVisible) {
-      templMenu.style.display = 'none';
-    } else {
-      const triggerBtn = (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-color-templates');
-      templMenu.style.display = 'flex';
-      positionFloatingDropdown(templMenu, triggerBtn);
-    }
-  }
 }
 
 function closeAllColorPalettes() {
-  const fillPalette = document.getElementById('palette-fill-color');
-  const fontPalette = document.getElementById('palette-font-color');
-  const condMenu = document.getElementById('excel-conditional-menu');
-  const templMenu = document.getElementById('excel-templates-menu');
-  if (fillPalette) fillPalette.style.display = 'none';
-  if (fontPalette) fontPalette.style.display = 'none';
-  if (condMenu) condMenu.style.display = 'none';
-  if (templMenu) templMenu.style.display = 'none';
+  const ids = ['palette-fill-color', 'palette-font-color', 'excel-conditional-menu', 'excel-templates-menu'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.remove('is-open');
+      el.style.setProperty('display', 'none', 'important');
+    }
+  });
 }
 
-// Close color palettes on outside click or window resize/scroll
+function toggleColorPalette(type, event, btnEl) {
+  if (event) {
+    if (typeof event.stopPropagation === 'function') event.stopPropagation();
+    if (typeof event.preventDefault === 'function') event.preventDefault();
+  }
+
+  const targetId = type === 'fill' ? 'palette-fill-color' : 'palette-font-color';
+  const targetMenu = document.getElementById(targetId);
+  if (!targetMenu) return;
+
+  const wasOpen = isPopupOpen(targetMenu);
+  closeAllColorPalettes();
+
+  if (!wasOpen) {
+    const defaultBtnId = type === 'fill' ? 'btn-fill-color-picker' : 'btn-font-color-picker';
+    const triggerBtn = btnEl || (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById(defaultBtnId);
+    positionFloatingDropdown(targetMenu, triggerBtn);
+  }
+}
+
+function toggleConditionalFormattingMenu(event, btnEl) {
+  if (event) {
+    if (typeof event.stopPropagation === 'function') event.stopPropagation();
+    if (typeof event.preventDefault === 'function') event.preventDefault();
+  }
+
+  const condMenu = document.getElementById('excel-conditional-menu');
+  if (!condMenu) return;
+
+  const wasOpen = isPopupOpen(condMenu);
+  closeAllColorPalettes();
+
+  if (!wasOpen) {
+    const triggerBtn = btnEl || (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-conditional-formatting');
+    positionFloatingDropdown(condMenu, triggerBtn);
+  }
+}
+
+function toggleColorTemplatesMenu(event, btnEl) {
+  if (event) {
+    if (typeof event.stopPropagation === 'function') event.stopPropagation();
+    if (typeof event.preventDefault === 'function') event.preventDefault();
+  }
+
+  const templMenu = document.getElementById('excel-templates-menu');
+  if (!templMenu) return;
+
+  const wasOpen = isPopupOpen(templMenu);
+  closeAllColorPalettes();
+
+  if (!wasOpen) {
+    const triggerBtn = btnEl || (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-color-templates');
+    positionFloatingDropdown(templMenu, triggerBtn);
+  }
+}
+
+// Close color palettes on outside click, window resize or Escape key
 document.addEventListener('click', (e) => {
   if (
     !e.target.closest('.excel-color-btn-wrapper') &&
@@ -174,6 +143,12 @@ document.addEventListener('click', (e) => {
 });
 
 window.addEventListener('resize', closeAllColorPalettes);
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAllColorPalettes();
+  }
+});
 
 function selectFillColor(color) {
   closeAllColorPalettes();

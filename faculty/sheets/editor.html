@@ -17,11 +17,11 @@
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261029">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
 
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-loading.css?v=20261120_v7">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-color-tools.css?v=20261120_v7">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-grid.css?v=20261120_v7">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-ribbon.css?v=20261120_v7">
-  <link rel="stylesheet" href="/faculty/sheets/sheets.css?v=20261120_v7">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-loading.css?v=20261120_v8">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-color-tools.css?v=20261120_v8">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-grid.css?v=20261120_v8">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-ribbon.css?v=20261120_v8">
+  <link rel="stylesheet" href="/faculty/sheets/sheets.css?v=20261120_v8">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -482,7 +482,7 @@
                     <!-- Color Pickers with Multi-Option Palette Popups (Excel Standard & Theme Matrix) -->
                     <div class="excel-color-btn-wrapper" style="position: relative; display: inline-flex;">
                       <button type="button" class="excel-icon-btn" id="btn-fill-color-picker"
-                        onclick="toggleColorPalette('fill', event)" title="Fill Color (Background)">
+                        onclick="toggleColorPalette('fill', event, this)" title="Fill Color (Background)">
                         <span class="excel-color-indicator fill" id="indicator-fill-color">
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -498,7 +498,7 @@
 
                     <div class="excel-color-btn-wrapper" style="position: relative; display: inline-flex;">
                       <button type="button" class="excel-icon-btn" id="btn-font-color-picker"
-                        onclick="toggleColorPalette('font', event)" title="Font Color (Text)">
+                        onclick="toggleColorPalette('font', event, this)" title="Font Color (Text)">
                         <span class="excel-color-indicator font" id="indicator-font-color">
                           <strong>A</strong>
                           <span class="color-bar" id="font-color-bar" style="background: #0f172a;"></span>
@@ -681,7 +681,7 @@
                 <div class="excel-tool-group excel-styles-group">
                   <div class="excel-tool-row">
                     <button type="button" class="excel-tool-btn" id="btn-conditional-formatting"
-                      onclick="toggleConditionalFormattingMenu(event)" title="Excel Conditional Formatting & Color Scales">
+                      onclick="toggleConditionalFormattingMenu(event, this)" title="Excel Conditional Formatting & Color Scales">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7"></rect>
                         <rect x="14" y="3" width="7" height="7"></rect>
@@ -693,7 +693,7 @@
 
                     <!-- Color Templates / Table Styles (Non-Conditional) -->
                     <button type="button" class="excel-tool-btn" id="btn-color-templates"
-                      onclick="toggleColorTemplatesMenu(event)" title="Sheet Color Templates & Table Themes">
+                      onclick="toggleColorTemplatesMenu(event, this)" title="Sheet Color Templates & Table Themes">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
                       </svg>
@@ -2912,11 +2912,11 @@
     <script src="/faculty/components/header/header.js?v=20261029"></script>
     <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
     <!-- Office Studio Modular Architecture: Lightweight Initial Hub & Loading Overlay (< 35 KB) -->
-    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_v7"></script>
-    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_v7"></script>
-    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v7"></script>
+    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_v8"></script>
+    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_v8"></script>
+    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v8"></script>
     <script src="/faculty/components/core/exceljs.min.js"></script>
-    <script src="/faculty/sheets/sheets.js?v=20261120_v7"></script>
+    <script src="/faculty/sheets/sheets.js?v=20261120_v8"></script>
 </body>
 
 </html>

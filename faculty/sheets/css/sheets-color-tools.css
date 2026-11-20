@@ -37,11 +37,15 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
   box-shadow: 0 16px 48px hsla(220, 30%, 8%, 0.28), 0 2px 6px hsla(220, 20%, 10%, 0.12);
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 0.45rem;
   animation: officeFadeIn 0.12s ease-out;
   user-select: none;
+}
+
+.excel-color-palette-popup.is-open {
+  display: flex !important;
 }
 
 .excel-palette-no-color-btn {
@@ -177,11 +181,15 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
   box-shadow: 0 18px 48px hsla(220, 30%, 8%, 0.28), 0 2px 6px hsla(220, 20%, 10%, 0.12);
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 0.25rem;
   animation: officeFadeIn 0.12s ease-out;
   user-select: none;
+}
+
+.excel-conditional-dropdown.is-open {
+  display: flex !important;
 }
 
 .cond-menu-header {
@@ -310,13 +318,17 @@
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-md, 8px) !important;
   box-shadow: 0 20px 50px hsla(220, 30%, 8%, 0.35), 0 4px 12px hsla(220, 20%, 10%, 0.18) !important;
-  display: flex !important;
+  display: none;
   flex-direction: column !important;
   gap: 0.45rem !important;
   animation: officeFadeIn 0.12s ease-out !important;
   user-select: none !important;
   box-sizing: border-box !important;
   overflow-y: auto !important;
+}
+
+.excel-templates-dropdown.is-open {
+  display: flex !important;
 }
 
 .excel-templates-dropdown::-webkit-scrollbar,
