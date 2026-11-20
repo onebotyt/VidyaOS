@@ -239,29 +239,28 @@
     </div>
   </div>
 
-  <!-- Modal: Student Dossier / View Details (Ultra-Compact Modern Profile Card) -->
+  <!-- Unified Modal: Student Profile (View & Edit in a Single Seamless Modal) -->
   <div id="modal-student-details" class="stu-modal-backdrop" style="display: none;"
     onclick="if(event.target===this)closeStudentDetailsModal()">
-    <div class="stu-modal-card stu-edit-modal-card">
+    <div class="stu-modal-card stu-edit-modal-card" id="stu-profile-card">
       <div class="stu-modal-header stu-edit-header">
-        <h2 class="stu-edit-title">Student Profile: <span id="detail-stu-name">Student</span></h2>
-        <button type="button" class="btn-modal-close" onclick="closeStudentDetailsModal()"
-          title="Close details">&times;</button>
+        <h2 class="stu-edit-title">
+          <span id="detail-modal-mode-prefix">Student Profile:</span> <span id="detail-stu-name">Student</span>
+        </h2>
+        <button type="button" class="btn-modal-close" onclick="closeStudentDetailsModal()" title="Close details">&times;</button>
       </div>
 
       <!-- Navigation Tabs -->
       <div class="stu-modal-tabs" id="detail-modal-tabs">
-        <button type="button" class="stu-modal-tab active" data-tab="profile"
-          onclick="switchDetailTab('profile')">Profile Info</button>
-        <button type="button" class="stu-modal-tab" data-tab="academic" onclick="switchDetailTab('academic')">Academic
-          Record</button>
-        <button type="button" class="stu-modal-tab" data-tab="attendance"
-          onclick="switchDetailTab('attendance')">Attendance</button>
-        <button type="button" class="stu-modal-tab" data-tab="contact" onclick="switchDetailTab('contact')">Contact
-          &amp; Status</button>
+        <button type="button" class="stu-modal-tab active" data-tab="profile" onclick="switchDetailTab('profile')">Profile Info</button>
+        <button type="button" class="stu-modal-tab" data-tab="academic" onclick="switchDetailTab('academic')">Academic Record</button>
+        <button type="button" class="stu-modal-tab" data-tab="attendance" onclick="switchDetailTab('attendance')">Attendance</button>
+        <button type="button" class="stu-modal-tab" data-tab="contact" onclick="switchDetailTab('contact')">Contact &amp; Status</button>
       </div>
 
-      <div class="stu-edit-form">
+      <form id="form-edit-student" onsubmit="submitEditStudent(event)" class="stu-edit-form">
+        <input type="hidden" id="edit-stu-id" value="">
+
         <!-- Tab Panel 1: Profile Info -->
         <div id="detail-tab-profile" class="stu-tab-panel active">
           <!-- Top Row: Photo on Left, Name & IDs on Right -->
@@ -274,22 +273,41 @@
             </div>
 
             <div class="stu-edit-main-col">
-              <!-- Name Display -->
+              <!-- Name Display / Input -->
               <div>
-                <label class="stu-compact-label">Name</label>
-                <div id="detail-stu-display-name" class="stu-compact-display-val">—</div>
+                <label for="edit-stu-name" class="stu-compact-label">
+                  Name <span class="stu-edit-indicator" style="display:none; color:var(--status-absent);">*</span>
+                </label>
+                <div id="detail-stu-display-name" class="stu-compact-display-val stu-view-mode">—</div>
+                <input type="text" id="edit-stu-name" required placeholder="Full Name" class="stu-compact-input stu-edit-mode" style="display:none;">
               </div>
 
               <!-- Dual Field: Enrollment & UBTER Reg. # -->
               <div class="stu-edit-dual-row">
                 <div>
-                  <label class="stu-compact-label">Enrollment #</label>
-                  <div id="detail-stu-enroll" class="stu-compact-display-val stu-mono-input">—</div>
+                  <div class="stu-compact-label-row">
+                    <label for="edit-stu-enroll" class="stu-compact-label" style="margin:0;">
+                      Enrollment # <span id="edit-stu-enroll-req" class="stu-edit-mode" style="display:none; color:var(--status-absent);">*</span>
+                    </label>
+                    <label class="chk-enroll-box stu-compact-chk stu-edit-mode" id="edit-chk-enroll-box" style="display:none;" title="Enrollment number not available">
+                      <input type="checkbox" id="edit-chk-enroll-not-available">
+                      <span>Not Avail.</span>
+                    </label>
+                  </div>
+                  <div id="detail-stu-enroll" class="stu-compact-display-val stu-mono-input stu-view-mode">—</div>
+                  <div class="stu-edit-mode" style="display:none;">
+                    <input type="text" id="edit-stu-enroll" placeholder="11-digit numeric" maxlength="11" autocomplete="off" class="stu-compact-input stu-mono-input">
+                    <p class="inp-hint" id="edit-stu-enroll-hint" style="display:none;">Enter exactly 11 numeric digits.</p>
+                    <p class="inp-error" id="edit-stu-enroll-error" style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;"></p>
+                  </div>
                 </div>
 
                 <div>
-                  <label class="stu-compact-label">UBTER Reg. #</label>
-                  <div id="detail-stu-reg" class="stu-compact-display-val stu-mono-input uppercase">—</div>
+                  <label for="edit-stu-reg" class="stu-compact-label">
+                    UBTER Reg. # <span class="stu-edit-mode" style="display:none; font-weight:normal; color:var(--text-muted);">(optional)</span>
+                  </label>
+                  <div id="detail-stu-reg" class="stu-compact-display-val stu-mono-input uppercase stu-view-mode">—</div>
+                  <input type="text" id="edit-stu-reg" placeholder="e.g. 24101054001" autocomplete="off" class="stu-compact-input stu-mono-input uppercase stu-edit-mode" style="display:none;">
                 </div>
               </div>
             </div>
@@ -298,18 +316,39 @@
           <!-- Bottom Row: Program, Roll #, Status -->
           <div class="stu-edit-bottom-row">
             <div>
-              <label class="stu-compact-label">Program</label>
-              <div id="detail-stu-cohort" class="stu-compact-display-val">Sem 1 (Year 1)</div>
+              <label for="edit-stu-sem" class="stu-compact-label">
+                Program <span class="stu-edit-mode" style="display:none; color:var(--status-absent);">*</span>
+              </label>
+              <div id="detail-stu-cohort" class="stu-compact-display-val stu-view-mode">Sem 1 (Year 1)</div>
+              <select id="edit-stu-sem" required class="stu-compact-input stu-compact-select stu-edit-mode" style="display:none;">
+                <option value="1">Sem 1 (Year 1)</option>
+                <option value="2">Sem 2 (Year 1)</option>
+                <option value="3">Sem 3 (Year 2)</option>
+                <option value="4">Sem 4 (Year 2)</option>
+                <option value="5">Sem 5 (Year 3)</option>
+                <option value="6">Sem 6 (Year 3)</option>
+              </select>
             </div>
 
             <div>
-              <label class="stu-compact-label">Roll #</label>
-              <div id="detail-stu-roll" class="stu-compact-display-val stu-mono-input">—</div>
+              <label for="edit-stu-roll" class="stu-compact-label">
+                Roll # <span class="stu-edit-mode" style="display:none; font-weight:normal; color:var(--text-muted);">(max 2)</span>
+              </label>
+              <div id="detail-stu-roll" class="stu-compact-display-val stu-mono-input stu-view-mode">—</div>
+              <div class="stu-edit-mode" style="display:none;">
+                <input type="text" id="edit-stu-roll" placeholder="01" maxlength="2" autocomplete="off" class="stu-compact-input stu-mono-input">
+                <p class="inp-error" id="edit-stu-roll-error" style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;"></p>
+              </div>
             </div>
 
             <div>
-              <label class="stu-compact-label">Status</label>
-              <div id="detail-stu-status-badge" class="stu-compact-display-val enrolled">Enrolled</div>
+              <label for="edit-stu-status" class="stu-compact-label">Status</label>
+              <div id="detail-stu-status-badge" class="stu-compact-display-val enrolled stu-view-mode">Enrolled</div>
+              <select id="edit-stu-status" class="stu-compact-input stu-compact-select stu-edit-mode" style="display:none;">
+                <option value="Active">Active</option>
+                <option value="Transferred">Transferred</option>
+                <option value="Withdrawn">Withdrawn</option>
+              </select>
             </div>
           </div>
         </div>
@@ -341,8 +380,7 @@
           <div class="stu-compact-tab-info">
             <div class="stu-compact-info-tile">
               <span class="info-label">Attendance Standing</span>
-              <span class="info-val" id="detail-stu-att"
-                style="color:var(--color-primary); font-weight:800;">100%</span>
+              <span class="info-val" id="detail-stu-att" style="color:var(--color-primary); font-weight:800;">100%</span>
             </div>
             <div class="stu-compact-info-tile">
               <span class="info-label">Threshold Requirement</span>
@@ -381,199 +419,27 @@
           </div>
         </div>
 
-        <!-- Footer Actions (Grouped & Responsive) -->
-        <div class="stu-details-footer stu-edit-details-footer">
+        <div id="edit-stu-alert" style="display:none; padding:0.4rem 0.65rem; border-radius:6px; font-size:0.74rem; font-weight:600;"></div>
+
+        <!-- Footer: View Mode Actions (Grouped & Responsive) -->
+        <div class="stu-details-footer stu-edit-details-footer" id="stu-footer-view">
           <div class="stu-footer-secondary">
-            <button type="button" class="btn-stu-compact danger" id="detail-btn-delete" onclick="detailDeleteStudent()"
-              title="Remove student from roster">Remove Student</button>
-            <button type="button" class="btn-stu-outline" onclick="detailResetPassword()"
-              title="Reset student password">Reset Password</button>
+            <button type="button" class="btn-stu-compact danger" id="detail-btn-delete"
+              onclick="detailDeleteStudent()" title="Remove student from roster">Remove Student</button>
+            <button type="button" class="btn-stu-outline" onclick="detailResetPassword()" title="Reset student password">Reset Password</button>
           </div>
           <div class="stu-footer-primary">
             <button type="button" class="btn-stu-outline" onclick="closeStudentDetailsModal()">Close</button>
-            <button type="button" class="btn-stu-outline" id="detail-btn-transfer"
-              onclick="detailTransferStudent()">Transfer</button>
-            <button type="button" class="btn-stu-outline" id="detail-btn-withdraw"
-              onclick="detailWithdrawStudent()">Withdraw</button>
-            <button type="button" class="btn-stu-compact" id="detail-btn-reactivate" style="display:none;"
-              onclick="detailReactivateStudent()">Re-Activate</button>
-            <button type="button" class="btn-stu-compact" id="detail-btn-edit" onclick="detailEditStudent()">Edit
-              Student</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal: Edit Student Details (Ultra-Compact Modern Profile Editor) -->
-  <div id="modal-edit-student" class="stu-modal-backdrop" style="display:none;"
-    onclick="if(event.target===this)closeEditStudentModal()">
-    <div class="stu-modal-card stu-edit-modal-card">
-      <div class="stu-modal-header stu-edit-header">
-        <h2 class="stu-edit-title">Edit Student Profile: <span id="edit-stu-title-name">Student</span></h2>
-        <button type="button" class="btn-modal-close" onclick="closeEditStudentModal()" title="Close">&times;</button>
-      </div>
-
-      <!-- Navigation Tabs -->
-      <div class="stu-modal-tabs">
-        <button type="button" class="stu-modal-tab active" data-tab="profile" onclick="switchEditTab('profile')">Profile
-          Info</button>
-        <button type="button" class="stu-modal-tab" data-tab="academic" onclick="switchEditTab('academic')">Academic
-          Record</button>
-        <button type="button" class="stu-modal-tab" data-tab="attendance"
-          onclick="switchEditTab('attendance')">Attendance</button>
-        <button type="button" class="stu-modal-tab" data-tab="status" onclick="switchEditTab('status')">Status</button>
-      </div>
-
-      <form id="form-edit-student" onsubmit="submitEditStudent(event)" class="stu-edit-form">
-        <input type="hidden" id="edit-stu-id" value="">
-
-        <!-- Tab Panel 1: Profile Info -->
-        <div id="edit-tab-profile" class="stu-tab-panel active">
-          <!-- Top Row: Photo on Left, Name & IDs on Right -->
-          <div class="stu-edit-top-grid">
-            <div class="stu-edit-photo-col">
-              <label class="stu-compact-label">Photo</label>
-              <div class="stu-edit-photo-box" id="edit-stu-photo-box">
-                <div class="stu-modal-avatar stu-edit-avatar-img" id="edit-stu-avatar">ST</div>
-              </div>
-            </div>
-
-            <div class="stu-edit-main-col">
-              <!-- Name Input -->
-              <div>
-                <label for="edit-stu-name" class="stu-compact-label">
-                  Name <span style="color:var(--status-absent);">*</span>
-                </label>
-                <input type="text" id="edit-stu-name" required placeholder="Full Name" class="stu-compact-input">
-              </div>
-
-              <!-- Dual Input: Official Enrollment & UBTER Reg. # -->
-              <div class="stu-edit-dual-row">
-                <div>
-                  <div class="stu-compact-label-row">
-                    <label for="edit-stu-enroll" class="stu-compact-label">
-                      Enrollment # <span id="edit-stu-enroll-req" style="color:var(--status-absent);">*</span>
-                    </label>
-                    <label class="chk-enroll-box stu-compact-chk" title="Enrollment number not available">
-                      <input type="checkbox" id="edit-chk-enroll-not-available">
-                      <span>Not Avail.</span>
-                    </label>
-                  </div>
-                  <input type="text" id="edit-stu-enroll" placeholder="11-digit numeric" maxlength="11"
-                    autocomplete="off" class="stu-compact-input stu-mono-input">
-                  <p class="inp-hint" id="edit-stu-enroll-hint" style="display:none;">Enter exactly 11 numeric digits.
-                  </p>
-                  <p class="inp-error" id="edit-stu-enroll-error"
-                    style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;">
-                  </p>
-                </div>
-
-                <div>
-                  <label for="edit-stu-reg" class="stu-compact-label">
-                    UBTER Reg. # <span style="font-weight:normal; color:var(--text-muted);">(optional)</span>
-                  </label>
-                  <input type="text" id="edit-stu-reg" placeholder="e.g. 24101054001" autocomplete="off"
-                    class="stu-compact-input stu-mono-input uppercase">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Row: Program, Roll #, Status -->
-          <div class="stu-edit-bottom-row">
-            <div>
-              <label for="edit-stu-sem" class="stu-compact-label">
-                Program <span style="color:var(--status-absent);">*</span>
-              </label>
-              <select id="edit-stu-sem" required class="stu-compact-input stu-compact-select">
-                <option value="1">Sem 1 (Year 1)</option>
-                <option value="2">Sem 2 (Year 1)</option>
-                <option value="3">Sem 3 (Year 2)</option>
-                <option value="4">Sem 4 (Year 2)</option>
-                <option value="5">Sem 5 (Year 3)</option>
-                <option value="6">Sem 6 (Year 3)</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="edit-stu-roll" class="stu-compact-label">
-                Roll # <span style="font-weight:normal; color:var(--text-muted);">(max 2)</span>
-              </label>
-              <input type="text" id="edit-stu-roll" placeholder="01" maxlength="2" autocomplete="off"
-                class="stu-compact-input stu-mono-input">
-              <p class="inp-error" id="edit-stu-roll-error"
-                style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;"></p>
-            </div>
-
-            <div>
-              <label for="edit-stu-status" class="stu-compact-label">Status</label>
-              <select id="edit-stu-status" class="stu-compact-input stu-compact-select">
-                <option value="Active">Active</option>
-                <option value="Transferred">Transferred</option>
-                <option value="Withdrawn">Withdrawn</option>
-              </select>
-            </div>
+            <button type="button" class="btn-stu-outline" id="detail-btn-transfer" onclick="detailTransferStudent()">Transfer</button>
+            <button type="button" class="btn-stu-outline" id="detail-btn-withdraw" onclick="detailWithdrawStudent()">Withdraw</button>
+            <button type="button" class="btn-stu-compact" id="detail-btn-reactivate" style="display:none;" onclick="detailReactivateStudent()">Re-Activate</button>
+            <button type="button" class="btn-stu-compact" id="detail-btn-edit" onclick="setStudentModalEditMode(true)">Edit Student</button>
           </div>
         </div>
 
-        <!-- Tab Panel 2: Academic Record -->
-        <div id="edit-tab-academic" class="stu-tab-panel" style="display:none;">
-          <div class="stu-compact-tab-info">
-            <div class="stu-compact-info-tile">
-              <span class="info-label">Assigned Cohort</span>
-              <span class="info-val" id="edit-tab-cohort-val">Year 1 &bull; Semester 1</span>
-            </div>
-            <div class="stu-compact-info-tile">
-              <span class="info-label">Department</span>
-              <span class="info-val" id="edit-tab-dept-val">Information Technology</span>
-            </div>
-            <div class="stu-compact-info-tile">
-              <span class="info-label">University Board</span>
-              <span class="info-val">UBTER Board</span>
-            </div>
-            <div class="stu-compact-info-tile">
-              <span class="info-label">Institution</span>
-              <span class="info-val">Government Polytechnic</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab Panel 3: Attendance -->
-        <div id="edit-tab-attendance" class="stu-tab-panel" style="display:none;">
-          <div class="stu-compact-tab-info">
-            <div class="stu-compact-info-tile">
-              <span class="info-label">Attendance Standing</span>
-              <span class="info-val" id="edit-tab-att-val"
-                style="color:var(--color-primary); font-weight:800;">100%</span>
-            </div>
-            <div class="stu-compact-info-tile">
-              <span class="info-label">Required Threshold</span>
-              <span class="info-val">75% Mandatory</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab Panel 4: Status -->
-        <div id="edit-tab-status" class="stu-tab-panel" style="display:none;">
-          <div class="stu-compact-tab-info">
-            <div class="stu-compact-info-tile">
-              <span class="info-label">Enrollment Status</span>
-              <span class="info-val" id="edit-tab-enroll-status-val">Enrolled (Active)</span>
-            </div>
-            <div class="stu-compact-info-tile">
-              <span class="info-label">Records Retention</span>
-              <span class="info-val">Permanent (All Records Preserved)</span>
-            </div>
-          </div>
-        </div>
-
-        <div id="edit-stu-alert"
-          style="display:none; padding:0.4rem 0.65rem; border-radius:6px; font-size:0.74rem; font-weight:600;"></div>
-
-        <!-- Footer -->
-        <div class="stu-edit-footer">
-          <button type="button" class="btn-stu-compact-cancel" onclick="closeEditStudentModal()">Cancel</button>
+        <!-- Footer: Edit Mode Actions (Cancel & Save) -->
+        <div class="stu-edit-footer" id="stu-footer-edit" style="display:none;">
+          <button type="button" class="btn-stu-compact-cancel" onclick="setStudentModalEditMode(false)">Cancel</button>
           <button type="submit" class="btn-stu-compact-save" id="btn-save-edit-student">Save Changes</button>
         </div>
       </form>

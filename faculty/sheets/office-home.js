@@ -124,15 +124,15 @@ async function loadSpreadsheetEngine(onReady) {
 
     // 2. Load modular tools only if not already in DOM / memory
     if (typeof window.toggleColorPalette !== 'function') {
-      await loadScript('/faculty/sheets/js/sheets-color-tools.js?v=20261120_v6');
+      await loadScript('/faculty/sheets/js/sheets-color-tools.js?v=20261120_v7');
     }
     if (typeof window.autoFitSheetColumns !== 'function') {
-      await loadScript('/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v6');
+      await loadScript('/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v7');
     }
 
     // 3. Load main Sheets Studio engine
     if (typeof window.initSheetsStudio !== 'function') {
-      await loadScript('/faculty/sheets/sheets.js?v=20261120_v6');
+      await loadScript('/faculty/sheets/sheets.js?v=20261120_v7');
     }
 
     window.__OFFICE_ENGINE_LOADED = true;
@@ -313,8 +313,10 @@ function filterOfficeSubjects(query) {
 function openOfficeHomeScreen() {
   const scr = document.getElementById('office-home-screen');
   const hdr = document.getElementById('faculty-header');
+  const studio = document.getElementById('studio-main-container');
   if (scr) scr.style.display = 'flex';
   if (hdr) hdr.classList.add('in-home-view');
+  if (studio) studio.style.display = 'none';
   renderOfficeRecentList();
   renderOfficeSubjectsGrid();
   const searchInput = document.getElementById('office-subject-search');
@@ -324,8 +326,10 @@ function openOfficeHomeScreen() {
 function closeOfficeHomeScreen() {
   const scr = document.getElementById('office-home-screen');
   const hdr = document.getElementById('faculty-header');
+  const studio = document.getElementById('studio-main-container');
   if (scr) scr.style.display = 'none';
   if (hdr) hdr.classList.remove('in-home-view');
+  if (studio) studio.style.display = 'flex';
 }
 
 function toggleOfficeHomeScreen() {

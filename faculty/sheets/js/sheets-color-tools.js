@@ -3,31 +3,48 @@
    ══════════════════════════════════════════════════════════════ */
 
 function positionFloatingDropdown(popup, button) {
-  if (!popup || !button) return;
+  if (!popup) return;
 
   // DOM Portal: Attach popup directly to document.body to completely bypass all ancestor overflow/clipping/stacking contexts
   if (popup.parentElement !== document.body) {
     document.body.appendChild(popup);
   }
 
-  const rect = button.getBoundingClientRect();
+  const rect = button && typeof button.getBoundingClientRect === 'function' ? button.getBoundingClientRect() : null;
   const popupW = popup.offsetWidth || 340;
-  const leftPos = Math.max(10, Math.min(rect.left, window.innerWidth - popupW - 16));
-  let topPos = rect.bottom + 6;
+  const popupH = popup.offsetHeight || 380;
 
-  const availBelow = window.innerHeight - topPos - 16;
-  if (availBelow < 250 && rect.top > 320) {
-    topPos = Math.max(10, rect.top - (popup.offsetHeight || 380) - 6);
-    popup.style.maxHeight = Math.max(200, rect.top - 20) + 'px';
+  let leftPos = 10;
+  let topPos = 108;
+
+  if (rect && (rect.width > 0 || rect.height > 0) && (rect.left > 0 || rect.top > 0)) {
+    // Dynamically align left with trigger button, bounding strictly inside window viewport
+    leftPos = rect.left;
+    if (leftPos + popupW > window.innerWidth - 16) {
+      leftPos = Math.max(10, window.innerWidth - popupW - 16);
+    }
+    if (leftPos < 10) leftPos = 10;
+
+    topPos = rect.bottom + 6;
+    const availBelow = window.innerHeight - topPos - 16;
+    if (availBelow < 250 && rect.top > 320) {
+      topPos = Math.max(10, rect.top - popupH - 6);
+      popup.style.setProperty('max-height', `${Math.max(200, rect.top - 20)}px`, 'important');
+    } else {
+      popup.style.setProperty('max-height', `${Math.max(220, availBelow)}px`, 'important');
+    }
   } else {
-    popup.style.maxHeight = Math.max(220, availBelow) + 'px';
+    // Graceful centered fallback if trigger rect cannot be measured
+    leftPos = Math.max(10, Math.floor((window.innerWidth - popupW) / 2));
+    topPos = 110;
+    popup.style.setProperty('max-height', `${Math.max(220, window.innerHeight - 130)}px`, 'important');
   }
 
-  popup.style.position = 'fixed';
-  popup.style.top = topPos + 'px';
-  popup.style.left = leftPos + 'px';
-  popup.style.overflowY = 'auto';
-  popup.style.zIndex = '99999999';
+  popup.style.setProperty('position', 'fixed', 'important');
+  popup.style.setProperty('top', `${topPos}px`, 'important');
+  popup.style.setProperty('left', `${leftPos}px`, 'important');
+  popup.style.setProperty('overflow-y', 'auto', 'important');
+  popup.style.setProperty('z-index', '99999999', 'important');
 
   // Ensure scroll is reset to very top so header and top cards are fully visible
   popup.scrollTop = 0;
@@ -57,9 +74,9 @@ function toggleColorPalette(type, event) {
       if (isVisible) {
         fillPalette.style.display = 'none';
       } else {
+        const triggerBtn = (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-fill-color-picker');
         fillPalette.style.display = 'flex';
-        const btn = document.getElementById('btn-fill-color-picker');
-        positionFloatingDropdown(fillPalette, btn);
+        positionFloatingDropdown(fillPalette, triggerBtn);
       }
     }
   } else if (type === 'font') {
@@ -69,9 +86,9 @@ function toggleColorPalette(type, event) {
       if (isVisible) {
         fontPalette.style.display = 'none';
       } else {
+        const triggerBtn = (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-font-color-picker');
         fontPalette.style.display = 'flex';
-        const btn = document.getElementById('btn-font-color-picker');
-        positionFloatingDropdown(fontPalette, btn);
+        positionFloatingDropdown(fontPalette, triggerBtn);
       }
     }
   }
@@ -97,9 +114,9 @@ function toggleConditionalFormattingMenu(event) {
     if (isVisible) {
       condMenu.style.display = 'none';
     } else {
+      const triggerBtn = (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-conditional-formatting');
       condMenu.style.display = 'flex';
-      const btn = document.getElementById('btn-conditional-formatting');
-      positionFloatingDropdown(condMenu, btn);
+      positionFloatingDropdown(condMenu, triggerBtn);
     }
   }
 }
@@ -124,9 +141,9 @@ function toggleColorTemplatesMenu(event) {
     if (isVisible) {
       templMenu.style.display = 'none';
     } else {
+      const triggerBtn = (event && (event.currentTarget || (event.target && event.target.closest('button')))) || document.getElementById('btn-color-templates');
       templMenu.style.display = 'flex';
-      const btn = document.getElementById('btn-color-templates');
-      positionFloatingDropdown(templMenu, btn);
+      positionFloatingDropdown(templMenu, triggerBtn);
     }
   }
 }

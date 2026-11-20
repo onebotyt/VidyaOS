@@ -21,8 +21,8 @@
   function getAuthToken() {
     try {
       return localStorage.getItem('access_token') ||
-             localStorage.getItem('token') ||
-             localStorage.getItem('authToken') || '';
+        localStorage.getItem('token') ||
+        localStorage.getItem('authToken') || '';
     } catch (_) {
       return '';
     }
@@ -68,7 +68,7 @@
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('auth_user', JSON.stringify(user));
       localStorage.setItem('currentUser', JSON.stringify(user));
-    } catch (_) {}
+    } catch (_) { }
   }
 
   function clearAuthSession() {
@@ -86,18 +86,18 @@
           'user_profile', 'user_roles', 'role', 'roles', 'session_id', 'vidyaos_device_id',
           'vidya_user_profile', 'vidya_selected_class', 'vidya_selected_dept', 'vidya_roster_cache'
         ];
-        authKeys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
+        authKeys.forEach(k => { try { localStorage.removeItem(k); } catch (_) { } });
       }
 
       // Restore user theme preference
       if (savedTheme) {
-        try { localStorage.setItem('vidya_theme', savedTheme); } catch (_) {}
+        try { localStorage.setItem('vidya_theme', savedTheme); } catch (_) { }
       }
 
       // 3. Clear ALL items in sessionStorage
       try {
         sessionStorage.clear();
-      } catch (_) {}
+      } catch (_) { }
 
       // 4. Clear all cookies across all paths and subdomains
       try {
@@ -111,13 +111,13 @@
           document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname};`;
           document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
         }
-      } catch (_) {}
+      } catch (_) { }
 
       // 5. Purge CacheStorage (Service Worker / browser HTTP cache)
       if (typeof window !== 'undefined' && window.caches && window.caches.keys) {
         window.caches.keys().then(names => {
           return Promise.all(names.map(name => window.caches.delete(name)));
-        }).catch(() => {});
+        }).catch(() => { });
       }
 
       // 6. Clear IndexedDB databases if supported and present
@@ -126,13 +126,13 @@
           if (Array.isArray(dbs)) {
             dbs.forEach(db => {
               if (db && db.name && !db.name.includes('theme')) {
-                try { window.indexedDB.deleteDatabase(db.name); } catch (_) {}
+                try { window.indexedDB.deleteDatabase(db.name); } catch (_) { }
               }
             });
           }
-        }).catch(() => {});
+        }).catch(() => { });
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   function handleSessionRevocation(reason = 'session_transferred') {
@@ -141,7 +141,7 @@
       sessionStorage.setItem('vidya_logout_notice', reason === 'session_expired'
         ? 'Your session expired due to inactivity. Please sign in again.'
         : 'Your session has ended because this account was logged into from another device or signed out.');
-    } catch (_) {}
+    } catch (_) { }
     window.location.replace(`/login/index.html?reason=${encodeURIComponent(reason)}`);
   }
 
@@ -160,10 +160,10 @@
         body: JSON.stringify({ device_id: deviceId, refresh_token: refreshToken }),
         keepalive: true,
         credentials: 'include'
-      }).catch(() => {});
-    } catch (_) {}
+      }).catch(() => { });
+    } catch (_) { }
     clearAuthSession();
-    try { sessionStorage.setItem('vidya_logged_out_flag', '1'); } catch (_) {}
+    try { sessionStorage.setItem('vidya_logged_out_flag', '1'); } catch (_) { }
     window.location.replace(`/login/index.html?reason=${encodeURIComponent(reason)}`);
   }
 
@@ -179,8 +179,8 @@
     toast.className = `toast toast-${type}`;
     toast.style.cssText = 'pointer-events:auto;animation:fadeIn 0.2s ease-out;margin-bottom:8px;padding:10px 16px;border-radius:6px;font-size:0.875rem;color:var(--text-white, #fff);box-shadow:var(--shadow-lg), 0 8px 24px rgba(0,0,0,0.18);';
     toast.style.background = type === 'error' ? 'var(--status-absent, #ef4444)' :
-                            (type === 'success' ? 'var(--status-present, #22c55e)' :
-                            (type === 'warning' ? 'var(--status-late, #f59e0b)' : 'var(--color-primary, #2563eb)'));
+      (type === 'success' ? 'var(--status-present, #22c55e)' :
+        (type === 'warning' ? 'var(--status-late, #f59e0b)' : 'var(--color-primary, #2563eb)'));
     toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => {
@@ -224,7 +224,7 @@
             return merged;
           }
         }
-      } catch (_) {} finally {
+      } catch (_) { } finally {
         _syncPromise = null;
       }
       return getCurrentUser();
@@ -258,7 +258,7 @@
             handleSessionRevocation();
           }
         }
-      } catch (_) {}
+      } catch (_) { }
     }, 120000);
   }
 
@@ -266,7 +266,7 @@
     try {
       const saved = localStorage.getItem('app_theme') || localStorage.getItem('theme') || localStorage.getItem('vidya_theme') || 'light';
       document.documentElement.setAttribute('data-theme', saved);
-    } catch (_) {}
+    } catch (_) { }
   }
 
   function toggleAppTheme() {
@@ -277,7 +277,7 @@
       localStorage.setItem('app_theme', next);
       localStorage.setItem('theme', next);
       localStorage.setItem('vidya_theme', next);
-    } catch (_) {}
+    } catch (_) { }
     showToast(`Appearance changed to ${next === 'dark' ? 'Dark Mode' : 'Light Mode'}`, 'info', 2000);
   }
 

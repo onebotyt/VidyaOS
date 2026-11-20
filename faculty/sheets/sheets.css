@@ -4774,7 +4774,7 @@ span.excel-hdr-num-badge {
   bottom: 0;
   background: var(--bg-surface);
   color: var(--text-main);
-  z-index: 950;
+  z-index: 2000;
   display: flex;
   flex-direction: column;
   overflow-y: auto;

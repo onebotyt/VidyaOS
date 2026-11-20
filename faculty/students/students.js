@@ -605,10 +605,52 @@
     });
   }
 
-  function viewStudentDetails(id) {
+  // ── Unified Student Profile & Edit Modal (Single Modal Architecture) ──
+  function setStudentModalEditMode(isEdit) {
+    const modal = document.getElementById('modal-student-details');
+    if (!modal) return;
+
+    const prefixEl = document.getElementById('detail-modal-mode-prefix');
+    if (prefixEl) {
+      prefixEl.textContent = isEdit ? 'Edit Student Profile:' : 'Student Profile:';
+    }
+
+    // Toggle view vs edit elements
+    modal.querySelectorAll('.stu-view-mode').forEach(el => {
+      el.style.display = isEdit ? 'none' : '';
+    });
+    modal.querySelectorAll('.stu-edit-mode').forEach(el => {
+      el.style.display = isEdit ? '' : 'none';
+    });
+    modal.querySelectorAll('.stu-edit-indicator').forEach(el => {
+      el.style.display = isEdit ? 'inline' : 'none';
+    });
+
+    const footerView = document.getElementById('stu-footer-view');
+    const footerEdit = document.getElementById('stu-footer-edit');
+    if (footerView) footerView.style.display = isEdit ? 'none' : 'flex';
+    if (footerEdit) footerEdit.style.display = isEdit ? 'flex' : 'none';
+
+    const alertBox = document.getElementById('edit-stu-alert');
+    if (alertBox) { alertBox.style.display = 'none'; alertBox.textContent = ''; }
+    const enrollErr = document.getElementById('edit-stu-enroll-error');
+    if (enrollErr) enrollErr.textContent = '';
+    const rollErr = document.getElementById('edit-stu-roll-error');
+    if (rollErr) rollErr.textContent = '';
+
+    if (isEdit) {
+      switchDetailTab('profile');
+      document.getElementById('edit-stu-name')?.focus();
+    }
+  }
+
+  function viewStudentDetails(id, startInEdit = false) {
     closeAllMenus();
     const st = allStudents.find(s => (s.student_id || s.id) === id);
-    if (!st) return;
+    if (!st) {
+      notify('Student record not found.', 'danger');
+      return;
+    }
 
     currentDetailStudentId = id;
     const modal = document.getElementById('modal-student-details');
@@ -621,8 +663,11 @@
     const initials = getInitials(st.full_name);
     const isPharma = isPharmaDept(st.department_name || st.department_code);
 
+    // Common header / avatar
     document.getElementById('detail-stu-avatar').textContent = initials;
     document.getElementById('detail-stu-name').textContent = st.full_name || 'Student';
+
+    // View mode display values
     const displayNameEl = document.getElementById('detail-stu-display-name');
     if (displayNameEl) displayNameEl.textContent = st.full_name || '—';
 
@@ -656,23 +701,23 @@
     document.getElementById('detail-stu-email').textContent = st.email || '—';
     document.getElementById('detail-stu-phone').textContent = st.phone || '—';
 
-    // Status badge
+    // Status badge (view mode)
     const statusBadge = document.getElementById('detail-stu-status-badge');
     const isInactive = st.enrollment_status === 'TRANSFERRED' || st.enrollment_status === 'WITHDRAWN';
     if (statusBadge) {
       if (st.enrollment_status === 'TRANSFERRED') {
-        statusBadge.className = 'stu-compact-display-val transferred';
+        statusBadge.className = 'stu-compact-display-val transferred stu-view-mode';
         statusBadge.textContent = 'Transferred';
       } else if (st.enrollment_status === 'WITHDRAWN') {
-        statusBadge.className = 'stu-compact-display-val withdrawn';
+        statusBadge.className = 'stu-compact-display-val withdrawn stu-view-mode';
         statusBadge.textContent = 'Withdrawn';
       } else {
-        statusBadge.className = 'stu-compact-display-val enrolled';
+        statusBadge.className = 'stu-compact-display-val enrolled stu-view-mode';
         statusBadge.textContent = 'Enrolled (Active)';
       }
     }
 
-    // Toggle footer buttons
+    // Toggle view footer action buttons
     const btnTransfer = document.getElementById('detail-btn-transfer');
     const btnWithdraw = document.getElementById('detail-btn-withdraw');
     const btnReactivate = document.getElementById('detail-btn-reactivate');
@@ -680,6 +725,61 @@
     if (btnWithdraw) btnWithdraw.style.display = isInactive ? 'none' : '';
     if (btnReactivate) btnReactivate.style.display = isInactive ? '' : 'none';
 
+    // Populate Edit Inputs
+    document.getElementById('edit-stu-id').value = id;
+    const nameInput = document.getElementById('edit-stu-name');
+    if (nameInput) nameInput.value = st.full_name || '';
+
+    const statusSelect = document.getElementById('edit-stu-status');
+    if (statusSelect) {
+      if (st.is_active === 0 || st.is_active === false) {
+        statusSelect.value = (st.status === 'Withdrawn' || st.enrollment_status === 'Withdrawn') ? 'Withdrawn' : 'Transferred';
+      } else {
+        statusSelect.value = 'Active';
+      }
+    }
+
+    const chkNotAvail = document.getElementById('edit-chk-enroll-not-available');
+    const enrollInput = document.getElementById('edit-stu-enroll');
+    const enrollReq = document.getElementById('edit-stu-enroll-req');
+    const enrollHint = document.getElementById('edit-stu-enroll-hint');
+
+    const isUnassigned = !st.official_enrollment_no || st.enrollment_no_status === 'Not Assigned';
+    if (chkNotAvail) chkNotAvail.checked = isUnassigned;
+
+    if (isUnassigned) {
+      if (enrollInput) {
+        enrollInput.value = '';
+        enrollInput.disabled = true;
+        enrollInput.placeholder = 'Not Assigned';
+        enrollInput.removeAttribute('required');
+      }
+      if (enrollReq) enrollReq.style.display = 'none';
+      if (enrollHint) enrollHint.textContent = 'Enrollment status is set to "Not Assigned".';
+    } else {
+      if (enrollInput) {
+        enrollInput.value = st.official_enrollment_no;
+        enrollInput.disabled = false;
+        enrollInput.placeholder = '11-digit numeric enrollment';
+        enrollInput.setAttribute('required', 'required');
+      }
+      if (enrollReq) enrollReq.style.display = 'inline';
+      if (enrollHint) enrollHint.textContent = 'Enter exactly 11 numeric digits (0–9).';
+    }
+
+    const regInput = document.getElementById('edit-stu-reg');
+    if (regInput) regInput.value = st.registration_no || '';
+
+    const rollInput = document.getElementById('edit-stu-roll');
+    if (rollInput) rollInput.value = (st.class_roll_no != null && String(st.class_roll_no) !== '') ? String(st.class_roll_no) : (st.roll_number != null ? String(st.roll_number) : '');
+
+    const semSelect = document.getElementById('edit-stu-sem');
+    if (semSelect) {
+      const semVal = st.semester || (st.year ? st.year * 2 - 1 : 1);
+      updateSemesterOptions(semSelect, st.department_name || st.department_code, semVal);
+    }
+
+    setStudentModalEditMode(Boolean(startInEdit));
     switchDetailTab('profile');
     modal.style.display = 'flex';
   }
@@ -691,10 +791,15 @@
   }
 
   function detailEditStudent() {
-    if (!currentDetailStudentId) return;
-    const sId = currentDetailStudentId;
+    setStudentModalEditMode(true);
+  }
+
+  function openEditStudentModal(id) {
+    viewStudentDetails(id, true);
+  }
+
+  function closeEditStudentModal() {
     closeStudentDetailsModal();
-    openEditStudentModal(sId);
   }
 
   function detailResetPassword() {
@@ -1318,129 +1423,13 @@
     }
   }
 
-  // 10B. Edit Student Modal
-  function openEditStudentModal(id) {
-    closeAllMenus();
-    const st = allStudents.find(s => (s.student_id || s.id) === id);
-    if (!st) {
-      notify('Student record not found.', 'danger');
-      return;
-    }
-
-    const modal = document.getElementById('modal-edit-student');
-    if (!modal) return;
-
-    document.getElementById('edit-stu-id').value = id;
-    const initials = getInitials(st.full_name);
-    document.getElementById('edit-stu-avatar').textContent = initials;
-    document.getElementById('edit-stu-name').value = st.full_name || '';
-
-    const titleNameEl = document.getElementById('edit-stu-title-name');
-    if (titleNameEl) titleNameEl.textContent = st.full_name || 'Student';
-
-    const statusSelect = document.getElementById('edit-stu-status');
-    if (statusSelect) {
-      if (st.is_active === 0 || st.is_active === false) {
-        statusSelect.value = (st.status === 'Withdrawn' || st.enrollment_status === 'Withdrawn') ? 'Withdrawn' : 'Transferred';
-      } else {
-        statusSelect.value = 'Active';
-      }
-    }
-
-    // Populate tab preview values
-    const yr = st.year || (st.semester ? Math.ceil(st.semester / 2) : 1);
-    const sem = st.semester ? `Sem ${st.semester}` : `Sem ${yr * 2 - 1}`;
-    const cohortVal = document.getElementById('edit-tab-cohort-val');
-    if (cohortVal) cohortVal.textContent = `Year ${yr} • ${sem}`;
-
-    const deptVal = document.getElementById('edit-tab-dept-val');
-    if (deptVal) deptVal.textContent = st.department_name || st.department_code || 'Information Technology';
-
-    const attVal = document.getElementById('edit-tab-att-val');
-    if (attVal) attVal.textContent = typeof st.attendance_pct === 'number' ? `${st.attendance_pct.toFixed(0)}%` : '100%';
-
-    const enrollStatusVal = document.getElementById('edit-tab-enroll-status-val');
-    if (enrollStatusVal) enrollStatusVal.textContent = st.is_active ? 'Enrolled (Active)' : (st.enrollment_status || 'Inactive');
-
-    switchEditTab('profile');
-
-    const chkNotAvail = document.getElementById('edit-chk-enroll-not-available');
-    const enrollInput = document.getElementById('edit-stu-enroll');
-    const enrollReq = document.getElementById('edit-stu-enroll-req');
-    const enrollHint = document.getElementById('edit-stu-enroll-hint');
-    const enrollErr = document.getElementById('edit-stu-enroll-error');
-    const rollErr = document.getElementById('edit-stu-roll-error');
-    const alertBox = document.getElementById('edit-stu-alert');
-
-    if (enrollErr) enrollErr.textContent = '';
-    if (rollErr) rollErr.textContent = '';
-    if (alertBox) { alertBox.style.display = 'none'; alertBox.textContent = ''; }
-
-    const isUnassigned = !st.official_enrollment_no || st.enrollment_no_status === 'Not Assigned';
-    if (chkNotAvail) chkNotAvail.checked = isUnassigned;
-
-    if (isUnassigned) {
-      if (enrollInput) {
-        enrollInput.value = '';
-        enrollInput.disabled = true;
-        enrollInput.placeholder = 'Not Assigned';
-        enrollInput.removeAttribute('required');
-      }
-      if (enrollReq) enrollReq.style.display = 'none';
-      if (enrollHint) enrollHint.textContent = 'Enrollment status is set to "Not Assigned".';
-    } else {
-      if (enrollInput) {
-        enrollInput.value = st.official_enrollment_no;
-        enrollInput.disabled = false;
-        enrollInput.placeholder = '11-digit numeric enrollment';
-        enrollInput.setAttribute('required', 'required');
-      }
-      if (enrollReq) enrollReq.style.display = 'inline';
-      if (enrollHint) enrollHint.textContent = 'Enter exactly 11 numeric digits (0–9).';
-    }
-
-    const regInput = document.getElementById('edit-stu-reg');
-    if (regInput) regInput.value = st.registration_no || '';
-
-    const rollInput = document.getElementById('edit-stu-roll');
-    if (rollInput) rollInput.value = (st.class_roll_no != null && String(st.class_roll_no) !== '') ? String(st.class_roll_no) : (st.roll_number != null ? String(st.roll_number) : '');
-
-    const semSelect = document.getElementById('edit-stu-sem');
-    if (semSelect) {
-      const semVal = st.semester || (st.year ? st.year * 2 - 1 : 1);
-      updateSemesterOptions(semSelect, st.department_name || st.department_code, semVal);
-    }
-
-    modal.style.display = 'flex';
-  }
-
+  // 10B. Edit Student Modal Compatibility Wrappers (Unified Single Modal Architecture)
   function switchEditTab(tabName) {
-    document.querySelectorAll('.stu-modal-tabs .stu-modal-tab').forEach(tab => {
-      if (tab.dataset.tab === tabName) {
-        tab.classList.add('active');
-      } else {
-        tab.classList.remove('active');
-      }
-    });
-
-    const panels = ['profile', 'academic', 'attendance', 'status'];
-    panels.forEach(p => {
-      const panelEl = document.getElementById(`edit-tab-${p}`);
-      if (panelEl) {
-        if (p === tabName) {
-          panelEl.style.display = 'flex';
-          panelEl.classList.add('active');
-        } else {
-          panelEl.style.display = 'none';
-          panelEl.classList.remove('active');
-        }
-      }
-    });
+    switchDetailTab(tabName);
   }
 
-  function closeEditStudentModal() {
-    const modal = document.getElementById('modal-edit-student');
-    if (modal) modal.style.display = 'none';
+  function cancelStudentEdit() {
+    setStudentModalEditMode(false);
   }
 
   async function submitEditStudent(e) {
@@ -1535,16 +1524,27 @@
           allStudents[idx].roll_number = classRoll;
           allStudents[idx].semester = semester;
           allStudents[idx].year = Math.ceil(semester / 2);
+          const statusSelect = document.getElementById('edit-stu-status');
+          if (statusSelect) {
+            const stVal = statusSelect.value;
+            if (stVal === 'Active') {
+              allStudents[idx].is_active = 1;
+              allStudents[idx].enrollment_status = 'ENROLLED';
+            } else if (stVal === 'Transferred') {
+              allStudents[idx].is_active = 0;
+              allStudents[idx].enrollment_status = 'TRANSFERRED';
+            } else if (stVal === 'Withdrawn') {
+              allStudents[idx].is_active = 0;
+              allStudents[idx].enrollment_status = 'WITHDRAWN';
+            }
+          }
         }
 
-        closeEditStudentModal();
         notify('Student details updated successfully.', 'success');
         renderTable();
 
-        // If View Details modal was active for this student, refresh it immediately
-        if (currentDetailStudentId === studentId) {
-          viewStudentDetails(studentId);
-        }
+        // Keep user in the single modal: seamless transition back to view mode
+        viewStudentDetails(studentId, false);
       } else {
         const msg = res?.error?.message || 'Failed to update student details.';
         if (alertBox) {
@@ -1777,6 +1777,8 @@
   window.viewStudentDetails = viewStudentDetails;
   window.closeStudentDetailsModal = closeStudentDetailsModal;
   window.switchDetailTab = switchDetailTab;
+  window.setStudentModalEditMode = setStudentModalEditMode;
+  window.cancelStudentEdit = cancelStudentEdit;
   window.openEditStudentModal = openEditStudentModal;
   window.closeEditStudentModal = closeEditStudentModal;
   window.switchEditTab = switchEditTab;
