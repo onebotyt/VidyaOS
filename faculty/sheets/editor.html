@@ -121,7 +121,7 @@
 
           <span class="header-nav-divider"></span>
 
-          
+
 
           <!-- Excel Brand Icon & Editable File Title + Compact Sync Pill -->
           <div class="excel-brand-block">
@@ -265,8 +265,7 @@
             <button type="button" class="excel-tab-btn" data-tab="data" onclick="switchRibbonTab('data')">Data</button>
             <button type="button" class="excel-tab-btn" data-tab="review"
               onclick="switchRibbonTab('review')">Review</button>
-            <button type="button" class="excel-tab-btn" data-tab="view"
-              onclick="switchRibbonTab('view')">View</button>
+            <button type="button" class="excel-tab-btn" data-tab="view" onclick="switchRibbonTab('view')">View</button>
             <button type="button" class="excel-tab-btn" data-tab="templates"
               onclick="switchRibbonTab('templates')">Templates</button>
           </nav>
@@ -685,8 +684,10 @@
                     <div class="excel-tool-vgroup">
                       <div class="excel-tool-row">
                         <button type="button" class="excel-tool-btn" id="btn-conditional-formatting"
-                          onclick="toggleConditionalFormattingMenu(event, this)" title="Excel Conditional Formatting & Color Scales">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          onclick="toggleConditionalFormattingMenu(event, this)"
+                          title="Excel Conditional Formatting & Color Scales">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <rect x="3" y="3" width="7" height="7"></rect>
                             <rect x="14" y="3" width="7" height="7"></rect>
                             <rect x="14" y="14" width="7" height="7"></rect>
@@ -698,7 +699,8 @@
                       <div class="excel-tool-row">
                         <button type="button" class="excel-tool-btn" id="btn-color-templates"
                           onclick="toggleColorTemplatesMenu(event, this)" title="Sheet Color Templates & Table Themes">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
                           </svg>
                           <span>Color Templates ▾</span>
@@ -716,16 +718,16 @@
                       title="Insert Row Above (Up)">
                       <span>+ Row ↑</span>
                     </button>
-                    <button type="button" class="excel-tool-btn" id="btn-insert-row-down" onclick="insertRowAtActive(false)"
-                      title="Insert Row Below (Down)">
+                    <button type="button" class="excel-tool-btn" id="btn-insert-row-down"
+                      onclick="insertRowAtActive(false)" title="Insert Row Below (Down)">
                       <span>+ Row ↓</span>
                     </button>
                     <button type="button" class="excel-tool-btn" id="btn-insert-col" onclick="insertColAtActive(true)"
                       title="Insert Column Left">
                       <span>+ Col ←</span>
                     </button>
-                    <button type="button" class="excel-tool-btn" id="btn-insert-col-right" onclick="insertColAtActive(false)"
-                      title="Insert Column Right">
+                    <button type="button" class="excel-tool-btn" id="btn-insert-col-right"
+                      onclick="insertColAtActive(false)" title="Insert Column Right">
                       <span>+ Col →</span>
                     </button>
                   </div>
@@ -740,8 +742,8 @@
                     </button>
                     <button type="button" class="excel-tool-btn" id="btn-add-student-row" onclick="openAddRowModal()"
                       title="Add Enrolled Student Row">+ Student</button>
-                    <button type="button" class="excel-tool-btn" id="btn-open-roster-form" onclick="openEditStudentRosterModal()"
-                      title="Open Scores Form Modal">Roster Form</button>
+                    <button type="button" class="excel-tool-btn" id="btn-open-roster-form"
+                      onclick="openEditStudentRosterModal()" title="Open Scores Form Modal">Roster Form</button>
                   </div>
                   <span class="excel-group-label">Cells</span>
                 </div>
@@ -896,7 +898,8 @@
                     <button type="button" class="excel-action-btn-large" onclick="openEditMarksModal()"
                       title="Configure Evaluation Scheme &amp; Marks Distribution">
                       <span class="excel-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                           <polyline points="14 2 14 8 20 8"></polyline>
                         </svg>
@@ -1047,7 +1050,8 @@
                       <div class="excel-tool-row">
                         <button type="button" class="excel-tool-btn active" id="btn-toggle-gridlines"
                           onclick="toggleGridlines()" title="Show/Hide Gridlines">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <rect x="3" y="3" width="18" height="18" rx="1" />
                             <line x1="3" y1="12" x2="21" y2="12" />
                             <line x1="12" y1="3" x2="12" y2="21" />
@@ -1056,21 +1060,24 @@
                         </button>
                         <button type="button" class="excel-tool-btn active" id="btn-toggle-formula-view"
                           onclick="toggleFormulaBarVisibility()" title="Show/Hide Formula Bar">
-                          <span style="font-family:serif;font-weight:700;font-size:0.8rem;color:var(--color-primary);">ƒx</span>
+                          <span
+                            style="font-family:serif;font-weight:700;font-size:0.8rem;color:var(--color-primary);">ƒx</span>
                           <span id="label-view-formula">Formula Bar: ON</span>
                         </button>
                       </div>
                       <div class="excel-tool-row">
                         <button type="button" class="excel-tool-btn active" id="btn-toggle-banner-view"
                           onclick="toggleInstitutionalBanner()" title="Show/Hide Institutional Header Banner">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6" />
                           </svg>
                           <span id="label-view-banner">College Banner: ON</span>
                         </button>
                         <button type="button" class="excel-tool-btn active" id="btn-toggle-signatures-bar"
                           onclick="toggleSignatureBarVisibility()" title="Show/Hide Faculty &amp; HOD Signatures Block">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                             <circle cx="8.5" cy="7" r="4" />
                             <line x1="20" y1="8" x2="20" y2="14" />
@@ -1090,25 +1097,31 @@
                     <div class="excel-tool-vgroup">
                       <div class="excel-tool-row">
                         <button type="button" class="excel-icon-btn" onclick="zoomOut()" title="Zoom Out (−)">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <line x1="5" y1="12" x2="19" y2="12" />
                           </svg>
                         </button>
                         <span class="zoom-level-indicator" id="view-zoom-level-label"
                           style="font-size:0.75rem;font-weight:800;color:var(--text-main);min-width:34px;text-align:center;">100%</span>
                         <button type="button" class="excel-icon-btn" onclick="zoomIn()" title="Zoom In (+)">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19" />
                             <line x1="5" y1="12" x2="19" y2="12" />
                           </svg>
                         </button>
-                        <button type="button" class="excel-tool-btn" onclick="resetZoom()" title="Reset Zoom to 100%">100%</button>
+                        <button type="button" class="excel-tool-btn" onclick="resetZoom()"
+                          title="Reset Zoom to 100%">100%</button>
                       </div>
                       <div class="excel-tool-row">
                         <button type="button" class="excel-tool-btn" id="btn-view-fit-screen"
-                          onclick="triggerFitColumnsToScreen()" title="Auto-Fit All Columns to Screen Width without scrolling">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                          onclick="triggerFitColumnsToScreen()"
+                          title="Auto-Fit All Columns to Screen Width without scrolling">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                              d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
                           </svg>
                           <span>Fit to Screen</span>
                         </button>
@@ -1133,7 +1146,8 @@
                         <div class="excel-dropdown-wrapper">
                           <button type="button" class="excel-tool-btn" id="btn-view-freeze-panes"
                             onclick="toggleFreezePanesMenu(event)" title="Freeze Panes / Rows / Columns">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2">
                               <rect x="3" y="3" width="18" height="18" rx="1" />
                               <line x1="3" y1="9" x2="21" y2="9" />
                               <line x1="9" y1="3" x2="9" y2="21" />
@@ -1141,16 +1155,20 @@
                             <span>Freeze Panes ▾</span>
                           </button>
                           <div class="excel-mini-menu" id="excel-freeze-menu" style="display:none;">
-                            <button type="button" class="excel-menu-row" onclick="freezeTopRow()"><strong>Freeze Top Row</strong></button>
-                            <button type="button" class="excel-menu-row" onclick="freezeFirstColumn()"><strong>Freeze First Column</strong></button>
-                            <button type="button" class="excel-menu-row" onclick="unfreezePanes()"><strong>Unfreeze Panes</strong></button>
+                            <button type="button" class="excel-menu-row" onclick="freezeTopRow()"><strong>Freeze Top
+                                Row</strong></button>
+                            <button type="button" class="excel-menu-row" onclick="freezeFirstColumn()"><strong>Freeze
+                                First Column</strong></button>
+                            <button type="button" class="excel-menu-row" onclick="unfreezePanes()"><strong>Unfreeze
+                                Panes</strong></button>
                           </div>
                         </div>
                       </div>
                       <div class="excel-tool-row">
                         <button type="button" class="excel-tool-btn" onclick="openEditMarksModal()"
                           title="Edit Total Marks &amp; Scheme Weightage">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
                           </svg>
@@ -1372,7 +1390,8 @@
               onclick="triggerFitColumnsToScreen()" title="Fit all columns to screen width without scrolling"
               style="font-size:0.75rem;font-weight:700;padding:0.22rem 0.55rem;display:inline-flex;align-items:center;gap:0.35rem;white-space:nowrap;flex-shrink:0;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                <path
+                  d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
               </svg>
               <span>Fit to Screen</span>
             </button>
@@ -2593,90 +2612,160 @@
       <div class="excel-palette-section-title">Theme Colors</div>
       <div class="excel-theme-matrix">
         <!-- 10 Base Columns -->
-        <button type="button" class="excel-theme-cell" style="background:#ffffff;" onclick="selectFillColor('#ffffff')" title="White"></button>
-        <button type="button" class="excel-theme-cell" style="background:#000000;" onclick="selectFillColor('#000000')" title="Black"></button>
-        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFillColor('#e2e8f0')" title="Light Gray"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1e3a8a;" onclick="selectFillColor('#1e3a8a')" title="Dark Blue"></button>
-        <button type="button" class="excel-theme-cell" style="background:#2563eb;" onclick="selectFillColor('#2563eb')" title="Blue"></button>
-        <button type="button" class="excel-theme-cell" style="background:#ea580c;" onclick="selectFillColor('#ea580c')" title="Orange"></button>
-        <button type="button" class="excel-theme-cell" style="background:#64748b;" onclick="selectFillColor('#64748b')" title="Slate"></button>
-        <button type="button" class="excel-theme-cell" style="background:#d97706;" onclick="selectFillColor('#d97706')" title="Gold"></button>
-        <button type="button" class="excel-theme-cell" style="background:#0d9488;" onclick="selectFillColor('#0d9488')" title="Teal"></button>
-        <button type="button" class="excel-theme-cell" style="background:#16a34a;" onclick="selectFillColor('#16a34a')" title="Green"></button>
+        <button type="button" class="excel-theme-cell" style="background:#ffffff;" onclick="selectFillColor('#ffffff')"
+          title="White"></button>
+        <button type="button" class="excel-theme-cell" style="background:#000000;" onclick="selectFillColor('#000000')"
+          title="Black"></button>
+        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFillColor('#e2e8f0')"
+          title="Light Gray"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1e3a8a;" onclick="selectFillColor('#1e3a8a')"
+          title="Dark Blue"></button>
+        <button type="button" class="excel-theme-cell" style="background:#2563eb;" onclick="selectFillColor('#2563eb')"
+          title="Blue"></button>
+        <button type="button" class="excel-theme-cell" style="background:#ea580c;" onclick="selectFillColor('#ea580c')"
+          title="Orange"></button>
+        <button type="button" class="excel-theme-cell" style="background:#64748b;" onclick="selectFillColor('#64748b')"
+          title="Slate"></button>
+        <button type="button" class="excel-theme-cell" style="background:#d97706;" onclick="selectFillColor('#d97706')"
+          title="Gold"></button>
+        <button type="button" class="excel-theme-cell" style="background:#0d9488;" onclick="selectFillColor('#0d9488')"
+          title="Teal"></button>
+        <button type="button" class="excel-theme-cell" style="background:#16a34a;" onclick="selectFillColor('#16a34a')"
+          title="Green"></button>
 
         <!-- Row 1: Tint 80% / Shade -->
-        <button type="button" class="excel-theme-cell" style="background:#f8fafc;" onclick="selectFillColor('#f8fafc')" title="White Tint"></button>
-        <button type="button" class="excel-theme-cell" style="background:#475569;" onclick="selectFillColor('#475569')" title="Black 50%"></button>
-        <button type="button" class="excel-theme-cell" style="background:#f1f5f9;" onclick="selectFillColor('#f1f5f9')" title="Gray Tint"></button>
-        <button type="button" class="excel-theme-cell" style="background:#dbeafe;" onclick="selectFillColor('#dbeafe')" title="Blue Tint"></button>
-        <button type="button" class="excel-theme-cell" style="background:#eff6ff;" onclick="selectFillColor('#eff6ff')" title="Ice Blue"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fff7ed;" onclick="selectFillColor('#fff7ed')" title="Orange Tint"></button>
-        <button type="button" class="excel-theme-cell" style="background:#f8fafc;" onclick="selectFillColor('#f8fafc')" title="Slate Tint"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fef3c7;" onclick="selectFillColor('#fef3c7')" title="Gold Tint"></button>
-        <button type="button" class="excel-theme-cell" style="background:#ccfbf1;" onclick="selectFillColor('#ccfbf1')" title="Teal Tint"></button>
-        <button type="button" class="excel-theme-cell" style="background:#dcfce7;" onclick="selectFillColor('#dcfce7')" title="Green Tint"></button>
+        <button type="button" class="excel-theme-cell" style="background:#f8fafc;" onclick="selectFillColor('#f8fafc')"
+          title="White Tint"></button>
+        <button type="button" class="excel-theme-cell" style="background:#475569;" onclick="selectFillColor('#475569')"
+          title="Black 50%"></button>
+        <button type="button" class="excel-theme-cell" style="background:#f1f5f9;" onclick="selectFillColor('#f1f5f9')"
+          title="Gray Tint"></button>
+        <button type="button" class="excel-theme-cell" style="background:#dbeafe;" onclick="selectFillColor('#dbeafe')"
+          title="Blue Tint"></button>
+        <button type="button" class="excel-theme-cell" style="background:#eff6ff;" onclick="selectFillColor('#eff6ff')"
+          title="Ice Blue"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fff7ed;" onclick="selectFillColor('#fff7ed')"
+          title="Orange Tint"></button>
+        <button type="button" class="excel-theme-cell" style="background:#f8fafc;" onclick="selectFillColor('#f8fafc')"
+          title="Slate Tint"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fef3c7;" onclick="selectFillColor('#fef3c7')"
+          title="Gold Tint"></button>
+        <button type="button" class="excel-theme-cell" style="background:#ccfbf1;" onclick="selectFillColor('#ccfbf1')"
+          title="Teal Tint"></button>
+        <button type="button" class="excel-theme-cell" style="background:#dcfce7;" onclick="selectFillColor('#dcfce7')"
+          title="Green Tint"></button>
 
         <!-- Row 2: Tint 60% -->
-        <button type="button" class="excel-theme-cell" style="background:#f1f5f9;" onclick="selectFillColor('#f1f5f9')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#334155;" onclick="selectFillColor('#334155')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFillColor('#e2e8f0')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#bfdbfe;" onclick="selectFillColor('#bfdbfe')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#dbeafe;" onclick="selectFillColor('#dbeafe')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#ffedd5;" onclick="selectFillColor('#ffedd5')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFillColor('#e2e8f0')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fde68a;" onclick="selectFillColor('#fde68a')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#99f6e4;" onclick="selectFillColor('#99f6e4')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#bbf7d0;" onclick="selectFillColor('#bbf7d0')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#f1f5f9;"
+          onclick="selectFillColor('#f1f5f9')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#334155;"
+          onclick="selectFillColor('#334155')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;"
+          onclick="selectFillColor('#e2e8f0')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#bfdbfe;"
+          onclick="selectFillColor('#bfdbfe')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#dbeafe;"
+          onclick="selectFillColor('#dbeafe')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#ffedd5;"
+          onclick="selectFillColor('#ffedd5')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;"
+          onclick="selectFillColor('#e2e8f0')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fde68a;"
+          onclick="selectFillColor('#fde68a')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#99f6e4;"
+          onclick="selectFillColor('#99f6e4')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#bbf7d0;"
+          onclick="selectFillColor('#bbf7d0')"></button>
 
         <!-- Row 3: Tint 40% -->
-        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFillColor('#e2e8f0')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1e293b;" onclick="selectFillColor('#1e293b')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;" onclick="selectFillColor('#cbd5e1')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#93c5fd;" onclick="selectFillColor('#93c5fd')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#93c5fd;" onclick="selectFillColor('#93c5fd')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fed7aa;" onclick="selectFillColor('#fed7aa')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;" onclick="selectFillColor('#cbd5e1')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fcd34d;" onclick="selectFillColor('#fcd34d')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#5eead4;" onclick="selectFillColor('#5eead4')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#86efac;" onclick="selectFillColor('#86efac')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;"
+          onclick="selectFillColor('#e2e8f0')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1e293b;"
+          onclick="selectFillColor('#1e293b')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;"
+          onclick="selectFillColor('#cbd5e1')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#93c5fd;"
+          onclick="selectFillColor('#93c5fd')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#93c5fd;"
+          onclick="selectFillColor('#93c5fd')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fed7aa;"
+          onclick="selectFillColor('#fed7aa')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;"
+          onclick="selectFillColor('#cbd5e1')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fcd34d;"
+          onclick="selectFillColor('#fcd34d')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#5eead4;"
+          onclick="selectFillColor('#5eead4')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#86efac;"
+          onclick="selectFillColor('#86efac')"></button>
 
         <!-- Row 4: Shade 25% -->
-        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;" onclick="selectFillColor('#cbd5e1')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#0f172a;" onclick="selectFillColor('#0f172a')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#94a3b8;" onclick="selectFillColor('#94a3b8')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1d4ed8;" onclick="selectFillColor('#1d4ed8')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1d4ed8;" onclick="selectFillColor('#1d4ed8')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#c2410c;" onclick="selectFillColor('#c2410c')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#475569;" onclick="selectFillColor('#475569')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#b45309;" onclick="selectFillColor('#b45309')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#0f766e;" onclick="selectFillColor('#0f766e')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#15803d;" onclick="selectFillColor('#15803d')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;"
+          onclick="selectFillColor('#cbd5e1')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#0f172a;"
+          onclick="selectFillColor('#0f172a')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#94a3b8;"
+          onclick="selectFillColor('#94a3b8')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1d4ed8;"
+          onclick="selectFillColor('#1d4ed8')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1d4ed8;"
+          onclick="selectFillColor('#1d4ed8')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#c2410c;"
+          onclick="selectFillColor('#c2410c')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#475569;"
+          onclick="selectFillColor('#475569')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#b45309;"
+          onclick="selectFillColor('#b45309')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#0f766e;"
+          onclick="selectFillColor('#0f766e')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#15803d;"
+          onclick="selectFillColor('#15803d')"></button>
 
         <!-- Row 5: Shade 50% -->
-        <button type="button" class="excel-theme-cell" style="background:#94a3b8;" onclick="selectFillColor('#94a3b8')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#020617;" onclick="selectFillColor('#020617')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#64748b;" onclick="selectFillColor('#64748b')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#172554;" onclick="selectFillColor('#172554')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1e40af;" onclick="selectFillColor('#1e40af')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#7c2d12;" onclick="selectFillColor('#7c2d12')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1e293b;" onclick="selectFillColor('#1e293b')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#78350f;" onclick="selectFillColor('#78350f')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#134e4a;" onclick="selectFillColor('#134e4a')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#14532d;" onclick="selectFillColor('#14532d')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#94a3b8;"
+          onclick="selectFillColor('#94a3b8')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#020617;"
+          onclick="selectFillColor('#020617')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#64748b;"
+          onclick="selectFillColor('#64748b')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#172554;"
+          onclick="selectFillColor('#172554')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1e40af;"
+          onclick="selectFillColor('#1e40af')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#7c2d12;"
+          onclick="selectFillColor('#7c2d12')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1e293b;"
+          onclick="selectFillColor('#1e293b')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#78350f;"
+          onclick="selectFillColor('#78350f')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#134e4a;"
+          onclick="selectFillColor('#134e4a')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#14532d;"
+          onclick="selectFillColor('#14532d')"></button>
       </div>
 
       <div class="excel-palette-section-title">Standard Colors</div>
       <div class="excel-standard-row">
-        <button type="button" class="excel-standard-cell" style="background:#c00000;" onclick="selectFillColor('#c00000')" title="Dark Red"></button>
-        <button type="button" class="excel-standard-cell" style="background:#ff0000;" onclick="selectFillColor('#ff0000')" title="Red"></button>
-        <button type="button" class="excel-standard-cell" style="background:#ffc000;" onclick="selectFillColor('#ffc000')" title="Orange"></button>
-        <button type="button" class="excel-standard-cell" style="background:#ffff00;" onclick="selectFillColor('#ffff00')" title="Yellow"></button>
-        <button type="button" class="excel-standard-cell" style="background:#92d050;" onclick="selectFillColor('#92d050')" title="Light Green"></button>
-        <button type="button" class="excel-standard-cell" style="background:#00b050;" onclick="selectFillColor('#00b050')" title="Green"></button>
-        <button type="button" class="excel-standard-cell" style="background:#00b0f0;" onclick="selectFillColor('#00b0f0')" title="Light Blue"></button>
-        <button type="button" class="excel-standard-cell" style="background:#0070c0;" onclick="selectFillColor('#0070c0')" title="Blue"></button>
-        <button type="button" class="excel-standard-cell" style="background:#002060;" onclick="selectFillColor('#002060')" title="Dark Blue"></button>
-        <button type="button" class="excel-standard-cell" style="background:#7030a0;" onclick="selectFillColor('#7030a0')" title="Purple"></button>
+        <button type="button" class="excel-standard-cell" style="background:#c00000;"
+          onclick="selectFillColor('#c00000')" title="Dark Red"></button>
+        <button type="button" class="excel-standard-cell" style="background:#ff0000;"
+          onclick="selectFillColor('#ff0000')" title="Red"></button>
+        <button type="button" class="excel-standard-cell" style="background:#ffc000;"
+          onclick="selectFillColor('#ffc000')" title="Orange"></button>
+        <button type="button" class="excel-standard-cell" style="background:#ffff00;"
+          onclick="selectFillColor('#ffff00')" title="Yellow"></button>
+        <button type="button" class="excel-standard-cell" style="background:#92d050;"
+          onclick="selectFillColor('#92d050')" title="Light Green"></button>
+        <button type="button" class="excel-standard-cell" style="background:#00b050;"
+          onclick="selectFillColor('#00b050')" title="Green"></button>
+        <button type="button" class="excel-standard-cell" style="background:#00b0f0;"
+          onclick="selectFillColor('#00b0f0')" title="Light Blue"></button>
+        <button type="button" class="excel-standard-cell" style="background:#0070c0;"
+          onclick="selectFillColor('#0070c0')" title="Blue"></button>
+        <button type="button" class="excel-standard-cell" style="background:#002060;"
+          onclick="selectFillColor('#002060')" title="Dark Blue"></button>
+        <button type="button" class="excel-standard-cell" style="background:#7030a0;"
+          onclick="selectFillColor('#7030a0')" title="Purple"></button>
       </div>
 
       <div class="excel-palette-footer">
@@ -2694,90 +2783,160 @@
       <div class="excel-palette-section-title">Theme Colors</div>
       <div class="excel-theme-matrix">
         <!-- 10 Base Columns -->
-        <button type="button" class="excel-theme-cell" style="background:#ffffff;" onclick="selectFontColor('#ffffff')" title="White"></button>
-        <button type="button" class="excel-theme-cell" style="background:#000000;" onclick="selectFontColor('#000000')" title="Black"></button>
-        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFontColor('#e2e8f0')" title="Light Gray"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1e3a8a;" onclick="selectFontColor('#1e3a8a')" title="Dark Blue"></button>
-        <button type="button" class="excel-theme-cell" style="background:#2563eb;" onclick="selectFontColor('#2563eb')" title="Blue"></button>
-        <button type="button" class="excel-theme-cell" style="background:#ea580c;" onclick="selectFontColor('#ea580c')" title="Orange"></button>
-        <button type="button" class="excel-theme-cell" style="background:#64748b;" onclick="selectFontColor('#64748b')" title="Slate"></button>
-        <button type="button" class="excel-theme-cell" style="background:#d97706;" onclick="selectFontColor('#d97706')" title="Gold"></button>
-        <button type="button" class="excel-theme-cell" style="background:#0d9488;" onclick="selectFontColor('#0d9488')" title="Teal"></button>
-        <button type="button" class="excel-theme-cell" style="background:#16a34a;" onclick="selectFontColor('#16a34a')" title="Green"></button>
+        <button type="button" class="excel-theme-cell" style="background:#ffffff;" onclick="selectFontColor('#ffffff')"
+          title="White"></button>
+        <button type="button" class="excel-theme-cell" style="background:#000000;" onclick="selectFontColor('#000000')"
+          title="Black"></button>
+        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFontColor('#e2e8f0')"
+          title="Light Gray"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1e3a8a;" onclick="selectFontColor('#1e3a8a')"
+          title="Dark Blue"></button>
+        <button type="button" class="excel-theme-cell" style="background:#2563eb;" onclick="selectFontColor('#2563eb')"
+          title="Blue"></button>
+        <button type="button" class="excel-theme-cell" style="background:#ea580c;" onclick="selectFontColor('#ea580c')"
+          title="Orange"></button>
+        <button type="button" class="excel-theme-cell" style="background:#64748b;" onclick="selectFontColor('#64748b')"
+          title="Slate"></button>
+        <button type="button" class="excel-theme-cell" style="background:#d97706;" onclick="selectFontColor('#d97706')"
+          title="Gold"></button>
+        <button type="button" class="excel-theme-cell" style="background:#0d9488;" onclick="selectFontColor('#0d9488')"
+          title="Teal"></button>
+        <button type="button" class="excel-theme-cell" style="background:#16a34a;" onclick="selectFontColor('#16a34a')"
+          title="Green"></button>
 
         <!-- Row 1: Tint 80% / Shade -->
-        <button type="button" class="excel-theme-cell" style="background:#f8fafc;" onclick="selectFontColor('#f8fafc')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#475569;" onclick="selectFontColor('#475569')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#f1f5f9;" onclick="selectFontColor('#f1f5f9')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#dbeafe;" onclick="selectFontColor('#dbeafe')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#eff6ff;" onclick="selectFontColor('#eff6ff')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fff7ed;" onclick="selectFontColor('#fff7ed')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#f8fafc;" onclick="selectFontColor('#f8fafc')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fef3c7;" onclick="selectFontColor('#fef3c7')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#ccfbf1;" onclick="selectFontColor('#ccfbf1')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#dcfce7;" onclick="selectFontColor('#dcfce7')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#f8fafc;"
+          onclick="selectFontColor('#f8fafc')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#475569;"
+          onclick="selectFontColor('#475569')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#f1f5f9;"
+          onclick="selectFontColor('#f1f5f9')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#dbeafe;"
+          onclick="selectFontColor('#dbeafe')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#eff6ff;"
+          onclick="selectFontColor('#eff6ff')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fff7ed;"
+          onclick="selectFontColor('#fff7ed')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#f8fafc;"
+          onclick="selectFontColor('#f8fafc')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fef3c7;"
+          onclick="selectFontColor('#fef3c7')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#ccfbf1;"
+          onclick="selectFontColor('#ccfbf1')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#dcfce7;"
+          onclick="selectFontColor('#dcfce7')"></button>
 
         <!-- Row 2: Tint 60% -->
-        <button type="button" class="excel-theme-cell" style="background:#f1f5f9;" onclick="selectFontColor('#f1f5f9')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#334155;" onclick="selectFontColor('#334155')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFontColor('#e2e8f0')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#bfdbfe;" onclick="selectFontColor('#bfdbfe')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#dbeafe;" onclick="selectFontColor('#dbeafe')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#ffedd5;" onclick="selectFontColor('#ffedd5')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFontColor('#e2e8f0')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fde68a;" onclick="selectFontColor('#fde68a')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#99f6e4;" onclick="selectFontColor('#99f6e4')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#bbf7d0;" onclick="selectFontColor('#bbf7d0')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#f1f5f9;"
+          onclick="selectFontColor('#f1f5f9')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#334155;"
+          onclick="selectFontColor('#334155')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;"
+          onclick="selectFontColor('#e2e8f0')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#bfdbfe;"
+          onclick="selectFontColor('#bfdbfe')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#dbeafe;"
+          onclick="selectFontColor('#dbeafe')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#ffedd5;"
+          onclick="selectFontColor('#ffedd5')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;"
+          onclick="selectFontColor('#e2e8f0')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fde68a;"
+          onclick="selectFontColor('#fde68a')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#99f6e4;"
+          onclick="selectFontColor('#99f6e4')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#bbf7d0;"
+          onclick="selectFontColor('#bbf7d0')"></button>
 
         <!-- Row 3: Tint 40% -->
-        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;" onclick="selectFontColor('#e2e8f0')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1e293b;" onclick="selectFontColor('#1e293b')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;" onclick="selectFontColor('#cbd5e1')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#93c5fd;" onclick="selectFontColor('#93c5fd')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#93c5fd;" onclick="selectFontColor('#93c5fd')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fed7aa;" onclick="selectFontColor('#fed7aa')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;" onclick="selectFontColor('#cbd5e1')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#fcd34d;" onclick="selectFontColor('#fcd34d')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#5eead4;" onclick="selectFontColor('#5eead4')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#86efac;" onclick="selectFontColor('#86efac')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#e2e8f0;"
+          onclick="selectFontColor('#e2e8f0')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1e293b;"
+          onclick="selectFontColor('#1e293b')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;"
+          onclick="selectFontColor('#cbd5e1')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#93c5fd;"
+          onclick="selectFontColor('#93c5fd')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#93c5fd;"
+          onclick="selectFontColor('#93c5fd')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fed7aa;"
+          onclick="selectFontColor('#fed7aa')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;"
+          onclick="selectFontColor('#cbd5e1')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#fcd34d;"
+          onclick="selectFontColor('#fcd34d')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#5eead4;"
+          onclick="selectFontColor('#5eead4')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#86efac;"
+          onclick="selectFontColor('#86efac')"></button>
 
         <!-- Row 4: Shade 25% -->
-        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;" onclick="selectFontColor('#cbd5e1')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#0f172a;" onclick="selectFontColor('#0f172a')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#94a3b8;" onclick="selectFontColor('#94a3b8')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1d4ed8;" onclick="selectFontColor('#1d4ed8')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1d4ed8;" onclick="selectFontColor('#1d4ed8')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#c2410c;" onclick="selectFontColor('#c2410c')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#475569;" onclick="selectFontColor('#475569')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#b45309;" onclick="selectFontColor('#b45309')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#0f766e;" onclick="selectFontColor('#0f766e')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#15803d;" onclick="selectFontColor('#15803d')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#cbd5e1;"
+          onclick="selectFontColor('#cbd5e1')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#0f172a;"
+          onclick="selectFontColor('#0f172a')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#94a3b8;"
+          onclick="selectFontColor('#94a3b8')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1d4ed8;"
+          onclick="selectFontColor('#1d4ed8')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1d4ed8;"
+          onclick="selectFontColor('#1d4ed8')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#c2410c;"
+          onclick="selectFontColor('#c2410c')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#475569;"
+          onclick="selectFontColor('#475569')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#b45309;"
+          onclick="selectFontColor('#b45309')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#0f766e;"
+          onclick="selectFontColor('#0f766e')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#15803d;"
+          onclick="selectFontColor('#15803d')"></button>
 
         <!-- Row 5: Shade 50% -->
-        <button type="button" class="excel-theme-cell" style="background:#94a3b8;" onclick="selectFontColor('#94a3b8')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#020617;" onclick="selectFontColor('#020617')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#64748b;" onclick="selectFontColor('#64748b')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#172554;" onclick="selectFontColor('#172554')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1e40af;" onclick="selectFontColor('#1e40af')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#7c2d12;" onclick="selectFontColor('#7c2d12')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#1e293b;" onclick="selectFontColor('#1e293b')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#78350f;" onclick="selectFontColor('#78350f')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#134e4a;" onclick="selectFontColor('#134e4a')"></button>
-        <button type="button" class="excel-theme-cell" style="background:#14532d;" onclick="selectFontColor('#14532d')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#94a3b8;"
+          onclick="selectFontColor('#94a3b8')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#020617;"
+          onclick="selectFontColor('#020617')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#64748b;"
+          onclick="selectFontColor('#64748b')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#172554;"
+          onclick="selectFontColor('#172554')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1e40af;"
+          onclick="selectFontColor('#1e40af')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#7c2d12;"
+          onclick="selectFontColor('#7c2d12')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#1e293b;"
+          onclick="selectFontColor('#1e293b')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#78350f;"
+          onclick="selectFontColor('#78350f')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#134e4a;"
+          onclick="selectFontColor('#134e4a')"></button>
+        <button type="button" class="excel-theme-cell" style="background:#14532d;"
+          onclick="selectFontColor('#14532d')"></button>
       </div>
 
       <div class="excel-palette-section-title">Standard Colors</div>
       <div class="excel-standard-row">
-        <button type="button" class="excel-standard-cell" style="background:#c00000;" onclick="selectFontColor('#c00000')" title="Dark Red"></button>
-        <button type="button" class="excel-standard-cell" style="background:#ff0000;" onclick="selectFontColor('#ff0000')" title="Red"></button>
-        <button type="button" class="excel-standard-cell" style="background:#ffc000;" onclick="selectFontColor('#ffc000')" title="Orange"></button>
-        <button type="button" class="excel-standard-cell" style="background:#ffff00;" onclick="selectFontColor('#ffff00')" title="Yellow"></button>
-        <button type="button" class="excel-standard-cell" style="background:#92d050;" onclick="selectFontColor('#92d050')" title="Light Green"></button>
-        <button type="button" class="excel-standard-cell" style="background:#00b050;" onclick="selectFontColor('#00b050')" title="Green"></button>
-        <button type="button" class="excel-standard-cell" style="background:#00b0f0;" onclick="selectFontColor('#00b0f0')" title="Light Blue"></button>
-        <button type="button" class="excel-standard-cell" style="background:#0070c0;" onclick="selectFontColor('#0070c0')" title="Blue"></button>
-        <button type="button" class="excel-standard-cell" style="background:#002060;" onclick="selectFontColor('#002060')" title="Dark Blue"></button>
-        <button type="button" class="excel-standard-cell" style="background:#7030a0;" onclick="selectFontColor('#7030a0')" title="Purple"></button>
+        <button type="button" class="excel-standard-cell" style="background:#c00000;"
+          onclick="selectFontColor('#c00000')" title="Dark Red"></button>
+        <button type="button" class="excel-standard-cell" style="background:#ff0000;"
+          onclick="selectFontColor('#ff0000')" title="Red"></button>
+        <button type="button" class="excel-standard-cell" style="background:#ffc000;"
+          onclick="selectFontColor('#ffc000')" title="Orange"></button>
+        <button type="button" class="excel-standard-cell" style="background:#ffff00;"
+          onclick="selectFontColor('#ffff00')" title="Yellow"></button>
+        <button type="button" class="excel-standard-cell" style="background:#92d050;"
+          onclick="selectFontColor('#92d050')" title="Light Green"></button>
+        <button type="button" class="excel-standard-cell" style="background:#00b050;"
+          onclick="selectFontColor('#00b050')" title="Green"></button>
+        <button type="button" class="excel-standard-cell" style="background:#00b0f0;"
+          onclick="selectFontColor('#00b0f0')" title="Light Blue"></button>
+        <button type="button" class="excel-standard-cell" style="background:#0070c0;"
+          onclick="selectFontColor('#0070c0')" title="Blue"></button>
+        <button type="button" class="excel-standard-cell" style="background:#002060;"
+          onclick="selectFontColor('#002060')" title="Dark Blue"></button>
+        <button type="button" class="excel-standard-cell" style="background:#7030a0;"
+          onclick="selectFontColor('#7030a0')" title="Purple"></button>
       </div>
 
       <div class="excel-palette-footer">

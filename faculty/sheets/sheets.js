@@ -10435,7 +10435,7 @@ function autoFitSheetColumns(sheet, force = false) {
       const v = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || '')).trim();
       if (!v) continue;
       if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet') || v.includes('Uttarakhand'))) continue;
-      
+
       let span = 1;
       if (Array.isArray(sheet.merges)) {
         for (const m of sheet.merges) {
