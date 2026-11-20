@@ -1,8 +1,8 @@
 {
-  "version": "1.0.91",
-  "buildNumber": 91,
+  "version": "1.0.92",
+  "buildNumber": 92,
   "releaseDate": "2026-11-20",
   "appName": "VidyaOS",
   "apkUrl": "https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk",
-  "releaseNotes": "Automated build 1.0.91 with instant cloud sync and mobile attendance studio."
+  "releaseNotes": "Automated build 1.0.92 with instant cloud sync and mobile attendance studio."
 }
