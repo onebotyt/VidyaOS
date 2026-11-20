@@ -170,6 +170,8 @@ async function initSheetsStudio() {
     const qReg = params.get('registerId') || params.get('register_id') || params.get('register');
     if (qReg) S.registerId = Number(qReg);
     const initialSheet = params.get('sheet') || 'evaluation';
+    const viewParam = params.get('view');
+    const isHomeStart = viewParam === 'home' || (!qId && !params.get('sheet'));
 
     setSheetViewMode(S.viewMode, false);
     setupTouchPinchZoom();
@@ -178,6 +180,12 @@ async function initSheetsStudio() {
     await loadTeacherGroupsList();
     renderSheetSelectorDropdownOptions();
     await switchSheetTab(initialSheet, false);
+
+    if (isHomeStart) {
+      openOfficeHomeScreen();
+    } else {
+      closeOfficeHomeScreen();
+    }
   } catch (err) {
     console.error('Fatal initialization error in Sheets Studio:', err);
     try {
@@ -8771,6 +8779,24 @@ function initExcelRichTooltips() {
         <text x="70" y="24" font-size="9" font-weight="bold" fill="var(--color-primary)" text-anchor="middle" font-family="sans-serif">College Banner Header</text>
       </svg>`
     },
+    'btn-toggle-signatures-bar': {
+      title: 'Institutional Signatures Bar',
+      desc: 'Show or hide official Subject Teacher, HOD, and Principal signature block outside spreadsheet grid cells.',
+      preview: `<svg width="140" height="40" viewBox="0 0 140 40" fill="none">
+        <rect x="10" y="5" width="120" height="30" rx="2" fill="var(--bg-card)" stroke="var(--border-color)"/>
+        <text x="25" y="24" font-size="8" font-weight="bold" fill="var(--color-primary)">Teacher</text>
+        <text x="70" y="24" font-size="8" font-weight="bold" fill="var(--color-primary)" text-anchor="middle">HOD</text>
+        <text x="115" y="24" font-size="8" font-weight="bold" fill="var(--color-primary)" text-anchor="end">Principal</text>
+      </svg>`
+    },
+    'btn-office-home': {
+      title: 'Office Studio Home & Subjects Hub',
+      desc: 'Return to Office Studio start screen to access your teaching subjects, recent workbooks, and templates.',
+      preview: `<svg width="140" height="40" viewBox="0 0 140 40" fill="none">
+        <rect x="10" y="5" width="120" height="30" rx="2" fill="var(--bg-card)" stroke="var(--border-color)"/>
+        <text x="70" y="24" font-size="9" font-weight="bold" fill="var(--color-primary)" text-anchor="middle">Office Studio Hub</text>
+      </svg>`
+    },
     'btn-home-toggle-gridlines': {
       title: 'Gridlines',
       desc: 'Show or hide the gridlines between rows and columns in the sheet to customize readability.',
@@ -9238,11 +9264,6 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     setCell(evalSheet, r, 12, { raw: practicalFormula, f: practicalFormula, s: { bold: true, align: 'center', bg: 'var(--chip-faculty-bg)' } });
   });
 
-  const signoffR = students.length + 5;
-  setCell(evalSheet, signoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
-  setCell(evalSheet, signoffR, 7, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
-  setCell(evalSheet, signoffR, 12, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
-
   EXCEL_WB.sheets.push(evalSheet);
 
   // ══════════════════════════════════════════════════════════════
@@ -9302,11 +9323,6 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const best4Formula = `=ROUND(AVERAGE(D${r + 1}:G${r + 1}) * 0.5, 2)`;
     setCell(testSheet, r, 13, { raw: best4Formula, f: best4Formula, s: { bold: true, align: 'center' } });
   });
-
-  const testSignoffR = students.length + 3;
-  setCell(testSheet, testSignoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
-  setCell(testSheet, testSignoffR, 6, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
-  setCell(testSheet, testSignoffR, 13, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
 
   EXCEL_WB.sheets.push(testSheet);
 
@@ -9398,11 +9414,6 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
       setCell(singleTestSheet, r, 7, { raw: sumFormula, f: sumFormula, s: { bold: true, align: 'center' } });
     });
 
-    const singleSignoffR = students.length + 3;
-    setCell(singleTestSheet, singleSignoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
-    setCell(singleTestSheet, singleSignoffR, 4, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
-    setCell(singleTestSheet, singleSignoffR, 7, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
-
     EXCEL_WB.sheets.push(singleTestSheet);
   });
 
@@ -9471,11 +9482,6 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const avgFormula = `=ROUND(AVERAGE(D${r + 1}:H${r + 1}), 1)`;
     setCell(assignSheet, r, 8, { raw: avgFormula, f: avgFormula, s: { bold: true, align: 'center' } });
   });
-
-  const assignSignoffR = students.length + 3;
-  setCell(assignSheet, assignSignoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
-  setCell(assignSheet, assignSignoffR, 5, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
-  setCell(assignSheet, assignSignoffR, 8, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
 
   EXCEL_WB.sheets.push(assignSheet);
 
@@ -9557,11 +9563,6 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     setCell(practicalSheet, r, 7, { raw: totalFormula, f: totalFormula, s: { bold: true, align: 'center' } });
   });
 
-  const pracSignoffR = students.length + 3;
-  setCell(practicalSheet, pracSignoffR, 0, { raw: `${teacherName}\nSubject Teacher`, v: `${teacherName}\nSubject Teacher`, s: { bold: true, align: 'left', wrap: true } });
-  setCell(practicalSheet, pracSignoffR, 4, { raw: 'Head of the Department', v: 'Head of the Department', s: { bold: true, align: 'center' } });
-  setCell(practicalSheet, pracSignoffR, 7, { raw: 'Principal', v: 'Principal', s: { bold: true, align: 'right' } });
-
   EXCEL_WB.sheets.push(practicalSheet);
 
   EXCEL_WB.sheets.forEach(s => {
@@ -9570,6 +9571,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   });
   renderSheetTabs();
   renderExcelGrid(true);
+  applySignatureBarVisibility();
   initExcelRichTooltips();
 }
 
@@ -9783,6 +9785,256 @@ function toggleInstitutionalBanner() {
 
   if (S.autoFit) {
     setTimeout(() => fitSheetToScreen(false), 40);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// INSTITUTIONAL SIGNATURES BAR CONTROLS
+// ══════════════════════════════════════════════════════════════
+function toggleSignatureBarVisibility() {
+  if (EXCEL_WB.signaturesVisible === undefined) {
+    EXCEL_WB.signaturesVisible = true;
+  }
+  EXCEL_WB.signaturesVisible = !EXCEL_WB.signaturesVisible;
+  applySignatureBarVisibility();
+}
+
+function applySignatureBarVisibility() {
+  const bar = document.getElementById('excel-signatures-bar');
+  const btn = document.getElementById('btn-toggle-signatures-bar');
+  const lbl = document.getElementById('btn-signatures-label');
+  const isVis = EXCEL_WB.signaturesVisible !== false;
+  if (bar) bar.style.display = isVis ? 'flex' : 'none';
+  if (btn) btn.classList.toggle('active', isVis);
+  if (lbl) lbl.textContent = isVis ? 'Signatures: ON' : 'Signatures: OFF';
+
+  const teacherName = S.group?.teacher_name || S.user?.full_name || S.user?.name || 'Navneet Mishra';
+  const sigTeacher = document.getElementById('sig-teacher-name');
+  if (sigTeacher) sigTeacher.textContent = teacherName;
+}
+
+// ══════════════════════════════════════════════════════════════
+// OFFICE STUDIO: EXCEL-STYLE START / HOME SCREEN & SUBJECTS HUB
+// ══════════════════════════════════════════════════════════════
+const OFFICE_RECENTS_KEY = 'vidya_office_recents_v1';
+
+function getOfficeRecentWorkbooks() {
+  try {
+    const raw = localStorage.getItem(OFFICE_RECENTS_KEY);
+    if (!raw) return [];
+    const list = JSON.parse(raw);
+    return Array.isArray(list) ? list : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function recordRecentWorkbook(title, sheetKey, groupId) {
+  try {
+    let recents = getOfficeRecentWorkbooks();
+    recents = recents.filter(item => !(item.groupId === groupId && item.sheetKey === sheetKey));
+    recents.unshift({
+      title: title || 'Institutional Evaluation Sheet',
+      sheetKey: sheetKey || 'evaluation',
+      groupId: groupId || S.groupId,
+      path: `Faculty > Office Studio > ${sheetKey || 'evaluation'}`,
+      timestamp: Date.now()
+    });
+    if (recents.length > 15) recents = recents.slice(0, 15);
+    localStorage.setItem(OFFICE_RECENTS_KEY, JSON.stringify(recents));
+  } catch (_) {}
+}
+
+function renderOfficeRecentList() {
+  const listEl = document.getElementById('office-recent-list');
+  if (!listEl) return;
+  const recents = getOfficeRecentWorkbooks();
+
+  if (!recents.length) {
+    const sampleRecents = (S.allGroups || []).slice(0, 4).map(grp => ({
+      title: `${grp.subject_code || 'SUB'} - ${grp.subject_name || 'Evaluation'}`,
+      sheetKey: 'evaluation',
+      groupId: grp.id,
+      path: `Faculty > Office Studio > ${grp.class_name || 'Semester'}`,
+      timestamp: Date.now() - 3600000
+    }));
+    if (sampleRecents.length) {
+      recents.push(...sampleRecents);
+    }
+  }
+
+  if (!recents.length) {
+    listEl.innerHTML = `<div style="padding: 1rem 0; font-size: 0.82rem; opacity: 0.7;">No recent workbooks found. Select a subject to get started.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = recents.map(item => `
+    <div class="office-recent-item" onclick="selectSubjectAndSheet(${item.groupId}, '${item.sheetKey}')" title="${escapeHtml(item.title)}">
+      <div class="office-recent-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 4h7v5h5v11H6V4zm2 8h8v2H8v-2zm0 4h8v2H8v-2z"/>
+        </svg>
+      </div>
+      <div class="office-recent-meta">
+        <div class="office-recent-name">${escapeHtml(item.title)}</div>
+        <div class="office-recent-path">${escapeHtml(item.path || 'VidyaOS > Office Studio')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderOfficeSubjectsGrid(filterQuery = '') {
+  const gridEl = document.getElementById('office-subjects-grid');
+  if (!gridEl) return;
+
+  const query = (filterQuery || '').toLowerCase().trim();
+  const groups = (S.allGroups || []).filter(g => {
+    if (!query) return true;
+    const hay = `${g.subject_name || ''} ${g.subject_code || ''} ${g.class_name || ''} ${g.department_name || ''}`.toLowerCase();
+    return hay.includes(query);
+  });
+
+  if (!groups.length) {
+    gridEl.innerHTML = `<div style="grid-column: 1 / -1; padding: 2.5rem; text-align: center; color: var(--text-muted); background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: 8px;">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.5rem; opacity: 0.6;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <div style="font-weight: 600; font-size: 0.95rem;">No subjects matching "${escapeHtml(filterQuery)}"</div>
+      <div style="font-size: 0.8rem; margin-top: 0.25rem;">Try searching by subject name, code, or class.</div>
+    </div>`;
+    return;
+  }
+
+  gridEl.innerHTML = groups.map(grp => `
+    <div class="office-subject-card" data-group-id="${grp.id}">
+      <div class="office-subject-header">
+        <div class="office-subject-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </div>
+        <div class="office-subject-meta">
+          <span class="office-subject-code">${escapeHtml(grp.subject_code || ('SUB' + grp.id))}</span>
+          <h3 class="office-subject-title">${escapeHtml(grp.subject_name || 'Academic Subject')}</h3>
+          <span class="office-subject-dept">${escapeHtml(grp.class_name || '')} ${grp.semester ? '• Semester ' + grp.semester : ''}</span>
+        </div>
+      </div>
+      <div class="office-subject-body">
+        <div class="office-subject-badge">Select a Worksheet to Open:</div>
+        <div class="office-sheet-quick-actions">
+          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'evaluation')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            Master Evaluation Sheet
+          </button>
+          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'tests')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Class Test Marksheets (UT1-UT10)
+          </button>
+          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'assignments')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Coursework & Assignments
+          </button>
+          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'practicals')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.69 19.3A2 2 0 0 0 6.44 22h11.12a2 2 0 0 0 1.75-2.7L14 9.31V2"/></svg>
+            Practicals & Lab Records
+          </button>
+          <button class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'blank')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Blank Worksheet
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterOfficeSubjects(query) {
+  let q = query;
+  if (q === undefined) {
+    const input = document.getElementById('office-subject-search') || document.getElementById('office-home-search');
+    q = input ? input.value : '';
+  }
+  renderOfficeSubjectsGrid(q);
+}
+
+function openOfficeHomeScreen() {
+  const scr = document.getElementById('office-home-screen');
+  if (!scr) return;
+  scr.style.display = 'flex';
+  renderOfficeRecentList();
+  renderOfficeSubjectsGrid();
+  const searchInput = document.getElementById('office-subject-search') || document.getElementById('office-home-search');
+  if (searchInput) searchInput.value = '';
+}
+
+function closeOfficeHomeScreen() {
+  const scr = document.getElementById('office-home-screen');
+  if (scr) scr.style.display = 'none';
+}
+
+function toggleOfficeHomeScreen() {
+  const scr = document.getElementById('office-home-screen');
+  if (!scr) return;
+  if (scr.style.display === 'flex') {
+    closeOfficeHomeScreen();
+  } else {
+    openOfficeHomeScreen();
+  }
+}
+
+async function selectSubjectAndSheet(groupId, sheetKey) {
+  closeOfficeHomeScreen();
+  S.groupId = Number(groupId);
+  const grp = (S.allGroups || []).find(g => g.id === S.groupId);
+  if (grp) S.group = grp;
+
+  const title = grp ? `${grp.subject_code || 'SUB'} - ${grp.subject_name}` : `Subject ${groupId}`;
+  recordRecentWorkbook(title, sheetKey, groupId);
+
+  const topSel = document.getElementById('subject-selector');
+  if (topSel) topSel.value = String(groupId);
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('groupId', groupId);
+  if (sheetKey && sheetKey !== 'blank') {
+    url.searchParams.set('sheet', sheetKey);
+  } else {
+    url.searchParams.delete('sheet');
+  }
+  url.searchParams.delete('view');
+  window.history.replaceState({}, '', url.toString());
+
+  if (sheetKey === 'blank') {
+    createNewBlankWorksheet();
+  } else {
+    await switchSheetTab(sheetKey, true);
+  }
+}
+
+function createNewBlankWorksheet() {
+  if (typeof createNewWorksheet === 'function') {
+    createNewWorksheet('Blank Sheet');
+  }
+}
+
+function createNewWorksheetFromHome() {
+  closeOfficeHomeScreen();
+  createNewBlankWorksheet();
+}
+
+function openBlankWorkbookFromHome() {
+  closeOfficeHomeScreen();
+  createNewBlankWorksheet();
+}
+
+function openSubjectSheetDirect(groupId, sheetKeyOrIdx) {
+  const targetGroup = groupId || S.groupId || (S.allGroups?.[0]?.id);
+  let sheetKey = sheetKeyOrIdx;
+  if (sheetKey === 0 || sheetKey === '0') sheetKey = 'evaluation';
+  if (sheetKey === 1 || sheetKey === '1') sheetKey = 'tests';
+  if (targetGroup) {
+    selectSubjectAndSheet(targetGroup, sheetKey || 'evaluation');
+  } else {
+    closeOfficeHomeScreen();
   }
 }
 
@@ -10219,3 +10471,14 @@ window.toggleAutoSumMenu = toggleAutoSumMenu;
 window.toggleFreezePanesMenu = toggleFreezePanesMenu;
 window.toggleExportMenu = toggleExportMenu;
 window.switchRibbonTab = switchRibbonTab;
+window.toggleSignatureBarVisibility = toggleSignatureBarVisibility;
+window.applySignatureBarVisibility = applySignatureBarVisibility;
+window.openOfficeHomeScreen = openOfficeHomeScreen;
+window.closeOfficeHomeScreen = closeOfficeHomeScreen;
+window.toggleOfficeHomeScreen = toggleOfficeHomeScreen;
+window.selectSubjectAndSheet = selectSubjectAndSheet;
+window.renderOfficeSubjectsGrid = renderOfficeSubjectsGrid;
+window.filterOfficeSubjects = filterOfficeSubjects;
+window.openBlankWorkbookFromHome = openBlankWorkbookFromHome;
+window.createNewWorksheetFromHome = createNewWorksheetFromHome;
+window.openSubjectSheetDirect = openSubjectSheetDirect;
