@@ -64,50 +64,57 @@ function loadScript(src) {
   });
 }
 
+function showOfficeScreenLoader(msg = 'Loading...') {
+  const loader = document.getElementById('office-engine-loader');
+  const txt = document.getElementById('office-loader-status');
+  if (txt) txt.textContent = msg;
+  if (loader) loader.style.display = 'flex';
+}
+
+function hideOfficeScreenLoader() {
+  const loader = document.getElementById('office-engine-loader');
+  if (loader) loader.style.display = 'none';
+}
+
 /**
  * Lazy Loads the Full Spreadsheet Engine (ExcelJS + sheets.js)
  * Caches in memory so subsequent launches are instantaneous (0ms network request).
  */
 async function loadSpreadsheetEngine(onReady) {
   if (window.__OFFICE_ENGINE_LOADED) {
-    if (typeof onReady === 'function') onReady();
+    if (typeof onReady === 'function') {
+      await onReady();
+    }
     return;
   }
 
-  const loader = document.getElementById('office-engine-loader');
-  const statusTxt = document.getElementById('office-loader-status');
-  if (loader) loader.style.display = 'flex';
-  if (statusTxt) statusTxt.textContent = 'Loading Academic Spreadsheet Engine...';
+  showOfficeScreenLoader('Loading...');
 
   try {
     // 1. Load ExcelJS if not already present
     if (typeof ExcelJS === 'undefined') {
-      if (statusTxt) statusTxt.textContent = 'Loading Excel Processing Engine...';
       await loadScript('/faculty/components/core/exceljs.min.js');
     }
 
     // 2. Load the main Sheets Studio engine
-    if (statusTxt) statusTxt.textContent = 'Hydrating Academic Marksheets & Ledger...';
     await loadScript('/faculty/sheets/sheets.js?v=20261120');
 
     window.__OFFICE_ENGINE_LOADED = true;
 
-    // Allow sheets.js a tick to mount its internal event handlers
+    if (typeof onReady === 'function') {
+      await onReady();
+    }
+
+    // Safety fallback to hide loader if network lags
     setTimeout(() => {
-      if (loader) loader.style.display = 'none';
-      if (typeof onReady === 'function') {
-        onReady();
-      }
-    }, 80);
+      hideOfficeScreenLoader();
+    }, 8000);
   } catch (err) {
     console.error('Fatal error loading spreadsheet engine:', err);
-    if (statusTxt) statusTxt.textContent = 'Failed to load spreadsheet engine. Please retry.';
+    hideOfficeScreenLoader();
     if (typeof showToast === 'function') {
       showToast('Could not load spreadsheet engine. Check your connection.', 'error', 4000);
     }
-    setTimeout(() => {
-      if (loader) loader.style.display = 'none';
-    }, 1200);
   }
 }
 
@@ -313,6 +320,8 @@ async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
     showToast(`Opening ${label}...`, 'info', 2000);
   }
 
+  showOfficeScreenLoader('Loading...');
+
   // Small delay allows tactile button pulse to be seen and felt
   setTimeout(() => {
     loadSpreadsheetEngine(async () => {
@@ -324,7 +333,7 @@ async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
       const title = grp ? `${grp.subject_code || 'SUB'} - ${grp.subject_name}` : `Subject ${groupId}`;
       recordRecentWorkbook(title, sheetKey, groupId);
 
-      const topSel = document.getElementById('subject-selector');
+      const topSel = document.getElementById('group-switcher-select') || document.getElementById('subject-selector');
       if (topSel) topSel.value = String(groupId);
 
       const url = new URL(window.location.href);
@@ -337,19 +346,24 @@ async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
       url.searchParams.delete('view');
       window.history.replaceState({}, '', url.toString());
 
+      if (typeof window.onSwitchGroup === 'function') {
+        await window.onSwitchGroup(groupId);
+      }
       if (sheetKey === 'blank') {
         if (typeof createNewWorksheet === 'function') createNewWorksheet('Blank Sheet');
       } else if (typeof switchSheetTab === 'function') {
         await switchSheetTab(sheetKey, true);
       }
+      hideOfficeScreenLoader();
     });
-  }, 60);
+  }, 40);
 }
 
 function createNewWorksheetFromHome(clickedEl) {
   if (clickedEl && clickedEl.classList) {
     clickedEl.classList.add('office-btn-pulse');
   }
+  showOfficeScreenLoader('Loading...');
   if (typeof showToast === 'function') {
     showToast('Creating new blank worksheet...', 'info', 2000);
   }
@@ -357,8 +371,9 @@ function createNewWorksheetFromHome(clickedEl) {
     loadSpreadsheetEngine(() => {
       closeOfficeHomeScreen();
       if (typeof createNewWorksheet === 'function') createNewWorksheet('Blank Sheet');
+      hideOfficeScreenLoader();
     });
-  }, 60);
+  }, 40);
 }
 
 function openBlankWorkbookFromHome(clickedEl) {
@@ -431,14 +446,17 @@ async function initOfficePortal() {
 
     if (isHomeStart) {
       openOfficeHomeScreen();
+      hideOfficeScreenLoader();
     } else {
-      // Direct deep link to specific sheet -> load engine immediately
+      // Direct deep link to specific sheet -> keep center gray loading animation visible to block extra clicks
+      showOfficeScreenLoader('Loading...');
       closeOfficeHomeScreen();
       loadSpreadsheetEngine();
     }
   } catch (err) {
     console.error('Portal boot error:', err);
     openOfficeHomeScreen();
+    hideOfficeScreenLoader();
   }
 }
 
@@ -473,6 +491,8 @@ function triggerExcelImport() {
 }
 
 // Global Exports
+window.showOfficeScreenLoader = showOfficeScreenLoader;
+window.hideOfficeScreenLoader = hideOfficeScreenLoader;
 window.openOfficeHomeScreen = openOfficeHomeScreen;
 window.closeOfficeHomeScreen = closeOfficeHomeScreen;
 window.toggleOfficeHomeScreen = toggleOfficeHomeScreen;

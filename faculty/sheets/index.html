@@ -199,19 +199,21 @@
       </header>
 
       <!-- ══════════════════════════════════════════════════════════════
-       OFFICE ENGINE LAZY LOADER (TRANSITION UX)
+       OFFICE FULLSCREEN GRAY LOADING OVERLAY (PREVENTS EXTRA CLICKS)
        ══════════════════════════════════════════════════════════════ -->
       <div id="office-engine-loader" class="office-engine-loader" style="display:none;" aria-live="polite">
         <div class="office-loader-card">
-          <div class="office-loader-spinner-wrap">
-            <div class="office-loader-spinner"></div>
-            <div class="office-loader-badge">XLS</div>
-          </div>
-          <div class="office-loader-title">Office Studio</div>
-          <div class="office-loader-sub" id="office-loader-status">Initializing Academic Spreadsheet Engine...</div>
-          <div class="office-loader-progress-bar">
-            <div class="office-loader-progress-inner"></div>
-          </div>
+          <svg class="office-spinner-dots-svg" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true">
+            <circle cx="28" cy="8" r="4.5" opacity="1.0"/>
+            <circle cx="42.14" cy="13.86" r="4.5" opacity="0.875"/>
+            <circle cx="48" cy="28" r="4.5" opacity="0.75"/>
+            <circle cx="42.14" cy="42.14" r="4.5" opacity="0.625"/>
+            <circle cx="28" cy="48" r="4.5" opacity="0.5"/>
+            <circle cx="13.86" cy="42.14" r="4.5" opacity="0.375"/>
+            <circle cx="8" cy="28" r="4.5" opacity="0.25"/>
+            <circle cx="13.86" cy="13.86" r="4.5" opacity="0.125"/>
+          </svg>
+          <div class="office-loader-label" id="office-loader-status">Loading...</div>
         </div>
       </div>
 
