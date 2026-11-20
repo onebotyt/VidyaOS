@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261029">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
-  <link rel="stylesheet" href="/faculty/classes/classes.css?v=20261117_code">
+  <link rel="stylesheet" href="/faculty/classes/classes.css?v=20261121_fab">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens on desktop */
     (function () {
@@ -39,7 +39,7 @@
       <main class="page-main-container container classes-container">
         <!-- 3 KPI Status Cards in 1 Row (My Classes, Total Students, Subjects) -->
         <section class="dash-kpi-row classes-kpi-row" aria-label="Classes Overview Metrics">
-          <!-- Stat 1: My Classes -->
+          <!-- Stat 1: Classes -->
           <article class="dash-kpi-card">
             <div class="dash-kpi-top">
               <div class="dash-kpi-icon icon-blue">
@@ -50,12 +50,12 @@
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
-              <span class="dash-kpi-label">My Classes</span>
+              <span class="dash-kpi-label">Classes</span>
             </div>
             <div class="dash-kpi-value" id="stat-my-classes">1</div>
           </article>
 
-          <!-- Stat 2: Total Students -->
+          <!-- Stat 2: Students -->
           <article class="dash-kpi-card">
             <div class="dash-kpi-top">
               <div class="dash-kpi-icon icon-green">
@@ -64,7 +64,7 @@
                   <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                 </svg>
               </div>
-              <span class="dash-kpi-label">Total Students</span>
+              <span class="dash-kpi-label">Students</span>
             </div>
             <div class="dash-kpi-value" id="stat-total-students">15</div>
             <div class="dash-kpi-trend positive">
@@ -88,9 +88,9 @@
           </article>
         </section>
 
-        <!-- 4. Action Buttons Row (+ Create Class, Students Roster, Broadcast Notice, Trash Bin) -->
+        <!-- 4. Action Buttons Row (On mobile: Roster, Broadcast, Trash Bin in 1 row; Create Class is in Floating FAB) -->
         <div class="classes-action-buttons-row">
-          <button type="button" class="btn-create-class-solid" onclick="openCreateGroupModal()">
+          <button type="button" class="btn-create-class-solid desktop-only-btn" onclick="openCreateGroupModal()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -98,7 +98,7 @@
             <span>Create Class</span>
           </button>
           <a href="/faculty/students/index.html" class="btn-action-outline">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -107,13 +107,13 @@
             <span>Students Roster</span>
           </a>
           <button type="button" class="btn-action-outline" onclick="openBroadcastNoticeModal()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-            <span>Broadcast Notice</span>
+            <span>Broadcast</span>
           </button>
           <a href="/faculty/classes/trash.html" class="btn-action-outline btn-trash-action" id="btn-classes-trash" title="Open Classroom Trash Bin (30-day recovery)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
@@ -122,7 +122,7 @@
           </a>
         </div>
 
-        <!-- 5. Search Bar & Semester Dropdown Filter -->
+        <!-- 5. Search Bar & Semester Filter -->
         <div class="classes-search-filter-row">
           <div class="classes-search-box">
             <svg class="classes-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -142,6 +142,17 @@
               <option value="6">Semester 6</option>
             </select>
           </div>
+        </div>
+
+        <!-- Swipeable Semester Filter Chips (Mobile friendly) -->
+        <div class="classes-sem-pills-scroll" id="classes-sem-pills-bar" aria-label="Filter by Semester">
+          <button type="button" class="sem-filter-pill active" onclick="handleSemesterFilterPill('ALL', this)">All</button>
+          <button type="button" class="sem-filter-pill" onclick="handleSemesterFilterPill('1', this)">Sem 1</button>
+          <button type="button" class="sem-filter-pill" onclick="handleSemesterFilterPill('2', this)">Sem 2</button>
+          <button type="button" class="sem-filter-pill" onclick="handleSemesterFilterPill('3', this)">Sem 3</button>
+          <button type="button" class="sem-filter-pill" onclick="handleSemesterFilterPill('4', this)">Sem 4</button>
+          <button type="button" class="sem-filter-pill" onclick="handleSemesterFilterPill('5', this)">Sem 5</button>
+          <button type="button" class="sem-filter-pill" onclick="handleSemesterFilterPill('6', this)">Sem 6</button>
         </div>
 
         <!-- 6. Classes Cards Grid Container -->
@@ -413,13 +424,22 @@
   <!-- Styled Feedback Toast Notification Banner -->
   <div id="classes-toast-banner" class="vidya-toast-banner"></div>
 
+  <!-- Floating Action Button (FAB) for Mobile: Option B -->
+  <button type="button" class="classes-mobile-fab" onclick="openCreateGroupModal()" aria-label="Create New Class">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+    <span>Class</span>
+  </button>
+
   <!-- Core Scripts -->
   <script src="/faculty/components/core/api.js"></script>
   <script src="/faculty/components/core/auth.js"></script>
   <script src="/faculty/components/icons.js?v=20261116"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
   <script src="/faculty/components/header/header.js?v=20261116"></script>
-  <script src="/faculty/classes/classes.js?v=20261117_code"></script>
+  <script src="/faculty/classes/classes.js?v=20261121_fab"></script>
 </body>
 
 </html>

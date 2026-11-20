@@ -241,7 +241,7 @@
                 <path d="M17.8 16.7A6 6 0 0 0 18 12a6 6 0 0 0-6-6"></path>
                 <path d="M15.2 13.7A2 2 0 0 0 14 12a2 2 0 0 0-2-2"></path>
               </svg>
-              <span>((•)) Take Attendance</span>
+              <span>Take Attendance</span>
             </a>
             <a href="/faculty/registers/index.html?groupId=${g.id}" class="btn-card-register">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -334,6 +334,23 @@
   };
 
   window.handleSemesterFilter = function (val) {
+    state.selectedSemester = val;
+    // Synchronize semester filter pills
+    document.querySelectorAll('.sem-filter-pill').forEach(p => {
+      const match = p.getAttribute('onclick')?.includes(`'${val}'`);
+      p.classList.toggle('active', !!match);
+    });
+    // Synchronize select dropdown if different
+    const selectElem = document.getElementById('filter-semester-select');
+    if (selectElem && selectElem.value !== val) selectElem.value = val;
+    renderCards();
+  };
+
+  window.handleSemesterFilterPill = function (val, elem) {
+    document.querySelectorAll('.sem-filter-pill').forEach(p => p.classList.remove('active'));
+    if (elem) elem.classList.add('active');
+    const selectElem = document.getElementById('filter-semester-select');
+    if (selectElem) selectElem.value = val;
     state.selectedSemester = val;
     renderCards();
   };
