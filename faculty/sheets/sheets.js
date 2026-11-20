@@ -1201,6 +1201,8 @@ function setSheetZoom(scale) {
   if (dLbl) dLbl.textContent = `${pct}%`;
   const hLbl = document.getElementById('home-zoom-level-label');
   if (hLbl) hLbl.textContent = `${pct}%`;
+  const vLbl = document.getElementById('view-zoom-level-label');
+  if (vLbl) vLbl.textContent = `${pct}%`;
   const bLbl = document.getElementById('excel-status-zoom-pct');
   if (bLbl) bLbl.textContent = `${pct}%`;
   const slider = document.getElementById('excel-bottom-zoom-slider');
@@ -10043,7 +10045,15 @@ function toggleGridlines() {
     });
   }
   const btn = document.getElementById('btn-toggle-gridlines');
-  if (btn) btn.textContent = `Gridlines: ${EXCEL_WB.gridlines ? 'ON' : 'OFF'}`;
+  if (btn) {
+    btn.classList.toggle('active', Boolean(EXCEL_WB.gridlines));
+    const vLbl = document.getElementById('label-view-gridlines');
+    if (vLbl) {
+      vLbl.textContent = `Gridlines: ${EXCEL_WB.gridlines ? 'ON' : 'OFF'}`;
+    } else {
+      btn.textContent = `Gridlines: ${EXCEL_WB.gridlines ? 'ON' : 'OFF'}`;
+    }
+  }
 }
 
 function toggleFormulaBarVisibility() {
@@ -10061,6 +10071,8 @@ function toggleFormulaBarVisibility() {
   const viewBtn = document.getElementById('btn-toggle-formula-view');
   if (viewBtn) {
     viewBtn.classList.toggle('active', Boolean(EXCEL_WB.formulaBarVisible));
+    const vLbl = document.getElementById('label-view-formula');
+    if (vLbl) vLbl.textContent = `Formula Bar: ${EXCEL_WB.formulaBarVisible ? 'ON' : 'OFF'}`;
   }
 }
 
@@ -10470,7 +10482,7 @@ function toggleFreezePanesMenu(e) {
     if (e.stopPropagation) e.stopPropagation();
   }
   const m = document.getElementById('excel-freeze-menu');
-  const btn = document.getElementById('btn-home-freeze-panes');
+  const btn = document.getElementById('btn-view-freeze-panes') || document.getElementById('btn-home-freeze-panes');
   if (typeof openDropdownOverlay === 'function') {
     openDropdownOverlay(m, btn);
   } else {
@@ -10841,7 +10853,7 @@ function sortActiveColumn(dir = 'asc') {
 
 /* Close popup menus on outside click or Escape */
 window.addEventListener('click', (e) => {
-  const isTrigger = e.target.closest('#btn-merge-cells, #btn-border-dropdown, #btn-autosum-dropdown, #btn-home-freeze-panes, #btn-export-dropdown');
+  const isTrigger = e.target.closest('#btn-merge-cells, #btn-border-dropdown, #btn-autosum-dropdown, #btn-view-freeze-panes, #btn-home-freeze-panes, #btn-export-dropdown');
   const isMenu = e.target.closest('.excel-dropdown-menu, .excel-mini-menu, .studio-export-menu');
   if (!isTrigger && !isMenu) {
     closeAllDropdownOverlays();

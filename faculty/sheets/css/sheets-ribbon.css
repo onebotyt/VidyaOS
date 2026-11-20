@@ -224,3 +224,23 @@
   border-color: var(--status-present);
   color: var(--status-present);
 }
+
+/* Compact Styles Group (2-Row Layout) */
+.excel-styles-group {
+  min-width: 140px;
+}
+
+.excel-styles-group .excel-tool-vgroup {
+  width: 100%;
+}
+
+.excel-styles-group .excel-tool-row {
+  width: 100%;
+}
+
+.excel-styles-group .excel-tool-btn {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.1rem 0.32rem;
+  font-size: 0.65rem;
+}

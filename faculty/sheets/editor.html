@@ -17,11 +17,11 @@
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261029">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
 
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-loading.css?v=20261120_v10">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-color-tools.css?v=20261120_v10">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-grid.css?v=20261120_v10">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-ribbon.css?v=20261120_v10">
-  <link rel="stylesheet" href="/faculty/sheets/sheets.css?v=20261120_v10">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-loading.css?v=20261120_v11">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-color-tools.css?v=20261120_v11">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-grid.css?v=20261120_v11">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-ribbon.css?v=20261120_v11">
+  <link rel="stylesheet" href="/faculty/sheets/sheets.css?v=20261120_v11">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -251,7 +251,7 @@
          EXCEL RIBBON / TOOLBAR SYSTEM (8 Tabs: File, Home, Insert, Page Layout, Formulas, Data, Review, View)
          ══════════════════════════════════════════════════════════════ -->
         <div class="excel-ribbon" id="excel-ribbon">
-          <!-- Ribbon Tabs Bar (View settings integrated into Home tab) -->
+          <!-- Ribbon Tabs Bar -->
           <nav class="excel-ribbon-tabs" aria-label="Excel Ribbon Tabs">
             <button type="button" class="excel-tab-btn" data-tab="file" onclick="switchRibbonTab('file')">File</button>
             <button type="button" class="excel-tab-btn active" data-tab="home"
@@ -265,6 +265,8 @@
             <button type="button" class="excel-tab-btn" data-tab="data" onclick="switchRibbonTab('data')">Data</button>
             <button type="button" class="excel-tab-btn" data-tab="review"
               onclick="switchRibbonTab('review')">Review</button>
+            <button type="button" class="excel-tab-btn" data-tab="view"
+              onclick="switchRibbonTab('view')">View</button>
             <button type="button" class="excel-tab-btn" data-tab="templates"
               onclick="switchRibbonTab('templates')">Templates</button>
           </nav>
@@ -677,28 +679,32 @@
                   <span class="excel-group-label">Number</span>
                 </div>
 
-                <!-- Styles & Conditional Formatting Group (Excel Feature) -->
+                <!-- Styles & Conditional Formatting Group (Compact 2-Row Vertical Layout) -->
                 <div class="excel-tool-group excel-styles-group">
-                  <div class="excel-tool-row">
-                    <button type="button" class="excel-tool-btn" id="btn-conditional-formatting"
-                      onclick="toggleConditionalFormattingMenu(event, this)" title="Excel Conditional Formatting & Color Scales">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                      </svg>
-                      <span>Conditional Formatting ▾</span>
-                    </button>
-
-                    <!-- Color Templates / Table Styles (Non-Conditional) -->
-                    <button type="button" class="excel-tool-btn" id="btn-color-templates"
-                      onclick="toggleColorTemplatesMenu(event, this)" title="Sheet Color Templates & Table Themes">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-                      </svg>
-                      <span>Color Templates ▾</span>
-                    </button>
+                  <div class="excel-tool-content">
+                    <div class="excel-tool-vgroup">
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn" id="btn-conditional-formatting"
+                          onclick="toggleConditionalFormattingMenu(event, this)" title="Excel Conditional Formatting & Color Scales">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                          </svg>
+                          <span>Conditional Formatting ▾</span>
+                        </button>
+                      </div>
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn" id="btn-color-templates"
+                          onclick="toggleColorTemplatesMenu(event, this)" title="Sheet Color Templates & Table Themes">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                          </svg>
+                          <span>Color Templates ▾</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   <span class="excel-group-label">Styles</span>
                 </div>
@@ -728,13 +734,6 @@
                     </button>
                     <button type="button" class="excel-tool-btn" onclick="openEditStudentRosterModal()"
                       title="Open Scores Form Modal">Roster Form</button>
-                    <button type="button" class="excel-tool-btn" id="btn-ribbon-fit-screen"
-                      onclick="triggerFitColumnsToScreen()" title="Fit all columns to screen width without scrolling">
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                      </svg>
-                      <span>Fit Screen</span>
-                    </button>
                   </div>
                   <span class="excel-group-label">Cells</span>
                 </div>
@@ -799,80 +798,6 @@
                     </button>
                   </div>
                   <span class="excel-group-label">Editing</span>
-                </div>
-
-                <!-- View & Display Group (Integrated into Home Tab) -->
-                <div class="excel-tool-group">
-                  <div class="excel-tool-content">
-                    <div class="excel-tool-vgroup">
-                      <div class="excel-tool-row">
-                        <button type="button" class="excel-tool-btn active" id="btn-home-toggle-gridlines"
-                          onclick="toggleGridlines()" title="Show/Hide Gridlines">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="1" />
-                            <line x1="3" y1="12" x2="21" y2="12" />
-                            <line x1="12" y1="3" x2="12" y2="21" />
-                          </svg>
-                          <span id="label-home-gridlines">Gridlines</span>
-                        </button>
-                        <button type="button" class="excel-tool-btn" id="btn-home-toggle-formula-bar"
-                          onclick="toggleFormulaBarVisibility()" title="Show/Hide Formula Bar">
-                          <span
-                            style="font-family:serif;font-weight:700;font-size:0.8rem;color:var(--color-primary);">ƒx</span>
-                          <span>Formula Bar</span>
-                        </button>
-                        <!-- Freeze Panes Dropdown -->
-                        <div class="excel-dropdown-wrapper">
-                          <button type="button" class="excel-tool-btn" id="btn-home-freeze-panes"
-                            onclick="toggleFreezePanesMenu(event)" title="Freeze Panes / Rows / Columns">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
-                              <rect x="3" y="3" width="18" height="18" rx="1" />
-                              <line x1="3" y1="9" x2="21" y2="9" />
-                              <line x1="9" y1="3" x2="9" y2="21" />
-                            </svg>
-                            <span>Freeze ▾</span>
-                          </button>
-                          <div class="excel-mini-menu" id="excel-freeze-menu" style="display:none;">
-                            <button type="button" class="excel-menu-row" onclick="freezeTopRow()"><strong>Freeze Top
-                                Row</strong></button>
-                            <button type="button" class="excel-menu-row" onclick="freezeFirstColumn()"><strong>Freeze
-                                First Column</strong></button>
-                            <button type="button" class="excel-menu-row" onclick="unfreezePanes()"><strong>Unfreeze
-                                Panes</strong></button>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="excel-tool-row">
-                        <button type="button" class="excel-icon-btn" onclick="zoomOut()" title="Zoom Out (−)">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                          </svg>
-                        </button>
-                        <span class="zoom-level-indicator" id="home-zoom-level-label"
-                          style="font-size:0.75rem;font-weight:800;color:var(--text-main);min-width:34px;text-align:center;">100%</span>
-                        <button type="button" class="excel-icon-btn" onclick="zoomIn()" title="Zoom In (+)">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                          </svg>
-                        </button>
-                        <button type="button" class="excel-tool-btn active" id="btn-home-autofit"
-                          onclick="toggleAutoFit()" title="Toggle Auto-Fit">Auto-Fit</button>
-                        <select class="density-select" id="home-density-selector" onchange="setDensity(this.value)"
-                          title="Display Density"
-                          style="padding:0.18rem 0.35rem;font-size:0.72rem;background:var(--bg-surface);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-sm);">
-                          <option value="normal" selected>Normal</option>
-                          <option value="compact">Compact</option>
-                          <option value="comfortable">Comfortable</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <span class="excel-group-label">View &amp; Display</span>
                 </div>
 
               </div>
@@ -948,46 +873,6 @@
               <div class="excel-ribbon-panel" id="panel-page-layout">
                 <div class="excel-tool-group">
                   <div class="excel-tool-content">
-                    <div class="excel-tool-vgroup">
-                      <div class="excel-tool-row">
-                        <button type="button" class="excel-tool-btn active" id="btn-toggle-gridlines"
-                          onclick="toggleGridlines()" title="Show/Hide Gridlines">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="1" />
-                            <line x1="3" y1="12" x2="21" y2="12" />
-                            <line x1="12" y1="3" x2="12" y2="21" />
-                          </svg>
-                          <span>Gridlines: ON</span>
-                        </button>
-                        <button type="button" class="excel-tool-btn active" id="btn-toggle-banner-view"
-                          onclick="toggleInstitutionalBanner()" title="Show/Hide Institutional Header Banner">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6" />
-                          </svg>
-                          <span>College Banner: ON</span>
-                        </button>
-                      </div>
-                      <div class="excel-tool-row">
-                        <button type="button" class="excel-tool-btn" onclick="openEditMarksModal()"
-                          title="Edit Total Marks &amp; Scheme">
-                          <span>Scheme Weightage</span>
-                        </button>
-                        <button type="button" class="excel-tool-btn" id="btn-layout-fit-screen"
-                          onclick="triggerFitColumnsToScreen()" title="Auto-Fit All Columns to Screen Width">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                          </svg>
-                          <span>Fit Columns to Screen</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <span class="excel-group-label">Sheet Display</span>
-                </div>
-                <div class="excel-tool-group">
-                  <div class="excel-tool-content">
                     <button type="button" class="excel-action-btn-large" onclick="window.print()"
                       title="Open Print View">
                       <span class="excel-icon">
@@ -1000,8 +885,18 @@
                       </span>
                       <span class="excel-btn-label">Print Sheet</span>
                     </button>
+                    <button type="button" class="excel-action-btn-large" onclick="openEditMarksModal()"
+                      title="Configure Evaluation Scheme &amp; Marks Distribution">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Scheme Marks</span>
+                    </button>
                   </div>
-                  <span class="excel-group-label">Print Setup</span>
+                  <span class="excel-group-label">Page Setup &amp; Print</span>
                 </div>
               </div>
 
@@ -1135,7 +1030,132 @@
                 </div>
               </div>
 
-              <!-- 8. TEMPLATES PANEL -->
+              <!-- 8. VIEW PANEL -->
+              <div class="excel-ribbon-panel" id="panel-view">
+                <!-- Group 1: Sheet Display / Show -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <div class="excel-tool-vgroup">
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn active" id="btn-toggle-gridlines"
+                          onclick="toggleGridlines()" title="Show/Hide Gridlines">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="1" />
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="12" y1="3" x2="12" y2="21" />
+                          </svg>
+                          <span id="label-view-gridlines">Gridlines: ON</span>
+                        </button>
+                        <button type="button" class="excel-tool-btn active" id="btn-toggle-formula-view"
+                          onclick="toggleFormulaBarVisibility()" title="Show/Hide Formula Bar">
+                          <span style="font-family:serif;font-weight:700;font-size:0.8rem;color:var(--color-primary);">ƒx</span>
+                          <span id="label-view-formula">Formula Bar: ON</span>
+                        </button>
+                      </div>
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn active" id="btn-toggle-banner-view"
+                          onclick="toggleInstitutionalBanner()" title="Show/Hide Institutional Header Banner">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6" />
+                          </svg>
+                          <span id="label-view-banner">College Banner: ON</span>
+                        </button>
+                        <button type="button" class="excel-tool-btn active" id="btn-toggle-signatures-bar"
+                          onclick="toggleSignatureBarVisibility()" title="Show/Hide Faculty &amp; HOD Signatures Block">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="8.5" cy="7" r="4" />
+                            <line x1="20" y1="8" x2="20" y2="14" />
+                            <line x1="23" y1="11" x2="17" y2="11" />
+                          </svg>
+                          <span id="btn-signatures-label">Signatures: ON</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="excel-group-label">Show / Hide</span>
+                </div>
+
+                <!-- Group 2: Zoom & Screen-Fit -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <div class="excel-tool-vgroup">
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-icon-btn" onclick="zoomOut()" title="Zoom Out (−)">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                        <span class="zoom-level-indicator" id="view-zoom-level-label"
+                          style="font-size:0.75rem;font-weight:800;color:var(--text-main);min-width:34px;text-align:center;">100%</span>
+                        <button type="button" class="excel-icon-btn" onclick="zoomIn()" title="Zoom In (+)">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                        <button type="button" class="excel-tool-btn" onclick="resetZoom()" title="Reset Zoom to 100%">100%</button>
+                      </div>
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn" id="btn-view-fit-screen"
+                          onclick="triggerFitColumnsToScreen()" title="Auto-Fit All Columns to Screen Width without scrolling">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                          </svg>
+                          <span>Fit to Screen</span>
+                        </button>
+                        <select class="density-select" id="view-density-selector" onchange="setDensity(this.value)"
+                          title="Display Density"
+                          style="padding:0.18rem 0.35rem;font-size:0.72rem;background:var(--bg-surface);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-sm);">
+                          <option value="normal" selected>Normal</option>
+                          <option value="compact">Compact</option>
+                          <option value="comfortable">Comfortable</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="excel-group-label">Zoom &amp; Fit</span>
+                </div>
+
+                <!-- Group 3: Window / Freeze Panes -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <div class="excel-tool-vgroup">
+                      <div class="excel-tool-row">
+                        <div class="excel-dropdown-wrapper">
+                          <button type="button" class="excel-tool-btn" id="btn-view-freeze-panes"
+                            onclick="toggleFreezePanesMenu(event)" title="Freeze Panes / Rows / Columns">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <rect x="3" y="3" width="18" height="18" rx="1" />
+                              <line x1="3" y1="9" x2="21" y2="9" />
+                              <line x1="9" y1="3" x2="9" y2="21" />
+                            </svg>
+                            <span>Freeze Panes ▾</span>
+                          </button>
+                          <div class="excel-mini-menu" id="excel-freeze-menu" style="display:none;">
+                            <button type="button" class="excel-menu-row" onclick="freezeTopRow()"><strong>Freeze Top Row</strong></button>
+                            <button type="button" class="excel-menu-row" onclick="freezeFirstColumn()"><strong>Freeze First Column</strong></button>
+                            <button type="button" class="excel-menu-row" onclick="unfreezePanes()"><strong>Unfreeze Panes</strong></button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn" onclick="openEditMarksModal()"
+                          title="Edit Total Marks &amp; Scheme Weightage">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                          </svg>
+                          <span>Scheme Weightage</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="excel-group-label">Window</span>
+                </div>
+              </div>
+
+              <!-- 9. TEMPLATES PANEL -->
               <div class="excel-ribbon-panel" id="panel-templates">
                 <div class="excel-tool-group">
                   <div class="excel-tool-content">
@@ -1220,7 +1240,6 @@
                 </div>
               </div>
 
-              <!-- 8. VIEW PANEL -->
             </div>
             <button type="button" class="ribbon-scroll-btn ribbon-scroll-right" id="btn-ribbon-scroll-right"
               onclick="scrollRibbon(220)" title="Scroll Ribbon Right" aria-label="Scroll Ribbon Right"
@@ -2936,11 +2955,11 @@
     <script src="/faculty/components/header/header.js?v=20261029"></script>
     <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
     <!-- Office Studio Modular Architecture: Lightweight Initial Hub & Loading Overlay (< 35 KB) -->
-    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_v10"></script>
-    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_v10"></script>
-    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v10"></script>
+    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_v11"></script>
+    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_v11"></script>
+    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v11"></script>
     <script src="/faculty/components/core/exceljs.min.js"></script>
-    <script src="/faculty/sheets/sheets.js?v=20261120_v10"></script>
+    <script src="/faculty/sheets/sheets.js?v=20261120_v11"></script>
 </body>
 
 </html>
