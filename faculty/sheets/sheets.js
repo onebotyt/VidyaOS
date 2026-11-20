@@ -9036,18 +9036,54 @@ function generateSheetPrintableHtml(sheet) {
     }
     @media screen {
       body {
-        background: #e2e8f0;
+        background: #0f172a;
         padding: 12px;
         min-width: 960px;
         box-sizing: border-box;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+      }
+      .no-print-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+        max-width: 1080px;
+        background: #1e293b;
+        color: #f8fafc;
+        padding: 8px 16px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-sizing: border-box;
+      }
+      .toolbar-brand {
+        font-size: 13px;
+        font-weight: 600;
+        color: #e2e8f0;
+      }
+      .tb-btn-print {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        background: #2563eb;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
       }
       .pdf-sheet-page {
         background: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         padding: 12px 14px;
         width: 100%;
         max-width: 1080px;
@@ -9060,6 +9096,9 @@ function generateSheetPrintableHtml(sheet) {
         padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
+      }
+      .no-print-toolbar {
+        display: none !important;
       }
       .pdf-sheet-page {
         border: none !important;
@@ -9140,6 +9179,21 @@ function generateSheetPrintableHtml(sheet) {
   </style>
 </head>
 <body>
+  <div class="no-print-toolbar">
+    <div class="toolbar-brand">
+      <strong>VidyaOS</strong> • ${escapeHtml(sheet.name || 'Worksheet')} (A4 Landscape)
+    </div>
+    <div class="toolbar-actions">
+      <button type="button" class="tb-btn tb-btn-print" onclick="window.print()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:text-bottom;">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>Print / Save as PDF</span>
+      </button>
+    </div>
+  </div>
   <div class="pdf-sheet-page">
     <div class="pdf-banner">
       <div class="pdf-banner-line1">${escapeHtml(instBanner)}</div>

@@ -132,7 +132,7 @@ async function loadSpreadsheetEngine(onReady) {
 
     // 3. Load main Sheets Studio engine
     if (typeof window.initSheetsStudio !== 'function') {
-      await loadScript('/faculty/sheets/sheets.js?v=20261121_mobile_v2');
+      await loadScript('/faculty/sheets/sheets.js?v=20261121_mobile_v3');
     }
 
     window.__OFFICE_ENGINE_LOADED = true;
@@ -610,7 +610,16 @@ function closeMobileTestSelectorModal() {
 }
 
 async function viewSheetOnMobile(groupId, sheetKey, testNumber = null) {
-  showOfficeScreenLoader('Generating Sheet Output...');
+  // Pre-open a blank tab synchronously to prevent popup blocker on mobile browsers
+  let newTab = null;
+  try {
+    newTab = window.open('about:blank', '_blank');
+    if (newTab && newTab.document) {
+      newTab.document.write('<!DOCTYPE html><html><head><title>Opening Worksheet...</title><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:#334155;background:#f8fafc;"><div style="text-align:center;"><div style="width:36px;height:36px;border:3px solid #cbd5e1;border-top-color:#2563eb;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px auto;"></div><p style="font-size:14px;font-weight:600;margin:0;">Opening Worksheet in Browser…</p><style>@keyframes spin{to{transform:rotate(360deg)}}</style></div></body></html>');
+    }
+  } catch (_) { }
+
+  showOfficeScreenLoader('Opening worksheet in browser…');
   try {
     // 1. Ensure spreadsheet engine is loaded
     await loadSpreadsheetEngine();
@@ -671,117 +680,82 @@ async function viewSheetOnMobile(groupId, sheetKey, testNumber = null) {
       throw new Error('Unable to generate HTML output.');
     }
 
-    // 5. Populate and display in-app viewer modal
-    const modal = document.getElementById('mobile-sheet-viewer-modal');
-    const iframe = document.getElementById('mobile-sheet-preview-iframe');
-    const titleEl = document.getElementById('mobile-sheet-viewer-title');
-    const subEl = document.getElementById('mobile-sheet-viewer-sub');
+    // 5. Open directly in browser view tab
+    const blob = new Blob([printHtml], { type: 'text/html;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
 
-    const grpName = S.group?.name || S.group?.subject_name || 'Subject';
-    const subCode = S.group?.subject_code || '';
-    const codeDisplay = subCode && !grpName.includes(subCode) ? ` [${subCode}]` : '';
-    const sem = S.group?.semester || 5;
-
-    if (titleEl) titleEl.textContent = targetSheet.name || 'Academic Worksheet';
-    if (subEl) subEl.textContent = `${grpName}${codeDisplay} • Sem ${sem}`;
-
-    window._currentActiveMobileSheet = targetSheet;
-    window._currentActiveMobileHtml = printHtml;
-
-    if (iframe) {
-      const doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write(printHtml);
-      doc.close();
+    if (newTab && !newTab.closed) {
+      newTab.location.href = blobUrl;
+    } else {
+      const w = window.open(blobUrl, '_blank');
+      if (!w) {
+        window.location.href = blobUrl;
+      }
     }
 
-    _mobileSheetZoomLevel = 1.0;
-    const zoomBadge = document.getElementById('mobile-viewer-zoom-level');
-    if (zoomBadge) zoomBadge.textContent = '100%';
-
+    closeMobileTestSelectorModal();
     hideOfficeScreenLoader();
-
-    if (modal) {
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
   } catch (err) {
-    console.error('Failed to view sheet on mobile:', err);
+    console.error('Failed to view sheet in browser:', err);
+    if (newTab && !newTab.closed) {
+      try { newTab.close(); } catch (_) { }
+    }
+    closeMobileTestSelectorModal();
     hideOfficeScreenLoader();
     if (typeof showToast === 'function') {
-      showToast('Could not load sheet output preview. Please try again.', 'error', 3500);
+      showToast('Could not open worksheet view. Please try again.', 'error', 3500);
     }
-  }
-}
-
-var _mobileSheetZoomLevel = 1.0;
-
-function adjustSheetZoom(delta) {
-  if (delta === 0) {
-    _mobileSheetZoomLevel = 1.0;
-  } else {
-    _mobileSheetZoomLevel = Math.min(2.5, Math.max(0.5, _mobileSheetZoomLevel + delta));
-  }
-  const pct = Math.round(_mobileSheetZoomLevel * 100);
-  const zoomBadge = document.getElementById('mobile-viewer-zoom-level');
-  if (zoomBadge) zoomBadge.textContent = `${pct}%`;
-
-  const iframe = document.getElementById('mobile-sheet-preview-iframe');
-  if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
-    const page = iframe.contentWindow.document.querySelector('.pdf-sheet-page') || iframe.contentWindow.document.body;
-    if (page) {
-      page.style.transform = `scale(${_mobileSheetZoomLevel})`;
-      page.style.transformOrigin = 'top center';
-      page.style.transition = 'transform 0.15s ease-out';
-    }
-  }
-}
-
-function openSheetInBrowserView() {
-  let html = window._currentActiveMobileHtml;
-  if (!html && window._currentActiveMobileSheet && typeof window.generateSheetPrintableHtml === 'function') {
-    html = window.generateSheetPrintableHtml(window._currentActiveMobileSheet);
-  }
-  if (!html) {
-    if (typeof showToast === 'function') showToast('No sheet preview available to open.', 'warning');
-    return;
-  }
-
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const blobUrl = URL.createObjectURL(blob);
-  const win = window.open(blobUrl, '_blank');
-  if (!win) {
-    window.location.href = blobUrl;
-  }
-}
-
-function closeMobileSheetViewerModal() {
-  const modal = document.getElementById('mobile-sheet-viewer-modal');
-  if (modal) {
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-}
-
-function downloadCurrentSheetPdf() {
-  const iframe = document.getElementById('mobile-sheet-preview-iframe');
-  if (iframe && iframe.contentWindow) {
-    try {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    } catch (_) {
-      window.print();
-    }
-  } else if (window._currentActiveMobileSheet && typeof window.exportSheetToPdf === 'function') {
-    window.exportSheetToPdf(window._currentActiveMobileSheet);
   }
 }
 
 async function downloadSheetDirectOnMobile(groupId, sheetKey, testNumber = null) {
-  await viewSheetOnMobile(groupId, sheetKey, testNumber);
-  setTimeout(() => {
-    downloadCurrentSheetPdf();
-  }, 450);
+  showOfficeScreenLoader('Preparing A4 PDF…');
+  try {
+    await loadSpreadsheetEngine();
+
+    S.groupId = Number(groupId);
+    S.group = (S.allGroups || []).find(g => Number(g.id) === Number(groupId)) || S.group;
+
+    if (typeof window.loadGroupMetadata === 'function') {
+      await window.loadGroupMetadata(groupId);
+    } else if (typeof window.hydrateAcademicSheetsFromGroup === 'function') {
+      window.hydrateAcademicSheetsFromGroup(false);
+    }
+
+    const sheets = (window.EXCEL_WB && window.EXCEL_WB.sheets) || [];
+    let targetSheet = null;
+
+    if (sheetKey === 'single-test' && testNumber) {
+      targetSheet = sheets.find(s => s.type === 'single-test' && (
+        Number(s.testNumber) === Number(testNumber) ||
+        String(s.name || '').toLowerCase().includes(`test ${testNumber}`)
+      ));
+    } else if (sheetKey === 'tests') {
+      targetSheet = sheets.find(s => s.type === 'tests') || sheets[1];
+    } else if (sheetKey === 'assignments') {
+      targetSheet = sheets.find(s => s.type === 'assignments') || sheets[12];
+    } else if (sheetKey === 'practicals') {
+      targetSheet = sheets.find(s => s.type === 'practicals') || sheets[13];
+    } else {
+      targetSheet = sheets.find(s => s.type === 'evaluation') || sheets[0];
+    }
+
+    if (!targetSheet && sheets.length > 0) targetSheet = sheets[0];
+
+    closeMobileTestSelectorModal();
+    hideOfficeScreenLoader();
+
+    if (targetSheet && typeof window.exportSheetToPdf === 'function') {
+      window.exportSheetToPdf(targetSheet);
+    }
+  } catch (err) {
+    console.error('Failed to download sheet:', err);
+    closeMobileTestSelectorModal();
+    hideOfficeScreenLoader();
+    if (typeof showToast === 'function') {
+      showToast('Could not generate PDF download. Please try again.', 'error');
+    }
+  }
 }
 
 // Global Exports
@@ -803,8 +777,4 @@ window.triggerExcelImport = triggerExcelImport;
 window.openMobileTestSelectorModal = openMobileTestSelectorModal;
 window.closeMobileTestSelectorModal = closeMobileTestSelectorModal;
 window.viewSheetOnMobile = viewSheetOnMobile;
-window.closeMobileSheetViewerModal = closeMobileSheetViewerModal;
-window.downloadCurrentSheetPdf = downloadCurrentSheetPdf;
 window.downloadSheetDirectOnMobile = downloadSheetDirectOnMobile;
-window.adjustSheetZoom = adjustSheetZoom;
-window.openSheetInBrowserView = openSheetInBrowserView;
