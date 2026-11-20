@@ -6449,6 +6449,16 @@ function renderExcelGrid(rebuildStructure = true) {
     tbody.innerHTML = bodyHtml;
   } else {
     // Fast in-place DOM update without tearing down grid structure
+    if (thead) {
+      for (let c = 0; c < cols; c++) {
+        const th = thead.querySelector(`.col-th-${c}`);
+        if (th && sheet.colWidths && sheet.colWidths[c]) {
+          const w = sheet.colWidths[c];
+          th.style.width = `${w}px`;
+          th.style.minWidth = `${w}px`;
+        }
+      }
+    }
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const td = tbody.querySelector(`.cell-${r}-${c}`);
@@ -8657,10 +8667,31 @@ async function exportCurrentSheet(format) {
           const isHeader = r === 0;
           const isSubHeader = (r === 1 && !isMarksRow(wsData, 1));
           const isMarks = r === 1 && isMarksRow(wsData, 1);
+
+          // Calculate maximum line breaks across all cells in this row to guarantee no vertical clipping
+          let maxLinesInRow = 1;
+          for (let c = 0; c <= maxDataCol; c++) {
+            const cell = getCell(wsData, r, c);
+            const valStr = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || '')).trim();
+            const explicitLines = valStr.split(/\r?\n/).length;
+            if (explicitLines > maxLinesInRow) maxLinesInRow = explicitLines;
+          }
+
+          let minRequiredH = 20;
+          if (isHeader) {
+            minRequiredH = 28;
+          } else if (maxLinesInRow >= 3) {
+            minRequiredH = 52;
+          } else if (maxLinesInRow === 2 || isSubHeader) {
+            minRequiredH = 38;
+          } else if (isMarks) {
+            minRequiredH = 22;
+          }
+
           if (wsData.rowHeights && typeof wsData.rowHeights[r] === 'number' && wsData.rowHeights[r] > 0) {
-            rowObj.height = Math.round(wsData.rowHeights[r] * 0.75);
+            rowObj.height = Math.max(Math.round(wsData.rowHeights[r] * 0.75), minRequiredH);
           } else {
-            rowObj.height = isHeader ? 26 : isSubHeader ? 38 : isMarks ? 22 : 20;
+            rowObj.height = minRequiredH;
           }
 
           for (let c = 0; c <= maxDataCol; c++) {
@@ -8769,7 +8800,7 @@ async function exportCurrentSheet(format) {
           rowObj.commit();
         }
 
-        // 6. Set custom or auto column widths up to maxDataCol (Total = 63px / 9 units, Grand Total = 65px / 9 units)
+        // 6. Set custom or auto column widths up to maxDataCol (Total = 63px / 9 units, Grand Total = 65px / 9.5 units)
         for (let c = 0; c <= maxDataCol; c++) {
           let customW = wsData.colWidths?.[c];
           let colHeaderStr = '';
@@ -8779,17 +8810,34 @@ async function exportCurrentSheet(format) {
             if (txt) colHeaderStr += ' ' + txt;
           }
           if (colHeaderStr.includes('GRAND TOTAL') || (colHeaderStr.includes('GRAND') && colHeaderStr.includes('TOTAL'))) {
-            customW = 65;
+            worksheet.getColumn(c + 1).width = 9.5; // Exactly 65px proportional in Excel
           } else if (colHeaderStr.includes('TOTAL') || colHeaderStr.includes('TOT')) {
-            customW = 63;
-          }
-
-          if (customW && typeof customW === 'number' && customW > 0) {
-            worksheet.getColumn(c + 1).width = Math.max(6, Math.round(customW / 7.2));
+            worksheet.getColumn(c + 1).width = 9.0; // Exactly 63px proportional in Excel
+          } else if (c === 0) {
+            worksheet.getColumn(c + 1).width = 6.5; // SR. NO.
+          } else if (c === 1) {
+            worksheet.getColumn(c + 1).width = 7.5; // ROLL NO.
+          } else if (c === 2) {
+            worksheet.getColumn(c + 1).width = 12.0; // REG. NO.
+          } else if (c === 3) {
+            worksheet.getColumn(c + 1).width = 16.0; // ENROLLMENT NO.
+          } else if (c === 4) {
+            worksheet.getColumn(c + 1).width = 24.0; // STUDENT NAME
+          } else if (customW && typeof customW === 'number' && customW > 0) {
+            worksheet.getColumn(c + 1).width = Math.max(11.5, Math.round(customW / 6.0));
           } else {
             worksheet.getColumn(c + 1).width = Math.max(colMaxLengths[c] || 12, 12);
           }
         }
+
+        // Configure Page Setup for Standard A4 Landscape & 1-page width fitting
+        worksheet.pageSetup = {
+          orientation: 'landscape',
+          paperSize: 9, // A4
+          fitToPage: true,
+          fitToWidth: 1,
+          fitToHeight: 0
+        };
 
         // 7. Apply sheet cell merges (shifted if banner prepended)
         if (Array.isArray(wsData.merges)) {
@@ -9220,7 +9268,9 @@ function exportSheetToWordDoc(sheet) {
       const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8pt'));
       const tag = isHeader ? 'th' : 'td';
 
-      tableHtml += `<${tag}${spanAttrs} style="padding:3px 2px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #cbd5e1;font-size:${fontSize};white-space:pre-wrap;word-break:break-word;box-sizing:border-box;">${escapeHtml(val)}</${tag}>`;
+      const colW = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : 68;
+      const cellPct = ((colW / sumColWidths) * 100).toFixed(2);
+      tableHtml += `<${tag}${spanAttrs} width="${cellPct}%" style="width:${cellPct}%;padding:3px 2px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #cbd5e1;font-size:${fontSize};white-space:pre-wrap;word-break:break-word;box-sizing:border-box;">${escapeHtml(val)}</${tag}>`;
     }
     tableHtml += '</tr>';
   }
@@ -9240,19 +9290,31 @@ function exportSheetToWordDoc(sheet) {
       <w:Zoom>100</w:Zoom>
       <w:DoNotOptimizeForBrowser/>
     </w:WordDocument>
+    <w:Compatibility>
+      <w:BreakWrappedTables/>
+      <w:SnapToGridInCell/>
+      <w:WrapTextWithPunct/>
+      <w:UseAsianBreakRules/>
+      <w:DontGrowAutofit/>
+    </w:Compatibility>
   </xml>
   <![endif]-->
   <style>
-    @page Section1 {
-      size: 297mm 210mm;
+    @page {
+      size: 29.7cm 21.0cm;
+      margin: 0.8cm 0.6cm 0.8cm 0.6cm;
       mso-page-orientation: landscape;
-      margin: 8mm 6mm 8mm 6mm;
-      mso-header-margin: 5mm;
-      mso-footer-margin: 5mm;
+    }
+    @page WordSection1 {
+      size: 841.9pt 595.3pt;
+      mso-page-orientation: landscape;
+      margin: 20pt 16pt 20pt 16pt;
+      mso-header-margin: 15pt;
+      mso-footer-margin: 15pt;
       mso-paper-source: 0;
     }
-    div.Section1 {
-      page: Section1;
+    div.WordSection1 {
+      page: WordSection1;
     }
     body {
       font-family: "Segoe UI", Calibri, Arial, sans-serif;
@@ -9266,7 +9328,7 @@ function exportSheetToWordDoc(sheet) {
       border-collapse: collapse;
       table-layout: fixed;
       font-family: "Segoe UI", Calibri, Arial, sans-serif;
-      font-size: 8pt;
+      font-size: 7.5pt;
     }
     th, td {
       border: 1px solid #94a3b8;
@@ -9277,7 +9339,7 @@ function exportSheetToWordDoc(sheet) {
   </style>
 </head>
 <body>
-  <div class="Section1">
+  <div class="WordSection1">
     ${tableHtml}
   </div>
 </body>
