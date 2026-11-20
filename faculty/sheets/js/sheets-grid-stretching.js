@@ -96,12 +96,29 @@ function autoFitSheetColumns(sheet, force = false) {
   // 3. Compute the required non-overlapping base width for every active column
   let totalBaseWidth = 0;
   const baseWidths = [];
+  const fixedWidthCols = new Set();
 
   for (let c = 0; c < activeColCount; c++) {
     const chars = Math.max(2, colMaxChars[c] || 4);
     let baseW = 54;
 
-    if (c === 0 && chars <= 7) {
+    // Detect column header content to check for Total / Grand Total
+    let colHeaderStr = '';
+    for (let r = 0; r <= 2; r++) {
+      const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
+      const txt = String(cell?.v !== undefined && cell?.v !== null ? cell.v : (cell?.raw || '')).trim().toUpperCase();
+      if (txt) colHeaderStr += ' ' + txt;
+    }
+    const isGrandTotal = colHeaderStr.includes('GRAND TOTAL') || (colHeaderStr.includes('GRAND') && colHeaderStr.includes('TOTAL'));
+    const isTotal = !isGrandTotal && (colHeaderStr.includes('TOTAL') || colHeaderStr.includes('TOT'));
+
+    if (isGrandTotal) {
+      baseW = 65; // User explicit requirement: Grand Total = 65px
+      fixedWidthCols.add(c);
+    } else if (isTotal) {
+      baseW = 63; // User explicit requirement: Total = 63px
+      fixedWidthCols.add(c);
+    } else if (c === 0 && chars <= 7) {
       baseW = 44; // SR. NO.
     } else if (c === 1 && chars <= 8) {
       baseW = 50; // ROLL NO.
@@ -134,22 +151,31 @@ function autoFitSheetColumns(sheet, force = false) {
     totalBaseWidth += baseWidths[c];
   }
 
-  // 4. Distribution: Guarantee NO OVERLAP under any circumstance
+  // 4. Distribution: Guarantee NO OVERLAP under any circumstance while preserving fixed Total / Grand Total widths
   if (availWidth >= totalBaseWidth) {
-    // Screen is wide enough: distribute extra pixels proportionally
+    // Screen is wide enough: distribute extra pixels proportionally to non-fixed columns
     const extra = availWidth - totalBaseWidth;
     const hasNameCol = activeColCount > 4;
     const nameExtra = hasNameCol ? Math.floor(extra * 0.25) : 0;
     const remainingExtra = extra - nameExtra;
-    const perColExtra = Math.floor(remainingExtra / activeColCount);
 
+    const scalableCols = [];
     for (let c = 0; c < activeColCount; c++) {
+      if (fixedWidthCols.has(c)) {
+        sheet.colWidths[c] = baseWidths[c]; // Strictly preserve 63px or 65px!
+      } else {
+        scalableCols.push(c);
+      }
+    }
+    const perColExtra = scalableCols.length > 0 ? Math.floor(remainingExtra / scalableCols.length) : 0;
+
+    scalableCols.forEach(c => {
       if (c === 4 && hasNameCol) {
         sheet.colWidths[c] = baseWidths[c] + nameExtra + perColExtra;
       } else {
         sheet.colWidths[c] = baseWidths[c] + perColExtra;
       }
-    }
+    });
   } else {
     // Screen is narrower than required data width:
     // Retain full baseWidths so no column's content overlaps or truncates!

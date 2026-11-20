@@ -8655,11 +8655,12 @@ async function exportCurrentSheet(format) {
           const excelR = r + 1 + bannerOffset;
           const rowObj = worksheet.getRow(excelR);
           const isHeader = r === 0;
+          const isSubHeader = (r === 1 && !isMarksRow(wsData, 1));
           const isMarks = r === 1 && isMarksRow(wsData, 1);
           if (wsData.rowHeights && typeof wsData.rowHeights[r] === 'number' && wsData.rowHeights[r] > 0) {
             rowObj.height = Math.round(wsData.rowHeights[r] * 0.75);
           } else {
-            rowObj.height = isHeader ? 26 : isMarks ? 22 : 20;
+            rowObj.height = isHeader ? 26 : isSubHeader ? 38 : isMarks ? 22 : 20;
           }
 
           for (let c = 0; c <= maxDataCol; c++) {
@@ -8670,6 +8671,10 @@ async function exportCurrentSheet(format) {
             if (strLen > colMaxLengths[c] && !isMarks) {
               colMaxLengths[c] = Math.min(strLen + 3, 35);
             }
+
+            const valStr = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || '')).trim();
+            const isLongNumeric = /^\d{8,}$/.test(valStr);
+            const isIdCol = (c === 0 || c === 1 || c === 2 || c === 3);
 
             if (cell.raw !== '' && cell.raw !== null && cell.raw !== undefined) {
               if (cell.f) {
@@ -8684,7 +8689,11 @@ async function exportCurrentSheet(format) {
                   formula: adjustedFormula,
                   result: cell.v
                 };
-              } else if (!isNaN(Number(cell.v)) && cell.v !== '' && !String(cell.v).startsWith('0')) {
+              } else if (isLongNumeric || (isIdCol && !isNaN(Number(valStr)) && valStr !== '')) {
+                // Keep as string with '@' format to completely avoid Excel scientific notation (e.g. 2.4011E+10)
+                excelCell.value = valStr;
+                excelCell.numFmt = '@';
+              } else if (!isNaN(Number(cell.v)) && cell.v !== '' && !valStr.startsWith('0')) {
                 excelCell.value = Number(cell.v);
               } else {
                 excelCell.value = cell.v !== undefined ? cell.v : cell.raw;
@@ -8705,6 +8714,8 @@ async function exportCurrentSheet(format) {
               bgHex = resolveColorToHex(cell.s.bg);
             } else if (isHeader) {
               bgHex = '#e2e8f0';
+            } else if (isSubHeader) {
+              bgHex = '#f8fafc';
             } else if (isMarks) {
               bgHex = '#f1f5f9';
             }
@@ -8721,16 +8732,16 @@ async function exportCurrentSheet(format) {
             let fontColorHex = '#1e293b';
             if (cell.s?.color) {
               fontColorHex = resolveColorToHex(cell.s.color);
-            } else if (isHeader) {
+            } else if (isHeader || isSubHeader) {
               fontColorHex = '#0f172a';
             } else if (isMarks) {
               fontColorHex = '#334155';
             }
 
-            const isBold = Boolean(cell.s?.bold !== undefined ? cell.s.bold : (isHeader || isMarks));
+            const isBold = Boolean(cell.s?.bold !== undefined ? cell.s.bold : (isHeader || isSubHeader || isMarks));
             const isItalic = Boolean(cell.s?.italic);
             const isUnderline = Boolean(cell.s?.underline);
-            const fontSize = cell.s?.fontSize ? Math.round(Number(cell.s.fontSize)) : (isHeader ? 10 : isMarks ? 9 : 10);
+            const fontSize = cell.s?.fontSize ? Math.round(Number(cell.s.fontSize)) : (isHeader ? 10 : isSubHeader ? 9.5 : isMarks ? 9 : 10);
             const fontFamily = cell.s?.fontFamily || 'Segoe UI';
 
             excelCell.font = {
@@ -8743,11 +8754,11 @@ async function exportCurrentSheet(format) {
             };
 
             // 3. Resolve Alignment & Text Wrapping
-            const defaultHAlign = (c === 2 && !isHeader && !isMarks) ? 'left' : 'center';
+            const defaultHAlign = (c === 2 && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center';
             const hAlign = cell.s?.align || defaultHAlign;
             const vAlign = cell.s?.vAlign || 'middle';
             const cellValStr = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || ''));
-            const isWrap = Boolean(cell.s?.wrap || isHeader || cellValStr.includes('\n'));
+            const isWrap = Boolean(cell.s?.wrap || isHeader || isSubHeader || cellValStr.includes('\n'));
 
             excelCell.alignment = {
               horizontal: hAlign,
@@ -8758,10 +8769,23 @@ async function exportCurrentSheet(format) {
           rowObj.commit();
         }
 
-        // 6. Set custom or auto column widths up to maxDataCol
+        // 6. Set custom or auto column widths up to maxDataCol (Total = 63px / 9 units, Grand Total = 65px / 9 units)
         for (let c = 0; c <= maxDataCol; c++) {
-          if (wsData.colWidths && typeof wsData.colWidths[c] === 'number' && wsData.colWidths[c] > 0) {
-            worksheet.getColumn(c + 1).width = Math.max(6, Math.round(wsData.colWidths[c] / 7.2));
+          let customW = wsData.colWidths?.[c];
+          let colHeaderStr = '';
+          for (let hr = 0; hr <= 2; hr++) {
+            const hCell = getCell(wsData, hr, c);
+            const txt = String(hCell?.v !== undefined && hCell?.v !== null ? hCell.v : (hCell?.raw || '')).trim().toUpperCase();
+            if (txt) colHeaderStr += ' ' + txt;
+          }
+          if (colHeaderStr.includes('GRAND TOTAL') || (colHeaderStr.includes('GRAND') && colHeaderStr.includes('TOTAL'))) {
+            customW = 65;
+          } else if (colHeaderStr.includes('TOTAL') || colHeaderStr.includes('TOT')) {
+            customW = 63;
+          }
+
+          if (customW && typeof customW === 'number' && customW > 0) {
+            worksheet.getColumn(c + 1).width = Math.max(6, Math.round(customW / 7.2));
           } else {
             worksheet.getColumn(c + 1).width = Math.max(colMaxLengths[c] || 12, 12);
           }
@@ -8827,6 +8851,34 @@ function exportSheetToPdf(sheet) {
     }
   }
 
+  // Calculate total widths and column percentages for A4 Landscape
+  let sumColWidths = 0;
+  for (let c = 0; c <= maxDataCol; c++) {
+    let colHeaderStr = '';
+    for (let hr = 0; hr <= 2; hr++) {
+      const hCell = getCell(sheet, hr, c);
+      const txt = String(hCell?.v !== undefined && hCell?.v !== null ? hCell.v : (hCell?.raw || '')).trim().toUpperCase();
+      if (txt) colHeaderStr += ' ' + txt;
+    }
+    if (colHeaderStr.includes('GRAND TOTAL') || (colHeaderStr.includes('GRAND') && colHeaderStr.includes('TOTAL'))) {
+      if (!sheet.colWidths) sheet.colWidths = {};
+      sheet.colWidths[c] = 65; // User explicit requirement: Grand Total = 65px
+    } else if (colHeaderStr.includes('TOTAL') || colHeaderStr.includes('TOT')) {
+      if (!sheet.colWidths) sheet.colWidths = {};
+      sheet.colWidths[c] = 63; // User explicit requirement: Total = 63px
+    }
+    const w = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : (c === 0 ? 42 : c === 1 ? 50 : c === 2 ? 76 : c === 3 ? 102 : c === 4 ? 145 : 68);
+    sumColWidths += w;
+  }
+
+  let colGroupHtml = '<colgroup>';
+  for (let c = 0; c <= maxDataCol; c++) {
+    const w = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : 68;
+    const pct = ((w / sumColWidths) * 100).toFixed(2);
+    colGroupHtml += `<col style="width:${pct}%;">`;
+  }
+  colGroupHtml += '</colgroup>';
+
   const instBanner = document.getElementById('hdr-banner-inst')?.textContent?.trim() || 'Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026-27 (Winter Session)';
   const subjectBanner = document.getElementById('hdr-banner-line2')?.textContent?.trim() || (S.group ? `Internal Evaluation | Subject : ${S.group.name || S.group.subject_name || 'Subject'}` : 'Internal Evaluation');
   const cohortBanner = document.getElementById('hdr-banner-cohort')?.textContent?.trim() || 'Information Technology | Semester 5';
@@ -8861,6 +8913,7 @@ function exportSheetToPdf(sheet) {
     if (!rowHasData && r > 2) continue;
 
     const isHeader = (r === 0);
+    const isSubHeader = (r === 1 && !isMarksRow(sheet, 1));
     const isMarks = (r === 1 && isMarksRow(sheet, 1));
     tableRowsHtml += '<tr>';
 
@@ -8871,18 +8924,17 @@ function exportSheetToPdf(sheet) {
       const spanAttrs = (mInfo && mInfo.isTopLeft) ? ` rowspan="${mInfo.rowSpan}" colspan="${mInfo.colSpan}"` : '';
       const cell = getCell(sheet, r, c);
       const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.raw;
-      const align = cell.s?.align || ((c === 2 && !isHeader && !isMarks) ? 'left' : 'center');
-      const vAlign = cell.s?.vAlign || (isHeader || isMarks ? 'middle' : 'top');
-      const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isMarks ? 'bold' : 'normal'));
+      const align = cell.s?.align || ((c === 2 && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center');
+      const vAlign = cell.s?.vAlign || 'middle';
+      const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isSubHeader || isMarks ? 'bold' : 'normal'));
       const fontStyle = cell.s?.italic ? 'italic' : 'normal';
       const textDecor = cell.s?.underline ? 'underline' : 'none';
-      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg) : (isHeader ? '#f1f5f9' : isMarks ? '#f8fafc' : '#ffffff');
-      const color = cell.s?.color ? resolveColorToHex(cell.s.color) : (isHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
-      const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '9pt' : '8.5pt');
+      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg) : (isHeader ? '#f1f5f9' : isSubHeader ? '#f8fafc' : isMarks ? '#f8fafc' : '#ffffff');
+      const color = cell.s?.color ? resolveColorToHex(cell.s.color) : (isHeader || isSubHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8.5pt'));
       const fontFamily = cell.s?.fontFamily ? `font-family:${cell.s.fontFamily};` : '';
-      const customW = (sheet.colWidths && sheet.colWidths[c] && (!mInfo || mInfo.colSpan === 1)) ? `width:${sheet.colWidths[c]}px;min-width:${sheet.colWidths[c]}px;` : '';
 
-      tableRowsHtml += `<td${spanAttrs} style="${customW}padding:4px 6px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #94a3b8;font-size:${fontSize};${fontFamily}white-space:pre-wrap;word-break:break-word;">${escapeHtml(val)}</td>`;
+      tableRowsHtml += `<td${spanAttrs} style="padding:3px 2px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #94a3b8;font-size:${fontSize};${fontFamily}white-space:pre-wrap;word-break:break-word;overflow:hidden;box-sizing:border-box;">${escapeHtml(val)}</td>`;
     }
     tableRowsHtml += '</tr>';
   }
@@ -8895,7 +8947,7 @@ function exportSheetToPdf(sheet) {
   <style>
     @page {
       size: A4 landscape;
-      margin: 8mm 6mm;
+      margin: 6mm 4mm;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -8908,49 +8960,56 @@ function exportSheetToPdf(sheet) {
     }
     .pdf-banner {
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       border-bottom: 2px solid #0284c7;
-      padding-bottom: 4px;
+      padding-bottom: 3px;
     }
     .pdf-banner-line1 {
-      font-size: 11pt;
+      font-size: 10pt;
       font-weight: 800;
       color: #0369a1;
     }
     .pdf-banner-line2 {
-      font-size: 9.5pt;
+      font-size: 8.5pt;
       font-weight: 700;
-      margin-top: 2px;
+      margin-top: 1px;
     }
     .pdf-banner-line3 {
-      font-size: 8.5pt;
+      font-size: 7.5pt;
       color: #475569;
       margin-top: 1px;
     }
     table {
       width: 100%;
+      max-width: 100%;
       border-collapse: collapse;
-      table-layout: auto;
+      table-layout: fixed;
       page-break-inside: auto;
     }
     tr {
       page-break-inside: avoid;
       page-break-after: auto;
     }
+    td, th {
+      box-sizing: border-box;
+      padding: 3px 2px;
+      overflow: hidden;
+      word-break: break-word;
+    }
     .pdf-signatures {
-      margin-top: 24px;
+      margin-top: 16px;
       display: flex;
       justify-content: space-between;
       padding: 0 20px;
-      font-size: 9pt;
+      font-size: 8pt;
       font-weight: 700;
       page-break-inside: avoid;
     }
     .pdf-sig-block {
       text-align: center;
       border-top: 1px dashed #64748b;
-      padding-top: 4px;
-      min-width: 140px;
+      padding-top: 3px;
+      min-width: 120px;
     }
   </style>
 </head>
@@ -8961,6 +9020,7 @@ function exportSheetToPdf(sheet) {
     <div class="pdf-banner-line3">${escapeHtml(cohortBanner)}</div>
   </div>
   <table>
+    ${colGroupHtml}
     <tbody>
       ${tableRowsHtml}
     </tbody>
@@ -9093,12 +9153,41 @@ function exportSheetToWordDoc(sheet) {
     });
   }
 
-  let tableHtml = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-family:Segoe UI,Arial,sans-serif;font-size:11px;width:100%;">';
+  // Calculate total widths and column percentages for Word document A4 Landscape
+  let sumColWidths = 0;
+  for (let c = 0; c <= maxDataCol; c++) {
+    let colHeaderStr = '';
+    for (let hr = 0; hr <= 2; hr++) {
+      const hCell = getCell(sheet, hr, c);
+      const txt = String(hCell?.v !== undefined && hCell?.v !== null ? hCell.v : (hCell?.raw || '')).trim().toUpperCase();
+      if (txt) colHeaderStr += ' ' + txt;
+    }
+    if (colHeaderStr.includes('GRAND TOTAL') || (colHeaderStr.includes('GRAND') && colHeaderStr.includes('TOTAL'))) {
+      if (!sheet.colWidths) sheet.colWidths = {};
+      sheet.colWidths[c] = 65; // User explicit requirement: Grand Total = 65px
+    } else if (colHeaderStr.includes('TOTAL') || colHeaderStr.includes('TOT')) {
+      if (!sheet.colWidths) sheet.colWidths = {};
+      sheet.colWidths[c] = 63; // User explicit requirement: Total = 63px
+    }
+    const w = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : (c === 0 ? 42 : c === 1 ? 50 : c === 2 ? 76 : c === 3 ? 102 : c === 4 ? 145 : 68);
+    sumColWidths += w;
+  }
+
+  let colGroupHtml = '<colgroup>';
+  for (let c = 0; c <= maxDataCol; c++) {
+    const w = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : 68;
+    const pct = ((w / sumColWidths) * 100).toFixed(2);
+    colGroupHtml += `<col style="width:${pct}%;">`;
+  }
+  colGroupHtml += '</colgroup>';
+
+  let tableHtml = '<table border="1" cellpadding="3" cellspacing="0" style="border-collapse:collapse;font-family:Segoe UI,Calibri,Arial,sans-serif;font-size:8pt;width:100%;max-width:100%;table-layout:fixed;">';
+  tableHtml += colGroupHtml;
 
   if (!alreadyHasBanner) {
-    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#0f172a;font-size:13px;padding:8px;text-align:center;">${escapeHtml(banner1)}</th></tr>`;
-    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#1e293b;font-size:11px;padding:5px;text-align:center;">${escapeHtml(banner2)}</th></tr>`;
-    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#475569;font-size:10px;padding:4px;text-align:center;">${escapeHtml(banner3)}</th></tr>`;
+    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#0f172a;font-size:11pt;padding:6px;text-align:center;">${escapeHtml(banner1)}</th></tr>`;
+    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#1e293b;font-size:9pt;padding:4px;text-align:center;">${escapeHtml(banner2)}</th></tr>`;
+    tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#475569;font-size:8pt;padding:3px;text-align:center;">${escapeHtml(banner3)}</th></tr>`;
   }
 
   for (let r = 0; r <= maxDataRow; r++) {
@@ -9110,6 +9199,7 @@ function exportSheetToWordDoc(sheet) {
     if (!hasData && r > 2) continue;
 
     const isHeader = r === 0;
+    const isSubHeader = (r === 1 && !isMarksRow(sheet, 1));
     const isMarks = r === 1 && isMarksRow(sheet, 1);
 
     tableHtml += '<tr>';
@@ -9120,22 +9210,80 @@ function exportSheetToWordDoc(sheet) {
       const spanAttrs = (mInfo && mInfo.isTopLeft) ? ` rowspan="${mInfo.rowSpan}" colspan="${mInfo.colSpan}"` : '';
       const cell = getCell(sheet, r, c);
       const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.raw;
-      const align = cell.s?.align || ((c === 2 && !isHeader && !isMarks) ? 'left' : 'center');
+      const align = cell.s?.align || ((c === 2 && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center');
       const vAlign = cell.s?.vAlign || 'middle';
-      const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isMarks ? 'bold' : 'normal'));
+      const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isSubHeader || isMarks ? 'bold' : 'normal'));
       const fontStyle = cell.s?.italic ? 'italic' : 'normal';
       const textDecor = cell.s?.underline ? 'underline' : 'none';
-      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg) : (isHeader ? '#e2e8f0' : isMarks ? '#f1f5f9' : '#ffffff');
-      const color = cell.s?.color ? resolveColorToHex(cell.s.color) : (isHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg) : (isHeader ? '#e2e8f0' : isSubHeader ? '#f8fafc' : isMarks ? '#f1f5f9' : '#ffffff');
+      const color = cell.s?.color ? resolveColorToHex(cell.s.color) : (isHeader || isSubHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8pt'));
       const tag = isHeader ? 'th' : 'td';
 
-      tableHtml += `<${tag}${spanAttrs} style="padding:5px 8px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #cbd5e1;white-space:pre-wrap;word-break:break-word;">${escapeHtml(val)}</${tag}>`;
+      tableHtml += `<${tag}${spanAttrs} style="padding:3px 2px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #cbd5e1;font-size:${fontSize};white-space:pre-wrap;word-break:break-word;box-sizing:border-box;">${escapeHtml(val)}</${tag}>`;
     }
     tableHtml += '</tr>';
   }
   tableHtml += '</table>';
 
-  const docBlob = new Blob(['\ufeff' + tableHtml], { type: 'application/msword' });
+  const wordDocContent = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="utf-8">
+  <title>${escapeHtml(sheet.name || 'Evaluation_Sheet')}</title>
+  <!--[if gte mso 9]>
+  <xml>
+    <w:WordDocument>
+      <w:View>Print</w:View>
+      <w:Zoom>100</w:Zoom>
+      <w:DoNotOptimizeForBrowser/>
+    </w:WordDocument>
+  </xml>
+  <![endif]-->
+  <style>
+    @page Section1 {
+      size: 297mm 210mm;
+      mso-page-orientation: landscape;
+      margin: 8mm 6mm 8mm 6mm;
+      mso-header-margin: 5mm;
+      mso-footer-margin: 5mm;
+      mso-paper-source: 0;
+    }
+    div.Section1 {
+      page: Section1;
+    }
+    body {
+      font-family: "Segoe UI", Calibri, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #0f172a;
+    }
+    table {
+      width: 100%;
+      max-width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-family: "Segoe UI", Calibri, Arial, sans-serif;
+      font-size: 8pt;
+    }
+    th, td {
+      border: 1px solid #94a3b8;
+      padding: 3px 2px;
+      word-break: break-word;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="Section1">
+    ${tableHtml}
+  </div>
+</body>
+</html>`;
+
+  const docBlob = new Blob(['\ufeff' + wordDocContent], { type: 'application/msword;charset=utf-8' });
   triggerBrowserDownload(docBlob, `${sheet.name || 'Sheet'}.doc`);
 }
 
@@ -9893,7 +10041,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     evalSheet.rowHeights[r] = 24;
   }
   // Default compact screen-fit proportions: All 16 columns fit 100% on standard screens without horizontal scroll
-  const defaultEvalWidths = [42, 50, 76, 102, 145, 68, 68, 54, 68, 52, 54, 68, 54, 54, 52, 65];
+  const defaultEvalWidths = [42, 50, 76, 102, 145, 68, 68, 54, 68, 63, 54, 68, 54, 54, 63, 65];
   for (let c = 0; c < 16; c++) {
     evalSheet.colWidths[c] = defaultEvalWidths[c];
   }
@@ -10075,7 +10223,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   testSheet.colWidths[3] = 102; // ENROLLMENT NO.
   testSheet.colWidths[4] = 145; // STUDENT NAME
   for (let c = 5; c <= 14; c++) testSheet.colWidths[c] = 48;
-  testSheet.colWidths[15] = 95;
+  testSheet.colWidths[15] = 65; // Final Total (Grand Total)
 
   const testHeaders = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Final Total (Best 4 Avg)'];
   testHeaders.forEach((h, c) => {
@@ -10155,7 +10303,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     singleTestSheet.colWidths[6] = 48;
     singleTestSheet.colWidths[7] = 48;
     singleTestSheet.colWidths[8] = 48;
-    singleTestSheet.colWidths[9] = 65;
+    singleTestSheet.colWidths[9] = 63; // Total
     singleTestSheet.colWidths[10] = 340;
 
     // Resolve test metadata and classroom post instructions & questions
@@ -10409,7 +10557,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   assignSheet.colWidths[3] = 102; // ENROLLMENT NO.
   assignSheet.colWidths[4] = 145; // STUDENT NAME
   for (let c = 5; c <= 9; c++) assignSheet.colWidths[c] = 48;
-  assignSheet.colWidths[10] = 95;
+  assignSheet.colWidths[10] = 63; // Total (Average)
   assignSheet.colWidths[11] = 180;
 
   const assignHeaders = [
@@ -10486,7 +10634,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   practicalSheet.colWidths[6] = 105; // Creative Work (Model/Chart/Project)
   practicalSheet.colWidths[7] = 65;  // Attendance
   practicalSheet.colWidths[8] = 65;  // Viva Voce
-  practicalSheet.colWidths[9] = 65;  // TOTAL
+  practicalSheet.colWidths[9] = 63;  // TOTAL
 
   const practicalHeaders = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', 'Lab Record File', 'Creative Work (Model/Chart/Project)', 'Attendance', 'Viva Voce', 'TOTAL'];
   practicalHeaders.forEach((h, c) => {
