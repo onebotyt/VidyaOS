@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/delete-modal/delete-modal.css?v=20261117">
-  <link rel="stylesheet" href="/faculty/faculty/faculty.css?v=20261121_03">
+  <link rel="stylesheet" href="/faculty/faculty/faculty.css?v=20261121_04">
   <script>
     (function () {
       try {
@@ -180,7 +180,7 @@
   </div>
 
   <!-- Modal: Add New Faculty -->
-  <div id="modal-add-faculty" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center; padding:1rem;" onclick="if(event.target===this)closeAddFacultyModal()">
+  <div id="modal-add-faculty" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100100; align-items:center; justify-content:center; padding:1rem;" onclick="if(event.target===this)closeAddFacultyModal()">
     <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; width:100%; max-width:480px; box-shadow:0 16px 36px rgba(0,0,0,0.2); overflow:hidden;">
       <div style="padding:1rem 1.25rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
         <strong style="font-size:1.05rem; color:var(--text-main);">+ Add Department Faculty</strong>
@@ -364,15 +364,9 @@
                 </select>
               </div>
 
-              <div class="form-grid-compact-pair">
-                <div class="form-group-wrap">
-                  <label class="form-field-label">Phone Number</label>
-                  <input type="tel" id="edit-fac-phone" placeholder="9876543210" class="form-control-input">
-                </div>
-                <div class="form-group-wrap">
-                  <label class="form-field-label">Department</label>
-                  <input type="text" id="edit-fac-dept-display" disabled value="Information Technology" class="form-control-input form-control-disabled">
-                </div>
+              <div class="form-group-wrap">
+                <label class="form-field-label">Phone Number</label>
+                <input type="tel" id="edit-fac-phone" placeholder="e.g. 9876543210" class="form-control-input">
               </div>
 
               <div class="form-group-wrap">
@@ -455,7 +449,7 @@
   <script src="/faculty/components/sidebar/sidebar.js?v=20261117"></script>
   <script src="/faculty/components/header/header.js?v=20261117"></script>
   <script src="/faculty/components/delete-modal/delete-modal.js?v=20261117"></script>
-  <script src="/faculty/faculty/faculty.js?v=20261121_03"></script>
+  <script src="/faculty/faculty/faculty.js?v=20261121_04"></script>
 </body>
 
 </html>

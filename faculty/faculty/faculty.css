@@ -860,36 +860,18 @@ input:checked + .slider:before {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Universal Faculty Profile View & Edit Modal System
-   ══════════════════════════════════════════════════════════════ */
-.fac-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  box-sizing: border-box;
-  opacity: 1;
-}
-
-/* ══════════════════════════════════════════════════════════════
  * FACULTY COMPLETE DETAILS & HOD EDIT MODAL
  * 100% Theme Token Compliant & Touch-Optimized
  * ══════════════════════════════════════════════════════════════ */
 
-/* Modal Backdrop */
+/* Modal Backdrop - z-index 100100 ensures modal is ABOVE all headers and navigation */
 .fac-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.68);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  z-index: 10000;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100100 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -910,12 +892,14 @@ input:checked + .slider:before {
   max-height: calc(100vh - 2.5rem);
   display: flex;
   flex-direction: column;
+  min-height: 0;
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.28);
   overflow: hidden;
   box-sizing: border-box;
   margin: auto;
   opacity: 1;
   transform: none;
+  position: relative;
 }
 
 .fac-details-header {
@@ -1531,18 +1515,23 @@ input:checked + .slider:before {
 /* Mobile Responsiveness for Faculty Details Modal */
 @media (max-width: 640px) {
   .fac-modal-backdrop {
-    padding: max(0.65rem, env(safe-area-inset-top)) 0.65rem max(0.65rem, env(safe-area-inset-bottom)) 0.65rem !important;
-    align-items: center !important;
+    padding: max(0.65rem, env(safe-area-inset-top)) 0.5rem max(0.65rem, env(safe-area-inset-bottom)) 0.5rem !important;
+    align-items: flex-start !important;
+    z-index: 100100 !important;
   }
 
   .fac-details-card {
-    max-height: calc(100dvh - 1.5rem) !important;
-    max-height: calc(100vh - 1.5rem) !important;
+    max-height: calc(100dvh - 1.25rem) !important;
+    max-height: calc(100vh - 1.25rem) !important;
     border-radius: 18px !important;
+    margin: auto 0 !important;
+    width: 100% !important;
+    min-height: 0 !important;
   }
 
   .fac-details-header {
     padding: 0.85rem 1rem !important;
+    flex-shrink: 0 !important;
   }
 
   .fac-modal-title {
@@ -1552,6 +1541,7 @@ input:checked + .slider:before {
   .fac-hero-banner {
     padding: 0.85rem 1rem !important;
     gap: 0.75rem !important;
+    flex-shrink: 0 !important;
   }
 
   .fac-details-avatar {
@@ -1567,6 +1557,7 @@ input:checked + .slider:before {
 
   .fac-details-tabs {
     padding: 0 0.65rem !important;
+    flex-shrink: 0 !important;
   }
 
   .fac-tab-btn {
@@ -1577,6 +1568,14 @@ input:checked + .slider:before {
   .fac-details-body {
     padding: 0.85rem 1rem !important;
     gap: 0.75rem !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .fac-tab-pane {
+    min-height: 0 !important;
   }
 
   .fac-details-grid {
@@ -1589,6 +1588,8 @@ input:checked + .slider:before {
 
   .fac-details-footer {
     padding: 0.75rem 1rem !important;
+    flex-shrink: 0 !important;
+  }
   }
 
   .fac-details-footer button {
