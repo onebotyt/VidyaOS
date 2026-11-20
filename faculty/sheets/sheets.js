@@ -264,9 +264,12 @@ async function initSheetsStudio() {
       loadTeacherGroupsList().catch(err => console.warn('Background sync error:', err));
     } else {
       closeOfficeHomeScreen();
-      // Keep loader visible while we fetch teaching groups and live student roster!
+      // Keep loader visible while we fetch teaching groups and live student roster (max 3.5s)
       try {
-        await loadTeacherGroupsList();
+        await Promise.race([
+          loadTeacherGroupsList(),
+          new Promise(r => setTimeout(r, 3500))
+        ]);
       } catch (e) {
         console.warn('Teacher groups load failed:', e);
       }

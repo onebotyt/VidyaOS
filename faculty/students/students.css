@@ -1162,9 +1162,15 @@ input:checked+.slider:before {
 
 /* Spinner Animation */
 @keyframes stuSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 .stu-spinner {
   animation: stuSpin 0.75s linear infinite;
   display: inline-block;
@@ -1192,6 +1198,7 @@ button:disabled.btn-disabled-loading,
   border-radius: 4px;
   vertical-align: middle;
 }
+
 .col-trash-check {
   width: 40px;
   text-align: center;
@@ -1215,8 +1222,15 @@ button:disabled.btn-disabled-loading,
 }
 
 @keyframes slideDownFade {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .trash-bulk-info {
@@ -1259,10 +1273,12 @@ button:disabled.btn-disabled-loading,
   justify-content: center;
   flex-shrink: 0;
 }
+
 .trash-confirm-icon-box.restore {
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
+
 .trash-confirm-icon-box.danger {
   background: var(--status-absent-bg);
   color: var(--status-absent);
@@ -1280,9 +1296,19 @@ button:disabled.btn-disabled-loading,
 }
 
 @keyframes stuBounceIn {
-  0% { transform: scale(0.85); opacity: 0; }
-  70% { transform: scale(1.03); opacity: 1; }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .stu-success-circle-icon {
@@ -1469,4 +1495,3 @@ button:disabled.btn-disabled-loading,
   height: 14px;
   accent-color: var(--color-primary);
 }
-

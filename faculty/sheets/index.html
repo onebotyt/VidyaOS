@@ -35,17 +35,19 @@
   <!-- ══════════════════════════════════════════════════════════════
    OFFICE FULLSCREEN GRAY LOADING OVERLAY (PREVENTS EXTRA CLICKS & COVERS WHOLE VIEWPORT)
    ══════════════════════════════════════════════════════════════ -->
-  <div id="office-engine-loader" class="office-engine-loader" style="display:none;" aria-live="polite" onclick="if(event.target === this) hideOfficeScreenLoader();">
+  <div id="office-engine-loader" class="office-engine-loader" style="display:none;" aria-live="polite"
+    onclick="hideOfficeScreenLoader();">
     <div class="office-loader-card">
-      <svg class="office-spinner-dots-svg" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true">
-        <circle cx="28" cy="8" r="4.5" opacity="1.0"/>
-        <circle cx="42.14" cy="13.86" r="4.5" opacity="0.875"/>
-        <circle cx="48" cy="28" r="4.5" opacity="0.75"/>
-        <circle cx="42.14" cy="42.14" r="4.5" opacity="0.625"/>
-        <circle cx="28" cy="48" r="4.5" opacity="0.5"/>
-        <circle cx="13.86" cy="42.14" r="4.5" opacity="0.375"/>
-        <circle cx="8" cy="28" r="4.5" opacity="0.25"/>
-        <circle cx="13.86" cy="13.86" r="4.5" opacity="0.125"/>
+      <svg class="office-spinner-dots-svg" width="56" height="56" viewBox="0 0 56 56" fill="currentColor"
+        aria-hidden="true">
+        <circle cx="28" cy="8" r="4.5" opacity="1.0" />
+        <circle cx="42.14" cy="13.86" r="4.5" opacity="0.875" />
+        <circle cx="48" cy="28" r="4.5" opacity="0.75" />
+        <circle cx="42.14" cy="42.14" r="4.5" opacity="0.625" />
+        <circle cx="28" cy="48" r="4.5" opacity="0.5" />
+        <circle cx="13.86" cy="42.14" r="4.5" opacity="0.375" />
+        <circle cx="8" cy="28" r="4.5" opacity="0.25" />
+        <circle cx="13.86" cy="13.86" r="4.5" opacity="0.125" />
       </svg>
       <div class="office-loader-label" id="office-loader-status">Loading...</div>
     </div>
@@ -55,7 +57,8 @@
   <div class="faculty-app-layout" id="faculty-app-layout">
     <div class="faculty-main-wrap">
       <!-- Unified Dedicated Faculty Top Header with Back, Title, Class Switcher, Save Status & Profiles -->
-      <header class="faculty-top-header admin-top-header sheets-top-header" id="faculty-header" aria-label="Faculty Header Bar">
+      <header class="faculty-top-header admin-top-header sheets-top-header" id="faculty-header"
+        aria-label="Faculty Header Bar">
         <div class="header-left">
           <!-- Mobile / Desktop Navigation Menu Toggle -->
           <button type="button" class="header-nav-toggle-btn" id="faculty-nav-toggle"
@@ -71,7 +74,8 @@
 
           <!-- Small Minimal Back Button to Classroom / Registers -->
           <button type="button" class="btn-icon-minimal header-back-btn excel-back-btn" id="btn-back-bar1"
-            onclick="navigateBackFromSheets()" title="Back to Classroom / Registers" aria-label="Back to Classroom / Registers">
+            onclick="navigateBackFromSheets()" title="Back to Classroom / Registers"
+            aria-label="Back to Classroom / Registers">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -81,7 +85,8 @@
 
           <!-- Office Studio Home / Subjects Hub Button -->
           <button type="button" class="btn-icon-minimal header-office-home-btn" id="btn-office-home"
-            onclick="toggleOfficeHomeScreen()" title="Office Studio Home &amp; Subjects Hub" aria-label="Office Studio Home">
+            onclick="toggleOfficeHomeScreen()" title="Office Studio Home &amp; Subjects Hub"
+            aria-label="Office Studio Home">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="7" height="7"></rect>
@@ -92,12 +97,17 @@
           </button>
 
           <!-- VidyaOS Brand Link -->
-          <a href="/faculty/dashboard/index.html" class="header-brand-link" id="header-brand-link" aria-label="VidyaOS Dashboard">
+          <a href="/faculty/dashboard/index.html" class="header-brand-link" id="header-brand-link"
+            aria-label="VidyaOS Dashboard">
             <span class="header-brand-logo">
-              <svg class="header-brand-cube" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M16 3.5L27.5 9.8L16 16.2L4.5 9.8L16 3.5Z" fill="var(--color-primary-light, hsl(215 90% 95%))" stroke="var(--color-primary)" stroke-width="1.2" stroke-linejoin="round"/>
-                <path d="M4.5 9.8L16 16.2V28.5L4.5 22.2V9.8Z" fill="var(--color-primary, hsl(217 91% 60%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/>
-                <path d="M16 16.2L27.5 9.8V22.2L16 28.5V16.2Z" fill="var(--color-primary-hover, hsl(224 76% 48%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/>
+              <svg class="header-brand-cube" width="28" height="28" viewBox="0 0 32 32" fill="none"
+                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M16 3.5L27.5 9.8L16 16.2L4.5 9.8L16 3.5Z" fill="var(--color-primary-light, hsl(215 90% 95%))"
+                  stroke="var(--color-primary)" stroke-width="1.2" stroke-linejoin="round" />
+                <path d="M4.5 9.8L16 16.2V28.5L4.5 22.2V9.8Z" fill="var(--color-primary, hsl(217 91% 60%))"
+                  stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round" />
+                <path d="M16 16.2L27.5 9.8V22.2L16 28.5V16.2Z" fill="var(--color-primary-hover, hsl(224 76% 48%))"
+                  stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round" />
               </svg>
             </span>
             <div class="header-brand-info">
@@ -173,11 +183,13 @@
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="notif-header-badge" id="notif-header-badge">0 New</span>
                 <button type="button" class="notif-mark-all-btn" onclick="markAllNotificationsAsRead(event)"
-                  style="background:transparent; border:none; color:var(--color-primary); font-size:0.75rem; font-weight:600; cursor:pointer;">Mark all read</button>
+                  style="background:transparent; border:none; color:var(--color-primary); font-size:0.75rem; font-weight:600; cursor:pointer;">Mark
+                  all read</button>
               </div>
             </div>
             <div class="notif-items-list" id="notif-items-list">
-              <div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading notifications...</div>
+              <div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading
+                notifications...</div>
             </div>
           </div>
 
@@ -200,17 +212,32 @@
             </div>
             <div class="profile-dropdown-divider"></div>
             <a href="/faculty/profile/index.html" class="profile-dropdown-item">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
               <span>My Profile</span>
             </a>
             <a href="/faculty/timetable/index.html" class="profile-dropdown-item">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
               <span>Weekly Timetable</span>
             </a>
             <div class="profile-dropdown-divider"></div>
             <button type="button" class="profile-dropdown-item dropdown-logout-btn"
               onclick="if(typeof confirmFacultyLogout==='function'){confirmFacultyLogout();}else if(typeof facultyLogout==='function'){facultyLogout();}else if(typeof logout==='function'){logout();}">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
               <span>Sign Out</span>
             </button>
           </div>
@@ -228,17 +255,18 @@
             <div class="office-hero-brand">
               <div class="office-hero-icon-pill">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
-                  <polyline points="10 9 9 9 8 9"/>
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
                 </svg>
                 <span class="office-hero-xls-badge">XLS</span>
               </div>
               <div class="office-hero-titles">
                 <h1 class="office-hero-heading">Office Studio</h1>
-                <p class="office-hero-sub">Academic evaluation spreadsheets, marks registers, and coursework documents</p>
+                <p class="office-hero-sub">Academic evaluation spreadsheets, marks registers, and coursework documents
+                </p>
               </div>
             </div>
 
@@ -248,13 +276,19 @@
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="office-subject-search" placeholder="Search your subjects, classes, or templates..." oninput="filterOfficeSubjects(this.value)">
+                <input type="text" id="office-subject-search"
+                  placeholder="Search your subjects, classes, or templates..."
+                  oninput="filterOfficeSubjects(this.value)">
               </div>
-              <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-office-open-file" onclick="triggerExcelImport()" title="Import XLSX / CSV from device">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-office-open-file"
+                onclick="triggerExcelImport()" title="Import XLSX / CSV from device">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                </svg>
                 <span>Open File</span>
               </button>
-              <button type="button" class="btn btn-primary btn-sm" onclick="closeOfficeHomeScreen()" title="Return to active spreadsheet editor">
+              <button type="button" class="btn btn-primary btn-sm" onclick="closeOfficeHomeScreen()"
+                title="Return to active spreadsheet editor">
                 <span>Spreadsheet Editor →</span>
               </button>
             </div>
@@ -266,7 +300,11 @@
             <div class="office-templates-row">
               <div class="office-template-card" onclick="createNewWorksheetFromHome(this)">
                 <div class="template-card-icon-wrap template-icon-blank">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="9" y1="21" x2="9" y2="9" />
+                  </svg>
                 </div>
                 <div class="template-card-info">
                   <span class="template-title">Blank Workbook</span>
@@ -276,7 +314,10 @@
 
               <div class="office-template-card" onclick="openSubjectSheetDirect(null, 0, this)">
                 <div class="template-card-icon-wrap template-icon-eval">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                  </svg>
                 </div>
                 <div class="template-card-info">
                   <span class="template-title">Master Evaluation</span>
@@ -286,7 +327,10 @@
 
               <div class="office-template-card" onclick="openSubjectSheetDirect(null, 1, this)">
                 <div class="template-card-icon-wrap template-icon-tests">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
                 </div>
                 <div class="template-card-info">
                   <span class="template-title">Class Test Marksheet</span>
@@ -296,7 +340,10 @@
 
               <div class="office-template-card" onclick="openSubjectSheetDirect(null, 'assignments', this)">
                 <div class="template-card-icon-wrap template-icon-assign">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                  </svg>
                 </div>
                 <div class="template-card-info">
                   <span class="template-title">Coursework Assignments</span>
@@ -306,7 +353,9 @@
 
               <div class="office-template-card" onclick="openSubjectSheetDirect(null, 'practicals', this)">
                 <div class="template-card-icon-wrap template-icon-prac">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.69 19.3A2 2 0 0 0 6.44 22h11.12a2 2 0 0 0 1.75-2.7L14 9.31V2"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 2v7.31L4.69 19.3A2 2 0 0 0 6.44 22h11.12a2 2 0 0 0 1.75-2.7L14 9.31V2" />
+                  </svg>
                 </div>
                 <div class="template-card-info">
                   <span class="template-title">Practicals &amp; Labs</span>
@@ -322,7 +371,10 @@
             <aside class="office-recent-sidebar-card">
               <div class="office-sidebar-card-header">
                 <div class="sidebar-header-left">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
                   <span>Recent Workbooks</span>
                 </div>
               </div>
@@ -336,7 +388,8 @@
               <div class="office-section-header-row">
                 <div class="office-section-title-wrap">
                   <h2 class="office-section-title">Teaching Subjects &amp; Academic Workbooks</h2>
-                  <p class="office-section-subtitle">Select a subject below to open its pre-configured evaluation register</p>
+                  <p class="office-section-subtitle">Select a subject below to open its pre-configured evaluation
+                    register</p>
                 </div>
                 <span class="office-subject-counter" id="office-subject-counter">Loading subjects...</span>
               </div>
@@ -378,955 +431,1012 @@
           <!-- Ribbon Panels Outer Container with Left/Right Navigation Chevrons -->
           <div class="excel-ribbon-panels-container">
             <button type="button" class="ribbon-scroll-btn ribbon-scroll-left" id="btn-ribbon-scroll-left"
-              onclick="scrollRibbon(-220)" title="Scroll Ribbon Left" aria-label="Scroll Ribbon Left" style="display:none;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              onclick="scrollRibbon(-220)" title="Scroll Ribbon Left" aria-label="Scroll Ribbon Left"
+              style="display:none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
             <!-- Ribbon Tab Panels -->
             <div class="excel-ribbon-panels" id="excel-ribbon-panels">
 
-            <!-- 1. FILE PANEL -->
-            <div class="excel-ribbon-panel" id="panel-file">
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" id="btn-ribbon-home" onclick="openOfficeHomeScreen()"
-                    title="Office Studio Home &amp; Subjects Hub">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                        <polyline points="9 22 9 12 15 12 15 22" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Home</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="createNewWorksheet()"
-                    title="Create Blank Sheet">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="12" y1="18" x2="12" y2="12" />
-                        <line x1="9" y1="15" x2="15" y2="15" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">New Sheet</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="triggerExcelImport()"
-                    title="Import .xlsx or .csv">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Open / Import</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="saveActiveSheetData(true)"
-                    title="Save Workbook (Ctrl+S)">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                        <polyline points="17 21 17 13 7 13 7 21" />
-                        <polyline points="7 3 7 8 15 8" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Save</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="exportCurrentSheet('xlsx')"
-                    title="Export to .xlsx">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Export .XLSX</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="window.print()"
-                    title="Print active sheet (Ctrl+P)">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <polyline points="6 9 6 2 18 2 18 9" />
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                        <rect x="6" y="14" width="12" height="8" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Print</span>
-                  </button>
-                </div>
-                <span class="excel-group-label">Workbook File</span>
-              </div>
-            </div>
-
-            <!-- 2. HOME PANEL (DEFAULT) -->
-            <div class="excel-ribbon-panel active" id="panel-home">
-              <!-- Clipboard Group: Large vertical Paste on left, Cut & Copy stacked on right -->
-              <div class="excel-tool-group excel-clipboard-group">
-                <div class="excel-clipboard-layout">
-                  <button type="button" class="excel-action-btn-large" id="btn-ribbon-paste" onclick="excelPaste()"
-                    title="Paste (Ctrl+V)">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                    </svg>
-                    <span class="excel-btn-label">Paste</span>
-                  </button>
-                  <div class="excel-cut-copy-stack">
-                    <button type="button" class="excel-tool-btn" id="btn-ribbon-cut" onclick="excelCut()"
-                      title="Cut (Ctrl+X)">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <circle cx="6" cy="6" r="3"></circle>
-                        <circle cx="6" cy="18" r="3"></circle>
-                        <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
-                        <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
-                        <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
-                      </svg>
-                      <span>Cut</span>
-                    </button>
-                    <button type="button" class="excel-tool-btn" id="btn-ribbon-copy" onclick="excelCopy()"
-                      title="Copy (Ctrl+C)">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                      <span>Copy</span>
-                    </button>
-                  </div>
-                </div>
-                <span class="excel-group-label">Clipboard</span>
-              </div>
-
-              <!-- Undo / Redo Group -->
-              <div class="excel-tool-group">
-                <div class="excel-tool-row">
-                  <button type="button" class="excel-icon-btn" id="btn-ribbon-undo" onclick="excelUndo()"
-                    title="Undo (Ctrl+Z)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M3 7v6h6"></path>
-                      <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
-                    </svg>
-                  </button>
-                  <button type="button" class="excel-icon-btn" id="btn-ribbon-redo" onclick="excelRedo()"
-                    title="Redo (Ctrl+Y)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 7v6h-6"></path>
-                      <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path>
-                    </svg>
-                  </button>
-                </div>
-                <span class="excel-group-label">History</span>
-              </div>
-
-              <!-- Font Group -->
-              <div class="excel-tool-group">
-                <div class="excel-tool-row">
-                  <select class="excel-select excel-font-family" id="font-family-select"
-                    onchange="applyFontFamily(this.value)" title="Font Family">
-                    <option value="Inter, sans-serif" selected>Inter</option>
-                    <option value="Arial, sans-serif">Arial</option>
-                    <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
-                    <option value="'Times New Roman', serif">Times New Roman</option>
-                    <option value="'Segoe UI', sans-serif">Segoe UI</option>
-                  </select>
-                  <select class="excel-select excel-font-size" id="font-size-select"
-                    onchange="applyFontSize(this.value)" title="Font Size">
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11" selected>11</option>
-                    <option value="12">12</option>
-                    <option value="14">14</option>
-                    <option value="16">16</option>
-                    <option value="18">18</option>
-                    <option value="20">20</option>
-                  </select>
-                </div>
-                <div class="excel-tool-row">
-                  <button type="button" class="excel-icon-btn" id="btn-font-bold" onclick="toggleFontBold()"
-                    title="Bold (Ctrl+B)"><strong>B</strong></button>
-                  <button type="button" class="excel-icon-btn" id="btn-font-italic" onclick="toggleFontItalic()"
-                    title="Italic (Ctrl+I)"><em>I</em></button>
-                  <button type="button" class="excel-icon-btn" id="btn-font-underline" onclick="toggleFontUnderline()"
-                    title="Underline (Ctrl+U)"><span style="text-decoration:underline;">U</span></button>
-
-                  <!-- Border Selector Dropdown -->
-                  <div class="excel-dropdown-wrapper">
-                    <button type="button" class="excel-icon-btn" id="btn-border-dropdown"
-                      onclick="toggleBordersMenu(event)" title="Borders">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="1"></rect>
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="12" y1="3" x2="12" y2="21"></line>
-                      </svg>
-                    </button>
-                    <div class="excel-mini-menu" id="excel-borders-menu" style="display:none;">
-                      <button type="button" class="excel-menu-row" onclick="applyCellBorders('all')">All
-                        Borders</button>
-                      <button type="button" class="excel-menu-row" onclick="applyCellBorders('outside')">Outside
-                        Borders</button>
-                      <button type="button" class="excel-menu-row" onclick="applyCellBorders('thick-bottom')">Thick
-                        Bottom Border</button>
-                      <button type="button" class="excel-menu-row" onclick="applyCellBorders('none')">No Border</button>
-                    </div>
-                  </div>
-
-                  <!-- Color Pickers with Multi-Option Palette Popups -->
-                  <div class="excel-color-btn-wrapper" style="position: relative; display: inline-flex;">
-                    <button type="button" class="excel-icon-btn" id="btn-fill-color-picker"
-                      onclick="toggleColorPalette('fill', event)" title="Fill Color (Background)">
-                      <span class="excel-color-indicator fill" id="indicator-fill-color">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              <!-- 1. FILE PANEL -->
+              <div class="excel-ribbon-panel" id="panel-file">
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" id="btn-ribbon-home"
+                      onclick="openOfficeHomeScreen()" title="Office Studio Home &amp; Subjects Hub">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
-                          <path d="M19 11l-8-8-8.5 8.5a5.5 5.5 0 0 0 7.78 7.78L19 11z" />
-                          <path d="M5 2l5 5" />
-                          <path d="M2 13h15" />
+                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                          <polyline points="9 22 9 12 15 12 15 22" />
                         </svg>
-                        <span class="color-bar" id="fill-color-bar" style="background: #ffffff;"></span>
                       </span>
+                      <span class="excel-btn-label">Home</span>
                     </button>
-                    <!-- Fill Color Palette Popup -->
-                    <div id="palette-fill-color" class="excel-color-palette-popup" style="display: none;">
-                      <div class="palette-header">Theme & Cell Colors</div>
-                      <div class="palette-grid">
-                        <button type="button" class="color-swatch no-fill" onclick="selectFillColor('')" title="No Fill / Clear">✕</button>
-                        <button type="button" class="color-swatch" style="background: #ffffff;" onclick="selectFillColor('#ffffff')" title="White"></button>
-                        <button type="button" class="color-swatch" style="background: #f8fafc;" onclick="selectFillColor('#f8fafc')" title="Slate 50"></button>
-                        <button type="button" class="color-swatch" style="background: #f1f5f9;" onclick="selectFillColor('#f1f5f9')" title="Slate 100"></button>
-                        <button type="button" class="color-swatch" style="background: #fee2e2;" onclick="selectFillColor('#fee2e2')" title="Soft Red"></button>
-                        <button type="button" class="color-swatch" style="background: #ffedd5;" onclick="selectFillColor('#ffedd5')" title="Soft Orange"></button>
-                        <button type="button" class="color-swatch" style="background: #fef3c7;" onclick="selectFillColor('#fef3c7')" title="Soft Amber / Yellow"></button>
-                        <button type="button" class="color-swatch" style="background: #dcfce7;" onclick="selectFillColor('#dcfce7')" title="Soft Green"></button>
-                        <button type="button" class="color-swatch" style="background: #d1fae5;" onclick="selectFillColor('#d1fae5')" title="Soft Emerald"></button>
-                        <button type="button" class="color-swatch" style="background: #ccfbf1;" onclick="selectFillColor('#ccfbf1')" title="Soft Teal"></button>
-                        <button type="button" class="color-swatch" style="background: #e0f2fe;" onclick="selectFillColor('#e0f2fe')" title="Soft Sky Blue"></button>
-                        <button type="button" class="color-swatch" style="background: #dbeafe;" onclick="selectFillColor('#dbeafe')" title="Soft Blue"></button>
-                        <button type="button" class="color-swatch" style="background: #e0e7ff;" onclick="selectFillColor('#e0e7ff')" title="Soft Indigo"></button>
-                        <button type="button" class="color-swatch" style="background: #ede9fe;" onclick="selectFillColor('#ede9fe')" title="Soft Violet"></button>
-                        <button type="button" class="color-swatch" style="background: #fae8ff;" onclick="selectFillColor('#fae8ff')" title="Soft Fuchsia"></button>
-                        <button type="button" class="color-swatch" style="background: #ffe4e6;" onclick="selectFillColor('#ffe4e6')" title="Soft Rose"></button>
-                      </div>
-                      <div class="palette-divider"></div>
-                      <div class="palette-custom-row">
-                        <label for="input-fill-color">Custom Color:</label>
-                        <input type="color" id="input-fill-color" value="#ffffff" onchange="selectFillColor(this.value)">
-                      </div>
-                      <div class="palette-divider"></div>
-                      <div class="palette-header">Quick Conditional Presets</div>
-                      <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('pass')">
-                        <span class="preset-pill" style="background:#dcfce7;color:#166534;">Pass (≥ 75%)</span>
-                      </button>
-                      <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('avg')">
-                        <span class="preset-pill" style="background:#fef3c7;color:#854d0e;">Average (50-74%)</span>
-                      </button>
-                      <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('fail')">
-                        <span class="preset-pill" style="background:#fee2e2;color:#991b1b;">Low / At Risk (&lt; 50%)</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="excel-color-btn-wrapper" style="position: relative; display: inline-flex;">
-                    <button type="button" class="excel-icon-btn" id="btn-font-color-picker"
-                      onclick="toggleColorPalette('font', event)" title="Font Color (Text)">
-                      <span class="excel-color-indicator font" id="indicator-font-color">
-                        <strong>A</strong>
-                        <span class="color-bar" id="font-color-bar" style="background: #0f172a;"></span>
+                    <button type="button" class="excel-action-btn-large" onclick="createNewWorksheet()"
+                      title="Create Blank Sheet">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                          <line x1="12" y1="18" x2="12" y2="12" />
+                          <line x1="9" y1="15" x2="15" y2="15" />
+                        </svg>
                       </span>
+                      <span class="excel-btn-label">New Sheet</span>
                     </button>
-                    <!-- Font Color Palette Popup -->
-                    <div id="palette-font-color" class="excel-color-palette-popup" style="display: none;">
-                      <div class="palette-header">Text Colors</div>
-                      <div class="palette-grid">
-                        <button type="button" class="color-swatch" style="background: #0f172a;" onclick="selectFontColor('#0f172a')" title="Default Dark"></button>
-                        <button type="button" class="color-swatch" style="background: #475569;" onclick="selectFontColor('#475569')" title="Muted Gray"></button>
-                        <button type="button" class="color-swatch" style="background: #dc2626;" onclick="selectFontColor('#dc2626')" title="Red"></button>
-                        <button type="button" class="color-swatch" style="background: #ea580c;" onclick="selectFontColor('#ea580c')" title="Orange"></button>
-                        <button type="button" class="color-swatch" style="background: #d97706;" onclick="selectFontColor('#d97706')" title="Amber"></button>
-                        <button type="button" class="color-swatch" style="background: #16a34a;" onclick="selectFontColor('#16a34a')" title="Green"></button>
-                        <button type="button" class="color-swatch" style="background: #0d9488;" onclick="selectFontColor('#0d9488')" title="Teal"></button>
-                        <button type="button" class="color-swatch" style="background: #2563eb;" onclick="selectFontColor('#2563eb')" title="Blue"></button>
-                        <button type="button" class="color-swatch" style="background: #4f46e5;" onclick="selectFontColor('#4f46e5')" title="Indigo"></button>
-                        <button type="button" class="color-swatch" style="background: #9333ea;" onclick="selectFontColor('#9333ea')" title="Purple"></button>
-                        <button type="button" class="color-swatch" style="background: #db2777;" onclick="selectFontColor('#db2777')" title="Pink"></button>
-                        <button type="button" class="color-swatch" style="background: #ffffff; border: 1px solid #cbd5e1;" onclick="selectFontColor('#ffffff')" title="White"></button>
-                      </div>
-                      <div class="palette-divider"></div>
-                      <div class="palette-custom-row">
-                        <label for="input-font-color">Custom Text:</label>
-                        <input type="color" id="input-font-color" value="#0f172a" onchange="selectFontColor(this.value)">
-                      </div>
-                    </div>
+                    <button type="button" class="excel-action-btn-large" onclick="triggerExcelImport()"
+                      title="Import .xlsx or .csv">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Open / Import</span>
+                    </button>
+                    <button type="button" class="excel-action-btn-large" onclick="saveActiveSheetData(true)"
+                      title="Save Workbook (Ctrl+S)">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                          <polyline points="17 21 17 13 7 13 7 21" />
+                          <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Save</span>
+                    </button>
+                    <button type="button" class="excel-action-btn-large" onclick="exportCurrentSheet('xlsx')"
+                      title="Export to .xlsx">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="7 10 12 15 17 10" />
+                          <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Export .XLSX</span>
+                    </button>
+                    <button type="button" class="excel-action-btn-large" onclick="window.print()"
+                      title="Print active sheet (Ctrl+P)">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <polyline points="6 9 6 2 18 2 18 9" />
+                          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                          <rect x="6" y="14" width="12" height="8" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Print</span>
+                    </button>
                   </div>
+                  <span class="excel-group-label">Workbook File</span>
                 </div>
-                <span class="excel-group-label">Font</span>
               </div>
 
-              <!-- Alignment Group -->
-              <div class="excel-tool-group">
-                <div class="excel-tool-row">
-                  <button type="button" class="excel-icon-btn" id="btn-valign-top" onclick="applyVAlign('top')"
-                    title="Top Align">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="3" y1="3" x2="21" y2="3"></line>
-                      <line x1="6" y1="9" x2="18" y2="9"></line>
-                      <line x1="8" y1="15" x2="16" y2="15"></line>
-                    </svg>
-                  </button>
-                  <button type="button" class="excel-icon-btn active" id="btn-valign-middle"
-                    onclick="applyVAlign('middle')" title="Middle Align">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="6" y1="7" x2="18" y2="7"></line>
-                      <line x1="3" y1="12" x2="21" y2="12"></line>
-                      <line x1="6" y1="17" x2="18" y2="17"></line>
-                    </svg>
-                  </button>
-                  <button type="button" class="excel-icon-btn" id="btn-valign-bottom" onclick="applyVAlign('bottom')"
-                    title="Bottom Align">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="8" y1="9" x2="16" y2="9"></line>
-                      <line x1="6" y1="15" x2="18" y2="15"></line>
-                      <line x1="3" y1="21" x2="21" y2="21"></line>
-                    </svg>
-                  </button>
-                  <button type="button" class="excel-tool-btn" id="btn-wrap-text" onclick="toggleWrapText()"
-                    title="Wrap Text">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="3" y1="6" x2="21" y2="6"></line>
-                      <path d="M3 12h15a3 3 0 0 1 0 6h-4"></path>
-                      <polyline points="16 16 14 18 16 20"></polyline>
-                      <line x1="3" y1="18" x2="9" y2="18"></line>
-                    </svg>
-                    <span>Wrap Text</span>
-                  </button>
-                </div>
-                <div class="excel-tool-row">
-                  <button type="button" class="excel-icon-btn" id="btn-align-left" onclick="applyHAlign('left')"
-                    title="Align Left">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="21" y1="6" x2="3" y2="6"></line>
-                      <line x1="15" y1="12" x2="3" y2="12"></line>
-                      <line x1="17" y1="18" x2="3" y2="18"></line>
-                    </svg>
-                  </button>
-                  <button type="button" class="excel-icon-btn" id="btn-align-center" onclick="applyHAlign('center')"
-                    title="Align Center">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="6"></line>
-                      <line x1="21" y1="12" x2="3" y2="12"></line>
-                      <line x1="18" y1="18" x2="6" y2="18"></line>
-                    </svg>
-                  </button>
-                  <button type="button" class="excel-icon-btn" id="btn-align-right" onclick="applyHAlign('right')"
-                    title="Align Right">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="21" y1="6" x2="3" y2="6"></line>
-                      <line x1="21" y1="12" x2="9" y2="12"></line>
-                      <line x1="21" y1="18" x2="7" y2="18"></line>
-                    </svg>
-                  </button>
-                  <!-- Merge & Center Dropdown -->
-                  <div class="excel-dropdown-wrapper">
-                    <button type="button" class="excel-tool-btn" id="btn-merge-cells"
-                      onclick="toggleMergeAndCenterMenu(event)" title="Merge &amp; Center or Unmerge Selected Cells">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              <!-- 2. HOME PANEL (DEFAULT) -->
+              <div class="excel-ribbon-panel active" id="panel-home">
+                <!-- Clipboard Group: Large vertical Paste on left, Cut & Copy stacked on right -->
+                <div class="excel-tool-group excel-clipboard-group">
+                  <div class="excel-clipboard-layout">
+                    <button type="button" class="excel-action-btn-large" id="btn-ribbon-paste" onclick="excelPaste()"
+                      title="Paste (Ctrl+V)">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                        <line x1="3" y1="12" x2="9" y2="12"></line>
-                        <line x1="15" y1="12" x2="21" y2="12"></line>
-                        <polyline points="7 10 9 12 7 14"></polyline>
-                        <polyline points="17 10 15 12 17 14"></polyline>
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
                       </svg>
-                      <span>Merge &amp; Center ▾</span>
+                      <span class="excel-btn-label">Paste</span>
                     </button>
-                    <div class="excel-dropdown-menu" id="menu-merge-cells" style="display:none;">
-                      <button type="button" class="excel-menu-item" onclick="mergeAndCenter()">
-                        <span class="excel-icon">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="7 15 2 12 7 9" />
-                            <polyline points="17 9 22 12 17 15" />
-                            <line x1="2" y1="12" x2="22" y2="12" />
-                          </svg>
-                        </span>
-                        <span>Merge &amp; Center</span>
-                      </button>
-                      <button type="button" class="excel-menu-item" onclick="mergeAcross()">
-                        <span class="excel-icon">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="13 17 18 12 13 7" />
-                            <polyline points="6 17 11 12 6 7" />
-                          </svg>
-                        </span>
-                        <span>Merge Across</span>
-                      </button>
-                      <button type="button" class="excel-menu-item" onclick="mergeCellsOnly()">
-                        <span class="excel-icon">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <line x1="3" y1="12" x2="21" y2="12" />
-                            <line x1="12" y1="3" x2="12" y2="21" />
-                          </svg>
-                        </span>
-                        <span>Merge Cells</span>
-                      </button>
-                      <div class="excel-menu-divider"></div>
-                      <button type="button" class="excel-menu-item text-danger" onclick="unmergeSelectedCells()">
-                        <span class="excel-icon">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="9 18 3 12 9 6" />
-                            <polyline points="15 6 21 12 15 18" />
-                          </svg>
-                        </span>
-                        <span>Unmerge Cells</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <span class="excel-group-label">Alignment</span>
-              </div>
-
-              <!-- Number Formatting Group -->
-              <div class="excel-tool-group excel-number-group">
-                <div class="excel-tool-row">
-                  <select class="excel-select" id="number-format-select" onchange="applyNumberFormat(this.value)"
-                    title="Number Format" style="width:78px;font-size:0.7rem;padding:0.15rem 0.25rem;">
-                    <option value="general" selected>General</option>
-                    <option value="number">Number (0.00)</option>
-                    <option value="currency">Currency (₹)</option>
-                    <option value="percent">Percentage (%)</option>
-                    <option value="date">Short Date</option>
-                  </select>
-                </div>
-                <div class="excel-tool-row">
-                  <button type="button" class="excel-icon-btn" id="btn-dec-increase" onclick="adjustDecimals(1)"
-                    title="Increase Decimal (.00 → .000)" style="width:20px;height:20px;font-size:0.62rem;font-weight:800;padding:0;">
-                    <span>.0+</span>
-                  </button>
-                  <button type="button" class="excel-icon-btn" id="btn-dec-decrease" onclick="adjustDecimals(-1)"
-                    title="Decrease Decimal (.000 → .00)" style="width:20px;height:20px;font-size:0.62rem;font-weight:800;padding:0;">
-                    <span>-.0</span>
-                  </button>
-                  <button type="button" class="excel-icon-btn" onclick="applyNumberFormat('currency')"
-                    title="Format as Currency (₹)" style="width:20px;height:20px;font-size:0.68rem;font-weight:800;padding:0;">₹</button>
-                  <button type="button" class="excel-icon-btn" onclick="applyNumberFormat('percent')"
-                    title="Format as Percent (%)" style="width:20px;height:20px;font-size:0.68rem;font-weight:800;padding:0;">%</button>
-                </div>
-                <span class="excel-group-label">Number</span>
-              </div>
-
-              <!-- Cells Operations Group -->
-              <div class="excel-tool-group">
-                <div class="excel-tool-row">
-                  <button type="button" class="excel-tool-btn" id="btn-insert-row" onclick="insertRowAtActive(true)"
-                    title="Insert Row Above">
-                    <span>+ Row</span>
-                  </button>
-                  <button type="button" class="excel-tool-btn" id="btn-insert-col" onclick="insertColAtActive(true)"
-                    title="Insert Column Left">
-                    <span>+ Col</span>
-                  </button>
-                  <button type="button" class="excel-tool-btn" onclick="openAddRowModal()"
-                    title="Add Enrolled Student Row">+ Student</button>
-                </div>
-                <div class="excel-tool-row">
-                  <button type="button" class="excel-tool-btn text-danger" id="btn-delete-row"
-                    onclick="deleteActiveRow()" title="Delete Selected Row">
-                    <span>− Row</span>
-                  </button>
-                  <button type="button" class="excel-tool-btn text-danger" id="btn-delete-col"
-                    onclick="deleteActiveCol()" title="Delete Selected Column">
-                    <span>− Col</span>
-                  </button>
-                  <button type="button" class="excel-tool-btn" onclick="openEditStudentRosterModal()"
-                    title="Open Scores Form Modal">Roster Form</button>
-                </div>
-                <span class="excel-group-label">Cells</span>
-              </div>
-
-              <!-- Editing & Search Group -->
-              <div class="excel-tool-group">
-                <div class="excel-tool-row">
-                  <!-- AutoSum Dropdown -->
-                  <div class="excel-dropdown-wrapper">
-                    <button type="button" class="excel-tool-btn" id="btn-autosum-dropdown"
-                      onclick="toggleAutoSumMenu(event)" title="AutoSum Formulas">
-                      <span style="font-weight:800;font-size:0.85rem;">Σ</span>
-                      <span>AutoSum ▾</span>
-                    </button>
-                    <div class="excel-mini-menu" id="excel-autosum-menu" style="display:none;">
-                      <button type="button" class="excel-menu-row"
-                        onclick="insertAutoFormula('SUM')"><strong>SUM</strong></button>
-                      <button type="button" class="excel-menu-row"
-                        onclick="insertAutoFormula('AVERAGE')"><strong>AVERAGE</strong></button>
-                      <button type="button" class="excel-menu-row" onclick="insertAutoFormula('COUNT')"><strong>COUNT
-                          NUMBERS</strong></button>
-                      <button type="button" class="excel-menu-row"
-                        onclick="insertAutoFormula('MAX')"><strong>MAX</strong></button>
-                      <button type="button" class="excel-menu-row"
-                        onclick="insertAutoFormula('MIN')"><strong>MIN</strong></button>
-                    </div>
-                  </div>
-                  <button type="button" class="excel-tool-btn" id="btn-sort-asc" onclick="sortActiveColumn('asc')"
-                    title="Sort Ascending A-Z / Lowest to Highest">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M11 5h10M11 9h7M11 13h4M3 17l3 3 3-3M6 18V4" />
-                    </svg>
-                    <span>A→Z</span>
-                  </button>
-                  <button type="button" class="excel-tool-btn" id="btn-sort-desc" onclick="sortActiveColumn('desc')"
-                    title="Sort Descending Z-A / Highest to Lowest">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M11 5h10M11 9h7M11 13h4M3 7l3-3 3 3M6 4v14" />
-                    </svg>
-                    <span>Z→A</span>
-                  </button>
-                </div>
-                <div class="excel-tool-row">
-                  <button type="button" class="excel-tool-btn" id="btn-find-replace-open"
-                    onclick="openFindReplaceModal()" title="Find &amp; Replace (Ctrl+F / Ctrl+H)">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="11" cy="11" r="8"></circle>
-                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <span>Find &amp; Replace</span>
-                  </button>
-                  <button type="button" class="excel-tool-btn" id="btn-clear-contents"
-                    onclick="clearSelectedCellContents()" title="Clear Contents (Delete)">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
-                    <span>Clear</span>
-                  </button>
-                </div>
-                <span class="excel-group-label">Editing</span>
-              </div>
-
-              <!-- View & Display Group (Integrated into Home Tab) -->
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <div class="excel-tool-vgroup">
-                    <div class="excel-tool-row">
-                      <button type="button" class="excel-tool-btn active" id="btn-home-toggle-gridlines"
-                        onclick="toggleGridlines()" title="Show/Hide Gridlines">
+                    <div class="excel-cut-copy-stack">
+                      <button type="button" class="excel-tool-btn" id="btn-ribbon-cut" onclick="excelCut()"
+                        title="Cut (Ctrl+X)">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
-                          <rect x="3" y="3" width="18" height="18" rx="1" />
-                          <line x1="3" y1="12" x2="21" y2="12" />
-                          <line x1="12" y1="3" x2="12" y2="21" />
+                          <circle cx="6" cy="6" r="3"></circle>
+                          <circle cx="6" cy="18" r="3"></circle>
+                          <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                          <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                          <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
                         </svg>
-                        <span id="label-home-gridlines">Gridlines</span>
+                        <span>Cut</span>
                       </button>
-                      <button type="button" class="excel-tool-btn" id="btn-home-toggle-formula-bar"
-                        onclick="toggleFormulaBarVisibility()" title="Show/Hide Formula Bar">
-                        <span
-                          style="font-family:serif;font-weight:700;font-size:0.8rem;color:var(--color-primary);">ƒx</span>
-                        <span>Formula Bar</span>
+                      <button type="button" class="excel-tool-btn" id="btn-ribbon-copy" onclick="excelCopy()"
+                        title="Copy (Ctrl+C)">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>Copy</span>
                       </button>
-                      <!-- Freeze Panes Dropdown -->
-                      <div class="excel-dropdown-wrapper">
-                        <button type="button" class="excel-tool-btn" id="btn-home-freeze-panes"
-                          onclick="toggleFreezePanesMenu(event)" title="Freeze Panes / Rows / Columns">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    </div>
+                  </div>
+                  <span class="excel-group-label">Clipboard</span>
+                </div>
+
+                <!-- Undo / Redo Group -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-row">
+                    <button type="button" class="excel-icon-btn" id="btn-ribbon-undo" onclick="excelUndo()"
+                      title="Undo (Ctrl+Z)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M3 7v6h6"></path>
+                        <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                      </svg>
+                    </button>
+                    <button type="button" class="excel-icon-btn" id="btn-ribbon-redo" onclick="excelRedo()"
+                      title="Redo (Ctrl+Y)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M21 7v6h-6"></path>
+                        <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">History</span>
+                </div>
+
+                <!-- Font Group -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-row">
+                    <select class="excel-select excel-font-family" id="font-family-select"
+                      onchange="applyFontFamily(this.value)" title="Font Family">
+                      <option value="Inter, sans-serif" selected>Inter</option>
+                      <option value="Arial, sans-serif">Arial</option>
+                      <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                      <option value="'Times New Roman', serif">Times New Roman</option>
+                      <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                    </select>
+                    <select class="excel-select excel-font-size" id="font-size-select"
+                      onchange="applyFontSize(this.value)" title="Font Size">
+                      <option value="9">9</option>
+                      <option value="10">10</option>
+                      <option value="11" selected>11</option>
+                      <option value="12">12</option>
+                      <option value="14">14</option>
+                      <option value="16">16</option>
+                      <option value="18">18</option>
+                      <option value="20">20</option>
+                    </select>
+                  </div>
+                  <div class="excel-tool-row">
+                    <button type="button" class="excel-icon-btn" id="btn-font-bold" onclick="toggleFontBold()"
+                      title="Bold (Ctrl+B)"><strong>B</strong></button>
+                    <button type="button" class="excel-icon-btn" id="btn-font-italic" onclick="toggleFontItalic()"
+                      title="Italic (Ctrl+I)"><em>I</em></button>
+                    <button type="button" class="excel-icon-btn" id="btn-font-underline" onclick="toggleFontUnderline()"
+                      title="Underline (Ctrl+U)"><span style="text-decoration:underline;">U</span></button>
+
+                    <!-- Border Selector Dropdown -->
+                    <div class="excel-dropdown-wrapper">
+                      <button type="button" class="excel-icon-btn" id="btn-border-dropdown"
+                        onclick="toggleBordersMenu(event)" title="Borders">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <rect x="3" y="3" width="18" height="18" rx="1"></rect>
+                          <line x1="3" y1="12" x2="21" y2="12"></line>
+                          <line x1="12" y1="3" x2="12" y2="21"></line>
+                        </svg>
+                      </button>
+                      <div class="excel-mini-menu" id="excel-borders-menu" style="display:none;">
+                        <button type="button" class="excel-menu-row" onclick="applyCellBorders('all')">All
+                          Borders</button>
+                        <button type="button" class="excel-menu-row" onclick="applyCellBorders('outside')">Outside
+                          Borders</button>
+                        <button type="button" class="excel-menu-row" onclick="applyCellBorders('thick-bottom')">Thick
+                          Bottom Border</button>
+                        <button type="button" class="excel-menu-row" onclick="applyCellBorders('none')">No
+                          Border</button>
+                      </div>
+                    </div>
+
+                    <!-- Color Pickers with Multi-Option Palette Popups -->
+                    <div class="excel-color-btn-wrapper" style="position: relative; display: inline-flex;">
+                      <button type="button" class="excel-icon-btn" id="btn-fill-color-picker"
+                        onclick="toggleColorPalette('fill', event)" title="Fill Color (Background)">
+                        <span class="excel-color-indicator fill" id="indicator-fill-color">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="1" />
-                            <line x1="3" y1="9" x2="21" y2="9" />
-                            <line x1="9" y1="3" x2="9" y2="21" />
+                            <path d="M19 11l-8-8-8.5 8.5a5.5 5.5 0 0 0 7.78 7.78L19 11z" />
+                            <path d="M5 2l5 5" />
+                            <path d="M2 13h15" />
                           </svg>
-                          <span>Freeze ▾</span>
+                          <span class="color-bar" id="fill-color-bar" style="background: #ffffff;"></span>
+                        </span>
+                      </button>
+                      <!-- Fill Color Palette Popup -->
+                      <div id="palette-fill-color" class="excel-color-palette-popup" style="display: none;">
+                        <div class="palette-header">Theme & Cell Colors</div>
+                        <div class="palette-grid">
+                          <button type="button" class="color-swatch no-fill" onclick="selectFillColor('')"
+                            title="No Fill / Clear">✕</button>
+                          <button type="button" class="color-swatch" style="background: #ffffff;"
+                            onclick="selectFillColor('#ffffff')" title="White"></button>
+                          <button type="button" class="color-swatch" style="background: #f8fafc;"
+                            onclick="selectFillColor('#f8fafc')" title="Slate 50"></button>
+                          <button type="button" class="color-swatch" style="background: #f1f5f9;"
+                            onclick="selectFillColor('#f1f5f9')" title="Slate 100"></button>
+                          <button type="button" class="color-swatch" style="background: #fee2e2;"
+                            onclick="selectFillColor('#fee2e2')" title="Soft Red"></button>
+                          <button type="button" class="color-swatch" style="background: #ffedd5;"
+                            onclick="selectFillColor('#ffedd5')" title="Soft Orange"></button>
+                          <button type="button" class="color-swatch" style="background: #fef3c7;"
+                            onclick="selectFillColor('#fef3c7')" title="Soft Amber / Yellow"></button>
+                          <button type="button" class="color-swatch" style="background: #dcfce7;"
+                            onclick="selectFillColor('#dcfce7')" title="Soft Green"></button>
+                          <button type="button" class="color-swatch" style="background: #d1fae5;"
+                            onclick="selectFillColor('#d1fae5')" title="Soft Emerald"></button>
+                          <button type="button" class="color-swatch" style="background: #ccfbf1;"
+                            onclick="selectFillColor('#ccfbf1')" title="Soft Teal"></button>
+                          <button type="button" class="color-swatch" style="background: #e0f2fe;"
+                            onclick="selectFillColor('#e0f2fe')" title="Soft Sky Blue"></button>
+                          <button type="button" class="color-swatch" style="background: #dbeafe;"
+                            onclick="selectFillColor('#dbeafe')" title="Soft Blue"></button>
+                          <button type="button" class="color-swatch" style="background: #e0e7ff;"
+                            onclick="selectFillColor('#e0e7ff')" title="Soft Indigo"></button>
+                          <button type="button" class="color-swatch" style="background: #ede9fe;"
+                            onclick="selectFillColor('#ede9fe')" title="Soft Violet"></button>
+                          <button type="button" class="color-swatch" style="background: #fae8ff;"
+                            onclick="selectFillColor('#fae8ff')" title="Soft Fuchsia"></button>
+                          <button type="button" class="color-swatch" style="background: #ffe4e6;"
+                            onclick="selectFillColor('#ffe4e6')" title="Soft Rose"></button>
+                        </div>
+                        <div class="palette-divider"></div>
+                        <div class="palette-custom-row">
+                          <label for="input-fill-color">Custom Color:</label>
+                          <input type="color" id="input-fill-color" value="#ffffff"
+                            onchange="selectFillColor(this.value)">
+                        </div>
+                        <div class="palette-divider"></div>
+                        <div class="palette-header">Quick Conditional Presets</div>
+                        <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('pass')">
+                          <span class="preset-pill" style="background:#dcfce7;color:#166534;">Pass (≥ 75%)</span>
                         </button>
-                        <div class="excel-mini-menu" id="excel-freeze-menu" style="display:none;">
-                          <button type="button" class="excel-menu-row" onclick="freezeTopRow()"><strong>Freeze Top
-                              Row</strong></button>
-                          <button type="button" class="excel-menu-row" onclick="freezeFirstColumn()"><strong>Freeze
-                              First Column</strong></button>
-                          <button type="button" class="excel-menu-row" onclick="unfreezePanes()"><strong>Unfreeze
-                              Panes</strong></button>
+                        <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('avg')">
+                          <span class="preset-pill" style="background:#fef3c7;color:#854d0e;">Average (50-74%)</span>
+                        </button>
+                        <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('fail')">
+                          <span class="preset-pill" style="background:#fee2e2;color:#991b1b;">Low / At Risk (&lt;
+                            50%)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="excel-color-btn-wrapper" style="position: relative; display: inline-flex;">
+                      <button type="button" class="excel-icon-btn" id="btn-font-color-picker"
+                        onclick="toggleColorPalette('font', event)" title="Font Color (Text)">
+                        <span class="excel-color-indicator font" id="indicator-font-color">
+                          <strong>A</strong>
+                          <span class="color-bar" id="font-color-bar" style="background: #0f172a;"></span>
+                        </span>
+                      </button>
+                      <!-- Font Color Palette Popup -->
+                      <div id="palette-font-color" class="excel-color-palette-popup" style="display: none;">
+                        <div class="palette-header">Text Colors</div>
+                        <div class="palette-grid">
+                          <button type="button" class="color-swatch" style="background: #0f172a;"
+                            onclick="selectFontColor('#0f172a')" title="Default Dark"></button>
+                          <button type="button" class="color-swatch" style="background: #475569;"
+                            onclick="selectFontColor('#475569')" title="Muted Gray"></button>
+                          <button type="button" class="color-swatch" style="background: #dc2626;"
+                            onclick="selectFontColor('#dc2626')" title="Red"></button>
+                          <button type="button" class="color-swatch" style="background: #ea580c;"
+                            onclick="selectFontColor('#ea580c')" title="Orange"></button>
+                          <button type="button" class="color-swatch" style="background: #d97706;"
+                            onclick="selectFontColor('#d97706')" title="Amber"></button>
+                          <button type="button" class="color-swatch" style="background: #16a34a;"
+                            onclick="selectFontColor('#16a34a')" title="Green"></button>
+                          <button type="button" class="color-swatch" style="background: #0d9488;"
+                            onclick="selectFontColor('#0d9488')" title="Teal"></button>
+                          <button type="button" class="color-swatch" style="background: #2563eb;"
+                            onclick="selectFontColor('#2563eb')" title="Blue"></button>
+                          <button type="button" class="color-swatch" style="background: #4f46e5;"
+                            onclick="selectFontColor('#4f46e5')" title="Indigo"></button>
+                          <button type="button" class="color-swatch" style="background: #9333ea;"
+                            onclick="selectFontColor('#9333ea')" title="Purple"></button>
+                          <button type="button" class="color-swatch" style="background: #db2777;"
+                            onclick="selectFontColor('#db2777')" title="Pink"></button>
+                          <button type="button" class="color-swatch"
+                            style="background: #ffffff; border: 1px solid #cbd5e1;" onclick="selectFontColor('#ffffff')"
+                            title="White"></button>
+                        </div>
+                        <div class="palette-divider"></div>
+                        <div class="palette-custom-row">
+                          <label for="input-font-color">Custom Text:</label>
+                          <input type="color" id="input-font-color" value="#0f172a"
+                            onchange="selectFontColor(this.value)">
                         </div>
                       </div>
                     </div>
-                    <div class="excel-tool-row">
-                      <button type="button" class="excel-icon-btn" onclick="zoomOut()" title="Zoom Out (−)">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  </div>
+                  <span class="excel-group-label">Font</span>
+                </div>
+
+                <!-- Alignment Group -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-row">
+                    <button type="button" class="excel-icon-btn" id="btn-valign-top" onclick="applyVAlign('top')"
+                      title="Top Align">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="3" y1="3" x2="21" y2="3"></line>
+                        <line x1="6" y1="9" x2="18" y2="9"></line>
+                        <line x1="8" y1="15" x2="16" y2="15"></line>
+                      </svg>
+                    </button>
+                    <button type="button" class="excel-icon-btn active" id="btn-valign-middle"
+                      onclick="applyVAlign('middle')" title="Middle Align">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="6" y1="7" x2="18" y2="7"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="6" y1="17" x2="18" y2="17"></line>
+                      </svg>
+                    </button>
+                    <button type="button" class="excel-icon-btn" id="btn-valign-bottom" onclick="applyVAlign('bottom')"
+                      title="Bottom Align">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="8" y1="9" x2="16" y2="9"></line>
+                        <line x1="6" y1="15" x2="18" y2="15"></line>
+                        <line x1="3" y1="21" x2="21" y2="21"></line>
+                      </svg>
+                    </button>
+                    <button type="button" class="excel-tool-btn" id="btn-wrap-text" onclick="toggleWrapText()"
+                      title="Wrap Text">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M3 12h15a3 3 0 0 1 0 6h-4"></path>
+                        <polyline points="16 16 14 18 16 20"></polyline>
+                        <line x1="3" y1="18" x2="9" y2="18"></line>
+                      </svg>
+                      <span>Wrap Text</span>
+                    </button>
+                  </div>
+                  <div class="excel-tool-row">
+                    <button type="button" class="excel-icon-btn" id="btn-align-left" onclick="applyHAlign('left')"
+                      title="Align Left">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="21" y1="6" x2="3" y2="6"></line>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                        <line x1="17" y1="18" x2="3" y2="18"></line>
+                      </svg>
+                    </button>
+                    <button type="button" class="excel-icon-btn" id="btn-align-center" onclick="applyHAlign('center')"
+                      title="Align Center">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="6"></line>
+                        <line x1="21" y1="12" x2="3" y2="12"></line>
+                        <line x1="18" y1="18" x2="6" y2="18"></line>
+                      </svg>
+                    </button>
+                    <button type="button" class="excel-icon-btn" id="btn-align-right" onclick="applyHAlign('right')"
+                      title="Align Right">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="21" y1="6" x2="3" y2="6"></line>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                        <line x1="21" y1="18" x2="7" y2="18"></line>
+                      </svg>
+                    </button>
+                    <!-- Merge & Center Dropdown -->
+                    <div class="excel-dropdown-wrapper">
+                      <button type="button" class="excel-tool-btn" id="btn-merge-cells"
+                        onclick="toggleMergeAndCenterMenu(event)" title="Merge &amp; Center or Unmerge Selected Cells">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
-                          <line x1="5" y1="12" x2="19" y2="12" />
+                          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                          <line x1="3" y1="12" x2="9" y2="12"></line>
+                          <line x1="15" y1="12" x2="21" y2="12"></line>
+                          <polyline points="7 10 9 12 7 14"></polyline>
+                          <polyline points="17 10 15 12 17 14"></polyline>
                         </svg>
+                        <span>Merge &amp; Center ▾</span>
                       </button>
-                      <span class="zoom-level-indicator" id="home-zoom-level-label"
-                        style="font-size:0.75rem;font-weight:800;color:var(--text-main);min-width:34px;text-align:center;">100%</span>
-                      <button type="button" class="excel-icon-btn" onclick="zoomIn()" title="Zoom In (+)">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2">
-                          <line x1="12" y1="5" x2="12" y2="19" />
-                          <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                      </button>
-                      <button type="button" class="excel-tool-btn active" id="btn-home-autofit"
-                        onclick="toggleAutoFit()" title="Toggle Auto-Fit">Auto-Fit</button>
-                      <select class="density-select" id="home-density-selector" onchange="setDensity(this.value)"
-                        title="Display Density"
-                        style="padding:0.18rem 0.35rem;font-size:0.72rem;background:var(--bg-surface);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-sm);">
-                        <option value="normal" selected>Normal</option>
-                        <option value="compact">Compact</option>
-                        <option value="comfortable">Comfortable</option>
-                      </select>
+                      <div class="excel-dropdown-menu" id="menu-merge-cells" style="display:none;">
+                        <button type="button" class="excel-menu-item" onclick="mergeAndCenter()">
+                          <span class="excel-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2">
+                              <polyline points="7 15 2 12 7 9" />
+                              <polyline points="17 9 22 12 17 15" />
+                              <line x1="2" y1="12" x2="22" y2="12" />
+                            </svg>
+                          </span>
+                          <span>Merge &amp; Center</span>
+                        </button>
+                        <button type="button" class="excel-menu-item" onclick="mergeAcross()">
+                          <span class="excel-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2">
+                              <polyline points="13 17 18 12 13 7" />
+                              <polyline points="6 17 11 12 6 7" />
+                            </svg>
+                          </span>
+                          <span>Merge Across</span>
+                        </button>
+                        <button type="button" class="excel-menu-item" onclick="mergeCellsOnly()">
+                          <span class="excel-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2">
+                              <rect x="3" y="3" width="18" height="18" rx="2" />
+                              <line x1="3" y1="12" x2="21" y2="12" />
+                              <line x1="12" y1="3" x2="12" y2="21" />
+                            </svg>
+                          </span>
+                          <span>Merge Cells</span>
+                        </button>
+                        <div class="excel-menu-divider"></div>
+                        <button type="button" class="excel-menu-item text-danger" onclick="unmergeSelectedCells()">
+                          <span class="excel-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2">
+                              <polyline points="9 18 3 12 9 6" />
+                              <polyline points="15 6 21 12 15 18" />
+                            </svg>
+                          </span>
+                          <span>Unmerge Cells</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
+                  <span class="excel-group-label">Alignment</span>
                 </div>
-                <span class="excel-group-label">View &amp; Display</span>
+
+                <!-- Number Formatting Group -->
+                <div class="excel-tool-group excel-number-group">
+                  <div class="excel-tool-row">
+                    <select class="excel-select" id="number-format-select" onchange="applyNumberFormat(this.value)"
+                      title="Number Format" style="width:78px;font-size:0.7rem;padding:0.15rem 0.25rem;">
+                      <option value="general" selected>General</option>
+                      <option value="number">Number (0.00)</option>
+                      <option value="currency">Currency (₹)</option>
+                      <option value="percent">Percentage (%)</option>
+                      <option value="date">Short Date</option>
+                    </select>
+                  </div>
+                  <div class="excel-tool-row">
+                    <button type="button" class="excel-icon-btn" id="btn-dec-increase" onclick="adjustDecimals(1)"
+                      title="Increase Decimal (.00 → .000)"
+                      style="width:20px;height:20px;font-size:0.62rem;font-weight:800;padding:0;">
+                      <span>.0+</span>
+                    </button>
+                    <button type="button" class="excel-icon-btn" id="btn-dec-decrease" onclick="adjustDecimals(-1)"
+                      title="Decrease Decimal (.000 → .00)"
+                      style="width:20px;height:20px;font-size:0.62rem;font-weight:800;padding:0;">
+                      <span>-.0</span>
+                    </button>
+                    <button type="button" class="excel-icon-btn" onclick="applyNumberFormat('currency')"
+                      title="Format as Currency (₹)"
+                      style="width:20px;height:20px;font-size:0.68rem;font-weight:800;padding:0;">₹</button>
+                    <button type="button" class="excel-icon-btn" onclick="applyNumberFormat('percent')"
+                      title="Format as Percent (%)"
+                      style="width:20px;height:20px;font-size:0.68rem;font-weight:800;padding:0;">%</button>
+                  </div>
+                  <span class="excel-group-label">Number</span>
+                </div>
+
+                <!-- Cells Operations Group -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-row">
+                    <button type="button" class="excel-tool-btn" id="btn-insert-row" onclick="insertRowAtActive(true)"
+                      title="Insert Row Above">
+                      <span>+ Row</span>
+                    </button>
+                    <button type="button" class="excel-tool-btn" id="btn-insert-col" onclick="insertColAtActive(true)"
+                      title="Insert Column Left">
+                      <span>+ Col</span>
+                    </button>
+                    <button type="button" class="excel-tool-btn" onclick="openAddRowModal()"
+                      title="Add Enrolled Student Row">+ Student</button>
+                  </div>
+                  <div class="excel-tool-row">
+                    <button type="button" class="excel-tool-btn text-danger" id="btn-delete-row"
+                      onclick="deleteActiveRow()" title="Delete Selected Row">
+                      <span>− Row</span>
+                    </button>
+                    <button type="button" class="excel-tool-btn text-danger" id="btn-delete-col"
+                      onclick="deleteActiveCol()" title="Delete Selected Column">
+                      <span>− Col</span>
+                    </button>
+                    <button type="button" class="excel-tool-btn" onclick="openEditStudentRosterModal()"
+                      title="Open Scores Form Modal">Roster Form</button>
+                  </div>
+                  <span class="excel-group-label">Cells</span>
+                </div>
+
+                <!-- Editing & Search Group -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-row">
+                    <!-- AutoSum Dropdown -->
+                    <div class="excel-dropdown-wrapper">
+                      <button type="button" class="excel-tool-btn" id="btn-autosum-dropdown"
+                        onclick="toggleAutoSumMenu(event)" title="AutoSum Formulas">
+                        <span style="font-weight:800;font-size:0.85rem;">Σ</span>
+                        <span>AutoSum ▾</span>
+                      </button>
+                      <div class="excel-mini-menu" id="excel-autosum-menu" style="display:none;">
+                        <button type="button" class="excel-menu-row"
+                          onclick="insertAutoFormula('SUM')"><strong>SUM</strong></button>
+                        <button type="button" class="excel-menu-row"
+                          onclick="insertAutoFormula('AVERAGE')"><strong>AVERAGE</strong></button>
+                        <button type="button" class="excel-menu-row" onclick="insertAutoFormula('COUNT')"><strong>COUNT
+                            NUMBERS</strong></button>
+                        <button type="button" class="excel-menu-row"
+                          onclick="insertAutoFormula('MAX')"><strong>MAX</strong></button>
+                        <button type="button" class="excel-menu-row"
+                          onclick="insertAutoFormula('MIN')"><strong>MIN</strong></button>
+                      </div>
+                    </div>
+                    <button type="button" class="excel-tool-btn" id="btn-sort-asc" onclick="sortActiveColumn('asc')"
+                      title="Sort Ascending A-Z / Lowest to Highest">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M11 5h10M11 9h7M11 13h4M3 17l3 3 3-3M6 18V4" />
+                      </svg>
+                      <span>A→Z</span>
+                    </button>
+                    <button type="button" class="excel-tool-btn" id="btn-sort-desc" onclick="sortActiveColumn('desc')"
+                      title="Sort Descending Z-A / Highest to Lowest">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M11 5h10M11 9h7M11 13h4M3 7l3-3 3 3M6 4v14" />
+                      </svg>
+                      <span>Z→A</span>
+                    </button>
+                  </div>
+                  <div class="excel-tool-row">
+                    <button type="button" class="excel-tool-btn" id="btn-find-replace-open"
+                      onclick="openFindReplaceModal()" title="Find &amp; Replace (Ctrl+F / Ctrl+H)">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                      <span>Find &amp; Replace</span>
+                    </button>
+                    <button type="button" class="excel-tool-btn" id="btn-clear-contents"
+                      onclick="clearSelectedCellContents()" title="Clear Contents (Delete)">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                      </svg>
+                      <span>Clear</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Editing</span>
+                </div>
+
+                <!-- View & Display Group (Integrated into Home Tab) -->
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <div class="excel-tool-vgroup">
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn active" id="btn-home-toggle-gridlines"
+                          onclick="toggleGridlines()" title="Show/Hide Gridlines">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="1" />
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="12" y1="3" x2="12" y2="21" />
+                          </svg>
+                          <span id="label-home-gridlines">Gridlines</span>
+                        </button>
+                        <button type="button" class="excel-tool-btn" id="btn-home-toggle-formula-bar"
+                          onclick="toggleFormulaBarVisibility()" title="Show/Hide Formula Bar">
+                          <span
+                            style="font-family:serif;font-weight:700;font-size:0.8rem;color:var(--color-primary);">ƒx</span>
+                          <span>Formula Bar</span>
+                        </button>
+                        <!-- Freeze Panes Dropdown -->
+                        <div class="excel-dropdown-wrapper">
+                          <button type="button" class="excel-tool-btn" id="btn-home-freeze-panes"
+                            onclick="toggleFreezePanesMenu(event)" title="Freeze Panes / Rows / Columns">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2">
+                              <rect x="3" y="3" width="18" height="18" rx="1" />
+                              <line x1="3" y1="9" x2="21" y2="9" />
+                              <line x1="9" y1="3" x2="9" y2="21" />
+                            </svg>
+                            <span>Freeze ▾</span>
+                          </button>
+                          <div class="excel-mini-menu" id="excel-freeze-menu" style="display:none;">
+                            <button type="button" class="excel-menu-row" onclick="freezeTopRow()"><strong>Freeze Top
+                                Row</strong></button>
+                            <button type="button" class="excel-menu-row" onclick="freezeFirstColumn()"><strong>Freeze
+                                First Column</strong></button>
+                            <button type="button" class="excel-menu-row" onclick="unfreezePanes()"><strong>Unfreeze
+                                Panes</strong></button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-icon-btn" onclick="zoomOut()" title="Zoom Out (−)">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                        <span class="zoom-level-indicator" id="home-zoom-level-label"
+                          style="font-size:0.75rem;font-weight:800;color:var(--text-main);min-width:34px;text-align:center;">100%</span>
+                        <button type="button" class="excel-icon-btn" onclick="zoomIn()" title="Zoom In (+)">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                        <button type="button" class="excel-tool-btn active" id="btn-home-autofit"
+                          onclick="toggleAutoFit()" title="Toggle Auto-Fit">Auto-Fit</button>
+                        <select class="density-select" id="home-density-selector" onchange="setDensity(this.value)"
+                          title="Display Density"
+                          style="padding:0.18rem 0.35rem;font-size:0.72rem;background:var(--bg-surface);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-sm);">
+                          <option value="normal" selected>Normal</option>
+                          <option value="compact">Compact</option>
+                          <option value="comfortable">Comfortable</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="excel-group-label">View &amp; Display</span>
+                </div>
+
               </div>
 
-            </div>
-
-            <!-- 3. INSERT PANEL -->
-            <div class="excel-ribbon-panel" id="panel-insert">
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="openInsertFunctionModal()"
-                    title="Insert Mathematical / Academic Formula">
-                    <span class="excel-icon"
-                      style="font-family:serif;font-weight:900;font-size:1.15rem;color:var(--color-primary);">ƒx</span>
-                    <span class="excel-btn-label">Insert Function</span>
-                  </button>
+              <!-- 3. INSERT PANEL -->
+              <div class="excel-ribbon-panel" id="panel-insert">
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="openInsertFunctionModal()"
+                      title="Insert Mathematical / Academic Formula">
+                      <span class="excel-icon"
+                        style="font-family:serif;font-weight:900;font-size:1.15rem;color:var(--color-primary);">ƒx</span>
+                      <span class="excel-btn-label">Insert Function</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Formulas</span>
                 </div>
-                <span class="excel-group-label">Formulas</span>
-              </div>
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="openAddRowModal()"
-                    title="Add Enrolled Student">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Student Row</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="openAddColumnModal()"
-                    title="Add Assessment Column">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                        <line x1="12" y1="3" x2="12" y2="21" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Column</span>
-                  </button>
-                </div>
-                <span class="excel-group-label">Rows &amp; Columns</span>
-              </div>
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="toggleInstitutionalBanner()"
-                    title="Toggle College Header Banner">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">College Header</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="togglePrintSignatures()"
-                    title="Toggle Signatures Block">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Signatures</span>
-                  </button>
-                </div>
-                <span class="excel-group-label">Institutional Header</span>
-              </div>
-            </div>
-
-            <!-- 4. PAGE LAYOUT PANEL -->
-            <div class="excel-ribbon-panel" id="panel-page-layout">
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <div class="excel-tool-vgroup">
-                    <div class="excel-tool-row">
-                      <button type="button" class="excel-tool-btn active" id="btn-toggle-gridlines"
-                        onclick="toggleGridlines()" title="Show/Hide Gridlines">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="openAddRowModal()"
+                      title="Add Enrolled Student">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
-                          <rect x="3" y="3" width="18" height="18" rx="1" />
-                          <line x1="3" y1="12" x2="21" y2="12" />
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Student Row</span>
+                    </button>
+                    <button type="button" class="excel-action-btn-large" onclick="openAddColumnModal()"
+                      title="Add Assessment Column">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" />
                           <line x1="12" y1="3" x2="12" y2="21" />
                         </svg>
-                        <span>Gridlines: ON</span>
-                      </button>
-                      <button type="button" class="excel-tool-btn active" id="btn-toggle-banner-view"
-                        onclick="toggleInstitutionalBanner()" title="Show/Hide Institutional Header Banner">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      </span>
+                      <span class="excel-btn-label">Column</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Rows &amp; Columns</span>
+                </div>
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="toggleInstitutionalBanner()"
+                      title="Toggle College Header Banner">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
                           <path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6" />
                         </svg>
-                        <span>College Banner: ON</span>
-                      </button>
-                    </div>
-                    <div class="excel-tool-row">
-                      <button type="button" class="excel-tool-btn" onclick="openEditMarksModal()"
-                        title="Edit Total Marks &amp; Scheme">
-                        <span>Scheme Weightage</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <span class="excel-group-label">Sheet Display</span>
-              </div>
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="window.print()" title="Open Print View">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <polyline points="6 9 6 2 18 2 18 9" />
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                        <rect x="6" y="14" width="12" height="8" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Print Sheet</span>
-                  </button>
-                </div>
-                <span class="excel-group-label">Print Setup</span>
-              </div>
-            </div>
-
-            <!-- 5. FORMULAS PANEL -->
-            <div class="excel-ribbon-panel" id="panel-formulas">
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="openInsertFunctionModal()"
-                    title="Browse Function Library">
-                    <span class="excel-icon"
-                      style="font-family:serif;font-weight:900;font-size:1.15rem;color:var(--color-primary);">ƒx</span>
-                    <span class="excel-btn-label">Insert Function</span>
-                  </button>
-                  <div class="excel-tool-vgroup">
-                    <div class="excel-tool-row">
-                      <button type="button" class="excel-tool-btn" onclick="insertFormulaTemplate('SUM')">SUM()</button>
-                      <button type="button" class="excel-tool-btn"
-                        onclick="insertFormulaTemplate('AVERAGE')">AVERAGE()</button>
-                      <button type="button" class="excel-tool-btn"
-                        onclick="insertFormulaTemplate('COUNT')">COUNT()</button>
-                    </div>
-                    <div class="excel-tool-row">
-                      <button type="button" class="excel-tool-btn" onclick="insertFormulaTemplate('IF')">IF()</button>
-                      <button type="button" class="excel-tool-btn"
-                        onclick="insertFormulaTemplate('ROUND')">ROUND()</button>
-                      <button type="button" class="excel-tool-btn"
-                        onclick="insertFormulaTemplate('TODAY')">TODAY()</button>
-                    </div>
-                  </div>
-                </div>
-                <span class="excel-group-label">Function Library</span>
-              </div>
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="recalculateAllSheetFormulas(true)"
-                    title="Force Recalculate Formulas Now">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <polyline points="23 4 23 10 17 10" />
-                        <polyline points="1 20 1 14 7 14" />
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Calculate Sheet</span>
-                  </button>
-                </div>
-                <span class="excel-group-label">Calculation Engine</span>
-              </div>
-            </div>
-
-            <!-- 6. DATA PANEL -->
-            <div class="excel-ribbon-panel" id="panel-data">
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <div class="excel-tool-vgroup">
-                    <div class="excel-tool-row">
-                      <button type="button" class="excel-tool-btn" onclick="sortActiveColumn('asc')"
-                        title="Sort Ascending A-Z">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      </span>
+                      <span class="excel-btn-label">College Header</span>
+                    </button>
+                    <button type="button" class="excel-action-btn-large" onclick="togglePrintSignatures()"
+                      title="Toggle Signatures Block">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
-                          <path d="M11 5h10M11 9h7M11 13h4M3 17l3 3 3-3M6 18V4" />
+                          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                         </svg>
-                        <span>Sort A &rarr; Z</span>
-                      </button>
-                      <button type="button" class="excel-tool-btn" onclick="sortActiveColumn('desc')"
-                        title="Sort Descending Z-A">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2">
-                          <path d="M11 5h10M11 9h7M11 13h4M3 7l3-3 3 3M6 4v14" />
-                        </svg>
-                        <span>Sort Z &rarr; A</span>
-                      </button>
-                    </div>
-                    <div class="excel-tool-row">
-                      <button type="button" class="excel-tool-btn" id="btn-data-filter"
-                        onclick="openSheetFilterModal()">Filters &amp; Sort</button>
-                      <button type="button" class="excel-tool-btn" onclick="clearAllSheetFilters()">Clear
-                        Filter</button>
+                      </span>
+                      <span class="excel-btn-label">Signatures</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Institutional Header</span>
+                </div>
+              </div>
+
+              <!-- 4. PAGE LAYOUT PANEL -->
+              <div class="excel-ribbon-panel" id="panel-page-layout">
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <div class="excel-tool-vgroup">
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn active" id="btn-toggle-gridlines"
+                          onclick="toggleGridlines()" title="Show/Hide Gridlines">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="1" />
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="12" y1="3" x2="12" y2="21" />
+                          </svg>
+                          <span>Gridlines: ON</span>
+                        </button>
+                        <button type="button" class="excel-tool-btn active" id="btn-toggle-banner-view"
+                          onclick="toggleInstitutionalBanner()" title="Show/Hide Institutional Header Banner">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6" />
+                          </svg>
+                          <span>College Banner: ON</span>
+                        </button>
+                      </div>
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn" onclick="openEditMarksModal()"
+                          title="Edit Total Marks &amp; Scheme">
+                          <span>Scheme Weightage</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
+                  <span class="excel-group-label">Sheet Display</span>
                 </div>
-                <span class="excel-group-label">Sort &amp; Filter</span>
-              </div>
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="reloadGroupAcademicData()"
-                    title="Re-sync roster and marks from database">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Refresh Data</span>
-                  </button>
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="window.print()"
+                      title="Open Print View">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <polyline points="6 9 6 2 18 2 18 9" />
+                          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                          <rect x="6" y="14" width="12" height="8" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Print Sheet</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Print Setup</span>
                 </div>
-                <span class="excel-group-label">Campus Database</span>
-              </div>
-            </div>
-
-            <!-- 7. REVIEW PANEL -->
-            <div class="excel-ribbon-panel" id="panel-review">
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="auditSheetPassFail()"
-                    title="Audit Student Pass / Fail Statistics">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        <polyline points="9 12 11 14 15 10" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Audit Pass/Fail</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="toggleEditSaveMode()"
-                    title="Toggle Read-Only / Protect Sheet">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Protect Sheet</span>
-                  </button>
-                </div>
-                <span class="excel-group-label">Audit &amp; Security</span>
-              </div>
-            </div>
-
-            <!-- 8. TEMPLATES PANEL -->
-            <div class="excel-ribbon-panel" id="panel-templates">
-              <div class="excel-tool-group">
-                <div class="excel-tool-content">
-                  <button type="button" class="excel-action-btn-large" onclick="openTemplateManagerModal()"
-                    title="Open Templates Library &amp; Management">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                        <path d="M3 9h18M9 21V9" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Browse Templates</span>
-                  </button>
-                  <button type="button" class="excel-action-btn-large" onclick="openSaveTemplateDialog()"
-                    title="Save Current Spreadsheet Structure as Reusable Template">
-                    <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                        <polyline points="17 21 17 13 7 13 7 21" />
-                        <polyline points="7 3 7 8 15 8" />
-                      </svg>
-                    </span>
-                    <span class="excel-btn-label">Save As Template</span>
-                  </button>
-                </div>
-                <span class="excel-group-label">Templates Library</span>
               </div>
 
-              <div class="excel-tool-group">
-                <div class="excel-tool-content" style="display:flex;align-items:center;gap:0.4rem;padding:0.2rem 0;">
-                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('eval')"
-                    title="Apply Standard Polytechnic Master Evaluation Template"
-                    style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
-                    <span class="excel-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                      </svg>
-                    </span>
-                    <span>Polytechnic Master Eval</span>
-                  </button>
-                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('test')"
-                    title="Apply Unit Test (20 Marks) Format"
-                    style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
-                    <span class="excel-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M9 11l3 3L22 4" />
-                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                      </svg>
-                    </span>
-                    <span>Class Test (20M)</span>
-                  </button>
-                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('assignment')"
-                    title="Apply Coursework Assignment Assessment Format"
-                    style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
-                    <span class="excel-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                      </svg>
-                    </span>
-                    <span>Assignments Roster</span>
-                  </button>
-                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('practical')"
-                    title="Apply Lab Record &amp; Practicals Format"
-                    style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
-                    <span class="excel-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0" />
-                      </svg>
-                    </span>
-                    <span>Practicals Lab</span>
-                  </button>
+              <!-- 5. FORMULAS PANEL -->
+              <div class="excel-ribbon-panel" id="panel-formulas">
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="openInsertFunctionModal()"
+                      title="Browse Function Library">
+                      <span class="excel-icon"
+                        style="font-family:serif;font-weight:900;font-size:1.15rem;color:var(--color-primary);">ƒx</span>
+                      <span class="excel-btn-label">Insert Function</span>
+                    </button>
+                    <div class="excel-tool-vgroup">
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn"
+                          onclick="insertFormulaTemplate('SUM')">SUM()</button>
+                        <button type="button" class="excel-tool-btn"
+                          onclick="insertFormulaTemplate('AVERAGE')">AVERAGE()</button>
+                        <button type="button" class="excel-tool-btn"
+                          onclick="insertFormulaTemplate('COUNT')">COUNT()</button>
+                      </div>
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn" onclick="insertFormulaTemplate('IF')">IF()</button>
+                        <button type="button" class="excel-tool-btn"
+                          onclick="insertFormulaTemplate('ROUND')">ROUND()</button>
+                        <button type="button" class="excel-tool-btn"
+                          onclick="insertFormulaTemplate('TODAY')">TODAY()</button>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="excel-group-label">Function Library</span>
                 </div>
-                <span class="excel-group-label">Institutional Presets</span>
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="recalculateAllSheetFormulas(true)"
+                      title="Force Recalculate Formulas Now">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <polyline points="23 4 23 10 17 10" />
+                          <polyline points="1 20 1 14 7 14" />
+                          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Calculate Sheet</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Calculation Engine</span>
+                </div>
               </div>
-            </div>
 
-            <!-- 8. VIEW PANEL -->
+              <!-- 6. DATA PANEL -->
+              <div class="excel-ribbon-panel" id="panel-data">
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <div class="excel-tool-vgroup">
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn" onclick="sortActiveColumn('asc')"
+                          title="Sort Ascending A-Z">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M11 5h10M11 9h7M11 13h4M3 17l3 3 3-3M6 18V4" />
+                          </svg>
+                          <span>Sort A &rarr; Z</span>
+                        </button>
+                        <button type="button" class="excel-tool-btn" onclick="sortActiveColumn('desc')"
+                          title="Sort Descending Z-A">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M11 5h10M11 9h7M11 13h4M3 7l3-3 3 3M6 4v14" />
+                          </svg>
+                          <span>Sort Z &rarr; A</span>
+                        </button>
+                      </div>
+                      <div class="excel-tool-row">
+                        <button type="button" class="excel-tool-btn" id="btn-data-filter"
+                          onclick="openSheetFilterModal()">Filters &amp; Sort</button>
+                        <button type="button" class="excel-tool-btn" onclick="clearAllSheetFilters()">Clear
+                          Filter</button>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="excel-group-label">Sort &amp; Filter</span>
+                </div>
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="reloadGroupAcademicData()"
+                      title="Re-sync roster and marks from database">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Refresh Data</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Campus Database</span>
+                </div>
+              </div>
+
+              <!-- 7. REVIEW PANEL -->
+              <div class="excel-ribbon-panel" id="panel-review">
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="auditSheetPassFail()"
+                      title="Audit Student Pass / Fail Statistics">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                          <polyline points="9 12 11 14 15 10" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Audit Pass/Fail</span>
+                    </button>
+                    <button type="button" class="excel-action-btn-large" onclick="toggleEditSaveMode()"
+                      title="Toggle Read-Only / Protect Sheet">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Protect Sheet</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Audit &amp; Security</span>
+                </div>
+              </div>
+
+              <!-- 8. TEMPLATES PANEL -->
+              <div class="excel-ribbon-panel" id="panel-templates">
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content">
+                    <button type="button" class="excel-action-btn-large" onclick="openTemplateManagerModal()"
+                      title="Open Templates Library &amp; Management">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" />
+                          <path d="M3 9h18M9 21V9" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Browse Templates</span>
+                    </button>
+                    <button type="button" class="excel-action-btn-large" onclick="openSaveTemplateDialog()"
+                      title="Save Current Spreadsheet Structure as Reusable Template">
+                      <span class="excel-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                          <polyline points="17 21 17 13 7 13 7 21" />
+                          <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                      </span>
+                      <span class="excel-btn-label">Save As Template</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Templates Library</span>
+                </div>
+
+                <div class="excel-tool-group">
+                  <div class="excel-tool-content" style="display:flex;align-items:center;gap:0.4rem;padding:0.2rem 0;">
+                    <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('eval')"
+                      title="Apply Standard Polytechnic Master Evaluation Template"
+                      style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
+                      <span class="excel-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                      </span>
+                      <span>Polytechnic Master Eval</span>
+                    </button>
+                    <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('test')"
+                      title="Apply Unit Test (20 Marks) Format"
+                      style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
+                      <span class="excel-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M9 11l3 3L22 4" />
+                          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                        </svg>
+                      </span>
+                      <span>Class Test (20M)</span>
+                    </button>
+                    <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('assignment')"
+                      title="Apply Coursework Assignment Assessment Format"
+                      style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
+                      <span class="excel-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                          <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                        </svg>
+                      </span>
+                      <span>Assignments Roster</span>
+                    </button>
+                    <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('practical')"
+                      title="Apply Lab Record &amp; Practicals Format"
+                      style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
+                      <span class="excel-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0" />
+                        </svg>
+                      </span>
+                      <span>Practicals Lab</span>
+                    </button>
+                  </div>
+                  <span class="excel-group-label">Institutional Presets</span>
+                </div>
+              </div>
+
+              <!-- 8. VIEW PANEL -->
             </div>
             <button type="button" class="ribbon-scroll-btn ribbon-scroll-right" id="btn-ribbon-scroll-right"
-              onclick="scrollRibbon(220)" title="Scroll Ribbon Right" aria-label="Scroll Ribbon Right" style="display:none;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              onclick="scrollRibbon(220)" title="Scroll Ribbon Right" aria-label="Scroll Ribbon Right"
+              style="display:none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </button>
@@ -1430,7 +1540,8 @@
             <button type="button" class="btn btn-secondary btn-sm active" id="btn-toggle-signatures-bar"
               onclick="toggleSignatureBarVisibility()" title="Show/Hide Institutional Signatures Bar"
               style="font-size:0.75rem;font-weight:700;padding:0.22rem 0.55rem;display:inline-flex;align-items:center;gap:0.35rem;white-space:nowrap;flex-shrink:0;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
                 <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
                 <path d="M2 2l7.586 7.586"></path>
@@ -1593,18 +1704,24 @@
               <div class="excel-signatures-bar" id="excel-signatures-bar">
                 <div class="sig-block sig-teacher" id="sig-block-teacher">
                   <div class="sig-line"></div>
-                  <div class="sig-name" id="sig-teacher-name" contenteditable="true" spellcheck="false" title="Double-click to edit name">Navneet Mishra</div>
-                  <div class="sig-role" id="sig-teacher-role" contenteditable="true" spellcheck="false">Subject Teacher</div>
+                  <div class="sig-name" id="sig-teacher-name" contenteditable="true" spellcheck="false"
+                    title="Double-click to edit name">Navneet Mishra</div>
+                  <div class="sig-role" id="sig-teacher-role" contenteditable="true" spellcheck="false">Subject Teacher
+                  </div>
                 </div>
                 <div class="sig-block sig-hod" id="sig-block-hod">
                   <div class="sig-line"></div>
-                  <div class="sig-name" id="sig-hod-name" contenteditable="true" spellcheck="false" title="Double-click to edit name">Head of the Department</div>
-                  <div class="sig-role" id="sig-hod-role" contenteditable="true" spellcheck="false">Academic Verification</div>
+                  <div class="sig-name" id="sig-hod-name" contenteditable="true" spellcheck="false"
+                    title="Double-click to edit name">Head of the Department</div>
+                  <div class="sig-role" id="sig-hod-role" contenteditable="true" spellcheck="false">Academic
+                    Verification</div>
                 </div>
                 <div class="sig-block sig-principal" id="sig-block-principal">
                   <div class="sig-line"></div>
-                  <div class="sig-name" id="sig-principal-name" contenteditable="true" spellcheck="false" title="Double-click to edit name">Principal</div>
-                  <div class="sig-role" id="sig-principal-role" contenteditable="true" spellcheck="false">Government Polytechnic Nainital</div>
+                  <div class="sig-name" id="sig-principal-name" contenteditable="true" spellcheck="false"
+                    title="Double-click to edit name">Principal</div>
+                  <div class="sig-role" id="sig-principal-role" contenteditable="true" spellcheck="false">Government
+                    Polytechnic Nainital</div>
                 </div>
               </div>
             </div>

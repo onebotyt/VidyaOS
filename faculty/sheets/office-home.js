@@ -41,14 +41,20 @@ function escapeHtml(str) {
  */
 function loadScript(src) {
   return new Promise((resolve, reject) => {
-    // Check if script already injected in DOM
-    const existing = document.querySelector(`script[src*="${src}"]`);
+    const cleanSrc = src.split('?')[0];
+    const existing = Array.from(document.querySelectorAll('script')).find(s => s.src && s.src.includes(cleanSrc));
     if (existing) {
-      if (existing.getAttribute('data-loaded') === 'true') {
+      if (
+        existing.getAttribute('data-loaded') === 'true' ||
+        existing.readyState === 'complete' ||
+        existing.readyState === 'loaded' ||
+        document.readyState !== 'loading'
+      ) {
         return resolve();
       }
-      existing.addEventListener('load', () => resolve());
-      existing.addEventListener('error', (e) => reject(e));
+      existing.addEventListener('load', () => resolve(), { once: true });
+      existing.addEventListener('error', (e) => reject(e), { once: true });
+      setTimeout(() => resolve(), 250);
       return;
     }
 
@@ -77,7 +83,7 @@ function showOfficeScreenLoader(msg = 'Loading...') {
     if (window._officeLoaderTimer) clearTimeout(window._officeLoaderTimer);
     window._officeLoaderTimer = setTimeout(() => {
       hideOfficeScreenLoader();
-    }, 15000);
+    }, 4000);
   }
 }
 
@@ -103,7 +109,7 @@ function hideOfficeScreenLoader() {
 async function loadSpreadsheetEngine(onReady) {
   if (window.__OFFICE_ENGINE_LOADED) {
     if (typeof onReady === 'function') {
-      await onReady();
+      try { await onReady(); } catch (e) { console.error(e); }
     }
     return;
   }
@@ -116,15 +122,23 @@ async function loadSpreadsheetEngine(onReady) {
       await loadScript('/faculty/components/core/exceljs.min.js');
     }
 
-    // 2. Load the modular tools and main Sheets Studio engine
-    await loadScript('/faculty/sheets/js/sheets-color-tools.js?v=20261120_real');
-    await loadScript('/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_real');
-    await loadScript('/faculty/sheets/sheets.js?v=20261120_real');
+    // 2. Load modular tools only if not already in DOM / memory
+    if (typeof window.toggleColorPalette !== 'function') {
+      await loadScript('/faculty/sheets/js/sheets-color-tools.js?v=20261120_real');
+    }
+    if (typeof window.autoFitSheetColumns !== 'function') {
+      await loadScript('/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_real');
+    }
+
+    // 3. Load main Sheets Studio engine
+    if (typeof window.initSheetsStudio !== 'function') {
+      await loadScript('/faculty/sheets/sheets.js?v=20261120_real');
+    }
 
     window.__OFFICE_ENGINE_LOADED = true;
 
     if (typeof onReady === 'function') {
-      await onReady();
+      try { await onReady(); } catch (e) { console.error(e); }
     }
   } catch (err) {
     console.error('Fatal error loading spreadsheet engine:', err);
@@ -372,16 +386,30 @@ async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
       window.history.replaceState({}, '', url.toString());
 
       // Directly load authentic classroom metadata and students from database
-      if (typeof window.loadGroupMetadata === 'function') {
-        await window.loadGroupMetadata(targetGroupId);
-      } else if (typeof window.onSwitchGroup === 'function') {
-        await window.onSwitchGroup(targetGroupId, true);
+      try {
+        if (typeof window.loadGroupMetadata === 'function') {
+          await Promise.race([
+            window.loadGroupMetadata(targetGroupId),
+            new Promise(r => setTimeout(r, 3500))
+          ]);
+        } else if (typeof window.onSwitchGroup === 'function') {
+          await Promise.race([
+            window.onSwitchGroup(targetGroupId, true),
+            new Promise(r => setTimeout(r, 3500))
+          ]);
+        }
+      } catch (err) {
+        console.warn('Error hydrating subject data:', err);
       }
-      if (sheetKey === 'blank') {
-        if (typeof createNewWorksheet === 'function') createNewWorksheet('Blank Sheet');
-      } else if (typeof switchSheetTab === 'function') {
-        await switchSheetTab(sheetKey, true);
-      }
+
+      try {
+        if (sheetKey === 'blank') {
+          if (typeof createNewWorksheet === 'function') createNewWorksheet('Blank Sheet');
+        } else if (typeof switchSheetTab === 'function') {
+          await switchSheetTab(sheetKey, true);
+        }
+      } catch (_) { }
+
       hideOfficeScreenLoader();
     });
   }, 40);

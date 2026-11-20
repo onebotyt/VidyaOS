@@ -12,10 +12,10 @@ function showOfficeScreenLoader(msg = 'Loading...') {
     loader.style.display = 'flex';
     loader.classList.remove('hidden');
     if (_officeLoaderTimer) clearTimeout(_officeLoaderTimer);
-    // Hard safety timeout: loader never stays stuck for more than 15000ms
+    // Hard safety timeout: loader never stays stuck for more than 4000ms
     _officeLoaderTimer = setTimeout(() => {
       hideOfficeScreenLoader();
-    }, 15000);
+    }, 4000);
   }
 }
 
@@ -29,6 +29,15 @@ function hideOfficeScreenLoader() {
     clearTimeout(_officeLoaderTimer);
     _officeLoaderTimer = null;
   }
+}
+
+// Allow user to dismiss stuck loader via Escape key
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      hideOfficeScreenLoader();
+    }
+  });
 }
 
 function showToast(message, type = 'info') {
