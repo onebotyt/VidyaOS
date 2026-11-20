@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
-  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261121d">
+  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261121e">
   <script>
     (function () {
       try {
@@ -74,113 +74,70 @@
           </div>
         </div>
 
-        <!-- Sleek High-Density Unified Telemetry Strip -->
-        <div class="esp-telemetry-banner">
-          <div class="esp-telemetry-item">
-            <div class="esp-telemetry-text">
-              <span class="esp-telemetry-label">Department Nodes</span>
-              <div class="esp-telemetry-val-row">
-                <span class="esp-telemetry-val" id="kpi-esp-devices">0 / 0</span>
-                <span class="esp-pill-tag green">Hardware OK</span>
-              </div>
-              <span class="esp-telemetry-sub">Online / Total paired terminals</span>
-            </div>
-          </div>
-
-          <div class="esp-telemetry-item">
-            <div class="esp-telemetry-text">
-              <span class="esp-telemetry-label">Cloud Biometric Vault</span>
-              <div class="esp-telemetry-val-row">
-                <span class="esp-telemetry-val" id="kpi-esp-templates">0 / 87</span>
-                <span class="esp-pill-tag">AS608 512B</span>
-              </div>
-              <span class="esp-telemetry-sub" id="kpi-esp-coverage">0% students enrolled</span>
-            </div>
-          </div>
-
-          <div class="esp-telemetry-item">
-            <div class="esp-telemetry-text">
-              <span class="esp-telemetry-label">2S Battery Telemetry</span>
-              <div class="esp-telemetry-val-row">
-                <span class="esp-telemetry-val" id="kpi-esp-battery">7.85V (84%)</span>
-                <span class="esp-pill-tag green" id="kpi-batt-status">7.4V Pack</span>
-              </div>
-              <span class="esp-telemetry-sub">6.40V cutoff – 8.40V full</span>
-            </div>
-          </div>
-
-          <div class="esp-telemetry-item">
-            <div class="esp-telemetry-text">
-              <span class="esp-telemetry-label">W25Q32 Flash Queue</span>
-              <div class="esp-telemetry-val-row">
-                <span class="esp-telemetry-val" id="kpi-esp-offline">0 Pending</span>
-                <span class="esp-pill-tag">SPI NOR 4MB</span>
-              </div>
-              <span class="esp-telemetry-sub">Auto-syncs offline records</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4 Modern Quick Action Cards (Glassy Rounded Header Bar) -->
-        <div class="esp-quick-grid">
-          <div class="esp-quick-card" style="--accent: var(--color-primary, #1977f5);">
-            <div class="esp-quick-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-            </div>
-            <h3>Student Directory</h3>
-            <p>Browse registered students and manage cloud biometric vault.</p>
-            <button type="button" class="btn btn-primary btn-sm" onclick="switchEspTab('vault')">View Students &rarr;</button>
-          </div>
-
-          <div class="esp-quick-card" style="--accent: var(--quick-purple, #8253ed);">
-            <div class="esp-quick-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-              </svg>
-            </div>
-            <h3>Fingerprint Enrollment</h3>
-            <p>Enroll fingerprints directly into ESP32 &amp; AES-256 cloud vault.</p>
-            <button type="button" class="btn btn-purple btn-sm" onclick="focusEnrollStation()">Enroll Fingerprint &rarr;</button>
-          </div>
-
-          <div class="esp-quick-card" style="--accent: var(--status-present, #10ae70);">
-            <div class="esp-quick-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-              </svg>
-            </div>
-            <h3>Attendance Scanner</h3>
-            <p>Verify enrolled students and simulate terminal scans.</p>
-            <button type="button" class="btn btn-success btn-sm" onclick="focusAttendanceScanner()">Scan Now &rarr;</button>
-          </div>
-
-          <div class="esp-quick-card" style="--accent: var(--quick-orange, #f29513);">
-            <div class="esp-quick-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                <line x1="12" y1="20" x2="12.01" y2="20"></line>
-              </svg>
-            </div>
-            <h3>Wi-Fi Manager</h3>
-            <p>View networks and manage terminal dual-band connectivity.</p>
-            <button type="button" class="btn btn-warning btn-sm" onclick="focusWifiManager()">Manage Wi-Fi &rarr;</button>
-          </div>
+        <!-- Visually Hidden KPI Telemetry Bindings for Background Sync -->
+        <div style="display:none;" aria-hidden="true">
+          <span id="kpi-esp-devices">0 / 0</span>
+          <span id="kpi-esp-templates">0 / 87</span>
+          <span id="kpi-esp-coverage">0% students enrolled</span>
+          <span id="kpi-esp-battery">7.85V (84%)</span>
+          <span id="kpi-batt-status">7.4V Pack</span>
+          <span id="kpi-esp-offline">0 Pending</span>
         </div>
 
         <!-- High-Density Balanced 2-Column Command Studio -->
         <div class="esp-studio-grid">
-          <!-- COLUMN 1: Student Biometric Registration & Scanner Station (Left) -->
+          <!-- COLUMN 1: Terminal Hardware & Wi-Fi Management (Left Side) -->
+          <div class="esp-studio-col">
+            <!-- 1. Connected Department ESP32 Terminals -->
+            <section class="card esp-terminals-card" id="section-esp-terminals">
+              <div class="esp-section-header">
+                <div>
+                  <div class="esp-card-badge-row">
+                    <h2 class="esp-section-title">Connected ESP32 Terminals</h2>
+                    <span class="esp-status-pill online" id="terminal-count-badge">● PAIRED</span>
+                  </div>
+                  <p class="esp-section-sub">Select active terminal to manage telemetry, sync templates, or trigger wireless OTA.</p>
+                </div>
+                <select id="active-device-select" class="form-select form-select-sm" style="max-width:200px;" onchange="onSelectActiveDevice(this.value)">
+                  <option value="">Select Active ESP32...</option>
+                </select>
+              </div>
+
+              <div id="esp-devices-list" class="esp-devices-grid">
+                <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.8rem;">Loading department ESP32 terminals...</div>
+              </div>
+            </section>
+
+            <!-- 2. Wi-Fi Connectivity & Multi-Network Failover Card -->
+            <section class="card esp-wifi-card" id="section-esp-wifi">
+              <div class="esp-section-header">
+                <div>
+                  <div class="esp-card-badge-row">
+                    <h2 class="esp-section-title">Wi-Fi Networks &amp; Failover</h2>
+                    <span class="esp-status-pill online" id="wifi-active-badge">● STANDBY</span>
+                  </div>
+                  <p class="esp-section-sub">Classroom access points &amp; auto-failover networks.</p>
+                </div>
+                <div class="esp-wifi-quick-actions">
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-scan-wifi" onclick="triggerScanNearbyWifi()" title="Scan nearby Wi-Fi networks">Scan Nearby</button>
+                  <button type="button" class="btn btn-primary btn-sm" id="btn-add-wifi-manual" onclick="openAddWifiModal()" title="Add Wi-Fi manually">+ Add Network</button>
+                </div>
+              </div>
+
+              <!-- Compact Wi-Fi Networks List -->
+              <div id="wifi-card-networks-list" class="esp-wifi-card-list">
+                <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.8rem;">Loading terminal Wi-Fi networks...</div>
+              </div>
+
+              <!-- Quick Fallback Footer Bar -->
+              <div class="esp-wifi-card-footer">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi" onclick="triggerWifiFallback()" title="Trigger fallback to primary default Wi-Fi">Fallback Default</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()" title="Emergency clear saved Wi-Fi">Emergency Reset</button>
+              </div>
+            </section>
+          </div>
+
+          <!-- COLUMN 2: Student Biometric Registration Station (Right Side) -->
           <div class="esp-studio-col">
             <section class="card esp-enrollment-card" id="section-bio-enrollment">
               <div class="esp-section-header">
@@ -289,26 +246,37 @@
                 </div>
               </div>
 
-              <!-- Student Quick Selection & Details Row (Clean Stack with Cohort Filter) -->
+              <!-- Student Quick Selection & Details Row (Clean Modern Stack) -->
               <div class="esp-enroll-stack">
-                <div class="form-group" style="margin-bottom:0.35rem;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
-                    <label class="esp-control-label" for="enroll-student-select" style="margin-bottom:0;">
-                      Select Student <span style="color:var(--status-absent);">*</span>
+                <div class="esp-enroll-select-group">
+                  <div class="esp-enroll-select-header">
+                    <label class="esp-enroll-label" for="enroll-student-select">
+                      <span>Select Student</span>
+                      <span class="esp-required-star">*</span>
                     </label>
-                    <select id="enroll-cohort-filter" class="form-select form-select-sm" style="max-width:130px; padding:0.15rem 0.4rem; font-size:0.72rem;" onchange="filterEnrollStudentDropdown(this.value)">
-                      <option value="pending" selected>Pending Only</option>
-                      <option value="all">All Students</option>
-                      <option value="1">1st Year</option>
-                      <option value="2">2nd Year</option>
-                      <option value="3">3rd Year</option>
-                    </select>
+                    <div class="esp-cohort-filter-wrap">
+                      <select id="enroll-cohort-filter" class="esp-cohort-filter-select" onchange="filterEnrollStudentDropdown(this.value)">
+                        <option value="pending" selected>Pending Only</option>
+                        <option value="all">All Students</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                      </select>
+                    </div>
                   </div>
-                  <select id="enroll-student-select" class="form-select form-select-sm" onchange="onSelectEnrollStudent(this.value)" style="width:100%;">
-                    <option value="">Choose a student from roster...</option>
-                  </select>
+                  <div class="esp-select-custom-wrapper">
+                    <select id="enroll-student-select" class="esp-modern-student-select" onchange="onSelectEnrollStudent(this.value)">
+                      <option value="">Choose a student from roster...</option>
+                    </select>
+                    <div class="esp-select-arrow" aria-hidden="true">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
+                <!-- Selected Student Preview Card -->
                 <div class="esp-selected-student-chip" id="enroll-student-chip">
                   <div class="esp-student-avatar-box">
                     <span id="enroll-chip-initials">--</span>
@@ -318,7 +286,7 @@
                     <div class="esp-student-chip-sub" id="enroll-chip-meta">Select student above or click Enroll in vault</div>
                   </div>
                   <div id="enroll-chip-status-wrap">
-                    <span class="esp-status-pill offline" id="enroll-chip-status-pill">WAITING</span>
+                    <span class="esp-status-pill offline" id="enroll-chip-status-pill">WAITING SELECTION</span>
                   </div>
                 </div>
               </div>
@@ -347,65 +315,6 @@
                 <button type="button" class="btn btn-danger btn-sm" id="btn-remove-selected-bio" onclick="removeCurrentSelectedStudentTemplate()" style="display:none;" title="Delete fingerprint template from cloud vault">
                   Remove
                 </button>
-              </div>
-            </section>
-          </div>
-
-          <!-- COLUMN 2: Terminal & Wi-Fi Management (Right) -->
-          <div class="esp-studio-col">
-            <!-- 1. Connected Department ESP32 Terminals -->
-            <section class="card esp-terminals-card" id="section-esp-terminals">
-              <div class="esp-section-header">
-                <div>
-                  <div class="esp-card-badge-row">
-                    <h2 class="esp-section-title">Connected ESP32 Terminals</h2>
-                    <span class="esp-status-pill online" id="terminal-count-badge">● PAIRED</span>
-                  </div>
-                  <p class="esp-section-sub">Select active terminal to manage telemetry, sync templates, or trigger wireless OTA.</p>
-                </div>
-                <select id="active-device-select" class="form-select form-select-sm" style="max-width:200px;" onchange="onSelectActiveDevice(this.value)">
-                  <option value="">Select Active ESP32...</option>
-                </select>
-              </div>
-
-              <div id="esp-devices-list" class="esp-devices-grid">
-                <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.8rem;">Loading department ESP32 terminals...</div>
-              </div>
-            </section>
-
-            <!-- 2. Wi-Fi Connectivity & Multi-Network Failover Card -->
-            <section class="card esp-wifi-card" id="section-esp-wifi">
-              <div class="esp-section-header">
-                <div>
-                  <div class="esp-card-badge-row">
-                    <h2 class="esp-section-title">Wi-Fi Networks &amp; Failover</h2>
-                    <span class="esp-status-pill online" id="wifi-active-badge">● STANDBY</span>
-                  </div>
-                  <p class="esp-section-sub">Classroom access points &amp; auto-failover networks.</p>
-                </div>
-                <div class="esp-wifi-quick-actions">
-                  <button type="button" class="btn btn-secondary btn-sm" id="btn-scan-wifi" onclick="triggerScanNearbyWifi()" title="Scan nearby Wi-Fi networks">Scan Nearby</button>
-                  <button type="button" class="btn btn-primary btn-sm" id="btn-add-wifi-manual" onclick="openAddWifiModal()" title="Add Wi-Fi manually">+ Add Network</button>
-                </div>
-              </div>
-
-              <!-- Compact Wi-Fi Networks List -->
-              <div id="wifi-card-networks-list" class="esp-wifi-card-list">
-                <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.8rem;">Loading terminal Wi-Fi networks...</div>
-              </div>
-
-              <!-- Inline Quick Add Wi-Fi Row (Image 1 Style) -->
-              <div class="esp-quick-add-wifi">
-                <span style="font-weight:700; color:var(--color-primary); font-size:1.1rem; padding:0 0.25rem;">+</span>
-                <input type="text" class="form-control form-control-sm" id="studio-quick-ssid" placeholder="Network name (SSID)...">
-                <input type="password" class="form-control form-control-sm" id="studio-quick-password" placeholder="Password...">
-                <button type="button" class="btn btn-primary btn-sm" onclick="quickAddStudioWifi()">Add</button>
-              </div>
-
-              <!-- Quick Fallback Footer Bar -->
-              <div class="esp-wifi-card-footer">
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi" onclick="triggerWifiFallback()" title="Trigger fallback to primary default Wi-Fi">Fallback Default</button>
-                <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()" title="Emergency clear saved Wi-Fi">Emergency Reset</button>
               </div>
             </section>
           </div>
@@ -875,7 +784,7 @@
   <script src="/faculty/components/faculty-ui.js?v=20261116"></script>
   <script src="/faculty/components/header/header.js?v=20261116"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
-  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261121d"></script>
+  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261121e"></script>
 </body>
 
 </html>

@@ -821,9 +821,9 @@ function filterEnrollStudentDropdown(filterVal) {
     optionsHtml += `<optgroup label="${grp}">`;
     groups[grp].forEach(s => {
       const isEnrolled = s.biometric_status === 'ENROLLED';
-      const tag = isEnrolled ? 'Enrolled' : 'Pending';
-      const roll = s.class_roll_no ? `#${s.class_roll_no}` : (s.official_enrollment_no || 'No Roll');
-      optionsHtml += `<option value="${s.student_id}">[${tag}] ${roll} - ${escHtml(s.full_name)} (Sem ${s.semester || 1})</option>`;
+      const statusLabel = isEnrolled ? 'Enrolled' : 'Pending';
+      const roll = s.class_roll_no ? `#${s.class_roll_no}` : (s.official_enrollment_no ? `UBTER ${s.official_enrollment_no}` : 'No Roll');
+      optionsHtml += `<option value="${s.student_id}">${roll} • ${escHtml(s.full_name)} (${statusLabel} — Sem ${s.semester || 1})</option>`;
     });
     optionsHtml += `</optgroup>`;
   });
