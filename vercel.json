@@ -99,6 +99,18 @@
       "destination": "/admin/academic-structure/index.html?tab=departments"
     },
     {
+      "source": "/faculty/esp32-devices",
+      "destination": "/faculty/esp32-devices/index.html"
+    },
+    {
+      "source": "/faculty/esp32-devices/",
+      "destination": "/faculty/esp32-devices/index.html"
+    },
+    {
+      "source": "/faculty/esp32-devices.html",
+      "destination": "/faculty/esp32-devices/index.html"
+    },
+    {
       "source": "/faculty",
       "destination": "/faculty/dashboard/index.html"
     },

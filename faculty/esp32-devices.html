@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
-  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261119">
+  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261120">
   <script>
     (function () {
       try {
@@ -35,41 +35,51 @@
     <div class="faculty-main-wrap">
       <div id="faculty-header-mount"></div>
 
-      <main class="container" style="padding-top: 1rem; padding-bottom: 4rem; max-width: 1380px;">
-        <!-- Page Header -->
+      <main class="container esp-main-container">
+        <!-- Compact Page Header -->
         <div class="esp-page-header">
-          <div>
-            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
-              <h1 class="esp-page-title">ESP32 Biometric Terminals &amp; Fingerprint Vault</h1>
+          <div class="esp-header-info">
+            <div class="esp-title-row">
+              <h1 class="esp-page-title">ESP32 Biometric Station &amp; Student Vault</h1>
               <span class="esp-crypto-badge" id="dept-code-pill">AES-256-GCM ENCRYPTED</span>
+              <span class="esp-node-status-pill online" id="kpi-dot-status-pill">
+                <span class="esp-kpi-dot online" id="kpi-dot-status"></span>
+                <span id="header-node-status-text">1 NODE ONLINE</span>
+              </span>
             </div>
             <p class="esp-page-subtitle">
-              Manage department ESP32 biometric terminals (AS608 + 0.96&quot; OLED + W25Q32 4MB Flash + 2S 7.4V Battery),
-              enroll student fingerprints into MySQL cloud vault, and trigger wireless OTA firmware updates.
+              Instant offline AS608 biometric attendance with 120s deep sleep, touch-wake, and background Wi-Fi sync.
             </p>
           </div>
-          <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-              <label for="dept-switcher-select"
-                style="font-size:0.78rem; font-weight:700; color:var(--text-muted); white-space:nowrap;">Dept:</label>
-              <select id="dept-switcher-select" class="form-select form-select-sm"
-                style="max-width:210px; font-weight:600;" onchange="onSwitchDepartment(this.value)">
+
+          <div class="esp-header-actions">
+            <div class="esp-dept-select-wrap">
+              <label for="dept-switcher-select" class="esp-control-label">Dept:</label>
+              <select id="dept-switcher-select" class="form-select form-select-sm" onchange="onSwitchDepartment(this.value)">
                 <option value="">Loading Departments...</option>
               </select>
             </div>
-            <a href="/faculty/students/index.html" class="btn btn-secondary btn-sm">&larr; Department Roster</a>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="loadEsp32Overview()">&#8635; Refresh Telemetry</button>
-            <button type="button" class="btn btn-primary btn-sm" id="btn-add-esp-terminal"
-              onclick="openRegisterDeviceModal()">+ Add ESP Terminal</button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-quick-register-bio" onclick="focusBiometricEnrollmentSection()" title="Register student fingerprint on ESP32">
+              👆 Register Biometric
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-check-esp-connect" onclick="checkActiveEspConnection()" title="Ping active ESP32 node and verify link">
+              📡 Check ESP Connected
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-esp-terminal" onclick="openRegisterDeviceModal()">
+              + Add ESP Terminal
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadEsp32Overview()" title="Refresh telemetry">
+              ↻ Refresh
+            </button>
           </div>
         </div>
 
-        <!-- 4 KPI Telemetry Cards -->
+        <!-- Sleek High-Density 4-KPI Telemetry Strip -->
         <div class="esp-kpi-grid">
           <div class="esp-kpi-card">
             <div class="esp-kpi-top">
-              <span class="esp-kpi-label">Department ESP32 Nodes</span>
-              <span class="esp-kpi-dot online" id="kpi-dot-status"></span>
+              <span class="esp-kpi-label">Department Nodes</span>
+              <span class="esp-pill-tag green">Hardware OK</span>
             </div>
             <div class="esp-kpi-val" id="kpi-esp-devices">0 / 0</div>
             <div class="esp-kpi-sub">Online / Total paired terminals</div>
@@ -77,63 +87,149 @@
 
           <div class="esp-kpi-card">
             <div class="esp-kpi-top">
-              <span class="esp-kpi-label">Cloud Fingerprint Vault</span>
-              <span class="esp-pill-tag">Slot-Agnostic</span>
+              <span class="esp-kpi-label">Cloud Biometric Vault</span>
+              <span class="esp-pill-tag">AS608 512B</span>
             </div>
             <div class="esp-kpi-val" id="kpi-esp-templates">0 / 0</div>
-            <div class="esp-kpi-sub" id="kpi-esp-coverage">0% students with 512B AS608 template</div>
+            <div class="esp-kpi-sub" id="kpi-esp-coverage">0% students enrolled</div>
           </div>
 
           <div class="esp-kpi-card">
             <div class="esp-kpi-top">
-              <span class="esp-kpi-label">2S 3.7V Battery Telemetry</span>
+              <span class="esp-kpi-label">2S Battery Telemetry</span>
               <span class="esp-pill-tag green" id="kpi-batt-status">7.4V Pack</span>
             </div>
             <div class="esp-kpi-val" id="kpi-esp-battery">7.85V (84%)</div>
-            <div class="esp-kpi-sub">6.40V cutoff &ndash; 8.40V full charge</div>
+            <div class="esp-kpi-sub">6.40V cutoff – 8.40V full</div>
           </div>
 
           <div class="esp-kpi-card">
             <div class="esp-kpi-top">
-              <span class="esp-kpi-label">W25Q32 4MB Flash Queue</span>
-              <span class="esp-pill-tag">SPI NOR</span>
+              <span class="esp-kpi-label">W25Q32 Flash Queue</span>
+              <span class="esp-pill-tag">SPI NOR 4MB</span>
             </div>
             <div class="esp-kpi-val" id="kpi-esp-offline">0 Pending</div>
-            <div class="esp-kpi-sub">Auto-syncs offline attendance on Wi-Fi</div>
+            <div class="esp-kpi-sub">Auto-syncs offline records</div>
           </div>
         </div>
 
-        <!-- Top Split Layout: Department ESP32 Terminals (Left) + Live 0.96" OLED & Hardware Simulator (Right) -->
+        <!-- Top 3-Card Command Center: Terminals (Left) | Biometric Registration (Middle) | Live OLED (Right) -->
         <div class="esp-top-split">
-          <!-- Left: Connected Department ESP32 Terminals -->
-          <section class="card esp-terminals-card">
+          <!-- 1. Left Card: Connected Department ESP32 Terminals -->
+          <section class="card esp-terminals-card" id="section-esp-terminals">
             <div class="esp-section-header">
               <div>
-                <h2 class="esp-section-title">Connected Department ESP32 Terminals</h2>
-                <p class="esp-section-sub">Select an active terminal to enroll student fingerprints, ping status, or push stored templates.</p>
+                <div class="esp-card-badge-row">
+                  <h2 class="esp-section-title">Connected ESP32 Terminals</h2>
+                  <span class="esp-status-pill online" id="terminal-count-badge">● PAIRED</span>
+                </div>
+                <p class="esp-section-sub">Select active terminal to manage telemetry, sync templates, or trigger wireless OTA.</p>
               </div>
-              <select id="active-device-select" class="form-select" style="max-width:240px;"
-                onchange="onSelectActiveDevice(this.value)">
+              <select id="active-device-select" class="form-select form-select-sm" style="max-width:170px;" onchange="onSelectActiveDevice(this.value)">
                 <option value="">Select Active ESP32...</option>
               </select>
             </div>
 
             <div id="esp-devices-list" class="esp-devices-grid">
-              <div style="text-align:center; padding:1.5rem; color:var(--text-muted);">Loading department ESP32 terminals...</div>
+              <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.8rem;">Loading department ESP32 terminals...</div>
             </div>
           </section>
 
-          <!-- Right: Live 0.96" SSD1306 OLED Display + LED + 5V Passive Buzzer Hardware Preview -->
-          <aside class="card esp-oled-simulator-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+          <!-- 2. Middle Card (Between Terminals & Hardware Console): Student Biometric Registration Station -->
+          <section class="card esp-enrollment-card" id="section-bio-enrollment">
+            <div class="esp-section-header">
               <div>
-                <h3 style="font-size:0.92rem; font-weight:800; margin:0;">Live ESP32 Hardware Console</h3>
-                <span style="font-size:0.72rem; color:var(--text-muted);">0.96&quot; OLED (128&times;64) &bull; AS608 &bull; W25Q32 &bull; 5V Buzzer</span>
+                <div class="esp-card-badge-row">
+                  <h2 class="esp-section-title">Biometric Registration Station</h2>
+                  <span class="esp-status-pill online" id="bio-sensor-status-badge">● AS608 READY</span>
+                </div>
+                <p class="esp-section-sub">
+                  Enroll student fingerprints directly into ESP32 hardware memory &amp; AES-256 MySQL cloud vault.
+                </p>
               </div>
-              <label
-                style="display:inline-flex; align-items:center; gap:0.35rem; font-size:0.72rem; font-weight:600; cursor:pointer;">
+              <div class="esp-quick-badge" id="bio-slot-preview-pill">SLOT: AUTO (1..300)</div>
+            </div>
+
+            <!-- Student Quick Selection & Details Row -->
+            <div class="esp-enroll-form-grid">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="esp-control-label" for="enroll-student-select">
+                  Select Student to Register <span style="color:var(--status-absent);">*</span>
+                </label>
+                <select id="enroll-student-select" class="form-select form-select-sm" onchange="onSelectEnrollStudent(this.value)">
+                  <option value="">Choose a student from roster...</option>
+                </select>
+              </div>
+
+              <div class="esp-selected-student-chip" id="enroll-student-chip">
+                <div class="esp-student-avatar-box">
+                  <span id="enroll-chip-initials">--</span>
+                </div>
+                <div class="esp-student-details-wrap">
+                  <div class="esp-student-chip-name" id="enroll-chip-name">No Student Selected</div>
+                  <div class="esp-student-chip-sub" id="enroll-chip-meta">Select student above or click Enroll in vault</div>
+                </div>
+                <div id="enroll-chip-status-wrap">
+                  <span class="esp-status-pill offline" id="enroll-chip-status-pill">WAITING</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Fingerprint Reader Graphic & Live Step Tracker -->
+            <div class="esp-scanner-interactive-box">
+              <div class="esp-fingerprint-visual-wrap" id="bio-scanner-visual-box">
+                <div class="esp-scanner-ring" id="bio-scanner-ring"></div>
+                <!-- High-Tech SVG Fingerprint Icon -->
+                <svg class="esp-fingerprint-svg" id="bio-fingerprint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+                  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+                  <path d="M2 16h.01" />
+                  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+                  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+                  <path d="M5.5 12.8a9 9 0 0 1 14.5-4.8" />
+                  <path d="M4 17.5a13 13 0 0 1 1-5" />
+                  <path d="M8 20.8a12 12 0 0 1-1.5-6" />
+                  <path d="M17 19.5c-.5 1-1.5 2-2.5 2.5" />
+                </svg>
+              </div>
+
+              <div class="esp-scanner-status-content">
+                <div class="esp-scanner-step-tracker">
+                  <span class="step-pill active" id="step-pill-1">1. Pick</span>
+                  <span class="step-arrow">&rarr;</span>
+                  <span class="step-pill" id="step-pill-2">2. Touch AS608</span>
+                  <span class="step-arrow">&rarr;</span>
+                  <span class="step-pill" id="step-pill-3">3. Cloud Stored</span>
+                </div>
+                <div class="esp-scanner-msg" id="bio-scanner-msg">
+                  Select a student and click <strong>"Enroll Fingerprint"</strong>. Terminal chimes and waits for finger touch.
+                </div>
+              </div>
+
+              <div class="esp-scanner-actions">
+                <button type="button" class="btn btn-primary btn-sm" id="btn-enroll-selected-student" onclick="enrollCurrentSelectedStudent()" title="Trigger AS608 biometric enrollment on active ESP32">
+                  👆 Enroll Fingerprint on ESP32
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-simulate-test-scan" onclick="simulateCurrentSelectedStudent()" title="Simulate attendance verification scan">
+                  ✓ Test Scan
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-remove-selected-bio" onclick="removeCurrentSelectedStudentTemplate()" style="display:none;" title="Delete fingerprint template from cloud vault">
+                  🗑️ Remove
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. Right Card: Live 0.96" OLED Display Simulator & Telemetry -->
+          <aside class="card esp-oled-simulator-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+              <div>
+                <h3 style="font-size:0.9rem; font-weight:800; margin:0; color:var(--text-main);">Live Hardware Console</h3>
+                <span style="font-size:0.7rem; color:var(--text-muted);">0.96&quot; SSD1306 OLED (128&times;64) &bull; AS608 &bull; W25Q32</span>
+              </div>
+              <label style="display:inline-flex; align-items:center; gap:0.35rem; font-size:0.72rem; font-weight:600; cursor:pointer;">
                 <input type="checkbox" id="chk-buzzer-audio" checked>
-                <span>5V Buzzer Audio</span>
+                <span>5V Piezo Buzzer</span>
               </label>
             </div>
 
@@ -143,7 +239,7 @@
               <div class="esp-leds-row">
                 <div class="esp-led-item">
                   <span class="esp-led-bulb green" id="sim-led-green"></span>
-                  <span>GREEN (Verified)</span>
+                  <span>GREEN (OK)</span>
                 </div>
                 <div class="esp-led-item">
                   <span class="esp-led-bulb red" id="sim-led-red"></span>
@@ -151,18 +247,16 @@
                 </div>
                 <div class="esp-led-item">
                   <span class="esp-led-bulb blue on" id="sim-led-blue"></span>
-                  <span>BLUE (Sync/Enroll)</span>
+                  <span>BLUE (Enroll/Sync)</span>
                 </div>
               </div>
 
               <!-- 0.96" I2C OLED Screen (Yellow/Blue Dual-Zone SSD1306 Style) -->
               <div class="oled-screen" id="oled-screen">
-                <!-- Yellow Top Status Bar (128x14) -->
                 <div class="oled-top-bar">
                   <span id="oled-status-left">WiFi -58dB</span>
                   <span id="oled-status-right">84% 7.8V</span>
                 </div>
-                <!-- Cyan/Blue Main Matrix (128x50) -->
                 <div class="oled-body">
                   <div class="oled-headline" id="oled-headline">VIDYAOS BIOMETRIC</div>
                   <div class="oled-line1" id="oled-line1" data-clock="true">10:45:12 AM</div>
@@ -181,75 +275,36 @@
 
               <!-- Interactive Display Simulation Modes -->
               <div class="oled-sim-controls">
-                <button type="button" class="oled-sim-btn active" id="sim-btn-standby" onclick="setOledSimMode('standby')">&#128994; Standby Clock</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-success" onclick="setOledSimMode('success')">&#9989; Verified</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-fail" onclick="setOledSimMode('fail')">&#10060; Attendance Failed</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-unregistered" onclick="setOledSimMode('unregistered')">&#9888;&#65039; Not Registered</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-enroll" onclick="setOledSimMode('enroll')">&#128274; Enroll Mode</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-low_batt" onclick="setOledSimMode('low_batt')">&#129685; Low Battery</button>
+                <button type="button" class="oled-sim-btn active" id="sim-btn-standby" onclick="setOledSimMode('standby')">🟢 Clock</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-success" onclick="setOledSimMode('success')">✅ Verified</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-fail" onclick="setOledSimMode('fail')">❌ Failed</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-unregistered" onclick="setOledSimMode('unregistered')">⚠️ Unregistered</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-enroll" onclick="setOledSimMode('enroll')">🔒 Enroll Mode</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-low_batt" onclick="setOledSimMode('low_batt')">🪫 Low Battery</button>
               </div>
             </div>
           </aside>
         </div>
 
-        <!-- Wi-Fi Connectivity & Multi-Network Failover -->
-        <section class="card" style="margin-top: 1rem;">
-          <div class="esp-section-header" style="margin-bottom: 0.75rem;">
-            <div>
-              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
-                <h2 class="esp-section-title">Wi-Fi Connectivity &amp; Multi-Network Failover</h2>
-                <span class="esp-crypto-badge" id="wifi-active-badge">CONNECTING...</span>
-              </div>
-              <p class="esp-section-sub">
-                Scan nearby classroom access points, register backup Wi-Fi networks with automatic failover, or switch
-                terminals to high-speed campus routers.
-              </p>
-            </div>
-            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-scan-wifi"
-                onclick="triggerScanNearbyWifi()">
-                &#128269; Scan Nearby Wi-Fi
-              </button>
-              <button type="button" class="btn btn-primary btn-sm" id="btn-add-wifi-manual"
-                onclick="openAddWifiModal()">
-                + Add Wi-Fi Manually
-              </button>
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi"
-                onclick="triggerWifiFallback()">
-                &#128260; Fallback Default Wi-Fi
-              </button>
-              <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()">
-                &#9888;&#65039; Emergency Reset
-              </button>
-            </div>
-          </div>
+        <!-- High-Density Horizontal Workspace Tabs -->
+        <div class="esp-nav-tabs">
+          <button type="button" class="esp-tab-btn active" id="tab-btn-vault" onclick="switchEspTab('vault')">
+            📇 Department Student Biometric Vault <span class="esp-tab-badge" id="badge-students-count">0</span>
+          </button>
+          <button type="button" class="esp-tab-btn" id="tab-btn-wifi" onclick="switchEspTab('wifi')">
+            📶 Wi-Fi &amp; Failover <span class="esp-tab-badge" id="badge-wifi-count">0</span>
+          </button>
+          <button type="button" class="esp-tab-btn" id="tab-btn-feed" onclick="switchEspTab('feed')">
+            ⚡ Live Attendance Feed <span class="esp-tab-badge online" id="badge-scans-count">LIVE</span>
+          </button>
+          <button type="button" class="esp-tab-btn" id="tab-btn-logs" onclick="switchEspTab('logs')">
+            📋 Remote ESP32 System Logs
+          </button>
+        </div>
 
-          <div class="table-responsive">
-            <table class="esp-table" id="wifi-networks-table">
-              <thead>
-                <tr>
-                  <th>SSID (Network Name)</th>
-                  <th>Security Protocol</th>
-                  <th>Signal Strength</th>
-                  <th>Failover Role</th>
-                  <th>Added On</th>
-                  <th style="text-align:right;">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="wifi-networks-tbody">
-                <tr>
-                  <td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">
-                    Loading Wi-Fi networks for selected terminal...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Department Student Biometric Roster & Portable Cloud Template Vault -->
-        <section class="card" style="margin-top: 1rem;">
-          <div class="esp-section-header">
+        <!-- TAB PANEL 1: Department Student Biometric Vault -->
+        <section class="card esp-tab-panel active" id="panel-vault">
+          <div class="esp-section-header" style="margin-bottom:0.65rem;">
             <div>
               <h2 class="esp-section-title">Department Student Biometric Vault (512B AS608 Portable Templates)</h2>
               <p class="esp-section-sub">
@@ -298,30 +353,111 @@
           </div>
         </section>
 
-        <!-- Live Scan Event Stream & Command Dispatch Queue -->
-        <div class="esp-bottom-grid" style="margin-top: 1rem;">
-          <!-- Recent Scans Feed -->
-          <section class="card">
-            <div class="esp-section-header" style="margin-bottom:0.65rem;">
-              <h3 style="font-size:0.95rem; font-weight:800; margin:0;">Live Biometric Attendance Feed</h3>
-              <span class="esp-status-pill online">&#9679; LIVE STREAM</span>
+        <!-- TAB PANEL 2: Wi-Fi Connectivity & Multi-Network Failover -->
+        <section class="card esp-tab-panel" id="panel-wifi">
+          <div class="esp-section-header" style="margin-bottom:0.65rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
+                <h2 class="esp-section-title">Wi-Fi Connectivity &amp; Multi-Network Failover</h2>
+                <span class="esp-crypto-badge" id="wifi-active-badge">CONNECTING...</span>
+              </div>
+              <p class="esp-section-sub">
+                Scan nearby classroom access points, register backup Wi-Fi networks with automatic failover, or switch
+                terminals to high-speed campus routers.
+              </p>
             </div>
-            <div id="esp-recent-scans-feed" class="esp-feed-list">
-              <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.82rem;">No recent biometric scans recorded yet today.</div>
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-scan-wifi"
+                onclick="triggerScanNearbyWifi()">
+                🔍 Scan Nearby Wi-Fi
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-add-wifi-manual"
+                onclick="openAddWifiModal()">
+                + Add Wi-Fi Manually
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi"
+                onclick="triggerWifiFallback()">
+                🔄 Fallback Default Wi-Fi
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()">
+                ⚠️ Emergency Reset
+              </button>
             </div>
-          </section>
+          </div>
 
-          <!-- Pending Hardware Command Queue -->
-          <section class="card">
-            <div class="esp-section-header" style="margin-bottom:0.65rem;">
-              <h3 style="font-size:0.95rem; font-weight:800; margin:0;">Hardware Command Dispatch Queue</h3>
-              <span class="esp-status-pill offline" id="cmd-queue-count-pill">0 COMMANDS</span>
+          <div class="table-responsive">
+            <table class="esp-table" id="wifi-networks-table">
+              <thead>
+                <tr>
+                  <th>SSID (Network Name)</th>
+                  <th>Security Protocol</th>
+                  <th>Signal Strength</th>
+                  <th>Failover Role</th>
+                  <th>Added On</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="wifi-networks-tbody">
+                <tr>
+                  <td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">
+                    Loading Wi-Fi networks for selected terminal...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB PANEL 3: Live Scan Event Stream & Command Dispatch Queue -->
+        <section class="card esp-tab-panel" id="panel-feed">
+          <div class="esp-bottom-grid">
+            <!-- Recent Scans Feed -->
+            <div>
+              <div class="esp-section-header" style="margin-bottom:0.65rem;">
+                <h3 style="font-size:0.95rem; font-weight:800; margin:0; color:var(--text-main);">Live Biometric Attendance Feed</h3>
+                <span class="esp-status-pill online">● LIVE STREAM</span>
+              </div>
+              <div id="esp-recent-scans-feed" class="esp-feed-list">
+                <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.82rem;">No recent biometric scans recorded yet today.</div>
+              </div>
             </div>
-            <div id="esp-command-queue-feed" class="esp-feed-list">
-              <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.82rem;">Queue idle. Commands execute on next 5s ESP32 polling tick.</div>
+
+            <!-- Pending Hardware Command Queue -->
+            <div>
+              <div class="esp-section-header" style="margin-bottom:0.65rem;">
+                <h3 style="font-size:0.95rem; font-weight:800; margin:0; color:var(--text-main);">Hardware Command Dispatch Queue</h3>
+                <span class="esp-status-pill offline" id="cmd-queue-count-pill">0 COMMANDS</span>
+              </div>
+              <div id="esp-command-queue-feed" class="esp-feed-list">
+                <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.82rem;">Queue idle. Commands execute on next 5s ESP32 polling tick.</div>
+              </div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
+
+        <!-- TAB PANEL 4: Live Remote ESP32 System Logs -->
+        <section class="card esp-tab-panel" id="panel-logs">
+          <div class="esp-section-header" style="margin-bottom:0.65rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <h3 style="font-size:0.95rem; font-weight:800; margin:0; color:var(--text-main);">Live Remote ESP32 System Logs</h3>
+              <p style="font-size:0.74rem; color:var(--text-muted); margin:0.15rem 0 0 0;">Real-time diagnostics transmitted over the internet from ESP32 nodes (Wi-Fi, AS608, OTA, battery &amp; errors).</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+              <select id="esp-log-level-filter" class="form-select" style="font-size:0.75rem; padding:0.2rem 0.5rem; width:auto;" onchange="loadDeviceRemoteLogs()">
+                <option value="ALL">All Levels</option>
+                <option value="INFO">INFO</option>
+                <option value="WARN">WARN</option>
+                <option value="ERROR">ERROR</option>
+              </select>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadDeviceRemoteLogs()" title="Refresh logs from cloud">↻ Refresh</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="clearDeviceRemoteLogs()" title="Clear remote logs">Clear</button>
+              <span class="esp-status-pill online" id="esp-log-status-pill">● LIVE CLOUD FEED</span>
+            </div>
+          </div>
+          <div id="esp-remote-logs-feed" class="esp-terminal-log-feed">
+            <div style="color:var(--text-muted); font-size:0.76rem; text-align:center; padding:1.5rem;">Connecting to remote ESP32 log stream...</div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -331,7 +467,7 @@
     <div class="modal-card" style="max-width:540px; width:100%;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
         <div>
-          <h2 style="font-size:1.12rem; font-weight:800; margin:0;">Pair Department ESP32 Terminal</h2>
+          <h2 style="font-size:1.12rem; font-weight:800; margin:0; color:var(--text-main);">Pair Department ESP32 Terminal</h2>
           <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Provision 256-bit AES-GCM encryption and register terminal to your department.</p>
         </div>
         <button type="button" onclick="closeRegisterDeviceModal()"
@@ -359,13 +495,13 @@
           <span class="esp-detect-stat-text" id="esp-detect-stat-text">0% &bull; Initializing RF receiver...</span>
           <div class="esp-detect-actions">
             <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-rescan"
-              onclick="startEspDetectionScan()" style="display:none; font-size:0.75rem; padding:0.2rem 0.55rem;">&#8635; Rescan</button>
+              onclick="startEspDetectionScan()" style="display:none; font-size:0.75rem; padding:0.2rem 0.55rem;">↻ Rescan</button>
             <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-usb"
               onclick="detectViaWebSerial()" style="font-size:0.75rem; padding:0.2rem 0.55rem;"
-              title="Detect ESP32 connected via USB cable">&#128268; USB Serial</button>
+              title="Detect ESP32 connected via USB cable">🔌 USB Serial</button>
             <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-sim"
               onclick="simulateEspDetection()" style="font-size:0.75rem; padding:0.2rem 0.55rem;"
-              title="Detect nearby ESP32 node immediately">&#9889; Detect Now</button>
+              title="Detect nearby ESP32 node immediately">⚡ Detect Now</button>
           </div>
         </div>
 
@@ -384,15 +520,8 @@
       </div>
 
       <form id="register-esp-form" onsubmit="submitRegisterEspDevice(event)">
-        <div class="form-group">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label class="form-label">Department <span style="color:var(--status-absent);">*</span></label>
-            <span id="esp-dept-locked-badge" style="display:none; font-size:0.72rem; color:var(--text-muted); font-weight:700;">&#128274; Locked to Your Department</span>
-          </div>
-          <select id="esp-dept-input" class="form-select" required>
-            <option value="">Select Department...</option>
-          </select>
-        </div>
+        <!-- Auto-resolved from active department session -->
+        <input type="hidden" id="esp-dept-input" value="">
         <div class="form-group">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <label class="form-label" style="margin-bottom:0;">ESP32 Hardware UID <span
@@ -451,7 +580,7 @@
     <div class="modal-card" style="max-width:680px; width:100%;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
         <div>
-          <h2 style="font-size:1.12rem; font-weight:800; margin:0;">ESP32 Firmware Configuration (`config.h`)</h2>
+          <h2 style="font-size:1.12rem; font-weight:800; margin:0; color:var(--text-main);">ESP32 Firmware Configuration (`config.h`)</h2>
           <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Paste this into
             `esp32_firmware/VidyaOS_ESP32_Biometric_Node/config.h` and flash via Arduino IDE or PlatformIO.</p>
         </div>
@@ -471,7 +600,7 @@
     <div class="modal-card" style="max-width:560px; width:100%;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
         <div>
-          <h2 style="font-size:1.12rem; font-weight:800; margin:0;">Nearby Wi-Fi Networks</h2>
+          <h2 style="font-size:1.12rem; font-weight:800; margin:0; color:var(--text-main);">Nearby Wi-Fi Networks</h2>
           <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Scanned directly by the ESP32 radio chip in real-time.</p>
         </div>
         <button type="button" onclick="closeScanWifiModal()"
@@ -480,7 +609,7 @@
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
         <span style="font-size:0.76rem; font-weight:700; color:var(--text-muted);">DETECTED ACCESS POINTS:</span>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerScanNearbyWifi(true)">&#8635; Rescan</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerScanNearbyWifi(true)">↻ Rescan</button>
       </div>
 
       <div id="scanned-wifi-list" class="scanned-wifi-grid">
@@ -488,16 +617,23 @@
       </div>
 
       <!-- Password entry for selected scanned network -->
-      <form id="scanned-wifi-form" onsubmit="submitConnectScannedWifi(event)"
+      <form id="scanned-wifi-form" autocomplete="off" onsubmit="submitConnectScannedWifi(event)"
         style="border-top:1px solid var(--border-color); padding-top:0.75rem; margin-top:0.5rem;">
+        <input type="text" style="display:none !important;" tabindex="-1" aria-hidden="true" autocomplete="false">
+        <input type="password" style="display:none !important;" tabindex="-1" aria-hidden="true" autocomplete="false">
+
         <div class="form-group">
-          <label class="form-label">Selected Network SSID <span style="color:var(--status-absent);">*</span></label>
-          <input type="text" id="scanned-wifi-ssid" class="form-control"
+          <label class="form-label" for="scanned-wifi-ssid">Selected Network SSID <span style="color:var(--status-absent);">*</span></label>
+          <input type="text" id="scanned-wifi-ssid" name="esp_selected_wifi_ssid" class="form-control"
+            autocomplete="off" autocapitalize="off" spellcheck="false"
+            readonly onfocus="this.removeAttribute('readonly');"
             placeholder="Select a network above or type SSID" required style="font-family:var(--font-family-mono);">
         </div>
         <div class="form-group">
-          <label class="form-label">Wi-Fi Password / WPA Key</label>
-          <input type="password" id="scanned-wifi-password" class="form-control"
+          <label class="form-label" for="scanned-wifi-password">Wi-Fi Password / WPA Key</label>
+          <input type="password" id="scanned-wifi-password" name="esp_selected_wifi_key" class="form-control"
+            autocomplete="new-password"
+            readonly onfocus="this.removeAttribute('readonly');"
             placeholder="Leave blank if open Wi-Fi network">
         </div>
         <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.85rem;">
@@ -517,7 +653,7 @@
     <div class="modal-card" style="max-width:500px; width:100%;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
         <div>
-          <h2 style="font-size:1.12rem; font-weight:800; margin:0;">Add Wi-Fi Network Manually</h2>
+          <h2 style="font-size:1.12rem; font-weight:800; margin:0; color:var(--text-main);">Add Wi-Fi Network Manually</h2>
           <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Pre-configure hidden or upcoming router credentials.</p>
         </div>
         <button type="button" onclick="closeAddWifiModal()"
@@ -559,7 +695,7 @@
     <div class="modal-card" style="max-width:540px; width:100%;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
         <div>
-          <h2 style="font-size:1.12rem; font-weight:800; margin:0;">Wireless Firmware Update (OTA)</h2>
+          <h2 style="font-size:1.12rem; font-weight:800; margin:0; color:var(--text-main);">Wireless Firmware Update (OTA)</h2>
           <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Update ESP32 firmware wirelessly without USB cables or physical intervention.</p>
         </div>
         <button type="button" onclick="closeOtaUpdateModal()"
@@ -614,7 +750,7 @@
   <script src="/faculty/components/faculty-ui.js?v=20261116"></script>
   <script src="/faculty/components/header/header.js?v=20261116"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
-  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261119"></script>
+  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261120"></script>
 </body>
 
 </html>
