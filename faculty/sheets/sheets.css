@@ -4066,6 +4066,18 @@ span.excel-hdr-num-badge {
   cursor: cell;
 }
 
+/* Merged Multi-Row Cells (Instructions, Questions, Side Panels) */
+.excel-cell[rowspan] {
+  height: auto;
+  min-height: 48px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  vertical-align: top;
+  overflow: auto;
+  padding: 8px 10px;
+  line-height: 1.4;
+}
+
 .excel-cell.cell-sticky-col {
   position: sticky;
   z-index: 5;

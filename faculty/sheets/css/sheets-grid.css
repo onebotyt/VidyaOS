@@ -79,6 +79,18 @@
   background-color: var(--table-row-hover, var(--bg-hover)) !important;
 }
 
+/* Merged Multi-Row Cells (Instructions, Questions, Side Panels) */
+.excel-cell[rowspan] {
+  height: auto;
+  min-height: 48px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  vertical-align: top;
+  overflow: auto;
+  padding: 8px 10px;
+  line-height: 1.4;
+}
+
 /* Section Header Accents (Theory, Practical, Grand Total) */
 .section-theory-hdr {
   background: var(--badge-primary-bg, var(--col-att-group-bg)) !important;

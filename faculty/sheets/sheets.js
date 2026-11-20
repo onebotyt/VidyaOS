@@ -6476,7 +6476,7 @@ function buildCellInlineStyle(s) {
   if (s.bg) styles.push(`background-color:${s.bg}`);
   if (s.align) styles.push(`text-align:${s.align}`);
   if (s.vAlign) styles.push(`vertical-align:${s.vAlign}`);
-  if (s.wrap) styles.push('white-space:normal;word-break:break-word;line-height:1.18');
+  if (s.wrap) styles.push('white-space:pre-wrap;word-break:break-word;line-height:1.35');
 
   if (s.border === 'all') styles.push('border:1px solid var(--border-color)');
   else if (s.border === 'outside') styles.push('outline:1px solid var(--border-color)');
@@ -6925,6 +6925,10 @@ window.addEventListener('keydown', (e) => {
   // Inline editing active keys
   if (EXCEL_WB.isEditing) {
     if (e.key === 'Enter') {
+      if (e.shiftKey || e.altKey || e.ctrlKey) {
+        // Multi-line cell input (Alt+Enter or Shift+Enter inside textarea)
+        return;
+      }
       e.preventDefault();
       commitInlineEditor();
       moveActiveCell(1, 0);
@@ -9649,7 +9653,143 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     singleTestSheet.colWidths[7] = 48;
     singleTestSheet.colWidths[8] = 48;
     singleTestSheet.colWidths[9] = 65;
-    singleTestSheet.colWidths[10] = 180;
+    singleTestSheet.colWidths[10] = 340;
+
+    // Resolve test metadata and classroom post instructions & questions
+    const activeTest = (Array.isArray(S.tests) && (
+      S.tests.find(item => String(item.id) === String(t.id)) ||
+      S.tests.find(item => item.test_number == tNum) ||
+      S.tests.find(item => item.name === t.name) ||
+      S.tests[tIdx]
+    )) || t || {};
+
+    const testTotalMax = Number(activeTest.max_marks || t.max_marks || 20);
+    const testMode = activeTest.mode || 'OFFLINE';
+    const testDuration = activeTest.duration_minutes ? `${activeTest.duration_minutes} minutes` : '50 minutes';
+
+    let instructions = [];
+    if (activeTest.instructions) {
+      if (Array.isArray(activeTest.instructions) && activeTest.instructions.length) {
+        instructions = activeTest.instructions;
+      } else if (typeof activeTest.instructions === 'string') {
+        try {
+          const parsed = JSON.parse(activeTest.instructions);
+          if (Array.isArray(parsed) && parsed.length) {
+            instructions = parsed;
+          } else if (typeof parsed === 'string') {
+            const lines = parsed.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            if (lines.length) instructions = lines;
+          }
+        } catch (_) {
+          const lines = activeTest.instructions.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+          if (lines.length) instructions = lines;
+        }
+      }
+    }
+
+    if (!instructions.length && S.currentTestState && (S.currentTestState.test?.id == activeTest.id || S.currentTestState.test?.test_number == tNum)) {
+      if (Array.isArray(S.currentTestState.instructions) && S.currentTestState.instructions.length) {
+        instructions = S.currentTestState.instructions;
+      }
+    }
+
+    if (!instructions.length) {
+      let savedCustom = null;
+      try {
+        const raw = localStorage.getItem(`test_sheet_custom_${S.groupId}_${activeTest.id || tNum}`);
+        if (raw) savedCustom = JSON.parse(raw);
+      } catch (_) { }
+      if (savedCustom && Array.isArray(savedCustom.instructions) && savedCustom.instructions.length) {
+        instructions = savedCustom.instructions;
+      }
+    }
+
+    if (!instructions.length) {
+      instructions = [
+        'All questions are compulsory.',
+        'Marks are indicated against each question.',
+        'Scientific calculator is permitted. Cell phones and unauthorized digital devices are strictly prohibited.',
+        'Candidates must write their Roll No. & Enrollment No. clearly on the answer script.'
+      ];
+    }
+
+    let questions = [];
+    if (activeTest.questions) {
+      try {
+        const parsed = typeof activeTest.questions === 'string' ? JSON.parse(activeTest.questions) : activeTest.questions;
+        if (Array.isArray(parsed) && parsed.length) {
+          const splitMax = testTotalMax ? +(testTotalMax / parsed.length).toFixed(1) : 5;
+          questions = parsed.map((q, i) => ({
+            num: q.num || (i + 1),
+            text: typeof q === 'string' ? q : (q.text || q.question || `Question ${i + 1}`),
+            max: Number(q.max || q.max_marks || q.marks || splitMax)
+          }));
+        }
+      } catch (_) {
+        const rawLines = String(activeTest.questions).split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+        if (rawLines.length) {
+          const splitMax = testTotalMax ? +(testTotalMax / rawLines.length).toFixed(1) : 5;
+          questions = rawLines.map((line, i) => ({
+            num: i + 1,
+            text: line.replace(/^(?:Q\.?\s*\d+[\.\:\-\)]*|\d+[\.\:\-\)])\s*/i, ''),
+            max: splitMax
+          }));
+        }
+      }
+    }
+
+    // Auto-extract question statements from instructions if questions not passed separately
+    if (!questions.length && instructions && instructions.length) {
+      const detectedQ = [];
+      const remainingIns = [];
+      instructions.forEach(line => {
+        if (/^(?:Q\.?\s*\d+|\d+)[\.\:\-\)]/i.test(line)) {
+          detectedQ.push(line.replace(/^(?:Q\.?\s*\d+|\d+)[\.\:\-\)]\s*/i, ''));
+        } else {
+          remainingIns.push(line);
+        }
+      });
+      if (detectedQ.length) {
+        const splitMax = testTotalMax ? +(testTotalMax / detectedQ.length).toFixed(1) : 5;
+        questions = detectedQ.map((qText, idx) => ({
+          num: idx + 1,
+          text: qText,
+          max: splitMax
+        }));
+        if (remainingIns.length) instructions = remainingIns;
+      }
+    }
+
+    if (!questions.length && S.currentTestState && (S.currentTestState.test?.id == activeTest.id || S.currentTestState.test?.test_number == tNum)) {
+      if (Array.isArray(S.currentTestState.questions) && S.currentTestState.questions.length) {
+        questions = S.currentTestState.questions;
+      }
+    }
+
+    if (!questions.length) {
+      let savedCustom = null;
+      try {
+        const raw = localStorage.getItem(`test_sheet_custom_${S.groupId}_${activeTest.id || tNum}`);
+        if (raw) savedCustom = JSON.parse(raw);
+      } catch (_) { }
+      if (savedCustom && Array.isArray(savedCustom.questions) && savedCustom.questions.length) {
+        questions = savedCustom.questions.map((q, i) => ({
+          num: q.num || (i + 1),
+          text: q.text || `Question ${i + 1}`,
+          max: Number(q.max || 5)
+        }));
+      }
+    }
+
+    if (!questions.length) {
+      const splitMax = testTotalMax ? +(testTotalMax / 4).toFixed(1) : 5;
+      questions = [
+        { num: 1, text: 'Define core architectural principles, definitions & fundamental terms.', max: splitMax },
+        { num: 2, text: 'Explain key working mechanisms and components with suitable diagrams.', max: splitMax },
+        { num: 3, text: 'Solve applied problem / algorithm / design case study with step-by-step procedure.', max: splitMax },
+        { num: 4, text: 'Detailed analytical evaluation, comparative breakdown and concluding summary.', max: splitMax }
+      ];
+    }
 
     // Header Row 0: SR. NO., ROLL NO., REG. NO., ENROLLMENT NO., STUDENT NAME, Unit Test (Total Marks: 20) [merged 5..9], Details
     setCell(singleTestSheet, 0, 0, { raw: 'SR. NO.', v: 'SR. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
@@ -9657,7 +9797,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     setCell(singleTestSheet, 0, 2, { raw: 'REG. NO.', v: 'REG. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     setCell(singleTestSheet, 0, 3, { raw: 'ENROLLMENT NO.', v: 'ENROLLMENT NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     setCell(singleTestSheet, 0, 4, { raw: 'STUDENT NAME', v: 'STUDENT NAME', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
-    setCell(singleTestSheet, 0, 5, { raw: `Unit Test ${tNum} (Total Marks : 20)`, v: `Unit Test ${tNum} (Total Marks : 20)`, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+    setCell(singleTestSheet, 0, 5, { raw: `Unit Test ${tNum} (Total Marks : ${testTotalMax})`, v: `Unit Test ${tNum} (Total Marks : ${testTotalMax})`, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     for (let c = 6; c <= 9; c++) {
       setCell(singleTestSheet, 0, c, { raw: '', v: '', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     }
@@ -9672,16 +9812,45 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     setCell(singleTestSheet, 1, 2, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
     setCell(singleTestSheet, 1, 3, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
     setCell(singleTestSheet, 1, 4, { raw: 'Question No. -->', v: 'Question No. -->', s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
-    setCell(singleTestSheet, 1, 5, { raw: 1, v: 1, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
-    setCell(singleTestSheet, 1, 6, { raw: 2, v: 2, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
-    setCell(singleTestSheet, 1, 7, { raw: 3, v: 3, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
-    setCell(singleTestSheet, 1, 8, { raw: 4, v: 4, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+    questions.slice(0, 4).forEach((q, qIdx) => {
+      setCell(singleTestSheet, 1, 5 + qIdx, { raw: q.num || (qIdx + 1), v: q.num || (qIdx + 1), s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+    });
     setCell(singleTestSheet, 1, 9, { raw: 'Total', v: 'Total', s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
-    setCell(singleTestSheet, 1, 10, { raw: `UNIT TEST ${tNum} | Maximum Marks : 20 | Time : 50 minutes`, v: `UNIT TEST ${tNum} | Maximum Marks : 20 | Time : 50 minutes`, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+    setCell(singleTestSheet, 1, 10, { raw: `UNIT TEST ${tNum} | Maximum Marks : ${testTotalMax} | Time : ${testDuration}`, v: `UNIT TEST ${tNum} | Maximum Marks : ${testTotalMax} | Time : ${testDuration}`, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
 
-    // Instructions and Questions left blank by default so teachers can enter their own content
-    const testInstructions = '';
-    setCell(singleTestSheet, 2, 10, { raw: testInstructions, v: testInstructions, s: { align: 'left', wrap: true } });
+    // Format examination instructions and classroom test questions for the merged details column
+    const insFormatted = instructions.map((ins, i) => `${i + 1}. ${ins}`).join('\n');
+    const qFormatted = questions.map((q, i) => `Q${q.num || (i + 1)} (${q.max || 5}M): ${q.text || 'Question ' + (i + 1)}`).join('\n');
+
+    const testDetailsBlock = [
+      `📌 EXAMINATION INSTRUCTIONS:`,
+      insFormatted,
+      ``,
+      `📝 TEST QUESTIONS & SCHEME:`,
+      qFormatted,
+      ``,
+      `💡 Mode: ${testMode} | Time: ${testDuration} | VidyaOS Classroom Synced`
+    ].join('\n');
+
+    // Merge Column 10 vertically across all student rows until the last student
+    const lastStudentRow = Math.max(2, students.length + 1);
+    singleTestSheet.merges.push({ s: { r: 2, c: 10 }, e: { r: lastStudentRow, c: 10 } });
+
+    // Cell (2, 10) holds the complete instructions and questions
+    setCell(singleTestSheet, 2, 10, {
+      raw: testDetailsBlock,
+      v: testDetailsBlock,
+      s: { align: 'left', vAlign: 'top', wrap: true, fontSize: 11 }
+    });
+
+    // Blank out subordinate merged rows in Column 10
+    for (let r = 3; r <= lastStudentRow; r++) {
+      setCell(singleTestSheet, r, 10, {
+        raw: '',
+        v: '',
+        s: { align: 'left', vAlign: 'top', wrap: true }
+      });
+    }
 
     students.forEach((stu, idx) => {
       const r = idx + 2;
