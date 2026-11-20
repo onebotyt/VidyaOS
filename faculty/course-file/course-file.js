@@ -966,7 +966,7 @@
         <table>
           <thead>
             <tr>
-              <th>Roll No</th><th>Enrollment No</th><th>Full Name</th><th>Email</th><th>Attended</th><th>Attendance %</th>
+              <th>Roll No</th><th>UBTER Roll No</th><th>Full Name</th><th>Email</th><th>Attended</th><th>Attendance %</th>
             </tr>
           </thead>
           <tbody>

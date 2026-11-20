@@ -214,7 +214,7 @@
 
           <!-- 5. Mobile Number Field -->
           <div class="field-group">
-            <label class="lbl" for="stu-phone">Mobile number <span class="opt">(optional)</span></label>
+            <label class="lbl" for="stu-phone">Mobile number <span class="req">*</span></label>
             <div class="field-input-box">
               <span class="field-icon">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,17 +222,18 @@
                 </svg>
               </span>
               <span class="phone-cc-badge">+91</span>
-              <input type="tel" id="stu-phone" class="field-input" placeholder="10-digit mobile number" maxlength="10" pattern="[6-9][0-9]{9}" autocomplete="tel">
+              <input type="tel" id="stu-phone" class="field-input" placeholder="10-digit mobile number" maxlength="10" pattern="[6-9][0-9]{9}" autocomplete="tel" required>
             </div>
+            <p class="inp-error" id="stu-phone-error"></p>
           </div>
 
-          <!-- 6. UBTER Enrollment Number Field -->
+          <!-- 6. UBTER Roll Number Field -->
           <div class="field-group">
             <div class="field-label-row">
-              <label class="lbl" for="stu-enroll">UBTER Enrollment No. <span class="req" id="stu-enroll-req">*</span></label>
+              <label class="lbl" for="stu-enroll">UBTER Roll No. <span class="req" id="stu-enroll-req">*</span></label>
               <label class="chk-enroll-inline">
                 <input type="checkbox" id="chk-enroll-not-available">
-                <span>Not available yet</span>
+                <span>Roll number not available yet</span>
               </label>
             </div>
             <div class="field-input-box">
@@ -245,9 +246,9 @@
                   <line x1="7" y1="16" x2="17" y2="16"></line>
                 </svg>
               </span>
-              <input type="text" id="stu-enroll" class="field-input mono" placeholder="11-digit numeric enrollment" maxlength="11" autocomplete="off" required>
+              <input type="text" id="stu-enroll" class="field-input mono" placeholder="11-digit numeric roll number" maxlength="11" autocomplete="off" required>
             </div>
-            <p class="inp-hint" id="stu-enroll-hint" style="display:none;">Enter your 11-digit official UBTER enrollment number.</p>
+            <p class="inp-hint" id="stu-enroll-hint" style="display:none;">Enter your 11-digit official UBTER roll number.</p>
             <p class="inp-error" id="stu-enroll-error"></p>
           </div>
 

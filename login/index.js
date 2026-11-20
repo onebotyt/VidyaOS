@@ -286,7 +286,8 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const deviceId = getVidyaDeviceId();
     const res = await executeLoginWithRetry({
       email: id, phone: id, credential: id,
-      identifier: id, username: id, enrollment_no: id,
+      identifier: id, username: id, enrollment_no: id, ubter_roll_no: id,
+      official_enrollment_no: id, registration_no: id, ubter_roll_no: id,
       official_enrollment_no: id, registration_no: id,
       password: pw,
       device_id: deviceId
@@ -448,7 +449,10 @@ window.showMobileSplashView = showMobileSplashView;
     const updateCheckBadge = () => {
       const val = mIdInput.value.trim();
       if (mCheckBadge) {
-        if (val.length >= 3) {
+        const isEmail = val.includes('@') && val.includes('.');
+        const isPhone = /^(?:\+91|0)?[6-9]\d{9}$/.test(val);
+        const isRoll = /^\d{11}$/.test(val);
+        if (isEmail || isPhone || isRoll) {
           mCheckBadge.classList.add('visible');
         } else {
           mCheckBadge.classList.remove('visible');
@@ -499,7 +503,9 @@ window.showMobileSplashView = showMobileSplashView;
         const deviceId = getVidyaDeviceId();
         const res = await executeLoginWithRetry({
           email: id, phone: id, credential: id,
-          identifier: id, username: id, enrollment_no: id,
+          identifier: id, username: id, enrollment_no: id, ubter_roll_no: id,
+      official_enrollment_no: id, registration_no: id, ubter_roll_no: id,
+          official_enrollment_no: id, registration_no: id,
           password: pw,
           device_id: deviceId
         });
@@ -553,7 +559,8 @@ async function submitForceLogin() {
   try {
     const res = await executeLoginWithRetry({
       email: id, phone: id, credential: id,
-      identifier: id, username: id, enrollment_no: id,
+      identifier: id, username: id, enrollment_no: id, ubter_roll_no: id,
+      official_enrollment_no: id, registration_no: id,
       password: pw,
       device_id: getVidyaDeviceId(),
       force_logout: true

@@ -112,7 +112,7 @@
           <tr class="excel-hdr-tan">
             <th style="width:45px;">ROLL</th>
             <th style="width:110px;">REG. NO.</th>
-            <th style="width:120px;">ENROLLMENT NO.</th>
+            <th style="width:120px;">UBTER ROLL NO.</th>
             <th style="text-align:left;padding-left:0.75rem;">STUDENT NAME</th>
             ${assignCols.map((a, i) => `<th>Assign ${a.assignment_number || i + 1}</th>`).join('')}
             ${examCols.map((e, i) => `<th>${esc(e.title || 'UT' + (i + 1))}</th>`).join('')}
@@ -180,7 +180,7 @@
           <tr class="excel-hdr-tan">
             <th style="width:45px;">ROLL</th>
             <th style="width:110px;">REG. NO.</th>
-            <th style="width:120px;">ENROLLMENT NO.</th>
+            <th style="width:120px;">UBTER ROLL NO.</th>
             <th style="text-align:left;padding-left:0.75rem;">STUDENT NAME</th>
             ${tests.length ? tests.map(t => `<th>${esc(t.title || 'Test')}<br><small style="font-weight:500;">(Max ${t.max_marks || 20})</small></th>`).join('') : `<th>Test 1</th>`}
             <th>Avg Score</th>
@@ -221,7 +221,7 @@
           <tr class="excel-hdr-tan">
             <th style="width:45px;">ROLL</th>
             <th style="width:110px;">REG. NO.</th>
-            <th style="width:120px;">ENROLLMENT NO.</th>
+            <th style="width:120px;">UBTER ROLL NO.</th>
             <th style="text-align:left;padding-left:0.75rem;">STUDENT NAME</th>
             ${assigns.length ? assigns.map((a, i) => `<th>Assignment ${a.assignment_number || i + 1}<br><small style="font-weight:500;">(Max ${a.max_marks || 20})</small></th>`).join('') : `<th>Assignment 1</th>`}
             <th>Total Score</th>

@@ -651,7 +651,7 @@
               <span class="omni-item-icon">${window.getSvgIcon('user', 16)}</span>
               <div class="omni-item-text">
                 <span class="omni-title">${escapeHtml(s.full_name)}</span>
-                <span class="omni-sub">Roll #${escapeHtml(s.class_roll_no || '-')} • Enrollment: ${escapeHtml(s.official_enrollment_no || '-')} • ${escapeHtml(s.department_code || '')}</span>
+                <span class="omni-sub">Roll #${escapeHtml(s.class_roll_no || '-')} • UBTER Roll: ${escapeHtml(s.ubter_roll_no || s.official_enrollment_no || '-')} • ${escapeHtml(s.department_code || '')}</span>
               </div>
             </div>
           `;

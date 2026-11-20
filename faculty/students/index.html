@@ -220,7 +220,7 @@
                 <th class="col-avatar" id="th-avatar" style="width: 44px; text-align: center;">Avatar</th>
                 <th style="width: 55px;" id="th-roll">Roll #</th>
                 <th class="col-reg" id="th-reg">Registration No</th>
-                <th class="col-enrollment" id="th-enrollment">Enrollment</th>
+                <th class="col-enrollment" id="th-enrollment">UBTER Roll No.</th>
                 <th>Student Name</th>
                 <th class="col-retention" id="th-retention" style="display: none;">Retention</th>
                 <th style="text-align: right; width: 65px;" id="th-actions">Actions</th>
@@ -282,14 +282,14 @@
                 <input type="text" id="edit-stu-name" required placeholder="Full Name" class="stu-compact-input stu-edit-mode" style="display:none;">
               </div>
 
-              <!-- Dual Field: Enrollment & UBTER Reg. # -->
+              <!-- Dual Field: UBTER Roll No. & UBTER Reg. # -->
               <div class="stu-edit-dual-row">
                 <div>
                   <div class="stu-compact-label-row">
                     <label for="edit-stu-enroll" class="stu-compact-label" style="margin:0;">
-                      Enrollment # <span id="edit-stu-enroll-req" class="stu-edit-mode" style="display:none; color:var(--status-absent);">*</span>
+                      UBTER Roll No. <span id="edit-stu-enroll-req" class="stu-edit-mode" style="display:none; color:var(--status-absent);">*</span>
                     </label>
-                    <label class="chk-enroll-box stu-compact-chk stu-edit-mode" id="edit-chk-enroll-box" style="display:none;" title="Enrollment number not available">
+                    <label class="chk-enroll-box stu-compact-chk stu-edit-mode" id="edit-chk-enroll-box" style="display:none;" title="Roll number not available">
                       <input type="checkbox" id="edit-chk-enroll-not-available">
                       <span>Not Avail.</span>
                     </label>
@@ -297,7 +297,7 @@
                   <div id="detail-stu-enroll" class="stu-compact-display-val stu-mono-input stu-view-mode">—</div>
                   <div class="stu-edit-mode" style="display:none;">
                     <input type="text" id="edit-stu-enroll" placeholder="11-digit numeric" maxlength="11" autocomplete="off" class="stu-compact-input stu-mono-input">
-                    <p class="inp-hint" id="edit-stu-enroll-hint" style="display:none;">Enter exactly 11 numeric digits.</p>
+                    <p class="inp-hint" id="edit-stu-enroll-hint" style="display:none;">Enter your 11-digit official UBTER roll number.</p>
                     <p class="inp-error" id="edit-stu-enroll-error" style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;"></p>
                   </div>
                 </div>
@@ -487,9 +487,9 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.65rem;">
           <div>
             <label
-              style="display:block; font-size:0.76rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">Official
-              Enrollment # *</label>
-            <input type="text" id="add-stu-enroll" required placeholder="2024IT001"
+              style="display:block; font-size:0.76rem; font-weight:700; color:var(--text-main); margin-bottom:0.25rem;">UBTER
+              Roll No. *</label>
+            <input type="text" id="add-stu-enroll" required placeholder="24011090008"
               style="width:100%; padding:0.55rem 0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.86rem; box-sizing:border-box; font-family:var(--font-family-mono);">
           </div>
           <div>
@@ -534,7 +534,7 @@
         <p style="font-size:0.78rem; color:var(--text-muted);">
           Paste comma-separated student rows in format:<br>
           <code
-            style="font-family:var(--font-family-mono); color:var(--color-primary);">Full Name, Official Enrollment, Roll No, Reg No, Semester</code>
+            style="font-family:var(--font-family-mono); color:var(--color-primary);">Full Name, UBTER Roll No, Class Roll No, Reg No, Semester</code>
         </p>
         <textarea id="bulk-csv-text" rows="6"
           placeholder="Aarav Sharma, 2024IT001, 1, 24101054001, 5&#10;Aditi Verma, 2024IT002, 2, 24101054002, 5"

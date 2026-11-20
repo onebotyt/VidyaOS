@@ -3663,7 +3663,7 @@
         <tr class="excel-hdr-tan">
           ${showSr ? '<th rowspan="2" style="width:48px;vertical-align:middle">SR. NO.</th>' : ''}
           <th rowspan="2" style="width:75px;vertical-align:middle">ROLL NO.</th>
-          ${showEnroll ? '<th rowspan="2" style="width:115px;vertical-align:middle">ENROLLMENT NO.</th>' : ''}
+          ${showEnroll ? '<th rowspan="2" style="width:115px;vertical-align:middle">UBTER ROLL NO.</th>' : ''}
           ${showReg ? '<th rowspan="2" style="width:115px;vertical-align:middle">REGISTRATION NO.</th>' : ''}
           <th rowspan="2" style="min-width:180px;vertical-align:middle">STUDENT NAME</th>
           <th colspan="${S.currentTestQuestions.length}">${unitTestOnly} (Total Marks : ${totalMax})</th>
@@ -3810,7 +3810,7 @@
             <span class="desktop-text">Roll</span>
             <span class="mobile-text">R.N</span>
           </th>
-          ${showEnroll ? '<th class="col-enroll" style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Enrollment No.</th>' : ''}
+          ${showEnroll ? '<th class="col-enroll" style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">UBTER Roll No.</th>' : ''}
           ${showReg ? '<th class="col-reg" style="width:115px;position:sticky;top:0;z-index:10;background:var(--bg-surface)">Reg No.</th>' : ''}
           <th class="col-name" style="position:sticky;top:0;left:32px;z-index:18;background:var(--bg-surface)">
             <span class="desktop-text">Student Name</span>

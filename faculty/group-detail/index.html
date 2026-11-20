@@ -1128,10 +1128,10 @@
                   <line x1="20" y1="8" x2="20" y2="14" />
                   <line x1="23" y1="11" x2="17" y2="11" />
                 </svg>
-                <input type="text" id="add-enroll-input" class="add-student-input" placeholder="Enrollment No. to add…"
+                <input type="text" id="add-enroll-input" class="add-student-input" placeholder="UBTER Roll No. to add…"
                   onkeydown="if(event.key==='Enter')addStudentByEnroll()">
                 <button type="button" class="add-student-submit-btn" onclick="addStudentByEnroll()"
-                  title="Add student by enrollment number">+ Add</button>
+                  title="Add student by UBTER roll number">+ Add</button>
               </div>
               <button type="button" class="btn btn-secondary btn-sm add-student-cohort-btn"
                 onclick="openAddUnenrolledModal()" title="Add students from cohort">
@@ -2273,7 +2273,7 @@
                     </svg></th>
                   <th style="width: 55px; text-align: left; padding:0.4rem;">Roll</th>
                   <th style="text-align: left; padding:0.4rem;">Student Name</th>
-                  <th style="width: 110px; text-align: left; padding:0.4rem;">Enrollment No</th>
+                  <th style="width: 110px; text-align: left; padding:0.4rem;">UBTER Roll No</th>
                   <th style="width: 95px; text-align: right; padding:0.4rem;">Scan Time</th>
                 </tr>
               </thead>
@@ -3150,7 +3150,7 @@
               class="desktop-only-col-filter">
               <button type="button" class="btn btn-secondary btn-sm btn-tool-minimal" id="btn-marks-col-filter"
                 onclick="toggleMarksColFilterMenu(event)"
-                title="Filter columns: Show/Hide SR. NO., Enrollment No., Registration No.">
+                title="Filter columns: Show/Hide SR. NO., UBTER Roll No., Registration No.">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
                   <path d="m3 16 4 4 4-4" />
@@ -3181,7 +3181,7 @@
                   class="dropdown-item">
                   <input type="checkbox" id="chk-show-enroll"
                     onchange="toggleMarksColumn('enrollmentNo', this.checked)">
-                  <span>Show Enrollment No.</span>
+                  <span>Show UBTER Roll No.</span>
                 </label>
                 <label
                   style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;cursor:pointer;font-size:0.78rem;color:var(--text-main);user-select:none"
@@ -3618,7 +3618,7 @@
         </div>
         <div class="modal-body" style="padding:1.25rem;overflow-y:auto">
           <div style="margin-bottom:1rem">
-            <input type="text" id="search-unenrolled-input" placeholder="Search by name, roll, or enrollment no..."
+            <input type="text" id="search-unenrolled-input" placeholder="Search by name, roll, or UBTER roll no..."
               oninput="filterUnenrolledStudents()"
               style="width:100%;padding:.55rem .85rem;border:1px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text-main);font-size:.85rem;box-sizing:border-box">
           </div>
@@ -3639,7 +3639,7 @@
                   <th style="width:40px;text-align:center"></th>
                   <th style="width:50px">Roll</th>
                   <th>Student Name</th>
-                  <th>Enrollment No</th>
+                  <th>UBTER Roll No</th>
                   <th style="text-align:right">Action</th>
                 </tr>
               </thead>

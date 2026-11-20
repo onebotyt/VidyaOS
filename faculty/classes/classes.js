@@ -94,9 +94,15 @@
   // ── Fetch Trash Count for Action Button Badge ──
   async function fetchTrashCount() {
     try {
-      const res = await api.get('/teaching-groups?status=TRASH');
-      const data = res.data || res;
-      const trashed = Array.isArray(data) ? data : (data.groups || data.classes || []);
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+      const res = await fetch('/api/v1/teaching-groups?status=TRASH', {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      const trashed = data?.data || (Array.isArray(data) ? data : []);
       const badge = document.getElementById('classes-trash-count');
       if (badge) {
         if (trashed.length > 0) {

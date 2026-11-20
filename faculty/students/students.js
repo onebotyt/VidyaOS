@@ -1471,12 +1471,12 @@
     } else {
       const cleanEnroll = (enrollInput?.value || '').trim().replace(/\D/g, '');
       if (!cleanEnroll) {
-        if (enrollErr) enrollErr.textContent = 'Official Enrollment Number is required (or check "Enrollment Number Not Available").';
+        if (enrollErr) enrollErr.textContent = 'UBTER Roll Number is required (or check "Not Avail.").';
         enrollInput?.focus();
         return;
       }
       if (cleanEnroll.length !== 11 || !/^\d{11}$/.test(cleanEnroll)) {
-        if (enrollErr) enrollErr.textContent = 'Official Enrollment Number must be exactly 11 numeric digits (0–9).';
+        if (enrollErr) enrollErr.textContent = 'UBTER Roll Number must be exactly 11 numeric digits (0–9).';
         enrollInput?.focus();
         return;
       }
@@ -1504,6 +1504,7 @@
         method: 'PUT',
         body: JSON.stringify({
           full_name: fullName,
+          ubter_roll_no: officialEnroll,
           official_enrollment_no: officialEnroll,
           enrollment_not_available: chkNotAvail,
           registration_no: regNo,
@@ -1517,6 +1518,7 @@
         const idx = allStudents.findIndex(s => (s.student_id || s.id) === studentId);
         if (idx !== -1) {
           allStudents[idx].full_name = fullName;
+          allStudents[idx].ubter_roll_no = officialEnroll;
           allStudents[idx].official_enrollment_no = officialEnroll;
           allStudents[idx].enrollment_no_status = chkNotAvail ? 'Not Assigned' : 'ASSIGNED';
           allStudents[idx].registration_no = regNo;
@@ -1720,14 +1722,14 @@
           editEnrollInput.placeholder = 'Not Assigned';
           editEnrollInput.removeAttribute('required');
           if (editEnrollReq) editEnrollReq.style.display = 'none';
-          if (editEnrollHint) editEnrollHint.textContent = 'Enrollment status is set to "Not Assigned".';
+          if (editEnrollHint) editEnrollHint.textContent = 'Roll number status is set to "Not Assigned".';
           if (editEnrollErr) editEnrollErr.textContent = '';
         } else {
           editEnrollInput.disabled = false;
-          editEnrollInput.placeholder = '11-digit numeric enrollment';
+          editEnrollInput.placeholder = '11-digit numeric roll number';
           editEnrollInput.setAttribute('required', 'required');
           if (editEnrollReq) editEnrollReq.style.display = 'inline';
-          if (editEnrollHint) editEnrollHint.textContent = 'Enter exactly 11 numeric digits (0–9).';
+          if (editEnrollHint) editEnrollHint.textContent = 'Enter your 11-digit official UBTER roll number (0–9).';
         }
       });
     }
@@ -1743,7 +1745,7 @@
         if (editChkNotAvail && editChkNotAvail.checked) return;
         const val = e.target.value.trim();
         if (val && val.length !== 11) {
-          if (editEnrollErr) editEnrollErr.textContent = 'Official Enrollment Number must be exactly 11 numeric digits (0–9).';
+          if (editEnrollErr) editEnrollErr.textContent = 'UBTER Roll Number must be exactly 11 numeric digits (0–9).';
         } else if (editEnrollErr) {
           editEnrollErr.textContent = '';
         }

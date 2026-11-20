@@ -444,7 +444,7 @@ async function exportStudentDossier(format) {
           <table>
             <tr>
               <th width="20%">Full Name</th><td width="30%"><strong>${escapeHtml(p.full_name || '—')}</strong></td>
-              <th width="20%">Enrollment No</th><td width="30%"><strong>${escapeHtml(p.official_enrollment_no || '—')}</strong></td>
+              <th width="20%">UBTER Roll No</th><td width="30%"><strong>${escapeHtml(p.ubter_roll_no || p.official_enrollment_no || '—')}</strong></td>
             </tr>
             <tr>
               <th>Class Roll No</th><td>${escapeHtml(p.class_roll_no ? String(p.class_roll_no) : '—')}</td>
@@ -526,7 +526,7 @@ async function exportStudentDossier(format) {
       let csv = '\uFEFF';
       csv += `OFFICIAL STUDENT ACADEMIC DOSSIER\n`;
       csv += `Student Name,${p.full_name || ''}\n`;
-      csv += `Enrollment No,${p.official_enrollment_no || ''}\n`;
+      csv += `UBTER Roll No,${p.ubter_roll_no || p.official_enrollment_no || ''}\n`;
       csv += `Class Roll No,${p.class_roll_no || ''}\n`;
       csv += `UBTER Reg No,${p.registration_no || ''}\n`;
       csv += `Department,${p.department_name || ''}\n`;
@@ -577,7 +577,7 @@ async function exportStudentDossier(format) {
           <hr/>
           <h3>1. Demographics</h3>
           <table>
-            <tr><td><strong>Name</strong></td><td>${escapeHtml(p.full_name || '')}</td><td><strong>Enrollment</strong></td><td>${escapeHtml(p.official_enrollment_no || '')}</td></tr>
+            <tr><td><strong>Name</strong></td><td>${escapeHtml(p.full_name || '')}</td><td><strong>UBTER Roll No</strong></td><td>${escapeHtml(p.ubter_roll_no || p.official_enrollment_no || '')}</td></tr>
             <tr><td><strong>Roll No</strong></td><td>${escapeHtml(p.class_roll_no ? String(p.class_roll_no) : '')}</td><td><strong>UBTER Reg</strong></td><td>${escapeHtml(p.registration_no || '')}</td></tr>
             <tr><td><strong>Father's Name</strong></td><td>${escapeHtml(p.father_name || '')}</td><td><strong>Mother's Name</strong></td><td>${escapeHtml(p.mother_name || '')}</td></tr>
             <tr><td><strong>DOB / Gender</strong></td><td>${escapeHtml(p.dob || '')} (${escapeHtml(p.gender || '')})</td><td><strong>Category</strong></td><td>${escapeHtml(p.category || '')}</td></tr>

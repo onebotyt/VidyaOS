@@ -43,7 +43,7 @@ function renderPeople() {
       '<div class="person-av" style="background:hsl(' + ((i * 47 + 142) % 360) + ',55%,48%)">' + initials(m.full_name) + '</div>' +
       '<div class="person-info">' +
         '<div class="person-name">' + esc(m.full_name || 'Student') + '</div>' +
-        '<div class="person-sub">Roll ' + (m.class_roll_no || '—') + ' • ' + esc(m.official_enrollment_no || m.enrollment_no || 'No enrollment no.') + '</div>' +
+        '<div class="person-sub">Roll ' + (m.class_roll_no || '—') + ' • ' + esc(m.ubter_roll_no || m.official_enrollment_no || m.enrollment_no || 'No UBTER roll no.') + '</div>' +
       '</div>' +
       '<button class="person-rm-btn" onclick="removeStudent(' + m.student_id + ')" title="Remove">' +
         removeIcon +

@@ -387,14 +387,14 @@ async function handleStudentSubmit(e) {
     enrollNo = null;
   } else {
     if (!enrollNo) {
-      if (enrollError) enrollError.textContent = 'UBTER Enrollment Number is required (or check "Enrollment Number Not Available").';
-      showAlert('Please enter your 11-digit official UBTER enrollment number or check "Enrollment Number Not Available".', 'danger');
+      if (enrollError) enrollError.textContent = 'UBTER Roll Number is required (or check "Roll number not available yet").';
+      showAlert('Please enter your 11-digit official UBTER roll number or check "Roll number not available yet".', 'danger');
       enrollInput?.focus();
       return;
     }
     if (enrollNo.length !== 11 || !/^\d{11}$/.test(enrollNo)) {
-      if (enrollError) enrollError.textContent = 'UBTER Enrollment Number must be exactly 11 numeric digits.';
-      showAlert('UBTER Enrollment Number must be exactly 11 numeric digits (0–9).', 'danger');
+      if (enrollError) enrollError.textContent = 'UBTER Roll Number must be exactly 11 numeric digits.';
+      showAlert('UBTER Roll Number must be exactly 11 numeric digits (0–9).', 'danger');
       enrollInput?.focus();
       return;
     }
@@ -440,8 +440,14 @@ async function handleStudentSubmit(e) {
     showAlert('Please fill in all required fields (Name, Branch, Semester, Gmail' + (isGoogle ? '' : ', Password') + ').', 'danger');
     return;
   }
-  if (phone && (phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone))) {
-    showAlert('If entering a mobile number, it must be a valid 10-digit Indian mobile number.', 'danger');
+  if (!phone) {
+    showAlert('Mobile number is required to identify your account.', 'danger');
+    document.getElementById('stu-phone')?.focus();
+    return;
+  }
+  if (phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone)) {
+    showAlert('Please enter a valid 10-digit Indian mobile number (starts with 6, 7, 8, or 9).', 'danger');
+    document.getElementById('stu-phone')?.focus();
     return;
   }
   if (password && password.length < 8) {
@@ -458,6 +464,7 @@ async function handleStudentSubmit(e) {
     submitBtn.innerHTML = 'Submitting… <span class="arrow">→</span>';
     const payload = {
       full_name: fullName,
+      ubter_roll_no: isEnrollNotAvailable ? null : enrollNo,
       official_enrollment_no: isEnrollNotAvailable ? null : enrollNo,
       enrollment_not_available: isEnrollNotAvailable,
       registration_no: ubterNo,
@@ -543,21 +550,47 @@ function showSuccessView(info) {
         stuEnrollInput.placeholder = 'Not Assigned';
         stuEnrollInput.removeAttribute('required');
         if (stuEnrollReq) stuEnrollReq.style.display = 'none';
-        if (stuEnrollHint) stuEnrollHint.textContent = 'Enrollment status will be registered as "Not Assigned".';
+        if (stuEnrollHint) stuEnrollHint.textContent = 'Roll number status will be registered as "Not Assigned".';
         if (stuEnrollError) stuEnrollError.textContent = '';
         stuEnrollInput.classList.remove('has-error');
       } else {
         stuEnrollInput.disabled = false;
-        stuEnrollInput.placeholder = '11-digit numeric enrollment';
+        stuEnrollInput.placeholder = '11-digit numeric roll number';
         stuEnrollInput.setAttribute('required', 'required');
         if (stuEnrollReq) stuEnrollReq.style.display = 'inline';
-        if (stuEnrollHint) stuEnrollHint.textContent = 'Enter your 11-digit official UBTER enrollment number.';
+        if (stuEnrollHint) stuEnrollHint.textContent = 'Enter your 11-digit official UBTER roll number.';
         if (stuEnrollError) stuEnrollError.textContent = '';
       }
     });
   }
 
-  // Enrollment Number numeric 11-digit enforcement
+  // Mobile phone 10-digit enforcement
+  const stuPhoneInput = document.getElementById('stu-phone');
+  const stuPhoneError = document.getElementById('stu-phone-error');
+  if (stuPhoneInput) {
+    stuPhoneInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+      if (stuPhoneError && e.target.value.length === 10) {
+        stuPhoneError.textContent = '';
+        stuPhoneInput.classList.remove('has-error');
+      }
+    });
+    stuPhoneInput.addEventListener('blur', (e) => {
+      const val = e.target.value.trim();
+      if (!val) {
+        if (stuPhoneError) stuPhoneError.textContent = 'Mobile number is required.';
+        stuPhoneInput.classList.add('has-error');
+      } else if (val.length !== 10 || !/^[6-9]\d{9}$/.test(val)) {
+        if (stuPhoneError) stuPhoneError.textContent = 'Enter a valid 10-digit mobile number (starts with 6-9).';
+        stuPhoneInput.classList.add('has-error');
+      } else if (stuPhoneError) {
+        stuPhoneError.textContent = '';
+        stuPhoneInput.classList.remove('has-error');
+      }
+    });
+  }
+
+  // UBTER Roll Number numeric 11-digit enforcement
   if (stuEnrollInput) {
     stuEnrollInput.addEventListener('input', (e) => {
       e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
@@ -570,7 +603,7 @@ function showSuccessView(info) {
       if (chkEnrollNotAvailable && chkEnrollNotAvailable.checked) return;
       const val = e.target.value.trim();
       if (val && val.length !== 11) {
-        if (stuEnrollError) stuEnrollError.textContent = 'UBTER Enrollment number must be exactly 11 numeric digits.';
+        if (stuEnrollError) stuEnrollError.textContent = 'UBTER Roll Number must be exactly 11 numeric digits.';
         stuEnrollInput.classList.add('has-error');
       } else if (stuEnrollError) {
         stuEnrollError.textContent = '';

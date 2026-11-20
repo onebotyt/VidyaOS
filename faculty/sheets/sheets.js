@@ -2152,7 +2152,7 @@ async function loadEvaluationSheetData() {
           exam_avg_max: examAvgMax,
           total_max: grandTotalMax,
           roll_label: (cachedState && cachedState.scheme && cachedState.scheme.roll_label) || 'ROLL NO',
-          enroll_label: (cachedState && cachedState.scheme && cachedState.scheme.enroll_label) || 'ENROLLMENT NO',
+          enroll_label: (cachedState && cachedState.scheme && cachedState.scheme.enroll_label) || 'UBTER ROLL NO',
           reg_label: (cachedState && cachedState.scheme && cachedState.scheme.reg_label) || 'REG NO',
           name_label: (cachedState && cachedState.scheme && cachedState.scheme.name_label) || 'STUDENT NAME',
           assign_label: (cachedState && cachedState.scheme && cachedState.scheme.assign_label) || 'Assignment Marks',
@@ -2198,7 +2198,7 @@ async function loadEvaluationSheetData() {
     exam_avg_max: 20,
     total_max: 40,
     roll_label: 'ROLL NO',
-    enroll_label: 'ENROLLMENT NO',
+    enroll_label: 'UBTER ROLL NO',
     reg_label: 'REG NO',
     name_label: 'STUDENT NAME',
     assign_label: 'Assignment Marks',
@@ -2355,7 +2355,7 @@ function renderEvaluationSheetTable() {
           <tr class="excel-hdr-tan">
             <th rowspan="2" class="col-roll" style="width: 70px;">${esc(scheme.roll_label || 'ROLL NO')}</th>
             <th rowspan="2" class="col-reg" style="width: 135px;">${esc(scheme.reg_label || 'REG NO')}</th>
-            <th rowspan="2" class="col-enroll" style="width: 135px;">${esc(scheme.enroll_label || 'ENROLLMENT NO')}</th>
+            <th rowspan="2" class="col-enroll" style="width: 135px;">${esc(scheme.enroll_label || 'UBTER ROLL NO')}</th>
             <th rowspan="2" class="col-name" style="min-width: 190px; text-align: left;">${esc(scheme.name_label || 'STUDENT NAME')}</th>
             <th colspan="${aCount}" class="col-assign">${esc(scheme.assign_label || 'Assignment Marks')}</th>
             <th rowspan="2" class="col-assign-avg" style="width: 95px;">${esc(scheme.assign_avg_label || 'Assign Avg')}</th>
@@ -3153,7 +3153,7 @@ function renderTestSheetTable() {
               <th rowspan="2" class="col-sr" style="width: 55px; vertical-align: middle;">SR. NO.</th>
               <th rowspan="2" class="col-roll" style="width: 85px; vertical-align: middle;">ROLL NO.</th>
               <th rowspan="2" class="col-reg" style="width: 125px; vertical-align: middle;">REG. NO.</th>
-              <th rowspan="2" class="col-enroll" style="width: 125px; vertical-align: middle;">ENROLLMENT NO.</th>
+              <th rowspan="2" class="col-enroll" style="width: 125px; vertical-align: middle;">UBTER ROLL NO.</th>
               <th rowspan="2" class="col-name" style="width: 200px; vertical-align: middle;">STUDENT NAME</th>
               <th colspan="${questions.length}" class="col-test" title="${esc(testTitle)}">${esc(testShort)} (${esc(testTitle)})</th>
               <th rowspan="2" class="col-total excel-cell-total" style="width: 75px; vertical-align: middle;">Total</th>
@@ -3605,7 +3605,7 @@ function renderAllTestsCombinedTable() {
               <th class="col-sr" style="width: 50px;">SR. NO.</th>
               <th class="col-roll" style="width: 85px;">ROLL NO.</th>
               <th class="col-reg" style="width: 125px;">REG. NO.</th>
-              <th class="col-enroll" style="width: 125px;">ENROLLMENT NO.</th>
+              <th class="col-enroll" style="width: 125px;">UBTER ROLL NO.</th>
               <th class="col-name" style="min-width: 200px;">STUDENT NAME</th>
               ${allTests.map((t, i) => `<th class="col-test" title="${esc(t.title || 'Unit Test ' + (i + 1))}">${esc(getTestShortHeader(t, i))}</th>`).join('')}
               <th class="col-total" style="width: 90px; font-weight: 800;">Total Marks</th>
@@ -4016,7 +4016,7 @@ function renderAssignmentsSheetTable() {
               <th class="col-sr" style="width: 50px;">SR. NO.</th>
               <th class="col-roll" style="width: 85px;">ROLL NO.</th>
               <th class="col-reg" style="width: 125px;">REG. NO.</th>
-              <th class="col-enroll" style="width: 125px;">ENROLLMENT NO.</th>
+              <th class="col-enroll" style="width: 125px;">UBTER ROLL NO.</th>
               <th class="col-name" style="min-width: 200px;">STUDENT NAME</th>
               ${assignments.length ? assignments.map((a, i) => `<th class="col-assign" title="${esc(a.title || a.name || 'Assignment ' + (i + 1))}">${esc(getAssignShortHeader(a, i))}</th>`).join('') : '<th class="col-assign" style="width: 120px;">Assignments</th>'}
               <th style="width: 90px;">Total Marks</th>
@@ -4316,7 +4316,7 @@ function renderPracticalsSheetTable() {
               <th class="col-sr" style="width: 50px;">SR. NO.</th>
               <th class="col-roll" style="width: 85px;">ROLL NO.</th>
               <th class="col-reg" style="width: 125px;">REG. NO.</th>
-              <th class="col-enroll" style="width: 125px;">ENROLLMENT NO.</th>
+              <th class="col-enroll" style="width: 125px;">UBTER ROLL NO.</th>
               <th class="col-name" style="min-width: 200px;">STUDENT NAME</th>
               ${practicals.length ? practicals.map((p, i) => `<th class="col-practical" title="${esc(p.title || p.name || 'Lab Experiment ' + (i + 1))}">${esc(getPracticalShortHeader(p, i))}</th>`).join('') : '<th class="col-practical" style="width: 120px;">Practicals</th>'}
               <th style="width: 90px;">Total Marks</th>
@@ -8647,7 +8647,7 @@ async function exportCurrentSheet(format) {
         // 4. Track column max lengths for perfect auto-width calculation
         const colMaxLengths = new Array(maxDataCol + 1).fill(10);
         colMaxLengths[0] = 10; // Roll #
-        colMaxLengths[1] = 18; // Enrollment No
+        colMaxLengths[1] = 18; // UBTER Roll No
         colMaxLengths[2] = 26; // Student Name
 
         // 5. Populate Data Rows & Cells
@@ -10122,7 +10122,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   setCell(evalSheet, 0, 0, { raw: 'SR. NO.', v: 'SR. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   setCell(evalSheet, 0, 1, { raw: 'ROLL NO.', v: 'ROLL NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   setCell(evalSheet, 0, 2, { raw: 'REG. NO.', v: 'REG. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
-  setCell(evalSheet, 0, 3, { raw: 'ENROLLMENT NO.', v: 'ENROLLMENT NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+  setCell(evalSheet, 0, 3, { raw: 'UBTER ROLL NO.', v: 'UBTER ROLL NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   setCell(evalSheet, 0, 4, { raw: 'STUDENT NAME', v: 'STUDENT NAME', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   setCell(evalSheet, 0, 5, { raw: 'THEORY', v: 'THEORY', s: { bold: true, align: 'center', bg: 'var(--badge-primary-bg, var(--chip-faculty-bg))', color: 'var(--color-primary)' } });
   for (let c = 6; c <= 9; c++) {
@@ -10297,7 +10297,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   for (let c = 5; c <= 14; c++) testSheet.colWidths[c] = 48;
   testSheet.colWidths[15] = 65; // Final Total (Grand Total)
 
-  const testHeaders = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Final Total (Best 4 Avg)'];
+  const testHeaders = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Final Total (Best 4 Avg)'];
   testHeaders.forEach((h, c) => {
     setCell(testSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   });
@@ -10518,7 +10518,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     setCell(singleTestSheet, 0, 0, { raw: 'SR. NO.', v: 'SR. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     setCell(singleTestSheet, 0, 1, { raw: 'ROLL NO.', v: 'ROLL NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     setCell(singleTestSheet, 0, 2, { raw: 'REG. NO.', v: 'REG. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
-    setCell(singleTestSheet, 0, 3, { raw: 'ENROLLMENT NO.', v: 'ENROLLMENT NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+    setCell(singleTestSheet, 0, 3, { raw: 'UBTER ROLL NO.', v: 'UBTER ROLL NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     setCell(singleTestSheet, 0, 4, { raw: 'STUDENT NAME', v: 'STUDENT NAME', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     setCell(singleTestSheet, 0, 5, { raw: `Unit Test ${tNum} (Total Marks : ${testTotalMax})`, v: `Unit Test ${tNum} (Total Marks : ${testTotalMax})`, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
     for (let c = 6; c <= 9; c++) {
@@ -10633,7 +10633,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   assignSheet.colWidths[11] = 180;
 
   const assignHeaders = [
-    'SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME',
+    'SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME',
     '1', '2', '3', '4', '5', 'Total (Average)',
     'Assignment Details (Mode : OFFLINE, Posted in VidyaOS as classwork)'
   ];
@@ -10708,7 +10708,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   practicalSheet.colWidths[8] = 65;  // Viva Voce
   practicalSheet.colWidths[9] = 63;  // TOTAL
 
-  const practicalHeaders = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', 'Lab Record File', 'Creative Work (Model/Chart/Project)', 'Attendance', 'Viva Voce', 'TOTAL'];
+  const practicalHeaders = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME', 'Lab Record File', 'Creative Work (Model/Chart/Project)', 'Attendance', 'Viva Voce', 'TOTAL'];
   practicalHeaders.forEach((h, c) => {
     setCell(practicalSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)', wrap: true } });
   });
