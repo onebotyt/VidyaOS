@@ -41,6 +41,18 @@
   function showToast(message, type = 'info', duration = 3500) {
     if (!message) return;
     const container = getToastContainer();
+
+    // Prevent duplicate toast stacking & clear identical messages
+    const existingToasts = Array.from(container.querySelectorAll('.faculty-toast-item'));
+    existingToasts.forEach(item => {
+      if (item.textContent.trim() === message.trim()) {
+        item.remove();
+      }
+    });
+    if (existingToasts.length >= 2 && existingToasts[0]?.parentNode) {
+      existingToasts[0].remove();
+    }
+
     const toast = document.createElement('div');
     toast.className = `faculty-toast-item toast-${type}`;
 
