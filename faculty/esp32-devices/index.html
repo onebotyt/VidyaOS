@@ -60,16 +60,16 @@
               </select>
             </div>
             <button type="button" class="btn btn-primary btn-sm" id="btn-quick-register-bio" onclick="focusBiometricEnrollmentSection()" title="Register student fingerprint on ESP32">
-              👆 Register Biometric
+              + Register Biometric
             </button>
             <button type="button" class="btn btn-secondary btn-sm" id="btn-check-esp-connect" onclick="checkActiveEspConnection()" title="Ping active ESP32 node and verify link">
-              📡 Check ESP Connected
+              Check ESP Connected
             </button>
             <button type="button" class="btn btn-secondary btn-sm" id="btn-add-esp-terminal" onclick="openRegisterDeviceModal()">
               + Add ESP Terminal
             </button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="loadEsp32Overview()" title="Refresh telemetry">
-              ↻ Refresh
+              Refresh
             </button>
           </div>
         </div>
@@ -150,13 +150,13 @@
               <div class="esp-quick-badge" id="bio-slot-preview-pill">SLOT: AUTO (1..300)</div>
             </div>
 
-            <!-- Student Quick Selection & Details Row -->
-            <div class="esp-enroll-form-grid">
-              <div class="form-group" style="margin-bottom:0;">
+            <!-- Student Quick Selection & Details Row (Clean Stack, Zero Overflow) -->
+            <div class="esp-enroll-stack">
+              <div class="form-group" style="margin-bottom:0.25rem;">
                 <label class="esp-control-label" for="enroll-student-select">
                   Select Student to Register <span style="color:var(--status-absent);">*</span>
                 </label>
-                <select id="enroll-student-select" class="form-select form-select-sm" onchange="onSelectEnrollStudent(this.value)">
+                <select id="enroll-student-select" class="form-select form-select-sm" onchange="onSelectEnrollStudent(this.value)" style="width:100%;">
                   <option value="">Choose a student from roster...</option>
                 </select>
               </div>
@@ -208,13 +208,13 @@
 
               <div class="esp-scanner-actions">
                 <button type="button" class="btn btn-primary btn-sm" id="btn-enroll-selected-student" onclick="enrollCurrentSelectedStudent()" title="Trigger AS608 biometric enrollment on active ESP32">
-                  👆 Enroll Fingerprint on ESP32
+                  Enroll Fingerprint on ESP32
                 </button>
                 <button type="button" class="btn btn-secondary btn-sm" id="btn-simulate-test-scan" onclick="simulateCurrentSelectedStudent()" title="Simulate attendance verification scan">
-                  ✓ Test Scan
+                  Test Scan
                 </button>
                 <button type="button" class="btn btn-danger btn-sm" id="btn-remove-selected-bio" onclick="removeCurrentSelectedStudentTemplate()" style="display:none;" title="Delete fingerprint template from cloud vault">
-                  🗑️ Remove
+                  Remove
                 </button>
               </div>
             </div>
@@ -275,12 +275,12 @@
 
               <!-- Interactive Display Simulation Modes -->
               <div class="oled-sim-controls">
-                <button type="button" class="oled-sim-btn active" id="sim-btn-standby" onclick="setOledSimMode('standby')">🟢 Clock</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-success" onclick="setOledSimMode('success')">✅ Verified</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-fail" onclick="setOledSimMode('fail')">❌ Failed</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-unregistered" onclick="setOledSimMode('unregistered')">⚠️ Unregistered</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-enroll" onclick="setOledSimMode('enroll')">🔒 Enroll Mode</button>
-                <button type="button" class="oled-sim-btn" id="sim-btn-low_batt" onclick="setOledSimMode('low_batt')">🪫 Low Battery</button>
+                <button type="button" class="oled-sim-btn active" id="sim-btn-standby" onclick="setOledSimMode('standby')">Clock</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-success" onclick="setOledSimMode('success')">Verified</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-fail" onclick="setOledSimMode('fail')">Failed</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-unregistered" onclick="setOledSimMode('unregistered')">Not Registered</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-enroll" onclick="setOledSimMode('enroll')">Enroll Mode</button>
+                <button type="button" class="oled-sim-btn" id="sim-btn-low_batt" onclick="setOledSimMode('low_batt')">Low Battery</button>
               </div>
             </div>
           </aside>
@@ -289,16 +289,16 @@
         <!-- High-Density Horizontal Workspace Tabs -->
         <div class="esp-nav-tabs">
           <button type="button" class="esp-tab-btn active" id="tab-btn-vault" onclick="switchEspTab('vault')">
-            📇 Department Student Biometric Vault <span class="esp-tab-badge" id="badge-students-count">0</span>
+            Student Biometric Vault <span class="esp-tab-badge" id="badge-students-count">0</span>
           </button>
           <button type="button" class="esp-tab-btn" id="tab-btn-wifi" onclick="switchEspTab('wifi')">
-            📶 Wi-Fi &amp; Failover <span class="esp-tab-badge" id="badge-wifi-count">0</span>
+            Wi-Fi Networks &amp; Failover <span class="esp-tab-badge" id="badge-wifi-count">0</span>
           </button>
           <button type="button" class="esp-tab-btn" id="tab-btn-feed" onclick="switchEspTab('feed')">
-            ⚡ Live Attendance Feed <span class="esp-tab-badge online" id="badge-scans-count">LIVE</span>
+            Live Attendance Feed <span class="esp-tab-badge online" id="badge-scans-count">LIVE</span>
           </button>
           <button type="button" class="esp-tab-btn" id="tab-btn-logs" onclick="switchEspTab('logs')">
-            📋 Remote ESP32 System Logs
+            Remote ESP32 System Logs
           </button>
         </div>
 
@@ -369,7 +369,7 @@
             <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
               <button type="button" class="btn btn-secondary btn-sm" id="btn-scan-wifi"
                 onclick="triggerScanNearbyWifi()">
-                🔍 Scan Nearby Wi-Fi
+                Scan Nearby Wi-Fi
               </button>
               <button type="button" class="btn btn-primary btn-sm" id="btn-add-wifi-manual"
                 onclick="openAddWifiModal()">
@@ -377,10 +377,10 @@
               </button>
               <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi"
                 onclick="triggerWifiFallback()">
-                🔄 Fallback Default Wi-Fi
+                Fallback Default Wi-Fi
               </button>
               <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()">
-                ⚠️ Emergency Reset
+                Emergency Reset
               </button>
             </div>
           </div>
@@ -449,7 +449,7 @@
                 <option value="WARN">WARN</option>
                 <option value="ERROR">ERROR</option>
               </select>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="loadDeviceRemoteLogs()" title="Refresh logs from cloud">↻ Refresh</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadDeviceRemoteLogs()" title="Refresh logs from cloud">Refresh</button>
               <button type="button" class="btn btn-secondary btn-sm" onclick="clearDeviceRemoteLogs()" title="Clear remote logs">Clear</button>
               <span class="esp-status-pill online" id="esp-log-status-pill">● LIVE CLOUD FEED</span>
             </div>
@@ -495,13 +495,13 @@
           <span class="esp-detect-stat-text" id="esp-detect-stat-text">0% &bull; Initializing RF receiver...</span>
           <div class="esp-detect-actions">
             <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-rescan"
-              onclick="startEspDetectionScan()" style="display:none; font-size:0.75rem; padding:0.2rem 0.55rem;">↻ Rescan</button>
+              onclick="startEspDetectionScan()" style="display:none; font-size:0.75rem; padding:0.2rem 0.55rem;">Rescan</button>
             <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-usb"
               onclick="detectViaWebSerial()" style="font-size:0.75rem; padding:0.2rem 0.55rem;"
-              title="Detect ESP32 connected via USB cable">🔌 USB Serial</button>
+              title="Detect ESP32 connected via USB cable">USB Serial</button>
             <button type="button" class="btn btn-secondary btn-sm" id="btn-esp-detect-sim"
               onclick="simulateEspDetection()" style="font-size:0.75rem; padding:0.2rem 0.55rem;"
-              title="Detect nearby ESP32 node immediately">⚡ Detect Now</button>
+              title="Detect nearby ESP32 node immediately">Detect Now</button>
           </div>
         </div>
 
@@ -609,7 +609,7 @@
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
         <span style="font-size:0.76rem; font-weight:700; color:var(--text-muted);">DETECTED ACCESS POINTS:</span>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerScanNearbyWifi(true)">↻ Rescan</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerScanNearbyWifi(true)">Rescan</button>
       </div>
 
       <div id="scanned-wifi-list" class="scanned-wifi-grid">

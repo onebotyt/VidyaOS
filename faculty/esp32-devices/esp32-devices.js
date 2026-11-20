@@ -235,7 +235,7 @@ function setOledSimMode(mode) {
 
     case 'low_batt':
       updateOledScreen({
-        statusLeft: '⚠️ LOW BATTERY',
+        statusLeft: 'LOW BATTERY',
         statusRight: '14% 6.68V',
         headline: '! LOW BATTERY !',
         line1: '[█░░░] 14% (6.68V)',
@@ -363,7 +363,7 @@ function renderLoadError(msg) {
       <div class="esp-empty-box" style="border-color:var(--status-absent, #dc2626);">
         <div style="font-weight:700; font-size:0.95rem; margin-bottom:0.35rem; color:var(--status-absent, #dc2626);">Unable to Load Department ESP32 Data</div>
         <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.85rem;">${escHtml(msg || 'Server did not respond with device telemetry.')}</div>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="loadEsp32Overview()">↻ Retry Loading</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadEsp32Overview()">Retry Loading</button>
       </div>
     `;
   }
@@ -535,10 +535,10 @@ function renderDevicesList(devices) {
             </div>
           </div>
           <div style="display:flex; gap:0.35rem; flex-wrap:wrap;">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); checkDeviceConnection(${d.id})" title="Ping ESP32 node and check live connection">📡 Ping</button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openOtaUpdateModal(${d.id})" title="Wireless Over-The-Air firmware update">⚡ OTA</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); checkDeviceConnection(${d.id})" title="Ping ESP32 node and check live connection">Ping</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openOtaUpdateModal(${d.id})" title="Wireless Over-The-Air firmware update">OTA</button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showEspConfigModal(${d.id})" title="View C++ config.h for this ESP32">config.h</button>
-            <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); triggerTemplateSyncToDevice(${d.id})" title="Push all stored student templates from MySQL to this ESP32">↻ Sync Templates</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); triggerTemplateSyncToDevice(${d.id})" title="Push all stored student templates from MySQL to this ESP32">Sync Templates</button>
           </div>
         </div>
 
@@ -571,7 +571,7 @@ async function checkDeviceConnection(deviceId) {
     const btn = event?.currentTarget;
     if (btn) {
       btn.disabled = true;
-      btn.textContent = '⏳ Pinging...';
+      btn.textContent = 'Pinging...';
     }
     const t0 = performance.now();
     const res = await fetchApi(`/devices/hod/${deviceId}/ping`);
@@ -579,7 +579,7 @@ async function checkDeviceConnection(deviceId) {
 
     if (btn) {
       btn.disabled = false;
-      btn.textContent = '📡 Ping';
+      btn.textContent = 'Ping';
     }
 
     if (!res || !res.success || !res.data) {
@@ -622,12 +622,12 @@ async function checkActiveEspConnection() {
   const btn = document.getElementById('btn-check-esp-connect');
   if (btn) {
     btn.disabled = true;
-    btn.textContent = '⏳ Checking...';
+    btn.textContent = 'Checking...';
   }
   await checkDeviceConnection(targetId);
   if (btn) {
     btn.disabled = false;
-    btn.textContent = '📡 Check ESP Connected';
+    btn.textContent = 'Check ESP Connected';
   }
 }
 window.checkActiveEspConnection = checkActiveEspConnection;
@@ -680,7 +680,7 @@ async function submitOtaUpdate(e) {
   const btn = document.getElementById('btn-submit-ota');
   if (btn) {
     btn.disabled = true;
-    btn.textContent = '⏳ Queuing OTA Update...';
+    btn.textContent = 'Queuing OTA Update...';
   }
 
   try {
@@ -756,7 +756,7 @@ function renderStudentsBiometricTable() {
         <td data-label="Cloud Template">
           ${isEnrolled ? `
             <div style="display:flex; flex-direction:column; gap:2px;">
-              <span class="esp-status-pill online" style="width:fit-content;">✓ 512B TEMPLATE STORED</span>
+              <span class="esp-status-pill online" style="width:fit-content;">512B TEMPLATE STORED</span>
               <span style="font-family:var(--font-family-mono); font-size:0.68rem; color:var(--text-muted);" title="Portable SHA-256: ${escHtml(st.template_sha256 || '')}">SHA256: ${escHtml(shaShort)}</span>
             </div>
           ` : `
@@ -766,17 +766,17 @@ function renderStudentsBiometricTable() {
         <td data-label="Actions" style="text-align:right;">
           <div style="display:inline-flex; gap:0.35rem; flex-wrap:wrap; justify-content:flex-end;">
             <button type="button" class="btn btn-primary btn-sm" onclick="selectStudentForEnrollment(${st.student_id})" title="Select student in Registration Station and trigger AS608 biometric enrollment">
-              👆 Enroll Biometric
+              Enroll Biometric
             </button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="simulateStudentBiometric(${st.student_id}, 'ENROLL_TEMPLATE')" title="Capture & encrypt 512-byte AS608 template into MySQL">
               ${isEnrolled ? 'Update Template' : 'Capture Template'}
             </button>
             ${isEnrolled ? `
               <button type="button" class="btn btn-secondary btn-sm" style="border-color:var(--status-present); color:var(--status-present);" onclick="simulateStudentBiometric(${st.student_id}, 'MARK_ATTENDANCE')" title="Test attendance scan & OLED display for this student">
-                ✓ Test Scan
+                Test Scan
               </button>
               <button type="button" class="btn btn-danger btn-sm" onclick="removeStudentCloudTemplate(${st.student_id}, '${escHtml(st.full_name)}', '${st.class_roll_no || ''}')" title="Remove student biometric template from cloud vault & ESP32 hardware slots">
-                🗑️ Remove
+                Remove
               </button>
             ` : ''}
           </div>
@@ -796,7 +796,7 @@ function populateEnrollStudentSelect() {
   sel.innerHTML = `<option value="">Choose a student from roster (${students.length} total)...</option>` +
     students.map(s => {
       const isEnrolled = s.biometric_status === 'ENROLLED';
-      const tag = isEnrolled ? '✅ Enrolled' : '⚠️ Pending';
+      const tag = isEnrolled ? 'Enrolled' : 'Pending';
       const roll = s.class_roll_no ? `#${s.class_roll_no}` : (s.official_enrollment_no || 'No Roll');
       return `<option value="${s.student_id}">[${tag}] ${roll} - ${escHtml(s.full_name)} (Yr ${s.year || 1} Sem ${s.semester || 1})</option>`;
     }).join('');
@@ -850,10 +850,10 @@ function onSelectEnrollStudent(studentId) {
   if (statusPill) {
     if (isEnrolled) {
       statusPill.className = 'esp-status-pill online';
-      statusPill.textContent = '✓ ENROLLED (512B AS608)';
+      statusPill.textContent = 'ENROLLED (512B AS608)';
     } else {
       statusPill.className = 'esp-status-pill offline';
-      statusPill.textContent = '⚠️ NOT ENROLLED';
+      statusPill.textContent = 'NOT ENROLLED';
     }
   }
 
@@ -1433,7 +1433,7 @@ async function submitRegisterEspDevice(e) {
   const btn = document.getElementById('btn-submit-pair-esp');
   if (btn) {
     btn.disabled = true;
-    btn.textContent = '⏳ Pairing Terminal...';
+    btn.textContent = 'Pairing Terminal...';
   }
 
   try {
@@ -1597,10 +1597,10 @@ async function loadDeviceWifiNetworks(deviceId) {
             <span class="wifi-security-badge ${net.encryption_type !== 'OPEN' ? 'secure' : ''}">${escHtml(net.encryption_type || 'WPA2_PSK')}</span>
           </td>
           <td data-label="Signal">
-            <span class="wifi-signal-pill ${signalClass}">📶 ${rssi} dBm</span>
+            <span class="wifi-signal-pill ${signalClass}">${rssi} dBm</span>
           </td>
           <td data-label="Default Status">
-            ${isDef ? `<span class="esp-status-pill online">★ PRIMARY DEFAULT</span>` : `<span class="esp-status-pill offline">SECONDARY</span>`}
+            ${isDef ? `<span class="esp-status-pill online">PRIMARY DEFAULT</span>` : `<span class="esp-status-pill offline">SECONDARY</span>`}
           </td>
           <td data-label="Added On">
             <span style="font-size:0.75rem; color:var(--text-muted);">${net.created_at ? new Date(net.created_at).toLocaleDateString('en-IN') : '—'}</span>
@@ -1609,7 +1609,7 @@ async function loadDeviceWifiNetworks(deviceId) {
             <div style="display:inline-flex; gap:0.35rem; justify-content:flex-end;">
               ${!isDef ? `<button type="button" class="btn btn-secondary btn-sm" onclick="setWifiAsDefault(${net.id})" title="Set as default failover network">Set Default</button>` : ''}
               <button type="button" class="btn btn-primary btn-sm" onclick="switchDeviceWifiTo(${net.id}, '${escHtml(net.ssid)}')" title="Switch ESP32 to this network immediately">Switch Now</button>
-              <button type="button" class="btn btn-danger btn-sm" onclick="deleteWifiNetwork(${net.id}, '${escHtml(net.ssid)}')" title="Remove Wi-Fi credentials">✕</button>
+              <button type="button" class="btn btn-danger btn-sm" onclick="deleteWifiNetwork(${net.id}, '${escHtml(net.ssid)}')" title="Remove Wi-Fi credentials">Remove</button>
             </div>
           </td>
         </tr>
@@ -1733,7 +1733,7 @@ function renderScannedWifiList(scans) {
         </div>
         <div style="display:flex; align-items:center; gap:0.4rem;">
           <span class="wifi-security-badge ${!isOpen ? 'secure' : ''}">${escHtml(authType)}</span>
-          <span class="wifi-signal-pill ${signalClass}">📶 ${rssi} dBm</span>
+          <span class="wifi-signal-pill ${signalClass}">${rssi} dBm</span>
           <button type="button" class="btn btn-secondary btn-sm" style="padding:0.18rem 0.48rem;" onclick="event.stopPropagation(); selectScannedWifi('${escHtml(sc.ssid)}')">Select</button>
         </div>
       </div>

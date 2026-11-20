@@ -2,7 +2,7 @@
    OFFICE STUDIO: AUTO-FIT COLUMNS & SCREEN-FIT DISTRIBUTION
    Intelligently proportions columns so institutional sheets & imported
    sheets fit 100% within the user's viewport without horizontal scrolling,
-   anchored to the LAST COLUMN THAT CONTAINS DATA (e.g. Grand Total).
+   anchored to the LAST COLUMN THAT CONTAINS DATA (e.g. Grand Total or Test Details).
    ══════════════════════════════════════════════════════════════ */
 
 function getCellColSpan(sheet, r, c) {
@@ -57,12 +57,15 @@ function autoFitSheetColumns(sheet, force = false) {
     document.querySelector('.excel-grid-workspace') ||
     document.getElementById('sheets-viewport');
   const screenW = container && container.clientWidth > 300 ? container.clientWidth : (typeof window !== 'undefined' ? window.innerWidth - 80 : 1200);
-  // Subtract row header (index column ~44px) + vertical scrollbar/padding cushion (~16px)
-  const availWidth = Math.max(screenW - 58, 640);
+  // Row headers (index numbers A, B, C... / 1, 2, 3...) take 44px + 14px cushion
+  const availWidth = Math.max(screenW - 58, 600);
 
   // 2. Dynamically find the LAST COLUMN THAT HAS DATA across all rows
   const lastDataCol = findLastDataColumn(sheet);
   const activeColCount = Math.max(1, lastDataCol + 1);
+
+  // Strictly constrain sheet.colsCount to the active columns with data so phantom empty columns are never rendered
+  sheet.colsCount = activeColCount;
 
   // 3. Compute base & minimum widths for every active column
   const fixedWidthCols = new Set();
@@ -70,7 +73,7 @@ function autoFitSheetColumns(sheet, force = false) {
   const minWidths = new Array(activeColCount).fill(48);
 
   for (let c = 0; c < activeColCount; c++) {
-    // Detect column header content to check for Total / Grand Total
+    // Detect column header content to check for Total / Grand Total / Details
     let colHeaderStr = '';
     for (let r = 0; r <= 2; r++) {
       const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
@@ -105,12 +108,16 @@ function autoFitSheetColumns(sheet, force = false) {
       minWidths[c] = 130;
     } else {
       // Questions / Marks / Tests / Custom columns
-      if (colHeaderStr.includes('UNIT TEST DETAILS') || colHeaderStr.includes('QUESTION') || colHeaderStr.includes('INSTRUCTION')) {
-        baseWidths[c] = 160;
-        minWidths[c] = 120;
+      if (colHeaderStr.includes('UNIT TEST DETAILS') || colHeaderStr.includes('INSTRUCTION') || colHeaderStr.includes('QUESTION')) {
+        baseWidths[c] = 300; // Room for question statements and instructions
+        minWidths[c] = 180;
       } else if (colHeaderStr.includes('ATTENDANCE') || colHeaderStr.includes('VIVA')) {
         baseWidths[c] = 56;
         minWidths[c] = 50;
+      } else if (colHeaderStr.includes('1') || colHeaderStr.includes('2') || colHeaderStr.includes('3') || colHeaderStr.includes('4')) {
+        // Individual test questions Q1..Q4
+        baseWidths[c] = 48;
+        minWidths[c] = 42;
       } else {
         baseWidths[c] = 68; // Assignment, UTs Total, Problem Solving, Lab Record, Creative Work
         minWidths[c] = 54;
@@ -125,21 +132,29 @@ function autoFitSheetColumns(sheet, force = false) {
   }
 
   // 5. Intelligent Screen-Fit Distribution:
-  // If screen has extra room: Expand scalable columns (Student Name gets highest weight).
+  // If screen has extra room: Expand scalable columns (Student Name & Details get highest weight).
   // If screen is tighter: Scale down scalable columns towards minWidths.
   // In BOTH cases: Strictly preserve TOTAL = 63px and GRAND TOTAL = 65px!
   if (availWidth >= totalBaseWidth) {
     const extra = availWidth - totalBaseWidth;
     const scalableCols = [];
+    let hasDetailsCol = false;
+    let detailsColIdx = -1;
+
     for (let c = 0; c < activeColCount; c++) {
       if (!fixedWidthCols.has(c)) {
         scalableCols.push(c);
+        if (baseWidths[c] >= 200) {
+          hasDetailsCol = true;
+          detailsColIdx = c;
+        }
       }
     }
 
     const hasNameCol = activeColCount > 4 && !fixedWidthCols.has(4);
-    const nameExtra = hasNameCol ? Math.floor(extra * 0.30) : 0;
-    const remainingExtra = extra - nameExtra;
+    const nameExtra = hasNameCol ? Math.floor(extra * 0.25) : 0;
+    const detailsExtra = hasDetailsCol ? Math.floor(extra * 0.35) : 0;
+    const remainingExtra = extra - nameExtra - detailsExtra;
     const perColExtra = scalableCols.length > 0 ? Math.floor(remainingExtra / scalableCols.length) : 0;
 
     for (let c = 0; c < activeColCount; c++) {
@@ -147,6 +162,8 @@ function autoFitSheetColumns(sheet, force = false) {
         sheet.colWidths[c] = baseWidths[c]; // Strictly 63px or 65px
       } else if (c === 4 && hasNameCol) {
         sheet.colWidths[c] = baseWidths[c] + nameExtra + perColExtra;
+      } else if (c === detailsColIdx && hasDetailsCol) {
+        sheet.colWidths[c] = baseWidths[c] + detailsExtra + perColExtra;
       } else {
         sheet.colWidths[c] = baseWidths[c] + perColExtra;
       }
@@ -182,16 +199,17 @@ function autoFitSheetColumns(sheet, force = false) {
     }
   }
 
-  // 6. Unused columns beyond lastDataCol get a compact default width
-  const totalCols = sheet.colsCount || 26;
-  for (let c = activeColCount; c < totalCols; c++) {
-    sheet.colWidths[c] = 50;
+  // 6. Delete any lingering column widths beyond activeColCount
+  for (const k of Object.keys(sheet.colWidths)) {
+    if (Number(k) >= activeColCount) {
+      delete sheet.colWidths[k];
+    }
   }
 
   // 7. Update DOM <th> elements directly if table header is present
   const thead = document.getElementById('excel-thead');
   if (thead) {
-    for (let c = 0; c < totalCols; c++) {
+    for (let c = 0; c < activeColCount; c++) {
       const th = thead.querySelector(`.col-th-${c}`);
       if (th && sheet.colWidths[c]) {
         const w = sheet.colWidths[c];
@@ -208,10 +226,37 @@ function triggerFitColumnsToScreen() {
 
   if (typeof pushUndoState === 'function') pushUndoState('Fit Columns to Screen');
 
+  // 1. Reset zoom to 100% so columns calculate against true viewport coordinates
+  if (typeof setSheetZoom === 'function') {
+    setSheetZoom(1.0);
+  }
+
+  // 2. Perform intelligent column width auto-fit up to last data column
   autoFitSheetColumns(sheet, true); // force = true so it works on all sheets
 
+  // 3. Full structural re-render to apply new column count and <th> widths in DOM
   if (typeof renderExcelGrid === 'function') {
-    renderExcelGrid(true); // Full structural re-render to apply <th> and <col> widths in DOM
+    renderExcelGrid(true);
+  }
+
+  // 4. Scroll container all the way to the left
+  const container = document.getElementById('excel-grid-workspace');
+  if (container) {
+    container.scrollLeft = 0;
+  }
+
+  // 5. If table is still slightly wider than viewport (e.g. low-res screen / high Windows DPI scaling):
+  // Automatically adjust zoom scale so the entire sheet fits without horizontal scroll
+  const table = document.getElementById('excel-grid-table');
+  if (container && table) {
+    const tableWidth = table.offsetWidth || table.scrollWidth;
+    const containerWidth = container.clientWidth;
+    if (tableWidth > containerWidth && containerWidth > 300) {
+      const fitZoom = Math.max(0.4, Math.min(1.0, Math.floor((containerWidth / tableWidth) * 100) / 100));
+      if (typeof setSheetZoom === 'function') {
+        setSheetZoom(fitZoom);
+      }
+    }
   }
 }
 

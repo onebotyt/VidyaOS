@@ -6362,7 +6362,7 @@ function renderExcelGrid(rebuildStructure = true) {
   const tbody = document.getElementById('excel-tbody');
   if (!thead || !tbody || !sheet) return;
 
-  const cols = Math.max(sheet.colsCount || 26, 20);
+  const cols = sheet.colsCount || (typeof findLastDataColumn === 'function' ? Math.max(findLastDataColumn(sheet) + 1, 16) : 16);
   const rows = Math.max(sheet.rowsCount || 50, 40);
 
   // Compute lookup map of merged cells for rowspan / colspan & absorbed cell skipping
