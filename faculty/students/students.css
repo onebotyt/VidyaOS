@@ -2037,51 +2037,71 @@ button:disabled.btn-disabled-loading,
 
 @media (max-width: 640px) {
   .stu-modal-backdrop {
-    padding: 0.5rem;
+    padding: max(0.65rem, env(safe-area-inset-top)) 0.5rem max(0.65rem, env(safe-area-inset-bottom)) 0.5rem !important;
+    align-items: flex-start !important;
+    z-index: 100100 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
-  .stu-edit-modal-card {
-    max-width: 100%;
-    border-radius: 16px;
+  .stu-edit-modal-card,
+  .stu-detail-modal-card,
+  .stu-modal-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: calc(100dvh - 1.25rem) !important;
+    max-height: calc(100vh - 1.25rem) !important;
+    border-radius: 18px !important;
+    margin: auto 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
   }
 
+  .stu-modal-header,
   .stu-edit-header {
-    padding: 0.75rem 0.95rem 0.5rem 0.95rem;
+    padding: 0.75rem 0.95rem 0.5rem 0.95rem !important;
+    flex-shrink: 0 !important;
   }
 
   .stu-modal-tabs {
-    padding: 0.35rem 0.95rem 0.55rem 0.95rem;
-    gap: 0.4rem;
+    padding: 0.35rem 0.95rem 0.55rem 0.95rem !important;
+    gap: 0.4rem !important;
+    flex-shrink: 0 !important;
   }
 
+  .stu-modal-body,
   .stu-edit-form {
-    padding: 0.75rem 0.95rem 0.95rem 0.95rem;
-    gap: 0.65rem;
+    padding: 0.75rem 0.95rem 0.95rem 0.95rem !important;
+    gap: 0.65rem !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .stu-edit-identity-row {
-    padding: 0.55rem 0.75rem;
-    gap: 0.65rem;
+    padding: 0.55rem 0.75rem !important;
+    gap: 0.65rem !important;
   }
 
   .stu-edit-bottom-row {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
   }
 
-  .stu-edit-bottom-row > div:first-child {
-    grid-column: span 2;
-  }
-
+  .stu-modal-footer,
   .stu-edit-footer {
-    gap: 0.5rem;
+    gap: 0.5rem !important;
+    flex-shrink: 0 !important;
   }
 
   .btn-stu-compact-cancel {
-    flex: 1;
+    flex: 1 !important;
   }
 
   .btn-stu-compact-save {
-    flex: 1.4;
+    flex: 1.4 !important;
   }
 }
