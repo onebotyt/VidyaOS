@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
-  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261121f">
+  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261121g">
   <script>
     (function () {
       try {
@@ -275,30 +275,74 @@
                 </div>
               </div>
 
-              <!-- Progress bar & Live Step Tracker -->
-              <div class="esp-scanner-status-content" style="margin-top:0.4rem;">
-                <div class="esp-scanner-step-tracker">
-                  <span class="step-pill active" id="step-pill-1">1. Pick</span>
-                  <span class="step-arrow">&rarr;</span>
-                  <span class="step-pill" id="step-pill-2">2. Touch AS608</span>
-                  <span class="step-arrow">&rarr;</span>
-                  <span class="step-pill" id="step-pill-3">3. Cloud Stored</span>
+              <!-- Biometric Enrollment Workflow Stepper & Actions Box -->
+              <div class="esp-enroll-workflow-box esp-scanner-status-content">
+                <!-- Segmented Stepper -->
+                <div class="esp-scanner-step-tracker" role="list" aria-label="Biometric Enrollment Workflow">
+                  <div class="step-pill active" id="step-pill-1" role="listitem">
+                    <span class="step-num">1</span>
+                    <span class="step-label">Pick Student</span>
+                  </div>
+                  <div class="step-connector" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
+                  <div class="step-pill" id="step-pill-2" role="listitem">
+                    <span class="step-num">2</span>
+                    <span class="step-label">Touch AS608</span>
+                  </div>
+                  <div class="step-connector" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
+                  <div class="step-pill" id="step-pill-3" role="listitem">
+                    <span class="step-num">3</span>
+                    <span class="step-label">Cloud Stored</span>
+                  </div>
                 </div>
-                <div class="esp-scanner-msg" id="bio-scanner-msg">
-                  Select a student and click <strong>"Enroll Fingerprint"</strong>. Terminal chimes and waits for finger touch.
-                </div>
-              </div>
 
-              <div class="esp-scanner-actions" style="margin-top:0.5rem;">
-                <button type="button" class="btn btn-primary btn-sm" id="btn-enroll-selected-student" onclick="enrollCurrentSelectedStudent()" title="Trigger AS608 biometric enrollment on active ESP32">
-                  Enroll Fingerprint on ESP32
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-simulate-test-scan" onclick="simulateCurrentSelectedStudent()" title="Simulate attendance verification scan">
-                  Test Scan
-                </button>
-                <button type="button" class="btn btn-danger btn-sm" id="btn-remove-selected-bio" onclick="removeCurrentSelectedStudentTemplate()" style="display:none;" title="Delete fingerprint template from cloud vault">
-                  Remove
-                </button>
+                <!-- Modern Assistant Guidance Callout -->
+                <div class="esp-scanner-callout" id="bio-scanner-callout">
+                  <div class="esp-callout-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                  </div>
+                  <div class="esp-scanner-msg" id="bio-scanner-msg">
+                    Select a student and click <strong>"Enroll Fingerprint"</strong>. Terminal chimes and waits for finger touch.
+                  </div>
+                </div>
+
+                <!-- Action Buttons Row -->
+                <div class="esp-scanner-actions">
+                  <button type="button" class="btn btn-primary btn-sm esp-btn-enroll" id="btn-enroll-selected-student" onclick="enrollCurrentSelectedStudent()" title="Trigger AS608 biometric enrollment on active ESP32">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 2a10 10 0 0 0-10 10c0 3.3 1.6 6.2 4.1 8"></path>
+                      <path d="M12 6a6 6 0 0 0-6 6c0 1.9.9 3.6 2.3 4.7"></path>
+                      <path d="M12 10a2 2 0 0 0-2 2c0 .8.4 1.5 1 1.9"></path>
+                      <path d="M17.5 19.5c.3-.5.5-1.1.5-1.7 0-3.3-2.7-6-6-6"></path>
+                      <path d="M22 12c0-5.5-4.5-10-10-10"></path>
+                    </svg>
+                    <span>Enroll Fingerprint on ESP32</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm esp-btn-test-scan" id="btn-simulate-test-scan" onclick="simulateCurrentSelectedStudent()" title="Simulate attendance verification scan">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Test Scan</span>
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm esp-btn-remove-bio" id="btn-remove-selected-bio" onclick="removeCurrentSelectedStudentTemplate()" style="display:none;" title="Delete fingerprint template from cloud vault">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Remove</span>
+                  </button>
+                </div>
               </div>
             </section>
           </div>
@@ -768,7 +812,7 @@
   <script src="/faculty/components/faculty-ui.js?v=20261116"></script>
   <script src="/faculty/components/header/header.js?v=20261116"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
-  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261121f"></script>
+  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261121g"></script>
 </body>
 
 </html>

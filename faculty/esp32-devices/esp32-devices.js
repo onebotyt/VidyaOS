@@ -847,6 +847,7 @@ function onSelectEnrollStudent(studentId) {
   const statusPill = document.getElementById('enroll-chip-status-pill');
   const removeBtn = document.getElementById('btn-remove-selected-bio');
   const msgEl = document.getElementById('bio-scanner-msg');
+  const calloutEl = document.getElementById('bio-scanner-callout');
   const visualBox = document.getElementById('bio-scanner-visual-box');
   const step1 = document.getElementById('step-pill-1');
   const step2 = document.getElementById('step-pill-2');
@@ -862,6 +863,13 @@ function onSelectEnrollStudent(studentId) {
     }
     if (removeBtn) removeBtn.style.display = 'none';
     if (visualBox) visualBox.className = 'esp-hardware-bezel';
+    if (calloutEl) calloutEl.className = 'esp-scanner-callout';
+    if (step1) step1.className = 'step-pill active';
+    if (step2) step2.className = 'step-pill';
+    if (step3) step3.className = 'step-pill';
+    if (msgEl) {
+      msgEl.innerHTML = 'Select a student and click <strong>"Enroll Fingerprint"</strong>. Terminal chimes and waits for finger touch.';
+    }
     return;
   }
 
@@ -891,8 +899,12 @@ function onSelectEnrollStudent(studentId) {
   }
 
   if (step1) step1.className = 'step-pill completed';
-  if (step2) step2.className = 'step-pill';
+  if (step2) step2.className = isEnrolled ? 'step-pill completed' : 'step-pill active';
   if (step3) step3.className = isEnrolled ? 'step-pill completed' : 'step-pill';
+
+  if (calloutEl) {
+    calloutEl.className = `esp-scanner-callout ${isEnrolled ? 'success' : ''}`;
+  }
 
   if (visualBox) {
     visualBox.className = `esp-hardware-bezel ${isEnrolled ? 'success' : ''}`;
@@ -944,12 +956,16 @@ async function enrollCurrentSelectedStudent() {
 
   const visualBox = document.getElementById('bio-scanner-visual-box');
   const msgEl = document.getElementById('bio-scanner-msg');
+  const calloutEl = document.getElementById('bio-scanner-callout');
   const step2 = document.getElementById('step-pill-2');
   const step3 = document.getElementById('step-pill-3');
 
   if (visualBox) {
     visualBox.classList.remove('success');
     visualBox.classList.add('scanning');
+  }
+  if (calloutEl) {
+    calloutEl.className = 'esp-scanner-callout scanning';
   }
   if (step2) step2.classList.add('active');
   if (step3) step3.classList.remove('active');
