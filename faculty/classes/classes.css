@@ -1087,7 +1087,7 @@
 /* ── 12. Strict Mobile Responsive Adaptations (Zero Overflow & Native UX) ── */
 @media (max-width: 768px) {
   .classes-container {
-    padding: 0.65rem 0.75rem calc(88px + env(safe-area-inset-bottom, 0px));
+    padding: 0.45rem 0.75rem calc(88px + env(safe-area-inset-bottom, 0px)) !important;
     overflow-x: hidden;
   }
 
