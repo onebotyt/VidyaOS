@@ -997,7 +997,7 @@ async function removeCurrentSelectedStudentTemplate() {
 }
 
 function switchEspTab(tabName) {
-  const tabs = ['vault', 'wifi', 'feed', 'logs'];
+  const tabs = ['vault', 'feed', 'logs'];
   tabs.forEach(t => {
     const btn = document.getElementById(`tab-btn-${t}`);
     const panel = document.getElementById(`panel-${t}`);
@@ -1636,7 +1636,7 @@ async function loadDeviceWifiNetworks(deviceId) {
           </div>
         `;
       } else {
-        cardList.innerHTML = networks.slice(0, 4).map(net => {
+        cardList.innerHTML = networks.map(net => {
           const isDef = Boolean(net.is_default);
           const rssi = net.last_rssi != null ? net.last_rssi : -65;
           const bars = rssi > -60 ? 4 : rssi > -70 ? 3 : rssi > -80 ? 2 : 1;
@@ -1650,7 +1650,7 @@ async function loadDeviceWifiNetworks(deviceId) {
                   ${isDef ? `<span class="esp-status-pill online" style="font-size:0.58rem; padding:0.05rem 0.3rem;">DEFAULT</span>` : ''}
                 </div>
               </div>
-              <div style="display:inline-flex; align-items:center; gap:0.5rem;">
+              <div style="display:inline-flex; align-items:center; gap:0.35rem;">
                 <div class="esp-wifi-signal-bars" title="${rssi} dBm">
                   <span class="bar bar-1 ${bars >= 1 ? 'active' : ''}"></span>
                   <span class="bar bar-2 ${bars >= 2 ? 'active' : ''}"></span>
@@ -1658,16 +1658,11 @@ async function loadDeviceWifiNetworks(deviceId) {
                   <span class="bar bar-4 ${bars >= 4 ? 'active' : ''}"></span>
                 </div>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="switchDeviceWifiTo(${net.id}, '${escHtml(net.ssid)}')" title="Connect/Switch to this network" style="padding:0.18rem 0.45rem; font-size:0.7rem;">Connect</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteWifiNetwork(${net.id}, '${escHtml(net.ssid)}')" title="Remove Wi-Fi credentials" style="padding:0.18rem 0.35rem; font-size:0.7rem; line-height:1;">&times;</button>
               </div>
             </div>
           `;
-        }).join('') + (networks.length > 4 ? `
-          <div style="text-align:center; padding-top:0.15rem;">
-            <button type="button" class="btn btn-link btn-sm" onclick="switchEspTab('wifi')" style="font-size:0.7rem; color:var(--color-primary); cursor:pointer;">
-              View all ${networks.length} networks &rarr;
-            </button>
-          </div>
-        ` : '');
+        }).join('');
       }
     }
 
