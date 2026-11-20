@@ -231,176 +231,181 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
-       MOBILE VIEW (Smartphones <= 768px: UGIP Nainital Design)
+       MOBILE VIEW (Smartphones <= 768px: Modern Edu Theme)
        ══════════════════════════════════════════════════════════ -->
   <div id="mobile-login-view" class="mobile-login-layout">
-    <div class="m-background"></div>
 
-    <main class="m-page">
-      <div class="m-container">
+    <!-- ── 1. WELCOME / SPLASH SCREEN VIEW ── -->
+    <div id="m-splash-view" class="m-splash-screen" style="display: none;">
+      <div class="m-splash-backdrop">
+        <div class="m-splash-wave-1"></div>
+        <div class="m-splash-wave-2"></div>
+      </div>
+      <div class="m-splash-center">
+        <div class="m-splash-icon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14.5A4.5 4.5 0 0 1 8.5 10H22v26H8.5A4.5 4.5 0 0 0 4 40.5V14.5Z"/>
+            <path d="M44 14.5A4.5 4.5 0 0 0 39.5 10H26v26h13.5a4.5 4.5 0 0 1 4.5 4.5V14.5Z"/>
+            <line x1="22" y1="10" x2="26" y2="10"/>
+            <line x1="22" y1="36" x2="26" y2="36"/>
+          </svg>
+        </div>
+        <h1 class="m-splash-title">Vidya<span>OS</span></h1>
+        <p class="m-splash-sub">Institutional Campus &amp; Academic Operating System</p>
+      </div>
+      <div class="m-splash-bottom-card">
+        <h2 class="m-splash-card-heading">Enjoy Your Education at Your Fingertips !</h2>
+        <button type="button" class="m-btn-get-started" onclick="showMobileLoginView()">Get Started</button>
+        <a href="/login/register/index.html" class="m-btn-splash-signup">New Here ? <strong>Sign Up</strong></a>
+      </div>
+    </div>
 
-        <!-- BRAND HEADER -->
-        <header class="m-header">
-          <div class="m-logo">
-            <svg viewBox="0 0 48 48" fill="none">
-              <path d="M4 17.5L24 7L44 17.5L24 28L4 17.5Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
-              <path d="M11 22V32L24 39L37 32V22" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
-              <path d="M44 18V32" stroke="currentColor" stroke-width="3"/>
-              <circle cx="44" cy="35" r="2.5" fill="currentColor"/>
+    <!-- ── 2. LOGIN SCREEN VIEW ── -->
+    <div id="m-login-view" class="m-login-screen">
+      <!-- Blue Curved Wave Header -->
+      <header class="m-blue-header">
+        <div class="m-header-nav">
+          <div class="m-header-inst-tag">UGIP Nainital</div>
+          <button type="button" class="m-back-circle-btn" onclick="handleMobileBack()" aria-label="Go back" title="Go back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
-          </div>
-          <div class="m-brand">
-            <div class="m-brand-name">VidyaOS</div>
-            <div class="m-brand-subtitle">
-              Institutional Campus &amp;<br>
-              Academic Operating System
+          </button>
+        </div>
+        <div class="m-header-text">
+          <h1 class="m-login-title">Log In</h1>
+          <p class="m-login-subtitle">Experience a better learning environment</p>
+        </div>
+        <!-- Organic liquid wave transition -->
+        <div class="m-header-wave-svg">
+          <svg viewBox="0 0 375 56" fill="none" preserveAspectRatio="none">
+            <path d="M0,0 C90,45 180,56 270,30 C320,16 350,22 375,34 L375,56 L0,56 Z" fill="#ffffff" opacity="0.3"/>
+            <path d="M0,12 C100,50 200,48 290,20 C330,8 360,14 375,22 L375,56 L0,56 Z" fill="#ffffff"/>
+          </svg>
+        </div>
+      </header>
+
+      <!-- VidyaOS Custom Vector Graphic Illustration -->
+      <div class="m-illustration-container">
+        <img src="/login/images/login-illustration.svg" alt="VidyaOS Academic & Analytics Ecosystem" class="m-illustration-img">
+      </div>
+
+      <!-- Main Form Section -->
+      <div class="m-form-container">
+        <form id="mobile-login-form" novalidate autocomplete="on">
+          <!-- EMAIL / IDENTIFIER -->
+          <div class="m-field-group">
+            <label class="m-field-label" for="m-identifier">Email address</label>
+            <div class="m-input-box" id="m-box-identifier">
+              <span class="m-input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="5" width="18" height="14" rx="2"/>
+                  <path d="m3 7 9 6 9-6"/>
+                </svg>
+              </span>
+              <span class="m-input-sep"></span>
+              <input
+                type="text"
+                id="m-identifier"
+                name="identifier"
+                placeholder="business.abineshjiro@gmail.com"
+                autocomplete="username"
+                required
+              >
+              <span class="m-validation-check" id="m-identifier-check" aria-hidden="true" title="Valid format">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="10" fill="#2563EB"/>
+                  <path d="M6 10l3 3 5-6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
             </div>
           </div>
-        </header>
 
-        <!-- COLLEGE HERO -->
-        <section class="m-hero">
-          <h1 class="m-college-name">
-            <span>UGIP</span> Nainital
-          </h1>
-          <p class="m-state">Uttarakhand</p>
-          <div class="m-nba-badge">
-            <span>✦</span>
-            COMPLETELY ADHERED TO
-            <strong>NBA GUIDELINES</strong>
-          </div>
-        </section>
-
-        <!-- LOGIN CARD -->
-        <section class="m-login-section">
-          <div class="m-login-card">
-            <div class="m-card-header">
-              <div>
-                <h2 class="m-welcome">Welcome back</h2>
-                <p class="m-description">
-                  Sign in with your institutional email<br>
-                  to access VidyaOS
-                </p>
-              </div>
-              <div class="m-cap-icon">
-                <svg viewBox="0 0 80 80" fill="none">
-                  <path d="M5 29L40 11L75 29L40 47L5 29Z" fill="currentColor"/>
-                  <path d="M16 38V54L40 67L64 54V38L40 50L16 38Z" fill="currentColor"/>
-                  <path d="M74 30V55" stroke="currentColor" stroke-width="4"/>
-                  <path d="M68 58H80V66H68Z" fill="currentColor"/>
+          <!-- PASSWORD -->
+          <div class="m-field-group">
+            <label class="m-field-label" for="m-password">Password</label>
+            <div class="m-input-box" id="m-box-password">
+              <span class="m-input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="10" width="16" height="11" rx="2"/>
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
                 </svg>
-              </div>
-            </div>
-
-            <form id="mobile-login-form" autocomplete="on" novalidate>
-              <!-- EMAIL / IDENTIFIER -->
-              <div class="m-form-group">
-                <label class="m-label" for="m-identifier">
-                  Institutional Email / Mobile
-                </label>
-                <div class="m-input-box">
-                  <svg class="m-input-icon" viewBox="0 0 24 24" fill="none">
-                    <rect x="2.5" y="4.5" width="19" height="15" rx="2" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M3.5 6L12 13L20.5 6" stroke="currentColor" stroke-width="1.8"/>
-                  </svg>
-                  <input
-                    type="text"
-                    id="m-identifier"
-                    name="identifier"
-                    placeholder="e.g. student@ugipnainital.ac.in"
-                    autocomplete="username"
-                    required
-                  >
-                </div>
-                <p class="m-hint">e.g. student@ugipnainital.ac.in or registered mobile</p>
-              </div>
-
-              <!-- PASSWORD -->
-              <div class="m-password-heading">
-                <label class="m-label" for="m-password">Password</label>
-                <a href="#" class="m-forgot" id="m-forgotPassword" onclick="handleForgotPassword(); return false;">Forgot password?</a>
-              </div>
-              <div class="m-input-box">
-                <svg class="m-input-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="5" y="10" width="14" height="12" rx="2"/>
-                  <path d="M8 10V7A4 4 0 0 1 16 7V10" fill="none" stroke="currentColor" stroke-width="2"/>
-                </svg>
-                <input
-                  type="password"
-                  id="m-password"
-                  name="password"
-                  placeholder="Enter your password"
-                  autocomplete="current-password"
-                  required
-                >
-                <button
-                  type="button"
-                  class="m-toggle-password"
-                  id="m-togglePassword"
-                  aria-label="Show password"
-                  aria-pressed="false"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M2 12S5.6 6 12 6S22 12 22 12S18.4 18 12 18S2 12 2 12Z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-              </div>
-
-              <!-- SIGN IN BUTTON -->
-              <button type="submit" id="m-submit-btn" class="m-sign-in">
-                <span id="m-submit-text">Sign In</span>
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M4 12H19M13 6L19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </span>
+              <span class="m-input-sep"></span>
+              <input
+                type="password"
+                id="m-password"
+                name="password"
+                placeholder="Password"
+                autocomplete="current-password"
+                required
+              >
+              <button
+                type="button"
+                class="m-toggle-eye-btn"
+                id="m-togglePassword"
+                aria-label="Toggle password visibility"
+                aria-pressed="false"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12S5.6 6 12 6S22 12 22 12S18.4 18 12 18S2 12 2 12Z"/>
+                  <circle cx="12" cy="12" r="3"/>
                 </svg>
               </button>
-
-              <!-- APP ACTIONS: GITHUB PROFILE (Girdhardhami) -->
-              <div class="m-actions-row">
-                <a href="https://github.com/onebotyt" class="m-action-btn m-btn-github" target="_blank" rel="noopener noreferrer" title="View Girdhardhami GitHub profile">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-                  </svg>
-                  <span>Girdhardhami</span>
-                </a>
-              </div>
-
-              <!-- STATUS / ERROR MESSAGE -->
-              <p class="m-message" id="m-message" role="status" aria-live="polite"></p>
-
-              <!-- REGISTRATION LINKS -->
-              <div class="m-footer-links">
-                <a href="/login/register/index.html">New to VidyaOS? Create an account / Register &rarr;</a>
-                <a href="/login/register/index.html?role=faculty" class="m-sublink">Faculty &amp; HOD Application Form &rarr;</a>
-              </div>
-            </form>
-
-            <!-- CAMPUS FOOTER -->
-            <div class="m-campus-footer">
-              <svg class="m-building-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 21V5L12 2L21 5V21H15V15H9V21H3ZM6 8H9V6H6V8ZM6 13H9V11H6V13ZM15 8H18V6H15V8ZM15 13H18V11H15V13Z"/>
-              </svg>
-              <div class="m-footer-divider"></div>
-              <div>
-                <div class="m-footer-title">
-                  UGIP Nainital, Uttarakhand
-                </div>
-                <div class="m-footer-subtitle">
-                  Completely Adhered to NBA Guidelines
-                </div>
-              </div>
             </div>
-
           </div>
-        </section>
 
-        <!-- COPYRIGHT -->
-        <footer class="m-copyright">
-          © 2026 UGIP Nainital. All rights reserved.
-        </footer>
+          <!-- REMEMBER ME & FORGOT PASSWORD ROW -->
+          <div class="m-options-row">
+            <label class="m-remember-checkbox-label">
+              <input type="checkbox" id="m-remember" class="m-checkbox-input">
+              <span class="m-checkbox-custom"></span>
+              <span class="m-remember-text">Remember me</span>
+            </label>
+            <a href="#" class="m-forgot-pw-link" id="m-forgotPassword" onclick="handleForgotPassword(); return false;">Forgot password ?</a>
+          </div>
 
+          <!-- PRIMARY LOGIN CTA -->
+          <button type="submit" id="m-submit-btn" class="m-btn-login-now">
+            <span id="m-submit-text">Login Now</span>
+            <svg class="m-btn-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+
+          <!-- OR DIVIDER -->
+          <div class="m-or-divider">
+            <span class="m-or-line"></span>
+            <span class="m-or-text">OR</span>
+            <span class="m-or-line"></span>
+          </div>
+
+          <!-- SIGN IN WITH GOOGLE -->
+          <button type="button" class="m-btn-google-signin" id="m-google-btn" onclick="handleGoogleSignIn()">
+            <span>Sign In with Google</span>
+            <svg class="m-google-svg" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5Z"/>
+              <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5Z"/>
+              <path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.9-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1Z"/>
+              <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48Z"/>
+            </svg>
+          </button>
+
+          <!-- NEW HERE ? SIGN UP -->
+          <a href="/login/register/index.html" class="m-btn-signup-now" id="m-signup-btn">
+            New Here ? <strong>Sign Up</strong>
+          </a>
+
+          <!-- STATUS & ERROR FEEDBACK -->
+          <div class="m-message" id="m-message" role="status" aria-live="polite"></div>
+
+          <!-- INSTITUTIONAL BRANDING FOOTER -->
+          <footer class="m-bottom-inst-footer">
+            <span class="m-inst-dot">•</span> Government Polytechnic Nainital <span class="m-inst-dot">•</span> NBA Accredited
+          </footer>
+        </form>
       </div>
-    </main>
+    </div>
   </div>
 
   <!-- ══ FIRST-TIME ACTIVATION MODAL ══ -->
@@ -434,38 +439,6 @@
           <span id="act-submit-text">Save &amp; Enter Portal →</span>
         </button>
       </form>
-    </div>
-  </div>
-
-  <!-- ══ GOOGLE ACCOUNT CHOOSER MODAL ══ -->
-  <div id="google-signin-modal" class="google-modal-overlay" style="display: none;" onclick="if(event.target===this)closeGoogleSignInModal()">
-    <div class="google-card" role="dialog" aria-modal="true" aria-labelledby="google-login-modal-title">
-      <button type="button" class="google-card-close" onclick="closeGoogleSignInModal()" aria-label="Close">&times;</button>
-      <div class="google-card-header">
-        <svg viewBox="0 0 48 48" width="36" height="36" aria-hidden="true">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z"/>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-        </svg>
-        <h2 id="google-login-modal-title" class="google-card-title">Sign In with Google</h2>
-        <div class="google-card-subtitle">Choose an institutional account to sign in</div>
-      </div>
-      <div id="google-login-card-error" class="conflict-banner" style="display:none;margin-bottom:12px;"></div>
-      <div id="google-accounts-view">
-        <ul id="google-account-list" class="google-account-list"></ul>
-        <div class="google-use-another" onclick="showGoogleEmailInput()">
-          <span>+ Use another account</span>
-        </div>
-      </div>
-      <div id="google-input-view" style="display: none;" class="google-card-input-panel">
-        <div style="font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600;">Enter your Google email:</div>
-        <input type="email" id="google-manual-email" class="google-input-field" placeholder="student@gmail.com" onkeydown="if(event.key==='Enter')submitGoogleManualLogin()">
-        <div class="google-card-actions">
-          <button type="button" class="google-btn-text" onclick="showGoogleAccountList()">Back</button>
-          <button type="button" class="google-btn-blue" onclick="submitGoogleManualLogin()">Sign In</button>
-        </div>
-      </div>
     </div>
   </div>
 

@@ -230,37 +230,36 @@ function handleFacultyDeptChange() {
 
 /* ── Google 1-Click Auto-Fill ── */
 async function initiateGoogleSignUp() {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('mock') === '1' || window.__USE_MOCK_GOOGLE__) {
-    openGoogleCardForRegistration();
-    return;
-  }
+  const btn = document.getElementById('google-signup-btn');
   const btnText = document.getElementById('google-signup-btn-text');
   const originalText = btnText ? btnText.textContent : 'Sign up with Google (Auto-Fill)';
-  if (btnText) btnText.textContent = 'Opening Google Sign-In...';
+  if (btnText) btnText.textContent = 'Connecting to Google…';
+  if (btn) btn.disabled = true;
+
   try {
     const origin = window.location.origin;
-    const res = await fetch(`/api/v1/auth/google/url?mode=STUDENT_REGISTER&origin=${encodeURIComponent(origin)}`).then(r => r.json());
-    if (res && res.success && res.data && res.data.url) {
-      const width = 500, height = 650;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
-      const popup = window.open(res.data.url, 'google_account_chooser', `width=${width},height=${height},left=${left},top=${top},status=0,menubar=0,toolbar=0`);
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        window.location.href = res.data.url;
-      } else {
-        popup.focus();
-      }
-    } else {
-      openGoogleCardForRegistration();
+    let res = await fetch(`/api/v1/auth/google/url?mode=STUDENT_REGISTER&origin=${encodeURIComponent(origin)}`).then(r => r.json()).catch(() => null);
+    if (!res || !res.success || !res.data?.url) {
+      res = await fetch(`https://vidyaos-backend.onrender.com/api/v1/auth/google/url?mode=STUDENT_REGISTER&origin=${encodeURIComponent(origin)}`).then(r => r.json()).catch(() => null);
     }
+
+    if (res && res.data?.url) {
+      // Direct navigation to Google OAuth with prompt=select_account triggers the native Android account chooser
+      window.location.href = res.data.url;
+      return;
+    }
+
+    // Direct fallback with official Client ID if backend URL service is unreachable
+    const clientId = '147063521055-9044vtuf4ldk39g7c55cgqdcu0r98e3u.apps.googleusercontent.com';
+    const redirectUri = 'https://vidyaos-backend.onrender.com/api/v1/auth/google/callback';
+    const stateObj = { mode: 'STUDENT_REGISTER', userId: null, frontendOrigin: origin, ts: Date.now() };
+    const state = btoa(JSON.stringify(stateObj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const fallbackUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid+email+profile&access_type=offline&prompt=select_account&state=${state}`;
+    window.location.href = fallbackUrl;
   } catch (err) {
-    console.warn('Google OAuth URL fetch failed:', err);
-    openGoogleCardForRegistration();
-  } finally {
-    setTimeout(() => {
-      if (btnText && !S.googleRegistrationData) btnText.textContent = originalText;
-    }, 1500);
+    console.error('Google Auto-Fill error:', err);
+    if (btnText) btnText.textContent = originalText;
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -287,27 +286,16 @@ function openGoogleCardForRegistration() {
   const modal = document.getElementById('google-signin-modal');
   const errorBox = document.getElementById('google-card-error');
   if (errorBox) errorBox.style.display = 'none';
-  document.getElementById('google-accounts-view').style.display = 'block';
-  document.getElementById('google-input-view').style.display = 'none';
-  document.getElementById('google-loading-view').style.display = 'none';
-  document.getElementById('google-manual-email').value = '';
-  const accountList = document.getElementById('google-account-list');
-  const currentEmail = document.getElementById('stu-email') ? document.getElementById('stu-email').value.trim() : '';
-  const candidateEmails = new Set();
-  if (currentEmail && currentEmail.includes('@')) candidateEmails.add(currentEmail);
-  candidateEmails.add('student.it01@college.edu');
-  candidateEmails.add('aarav.sharma@gmail.com');
-  candidateEmails.add('priya.verma@gmail.com');
-
-  accountList.innerHTML = Array.from(candidateEmails).map(function(email) {
-    const initial = email.charAt(0).toUpperCase();
-    const displayName = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    return `<li class="google-account-item" onclick="selectGoogleAccount('${email}', '${displayName}')">
-      <div class="google-account-avatar">${initial}</div>
-      <div class="google-account-details"><div class="google-account-name">${displayName}</div><div class="google-account-email">${email}</div></div>
-      <span class="google-signed-in-badge">Google</span></li>`;
-  }).join('');
-  modal.style.display = 'flex';
+  const inputView = document.getElementById('google-input-view');
+  if (inputView) inputView.style.display = 'block';
+  const loadingView = document.getElementById('google-loading-view');
+  if (loadingView) loadingView.style.display = 'none';
+  const inp = document.getElementById('google-manual-email');
+  if (inp) {
+    inp.value = '';
+    setTimeout(() => inp.focus(), 100);
+  }
+  if (modal) modal.style.display = 'flex';
 }
 
 function closeGoogleCard() {
@@ -315,21 +303,8 @@ function closeGoogleCard() {
   if (modal) modal.style.display = 'none';
 }
 
-function showGoogleEmailInput() {
-  document.getElementById('google-accounts-view').style.display = 'none';
-  document.getElementById('google-input-view').style.display = 'block';
-  document.getElementById('google-manual-email').focus();
-}
-
-function showGoogleAccountList() {
-  document.getElementById('google-input-view').style.display = 'none';
-  document.getElementById('google-accounts-view').style.display = 'block';
-  const errorBox = document.getElementById('google-card-error');
-  if (errorBox) errorBox.style.display = 'none';
-}
-
 function submitGoogleEmail() {
-  const email = document.getElementById('google-manual-email').value.trim();
+  const email = document.getElementById('google-manual-email')?.value?.trim();
   if (!email || !email.includes('@')) {
     const errorBox = document.getElementById('google-card-error');
     if (errorBox) { errorBox.innerText = 'Please enter a valid Google email address.'; errorBox.style.display = 'block'; }
@@ -350,8 +325,21 @@ function selectGoogleAccount(email, customName, googleSub) {
 
   const nameInput = document.getElementById('stu-name');
   const emailInput = document.getElementById('stu-email');
-  if (nameInput) { nameInput.value = displayName; nameInput.style.borderColor = 'var(--reg-success)'; }
-  if (emailInput) { emailInput.value = cleanEmail; emailInput.readOnly = true; emailInput.style.borderColor = 'var(--reg-success)'; }
+  if (nameInput) {
+    nameInput.value = displayName;
+    const nameBox = nameInput.closest('.field-input-box');
+    if (nameBox) nameBox.style.borderColor = 'var(--reg-success)';
+    const nameCheck = document.getElementById('stu-name-check');
+    if (nameCheck) nameCheck.style.display = 'flex';
+  }
+  if (emailInput) {
+    emailInput.value = cleanEmail;
+    emailInput.readOnly = true;
+    const emailBox = emailInput.closest('.field-input-box');
+    if (emailBox) emailBox.style.borderColor = 'var(--reg-success)';
+    const emailCheck = document.getElementById('stu-email-check');
+    if (emailCheck) emailCheck.style.display = 'flex';
+  }
 
   const badge = document.getElementById('google-connected-badge');
   const badgeName = document.getElementById('google-badge-name');
@@ -360,7 +348,7 @@ function selectGoogleAccount(email, customName, googleSub) {
   if (badgeName) badgeName.textContent = displayName;
   if (badgeEmail) badgeEmail.textContent = '(' + cleanEmail + ')';
   if (badge) badge.style.display = 'flex';
-  if (btnText) btnText.innerHTML = 'Account Linked with Google ' + (window.getSvgIcon ? window.getSvgIcon('check', 14) : '');
+  if (btnText) btnText.innerHTML = 'Account Linked with Google ✓';
 
   const pwLabel = document.querySelector('label[for="stu-password"]');
   const confLabel = document.querySelector('label[for="stu-confirm"]');
@@ -505,7 +493,7 @@ async function handleStudentSubmit(e) {
     showAlert(err.message || 'Network error submitting registration.', 'danger');
   } finally {
     submitBtn.disabled = false;
-    submitBtn.innerHTML = 'Submit Registration <span class="arrow">→</span>';
+    submitBtn.innerHTML = 'Register Now <span class="arrow">→</span>';
   }
 }
 

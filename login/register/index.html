@@ -7,123 +7,100 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Register — VidyaOS Campus Management</title>
   <meta name="description"
-    content="Register for VidyaOS institutional portal as a student or faculty member. Secure institutional registration.">
+    content="Register for VidyaOS institutional portal as a student. Secure institutional registration.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:wght@500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=JetBrains+Mono:wght@500;600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="/login/register/register.css?v=20261029">
+  <link rel="stylesheet" href="/login/register/register.css?v=20261120">
 </head>
 
 <body>
 
-  <!-- ── TOP BAR ── -->
+  <!-- ── TOP BAR (Desktop) ── -->
   <div class="top-bar">
     <a href="/" class="brand-mark">
-      <div class="brand-icon" style="display:flex;align-items:center;justify-content:center;"><svg width="24"
-          height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
           <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-        </svg></div>
+        </svg>
+      </div>
       <span class="brand-wordmark">Vidya<span>OS</span></span>
     </a>
     <div class="bar-actions">
-      <a href="/login" class="btn-ghost">Sign In</a>
-      <button class="btn-theme" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme"
-        title="Toggle dark mode" style="display:inline-flex;align-items:center;"><svg width="14" height="14"
-          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round">
+      <a href="/login/index.html" class="btn-ghost">Sign In</a>
+      <button class="btn-theme" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle dark mode">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg></button>
+        </svg>
+      </button>
     </div>
   </div>
+
+  <!-- ── MOBILE BRAND HEADER WAVE (<= 860px) ── -->
+  <header class="reg-mobile-header">
+    <div class="reg-header-nav">
+      <div class="reg-header-tag">UGIP Nainital</div>
+      <a href="/login/index.html" class="reg-back-btn" aria-label="Back to login" title="Back to login">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </a>
+    </div>
+    <div class="reg-header-titles">
+      <h1 class="reg-main-title">Sign Up</h1>
+      <p class="reg-main-subtitle">Register to Start Your Exciting Learning Process</p>
+    </div>
+    <div class="reg-wave-svg">
+      <svg viewBox="0 0 375 42" fill="none" preserveAspectRatio="none">
+        <path d="M0,0 C90,32 180,42 270,22 C320,12 350,16 375,26 L375,42 L0,42 Z" fill="#ffffff" opacity="0.3"/>
+        <path d="M0,8 C100,36 200,34 290,14 C330,6 360,10 375,16 L375,42 L0,42 Z" fill="#ffffff"/>
+      </svg>
+    </div>
+  </header>
 
   <!-- ── MAIN CARD ── -->
   <div class="reg-card" id="main-card">
 
-    <!-- ── CARD HEADER ── -->
+    <!-- ── CARD HEADER (Desktop Only) ── -->
     <div class="card-header">
       <div class="header-badge">Institutional Onboarding</div>
-      <h1 class="header-title" id="page-heading">Create your account</h1>
-      <p class="header-sub" id="page-subheading">Select your role and fill in your details below</p>
+      <h1 class="header-title" id="page-heading">Create your student account</h1>
+      <p class="header-sub" id="page-subheading">Fill in your academic and identity details to begin learning</p>
     </div>
 
-    <!-- ── ROLE SWITCHER ── -->
-    <div class="role-switcher" role="tablist" aria-label="Select registration role">
-      <button type="button" class="rs-btn active" id="tab-student" role="tab" aria-selected="true">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-          <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-        </svg> Student Registration
-      </button>
+    <!-- Hidden role switcher for script compatibility -->
+    <div class="role-switcher" role="tablist" style="display:none;">
+      <button type="button" class="rs-btn active" id="tab-student" role="tab" aria-selected="true">Student Registration</button>
     </div>
 
-    <!-- ── GLOBAL ALERT ── -->
+    <!-- ── GLOBAL ALERT BANNER ── -->
     <div id="alert-banner" class="alert" role="alert"></div>
 
     <!-- ══ FORM CONTAINER ══ -->
     <div id="form-container">
 
       <!-- ═══════════════════════════════════════════
-         STUDENT REGISTRATION
+         STUDENT REGISTRATION FORM
          ═══════════════════════════════════════════ -->
       <div id="student-section" class="tab-section active">
         <form id="student-form" novalidate onsubmit="handleStudentSubmit(event)">
 
-          <p class="section-label">Academic Details</p>
-
-          <div class="field-row">
-            <div class="field">
-              <label class="lbl" for="stu-dept">Branch / Department <span class="req">*</span></label>
-              <div class="inp-wrap">
-                <select id="stu-dept" class="inp" required onchange="handleStudentDeptChange()">
-                  <option value="">— Loading branches…</option>
-                </select>
-              </div>
-            </div>
-            <div class="field">
-              <label class="lbl" for="stu-sem">Current Semester <span class="req">*</span></label>
-              <div class="inp-wrap">
-                <select id="stu-sem" class="inp" required disabled onchange="handleStudentSemChange()">
-                  <option value="">— Select branch first —</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Routing Banner -->
-          <div class="callout" id="stu-routing-banner">
-            <span class="callout-icon" style="display:inline-flex;align-items:center;"><svg width="14" height="14"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
-              </svg></span>
-            <div class="callout-text">
-              <strong id="stu-routing-target">Department Verification</strong>
-              <span id="stu-routing-desc">Select your branch and semester. Requests are verified by Department
-                Faculty.</span>
-            </div>
-          </div>
-
-          <!-- Google 1-Click Auto-Fill -->
-          <div style="margin-bottom: 1.25rem;">
-            <button type="button" class="btn-google" id="google-signup-btn" onclick="initiateGoogleSignUp()">
-              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                <path fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                <path fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+          <!-- 1. Google 1-Click Auto-Fill (Direct Device Google OAuth) -->
+          <div class="reg-google-wrapper">
+            <button type="button" class="btn-google-action" id="google-signup-btn" onclick="initiateGoogleSignUp()">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
               </svg>
               <span id="google-signup-btn-text">Sign up with Google (Auto-Fill)</span>
             </button>
             <div id="google-connected-badge" class="google-connected-badge" style="display: none;">
+              <span class="g-badge-dot"></span>
               <div>
                 <strong style="color: var(--reg-success);">Google Connected:</strong>
                 <span id="google-badge-name"></span>
@@ -132,105 +109,234 @@
             </div>
           </div>
 
-          <p class="section-label">Personal &amp; Academic Identity</p>
+          <div class="reg-or-divider">
+            <span>OR ENTER DETAILS MANUALLY</span>
+          </div>
 
-          <div class="field-row">
-            <div class="field">
-              <label class="lbl" for="stu-name">Full Name <span class="req">*</span></label>
-              <input type="text" id="stu-name" class="inp" placeholder="e.g. Aarav Sharma" required autocomplete="name">
-            </div>
-            <div class="field">
-              <div
-                style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.25rem; margin-bottom:0.35rem;">
-                <label class="lbl" for="stu-enroll" style="margin-bottom:0;">UBTER Enrollment No. <span class="req"
-                    id="stu-enroll-req">*</span></label>
-                <label class="chk-enroll-box">
-                  <input type="checkbox" id="chk-enroll-not-available">
-                  <span>Enrollment Number Not Available</span>
-                </label>
-              </div>
-              <input type="text" id="stu-enroll" class="inp mono" placeholder="11-digit numeric enrollment"
-                maxlength="11" autocomplete="off" required>
-              <p class="inp-hint" id="stu-enroll-hint">Enter your 11-digit official UBTER enrollment number.</p>
-              <p class="inp-error" id="stu-enroll-error"></p>
+          <!-- Routing Banner (Kept for department verification notice) -->
+          <div class="callout" id="stu-routing-banner" style="display:none;">
+            <span class="callout-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path>
+              </svg>
+            </span>
+            <div class="callout-text">
+              <strong id="stu-routing-target">Department Verification</strong>
+              <span id="stu-routing-desc">Select your branch and semester.</span>
             </div>
           </div>
 
+          <!-- 2. Academic Program Row (Branch & Semester) -->
+          <div class="field-row">
+            <div class="field">
+              <label class="lbl" for="stu-dept">Branch / Department <span class="req">*</span></label>
+              <div class="field-input-box">
+                <span class="field-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                    <path d="M9 22v-4h6v4"></path>
+                    <path d="M8 6h.01"></path>
+                    <path d="M16 6h.01"></path>
+                    <path d="M8 10h.01"></path>
+                    <path d="M16 10h.01"></path>
+                    <path d="M8 14h.01"></path>
+                    <path d="M16 14h.01"></path>
+                  </svg>
+                </span>
+                <select id="stu-dept" class="field-select" required onchange="handleStudentDeptChange()">
+                  <option value="">— Loading branches…</option>
+                </select>
+                <span class="select-chevron">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+            </div>
+            <div class="field">
+              <label class="lbl" for="stu-sem">Current Semester <span class="req">*</span></label>
+              <div class="field-input-box">
+                <span class="field-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                  </svg>
+                </span>
+                <select id="stu-sem" class="field-select" required disabled onchange="handleStudentSemChange()">
+                  <option value="">— Select branch first —</option>
+                </select>
+                <span class="select-chevron">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Full Name Field -->
+          <div class="field-group">
+            <label class="lbl" for="stu-name">Full Name <span class="req">*</span></label>
+            <div class="field-input-box">
+              <span class="field-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </span>
+              <input type="text" id="stu-name" class="field-input" placeholder="e.g. Aarav Sharma" required autocomplete="name">
+              <span class="field-status-icon" id="stu-name-check">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- 4. Email Address Field -->
+          <div class="field-group">
+            <label class="lbl" for="stu-email">Email address <span class="req">*</span></label>
+            <div class="field-input-box">
+              <span class="field-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                </svg>
+              </span>
+              <input type="email" id="stu-email" class="field-input" placeholder="student@gmail.com" required autocomplete="email">
+              <span class="field-status-icon" id="stu-email-check">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- 5. Mobile Number Field -->
+          <div class="field-group">
+            <label class="lbl" for="stu-phone">Mobile number <span class="opt">(optional)</span></label>
+            <div class="field-input-box">
+              <span class="field-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+              </span>
+              <span class="phone-cc-badge">+91</span>
+              <input type="tel" id="stu-phone" class="field-input" placeholder="10-digit mobile number" maxlength="10" pattern="[6-9][0-9]{9}" autocomplete="tel">
+            </div>
+          </div>
+
+          <!-- 6. UBTER Enrollment Number Field -->
+          <div class="field-group">
+            <div class="field-label-row">
+              <label class="lbl" for="stu-enroll">UBTER Enrollment No. <span class="req" id="stu-enroll-req">*</span></label>
+              <label class="chk-enroll-inline">
+                <input type="checkbox" id="chk-enroll-not-available">
+                <span>Not available yet</span>
+              </label>
+            </div>
+            <div class="field-input-box">
+              <span class="field-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                  <circle cx="9" cy="10" r="2"></circle>
+                  <line x1="15" y1="8" x2="17" y2="8"></line>
+                  <line x1="15" y1="12" x2="17" y2="12"></line>
+                  <line x1="7" y1="16" x2="17" y2="16"></line>
+                </svg>
+              </span>
+              <input type="text" id="stu-enroll" class="field-input mono" placeholder="11-digit numeric enrollment" maxlength="11" autocomplete="off" required>
+            </div>
+            <p class="inp-hint" id="stu-enroll-hint" style="display:none;">Enter your 11-digit official UBTER enrollment number.</p>
+            <p class="inp-error" id="stu-enroll-error"></p>
+          </div>
+
+          <!-- 7. Passwords (Create & Confirm) -->
+          <div class="field-group">
+            <label class="lbl" for="stu-password">Create a Password <span class="req">*</span></label>
+            <div class="field-input-box">
+              <span class="field-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </span>
+              <input type="password" id="stu-password" class="field-input" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password" oninput="checkStrength('stu')">
+              <button type="button" class="field-eye-btn" onclick="togglePwVisibility('stu-password', this)" aria-label="Toggle password visibility">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+            <div id="stu-pw-bar" class="pw-bar"></div>
+            <div id="stu-pw-label" class="pw-lbl"></div>
+          </div>
+
+          <div class="field-group">
+            <label class="lbl" for="stu-confirm">Confirm Password <span class="req">*</span></label>
+            <div class="field-input-box">
+              <span class="field-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </span>
+              <input type="password" id="stu-confirm" class="field-input" placeholder="Retype password" required minlength="8" autocomplete="new-password">
+              <button type="button" class="field-eye-btn" onclick="togglePwVisibility('stu-confirm', this)" aria-label="Toggle password visibility">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 8. Additional College IDs (Directly Visible) -->
           <div class="field-row">
             <div class="field">
               <label class="lbl" for="stu-ubter">UBTER Reg. No. <span class="opt">(optional)</span></label>
-              <input type="text" id="stu-ubter" class="inp mono" placeholder="e.g. 24101054 (max 8 digits)"
-                maxlength="8" autocomplete="off" style="text-transform:uppercase;">
-              <p class="inp-hint">Used for sign-in &amp; verification if enrollment no. is not yet issued (maximum 8
-                digits).</p>
+              <div class="field-input-box">
+                <span class="field-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="9" x2="20" y2="9"></line>
+                    <line x1="4" y1="15" x2="20" y2="15"></line>
+                    <line x1="10" y1="3" x2="8" y2="21"></line>
+                    <line x1="16" y1="3" x2="14" y2="21"></line>
+                  </svg>
+                </span>
+                <input type="text" id="stu-ubter" class="field-input mono" placeholder="e.g. 24101054" maxlength="8" autocomplete="off" style="text-transform:uppercase;">
+              </div>
               <p class="inp-error" id="stu-ubter-error"></p>
             </div>
             <div class="field">
               <label class="lbl" for="stu-class-roll-no">Class Roll No. <span class="opt">(optional)</span></label>
-              <input type="text" id="stu-class-roll-no" class="inp mono" placeholder="e.g. 15 (max 2 digits)"
-                maxlength="2" autocomplete="off">
-              <p class="inp-hint">Numeric only, maximum 2 digits (e.g. 01 to 99).</p>
+              <div class="field-input-box">
+                <span class="field-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </span>
+                <input type="text" id="stu-class-roll-no" class="field-input mono" placeholder="e.g. 15" maxlength="2" autocomplete="off">
+              </div>
               <p class="inp-error" id="stu-roll-error"></p>
             </div>
           </div>
 
-          <div class="field-row">
-            <div class="field">
-              <label class="lbl" for="stu-email">Gmail Address <span class="req">*</span></label>
-              <input type="email" id="stu-email" class="inp" placeholder="student@gmail.com" required
-                autocomplete="email">
-              <p class="inp-hint">Used for sign-in &amp; alerts.</p>
-            </div>
-            <div class="field">
-              <label class="lbl" for="stu-phone">Mobile Number <span class="opt">(optional)</span></label>
-              <div class="phone-row">
-                <span class="phone-cc">+91</span>
-                <input type="tel" id="stu-phone" class="inp" placeholder="10-digit mobile" maxlength="10"
-                  pattern="[6-9][0-9]{9}" autocomplete="tel" style="flex:1;">
-              </div>
-              <p class="inp-hint">Used for attendance alerts &amp; institutional notifications.</p>
-            </div>
-          </div>
+          <!-- 9. Terms of Service & Privacy Policy -->
+          <label class="reg-terms-row">
+            <input type="checkbox" id="reg-terms-chk" checked required>
+            <span>By signing up you accept our <a href="#" onclick="return false;">Terms of Service</a> &amp; <a href="#" onclick="return false;">Privacy Policy</a></span>
+          </label>
 
-          <p class="section-label">Set Password</p>
-
-          <div class="field-row">
-            <div class="field">
-              <label class="lbl" for="stu-password">Password <span class="req">*</span></label>
-              <div class="pw-field">
-                <input type="password" id="stu-password" class="inp" placeholder="Min. 8 characters" required
-                  minlength="8" autocomplete="new-password" oninput="checkStrength('stu')"
-                  style="padding-right:2.2rem;">
-                <button type="button" class="pw-eye" onclick="togglePwVisibility('stu-password', this)"
-                  aria-label="Toggle password" style="display:inline-flex;align-items:center;"><svg width="14"
-                    height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg></button>
-              </div>
-              <div id="stu-pw-bar" class="pw-bar"></div>
-              <div id="stu-pw-label" class="pw-lbl"></div>
-            </div>
-            <div class="field">
-              <label class="lbl" for="stu-confirm">Confirm Password <span class="req">*</span></label>
-              <div class="pw-field">
-                <input type="password" id="stu-confirm" class="inp" placeholder="Re-enter password" required
-                  minlength="8" autocomplete="new-password" style="padding-right:2.2rem;">
-                <button type="button" class="pw-eye" onclick="togglePwVisibility('stu-confirm', this)"
-                  aria-label="Toggle confirm" style="display:inline-flex;align-items:center;"><svg width="14"
-                    height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg></button>
-              </div>
-            </div>
-          </div>
-
+          <!-- 10. Primary Submit Button -->
           <button type="submit" id="stu-submit-btn" class="btn-submit">
-            Submit Registration <span class="arrow">→</span>
+            <span>Register Now</span> <span class="arrow">→</span>
           </button>
+
+          <!-- 11. Secondary Outlined Button -->
+          <a href="/login/index.html" class="reg-btn-login-member">Already a Member ? <strong>Login Now</strong></a>
         </form>
       </div>
 
@@ -240,92 +346,33 @@
        SUCCESS VIEW
        ═══════════════════════════════════════════ -->
     <div id="success-view" class="success-view">
-      <div class="success-ring" style="display:flex;align-items:center;justify-content:center;"><svg width="28"
-          height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round">
+      <div class="success-ring">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
-        </svg></div>
+        </svg>
+      </div>
       <h2 class="success-title">Registration Submitted!</h2>
       <p class="success-msg" id="success-message">
-        Your account request has been received and routed for administrative authorization.
+        Your student account request has been received and routed for departmental authorization.
       </p>
       <div class="summary-grid" id="success-summary"></div>
       <div class="what-next">
-        <strong>What happens next?</strong> Your departmental administrator will verify your credentials and approve
-        your account. Once authorized, you can sign in through the unified login portal.
+        <strong>What happens next?</strong> Your departmental administrator will verify your enrollment credentials and approve your account. Once verified, you can sign in directly through the portal.
       </div>
-      <a href="/login" class="btn-goto">Go to Sign In →</a>
+      <a href="/login/index.html" class="btn-goto">Go to Sign In →</a>
     </div>
 
-    <!-- ── FOOTER LINKS ── -->
+    <!-- ── FOOTER LINKS (Desktop) ── -->
     <div class="footer-links">
-      <div>Already registered? <a href="/login">Sign In →</a></div>
+      <div>Already registered? <a href="/login/index.html">Sign In →</a></div>
       <div style="font-size:0.8rem; color:var(--reg-muted); margin-top:0.25rem;">
-        Need assistance? Contact your Department Faculty or Institutional Administrator.
+        Government Polytechnic Nainital • Institutional Campus OS
       </div>
     </div>
 
   </div><!-- /.reg-card -->
 
-  <!-- ══ OFFICIAL GOOGLE SIGN-IN CARD MODAL ══ -->
-  <div id="google-signin-modal" class="google-modal-overlay" style="display: none;"
-    onclick="if(event.target===this)closeGoogleCard()">
-    <div class="google-card" role="dialog" aria-modal="true" aria-labelledby="google-modal-title">
-      <button type="button" class="google-card-close" onclick="closeGoogleCard()" aria-label="Close"
-        style="display:inline-flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg></button>
-      <div class="google-card-header">
-        <svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true">
-          <path fill="#EA4335"
-            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-          <path fill="#4285F4"
-            d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-          <path fill="#FBBC05"
-            d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z" />
-          <path fill="#34A853"
-            d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
-        </svg>
-        <h2 id="google-modal-title" class="google-card-title">Register with Google</h2>
-        <div id="google-modal-subtitle" class="google-card-subtitle">Choose an account to auto-fill details</div>
-        <div class="google-card-app">to continue to VidyaOS Campus System</div>
-      </div>
-      <div id="google-card-error" class="google-card-alert" style="display: none;"></div>
-      <div id="google-accounts-view">
-        <ul id="google-account-list" class="google-account-list"></ul>
-        <div class="google-use-another" onclick="showGoogleEmailInput()">
-          <span style="display:inline-flex;align-items:center;color:var(--text-muted);"><svg width="14" height="14"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg></span>
-          <span>Use another account</span>
-        </div>
-      </div>
-      <div id="google-input-view" style="display: none;" class="google-card-input-panel">
-        <div style="font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 500;">Enter your
-          Google account email:</div>
-        <input type="email" id="google-manual-email" class="google-input-field" placeholder="Email or phone"
-          onkeydown="if(event.key==='Enter')submitGoogleEmail()">
-        <div class="google-card-actions">
-          <button type="button" class="google-btn-text" onclick="showGoogleAccountList()">Back</button>
-          <button type="button" id="google-submit-manual-btn" class="google-btn-blue"
-            onclick="submitGoogleEmail()">Next</button>
-        </div>
-      </div>
-      <div id="google-loading-view" style="display: none; padding: 2.5rem; text-align: center;">
-        <div style="font-size: 2rem; margin-bottom: 0.75rem;">⏳</div>
-        <div style="font-size: 0.95rem; font-weight: 500; color: var(--text-main);">Fetching account details...</div>
-      </div>
-      <div class="google-card-footer">To continue, Google will share your name and email address with VidyaOS to
-        auto-fill your registration form.</div>
-    </div>
-  </div>
-
-  <script src="/login/register/register.js?v=20261029"></script>
+  <script src="/login/register/register.js?v=20261120"></script>
 </body>
 
 </html>

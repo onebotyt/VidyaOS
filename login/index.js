@@ -353,8 +353,73 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   }
 });
 
-/* ── Mobile Login Handlers (UGIP Nainital Layout) ── */
+/* ── Mobile Login Handlers (Modern Edu UI/UX Layout) ── */
+function isMobileAppUser() {
+  return typeof window !== 'undefined' && (
+    Boolean(window.Capacitor?.isNativePlatform?.()) ||
+    Boolean(window.Capacitor) ||
+    window.VIDYAOS_IS_NATIVE === true ||
+    window.location.protocol === 'capacitor:' ||
+    window.location.protocol === 'file:' ||
+    window.VIDYAOS_FORCE_NATIVE === true
+  );
+}
+
+function handleMobileBack() {
+  if (isMobileAppUser()) {
+    showMobileSplashView();
+  } else {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = '/';
+    }
+  }
+}
+window.handleMobileBack = handleMobileBack;
+
+function showMobileLoginView() {
+  const splash = document.getElementById('m-splash-view');
+  const login = document.getElementById('m-login-view');
+  if (splash && login) {
+    splash.style.display = 'none';
+    login.style.display = 'flex';
+  }
+}
+window.showMobileLoginView = showMobileLoginView;
+
+function showMobileSplashView() {
+  const params = new URLSearchParams(window.location.search);
+  const isPreview = params.get('preview') === 'splash';
+  // Strictly for mobile application users (e.g. Capacitor APK shell)
+  if (!isMobileAppUser() && !isPreview) {
+    showMobileLoginView();
+    return;
+  }
+  const splash = document.getElementById('m-splash-view');
+  const login = document.getElementById('m-login-view');
+  if (splash && login) {
+    login.style.display = 'none';
+    splash.style.display = 'flex';
+  }
+}
+window.showMobileSplashView = showMobileSplashView;
+
 (function setupMobileLoginForm() {
+  // Check if running inside mobile application APK
+  if (isMobileAppUser()) {
+    const seenSplash = sessionStorage.getItem('vidya_mobile_splash_seen');
+    if (!seenSplash) {
+      showMobileSplashView();
+      sessionStorage.setItem('vidya_mobile_splash_seen', '1');
+    } else {
+      showMobileLoginView();
+    }
+  } else {
+    // Web users always see Login view directly
+    showMobileLoginView();
+  }
+
   const mToggleBtn = document.getElementById('m-togglePassword');
   const mPasswordInput = document.getElementById('m-password');
   if (mToggleBtn && mPasswordInput) {
@@ -374,6 +439,37 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     });
   }
 
+  // Live validation for email/identifier checkmark badge & Remember Me restoration
+  const mIdInput = document.getElementById('m-identifier');
+  const mCheckBadge = document.getElementById('m-identifier-check');
+  const mRememberBox = document.getElementById('m-remember');
+
+  if (mIdInput) {
+    const updateCheckBadge = () => {
+      const val = mIdInput.value.trim();
+      if (mCheckBadge) {
+        if (val.length >= 3) {
+          mCheckBadge.classList.add('visible');
+        } else {
+          mCheckBadge.classList.remove('visible');
+        }
+      }
+    };
+
+    mIdInput.addEventListener('input', updateCheckBadge);
+    mIdInput.addEventListener('change', updateCheckBadge);
+
+    // Restore remembered identifier
+    try {
+      const savedId = localStorage.getItem('vidya_remember_id');
+      if (savedId) {
+        mIdInput.value = savedId;
+        if (mRememberBox) mRememberBox.checked = true;
+        updateCheckBadge();
+      }
+    } catch (_) { }
+  }
+
   const mLoginForm = document.getElementById('mobile-login-form');
   if (mLoginForm) {
     mLoginForm.addEventListener('submit', async (e) => {
@@ -381,6 +477,13 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
       const id = (document.getElementById('m-identifier')?.value || '').trim();
       const pw = document.getElementById('m-password')?.value || '';
       if (!id || !pw) return;
+
+      // Handle Remember Me
+      if (mRememberBox && mRememberBox.checked) {
+        try { localStorage.setItem('vidya_remember_id', id); } catch (_) { }
+      } else {
+        try { localStorage.removeItem('vidya_remember_id'); } catch (_) { }
+      }
 
       const btn = document.getElementById('m-submit-btn');
       const text = document.getElementById('m-submit-text');
@@ -408,7 +511,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
             document.getElementById('act-email').textContent = res.data.user?.email || 'your account';
             document.getElementById('activation-modal').style.display = 'flex';
             if (btn) btn.disabled = false;
-            if (text) text.textContent = 'Sign In';
+            if (text) text.textContent = 'Login Now';
             return;
           }
           setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
@@ -421,7 +524,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         }
       } catch (err) {
         if (btn) btn.disabled = false;
-        if (text) text.textContent = 'Sign In';
+        if (text) text.textContent = 'Login Now';
 
         const genericError = 'Invalid credentials. Please check your username/email and password.';
         const isRestricted = err?.code === 'FORBIDDEN' || err?.message?.toLowerCase().includes('suspend') || err?.message?.toLowerCase().includes('restrict');
@@ -524,28 +627,35 @@ async function handleGoogleSignIn() {
     return;
   }
 
-  const btn = document.getElementById('google-signin-btn');
-  const txt = document.getElementById('google-btn-text');
-  btn.disabled = true;
-  txt.textContent = 'Connecting…';
+  const btn = document.getElementById('google-signin-btn') || document.getElementById('m-google-btn');
+  const txt = document.getElementById('google-btn-text') || btn?.querySelector('span');
+  if (btn) btn.disabled = true;
+  if (txt) txt.textContent = 'Connecting to Google…';
 
   try {
-    const res = await fetchApi('/auth/google/url?mode=LOGIN');
-    if (res.configured && res.data?.url) {
-      const w = 500, h = 650;
-      const l = window.screenX + (window.outerWidth - w) / 2;
-      const t = window.screenY + (window.outerHeight - h) / 2;
-      const popup = window.open(res.data.url, 'vidyaos_google_login', `width=${w},height=${h},left=${l},top=${t},status=0,menubar=0,toolbar=0`);
-      if (popup) popup.focus(); else window.location.href = res.data.url;
-    } else {
-      // Fallback to Google Account Chooser modal
-      openGoogleSignInModal();
+    const origin = window.location.origin;
+    let res = await fetchApi('/auth/google/url?mode=LOGIN&origin=' + encodeURIComponent(origin)).catch(() => null);
+    if (!res || !res.success || !res.data?.url) {
+      res = await fetch('https://vidyaos-backend.onrender.com/api/v1/auth/google/url?mode=LOGIN&origin=' + encodeURIComponent(origin)).then(r => r.json()).catch(() => null);
     }
-  } catch (_) {
-    openGoogleSignInModal();
-  } finally {
-    btn.disabled = false;
-    txt.textContent = 'Continue with Google';
+
+    if (res && res.data?.url) {
+      // Direct navigation to Google OAuth with prompt=select_account triggers the native Android account chooser
+      window.location.href = res.data.url;
+      return;
+    }
+
+    // Direct fallback with official Client ID if backend URL service is unreachable
+    const clientId = '147063521055-9044vtuf4ldk39g7c55cgqdcu0r98e3u.apps.googleusercontent.com';
+    const redirectUri = 'https://vidyaos-backend.onrender.com/api/v1/auth/google/callback';
+    const stateObj = { mode: 'LOGIN', userId: null, frontendOrigin: origin, ts: Date.now() };
+    const state = btoa(JSON.stringify(stateObj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const fallbackUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid+email+profile&access_type=offline&prompt=select_account&state=${state}`;
+    window.location.href = fallbackUrl;
+  } catch (err) {
+    console.error('Google Sign-In initialization failed:', err);
+    if (txt) txt.textContent = btn?.id === 'm-google-btn' ? 'Sign In with Google' : 'Continue with Google';
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -553,47 +663,17 @@ function openGoogleSignInModal() {
   const modal = document.getElementById('google-signin-modal');
   const errBox = document.getElementById('google-login-card-error');
   if (errBox) errBox.style.display = 'none';
-  document.getElementById('google-accounts-view').style.display = 'block';
-  document.getElementById('google-input-view').style.display = 'none';
-
-  const accountList = document.getElementById('google-account-list');
-  const candidateEmails = [
-    'student.it01@college.edu',
-    'admin@gmail.com',
-    'prof.sharma@college.edu'
-  ];
-
-  accountList.innerHTML = candidateEmails.map(email => {
-    const initial = email.charAt(0).toUpperCase();
-    const displayName = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    return `<li class="google-account-item" onclick="loginWithGoogleEmail('${email}')">
-      <div class="google-account-avatar">${initial}</div>
-      <div class="google-account-details">
-        <div class="google-account-name">${displayName}</div>
-        <div class="google-account-email">${email}</div>
-      </div>
-      <span style="font-size:11px;font-weight:700;color:#2563eb;">Sign In</span>
-    </li>`;
-  }).join('');
-
-  modal.style.display = 'flex';
+  const inp = document.getElementById('google-manual-email');
+  if (inp) {
+    inp.value = '';
+    setTimeout(() => inp.focus(), 100);
+  }
+  if (modal) modal.style.display = 'flex';
 }
 
 function closeGoogleSignInModal() {
   const modal = document.getElementById('google-signin-modal');
   if (modal) modal.style.display = 'none';
-}
-
-function showGoogleEmailInput() {
-  document.getElementById('google-accounts-view').style.display = 'none';
-  document.getElementById('google-input-view').style.display = 'block';
-  const inp = document.getElementById('google-manual-email');
-  if (inp) { inp.value = ''; inp.focus(); }
-}
-
-function showGoogleAccountList() {
-  document.getElementById('google-input-view').style.display = 'none';
-  document.getElementById('google-accounts-view').style.display = 'block';
 }
 
 function submitGoogleManualLogin() {

@@ -25,9 +25,7 @@
     Boolean(window.Capacitor?.isNativePlatform?.()) ||
     Boolean(window.Capacitor) ||
     window.location.protocol === 'capacitor:' ||
-    window.location.protocol === 'file:' ||
-    (window.location.hostname === 'localhost' && (window.location.protocol === 'https:' || !window.location.port)) ||
-    (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent) && window.location.hostname === 'localhost')
+    window.location.protocol === 'file:'
   );
 
   window.VIDYAOS_IS_NATIVE = isCapacitor;

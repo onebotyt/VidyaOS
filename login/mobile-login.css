@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   MOBILE UGIP NAINITAL LOGIN STYLES
+   MOBILE VIDYAOS LOGIN STYLES (VidyaOS Campus OS Theme)
    frontend/login/mobile-login.css
    Active strictly on mobile viewports (<= 860px)
    ══════════════════════════════════════════════════════════════ */
@@ -14,6 +14,7 @@
 }
 
 @media (max-width: 860px) {
+  /* Hide Desktop Layout Elements */
   .desktop-login-layout,
   #desktop-login-view,
   .bg,
@@ -25,621 +26,720 @@
 
   html, body {
     width: 100% !important;
-    height: auto !important;
+    height: 100% !important;
     min-height: 100vh !important;
     min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
     overflow-x: hidden !important;
-    overflow-y: auto !important;
-    background: #edf4ff !important;
-    color: #101744 !important;
-    font-family: Arial, Helvetica, sans-serif !important;
+    overflow-y: hidden !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-login-layout {
     display: flex !important;
     flex-direction: column;
     width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-    color: #101744;
-    background: #edf4ff;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    background: #ffffff;
+    color: #0f172a;
     position: relative;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
-  /* BACKGROUND */
-  .m-background {
-    position: fixed;
+  /* ══════════════════════════════════════════════════════════════
+     1. WELCOME / SPLASH SCREEN VIEW
+     ══════════════════════════════════════════════════════════════ */
+  .m-splash-screen {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px 18px 20px;
+    box-sizing: border-box;
+    position: relative;
+    background: linear-gradient(160deg, #0a1b4d 0%, #17389c 48%, #2563eb 100%);
+    overflow: hidden;
+  }
+
+  .m-splash-backdrop {
+    position: absolute;
     inset: 0;
-    z-index: 0;
-    background:
-      linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(237, 244, 255, 0.35) 25%,
-        rgba(237, 244, 255, 0.94) 53%,
-        #edf4ff 75%
-      ),
-      url("/login/campus.jpg");
-    background-size: 100% 100%, 100% auto;
-    background-position: center, center top;
-    background-repeat: no-repeat;
     pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
   }
 
-  /* MAIN LAYOUT */
-  .m-page {
+  .m-splash-wave-1 {
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 70%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 45%;
+    transform: rotate(-15deg);
+  }
+
+  .m-splash-wave-2 {
+    position: absolute;
+    top: 25%;
+    right: -30%;
+    width: 120%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, rgba(37, 99, 235, 0) 70%);
+    border-radius: 50%;
+  }
+
+  .m-splash-center {
     position: relative;
     z-index: 1;
-    width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    padding: 20px 0 14px;
-    box-sizing: border-box;
+    align-items: center;
+    text-align: center;
+    margin: auto 0;
+    padding: 10px 0;
   }
 
-  .m-container {
-    width: min(100% - 32px, 560px);
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    box-sizing: border-box;
-  }
-
-  /* BRAND HEADER */
-  .m-header {
+  .m-splash-icon {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
-    flex-shrink: 0;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    box-shadow: 0 10px 28px rgba(10, 25, 80, 0.28);
+    backdrop-filter: blur(8px);
   }
 
-  .m-logo {
-    width: 60px;
-    height: 60px;
-    border-radius: 18px;
-    display: grid;
-    place-items: center;
-    color: white;
-    background: linear-gradient(145deg, #315eea, #5948f5);
-    box-shadow: 0 8px 22px rgba(49, 94, 234, 0.28);
-    flex-shrink: 0;
-  }
-
-  .m-logo svg {
+  .m-splash-icon svg {
     width: 38px;
     height: 38px;
   }
 
-  .m-brand {
-    margin-left: 14px;
-  }
-
-  .m-brand-name {
-    font-size: 30px;
-    font-weight: 750;
-    letter-spacing: -1.2px;
-    color: #101744;
+  .m-splash-title {
+    font-size: 34px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -1px;
     line-height: 1.1;
   }
 
-  .m-brand-subtitle {
-    font-size: 11px;
-    color: #58627d;
-    margin-top: 4px;
-    line-height: 1.3;
+  .m-splash-title span {
+    color: #93c5fd;
   }
 
-  /* COLLEGE HERO */
-  .m-hero {
-    flex-shrink: 0;
-    padding-top: clamp(14px, 3vh, 28px);
+  .m-splash-sub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.88);
+    margin: 8px 0 0;
+    max-width: 250px;
+    line-height: 1.4;
   }
 
-  .m-college-name {
-    font-size: clamp(32px, 7.5vw, 46px);
-    font-weight: 750;
-    letter-spacing: -1.5px;
-    line-height: 1.1;
-    color: #101744;
-  }
-
-  .m-college-name span {
-    color: #315eea;
-  }
-
-  .m-state {
-    font-size: 20px;
-    font-weight: 650;
-    margin-top: 4px;
-    color: #101744;
-  }
-
-  .m-nba-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
-    padding: 9px 16px;
-    color: white;
-    background: #3154d6;
-    border: 3.5px solid #f5d75c;
-    border-radius: 50px;
-    font-size: 11px;
-    font-weight: 750;
-    box-shadow: 0 5px 15px rgba(25, 54, 145, 0.18);
-  }
-
-  .m-nba-badge strong {
-    color: #ffe56b;
-    font-size: 14px;
-  }
-
-  /* LOGIN SECTION & CARD */
-  .m-login-section {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 16px;
-  }
-
-  .m-login-card {
-    width: 100%;
-    padding: 24px 24px 18px;
-    background: rgba(255, 255, 255, 0.98);
-    border: 1px solid rgba(255, 255, 255, 0.9);
+  .m-splash-bottom-card {
+    position: relative;
+    z-index: 1;
+    background: #ffffff;
     border-radius: 24px;
-    box-shadow: 0 16px 44px rgba(35, 55, 115, 0.15);
-    box-sizing: border-box;
+    padding: 22px 18px 18px;
+    box-shadow: 0 14px 36px rgba(10, 25, 80, 0.25);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
-  /* CARD HEADER */
-  .m-card-header {
+  .m-splash-card-heading {
+    font-size: 16.5px;
+    font-weight: 750;
+    color: #0f172a;
+    margin: 0 0 4px;
+    line-height: 1.35;
+    letter-spacing: -0.2px;
+  }
+
+  .m-btn-get-started {
+    width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    font-size: 15px;
+    font-weight: 650;
     display: flex;
     align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    transition: background-color 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+
+  .m-btn-get-started:active {
+    transform: scale(0.985);
+    background: #1d4ed8;
+  }
+
+  .m-btn-splash-signup {
+    width: 100%;
+    height: 46px;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #2563eb;
+    border: 1.5px solid #2563eb;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: background-color 0.15s, transform 0.1s;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  .m-btn-splash-signup:active {
+    transform: scale(0.985);
+    background: #eff6ff;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     2. LOGIN SCREEN VIEW (Single-Screen / No Scrolling)
+     ══════════════════════════════════════════════════════════════ */
+  .m-login-screen {
+    width: 100%;
+    height: 100%;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 20px;
+    background: #ffffff;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
-  .m-welcome {
-    font-size: clamp(26px, 6vw, 34px);
-    font-weight: 750;
-    letter-spacing: -1.2px;
-    color: #101744;
-    line-height: 1.1;
-  }
-
-  .m-description {
-    margin-top: 6px;
-    color: #78829b;
-    font-size: 14px;
-    line-height: 1.45;
-  }
-
-  .m-cap-icon {
-    width: 68px;
-    height: 68px;
+  /* Blue Header (Main App Gradient) */
+  .m-blue-header {
+    background: linear-gradient(160deg, #0a1b4d 0%, #17389c 48%, #2563eb 100%);
+    padding: 12px 18px 0;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
     flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    color: #5948f5;
-    background: #f0edff;
   }
 
-  .m-cap-icon svg {
-    width: 54px;
-    height: 54px;
+  .m-header-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 2;
   }
 
-  /* FORM CONTROLS */
-  .m-form-group {
-    margin-bottom: 14px;
-  }
-
-  .m-label {
-    display: block;
-    margin-bottom: 7px;
-    font-size: 14px;
+  .m-header-inst-tag {
+    font-size: 10.5px;
     font-weight: 700;
-    color: #101744;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.14);
+    padding: 3.5px 9px;
+    border-radius: 16px;
+    backdrop-filter: blur(4px);
+  }
+
+  .m-back-circle-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .m-back-circle-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .m-back-circle-btn:active {
+    transform: scale(0.92);
+    background: #f1f5f9;
+  }
+
+  .m-header-text {
+    position: relative;
+    z-index: 2;
+  }
+
+  .m-login-title {
+    font-size: 23px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -0.4px;
+  }
+
+  .m-login-subtitle {
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.88);
+    margin: 3px 0 0;
+    line-height: 1.35;
+    font-weight: 450;
+  }
+
+  .m-header-wave-svg {
+    width: 100%;
+    height: 18px;
+    margin-top: 4px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .m-header-wave-svg svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Custom Vector Graphic Illustration */
+  .m-illustration-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 16px;
+    margin-top: -6px;
+    position: relative;
+    z-index: 3;
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  .m-illustration-img {
+    width: 100%;
+    max-width: 320px;
+    height: clamp(75px, 11.5vh, 105px);
+    display: block;
+    object-fit: contain;
+  }
+
+  /* Form Container (Pact & Centered) */
+  .m-form-container {
+    width: 100%;
+    max-width: 390px;
+    margin: 0 auto;
+    padding: 2px 20px 8px;
+    box-sizing: border-box;
+    background: #ffffff;
+    position: relative;
+    z-index: 4;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .m-field-group {
+    margin-bottom: 8px;
+  }
+
+  .m-field-label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 3px;
+    letter-spacing: -0.1px;
   }
 
   .m-input-box {
-    min-height: 54px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 0 14px;
-    border: 1.5px solid #dfe3eb;
-    border-radius: 14px;
-    background: white;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    height: 40px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 11px;
+    padding: 0 12px;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
   }
 
   .m-input-box:focus-within {
-    border-color: #5948f5;
-    box-shadow: 0 0 0 3px rgba(89, 72, 245, 0.15);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   }
 
   .m-input-icon {
-    width: 22px;
-    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
-    color: #818ba2;
+  }
+
+  .m-input-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .m-input-sep {
+    width: 1px;
+    height: 18px;
+    background: #e2e8f0;
+    margin: 0 10px;
+    flex-shrink: 0;
   }
 
   .m-input-box input {
-    width: 100%;
-    height: 50px;
+    flex: 1;
     border: none;
     outline: none;
-    font-size: 15px;
-    color: #101744;
     background: transparent;
+    font-size: 13.5px;
+    color: #0f172a;
     font-family: inherit;
-  }
-
-  .m-input-box input::placeholder {
-    color: #9299a9;
-  }
-
-  .m-hint {
-    margin: 6px 0 0 38px;
-    font-size: 11px;
-    color: #78829b;
-  }
-
-  /* PASSWORD ROW */
-  .m-password-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 7px;
-  }
-
-  .m-password-heading .m-label {
-    margin: 0;
-  }
-
-  .m-forgot {
-    font-size: 13px;
-    font-weight: 700;
-    color: #5145df;
-    text-decoration: none;
-  }
-
-  .m-forgot:hover {
-    text-decoration: underline;
-  }
-
-  .m-toggle-password {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    background: transparent;
-    color: #7c879d;
-    cursor: pointer;
+    font-weight: 500;
+    min-width: 0;
     padding: 0;
   }
 
-  .m-toggle-password svg {
-    width: 22px;
-    height: 22px;
+  .m-input-box input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
   }
 
-  /* SIGN IN BUTTON */
-  .m-sign-in {
-    width: 100%;
-    min-height: 52px;
+  /* Validation Checkmark Badge */
+  .m-validation-check {
+    width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-top: 18px;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .m-validation-check.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .m-validation-check svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* Password Toggle Eye */
+  .m-toggle-eye-btn {
     border: none;
-    border-radius: 14px;
-    color: white;
-    background: linear-gradient(100deg, #554df0, #6550f5);
-    font-size: 17px;
-    font-weight: 750;
-    box-shadow: 0 8px 20px rgba(83, 76, 231, 0.25);
+    background: transparent;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
     cursor: pointer;
-    transition: filter 0.2s, transform 0.1s;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  .m-toggle-eye-btn:hover {
+    color: #475569;
+  }
+
+  .m-toggle-eye-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Options Row: Remember Me & Forgot Password */
+  .m-options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 4px 0 9px;
+  }
+
+  .m-remember-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .m-checkbox-input {
+    width: 15px;
+    height: 15px;
+    accent-color: #2563eb;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .m-remember-text {
+    font-size: 11.5px;
+    color: #475569;
+    font-weight: 500;
+  }
+
+  .m-forgot-pw-link {
+    font-size: 11.5px;
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .m-forgot-pw-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Primary Login Button */
+  .m-btn-login-now {
+    width: 100%;
+    height: 42px;
+    border-radius: 11px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    font-size: 14.5px;
+    font-weight: 650;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    transition: background-color 0.15s, transform 0.1s;
     font-family: inherit;
   }
 
-  .m-sign-in:hover {
-    filter: brightness(1.05);
+  .m-btn-login-now:hover {
+    background: #1d4ed8;
   }
 
-  .m-sign-in:active {
-    transform: scale(0.99);
+  .m-btn-login-now:active {
+    transform: scale(0.985);
+    background: #1e40af;
   }
 
-  .m-sign-in:disabled {
+  .m-btn-login-now:disabled {
     opacity: 0.7;
     cursor: not-allowed;
   }
 
-  .m-sign-in svg {
-    width: 20px;
-    height: 20px;
+  .m-btn-arrow-icon {
+    width: 17px;
+    height: 17px;
   }
 
-  /* APP ACTIONS (APK DOWNLOAD + GITHUB PROFILE) */
-  .m-actions-row {
+  /* OR Divider */
+  .m-or-divider {
     display: flex;
+    align-items: center;
+    margin: 7px 0;
     gap: 10px;
-    margin-top: 14px;
-    width: 100%;
-    box-sizing: border-box;
   }
 
-  .m-action-btn {
+  .m-or-line {
     flex: 1;
-    display: inline-flex;
+    height: 1px;
+    background: #e2e8f0;
+  }
+
+  .m-or-text {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Google Sign In */
+  .m-btn-google-signin {
+    width: 100%;
+    height: 38px;
+    border-radius: 11px;
+    background: #ffffff;
+    color: #0f172a;
+    border: 1.5px solid #e2e8f0;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
-    padding: 10px 10px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: transform 0.15s ease, filter 0.15s ease;
+    gap: 9px;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+    font-family: inherit;
     box-sizing: border-box;
-    text-align: center;
   }
 
-  .m-action-btn:active {
-    transform: scale(0.98);
+  .m-btn-google-signin:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
   }
 
-  .m-btn-apk {
-    background: #eef7f0;
-    color: #1b7e36;
-    border: 1.5px solid #bce2c7;
+  .m-btn-google-signin:active {
+    transform: scale(0.985);
   }
 
-  .m-btn-apk:hover {
-    filter: brightness(0.96);
+  .m-google-svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 
-  .m-btn-github {
-    background: #f1f3f8;
-    color: #1e2532;
-    border: 1.5px solid #d3d9e4;
+  /* New Here ? Sign Up */
+  .m-btn-signup-now {
+    width: 100%;
+    height: 38px;
+    border-radius: 11px;
+    background: #ffffff;
+    color: #2563eb;
+    border: 1.5px solid #2563eb;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-decoration: none;
+    margin-top: 6px;
+    transition: background-color 0.15s, transform 0.1s;
+    font-family: inherit;
+    box-sizing: border-box;
   }
 
-  .m-btn-github:hover {
-    filter: brightness(0.96);
+  .m-btn-signup-now strong {
+    font-weight: 700;
   }
 
-  /* STATUS MESSAGE */
+  .m-btn-signup-now:hover {
+    background: #eff6ff;
+  }
+
+  .m-btn-signup-now:active {
+    transform: scale(0.985);
+  }
+
+  /* Status / Feedback Message */
   .m-message {
     text-align: center;
-    font-size: 12.5px;
-    margin-top: 10px;
-    line-height: 1.4;
+    font-size: 12px;
+    margin-top: 8px;
+    line-height: 1.35;
+    empty-cells: hide;
   }
 
   .m-message.error {
-    color: #d32f2f;
-    background: #ffebee;
-    border: 1px solid #ffcdd2;
-    border-radius: 10px;
-    padding: 8px 12px;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 6px 10px;
     font-weight: 600;
   }
 
   .m-message.success {
-    color: #2e7d32;
-    background: #e8f5e9;
-    border: 1px solid #c8e6c9;
-    border-radius: 10px;
-    padding: 8px 12px;
+    color: #15803d;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 6px 10px;
     font-weight: 600;
   }
 
-  /* BOTTOM LINKS */
-  .m-footer-links {
-    margin-top: 14px;
+  /* Micro Institutional Footer */
+  .m-bottom-inst-footer {
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 13px;
-  }
-
-  .m-footer-links a {
-    color: #315eea;
-    text-decoration: none;
-    font-weight: 650;
-  }
-
-  .m-footer-links a:hover {
-    text-decoration: underline;
-  }
-
-  .m-footer-links .m-sublink {
-    color: #78829b;
-    font-size: 11.5px;
-    font-weight: 500;
-  }
-
-  /* CAMPUS FOOTER */
-  .m-campus-footer {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 16px;
-    padding: 10px 12px;
-    border: 1px solid #d3dcff;
-    border-radius: 14px;
-    background: linear-gradient(100deg, #f0f2ff, #edf3ff);
-  }
-
-  .m-building-icon {
-    width: 28px;
-    height: 28px;
-    color: #3156d5;
-    flex-shrink: 0;
-  }
-
-  .m-footer-divider {
-    width: 1px;
-    height: 32px;
-    background: #c9d2e9;
-  }
-
-  .m-footer-title {
-    font-size: 12px;
-    font-weight: 750;
-    color: #101744;
-  }
-
-  .m-footer-subtitle {
-    margin-top: 2px;
     font-size: 10.5px;
-    color: #5145df;
-    font-weight: 700;
-  }
-
-  /* COPYRIGHT */
-  .m-copyright {
+    color: #94a3b8;
+    margin-top: 7px;
+    padding-bottom: 4px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
     flex-shrink: 0;
-    text-align: center;
-    padding-top: 10px;
-    color: #63708d;
+  }
+
+  .m-inst-dot {
+    color: #cbd5e1;
+    margin: 0 3px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SHORT SCREENS (Small height / horizontal)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 860px) and (max-height: 680px) {
+  .m-blue-header {
+    padding-top: 8px;
+  }
+  .m-login-title {
+    font-size: 20px;
+  }
+  .m-login-subtitle {
     font-size: 11px;
+    margin-top: 1px;
   }
-}
-
-/* SHORT SCREEN OPTIMIZATIONS (Phone horizontal or small heights) */
-@media (max-width: 860px) and (max-height: 760px) {
-  .m-page {
-    padding-top: 8px;
-    padding-bottom: 6px;
+  .m-illustration-img {
+    height: 65px;
   }
-  .m-logo {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-  }
-  .m-logo svg {
-    width: 30px;
-    height: 30px;
-  }
-  .m-brand-name {
-    font-size: 25px;
-  }
-  .m-brand-subtitle {
-    font-size: 9.5px;
-  }
-  .m-hero {
-    padding-top: 10px;
-  }
-  .m-college-name {
-    font-size: 28px;
-  }
-  .m-state {
-    font-size: 16px;
-    margin-top: 2px;
-  }
-  .m-nba-badge {
-    margin-top: 8px;
-    padding: 6px 12px;
-    font-size: 9.5px;
-  }
-  .m-login-section {
-    padding-top: 8px;
-  }
-  .m-login-card {
-    padding: 14px 16px 12px;
-    border-radius: 18px;
-  }
-  .m-card-header {
-    margin-bottom: 10px;
-  }
-  .m-welcome {
-    font-size: 24px;
-  }
-  .m-description {
-    font-size: 11.5px;
-    margin-top: 3px;
-  }
-  .m-cap-icon {
-    width: 50px;
-    height: 50px;
-  }
-  .m-cap-icon svg {
-    width: 40px;
-    height: 40px;
+  .m-form-container {
+    padding-top: 2px;
+    padding-bottom: 4px;
   }
   .m-input-box {
-    min-height: 44px;
-    border-radius: 11px;
-  }
-  .m-input-box input {
-    height: 40px;
-    font-size: 13.5px;
-  }
-  .m-sign-in {
-    min-height: 44px;
-    margin-top: 10px;
-    font-size: 15px;
-  }
-  .m-campus-footer {
-    margin-top: 10px;
-    padding: 7px 10px;
-  }
-}
-
-/* VERY SHORT SCREENS */
-@media (max-width: 860px) and (max-height: 650px) {
-  .m-brand-subtitle {
-    display: none;
-  }
-  .m-hero {
-    padding-top: 4px;
-  }
-  .m-college-name {
-    font-size: 24px;
-  }
-  .m-state {
-    font-size: 14px;
-  }
-  .m-nba-badge {
-    display: none;
-  }
-  .m-login-card {
-    padding: 10px 14px 10px;
-  }
-  .m-cap-icon {
-    display: none;
-  }
-  .m-input-box {
-    min-height: 38px;
-  }
-  .m-input-box input {
     height: 36px;
   }
-  .m-sign-in {
-    min-height: 38px;
+  .m-field-group {
+    margin-bottom: 6px;
+  }
+  .m-btn-login-now {
+    height: 38px;
+    font-size: 13.5px;
+  }
+  .m-btn-google-signin,
+  .m-btn-signup-now {
+    height: 34px;
+    font-size: 12px;
+  }
+  .m-or-divider {
+    margin: 5px 0;
+  }
+  .m-bottom-inst-footer {
+    font-size: 9.5px;
+    margin-top: 4px;
   }
 }

@@ -11,8 +11,6 @@ function getVidyaApiBase() {
     const isMobileHost =
       window.location.protocol === 'file:' ||
       window.location.protocol === 'capacitor:' ||
-      (window.location.hostname === 'localhost' && (!window.location.port || window.location.protocol === 'https:')) ||
-      (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent) && window.location.hostname === 'localhost') ||
       Boolean(window.VIDYAOS_FORCE_NATIVE) ||
       Boolean(window.VIDYAOS_IS_NATIVE);
     if (isMobileHost) {
