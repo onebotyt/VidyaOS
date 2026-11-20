@@ -62,18 +62,24 @@ function autoFitSheetColumns(sheet, force = false) {
 
   // 2. Dynamically find the LAST COLUMN THAT HAS DATA across all rows
   const lastDataCol = findLastDataColumn(sheet);
-  const activeColCount = Math.max(1, lastDataCol + 1);
+  // On forced screen fit (Fit Screen button), anchor strictly to last column with data
+  // On non-forced auto-fit, preserve any newly added empty columns
+  const activeColCount = force ? Math.max(1, lastDataCol + 1) : Math.max(sheet.colsCount || 1, lastDataCol + 1);
 
-  // Strictly constrain sheet.colsCount to the active columns with data so phantom empty columns are never rendered
+  // Strictly constrain sheet.colsCount to active columns so phantom empty columns are never rendered
   sheet.colsCount = activeColCount;
 
-  // 3. Compute base & minimum widths for every active column
+  // 3. Compute base & minimum widths for every active column dynamically based on header contents
   const fixedWidthCols = new Set();
   const baseWidths = new Array(activeColCount).fill(60);
   const minWidths = new Array(activeColCount).fill(48);
 
+  let studentNameColIdx = -1;
+  let detailsColIdx = -1;
+  let hasDetailsCol = false;
+
   for (let c = 0; c < activeColCount; c++) {
-    // Detect column header content to check for Total / Grand Total / Details
+    // Detect column header content to check for Total / Grand Total / Details / Name
     let colHeaderStr = '';
     for (let r = 0; r <= 2; r++) {
       const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
@@ -91,37 +97,37 @@ function autoFitSheetColumns(sheet, force = false) {
       baseWidths[c] = 63; // User explicit requirement: Total = 63px
       minWidths[c] = 63;
       fixedWidthCols.add(c);
-    } else if (c === 0) {
-      baseWidths[c] = 42; // SR. NO.
-      minWidths[c] = 38;
-    } else if (c === 1) {
-      baseWidths[c] = 50; // ROLL NO.
-      minWidths[c] = 44;
-    } else if (c === 2) {
-      baseWidths[c] = 76; // REG. NO.
-      minWidths[c] = 68;
-    } else if (c === 3) {
+    } else if (colHeaderStr.includes('DETAILS') || colHeaderStr.includes('INSTRUCTION') || colHeaderStr.includes('QUESTION NO.')) {
+      baseWidths[c] = 300; // Room for question statements and instructions
+      minWidths[c] = 180;
+      detailsColIdx = c;
+      hasDetailsCol = true;
+    } else if (colHeaderStr.includes('STUDENT') || colHeaderStr.includes('NAME') || (!colHeaderStr && c === 4)) {
+      baseWidths[c] = 145; // STUDENT NAME
+      minWidths[c] = 120;
+      studentNameColIdx = c;
+    } else if (colHeaderStr.includes('ENROLLMENT') || (!colHeaderStr && c === 3)) {
       baseWidths[c] = 102; // ENROLLMENT NO.
-      minWidths[c] = 92;
-    } else if (c === 4) {
-      baseWidths[c] = 150; // STUDENT NAME
-      minWidths[c] = 130;
+      minWidths[c] = 90;
+    } else if (colHeaderStr.includes('REG') || (!colHeaderStr && c === 2)) {
+      baseWidths[c] = 76; // REG. NO.
+      minWidths[c] = 65;
+    } else if (colHeaderStr.includes('ROLL') || (!colHeaderStr && c === 1)) {
+      baseWidths[c] = 50; // ROLL NO.
+      minWidths[c] = 42;
+    } else if (colHeaderStr.includes('SR') || (!colHeaderStr && c === 0)) {
+      baseWidths[c] = 42; // SR. NO.
+      minWidths[c] = 36;
+    } else if (colHeaderStr.includes('ATTENDANCE') || colHeaderStr.includes('VIVA')) {
+      baseWidths[c] = 54;
+      minWidths[c] = 48;
+    } else if (/^[0-9]+$/.test(colHeaderStr.trim())) {
+      // Individual test questions 1..10
+      baseWidths[c] = 48;
+      minWidths[c] = 40;
     } else {
-      // Questions / Marks / Tests / Custom columns
-      if (colHeaderStr.includes('UNIT TEST DETAILS') || colHeaderStr.includes('INSTRUCTION') || colHeaderStr.includes('QUESTION')) {
-        baseWidths[c] = 300; // Room for question statements and instructions
-        minWidths[c] = 180;
-      } else if (colHeaderStr.includes('ATTENDANCE') || colHeaderStr.includes('VIVA')) {
-        baseWidths[c] = 56;
-        minWidths[c] = 50;
-      } else if (colHeaderStr.includes('1') || colHeaderStr.includes('2') || colHeaderStr.includes('3') || colHeaderStr.includes('4')) {
-        // Individual test questions Q1..Q4
-        baseWidths[c] = 48;
-        minWidths[c] = 42;
-      } else {
-        baseWidths[c] = 68; // Assignment, UTs Total, Problem Solving, Lab Record, Creative Work
-        minWidths[c] = 54;
-      }
+      baseWidths[c] = 68; // Assignment, UTs Total, Problem Solving, Lab Record, Creative Work
+      minWidths[c] = 52;
     }
   }
 
@@ -138,29 +144,23 @@ function autoFitSheetColumns(sheet, force = false) {
   if (availWidth >= totalBaseWidth) {
     const extra = availWidth - totalBaseWidth;
     const scalableCols = [];
-    let hasDetailsCol = false;
-    let detailsColIdx = -1;
 
     for (let c = 0; c < activeColCount; c++) {
       if (!fixedWidthCols.has(c)) {
         scalableCols.push(c);
-        if (baseWidths[c] >= 200) {
-          hasDetailsCol = true;
-          detailsColIdx = c;
-        }
       }
     }
 
-    const hasNameCol = activeColCount > 4 && !fixedWidthCols.has(4);
+    const hasNameCol = studentNameColIdx >= 0 && !fixedWidthCols.has(studentNameColIdx);
     const nameExtra = hasNameCol ? Math.floor(extra * 0.25) : 0;
-    const detailsExtra = hasDetailsCol ? Math.floor(extra * 0.35) : 0;
+    const detailsExtra = hasDetailsCol && detailsColIdx >= 0 ? Math.floor(extra * 0.35) : 0;
     const remainingExtra = extra - nameExtra - detailsExtra;
     const perColExtra = scalableCols.length > 0 ? Math.floor(remainingExtra / scalableCols.length) : 0;
 
     for (let c = 0; c < activeColCount; c++) {
       if (fixedWidthCols.has(c)) {
         sheet.colWidths[c] = baseWidths[c]; // Strictly 63px or 65px
-      } else if (c === 4 && hasNameCol) {
+      } else if (c === studentNameColIdx && hasNameCol) {
         sheet.colWidths[c] = baseWidths[c] + nameExtra + perColExtra;
       } else if (c === detailsColIdx && hasDetailsCol) {
         sheet.colWidths[c] = baseWidths[c] + detailsExtra + perColExtra;
@@ -226,13 +226,13 @@ function triggerFitColumnsToScreen() {
 
   if (typeof pushUndoState === 'function') pushUndoState('Fit Columns to Screen');
 
-  // 1. Reset zoom to 100% so columns calculate against true viewport coordinates
+  // 1. Reset zoom to 100% so coordinates are true viewport
   if (typeof setSheetZoom === 'function') {
     setSheetZoom(1.0);
   }
 
-  // 2. Perform intelligent column width auto-fit up to last data column
-  autoFitSheetColumns(sheet, true); // force = true so it works on all sheets
+  // 2. Perform intelligent column width auto-fit up to last data column (force = true)
+  autoFitSheetColumns(sheet, true);
 
   // 3. Full structural re-render to apply new column count and <th> widths in DOM
   if (typeof renderExcelGrid === 'function') {
@@ -245,19 +245,22 @@ function triggerFitColumnsToScreen() {
     container.scrollLeft = 0;
   }
 
-  // 5. If table is still slightly wider than viewport (e.g. low-res screen / high Windows DPI scaling):
-  // Automatically adjust zoom scale so the entire sheet fits without horizontal scroll
-  const table = document.getElementById('excel-grid-table');
-  if (container && table) {
-    const tableWidth = table.offsetWidth || table.scrollWidth;
-    const containerWidth = container.clientWidth;
-    if (tableWidth > containerWidth && containerWidth > 300) {
-      const fitZoom = Math.max(0.4, Math.min(1.0, Math.floor((containerWidth / tableWidth) * 100) / 100));
-      if (typeof setSheetZoom === 'function') {
-        setSheetZoom(fitZoom);
+  // 5. In next animation frame after browser layout, check if zoom scaling is needed
+  requestAnimationFrame(() => {
+    const table = document.getElementById('excel-grid-table');
+    const ws = document.getElementById('excel-grid-workspace');
+    if (ws && table) {
+      const tableW = table.offsetWidth || table.scrollWidth;
+      const wsW = ws.clientWidth;
+      if (tableW > wsW && wsW > 250) {
+        const fitScale = Math.max(0.35, Math.min(1.0, Math.floor((wsW / (tableW + 4)) * 100) / 100));
+        if (typeof setSheetZoom === 'function') {
+          setSheetZoom(fitScale);
+        }
       }
+      ws.scrollLeft = 0;
     }
-  }
+  });
 }
 
 // Automatic debounced re-fit on window resize
@@ -276,5 +279,6 @@ if (typeof window !== 'undefined') {
 
   window.findLastDataColumn = findLastDataColumn;
   window.autoFitSheetColumns = autoFitSheetColumns;
+  window.sheetStretchingAutoFit = autoFitSheetColumns;
   window.triggerFitColumnsToScreen = triggerFitColumnsToScreen;
 }

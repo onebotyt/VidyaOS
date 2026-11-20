@@ -6362,7 +6362,8 @@ function renderExcelGrid(rebuildStructure = true) {
   const tbody = document.getElementById('excel-tbody');
   if (!thead || !tbody || !sheet) return;
 
-  const cols = sheet.colsCount || (typeof findLastDataColumn === 'function' ? Math.max(findLastDataColumn(sheet) + 1, 16) : 16);
+  const activeCols = typeof findLastDataColumn === 'function' ? Math.max(1, findLastDataColumn(sheet) + 1) : 16;
+  const cols = sheet.colsCount ? Math.max(sheet.colsCount, activeCols) : activeCols;
   const rows = Math.max(sheet.rowsCount || 50, 40);
 
   // Compute lookup map of merged cells for rowspan / colspan & absorbed cell skipping
@@ -10031,6 +10032,15 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
             EXCEL_WB.name = parsed.name || EXCEL_WB.name;
             EXCEL_WB.sheets = parsed.sheets;
             EXCEL_WB.activeSheetIndex = 0;
+            EXCEL_WB.sheets.forEach(s => {
+              if (typeof findLastDataColumn === 'function') {
+                const lastCol = findLastDataColumn(s);
+                s.colsCount = Math.max(1, lastCol + 1);
+              }
+              if (typeof autoFitSheetColumns === 'function') {
+                autoFitSheetColumns(s, true);
+              }
+            });
             recalculateAllSheetFormulas(false);
             renderSheetTabs();
             renderExcelGrid(true);
@@ -10770,114 +10780,8 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
 }
 
 function autoFitSheetColumns(sheet, force = false) {
-  if (typeof window !== 'undefined' && typeof window.autoFitSheetColumns === 'function' && window.autoFitSheetColumns !== autoFitSheetColumns) {
-    return window.autoFitSheetColumns(sheet, force);
-  }
-  if (!sheet || !sheet.cells) return;
-  if (!sheet.colWidths) sheet.colWidths = {};
-
-  const totalCols = sheet.colsCount || 26;
-  const totalRows = Math.min(sheet.rowsCount || 60, 200);
-
-  // Scan backwards from right to find last column with content
-  let lastDataCol = 0;
-  for (let c = totalCols - 1; c >= 0; c--) {
-    let hasData = false;
-    for (let r = 0; r < totalRows; r++) {
-      const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
-      if (!cell) continue;
-      const v = cell.v !== undefined && cell.v !== null ? String(cell.v).trim() : '';
-      const raw = cell.raw !== undefined && cell.raw !== null ? String(cell.raw).trim() : '';
-      if (v !== '' || raw !== '') {
-        if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet') || v.includes('Uttarakhand'))) {
-          continue;
-        }
-        hasData = true;
-        break;
-      }
-    }
-    if (hasData) {
-      lastDataCol = c;
-      break;
-    }
-  }
-
-  const activeColCount = Math.max(1, lastDataCol + 1);
-
-  const container = document.getElementById('excel-grid-workspace') ||
-    document.getElementById('excel-grid-container') ||
-    document.querySelector('.excel-grid-workspace') ||
-    document.getElementById('sheets-viewport');
-  const screenW = container ? container.clientWidth : (typeof window !== 'undefined' ? window.innerWidth - 80 : 1200);
-  const availWidth = Math.max(screenW - 58, 640);
-
-  const colMaxChars = {};
-  for (let c = 0; c < activeColCount; c++) colMaxChars[c] = 0;
-
-  for (let r = 0; r < Math.min(sheet.rowsCount || 60, 100); r++) {
-    for (let c = 0; c < activeColCount; c++) {
-      const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
-      if (!cell) continue;
-      const v = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || '')).trim();
-      if (!v) continue;
-      if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet') || v.includes('Uttarakhand'))) continue;
-
-      let span = 1;
-      if (Array.isArray(sheet.merges)) {
-        for (const m of sheet.merges) {
-          if (r >= m.s.r && r <= m.e.r && c >= m.s.c && c <= m.e.c) {
-            span = Math.max(1, m.e.c - m.s.c + 1);
-            break;
-          }
-        }
-      }
-      const effChars = span > 1 ? Math.ceil(v.length / span) : v.length;
-      if (effChars > colMaxChars[c]) colMaxChars[c] = effChars;
-    }
-  }
-
-  let totalBaseWidth = 0;
-  const baseWidths = [];
-  for (let c = 0; c < activeColCount; c++) {
-    const chars = Math.max(2, colMaxChars[c] || 4);
-    let baseW = 54;
-    if (c === 0 && chars <= 7) baseW = 44;
-    else if (c === 1 && chars <= 8) baseW = 50;
-    else if (c === 2 && chars <= 10) baseW = 82;
-    else if (c === 3 && chars <= 14) baseW = 114;
-    else if (c === 4 && chars <= 30) baseW = Math.max(165, Math.min(220, chars * 7 + 24));
-    else {
-      if (chars <= 4) baseW = 50;
-      else if (chars <= 7) baseW = 66;
-      else if (chars <= 12) baseW = 82;
-      else if (chars <= 18) baseW = 100;
-      else if (chars <= 25) baseW = 135;
-      else baseW = Math.min(340, Math.max(180, Math.ceil(chars / 2) * 7.5 + 24));
-    }
-    baseWidths[c] = Math.round(baseW);
-    totalBaseWidth += baseWidths[c];
-  }
-
-  if (availWidth >= totalBaseWidth) {
-    const extra = availWidth - totalBaseWidth;
-    const hasNameCol = activeColCount > 4;
-    const nameExtra = hasNameCol ? Math.floor(extra * 0.25) : 0;
-    const perColExtra = Math.floor((extra - nameExtra) / activeColCount);
-    for (let c = 0; c < activeColCount; c++) {
-      if (c === 4 && hasNameCol) {
-        sheet.colWidths[c] = baseWidths[c] + nameExtra + perColExtra;
-      } else {
-        sheet.colWidths[c] = baseWidths[c] + perColExtra;
-      }
-    }
-  } else {
-    for (let c = 0; c < activeColCount; c++) {
-      sheet.colWidths[c] = baseWidths[c];
-    }
-  }
-
-  for (let c = activeColCount; c < sheet.colsCount; c++) {
-    sheet.colWidths[c] = 55;
+  if (typeof window !== 'undefined' && typeof window.sheetStretchingAutoFit === 'function') {
+    return window.sheetStretchingAutoFit(sheet, force);
   }
 }
 
