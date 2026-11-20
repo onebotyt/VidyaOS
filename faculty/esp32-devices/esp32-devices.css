@@ -4,6 +4,32 @@
    Compact, High-Density, Zero-Hardcoded-Hex, Full Theme Token Compliance
    ═══════════════════════════════════════════════════════════════════════════ */
 
+:root {
+  --quick-purple: #8253ed;
+  --quick-orange: #f29513;
+  --oled-screen-bg: #000000;
+  --oled-border: #1e293b;
+  --oled-yellow: #fbbf24;
+  --oled-blue: #38bdf8;
+  --oled-white: #ffffff;
+  --oled-muted: #94a3b8;
+  --oled-light: #cbd5e1;
+  --oled-bright: #f1f5f9;
+}
+
+[data-theme='dark'] {
+  --quick-purple: #9b72ff;
+  --quick-orange: #f5a623;
+  --oled-screen-bg: #000000;
+  --oled-border: #1e293b;
+  --oled-yellow: #fbbf24;
+  --oled-blue: #38bdf8;
+  --oled-white: #ffffff;
+  --oled-muted: #94a3b8;
+  --oled-light: #cbd5e1;
+  --oled-bright: #f1f5f9;
+}
+
 /* Modal Visibility & Transitions */
 .modal-backdrop.open,
 .modal-backdrop.active,
@@ -151,80 +177,107 @@
   }
 }
 
-.esp-kpi-card {
+/* Unified Sleek Telemetry Ribbon */
+.esp-telemetry-banner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
-  padding: 0.55rem 0.8rem;
+  padding: 0.45rem 0.85rem;
+  margin-bottom: 0.65rem;
   box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 992px) {
+  .esp-telemetry-banner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 540px) {
+  .esp-telemetry-banner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.esp-telemetry-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0.35rem;
+}
+
+.esp-telemetry-text {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  min-width: 0;
+  flex: 1;
 }
 
-.esp-kpi-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.15rem;
-}
-
-.esp-kpi-label {
-  font-size: 0.68rem;
+.esp-telemetry-label {
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--text-muted);
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
-.esp-kpi-val {
-  font-size: 1.18rem;
+.esp-telemetry-val-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.1rem;
+}
+
+.esp-telemetry-val {
+  font-size: 1.05rem;
   font-weight: 800;
   color: var(--text-main);
   font-family: var(--font-family-mono, monospace);
   line-height: 1.2;
+  white-space: nowrap;
 }
 
-.esp-kpi-sub {
-  font-size: 0.68rem;
+.esp-telemetry-sub {
+  font-size: 0.64rem;
   color: var(--text-muted);
-  margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.05rem;
 }
 
-.esp-kpi-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  display: inline-block;
-}
-
-.esp-kpi-dot.online {
-  background: var(--status-present);
-  box-shadow: 0 0 5px var(--status-present);
-}
-
-/* Command Center Split Grid: 4 Cards:
-   1. Terminals | 2. Wi-Fi & Failover | 3. Biometric Registration | 4. Live Hardware Console */
-.esp-top-split {
+/* Master 2-Column Command Studio Grid */
+.esp-studio-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1.15fr) minmax(0, 0.95fr);
-  gap: 0.45rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.65rem;
   align-items: stretch;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.65rem;
 }
 
-@media (max-width: 1240px) {
-  .esp-top-split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.55rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .esp-top-split {
+@media (max-width: 1024px) {
+  .esp-studio-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.esp-studio-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* Fallback split grid for older layouts */
+.esp-top-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
 }
 
 /* 1. Left Card: Connected ESP32 Terminals */
@@ -232,18 +285,18 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 10px);
-  padding: 0.55rem 0.65rem;
+  padding: 0.65rem 0.85rem;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
 }
 
-/* 2. Wi-Fi Connectivity & Multi-Network Failover Card (Same Style as Terminals) */
+/* 2. Wi-Fi Connectivity & Multi-Network Failover Card */
 .esp-wifi-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 10px);
-  padding: 0.55rem 0.65rem;
+  padding: 0.65rem 0.85rem;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
@@ -252,7 +305,7 @@
 .esp-wifi-quick-actions {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
 }
 
 .esp-wifi-card-list {
@@ -260,7 +313,7 @@
   flex-direction: column;
   gap: 0.35rem;
   flex: 1;
-  min-height: 110px;
+  min-height: 100px;
   max-height: 220px;
   overflow-y: auto;
   margin: 0.35rem 0;
@@ -272,7 +325,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.35rem 0.5rem;
+  padding: 0.35rem 0.55rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm, 6px);
@@ -299,7 +352,7 @@
 
 .esp-wifi-item-ssid {
   font-family: var(--font-family-mono, monospace);
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
@@ -310,15 +363,15 @@
 .esp-wifi-item-meta {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
   flex-wrap: wrap;
 }
 
 .esp-wifi-card-footer {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding-top: 0.4rem;
+  gap: 0.4rem;
+  padding-top: 0.45rem;
   border-top: 1px dashed var(--border-color);
   margin-top: auto;
 }
@@ -766,8 +819,8 @@
 }
 
 .oled-screen {
-  background: #000000;
-  border: 1px solid #1e293b;
+  background: var(--oled-screen-bg);
+  border: 1px solid var(--oled-border);
   border-radius: 5px;
   overflow: hidden;
   font-family: var(--font-family-mono, monospace);
@@ -776,9 +829,9 @@
 }
 
 .oled-top-bar {
-  background: #000000;
-  color: #fbbf24;
-  border-bottom: 1px solid #fbbf24;
+  background: var(--oled-screen-bg);
+  color: var(--oled-yellow);
+  border-bottom: 1px solid var(--oled-yellow);
   font-size: 0.68rem;
   font-weight: 700;
   padding: 0.2rem 0.45rem;
@@ -798,25 +851,25 @@
 }
 
 .oled-headline {
-  color: #38bdf8;
+  color: var(--oled-blue);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.08em;
 }
 
 .oled-line1 {
-  color: #ffffff;
+  color: var(--oled-white);
   font-size: 0.84rem;
   font-weight: 700;
 }
 
 .oled-line2 {
-  color: #94a3b8;
+  color: var(--oled-muted);
   font-size: 0.68rem;
 }
 
 .oled-line3 {
-  color: #38bdf8;
+  color: var(--oled-blue);
   font-size: 0.68rem;
 }
 
@@ -831,7 +884,7 @@
   font-family: var(--font-family-mono, monospace);
   font-size: 0.6rem;
   background: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
+  color: var(--oled-light);
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -846,7 +899,7 @@
 .oled-sim-btn {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #f1f5f9;
+  color: var(--oled-bright);
   font-size: 0.66rem;
   font-weight: 600;
   padding: 0.25rem 0.35rem;
@@ -1215,4 +1268,291 @@
 
 .scanned-wifi-card:hover {
   background: var(--bg-surface-hover, var(--bg-card));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODERN 4-CARD QUICK ACTION BAR (IMAGE 1 STYLE)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.esp-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.esp-quick-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 18px);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.esp-quick-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent, var(--color-primary));
+}
+
+.esp-quick-card::after {
+  content: "";
+  position: absolute;
+  right: -24px;
+  bottom: -32px;
+  width: 90px;
+  height: 90px;
+  background: var(--accent, var(--color-primary));
+  opacity: 0.06;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.esp-quick-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--oled-white);
+  background: var(--accent, var(--color-primary));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 0.65rem;
+}
+
+.esp-quick-card h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.esp-quick-card p {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+.esp-quick-card button {
+  align-self: flex-start;
+  margin-top: auto;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md, 8px);
+}
+
+.btn-purple {
+  background: var(--quick-purple);
+  color: var(--oled-white);
+  border: none;
+}
+.btn-purple:hover {
+  filter: brightness(0.92);
+  color: var(--oled-white);
+}
+
+.btn-warning {
+  background: var(--quick-orange);
+  color: var(--oled-white);
+  border: none;
+}
+.btn-warning:hover {
+  filter: brightness(0.92);
+  color: var(--oled-white);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INTERACTIVE BIOMETRIC HARDWARE & VIEWBOX DISPLAY (IMAGE 1 STYLE)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.esp-scanner-display-box {
+  background: var(--bg-surface, var(--bg-app));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 14px);
+  padding: 0.75rem 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.scanner-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.25rem;
+}
+
+.scanner-hardware {
+  width: 90px;
+  height: 135px;
+  border-radius: 22px;
+  background: linear-gradient(140deg, var(--bg-card), var(--bg-app));
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.08), var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.sensor {
+  width: 56px;
+  height: 52px;
+  border-radius: 14px;
+  background: radial-gradient(circle, var(--status-present) 0%, rgba(16, 185, 129, 0.2) 70%, transparent 100%), var(--bg-card);
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+  display: grid;
+  place-items: center;
+}
+
+.sensor-led {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--status-present);
+  box-shadow: 0 0 10px var(--status-present);
+}
+
+.sensor-waves {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+
+.sensor-waves span {
+  display: block;
+  height: 2px;
+  background: var(--text-muted);
+  border-radius: 2px;
+}
+
+.sensor-waves span:nth-child(1) { width: 14px; }
+.sensor-waves span:nth-child(2) { width: 22px; }
+.sensor-waves span:nth-child(3) { width: 10px; }
+
+.fingerprint-box {
+  width: 148px;
+  height: 135px;
+  border-radius: 18px;
+  background: linear-gradient(140deg, rgba(37, 99, 235, 0.12), rgba(30, 64, 175, 0.22));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  display: grid;
+  place-items: center;
+  color: var(--color-primary);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 18px rgba(59, 130, 246, 0.15);
+}
+
+.fingerprint-box .fp {
+  width: 68px;
+  height: 68px;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.fingerprint-box.scanning .fp {
+  animation: fpPulse 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes fpPulse {
+  from {
+    transform: scale(0.96);
+    opacity: 0.7;
+    filter: drop-shadow(0 0 4px var(--color-primary));
+  }
+  to {
+    transform: scale(1.05);
+    opacity: 1;
+    filter: drop-shadow(0 0 14px var(--color-primary));
+  }
+}
+
+.corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--color-primary);
+  border-style: solid;
+}
+
+.c1 { top: 10px; left: 10px; border-width: 2.5px 0 0 2.5px; }
+.c2 { top: 10px; right: 10px; border-width: 2.5px 2.5px 0 0; }
+.c3 { bottom: 10px; left: 10px; border-width: 0 0 2.5px 2.5px; }
+.c4 { bottom: 10px; right: 10px; border-width: 0 2.5px 2.5px 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WI-FI SIGNAL BARS & QUICK ADD ROW (IMAGE 1 STYLE)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.esp-wifi-signal-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 13px;
+}
+
+.esp-wifi-signal-bars .bar {
+  width: 3px;
+  background: var(--border-color);
+  border-radius: 1px;
+}
+
+.esp-wifi-signal-bars .bar.bar-1 { height: 4px; }
+.esp-wifi-signal-bars .bar.bar-2 { height: 7px; }
+.esp-wifi-signal-bars .bar.bar-3 { height: 10px; }
+.esp-wifi-signal-bars .bar.bar-4 { height: 13px; }
+
+.esp-wifi-signal-bars .bar.active {
+  background: var(--status-present);
+}
+
+.esp-quick-add-wifi {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.45rem 0.6rem;
+  background: var(--bg-surface, var(--bg-app));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  margin-top: 0.5rem;
+}
+
+.esp-quick-add-wifi input {
+  font-size: 0.78rem;
+  border-radius: var(--radius-sm, 6px);
+}
+
+.esp-quick-add-wifi button {
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .esp-quick-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .esp-quick-grid {
+    grid-template-columns: 1fr;
+  }
+  .scanner-body {
+    gap: 0.85rem;
+  }
+  .scanner-hardware {
+    width: 78px;
+    height: 120px;
+  }
+  .fingerprint-box {
+    width: 125px;
+    height: 120px;
+  }
 }

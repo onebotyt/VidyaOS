@@ -609,7 +609,7 @@
               <th rowspan="2" class="col-sr" style="width:50px; vertical-align:middle;">SR. NO.</th>
               <th rowspan="2" class="col-roll" style="width:80px; vertical-align:middle;">ROLL NO.</th>
               <th rowspan="2" class="col-reg" style="width:120px; vertical-align:middle;">REG. NO.</th>
-              <th rowspan="2" class="col-enroll" style="width:120px; vertical-align:middle;">ENROLLMENT NO.</th>
+              <th rowspan="2" class="col-enroll" style="width:120px; vertical-align:middle;">UBTER ROLL NO.</th>
               <th rowspan="2" class="col-name" style="width:200px; vertical-align:middle;">STUDENT NAME</th>
               <th colspan="${questions.length}" class="col-test" style="text-align:center;">${escapeHtml(test.short_title)} (${escapeHtml(test.title)})</th>
               <th rowspan="2" class="col-total" style="width:70px; vertical-align:middle; text-align:center;">Total</th>
@@ -722,7 +722,7 @@
             <th class="col-sr" style="width:50px;">SR. NO.</th>
             <th class="col-roll" style="width:80px;">ROLL NO.</th>
             <th class="col-reg" style="width:120px;">REG. NO.</th>
-            <th class="col-enroll" style="width:120px;">ENROLLMENT NO.</th>
+            <th class="col-enroll" style="width:120px;">UBTER ROLL NO.</th>
             <th class="col-name" style="min-width:200px;">STUDENT NAME</th>
             ${items.map(it => `<th class="col-test" title="${escapeHtml(it.title)}">${escapeHtml(it.short_title)}</th>`).join('')}
             <th class="col-total" style="width:90px; font-weight:800;">Total Marks</th>
@@ -815,7 +815,7 @@
 
     if (sheetData.type === 'SINGLE_TEST') {
       const qList = sheetData.test?.questions || [];
-      const hdr = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', ...qList.map(q => `Q${q.num}`), 'Total'];
+      const hdr = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME', ...qList.map(q => `Q${q.num}`), 'Total'];
       const rHdr = ws.addRow(hdr);
       rHdr.font = { bold: true };
       rHdr.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF59E0B' } };
@@ -839,7 +839,7 @@
       });
     } else {
       const items = sheetData.items || [];
-      const hdr = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', ...items.map(it => it.short_title), 'Total Marks', 'Average %'];
+      const hdr = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME', ...items.map(it => it.short_title), 'Total Marks', 'Average %'];
       const rHdr = ws.addRow(hdr);
       rHdr.font = { bold: true };
       rHdr.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF59E0B' } };
@@ -1794,7 +1794,7 @@
     ws.addRows([
       { field: 'Full Student Name', value: p.full_name || '--' },
       { field: 'Class Roll No', value: p.class_roll_no || '--' },
-      { field: 'Official Enrollment No', value: p.official_enrollment_no || '--' },
+      { field: 'UBTER Roll No', value: p.official_enrollment_no || '--' },
       { field: 'UBTER Registration No', value: p.registration_no || '--' },
       { field: "Father's Name", value: p.father_name || '--' },
       { field: "Mother's Name", value: p.mother_name || '--' },
@@ -1926,7 +1926,7 @@
         <table class="bio-grid">
           <tr><th>Full Student Name</th><td><b>${escapeHtml(p.full_name || '--')}</b></td></tr>
           <tr><th>Class Roll Number</th><td><b>${escapeHtml(p.class_roll_no || '--')}</b></td></tr>
-          <tr><th>Official Enrollment No</th><td>${escapeHtml(p.official_enrollment_no || '--')}</td></tr>
+          <tr><th>UBTER Roll No</th><td>${escapeHtml(p.official_enrollment_no || '--')}</td></tr>
           <tr><th>UBTER Registration No</th><td>${escapeHtml(p.registration_no || '--')}</td></tr>
           <tr><th>Father's Name</th><td>${escapeHtml(p.father_name || '--')}</td></tr>
           <tr><th>Mother's Name</th><td>${escapeHtml(p.mother_name || '--')}</td></tr>
@@ -2048,7 +2048,7 @@
       wsProfile.addRows([
         { field: 'Full Student Name', value: p.full_name || '' },
         { field: 'Class Roll No', value: p.class_roll_no || '' },
-        { field: 'Official Enrollment No', value: p.official_enrollment_no || '' },
+        { field: 'UBTER Roll No', value: p.official_enrollment_no || '' },
         { field: 'UBTER Registration No', value: p.registration_no || '' },
         { field: "Father's Name", value: p.father_name || '' },
         { field: "Mother's Name", value: p.mother_name || '' },
@@ -2255,7 +2255,7 @@
         <h2>1. Student Demographic Profile</h2>
         <table>
           <tr><th width="25%">Full Student Name</th><td width="25%"><b>${escapeHtml(p.full_name || '')}</b></td><th width="25%">Class Roll Number</th><td width="25%"><b>${escapeHtml(p.class_roll_no || '')}</b></td></tr>
-          <tr><th>Official Enrollment No</th><td>${escapeHtml(p.official_enrollment_no || '')}</td><th>UBTER Registration No</th><td>${escapeHtml(p.registration_no || '')}</td></tr>
+          <tr><th>UBTER Roll No</th><td>${escapeHtml(p.official_enrollment_no || '')}</td><th>UBTER Registration No</th><td>${escapeHtml(p.registration_no || '')}</td></tr>
           <tr><th>Father's Name</th><td>${escapeHtml(p.father_name || '')}</td><th>Mother's Name</th><td>${escapeHtml(p.mother_name || '')}</td></tr>
           <tr><th>Date of Birth</th><td>${p.dob || ''}</td><th>Gender / Category</th><td>${escapeHtml(p.gender || '')} / ${escapeHtml(p.category || '')}</td></tr>
           <tr><th>Aadhar Number</th><td>${escapeHtml(p.aadhar_number || '')}</td><th>Contact Phone</th><td>${escapeHtml(p.phone || '')}</td></tr>
@@ -2594,7 +2594,7 @@
 
     ws.columns = [
       { header: 'Roll #', key: 'roll', width: 10 },
-      { header: 'Enrollment No', key: 'enroll', width: 18 },
+      { header: 'UBTER Roll No', key: 'enroll', width: 18 },
       { header: 'UBTER Reg No', key: 'reg', width: 18 },
       { header: 'Full Student Name', key: 'name', width: 28 },
       { header: 'Gender', key: 'gender', width: 12 },
@@ -2662,7 +2662,7 @@
         <p>Total Records: ${students.length} • Generated: ${new Date().toLocaleDateString()}</p>
         <table>
           <tr>
-            <th>Roll #</th><th>Enrollment No</th><th>UBTER Reg</th><th>Student Full Name</th>
+            <th>Roll #</th><th>UBTER Roll No</th><th>UBTER Reg</th><th>Student Full Name</th>
             <th>Father's Name</th><th>DOB</th><th>Phone</th><th>Cohort</th><th>Batch</th><th>Att %</th>
           </tr>
           ${students.map((s, idx) => `
@@ -2721,7 +2721,7 @@
         <table>
           <thead>
             <tr>
-              <th>Roll #</th><th>Enrollment No</th><th>Student Name</th>
+              <th>Roll #</th><th>UBTER Roll No</th><th>Student Name</th>
               <th>Father's Name</th><th>DOB</th><th>Phone</th><th>Cohort</th><th>Batch</th><th>Attendance %</th>
             </tr>
           </thead>

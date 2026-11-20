@@ -1607,22 +1607,25 @@ async function loadDeviceWifiNetworks(deviceId) {
         cardList.innerHTML = networks.slice(0, 4).map(net => {
           const isDef = Boolean(net.is_default);
           const rssi = net.last_rssi != null ? net.last_rssi : -65;
-          let signalClass = 'medium';
-          if (rssi >= -60) signalClass = 'strong';
-          else if (rssi < -75) signalClass = 'weak';
+          const bars = rssi > -60 ? 4 : rssi > -70 ? 3 : rssi > -80 ? 2 : 1;
 
           return `
             <div class="esp-wifi-compact-item ${isDef ? 'default' : ''}">
               <div class="esp-wifi-item-info">
                 <div class="esp-wifi-item-ssid">${escHtml(net.ssid)}</div>
                 <div class="esp-wifi-item-meta">
-                  <span class="wifi-signal-pill ${signalClass}">${rssi} dBm</span>
-                  <span class="wifi-security-badge" style="font-size:0.6rem; padding:0.1rem 0.3rem;">${escHtml(net.encryption_type || 'WPA2')}</span>
+                  <span class="wifi-security-badge" style="font-size:0.6rem; padding:0.1rem 0.3rem;">${escHtml(net.encryption_type || 'WPA2')} &bull; ${rssi} dBm</span>
                   ${isDef ? `<span class="esp-status-pill online" style="font-size:0.58rem; padding:0.05rem 0.3rem;">DEFAULT</span>` : ''}
                 </div>
               </div>
-              <div class="esp-wifi-item-actions">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="switchDeviceWifiTo(${net.id}, '${escHtml(net.ssid)}')" title="Switch to this network" style="padding:0.18rem 0.45rem; font-size:0.7rem;">Switch</button>
+              <div style="display:inline-flex; align-items:center; gap:0.5rem;">
+                <div class="esp-wifi-signal-bars" title="${rssi} dBm">
+                  <span class="bar bar-1 ${bars >= 1 ? 'active' : ''}"></span>
+                  <span class="bar bar-2 ${bars >= 2 ? 'active' : ''}"></span>
+                  <span class="bar bar-3 ${bars >= 3 ? 'active' : ''}"></span>
+                  <span class="bar bar-4 ${bars >= 4 ? 'active' : ''}"></span>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="switchDeviceWifiTo(${net.id}, '${escHtml(net.ssid)}')" title="Connect/Switch to this network" style="padding:0.18rem 0.45rem; font-size:0.7rem;">Connect</button>
               </div>
             </div>
           `;
@@ -2023,6 +2026,52 @@ async function triggerWifiReset() {
   }
 }
 
+// ─── Modern Studio Quick Action Handlers ────────────────────────────────────
+function focusEnrollStation() {
+  const sel = document.getElementById('enroll-student-select');
+  const sec = document.getElementById('section-bio-enrollment');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (sel) {
+    setTimeout(() => { sel.focus(); }, 300);
+  }
+}
+
+function focusAttendanceScanner() {
+  const sec = document.getElementById('section-bio-enrollment');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  simulateCurrentSelectedStudent();
+}
+
+function focusWifiManager() {
+  const sec = document.getElementById('section-esp-wifi');
+  if (sec) {
+    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    switchEspTab('wifi');
+  }
+}
+
+async function quickAddStudioWifi() {
+  const ssidInput = document.getElementById('studio-quick-ssid');
+  const passInput = document.getElementById('studio-quick-password');
+  const ssid = ssidInput ? ssidInput.value.trim() : '';
+  const pass = passInput ? passInput.value.trim() : '';
+
+  if (!ssid) {
+    showToast('Please enter a Wi-Fi network SSID.', 'warning');
+    return;
+  }
+
+  const manualSsid = document.getElementById('manual-wifi-ssid');
+  const manualPass = document.getElementById('manual-wifi-password');
+  if (manualSsid) manualSsid.value = ssid;
+  if (manualPass) manualPass.value = pass;
+
+  await submitAddWifiManual();
+  if (ssidInput) ssidInput.value = '';
+  if (passInput) passInput.value = '';
+}
+
 // ─── Window Function Exports ───────────────────────────────────────────────
 window.loadEsp32Overview = loadEsp32Overview;
 window.onSwitchDepartment = onSwitchDepartment;
@@ -2073,5 +2122,9 @@ window.enrollCurrentSelectedStudent = enrollCurrentSelectedStudent;
 window.simulateCurrentSelectedStudent = simulateCurrentSelectedStudent;
 window.removeCurrentSelectedStudentTemplate = removeCurrentSelectedStudentTemplate;
 window.switchEspTab = switchEspTab;
+window.focusEnrollStation = focusEnrollStation;
+window.focusAttendanceScanner = focusAttendanceScanner;
+window.focusWifiManager = focusWifiManager;
+window.quickAddStudioWifi = quickAddStudioWifi;
 
 document.addEventListener('DOMContentLoaded', loadEsp32Overview);
