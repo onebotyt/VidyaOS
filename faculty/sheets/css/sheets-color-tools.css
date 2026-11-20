@@ -1,9 +1,9 @@
 /* ══════════════════════════════════════════════════════════════
-   EXCEL STUDIO: COLOR FORMATTING & PALETTE POPUPS
+   EXCEL STUDIO: COLOR FORMATTING & CONDITIONAL STYLING (EXCEL SUITE)
    ══════════════════════════════════════════════════════════════ */
 
 .excel-color-btn-wrapper {
-  position: relative;
+  position: relative !important;
   display: inline-flex;
   align-items: center;
 }
@@ -26,68 +26,113 @@
   background-color: var(--text-main);
 }
 
+/* Floating Palette Popup - Positioned fixed to guarantee NO overflow clipping by ribbon or formula bar */
 .excel-color-palette-popup {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 1000;
-  min-width: 210px;
-  padding: 0.65rem;
+  position: fixed !important;
+  z-index: 9999999 !important;
+  min-width: 240px;
+  max-width: 270px;
+  padding: 0.65rem 0.75rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
-  box-shadow: 0 10px 30px hsla(220, 30%, 10%, 0.18);
+  box-shadow: 0 16px 48px hsla(220, 30%, 8%, 0.26), 0 2px 6px hsla(220, 20%, 10%, 0.1);
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
   animation: officeFadeIn 0.12s ease-out;
+  user-select: none;
 }
 
-.palette-header {
-  font-size: 0.7rem;
+.palette-section-title {
+  font-size: 0.68rem;
   font-weight: 700;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--text-muted);
-  padding: 0 0.2rem;
+  margin: 0.2rem 0 0.15rem 0;
 }
 
-.palette-grid {
+/* Excel 10-Column Theme Matrix */
+.excel-theme-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 0.35rem;
+}
+
+.excel-theme-row {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+}
+
+.excel-theme-row.base-row {
+  margin-bottom: 3px;
 }
 
 .color-swatch {
-  width: 20px;
-  height: 20px;
-  border-radius: 3px;
+  width: 19px;
+  height: 17px;
+  border-radius: 2px;
   border: 1px solid var(--border-color);
   cursor: pointer;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.1s ease, border-color 0.1s ease;
+  transition: transform 0.08s ease, outline 0.08s ease;
+  box-sizing: border-box;
 }
 
 .color-swatch:hover {
-  transform: scale(1.18);
-  border-color: var(--color-primary);
-  z-index: 2;
+  transform: scale(1.22);
+  outline: 1.5px solid var(--color-primary);
+  z-index: 10;
 }
 
-.color-swatch.no-fill {
-  background: var(--bg-surface) !important;
-  color: var(--status-absent, #ef4444);
-  font-size: 0.65rem;
-  font-weight: 800;
+/* 10 Standard Colors Row */
+.excel-standard-row {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  margin-bottom: 0.35rem;
+}
+
+.excel-standard-row .color-swatch {
+  height: 19px;
+}
+
+.palette-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.3rem 0.45rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 4px);
+  color: var(--text-main);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+}
+
+.palette-action-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  border-color: var(--border-color);
+}
+
+.palette-action-btn svg {
+  flex-shrink: 0;
 }
 
 .palette-divider {
   height: 1px;
   background: var(--border-color);
-  margin: 0.2rem 0;
+  margin: 0.25rem 0;
 }
 
 .palette-custom-row {
@@ -95,14 +140,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  padding: 0.2rem 0.35rem;
   font-size: 0.74rem;
+  font-weight: 600;
   color: var(--text-main);
-  padding: 0.1rem 0.2rem;
 }
 
 .palette-custom-row input[type="color"] {
-  width: 26px;
-  height: 24px;
+  width: 28px;
+  height: 22px;
   padding: 0;
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -110,29 +156,73 @@
   background: none;
 }
 
-.palette-preset-btn {
+/* ══════════════════════════════════════════════════════════════
+   EXCEL CONDITIONAL FORMATTING DROPDOWN MENU
+   ══════════════════════════════════════════════════════════════ */
+.excel-conditional-dropdown {
+  position: fixed !important;
+  z-index: 9999999 !important;
+  min-width: 260px;
+  padding: 0.45rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 18px 48px hsla(220, 30%, 8%, 0.28), 0 2px 6px hsla(220, 20%, 10%, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  animation: officeFadeIn 0.12s ease-out;
+  user-select: none;
+}
+
+.cond-menu-item {
   display: flex;
   align-items: center;
+  gap: 0.55rem;
   width: 100%;
-  padding: 0.25rem 0.35rem;
+  padding: 0.38rem 0.55rem;
   background: transparent;
   border: none;
   border-radius: var(--radius-sm, 4px);
+  color: var(--text-main);
+  font-size: 0.76rem;
+  font-weight: 600;
   cursor: pointer;
   text-align: left;
-  transition: background 0.12s ease;
+  transition: all 0.12s ease;
 }
 
-.palette-preset-btn:hover {
-  background: var(--bg-surface-secondary, rgba(0, 0, 0, 0.04));
+.cond-menu-item:hover {
+  background: var(--bg-surface-hover, var(--bg-surface));
+  color: var(--color-primary);
 }
 
-.preset-pill {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.15rem 0.45rem;
+.cond-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
   border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.cond-item-label {
+  flex: 1;
+}
+
+.cond-badge-preview {
+  display: inline-block;
+  padding: 0.12rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.cond-scale-bar {
+  display: inline-block;
+  width: 48px;
+  height: 10px;
+  border-radius: 2px;
   border: 1px solid var(--border-color);
-  width: 100%;
 }

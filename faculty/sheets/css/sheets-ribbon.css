@@ -9,6 +9,8 @@
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
   box-shadow: 0 1px 3px hsla(220, 20%, 10%, 0.04);
+  position: relative;
+  z-index: 1000;
 }
 
 .excel-ribbon-tabs {

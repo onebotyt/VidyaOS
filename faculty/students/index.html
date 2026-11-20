@@ -238,116 +238,64 @@
   <!-- Modal: View Student Full Details -->
   <div id="modal-student-details" class="stu-modal-backdrop" style="display: none;"
     onclick="if(event.target===this)closeStudentDetailsModal()">
-    <div class="stu-modal-card">
+    <div class="stu-modal-card stu-detail-modal-card">
       <div class="stu-modal-header">
         <div class="stu-modal-title-group">
           <div class="stu-modal-avatar" id="detail-stu-avatar">ST</div>
-          <div>
-            <h2 id="detail-stu-name" style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0;">
-              Student Details</h2>
-            <div style="display: flex; align-items: center; gap: 0.45rem; margin-top: 0.15rem;">
-              <span id="detail-stu-roll"
-                style="font-family: var(--font-family-mono); font-size: 0.76rem; font-weight: 700; color: var(--color-primary);">Roll
-                #—</span>
+          <div class="stu-detail-header-meta">
+            <h2 id="detail-stu-name" class="stu-detail-title">Student Details</h2>
+            <div class="stu-detail-badges-row">
+              <span id="detail-stu-roll" class="stu-detail-roll-pill">Roll #—</span>
               <span class="stu-modal-cohort-badge" id="detail-stu-cohort">Cohort</span>
               <span class="stu-status-chip enrolled" id="detail-stu-status-badge">Enrolled</span>
             </div>
           </div>
         </div>
-        <button type="button" class="btn-modal-close" onclick="closeStudentDetailsModal()">&times;</button>
+        <button type="button" class="btn-modal-close" onclick="closeStudentDetailsModal()" title="Close details">&times;</button>
       </div>
 
       <div class="stu-modal-body">
         <div class="stu-details-grid">
-          <div class="stu-detail-item">
+          <div class="stu-detail-tile">
             <label>Official Enrollment #</label>
-            <span id="detail-stu-enroll"
-              style="font-family: var(--font-family-mono); color: var(--color-primary);">—</span>
+            <span id="detail-stu-enroll" class="stu-val-mono">—</span>
           </div>
-          <div class="stu-detail-item">
+          <div class="stu-detail-tile">
             <label>UBTER Reg. #</label>
-            <span id="detail-stu-reg" style="font-family: var(--font-family-mono);">—</span>
+            <span id="detail-stu-reg" class="stu-val-mono">—</span>
           </div>
-          <div class="stu-detail-item">
+          <div class="stu-detail-tile">
             <label>Attendance Standing</label>
-            <span id="detail-stu-att">—</span>
+            <span id="detail-stu-att" class="stu-val-highlight">—</span>
           </div>
-          <div class="stu-detail-item">
+          <div class="stu-detail-tile">
             <label>Department</label>
             <span id="detail-stu-dept">—</span>
           </div>
-          <div class="stu-detail-item">
+          <div class="stu-detail-tile">
             <label>Email Address</label>
             <span id="detail-stu-email">—</span>
           </div>
-          <div class="stu-detail-item">
+          <div class="stu-detail-tile">
             <label>Phone Number</label>
             <span id="detail-stu-phone">—</span>
-          </div>
-        </div>
-
-        <!-- Academic Records & Uploaded Documents (Permanently Accessible) -->
-        <div class="stu-records-section">
-          <div class="stu-records-header">
-            <div class="stu-records-title">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-              <span>Academic Records &amp; Documents</span>
-              <span class="stu-doc-tag" id="detail-docs-count">0 files</span>
-            </div>
-            <button type="button" class="btn-stu-outline" style="height:26px; padding:0 0.5rem; font-size:0.72rem;" onclick="toggleUploadDocBox()">
-              + Attach Doc
-            </button>
-          </div>
-
-          <!-- Inline Document Upload Box -->
-          <div id="stu-inline-upload-box" class="stu-upload-box" style="display:none; margin-bottom: 0.65rem;">
-            <div style="font-size:0.75rem; font-weight:700; margin-bottom:0.4rem; color:var(--text-main);">Upload Student Document / Certificate</div>
-            <div style="display:flex; flex-direction:column; gap:0.4rem;">
-              <input type="text" id="doc-upload-title" placeholder="Document Title (e.g. Transfer Certificate, Marksheet)"
-                style="padding:0.35rem 0.5rem; font-size:0.75rem; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main);">
-              <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-                <select id="doc-upload-type" style="padding:0.35rem 0.5rem; font-size:0.75rem; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-main); flex:1; min-width:140px;">
-                  <option value="ACADEMIC_RECORD">Academic Record</option>
-                  <option value="TRANSFER_CERTIFICATE">Transfer Certificate (TC)</option>
-                  <option value="WITHDRAWAL_FORM">Withdrawal Form</option>
-                  <option value="ADMISSION_PROOF">Admission Proof</option>
-                  <option value="ID_PROOF">ID Proof / Aadhaar</option>
-                  <option value="MEDICAL_CERTIFICATE">Medical Certificate</option>
-                  <option value="OTHER">Other Document</option>
-                </select>
-                <input type="file" id="doc-upload-file" style="font-size:0.72rem; flex:1.2; min-width:140px; color:var(--text-main);">
-              </div>
-              <div style="display:flex; justify-content:flex-end; gap:0.4rem; margin-top:0.2rem;">
-                <button type="button" class="btn-stu-outline" style="height:24px; padding:0 0.5rem; font-size:0.7rem;" onclick="toggleUploadDocBox()">Cancel</button>
-                <button type="button" class="btn-stu-compact" style="height:24px; padding:0 0.65rem; font-size:0.7rem;" onclick="submitStudentDocument()">Upload</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Document List Container -->
-          <div class="stu-doc-list" id="detail-doc-list">
-            <div style="padding:0.75rem; text-align:center; color:var(--text-muted); font-size:0.75rem;">
-              Loading student records...
-            </div>
           </div>
         </div>
       </div>
 
       <div class="stu-details-footer">
-        <button type="button" class="btn-stu-outline" onclick="closeStudentDetailsModal()">Close</button>
-        <button type="button" class="btn-stu-compact" id="detail-btn-edit" onclick="detailEditStudent()">Edit Student</button>
-        <button type="button" class="btn-stu-outline" id="detail-btn-transfer" onclick="detailTransferStudent()">Transfer</button>
-        <button type="button" class="btn-stu-outline" id="detail-btn-withdraw" onclick="detailWithdrawStudent()">Withdraw</button>
-        <button type="button" class="btn-stu-compact" id="detail-btn-reactivate" style="display:none;" onclick="detailReactivateStudent()">Re-Activate</button>
-        <button type="button" class="btn-stu-outline" onclick="detailResetPassword()">Reset Password</button>
-        <button type="button" class="btn-stu-compact danger" id="detail-btn-delete"
-          onclick="detailDeleteStudent()">Remove Student</button>
+        <div class="stu-footer-secondary">
+          <button type="button" class="btn-stu-compact danger" id="detail-btn-delete"
+            onclick="detailDeleteStudent()" title="Remove student from roster">Remove Student</button>
+          <button type="button" class="btn-stu-outline" onclick="detailResetPassword()" title="Reset student password">Reset Password</button>
+        </div>
+        <div class="stu-footer-primary">
+          <button type="button" class="btn-stu-outline" onclick="closeStudentDetailsModal()">Close</button>
+          <button type="button" class="btn-stu-outline" id="detail-btn-transfer" onclick="detailTransferStudent()">Transfer</button>
+          <button type="button" class="btn-stu-outline" id="detail-btn-withdraw" onclick="detailWithdrawStudent()">Withdraw</button>
+          <button type="button" class="btn-stu-compact" id="detail-btn-reactivate" style="display:none;" onclick="detailReactivateStudent()">Re-Activate</button>
+          <button type="button" class="btn-stu-compact" id="detail-btn-edit" onclick="detailEditStudent()">Edit Student</button>
+        </div>
       </div>
     </div>
   </div>

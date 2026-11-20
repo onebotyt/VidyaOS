@@ -3432,6 +3432,8 @@ span.excel-hdr-num-badge {
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  position: relative;
+  z-index: 1000;
 }
 
 .excel-ribbon-tabs {

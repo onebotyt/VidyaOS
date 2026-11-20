@@ -609,14 +609,7 @@
     if (btnWithdraw) btnWithdraw.style.display = isInactive ? 'none' : '';
     if (btnReactivate) btnReactivate.style.display = isInactive ? '' : 'none';
 
-    // Hide inline upload box initially
-    const uploadBox = document.getElementById('stu-inline-upload-box');
-    if (uploadBox) uploadBox.style.display = 'none';
-
     modal.style.display = 'flex';
-
-    // Load student documents & academic records
-    loadStudentDocuments(id);
   }
 
   function closeStudentDetailsModal() {
@@ -664,187 +657,6 @@
     const st = allStudents.find(s => (s.student_id || s.id) === currentDetailStudentId);
     reactivateStudentAction(currentDetailStudentId, st?.full_name || 'Student');
     closeStudentDetailsModal();
-  }
-
-  async function loadStudentDocuments(id) {
-    const listEl = document.getElementById('detail-doc-list');
-    const countEl = document.getElementById('detail-docs-count');
-    if (!listEl) return;
-
-    listEl.innerHTML = `<div style="padding:0.6rem; text-align:center; color:var(--text-muted); font-size:0.75rem;">Loading documents...</div>`;
-
-    try {
-      const res = await api(`/hod/students/${id}/documents`);
-      if (res && res.success && res.data) {
-        const docs = res.data.documents || [];
-        const subs = res.data.submissions || [];
-        const leaves = res.data.leaves || [];
-        const totalItems = docs.length + subs.length + leaves.length;
-
-        if (countEl) countEl.textContent = `${totalItems} file${totalItems === 1 ? '' : 's'}`;
-
-        if (totalItems === 0) {
-          listEl.innerHTML = `<div style="padding:0.75rem; text-align:center; color:var(--text-muted); font-size:0.74rem;">No uploaded documents or academic submissions yet. Use &ldquo;+ Attach Doc&rdquo; to add records.</div>`;
-          return;
-        }
-
-        let html = '';
-
-        docs.forEach(doc => {
-          const typeLabel = doc.document_type ? doc.document_type.replace(/_/g, ' ') : 'Document';
-          html += `
-            <div class="stu-doc-item">
-              <div class="stu-doc-item-left">
-                <svg class="stu-doc-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                <div style="min-width:0; flex:1;">
-                  <div class="stu-doc-name" title="${esc(doc.title)}">${esc(doc.title)}</div>
-                  <div style="font-size:0.68rem; color:var(--text-muted); display:flex; align-items:center; gap:0.4rem;">
-                    <span>${new Date(doc.created_at).toLocaleDateString()}</span>
-                    <span>&bull;</span>
-                    <span>${esc(doc.uploader_name || 'Faculty')}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="stu-doc-actions">
-                <span class="stu-doc-tag">${esc(typeLabel)}</span>
-                <a href="${esc(doc.file_path)}" target="_blank" download class="stu-doc-link" title="Open or Download File">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  <span>View</span>
-                </a>
-                <button type="button" class="btn-kebab" style="width:24px; height:24px; border:none; color:var(--status-absent);" title="Delete Document" onclick="deleteStudentDocumentAction(${doc.id})">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                </button>
-              </div>
-            </div>
-          `;
-        });
-
-        subs.forEach(sub => {
-          html += `
-            <div class="stu-doc-item">
-              <div class="stu-doc-item-left">
-                <svg class="stu-doc-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="9 11 12 14 22 4"></polyline>
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                </svg>
-                <div style="min-width:0; flex:1;">
-                  <div class="stu-doc-name" title="${esc(sub.assessment_title)}">${esc(sub.assessment_title)}</div>
-                  <div style="font-size:0.68rem; color:var(--text-muted);">
-                    ${esc(sub.subject_code || '')} &bull; Marks: ${sub.marks_obtained != null ? sub.marks_obtained : 'Ungraded'}
-                  </div>
-                </div>
-              </div>
-              <div class="stu-doc-actions">
-                <span class="stu-doc-tag">${esc(sub.assessment_type || 'COURSEWORK')}</span>
-                ${sub.file_path ? `
-                <a href="${esc(sub.file_path)}" target="_blank" download class="stu-doc-link" title="Download Submission File">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  <span>View</span>
-                </a>
-                ` : ''}
-              </div>
-            </div>
-          `;
-        });
-
-        leaves.forEach(lv => {
-          html += `
-            <div class="stu-doc-item">
-              <div class="stu-doc-item-left">
-                <svg class="stu-doc-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                <div style="min-width:0; flex:1;">
-                  <div class="stu-doc-name">Leave: ${esc(lv.reason || 'Medical / Personal Leave')}</div>
-                  <div style="font-size:0.68rem; color:var(--text-muted);">
-                    ${lv.start_date} to ${lv.end_date} &bull; Status: ${esc(lv.status)}
-                  </div>
-                </div>
-              </div>
-              <div class="stu-doc-actions">
-                <span class="stu-doc-tag">LEAVE</span>
-              </div>
-            </div>
-          `;
-        });
-
-        listEl.innerHTML = html;
-      }
-    } catch (err) {
-      listEl.innerHTML = `<div style="padding:0.6rem; text-align:center; color:var(--status-absent); font-size:0.74rem;">Failed to load documents: ${esc(err.message)}</div>`;
-    }
-  }
-
-  function toggleUploadDocBox() {
-    const box = document.getElementById('stu-inline-upload-box');
-    if (!box) return;
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
-  }
-
-  async function submitStudentDocument() {
-    if (!currentDetailStudentId) return;
-    const titleInput = document.getElementById('doc-upload-title');
-    const typeSelect = document.getElementById('doc-upload-type');
-    const fileInput = document.getElementById('doc-upload-file');
-
-    if (!fileInput || !fileInput.files.length) {
-      notify('Please select a file to upload', 'error');
-      return;
-    }
-
-    const file = fileInput.files[0];
-    const title = titleInput?.value.trim() || file.name;
-    const document_type = typeSelect?.value || 'ACADEMIC_RECORD';
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('title', title);
-    formData.append('document_type', document_type);
-
-    try {
-      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-      const res = await fetch(`/api/v1/hod/students/${currentDetailStudentId}/documents`, {
-        method: 'POST',
-        headers: {
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: formData
-      });
-      const data = await res.json();
-      if (data && data.success) {
-        notify('Student document uploaded and archived successfully!', 'success');
-        if (titleInput) titleInput.value = '';
-        if (fileInput) fileInput.value = '';
-        toggleUploadDocBox();
-        await loadStudentDocuments(currentDetailStudentId);
-      } else {
-        throw new Error(data?.error?.message || 'Upload failed');
-      }
-    } catch (err) {
-      notify(err.message, 'error');
-    }
-  }
-
-  async function deleteStudentDocumentAction(docId) {
-    if (!currentDetailStudentId) return;
-    if (!confirm('Remove this document from the student records?')) return;
-    try {
-      const res = await api(`/hod/students/${currentDetailStudentId}/documents/${docId}`, { method: 'DELETE' });
-      if (res && res.success) {
-        notify('Document removed successfully', 'success');
-        await loadStudentDocuments(currentDetailStudentId);
-      } else {
-        throw new Error(res?.error?.message || 'Delete failed');
-      }
-    } catch (err) {
-      notify(err.message, 'error');
-    }
   }
 
   // 9. Actions: Reset, Transfer, Withdraw, Reactivate, Delete, Restore, Reindex, Approve, Reject
@@ -1843,9 +1655,6 @@
   window.transferStudentAction = transferStudentAction;
   window.withdrawStudentAction = withdrawStudentAction;
   window.reactivateStudentAction = reactivateStudentAction;
-  window.toggleUploadDocBox = toggleUploadDocBox;
-  window.submitStudentDocument = submitStudentDocument;
-  window.deleteStudentDocumentAction = deleteStudentDocumentAction;
   window.resetStudentPassword = resetStudentPassword;
   window.deleteStudentMember = deleteStudentMember;
   window.restoreStudentMember = restoreStudentMember;
