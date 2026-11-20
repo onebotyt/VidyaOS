@@ -68,12 +68,28 @@ function showOfficeScreenLoader(msg = 'Loading...') {
   const loader = document.getElementById('office-engine-loader');
   const txt = document.getElementById('office-loader-status');
   if (txt) txt.textContent = msg;
-  if (loader) loader.style.display = 'flex';
+  if (loader) {
+    loader.style.display = 'flex';
+    loader.classList.remove('hidden');
+    // Clear any previous timer
+    if (window._officeLoaderTimer) clearTimeout(window._officeLoaderTimer);
+    // Hard safety ceiling: loader can NEVER stay visible for more than 2500ms under any circumstance
+    window._officeLoaderTimer = setTimeout(() => {
+      hideOfficeScreenLoader();
+    }, 2500);
+  }
 }
 
 function hideOfficeScreenLoader() {
   const loader = document.getElementById('office-engine-loader');
-  if (loader) loader.style.display = 'none';
+  if (loader) {
+    loader.style.display = 'none';
+    loader.classList.add('hidden');
+  }
+  if (window._officeLoaderTimer) {
+    clearTimeout(window._officeLoaderTimer);
+    window._officeLoaderTimer = null;
+  }
 }
 
 /**
@@ -105,10 +121,10 @@ async function loadSpreadsheetEngine(onReady) {
       await onReady();
     }
 
-    // Safety fallback to hide loader if network lags
+    // Safety fallback to hide loader quickly so buttons never freeze
     setTimeout(() => {
       hideOfficeScreenLoader();
-    }, 8000);
+    }, 1200);
   } catch (err) {
     console.error('Fatal error loading spreadsheet engine:', err);
     hideOfficeScreenLoader();
@@ -117,6 +133,13 @@ async function loadSpreadsheetEngine(onReady) {
     }
   }
 }
+
+// Allow Escape key to dismiss stuck loader at any time
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    hideOfficeScreenLoader();
+  }
+});
 
 /**
  * Recent Workbooks Management
@@ -431,26 +454,34 @@ async function initOfficePortal() {
     const viewParam = params.get('view');
     const isHomeStart = viewParam === 'home' || (!qId && !params.get('sheet'));
 
-    // Fetch teaching groups lightweight
-    try {
-      const res = await apiFetch('/teaching-groups?status=ACTIVE');
-      if (res && res.success && Array.isArray(res.data)) {
-        S.allGroups = res.data;
-        if (!S.groupId && S.allGroups.length > 0) {
-          S.groupId = S.allGroups[0].id;
+    // Fetch teaching groups lightweight in background without blocking sheet launch
+    const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
+    Promise.race([apiFetch('/teaching-groups?status=ACTIVE'), timeout(2000)])
+      .then(res => {
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+          S.allGroups = res.data;
+          if (!S.groupId && S.allGroups.length > 0) {
+            S.groupId = S.allGroups[0].id;
+          }
+          if (typeof renderOfficeSubjectsGrid === 'function') {
+            renderOfficeSubjectsGrid();
+          }
+          if (typeof renderGroupSwitcherOptions === 'function') {
+            renderGroupSwitcherOptions();
+          }
         }
-      }
-    } catch (err) {
-      console.warn('Could not load groups via apiFetch, using offline fallback', err);
-    }
+      })
+      .catch(err => {
+        console.warn('Could not load groups via apiFetch, using offline fallback', err);
+      });
 
     if (isHomeStart) {
       openOfficeHomeScreen();
       hideOfficeScreenLoader();
     } else {
-      // Direct deep link to specific sheet -> keep center gray loading animation visible to block extra clicks
-      showOfficeScreenLoader('Loading...');
+      // Direct deep link to specific sheet -> immediately close home, show brief loader and boot spreadsheet engine
       closeOfficeHomeScreen();
+      showOfficeScreenLoader('Loading...');
       loadSpreadsheetEngine();
     }
   } catch (err) {

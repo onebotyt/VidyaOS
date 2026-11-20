@@ -5439,6 +5439,13 @@ span.excel-hdr-num-badge {
   animation: officeFadeIn 0.15s ease-out;
 }
 
+.office-engine-loader[style*="display: none"],
+.office-engine-loader.hidden {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 [data-theme='dark'] .office-engine-loader {
   background: hsla(220, 25%, 8%, 0.68);
 }

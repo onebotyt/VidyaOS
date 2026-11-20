@@ -201,7 +201,7 @@
       <!-- ══════════════════════════════════════════════════════════════
        OFFICE FULLSCREEN GRAY LOADING OVERLAY (PREVENTS EXTRA CLICKS)
        ══════════════════════════════════════════════════════════════ -->
-      <div id="office-engine-loader" class="office-engine-loader" style="display:none;" aria-live="polite">
+      <div id="office-engine-loader" class="office-engine-loader" style="display:none;" aria-live="polite" onclick="if(event.target === this) hideOfficeScreenLoader();">
         <div class="office-loader-card">
           <svg class="office-spinner-dots-svg" width="56" height="56" viewBox="0 0 56 56" fill="currentColor" aria-hidden="true">
             <circle cx="28" cy="8" r="4.5" opacity="1.0"/>
