@@ -5,6 +5,16 @@
    anchored to the LAST COLUMN THAT CONTAINS DATA (not just 'total').
    ══════════════════════════════════════════════════════════════ */
 
+function getCellColSpan(sheet, r, c) {
+  if (!sheet || !sheet.merges || !sheet.merges.length) return 1;
+  for (const m of sheet.merges) {
+    if (r >= m.s.r && r <= m.e.r && c >= m.s.c && c <= m.e.c) {
+      return Math.max(1, (m.e.c - m.s.c + 1));
+    }
+  }
+  return 1;
+}
+
 function findLastDataColumn(sheet) {
   if (!sheet || !sheet.cells) return 0;
   const totalCols = sheet.colsCount || 26;
@@ -21,7 +31,7 @@ function findLastDataColumn(sheet) {
 
       if (v !== '' || raw !== '') {
         // Exclude full-width institutional banner row from determining column width
-        if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet'))) {
+        if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet') || v.includes('Uttarakhand'))) {
           continue;
         }
         return c; // Found the last column with actual data!
@@ -50,62 +60,73 @@ function autoFitSheetColumns(sheet, force = false) {
   // Subtract row header (42px) + scrollbar/border cushion (16px)
   const availWidth = Math.max(screenW - 58, 640);
 
-  // Dynamically find the LAST COLUMN THAT HAS DATA across all rows
+  // 1. Dynamically find the LAST COLUMN THAT HAS DATA across all rows
   const lastDataCol = findLastDataColumn(sheet);
   const activeColCount = Math.max(1, lastDataCol + 1);
 
-  // Calculate content-aware base width for each column up to lastDataCol
+  // 2. Measure max content characters for every column from 0 to lastDataCol
   const colMaxChars = {};
   for (let c = 0; c < activeColCount; c++) {
     colMaxChars[c] = 0;
   }
 
-  const sampleRows = Math.min(sheet.rowsCount || 40, 60);
+  const sampleRows = Math.min(sheet.rowsCount || 60, 100);
   for (let r = 0; r < sampleRows; r++) {
     for (let c = 0; c < activeColCount; c++) {
       const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
       if (!cell) continue;
       const v = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || '')).trim();
-      // Skip banner row text
-      if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet'))) {
+      if (!v) continue;
+
+      // Skip full-width institutional banner row from determining column width
+      if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet') || v.includes('Uttarakhand'))) {
         continue;
       }
-      if (v.length > colMaxChars[c] && v.length < 40) {
-        colMaxChars[c] = v.length;
+
+      // Check if this cell is merged across multiple columns
+      const span = getCellColSpan(sheet, r, c);
+      const effChars = span > 1 ? Math.ceil(v.length / span) : v.length;
+
+      if (effChars > colMaxChars[c]) {
+        colMaxChars[c] = effChars;
       }
     }
   }
 
-  // Base width rules for active data columns
+  // 3. Compute the required non-overlapping base width for every active column
   let totalBaseWidth = 0;
   const baseWidths = [];
 
   for (let c = 0; c < activeColCount; c++) {
     const chars = Math.max(2, colMaxChars[c] || 4);
-    let baseW = 52; // Default for numbers / short marks
+    let baseW = 54;
 
-    if (c === 0 && chars <= 4) {
-      baseW = 40;  // SR. NO.
-    } else if (c === 1 && chars <= 6) {
-      baseW = 48;  // ROLL NO.
+    if (c === 0 && chars <= 7) {
+      baseW = 44; // SR. NO.
+    } else if (c === 1 && chars <= 8) {
+      baseW = 50; // ROLL NO.
     } else if (c === 2 && chars <= 10) {
-      baseW = 76;  // REG. NO.
+      baseW = 82; // REG. NO.
     } else if (c === 3 && chars <= 14) {
-      baseW = 98;  // ENROLLMENT NO.
-    } else if (c === 4 && chars <= 28) {
-      baseW = 145; // STUDENT NAME
+      baseW = 114; // ENROLLMENT NO. (fits 11-12 digit numbers without '...')
+    } else if (c === 4 && chars <= 30) {
+      baseW = Math.max(165, Math.min(220, chars * 7 + 24)); // STUDENT NAME
     } else {
-      // Data / marks / custom columns
-      if (chars <= 5) {
-        baseW = 52;
-      } else if (chars <= 10) {
-        baseW = 62;
-      } else if (chars <= 16) {
-        baseW = 70;
+      // Questions / Marks / Totals / Custom details columns
+      if (chars <= 4) {
+        baseW = 50; // Q1..Q4, small numbers
+      } else if (chars <= 7) {
+        baseW = 66; // Total, Viva
+      } else if (chars <= 12) {
+        baseW = 82; // Theory, Practical, Attendance
+      } else if (chars <= 18) {
+        baseW = 100; // Lab Record File, Problem Solving
       } else if (chars <= 25) {
-        baseW = 85;
+        baseW = 135; // Creative Work (Project)
       } else {
-        baseW = Math.min(160, chars * 6.5 + 16);
+        // Detailed headers / notes (e.g. Unit Test Details...)
+        // Supports multiline wrapping with sufficient legibility width
+        baseW = Math.min(340, Math.max(180, Math.ceil(chars / 2) * 7.5 + 24));
       }
     }
 
@@ -113,14 +134,14 @@ function autoFitSheetColumns(sheet, force = false) {
     totalBaseWidth += baseWidths[c];
   }
 
-  // Proportional Distribution: Fit columns 0 through lastDataCol to exact screen width
+  // 4. Distribution: Guarantee NO OVERLAP under any circumstance
   if (availWidth >= totalBaseWidth) {
-    // Screen is wide enough: distribute remaining width
+    // Screen is wide enough: distribute extra pixels proportionally
     const extra = availWidth - totalBaseWidth;
-    // Give 25% of extra space to student name column (c=4) if present
     const hasNameCol = activeColCount > 4;
     const nameExtra = hasNameCol ? Math.floor(extra * 0.25) : 0;
-    const perColExtra = Math.floor((extra - nameExtra) / activeColCount);
+    const remainingExtra = extra - nameExtra;
+    const perColExtra = Math.floor(remainingExtra / activeColCount);
 
     for (let c = 0; c < activeColCount; c++) {
       if (c === 4 && hasNameCol) {
@@ -130,15 +151,14 @@ function autoFitSheetColumns(sheet, force = false) {
       }
     }
   } else {
-    // Screen is narrower: scale down smoothly while respecting minimum readable widths
-    const ratio = Math.max(0.68, availWidth / Math.max(totalBaseWidth, 1));
+    // Screen is narrower than required data width:
+    // Retain full baseWidths so no column's content overlaps or truncates!
     for (let c = 0; c < activeColCount; c++) {
-      const minW = (c === 0) ? 34 : (c === 4 ? 115 : 36);
-      sheet.colWidths[c] = Math.max(minW, Math.round(baseWidths[c] * ratio));
+      sheet.colWidths[c] = baseWidths[c];
     }
   }
 
-  // Unused columns beyond lastDataCol get a compact default width
+  // 5. Unused columns beyond lastDataCol get a compact default width
   for (let c = activeColCount; c < sheet.colsCount; c++) {
     sheet.colWidths[c] = 55;
   }

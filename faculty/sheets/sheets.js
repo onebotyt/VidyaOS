@@ -7830,7 +7830,12 @@ function switchWorksheet(idx) {
     bannerViewBtn.textContent = `College Banner: ${EXCEL_WB.bannerVisible ? 'ON' : 'OFF'}`;
   }
 
-  // 5. Render tabs, grid, formula bar, stats
+  // 5. Auto-fit columns for this worksheet so every column's data does not overlap
+  if (typeof autoFitSheetColumns === 'function' && !EXCEL_WB.isImportedWorkbook) {
+    autoFitSheetColumns(sheet, false);
+  }
+
+  // 6. Render tabs, grid, formula bar, stats
   recalculateSheetFormulas(sheet);
   renderSheetTabs();
   renderExcelGrid(true);
@@ -9902,7 +9907,7 @@ function autoFitSheetColumns(sheet, force = false) {
       const v = cell.v !== undefined && cell.v !== null ? String(cell.v).trim() : '';
       const raw = cell.raw !== undefined && cell.raw !== null ? String(cell.raw).trim() : '';
       if (v !== '' || raw !== '') {
-        if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet'))) {
+        if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet') || v.includes('Uttarakhand'))) {
           continue;
         }
         hasData = true;
@@ -9927,13 +9932,25 @@ function autoFitSheetColumns(sheet, force = false) {
   const colMaxChars = {};
   for (let c = 0; c < activeColCount; c++) colMaxChars[c] = 0;
 
-  for (let r = 0; r < Math.min(sheet.rowsCount || 40, 60); r++) {
+  for (let r = 0; r < Math.min(sheet.rowsCount || 60, 100); r++) {
     for (let c = 0; c < activeColCount; c++) {
       const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
       if (!cell) continue;
       const v = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || '')).trim();
-      if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet'))) continue;
-      if (v.length > colMaxChars[c] && v.length < 40) colMaxChars[c] = v.length;
+      if (!v) continue;
+      if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet') || v.includes('Uttarakhand'))) continue;
+      
+      let span = 1;
+      if (Array.isArray(sheet.merges)) {
+        for (const m of sheet.merges) {
+          if (r >= m.s.r && r <= m.e.r && c >= m.s.c && c <= m.e.c) {
+            span = Math.max(1, m.e.c - m.s.c + 1);
+            break;
+          }
+        }
+      }
+      const effChars = span > 1 ? Math.ceil(v.length / span) : v.length;
+      if (effChars > colMaxChars[c]) colMaxChars[c] = effChars;
     }
   }
 
@@ -9941,18 +9958,19 @@ function autoFitSheetColumns(sheet, force = false) {
   const baseWidths = [];
   for (let c = 0; c < activeColCount; c++) {
     const chars = Math.max(2, colMaxChars[c] || 4);
-    let baseW = 52;
-    if (c === 0 && chars <= 4) baseW = 40;
-    else if (c === 1 && chars <= 6) baseW = 48;
-    else if (c === 2 && chars <= 10) baseW = 76;
-    else if (c === 3 && chars <= 14) baseW = 98;
-    else if (c === 4 && chars <= 28) baseW = 145;
+    let baseW = 54;
+    if (c === 0 && chars <= 7) baseW = 44;
+    else if (c === 1 && chars <= 8) baseW = 50;
+    else if (c === 2 && chars <= 10) baseW = 82;
+    else if (c === 3 && chars <= 14) baseW = 114;
+    else if (c === 4 && chars <= 30) baseW = Math.max(165, Math.min(220, chars * 7 + 24));
     else {
-      if (chars <= 5) baseW = 52;
-      else if (chars <= 10) baseW = 62;
-      else if (chars <= 16) baseW = 70;
-      else if (chars <= 25) baseW = 85;
-      else baseW = Math.min(160, chars * 6.5 + 16);
+      if (chars <= 4) baseW = 50;
+      else if (chars <= 7) baseW = 66;
+      else if (chars <= 12) baseW = 82;
+      else if (chars <= 18) baseW = 100;
+      else if (chars <= 25) baseW = 135;
+      else baseW = Math.min(340, Math.max(180, Math.ceil(chars / 2) * 7.5 + 24));
     }
     baseWidths[c] = Math.round(baseW);
     totalBaseWidth += baseWidths[c];
@@ -9971,10 +9989,8 @@ function autoFitSheetColumns(sheet, force = false) {
       }
     }
   } else {
-    const ratio = Math.max(0.68, availWidth / Math.max(totalBaseWidth, 1));
     for (let c = 0; c < activeColCount; c++) {
-      const minW = (c === 0) ? 34 : (c === 4 ? 115 : 36);
-      sheet.colWidths[c] = Math.max(minW, Math.round(baseWidths[c] * ratio));
+      sheet.colWidths[c] = baseWidths[c];
     }
   }
 
@@ -10703,18 +10719,36 @@ function openDropdownOverlay(menu, triggerBtn) {
   if (isAlreadyOpen) return;
 
   if (triggerBtn) {
+    // Temporarily show menu invisibly to accurately measure true rendered width & height
+    const prevDisplay = menu.style.display;
+    const prevVis = menu.style.visibility;
+    menu.style.visibility = 'hidden';
+    menu.style.display = 'flex';
+    menu.classList.add('open');
+    const menuWidth = Math.max(menu.offsetWidth || 0, 260);
+    const menuHeight = Math.max(menu.offsetHeight || 0, 200);
+    menu.style.visibility = prevVis;
+    menu.style.display = prevDisplay;
+
     const rect = triggerBtn.getBoundingClientRect();
-    const menuWidth = Math.max(menu.offsetWidth || 0, 180);
     let top = rect.bottom + 4;
-    let left = rect.left;
+    // For trigger buttons located on the right half of the screen (e.g. Export button),
+    // align the menu's right edge with the button's right edge so it opens inwards!
+    let left = (rect.right > window.innerWidth / 2)
+      ? rect.right - menuWidth
+      : rect.left;
 
     // Prevent overflow right edge of viewport
-    if (left + menuWidth > window.innerWidth - 10) {
-      left = Math.max(10, window.innerWidth - menuWidth - 10);
+    if (left + menuWidth > window.innerWidth - 12) {
+      left = Math.max(12, window.innerWidth - menuWidth - 12);
+    }
+    // Prevent overflow left edge of viewport
+    if (left < 12) {
+      left = 12;
     }
     // Prevent overflow bottom edge of viewport
-    if (top + 220 > window.innerHeight && rect.top > 220) {
-      top = Math.max(10, rect.top - 220);
+    if (top + menuHeight > window.innerHeight - 10 && rect.top > menuHeight) {
+      top = Math.max(10, rect.top - menuHeight - 4);
     }
 
     menu.style.position = 'fixed';

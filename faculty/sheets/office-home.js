@@ -124,15 +124,15 @@ async function loadSpreadsheetEngine(onReady) {
 
     // 2. Load modular tools only if not already in DOM / memory
     if (typeof window.toggleColorPalette !== 'function') {
-      await loadScript('/faculty/sheets/js/sheets-color-tools.js?v=20261120_v11');
+      await loadScript('/faculty/sheets/js/sheets-color-tools.js?v=20261120_v12');
     }
     if (typeof window.autoFitSheetColumns !== 'function') {
-      await loadScript('/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v11');
+      await loadScript('/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v12');
     }
 
     // 3. Load main Sheets Studio engine
     if (typeof window.initSheetsStudio !== 'function') {
-      await loadScript('/faculty/sheets/sheets.js?v=20261120_v11');
+      await loadScript('/faculty/sheets/sheets.js?v=20261120_v12');
     }
 
     window.__OFFICE_ENGINE_LOADED = true;
