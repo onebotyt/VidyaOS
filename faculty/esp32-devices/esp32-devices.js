@@ -788,12 +788,25 @@ function renderStudentsBiometricTable() {
 
 // ─── Student Biometric Registration Station Management ──────────────────────
 function populateEnrollStudentSelect() {
+  const cohortFilter = document.getElementById('enroll-cohort-filter')?.value || 'pending';
+  filterEnrollStudentDropdown(cohortFilter);
+}
+
+function filterEnrollStudentDropdown(filterVal) {
   const sel = document.getElementById('enroll-student-select');
   if (!sel) return;
-  const students = espOverviewData.students || [];
+  const allStudents = espOverviewData.students || [];
+  let students = allStudents;
+
+  if (filterVal === 'pending') {
+    students = allStudents.filter(s => s.biometric_status !== 'ENROLLED');
+  } else if (filterVal !== 'all') {
+    students = allStudents.filter(s => String(s.year) === String(filterVal));
+  }
+
   const currentVal = sel.value;
 
-  sel.innerHTML = `<option value="">Choose a student from roster (${students.length} total)...</option>` +
+  sel.innerHTML = `<option value="">Choose a student (${students.length} ${filterVal === 'pending' ? 'pending' : 'students'})...</option>` +
     students.map(s => {
       const isEnrolled = s.biometric_status === 'ENROLLED';
       const tag = isEnrolled ? 'Enrolled' : 'Pending';
@@ -1541,10 +1554,14 @@ async function loadDeviceWifiNetworks(deviceId) {
   const targetId = deviceId || selectedDeviceId;
   const tbody = document.getElementById('wifi-networks-tbody');
   const badge = document.getElementById('wifi-active-badge');
+  const tabBadge = document.getElementById('wifi-tab-active-badge');
+  const cardList = document.getElementById('wifi-card-networks-list');
 
   if (!targetId) {
     if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:var(--text-muted);">Please connect or select an ESP32 terminal to manage Wi-Fi.</td></tr>`;
-    if (badge) badge.textContent = 'NO TERMINAL SELECTED';
+    if (cardList) cardList.innerHTML = `<div class="esp-empty-box" style="padding:1rem 0.5rem;"><div style="font-size:0.75rem; color:var(--text-muted);">Select active ESP32 terminal above to load Wi-Fi networks.</div></div>`;
+    if (badge) badge.textContent = 'NO TERMINAL';
+    if (tabBadge) tabBadge.textContent = 'NO TERMINAL';
     return;
   }
 
@@ -1566,11 +1583,56 @@ async function loadDeviceWifiNetworks(deviceId) {
 
     if (badge) {
       if (active_device && active_device.is_online) {
-        badge.textContent = `ONLINE: ${escHtml(active_device.ip_address || 'Connected')} (RSSI: ${active_device.wifi_rssi || -55} dBm)`;
-        badge.classList.remove('offline');
-        badge.classList.add('online');
+        badge.textContent = `ONLINE (${active_device.wifi_rssi || -55} dBm)`;
+        badge.className = 'esp-status-pill online';
       } else {
-        badge.textContent = `STANDBY: READY TO CONNECT`;
+        badge.textContent = `STANDBY`;
+        badge.className = 'esp-status-pill offline';
+      }
+    }
+    if (tabBadge && badge) {
+      tabBadge.textContent = badge.textContent;
+    }
+
+    // Render Compact Top Card List
+    if (cardList) {
+      if (!networks.length) {
+        cardList.innerHTML = `
+          <div class="esp-empty-box" style="padding:0.85rem 0.5rem;">
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.4rem;">No Wi-Fi credentials stored on node.</div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="triggerScanNearbyWifi()">Scan Nearby Wi-Fi</button>
+          </div>
+        `;
+      } else {
+        cardList.innerHTML = networks.slice(0, 4).map(net => {
+          const isDef = Boolean(net.is_default);
+          const rssi = net.last_rssi != null ? net.last_rssi : -65;
+          let signalClass = 'medium';
+          if (rssi >= -60) signalClass = 'strong';
+          else if (rssi < -75) signalClass = 'weak';
+
+          return `
+            <div class="esp-wifi-compact-item ${isDef ? 'default' : ''}">
+              <div class="esp-wifi-item-info">
+                <div class="esp-wifi-item-ssid">${escHtml(net.ssid)}</div>
+                <div class="esp-wifi-item-meta">
+                  <span class="wifi-signal-pill ${signalClass}">${rssi} dBm</span>
+                  <span class="wifi-security-badge" style="font-size:0.6rem; padding:0.1rem 0.3rem;">${escHtml(net.encryption_type || 'WPA2')}</span>
+                  ${isDef ? `<span class="esp-status-pill online" style="font-size:0.58rem; padding:0.05rem 0.3rem;">DEFAULT</span>` : ''}
+                </div>
+              </div>
+              <div class="esp-wifi-item-actions">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="switchDeviceWifiTo(${net.id}, '${escHtml(net.ssid)}')" title="Switch to this network" style="padding:0.18rem 0.45rem; font-size:0.7rem;">Switch</button>
+              </div>
+            </div>
+          `;
+        }).join('') + (networks.length > 4 ? `
+          <div style="text-align:center; padding-top:0.15rem;">
+            <button type="button" class="btn btn-link btn-sm" onclick="switchEspTab('wifi')" style="font-size:0.7rem; color:var(--color-primary); cursor:pointer;">
+              View all ${networks.length} networks &rarr;
+            </button>
+          </div>
+        ` : '');
       }
     }
 

@@ -135,7 +135,35 @@
             </div>
           </section>
 
-          <!-- 2. Middle Card (Between Terminals & Hardware Console): Student Biometric Registration Station -->
+          <!-- 2. Wi-Fi Connectivity & Multi-Network Failover Card (Same Style as Terminals) -->
+          <section class="card esp-wifi-card" id="section-esp-wifi">
+            <div class="esp-section-header">
+              <div>
+                <div class="esp-card-badge-row">
+                  <h2 class="esp-section-title">Wi-Fi &amp; Failover</h2>
+                  <span class="esp-status-pill online" id="wifi-active-badge">● STANDBY</span>
+                </div>
+                <p class="esp-section-sub">Classroom access points &amp; auto-failover.</p>
+              </div>
+              <div class="esp-wifi-quick-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-scan-wifi" onclick="triggerScanNearbyWifi()" title="Scan nearby Wi-Fi networks">Scan</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-add-wifi-manual" onclick="openAddWifiModal()" title="Add Wi-Fi manually">+ Add</button>
+              </div>
+            </div>
+
+            <!-- Compact Wi-Fi Networks List -->
+            <div id="wifi-card-networks-list" class="esp-wifi-card-list">
+              <div style="text-align:center; padding:1.25rem; color:var(--text-muted); font-size:0.8rem;">Loading terminal Wi-Fi networks...</div>
+            </div>
+
+            <!-- Quick Fallback Footer Bar -->
+            <div class="esp-wifi-card-footer">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi" onclick="triggerWifiFallback()" title="Trigger fallback to primary default Wi-Fi">Fallback Default</button>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()" title="Emergency clear saved Wi-Fi">Emergency Reset</button>
+            </div>
+          </section>
+
+          <!-- 3. Middle Card: Student Biometric Registration Station -->
           <section class="card esp-enrollment-card" id="section-bio-enrollment">
             <div class="esp-section-header">
               <div>
@@ -150,12 +178,21 @@
               <div class="esp-quick-badge" id="bio-slot-preview-pill">SLOT: AUTO (1..300)</div>
             </div>
 
-            <!-- Student Quick Selection & Details Row (Clean Stack, Zero Overflow) -->
+            <!-- Student Quick Selection & Details Row (Clean Stack with Cohort Filter) -->
             <div class="esp-enroll-stack">
               <div class="form-group" style="margin-bottom:0.25rem;">
-                <label class="esp-control-label" for="enroll-student-select">
-                  Select Student to Register <span style="color:var(--status-absent);">*</span>
-                </label>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.2rem;">
+                  <label class="esp-control-label" for="enroll-student-select" style="margin-bottom:0;">
+                    Select Student <span style="color:var(--status-absent);">*</span>
+                  </label>
+                  <select id="enroll-cohort-filter" class="form-select form-select-sm" style="max-width:115px; padding:0.12rem 0.35rem; font-size:0.7rem;" onchange="filterEnrollStudentDropdown(this.value)">
+                    <option value="pending" selected>Pending Only</option>
+                    <option value="all">All Students</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                  </select>
+                </div>
                 <select id="enroll-student-select" class="form-select form-select-sm" onchange="onSelectEnrollStudent(this.value)" style="width:100%;">
                   <option value="">Choose a student from roster...</option>
                 </select>
@@ -359,7 +396,7 @@
             <div>
               <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
                 <h2 class="esp-section-title">Wi-Fi Connectivity &amp; Multi-Network Failover</h2>
-                <span class="esp-crypto-badge" id="wifi-active-badge">CONNECTING...</span>
+                <span class="esp-crypto-badge" id="wifi-tab-active-badge">CONNECTING...</span>
               </div>
               <p class="esp-section-sub">
                 Scan nearby classroom access points, register backup Wi-Fi networks with automatic failover, or switch
@@ -367,19 +404,19 @@
               </p>
             </div>
             <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-scan-wifi"
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-tab-scan-wifi"
                 onclick="triggerScanNearbyWifi()">
                 Scan Nearby Wi-Fi
               </button>
-              <button type="button" class="btn btn-primary btn-sm" id="btn-add-wifi-manual"
+              <button type="button" class="btn btn-primary btn-sm" id="btn-tab-add-wifi"
                 onclick="openAddWifiModal()">
                 + Add Wi-Fi Manually
               </button>
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi"
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-tab-fallback-wifi"
                 onclick="triggerWifiFallback()">
                 Fallback Default Wi-Fi
               </button>
-              <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()">
+              <button type="button" class="btn btn-danger btn-sm" id="btn-tab-reset-wifi" onclick="triggerWifiReset()">
                 Emergency Reset
               </button>
             </div>
