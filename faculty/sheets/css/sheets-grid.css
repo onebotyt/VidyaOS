@@ -1,0 +1,157 @@
+/* ══════════════════════════════════════════════════════════════
+   EXCEL STUDIO: COMPACT GRID & PROFESSIONAL COLOR SCHEMES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Eliminate unnecessary empty space and let sheet fill viewport width */
+.excel-grid-container {
+  width: 100%;
+  overflow: auto;
+  position: relative;
+  background: var(--bg-surface-secondary);
+}
+
+.excel-grid-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 0.76rem;
+  color: var(--text-main);
+  background: var(--bg-card);
+  min-width: 100%;
+}
+
+/* Row Headers & Col Headers */
+.excel-grid-table thead tr th {
+  background: var(--table-th-bg);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  height: 26px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  user-select: none;
+  padding: 2px 4px;
+  box-sizing: border-box;
+}
+
+.excel-row-th {
+  background: var(--table-th-bg) !important;
+  border-right: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  width: 42px;
+  min-width: 42px;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  user-select: none;
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  z-index: 15;
+}
+
+/* Compact Data Cells - Crisp, no unnecessary padding */
+.excel-cell {
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 2px 6px;
+  height: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  background: var(--bg-card);
+  color: var(--text-main);
+  line-height: 1.25;
+}
+
+/* Subtle Alternating Row Zebra Striping */
+.excel-grid-table tbody tr:nth-child(even) td.excel-cell {
+  background-color: var(--table-zebra-bg, var(--bg-surface));
+}
+
+/* Hover effect on student rows */
+.excel-grid-table tbody tr:hover td.excel-cell {
+  background-color: var(--table-row-hover, var(--bg-hover)) !important;
+}
+
+/* Section Header Accents (Theory, Practical, Grand Total) */
+.section-theory-hdr {
+  background: var(--badge-primary-bg, var(--col-att-group-bg)) !important;
+  color: var(--color-primary) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--color-primary) !important;
+}
+
+.section-practical-hdr {
+  background: var(--status-present-bg, var(--col-att-group-bg)) !important;
+  color: var(--status-present, var(--color-primary)) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--status-present, var(--color-primary)) !important;
+}
+
+.section-grand-hdr {
+  background: var(--chip-faculty-bg) !important;
+  color: var(--color-primary) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--color-primary) !important;
+}
+
+/* Total Column Highlights */
+.col-total-highlight {
+  background: var(--chip-faculty-bg) !important;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Active Cell and Selection Styles */
+.excel-cell.cell-selected {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: -2px;
+  z-index: 5;
+  position: relative;
+}
+
+.excel-cell.in-range-selection {
+  background-color: var(--badge-primary-bg, var(--chip-faculty-bg)) !important;
+}
+
+/* Formula Bar Integration */
+.formula-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.78rem;
+}
+
+.formula-address-box {
+  width: 58px;
+  text-align: center;
+  font-weight: 700;
+  padding: 0.18rem 0.35rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.formula-input-box {
+  flex: 1;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.8rem;
+}

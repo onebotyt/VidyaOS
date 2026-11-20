@@ -213,7 +213,9 @@
                 <th id="th-trash-check" style="width: 38px; text-align: center; display: none;">
                   <input type="checkbox" id="check-all-trash" class="stu-checkbox" onchange="toggleSelectAllTrash(this.checked)" title="Select all trashed students">
                 </th>
-                <th style="width: 55px;">Roll #</th>
+                <th class="col-avatar" id="th-avatar" style="width: 44px; text-align: center;">Avatar</th>
+                <th style="width: 55px;" id="th-roll">Roll #</th>
+                <th class="col-reg" id="th-reg">Registration No</th>
                 <th class="col-enrollment" id="th-enrollment">Enrollment</th>
                 <th>Student Name</th>
                 <th class="col-retention" id="th-retention" style="display: none;">Retention</th>
@@ -222,7 +224,7 @@
             </thead>
             <tbody id="students-tbody">
               <tr>
-                <td colspan="5" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                <td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
                   Loading students roster...
                 </td>
               </tr>

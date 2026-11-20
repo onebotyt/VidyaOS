@@ -477,6 +477,52 @@ input:checked+.slider:before {
   border-top-left-radius: 13px;
 }
 
+/* When trash checkbox column is hidden, round the top-left of the first visible header (avatar) */
+#stu-thead-tr:not(.trash-active) th.col-avatar {
+  border-top-left-radius: 13px;
+}
+
+.col-avatar {
+  width: 44px;
+  text-align: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.stu-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 1px solid var(--border-color);
+}
+
+.stu-avatar:hover {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-sm);
+}
+
+.stu-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.col-reg {
+  white-space: nowrap;
+}
+
 .stu-table thead tr:first-child th:last-child {
   border-top-right-radius: 13px;
 }
@@ -1083,8 +1129,21 @@ input:checked+.slider:before {
     display: inline-block;
   }
 
-  /* Hide Official Enrollment and Retention columns on mobile */
+  .col-avatar {
+    width: 34px;
+    padding: 0.45rem 0.35rem !important;
+    text-align: center;
+  }
+
+  .stu-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 0.65rem;
+  }
+
+  /* Hide Official Enrollment, Registration, and Retention columns on mobile */
   .col-enrollment,
+  .col-reg,
   .col-retention {
     display: none !important;
   }

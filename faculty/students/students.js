@@ -49,6 +49,14 @@
     return isHtml ? `<span class="stu-code-mono">${esc(val)}</span>` : esc(val);
   }
 
+  function formatRegistrationDisplay(val, isHtml = true) {
+    const hasVal = Boolean(val && String(val).trim() !== '' && String(val).trim() !== '—');
+    if (!hasVal) {
+      return isHtml ? '<span class="stu-sub-mono" style="color:var(--text-muted);">—</span>' : '—';
+    }
+    return isHtml ? `<span class="stu-code-mono">${esc(val)}</span>` : esc(val);
+  }
+
   async function api(url, opts = {}) {
     if (typeof fetchApi === 'function') return await fetchApi(url, opts);
     const token = localStorage.getItem('token') || localStorage.getItem('access_token');
@@ -211,7 +219,7 @@
     renderTable();
   }
 
-  // 4. Render Table (Minimal: PC = RollNo, Enrollment, Student Name, Actions)
+  // 4. Render Table (Minimal: PC = Avatar, RollNo, RegNo, Enrollment, Student Name, Actions)
   function renderTable() {
     const tbody = document.getElementById('students-tbody');
     const searchVal = (document.getElementById('student-search')?.value || '').toLowerCase().trim();
@@ -222,11 +230,15 @@
     const isTrash = currentYearFilter === 'TRASH';
     const thRetention = document.getElementById('th-retention');
     const thEnrollment = document.getElementById('th-enrollment');
+    const thReg = document.getElementById('th-reg');
     const thTrashCheck = document.getElementById('th-trash-check');
     const thActions = document.getElementById('th-actions');
+    const theadTr = document.getElementById('stu-thead-tr');
 
+    if (theadTr) theadTr.classList.toggle('trash-active', isTrash);
     if (thRetention) thRetention.style.display = isTrash ? '' : 'none';
     if (thEnrollment) thEnrollment.style.display = isTrash ? 'none' : '';
+    if (thReg) thReg.style.display = isTrash ? 'none' : '';
     if (thTrashCheck) thTrashCheck.style.display = isTrash ? '' : 'none';
     if (thActions) thActions.style.width = isTrash ? '150px' : '65px';
 
@@ -270,7 +282,7 @@
     if (list.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="4" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+          <td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
             No students found matching current filter criteria.
           </td>
         </tr>
@@ -281,13 +293,14 @@
     tbody.innerHTML = list.map((st, idx) => {
       const roll = st.class_roll_no || st.roll_number || (idx + 1);
       const enrollFormatted = formatEnrollmentDisplay(st.official_enrollment_no, st.enrollment_no_status, true);
-      const hasEnroll = Boolean(st.official_enrollment_no && String(st.official_enrollment_no).trim() !== '' && st.enrollment_no_status !== 'Not Assigned');
-      const enrollSub = hasEnroll
-        ? `<span class="stu-sub-mono">${esc(st.official_enrollment_no)}</span>`
-        : `<span class="stu-sub-mono" style="color:var(--status-late); font-weight:600;">Not Assigned</span>`;
+      const regFormatted = formatRegistrationDisplay(st.registration_no, true);
       const name = st.full_name || 'Student';
       const studentId = st.student_id || st.id;
       const isInactive = st.enrollment_status === 'TRANSFERRED' || st.enrollment_status === 'WITHDRAWN';
+      const initials = getInitials(name);
+      const avatarContent = st.profile_photo
+        ? `<img src="${esc(st.profile_photo)}" alt="${esc(name)}" class="stu-avatar-img" onerror="this.parentElement.textContent='${initials}'">`
+        : initials;
 
       let statusChip = '';
       if (st.enrollment_status === 'TRANSFERRED') {
@@ -298,7 +311,13 @@
 
       return `
         <tr>
+          <td class="col-avatar" style="text-align: center;">
+            <div class="stu-avatar" style="cursor: pointer;" onclick="viewStudentDetails(${studentId})" title="View ${esc(name)}'s Dossier">
+              ${avatarContent}
+            </div>
+          </td>
           <td><span class="stu-roll-badge">${roll}</span></td>
+          <td class="col-reg">${regFormatted}</td>
           <td class="col-enrollment">${enrollFormatted}</td>
           <td>
             <div class="stu-name-wrap">
@@ -376,7 +395,7 @@
     if (list.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="5" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+          <td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
             No students currently in the Trash Bin.
           </td>
         </tr>
@@ -401,11 +420,20 @@
       const daysLeft = st.days_left != null ? st.days_left : 30;
       const studentId = Number(st.student_id || st.id);
       const isChecked = selectedTrashIds.has(studentId);
+      const initials = getInitials(name);
+      const avatarContent = st.profile_photo
+        ? `<img src="${esc(st.profile_photo)}" alt="${esc(name)}" class="stu-avatar-img" onerror="this.parentElement.textContent='${initials}'">`
+        : initials;
 
       return `
         <tr class="${isChecked ? 'row-selected' : ''}">
           <td style="width: 38px; text-align: center;">
             <input type="checkbox" class="stu-checkbox trash-row-check" data-id="${studentId}" ${isChecked ? 'checked' : ''} onchange="toggleTrashSelect(${studentId}, this.checked)">
+          </td>
+          <td class="col-avatar" style="text-align: center;">
+            <div class="stu-avatar" style="opacity: 0.8; cursor: pointer;" onclick="viewStudentDetails(${studentId})" title="View ${esc(name)}">
+              ${avatarContent}
+            </div>
           </td>
           <td><span class="stu-roll-badge" style="opacity: 0.7;">${roll}</span></td>
           <td>
@@ -455,7 +483,7 @@
     if (list.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="4" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+          <td colspan="6" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
             No pending student enrollment applications in queue.
           </td>
         </tr>
@@ -463,9 +491,19 @@
       return;
     }
 
-    tbody.innerHTML = list.map(req => `
+    tbody.innerHTML = list.map(req => {
+      const name = req.full_name || 'Applicant';
+      const initials = getInitials(name);
+      const reg = req.registration_no || req.ubter_reg_no || '';
+      const regFormatted = formatRegistrationDisplay(reg, true);
+
+      return `
       <tr>
+        <td class="col-avatar" style="text-align: center;">
+          <div class="stu-avatar">${initials}</div>
+        </td>
         <td><span class="stu-roll-badge">—</span></td>
+        <td class="col-reg">${regFormatted}</td>
         <td class="col-enrollment"><span class="stu-code-mono">${esc(req.official_enrollment_no || 'APPLICANT')}</span></td>
         <td>
           <div class="stu-name-wrap">
@@ -480,7 +518,7 @@
           </div>
         </td>
       </tr>
-    `).join('');
+    `}).join('');
   }
 
   // 7. 3-Dot Dropdown Menu Handlers with Auto Drop-Up Flipping

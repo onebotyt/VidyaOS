@@ -579,22 +579,92 @@
                     </div>
                   </div>
 
-                  <!-- Color Pickers -->
-                  <button type="button" class="excel-icon-btn" id="btn-fill-color-picker"
-                    onclick="document.getElementById('input-fill-color').click()" title="Fill Color">
-                    <span class="excel-color-indicator fill" id="indicator-fill-color">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M19 11l-8-8-8.5 8.5a5.5 5.5 0 0 0 7.78 7.78L19 11z" />
-                        <path d="M5 2l5 5" />
-                        <path d="M2 13h15" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button type="button" class="excel-icon-btn" id="btn-font-color-picker"
-                    onclick="document.getElementById('input-font-color').click()" title="Font Color">
-                    <span class="excel-color-indicator font" id="indicator-font-color"><strong>A</strong></span>
-                  </button>
+                  <!-- Color Pickers with Multi-Option Palette Popups -->
+                  <div class="excel-color-btn-wrapper" style="position: relative; display: inline-flex;">
+                    <button type="button" class="excel-icon-btn" id="btn-fill-color-picker"
+                      onclick="toggleColorPalette('fill', event)" title="Fill Color (Background)">
+                      <span class="excel-color-indicator fill" id="indicator-fill-color">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M19 11l-8-8-8.5 8.5a5.5 5.5 0 0 0 7.78 7.78L19 11z" />
+                          <path d="M5 2l5 5" />
+                          <path d="M2 13h15" />
+                        </svg>
+                        <span class="color-bar" id="fill-color-bar" style="background: #ffffff;"></span>
+                      </span>
+                    </button>
+                    <!-- Fill Color Palette Popup -->
+                    <div id="palette-fill-color" class="excel-color-palette-popup" style="display: none;">
+                      <div class="palette-header">Theme & Cell Colors</div>
+                      <div class="palette-grid">
+                        <button type="button" class="color-swatch no-fill" onclick="selectFillColor('')" title="No Fill / Clear">✕</button>
+                        <button type="button" class="color-swatch" style="background: #ffffff;" onclick="selectFillColor('#ffffff')" title="White"></button>
+                        <button type="button" class="color-swatch" style="background: #f8fafc;" onclick="selectFillColor('#f8fafc')" title="Slate 50"></button>
+                        <button type="button" class="color-swatch" style="background: #f1f5f9;" onclick="selectFillColor('#f1f5f9')" title="Slate 100"></button>
+                        <button type="button" class="color-swatch" style="background: #fee2e2;" onclick="selectFillColor('#fee2e2')" title="Soft Red"></button>
+                        <button type="button" class="color-swatch" style="background: #ffedd5;" onclick="selectFillColor('#ffedd5')" title="Soft Orange"></button>
+                        <button type="button" class="color-swatch" style="background: #fef3c7;" onclick="selectFillColor('#fef3c7')" title="Soft Amber / Yellow"></button>
+                        <button type="button" class="color-swatch" style="background: #dcfce7;" onclick="selectFillColor('#dcfce7')" title="Soft Green"></button>
+                        <button type="button" class="color-swatch" style="background: #d1fae5;" onclick="selectFillColor('#d1fae5')" title="Soft Emerald"></button>
+                        <button type="button" class="color-swatch" style="background: #ccfbf1;" onclick="selectFillColor('#ccfbf1')" title="Soft Teal"></button>
+                        <button type="button" class="color-swatch" style="background: #e0f2fe;" onclick="selectFillColor('#e0f2fe')" title="Soft Sky Blue"></button>
+                        <button type="button" class="color-swatch" style="background: #dbeafe;" onclick="selectFillColor('#dbeafe')" title="Soft Blue"></button>
+                        <button type="button" class="color-swatch" style="background: #e0e7ff;" onclick="selectFillColor('#e0e7ff')" title="Soft Indigo"></button>
+                        <button type="button" class="color-swatch" style="background: #ede9fe;" onclick="selectFillColor('#ede9fe')" title="Soft Violet"></button>
+                        <button type="button" class="color-swatch" style="background: #fae8ff;" onclick="selectFillColor('#fae8ff')" title="Soft Fuchsia"></button>
+                        <button type="button" class="color-swatch" style="background: #ffe4e6;" onclick="selectFillColor('#ffe4e6')" title="Soft Rose"></button>
+                      </div>
+                      <div class="palette-divider"></div>
+                      <div class="palette-custom-row">
+                        <label for="input-fill-color">Custom Color:</label>
+                        <input type="color" id="input-fill-color" value="#ffffff" onchange="selectFillColor(this.value)">
+                      </div>
+                      <div class="palette-divider"></div>
+                      <div class="palette-header">Quick Conditional Presets</div>
+                      <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('pass')">
+                        <span class="preset-pill" style="background:#dcfce7;color:#166534;">Pass (≥ 75%)</span>
+                      </button>
+                      <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('avg')">
+                        <span class="preset-pill" style="background:#fef3c7;color:#854d0e;">Average (50-74%)</span>
+                      </button>
+                      <button type="button" class="palette-preset-btn" onclick="applyPresetFormatting('fail')">
+                        <span class="preset-pill" style="background:#fee2e2;color:#991b1b;">Low / At Risk (&lt; 50%)</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="excel-color-btn-wrapper" style="position: relative; display: inline-flex;">
+                    <button type="button" class="excel-icon-btn" id="btn-font-color-picker"
+                      onclick="toggleColorPalette('font', event)" title="Font Color (Text)">
+                      <span class="excel-color-indicator font" id="indicator-font-color">
+                        <strong>A</strong>
+                        <span class="color-bar" id="font-color-bar" style="background: #0f172a;"></span>
+                      </span>
+                    </button>
+                    <!-- Font Color Palette Popup -->
+                    <div id="palette-font-color" class="excel-color-palette-popup" style="display: none;">
+                      <div class="palette-header">Text Colors</div>
+                      <div class="palette-grid">
+                        <button type="button" class="color-swatch" style="background: #0f172a;" onclick="selectFontColor('#0f172a')" title="Default Dark"></button>
+                        <button type="button" class="color-swatch" style="background: #475569;" onclick="selectFontColor('#475569')" title="Muted Gray"></button>
+                        <button type="button" class="color-swatch" style="background: #dc2626;" onclick="selectFontColor('#dc2626')" title="Red"></button>
+                        <button type="button" class="color-swatch" style="background: #ea580c;" onclick="selectFontColor('#ea580c')" title="Orange"></button>
+                        <button type="button" class="color-swatch" style="background: #d97706;" onclick="selectFontColor('#d97706')" title="Amber"></button>
+                        <button type="button" class="color-swatch" style="background: #16a34a;" onclick="selectFontColor('#16a34a')" title="Green"></button>
+                        <button type="button" class="color-swatch" style="background: #0d9488;" onclick="selectFontColor('#0d9488')" title="Teal"></button>
+                        <button type="button" class="color-swatch" style="background: #2563eb;" onclick="selectFontColor('#2563eb')" title="Blue"></button>
+                        <button type="button" class="color-swatch" style="background: #4f46e5;" onclick="selectFontColor('#4f46e5')" title="Indigo"></button>
+                        <button type="button" class="color-swatch" style="background: #9333ea;" onclick="selectFontColor('#9333ea')" title="Purple"></button>
+                        <button type="button" class="color-swatch" style="background: #db2777;" onclick="selectFontColor('#db2777')" title="Pink"></button>
+                        <button type="button" class="color-swatch" style="background: #ffffff; border: 1px solid #cbd5e1;" onclick="selectFontColor('#ffffff')" title="White"></button>
+                      </div>
+                      <div class="palette-divider"></div>
+                      <div class="palette-custom-row">
+                        <label for="input-font-color">Custom Text:</label>
+                        <input type="color" id="input-font-color" value="#0f172a" onchange="selectFontColor(this.value)">
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <span class="excel-group-label">Font</span>
               </div>
@@ -2588,7 +2658,10 @@
     <script src="/faculty/components/faculty-ui.js?v=20261029"></script>
     <script src="/faculty/components/header/header.js?v=20261029"></script>
     <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
-    <!-- Office Studio Modular Architecture: Lightweight Initial Hub Loader (< 20 KB) -->
+    <!-- Office Studio Modular Architecture: Lightweight Initial Hub & Loading Overlay (< 35 KB) -->
+    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_real"></script>
+    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_real"></script>
+    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_real"></script>
     <script src="/faculty/sheets/office-home.js?v=20261120_real"></script>
 </body>
 

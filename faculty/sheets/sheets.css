@@ -2,6 +2,10 @@
    PAGE STYLES: SHEETS
    frontend/faculty/sheets/sheets.css
 ══════════════════════════════════════════════════════════════ */
+@import url('/faculty/sheets/css/sheets-loading.css');
+@import url('/faculty/sheets/css/sheets-color-tools.css');
+@import url('/faculty/sheets/css/sheets-grid.css');
+@import url('/faculty/sheets/css/sheets-ribbon.css');
 
 /* Full-viewport Spreadsheet App Layout (Zero Window Scrolling) */
 html,

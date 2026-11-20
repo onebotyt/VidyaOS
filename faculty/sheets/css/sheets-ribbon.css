@@ -1,0 +1,224 @@
+/* ══════════════════════════════════════════════════════════════
+   EXCEL STUDIO: RIBBON SYSTEM, TOOLBARS & FORMULA BAR
+   ══════════════════════════════════════════════════════════════ */
+
+.excel-ribbon {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px hsla(220, 20%, 10%, 0.04);
+}
+
+.excel-ribbon-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.2rem 0.65rem 0;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.excel-ribbon-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.excel-tab-btn {
+  padding: 0.32rem 0.75rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-top-left-radius: var(--radius-sm, 4px);
+  border-top-right-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.excel-tab-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-surface-hover);
+}
+
+.excel-tab-btn.active {
+  color: var(--status-present, var(--color-primary));
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  border-top: 2px solid var(--status-present, var(--color-primary));
+  font-weight: 800;
+}
+
+.excel-ribbon-panels-container {
+  position: relative;
+  width: 100%;
+  background: var(--bg-card);
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ribbon-scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 48px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 4px);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 500;
+  box-shadow: var(--shadow-md);
+  transition: all 0.15s ease;
+  opacity: 0.95;
+}
+
+.ribbon-scroll-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+.ribbon-scroll-left {
+  left: 3px;
+}
+
+.ribbon-scroll-right {
+  right: 3px;
+}
+
+.excel-ribbon-panels {
+  min-height: 80px;
+  max-height: 84px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  width: 100%;
+  overflow: visible;
+}
+
+.excel-ribbon-panel {
+  display: none;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 0.25rem 0.42rem;
+  gap: 0.35rem;
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.excel-ribbon-panel.active {
+  display: flex;
+  align-items: stretch;
+}
+
+.excel-tool-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.3rem;
+  border-right: 1px solid var(--border-color);
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.excel-tool-group:last-child {
+  border-right: none;
+}
+
+.excel-tool-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.28rem;
+  flex: 1;
+}
+
+.excel-tool-vgroup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.18rem;
+}
+
+.excel-group-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 0.12rem;
+  user-select: none;
+  line-height: 1;
+}
+
+.excel-tool-row {
+  display: flex;
+  align-items: center;
+  gap: 0.18rem;
+}
+
+.excel-tool-btn {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.18rem 0.36rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.excel-tool-btn:hover {
+  background: var(--bg-surface-hover);
+}
+
+.excel-tool-btn.active {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border-color: var(--status-present);
+}
+
+.excel-icon-btn {
+  width: 25px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  font-size: 0.74rem;
+  flex-shrink: 0;
+}
+
+.excel-icon-btn:hover {
+  background: var(--bg-surface-hover);
+}
+
+.excel-icon-btn.active {
+  background: var(--status-present-bg);
+  border-color: var(--status-present);
+  color: var(--status-present);
+}

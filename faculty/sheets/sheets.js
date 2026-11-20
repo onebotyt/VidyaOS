@@ -175,6 +175,9 @@ async function initSheetsStudio() {
     const initialSheet = params.get('sheet') || 'evaluation';
     const viewParam = params.get('view');
     const isHomeStart = viewParam === 'home' || (!qId && !params.get('sheet'));
+    if (!isHomeStart && typeof showOfficeScreenLoader === 'function') {
+      showOfficeScreenLoader('Loading...');
+    }
 
     setSheetViewMode(S.viewMode, false);
     setupTouchPinchZoom();
@@ -218,7 +221,11 @@ async function initSheetsStudio() {
         if (!k) continue;
         if (k.startsWith('vidyaos_excel_wb') || k.startsWith('vidyaos_inst_header') || k === 'vidyaos_institution_marks_header') {
           const val = localStorage.getItem(k);
-          if (val && (val.includes('24011F') || val.includes('HARSHIT JOSHI') || val.includes('KAPIL BISHT') || val.includes('MANISH TIWARI') || val.includes('8.3') || val.includes('1.82'))) {
+          if (val && (
+            val.includes('24011F') || val.includes('HARSHIT JOSHI') || val.includes('KAPIL BISHT') || val.includes('MANISH TIWARI') ||
+            val.includes('8.3') || val.includes('1.82') ||
+            !val.includes('REG. NO.') || val.includes('ROUND(D') || val.includes('ROUND(I')
+          )) {
             keysToRemove.push(k);
           }
         }
@@ -251,17 +258,22 @@ async function initSheetsStudio() {
 
     if (isHomeStart) {
       openOfficeHomeScreen();
+      if (typeof hideOfficeScreenLoader === 'function') {
+        hideOfficeScreenLoader();
+      }
+      loadTeacherGroupsList().catch(err => console.warn('Background sync error:', err));
     } else {
       closeOfficeHomeScreen();
+      // Keep loader visible while we fetch teaching groups and live student roster!
+      try {
+        await loadTeacherGroupsList();
+      } catch (e) {
+        console.warn('Teacher groups load failed:', e);
+      }
+      if (typeof hideOfficeScreenLoader === 'function') {
+        hideOfficeScreenLoader();
+      }
     }
-
-    // 3. Immediately dismiss loader once grid is rendered on screen
-    if (typeof hideOfficeScreenLoader === 'function') {
-      hideOfficeScreenLoader();
-    }
-
-    // 4. In background without blocking UI, fetch fresh server data
-    loadTeacherGroupsList().catch(err => console.warn('Background sync error:', err));
   } catch (err) {
     console.error('Fatal initialization error in Sheets Studio:', err);
     try {
@@ -9255,7 +9267,11 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     try {
       const saved = localStorage.getItem(key);
       if (saved) {
-        if (saved.includes('24011F') || saved.includes('HARSHIT JOSHI') || saved.includes('KAPIL BISHT') || saved.includes('MANISH TIWARI') || saved.includes('8.3')) {
+        if (
+          saved.includes('24011F') || saved.includes('HARSHIT JOSHI') || saved.includes('KAPIL BISHT') || saved.includes('MANISH TIWARI') ||
+          saved.includes('8.3') || saved.includes('1.82') ||
+          !saved.includes('REG. NO.') || saved.includes('ROUND(D') || saved.includes('ROUND(I')
+        ) {
           localStorage.removeItem(key);
         } else {
           const parsed = JSON.parse(saved);
@@ -9293,7 +9309,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   let existingScoresMap = {};
   try {
     const rawSaved = localStorage.getItem(key);
-    if (rawSaved && !rawSaved.includes('24011F') && !rawSaved.includes('HARSHIT JOSHI') && !rawSaved.includes('KAPIL BISHT') && !rawSaved.includes('MANISH TIWARI')) {
+    if (rawSaved && !rawSaved.includes('24011F') && !rawSaved.includes('HARSHIT JOSHI') && !rawSaved.includes('KAPIL BISHT') && !rawSaved.includes('MANISH TIWARI') && rawSaved.includes('REG. NO.')) {
       const parsed = JSON.parse(rawSaved);
       if (parsed && Array.isArray(parsed.sheets)) {
         existingScoresMap = extractExistingStudentScores(parsed.sheets);
@@ -9318,24 +9334,15 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   }
 
   // If classroom does not have members enrolled yet, supply clean blank rows with ZERO scores
-  if (!studentList || studentList.length === 0) {
-    const fallbackNames = [
-      'Girdhar Dhami', 'Aditi Verma', 'Akash Patel', 'Ananya Gupta',
-      'Arjun Rao', 'Bhavya Nair', 'Chirag Joshi', 'Deepika Singh',
-      'Rohan Kulkarni', 'Sneha Patil'
-    ];
-    studentList = fallbackNames.map((name, i) => ({
-      class_roll_no: i + 1,
-      registration_no: `UBTER2026${String(i + 1).padStart(3, '0')}`,
-      official_enrollment_no: `2024IT${String(i + 1).padStart(3, '0')}`,
-      full_name: name,
-      attendance_percentage: 0,
-      assignment_scores: [0, 0, 0, 0, 0],
-      exam_scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    }));
-  }
-
-  const students = sortStudentsList(studentList);
+  const hasRealStudents = Boolean(studentList && studentList.length > 0);
+  const students = hasRealStudents ? sortStudentsList(studentList) : Array.from({ length: 20 }, (_, idx) => ({
+    class_roll_no: idx + 1,
+    registration_no: '',
+    official_enrollment_no: '',
+    full_name: '',
+    attendance_percentage: 0,
+    isPlaceholder: true
+  }));
 
   EXCEL_WB.sheets = [];
   const totalRows = Math.max(students.length + 8, 45);
@@ -9380,15 +9387,15 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   setCell(evalSheet, 0, 2, { raw: 'REG. NO.', v: 'REG. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   setCell(evalSheet, 0, 3, { raw: 'ENROLLMENT NO.', v: 'ENROLLMENT NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
   setCell(evalSheet, 0, 4, { raw: 'STUDENT NAME', v: 'STUDENT NAME', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
-  setCell(evalSheet, 0, 5, { raw: 'THEORY', v: 'THEORY', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+  setCell(evalSheet, 0, 5, { raw: 'THEORY', v: 'THEORY', s: { bold: true, align: 'center', bg: 'var(--badge-primary-bg, var(--chip-faculty-bg))', color: 'var(--color-primary)' } });
   for (let c = 6; c <= 9; c++) {
-    setCell(evalSheet, 0, c, { raw: '', v: '', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+    setCell(evalSheet, 0, c, { raw: '', v: '', s: { bold: true, align: 'center', bg: 'var(--badge-primary-bg, var(--chip-faculty-bg))' } });
   }
-  setCell(evalSheet, 0, 10, { raw: 'PRACTICAL', v: 'PRACTICAL', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+  setCell(evalSheet, 0, 10, { raw: 'PRACTICAL', v: 'PRACTICAL', s: { bold: true, align: 'center', bg: 'var(--status-present-bg, var(--chip-faculty-bg))', color: 'var(--status-present, var(--color-primary))' } });
   for (let c = 11; c <= 14; c++) {
-    setCell(evalSheet, 0, c, { raw: '', v: '', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+    setCell(evalSheet, 0, c, { raw: '', v: '', s: { bold: true, align: 'center', bg: 'var(--status-present-bg, var(--chip-faculty-bg))' } });
   }
-  setCell(evalSheet, 0, 15, { raw: 'GRAND TOTAL', v: 'GRAND TOTAL', s: { bold: true, align: 'center', bg: 'var(--chip-faculty-bg)' } });
+  setCell(evalSheet, 0, 15, { raw: 'GRAND TOTAL', v: 'GRAND TOTAL', s: { bold: true, align: 'center', bg: 'var(--chip-faculty-bg)', color: 'var(--color-primary)' } });
 
   // Header Row 1: Subheaders for Theory and Practical
   setCell(evalSheet, 1, 0, { raw: '', v: '', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
@@ -9443,8 +9450,8 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const r = idx + 3;
     const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
-    const regNo = stu.registration_no || stu.reg_no || '—';
-    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—';
+    const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
     const name = stu.full_name || stu.student_name || stu.name || '';
     const attPct = Math.round(Number(stu.attendance_percentage !== undefined && stu.attendance_percentage !== null ? stu.attendance_percentage : 0));
 
@@ -9568,8 +9575,8 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const r = idx + 2;
     const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
-    const regNo = stu.registration_no || stu.reg_no || '—';
-    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—';
+    const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
     const name = stu.full_name || stu.student_name || stu.name || '';
 
     const preserved = existingScoresMap[enroll] || existingScoresMap[regNo] || existingScoresMap[roll] || existingScoresMap[name] || {};
@@ -9670,8 +9677,8 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
       const r = idx + 2;
       const srNo = idx + 1;
       const roll = stu.class_roll_no || (idx + 1);
-      const regNo = stu.registration_no || stu.reg_no || '—';
-      const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—';
+      const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
+      const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
       const name = stu.full_name || stu.student_name || stu.name || '';
 
       const preserved = existingScoresMap[enroll] || existingScoresMap[regNo] || existingScoresMap[roll] || existingScoresMap[name] || {};
@@ -9745,8 +9752,8 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const r = idx + 2;
     const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
-    const regNo = stu.registration_no || stu.reg_no || '—';
-    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—';
+    const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
     const name = stu.full_name || stu.student_name || stu.name || '';
 
     const preserved = existingScoresMap[enroll] || existingScoresMap[regNo] || existingScoresMap[roll] || existingScoresMap[name] || {};
@@ -9814,8 +9821,8 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const r = idx + 2;
     const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
-    const regNo = stu.registration_no || stu.reg_no || '—';
-    const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—';
+    const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
     const name = stu.full_name || stu.student_name || stu.name || '';
     const attPct = Math.round(Number(stu.attendance_percentage !== undefined && stu.attendance_percentage !== null ? stu.attendance_percentage : 0));
 
@@ -9871,6 +9878,9 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
 }
 
 function autoFitSheetColumns(sheet) {
+  if (typeof window !== 'undefined' && typeof window.autoFitSheetColumns === 'function' && window.autoFitSheetColumns !== autoFitSheetColumns) {
+    return window.autoFitSheetColumns(sheet);
+  }
   if (!sheet || !sheet.cells) return;
   if (!sheet.colWidths) sheet.colWidths = {};
 
@@ -9892,16 +9902,35 @@ function autoFitSheetColumns(sheet) {
     }
   }
 
+  let totalBaseWidth = 0;
   for (let c = 0; c < sheet.colsCount; c++) {
     const maxChars = colMaxLen[c] || 6;
-    let autoW = Math.max(70, Math.min(360, maxChars * 8.5 + 28));
+    let autoW = Math.max(70, Math.min(360, maxChars * 8.5 + 24));
     if (c === 0) autoW = Math.max(autoW, 55);  // SR. NO.
     if (c === 1) autoW = Math.max(autoW, 75);  // ROLL NO.
     if (c === 2) autoW = Math.max(autoW, 125); // REG. NO.
     if (c === 3) autoW = Math.max(autoW, 125); // ENROLLMENT NO.
     if (c === 4) autoW = Math.max(autoW, 190); // STUDENT NAME
     sheet.colWidths[c] = Math.round(autoW);
+    totalBaseWidth += sheet.colWidths[c];
   }
+
+  try {
+    const container = document.getElementById('excel-grid-container') || document.querySelector('.excel-grid-container');
+    const screenW = container ? container.clientWidth : (typeof window !== 'undefined' ? window.innerWidth - 80 : 1200);
+    const availWidth = Math.max(screenW - 48, 800);
+
+    if (availWidth > totalBaseWidth && sheet.colsCount > 0) {
+      const remainingVoid = availWidth - totalBaseWidth;
+      const extraPerCol = Math.floor(remainingVoid / sheet.colsCount);
+      const addPerCol = Math.min(extraPerCol, 36);
+      if (addPerCol > 0) {
+        for (let c = 0; c < sheet.colsCount; c++) {
+          sheet.colWidths[c] += addPerCol;
+        }
+      }
+    }
+  } catch (_) { }
 }
 
 function saveActiveSheetData(showToast = false) {

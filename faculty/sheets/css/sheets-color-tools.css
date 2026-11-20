@@ -1,0 +1,138 @@
+/* ══════════════════════════════════════════════════════════════
+   EXCEL STUDIO: COLOR FORMATTING & PALETTE POPUPS
+   ══════════════════════════════════════════════════════════════ */
+
+.excel-color-btn-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.excel-color-indicator {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  position: relative;
+}
+
+.excel-color-indicator .color-bar {
+  display: block;
+  width: 14px;
+  height: 3px;
+  border-radius: 1px;
+  border: 1px solid var(--border-color);
+  background-color: var(--text-main);
+}
+
+.excel-color-palette-popup {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 1000;
+  min-width: 210px;
+  padding: 0.65rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 10px 30px hsla(220, 30%, 10%, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  animation: officeFadeIn 0.12s ease-out;
+}
+
+.palette-header {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 0 0.2rem;
+}
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.18);
+  border-color: var(--color-primary);
+  z-index: 2;
+}
+
+.color-swatch.no-fill {
+  background: var(--bg-surface) !important;
+  color: var(--status-absent, #ef4444);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.palette-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.2rem 0;
+}
+
+.palette-custom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.74rem;
+  color: var(--text-main);
+  padding: 0.1rem 0.2rem;
+}
+
+.palette-custom-row input[type="color"] {
+  width: 26px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+}
+
+.palette-preset-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.25rem 0.35rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+}
+
+.palette-preset-btn:hover {
+  background: var(--bg-surface-secondary, rgba(0, 0, 0, 0.04));
+}
+
+.preset-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  width: 100%;
+}
