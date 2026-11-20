@@ -182,6 +182,9 @@ async function initSheetsStudio() {
     updateFilterBadgeIndicator();
 
     // 1. Immediately setup group fallback so UI is 100% complete with 0ms delay
+    if ((!S.allGroups || !S.allGroups.length) && window.S && Array.isArray(window.S.allGroups) && window.S.allGroups.length) {
+      S.allGroups = window.S.allGroups;
+    }
     if (!S.groupId) {
       if (S.allGroups && S.allGroups.length > 0) {
         S.groupId = S.allGroups[0].id;
@@ -196,15 +199,40 @@ async function initSheetsStudio() {
       } else {
         S.group = {
           id: S.groupId,
-          name: 'Database Management Systems',
-          subject_name: 'Database Management Systems',
-          subject_code: 'IT' + S.groupId,
+          name: S.groupId === 9 ? 'Java Programming' : `Classroom ${S.groupId}`,
+          subject_name: S.groupId === 9 ? 'Java Programming' : `Classroom ${S.groupId}`,
+          subject_code: S.groupId === 9 ? '55508' : 'SUB' + S.groupId,
           component: 'THEORY+PRACTICAL',
           department_name: 'Information Technology',
           department_code: 'IT',
           semester: 5
         };
       }
+    }
+
+    // Purge any stale mock cache saved under old roster
+    try {
+      const testKey = `vidyaos_excel_wb_${S.groupId || 'default'}`;
+      const savedTest = localStorage.getItem(testKey);
+      if (savedTest && (savedTest.includes('24011F') || savedTest.includes('HARSHIT JOSHI') || savedTest.includes('KAPIL BISHT'))) {
+        localStorage.removeItem(testKey);
+      }
+    } catch (_) { }
+
+    // Update banner metadata text immediately
+    const initSubj = S.group?.name || S.group?.subject_name || 'Classroom';
+    const initCode = S.group?.subject_code ? ` [${S.group.subject_code}]` : '';
+    const initDeptCode = S.group?.department_code || 'IT';
+    const initDept = S.group?.department_name || 'Information Technology';
+    const initSem = S.group?.semester || S.group?.current_semester || 5;
+
+    const bannerLine2 = document.getElementById('hdr-banner-line2');
+    if (bannerLine2) {
+      bannerLine2.textContent = `Department (${initDeptCode}) | Internal Evaluation - Consolidated (Theory+Practical) | Subject : ${initSubj}${initCode}`;
+    }
+    const bannerCohort = document.getElementById('hdr-banner-cohort');
+    if (bannerCohort) {
+      bannerCohort.textContent = `${initDept} | Semester ${initSem}`;
     }
 
     // 2. Immediately hydrate and render spreadsheet grid (Instant 0ms UI)
@@ -249,7 +277,7 @@ if (document.readyState === 'loading') {
 async function loadTeacherGroupsList() {
   try {
     const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
-    const res = await Promise.race([apiFetch('/teaching-groups?status=ACTIVE'), timeout(3500)]).catch(() => null);
+    const res = await Promise.race([apiFetch('/teaching-groups?status=ACTIVE'), timeout(4000)]).catch(() => null);
     if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
       S.allGroups = res.data;
       if (!S.groupId) {
@@ -265,16 +293,27 @@ async function loadTeacherGroupsList() {
     S.allGroups = window.S.allGroups;
   }
 
+  // Find exact group in allGroups
+  if (S.groupId && Array.isArray(S.allGroups)) {
+    const matched = S.allGroups.find(g => Number(g.id) === Number(S.groupId));
+    if (matched) {
+      S.group = matched;
+      S.registerId = matched.register_id || matched.linked_register_id || S.registerId;
+    }
+  }
+
+  renderGroupSwitcherOptions();
+  renderSheetSelectorDropdownOptions();
+
   if (S.groupId) {
     await loadGroupMetadata(S.groupId);
   } else if (S.allGroups && S.allGroups.length > 0) {
     S.groupId = S.allGroups[0].id;
     await loadGroupMetadata(S.groupId);
   } else {
-    S.groupId = 1;
+    S.groupId = 9;
     await loadGroupMetadata(S.groupId);
   }
-  renderGroupSwitcherOptions();
 }
 
 function renderGroupSwitcherOptions() {
@@ -354,39 +393,74 @@ function renderSheetSelectorDropdownOptions() {
 async function loadGroupMetadata(groupId) {
   const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
   try {
-    const [groupRes, memRes, aRes, tRes, evalRes] = await Promise.allSettled([
-      Promise.race([apiFetch(`/teaching-groups/${groupId}`), timeout(3500)]),
-      Promise.race([apiFetch(`/teaching-groups/${groupId}/members`), timeout(3500)]),
-      Promise.race([apiFetch(`/teaching-groups/${groupId}/assignments`), timeout(3500)]),
-      Promise.race([apiFetch(`/teaching-groups/${groupId}/tests`), timeout(3500)]),
-      Promise.race([apiFetch(`/faculty/registers/${S.registerId || groupId}/internal-evaluation`), timeout(3500)])
+    // 1. Immediately match known group from S.allGroups
+    const found = (S.allGroups || []).find(g => Number(g.id) === Number(groupId));
+    if (found) {
+      S.group = Object.assign({}, found);
+      S.registerId = found.register_id || found.linked_register_id || S.registerId;
+    }
+
+    // 2. Fetch fresh details for this teaching group
+    const groupRes = await Promise.race([apiFetch(`/teaching-groups/${groupId}`), timeout(4000)]).catch(() => null);
+    if (groupRes && groupRes.success && groupRes.data) {
+      S.group = Object.assign(S.group || {}, groupRes.data);
+      S.registerId = S.group.register_id || S.group.linked_register_id || S.registerId || groupId;
+    } else if (!S.group) {
+      S.group = {
+        id: Number(groupId),
+        name: Number(groupId) === 9 ? 'Java Programming' : `Classroom ${groupId}`,
+        subject_name: Number(groupId) === 9 ? 'Java Programming' : `Classroom ${groupId}`,
+        subject_code: Number(groupId) === 9 ? '55508' : 'SUB' + groupId,
+        department_name: 'Information Technology',
+        department_code: 'IT',
+        component: 'THEORY+PRACTICAL',
+        semester: 5
+      };
+      S.registerId = S.group.register_id || S.registerId || groupId;
+    }
+
+    // 3. Update banner metadata text immediately with authentic classroom information
+    const subjName = S.group?.name || S.group?.subject_name || 'Classroom';
+    const subjCode = S.group?.subject_code ? ` [${S.group.subject_code}]` : '';
+    const dept = S.group?.department_name || 'Information Technology';
+    const deptCode = S.group?.department_code || 'IT';
+    const sem = S.group?.semester || S.group?.current_semester || 5;
+
+    const bannerLine2 = document.getElementById('hdr-banner-line2');
+    if (bannerLine2) {
+      const scope = getGroupComponentScope(S.group);
+      let sheetKind = 'Consolidated (Theory+Practical)';
+      if (scope.isPracticalOnly) sheetKind = 'Continuous Lab Evaluation';
+      else if (scope.isTheoryOnly) sheetKind = 'Theory Internal Evaluation';
+      bannerLine2.textContent = `Department (${deptCode}) | Internal Evaluation - ${sheetKind} | Subject : ${subjName}${subjCode}`;
+    }
+    const bannerCohort = document.getElementById('hdr-banner-cohort');
+    if (bannerCohort) {
+      bannerCohort.textContent = `${dept} | Semester ${sem}`;
+    }
+
+    // 4. Concurrently fetch members, assignments, tests, and marks evaluation
+    const [memRes, aRes, tRes, evalRes] = await Promise.allSettled([
+      Promise.race([apiFetch(`/teaching-groups/${groupId}/members`), timeout(4000)]),
+      Promise.race([apiFetch(`/teaching-groups/${groupId}/assignments`), timeout(4000)]),
+      Promise.race([apiFetch(`/teaching-groups/${groupId}/tests`), timeout(4000)]),
+      Promise.race([apiFetch(`/faculty/registers/${S.registerId || groupId}/internal-evaluation`), timeout(4000)])
     ]);
 
-    if (groupRes.status === 'fulfilled' && groupRes.value?.success && groupRes.value?.data) {
-      S.group = groupRes.value.data;
-      S.registerId = S.group.register_id || S.registerId || groupId;
-    } else {
-      const found = (S.allGroups || []).find(g => Number(g.id) === Number(groupId));
-      if (found) {
-        S.group = found;
-      } else if (!S.group) {
-        S.group = {
-          id: Number(groupId),
-          name: 'Database Management Systems',
-          subject_name: 'Database Management Systems',
-          subject_code: 'IT' + groupId,
-          department_name: 'Information Technology',
-          department_code: 'IT',
-          component: 'THEORY+PRACTICAL',
-          semester: 5
-        };
-      }
-      S.registerId = S.group.register_id || S.registerId || groupId;
+    if (memRes.status === 'fulfilled' && memRes.value?.success && Array.isArray(memRes.value.data) && memRes.value.data.length > 0) {
+      S.members = memRes.value.data;
+    } else if (S.group && Array.isArray(S.group.members) && S.group.members.length > 0) {
+      S.members = S.group.members;
     }
 
-    if (memRes.status === 'fulfilled' && memRes.value?.success && Array.isArray(memRes.value.data)) {
-      S.members = memRes.value.data;
+    // If teaching-group has no members enrolled yet, fetch real institutional students from database
+    if (!S.members || !S.members.length) {
+      const deptStudentsRes = await Promise.race([apiFetch(`/students?limit=50`), timeout(3000)]).catch(() => null);
+      if (deptStudentsRes && deptStudentsRes.success && Array.isArray(deptStudentsRes.data) && deptStudentsRes.data.length > 0) {
+        S.members = deptStudentsRes.data;
+      }
     }
+
     if (aRes.status === 'fulfilled' && aRes.value?.success && Array.isArray(aRes.value.data)) {
       S.assignments = aRes.value.data;
     }
@@ -410,44 +484,15 @@ async function loadGroupMetadata(groupId) {
 
     renderGroupSwitcherOptions();
     renderSheetSelectorDropdownOptions();
-
-    // Update banner metadata text
-    const bannerLine2 = document.getElementById('hdr-banner-line2');
-    if (bannerLine2 && S.group) {
-      const subjName = S.group.name || S.group.subject_name || 'Subject';
-      const subjCode = S.group.subject_code ? ` [${S.group.subject_code}]` : '';
-      bannerLine2.textContent = `Internal Evaluation | Subject : ${subjName}${subjCode}`;
-    }
-    const bannerCohort = document.getElementById('hdr-banner-cohort');
-    if (bannerCohort && S.group) {
-      const sem = S.group.semester || S.group.current_semester || 5;
-      const dept = S.group.department_name || 'Information Technology';
-      bannerCohort.textContent = `${dept} | Semester ${sem}`;
-    }
-
     renderSubsheetControls();
 
-    // Hydrate spreadsheet for this subject and refresh grid
-    hydrateAcademicSheetsFromGroup(false);
+    // 5. HYDRATE LIVE DATA FROM DATABASE (forceRefresh = true)!
+    hydrateAcademicSheetsFromGroup(true);
     renderExcelGrid(true);
     if (typeof hideOfficeScreenLoader === 'function') hideOfficeScreenLoader();
   } catch (err) {
     console.error('Error fetching group metadata:', err);
-    if (!S.group) {
-      S.group = {
-        id: Number(groupId),
-        name: 'Database Management Systems',
-        subject_name: 'Database Management Systems',
-        subject_code: 'IT' + groupId,
-        department_name: 'Information Technology',
-        department_code: 'IT',
-        component: 'THEORY+PRACTICAL',
-        semester: 5
-      };
-    }
-    renderGroupSwitcherOptions();
-    renderSheetSelectorDropdownOptions();
-    hydrateAcademicSheetsFromGroup(false);
+    hydrateAcademicSheetsFromGroup(true);
     renderExcelGrid(true);
     if (typeof hideOfficeScreenLoader === 'function') hideOfficeScreenLoader();
   }
@@ -549,7 +594,8 @@ async function switchSheetTab(sheetName, updateUrl = true) {
 function updateBannerForSheet(sheetTypeOrName) {
   const line2 = document.getElementById('hdr-banner-line2');
   if (!line2) return;
-  const subjName = S.group?.subject_name || S.group?.name || 'Class';
+  const subjName = S.group?.subject_name || S.group?.name || 'Classroom';
+  const subjCode = S.group?.subject_code ? ` [${S.group.subject_code}]` : '';
   let title = 'Marks Evaluation Sheet';
   if (sheetTypeOrName === 'evaluation' || sheetTypeOrName === 'Master Evaluation') {
     title = 'Consolidated (Theory+Practical)';
@@ -562,7 +608,7 @@ function updateBannerForSheet(sheetTypeOrName) {
   } else if (typeof sheetTypeOrName === 'string') {
     title = `Unit Test - ${sheetTypeOrName}`;
   }
-  line2.textContent = `Department (${S.group?.department_code || 'IT'}) | Internal Evaluation - ${title} | Subject : ${subjName}`;
+  line2.textContent = `Department (${S.group?.department_code || 'IT'}) | Internal Evaluation - ${title} | Subject : ${subjName}${subjCode}`;
 }
 
 // Purged legacy renderSheetSubToolbar
@@ -1822,13 +1868,6 @@ function updateInstitutionalBanner(line1, line2, line3) {
   const b2 = document.getElementById('hdr-banner-line2');
   const cohortEl = document.getElementById('hdr-banner-cohort');
 
-  if (EXCEL_WB && EXCEL_WB.customBanner) {
-    if (instEl && EXCEL_WB.customBanner.inst) instEl.innerText = EXCEL_WB.customBanner.inst;
-    if (b2 && EXCEL_WB.customBanner.subject) b2.innerText = EXCEL_WB.customBanner.subject;
-    if (cohortEl && EXCEL_WB.customBanner.cohort) cohortEl.innerText = EXCEL_WB.customBanner.cohort;
-    return;
-  }
-
   const sessionKey = (S.group && (S.group.academic_year_id || S.group.academic_year_label)) || '2026';
   const sessionStoreKey = `vidyaos_inst_header_session_${String(sessionKey).replace(/[^a-zA-Z0-9]/g, '_')}`;
   const dynamicInst = getDynamicSessionHeader();
@@ -1849,12 +1888,17 @@ function updateInstitutionalBanner(line1, line2, line3) {
   if (instEl && !S.isEditMode) {
     instEl.innerText = savedInst;
   }
-  if (b2 && line2) {
-    b2.innerHTML = line2;
+
+  const subjName = S.group?.subject_name || S.group?.name || 'Classroom';
+  const subjCode = S.group?.subject_code ? ` [${S.group.subject_code}]` : '';
+  const deptCode = S.group?.department_code || 'IT';
+  const dynamicLine2 = line2 || `Department (${deptCode}) | Internal Evaluation | Subject : ${subjName}${subjCode}`;
+  if (b2 && !S.isEditMode) {
+    b2.textContent = dynamicLine2;
   }
+  const dynamicCohort = line3 || `${S.group?.department_name || 'Information Technology'} | Semester ${S.group?.semester || 5}`;
   if (cohortEl && !S.isEditMode) {
-    const savedCohort = S.groupId ? localStorage.getItem(`vidyaos_cohort_banner_${S.groupId}`) : null;
-    cohortEl.innerText = savedCohort || line3 || 'IT Year 3 | Semester 5';
+    cohortEl.textContent = dynamicCohort;
   }
 }
 
@@ -9006,7 +9050,13 @@ function extractExistingStudentScores(sheets) {
       const name = String(getCell(evalSheet, r, 2)?.v || getCell(evalSheet, r, 2)?.raw || '').trim();
       if (!enroll && !name && !roll) continue;
 
-      const keys = [enroll, roll, name, `idx_${r - startR}`].filter(Boolean);
+      // DO NOT extract scores from mock students!
+      if (enroll.startsWith('24011F') || name.toUpperCase() === 'HARSHIT JOSHI' || name.toUpperCase() === 'KAPIL BISHT' || name.toUpperCase() === 'MANISH TIWARI') {
+        continue;
+      }
+
+      // Keys to preserve teacher edits on REAL students only (NEVER by index idx_${r - startR})
+      const keys = [enroll, roll, name].filter(Boolean);
       const studentScoreObj = {
         assignAvg: getCell(evalSheet, r, 3)?.v,
         utAvg: getCell(evalSheet, r, 4)?.v,
@@ -9032,6 +9082,7 @@ function extractExistingStudentScores(sheets) {
       const roll = String(getCell(testSheet, r, 0)?.v || getCell(testSheet, r, 0)?.raw || '').trim();
       const name = String(getCell(testSheet, r, 2)?.v || getCell(testSheet, r, 2)?.raw || '').trim();
       if (!enroll && !name && !roll) continue;
+      if (enroll.startsWith('24011F') || name.toUpperCase() === 'HARSHIT JOSHI' || name.toUpperCase() === 'KAPIL BISHT') continue;
 
       const examScores = [];
       for (let t = 0; t < 10; t++) {
@@ -9041,7 +9092,7 @@ function extractExistingStudentScores(sheets) {
         }
       }
 
-      const keys = [enroll, roll, name, `idx_${r - 2}`].filter(Boolean);
+      const keys = [enroll, roll, name].filter(Boolean);
       keys.forEach(k => {
         scoresMap[k] = scoresMap[k] || {};
         scoresMap[k].examScores = examScores;
@@ -9057,6 +9108,7 @@ function extractExistingStudentScores(sheets) {
       const roll = String(getCell(stSheet, r, 0)?.v || getCell(stSheet, r, 0)?.raw || '').trim();
       const name = String(getCell(stSheet, r, 2)?.v || getCell(stSheet, r, 2)?.raw || '').trim();
       if (!enroll && !name && !roll) continue;
+      if (enroll.startsWith('24011F') || name.toUpperCase() === 'HARSHIT JOSHI' || name.toUpperCase() === 'KAPIL BISHT') continue;
 
       const qMarks = [];
       for (let q = 0; q < 4; q++) {
@@ -9066,7 +9118,7 @@ function extractExistingStudentScores(sheets) {
         }
       }
 
-      const keys = [enroll, roll, name, `idx_${r - 2}`].filter(Boolean);
+      const keys = [enroll, roll, name].filter(Boolean);
       keys.forEach(k => {
         scoresMap[k] = scoresMap[k] || {};
         scoresMap[k].singleTests = scoresMap[k].singleTests || {};
@@ -9083,6 +9135,7 @@ function extractExistingStudentScores(sheets) {
       const roll = String(getCell(assignSheet, r, 0)?.v || getCell(assignSheet, r, 0)?.raw || '').trim();
       const name = String(getCell(assignSheet, r, 2)?.v || getCell(assignSheet, r, 2)?.raw || '').trim();
       if (!enroll && !name && !roll) continue;
+      if (enroll.startsWith('24011F') || name.toUpperCase() === 'HARSHIT JOSHI' || name.toUpperCase() === 'KAPIL BISHT') continue;
 
       const aScores = [];
       for (let a = 0; a < 5; a++) {
@@ -9092,7 +9145,7 @@ function extractExistingStudentScores(sheets) {
         }
       }
 
-      const keys = [enroll, roll, name, `idx_${r - 2}`].filter(Boolean);
+      const keys = [enroll, roll, name].filter(Boolean);
       keys.forEach(k => {
         scoresMap[k] = scoresMap[k] || {};
         scoresMap[k].assignScores = aScores;
@@ -9122,12 +9175,19 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
         const hasSingleTests = Array.isArray(parsed?.sheets) && parsed.sheets.some(s => s.type === 'single-test');
         const hasObsoleteGrade = s0 && (getCell(s0, 0, 7)?.v === 'Grade' || String(getCell(s0, 0, 3)?.v || '').includes('(10)'));
         const isTwoTier = String(getCell(s0, 0, 3)?.v || '').toUpperCase() === 'THEORY';
+
+        // Check if saved workbook contains old mock data
+        const firstStudentRoll = String(getCell(s0, 3, 1)?.v || getCell(s0, 3, 1)?.raw || '');
+        const firstStudentName = String(getCell(s0, 3, 2)?.v || getCell(s0, 3, 2)?.raw || '').toUpperCase();
+        const secondStudentName = String(getCell(s0, 4, 2)?.v || getCell(s0, 4, 2)?.raw || '').toUpperCase();
+        const isMockRoster = firstStudentRoll.startsWith('24011F') || (firstStudentName === 'GIRDHAR DHAMI' && secondStudentName === 'HARSHIT JOSHI');
+
         const hasStudentRow = s0 && (
           Boolean(getCell(s0, 3, 2)?.v || getCell(s0, 3, 2)?.raw) ||
           Boolean(getCell(s0, 3, 0)?.v || getCell(s0, 3, 0)?.raw)
         );
 
-        if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length >= 4 && !hasObsoleteGrade && !hasBrokenBannerInGrid && hasSingleTests && hasStudentRow && isTwoTier) {
+        if (!isMockRoster && parsed && Array.isArray(parsed.sheets) && parsed.sheets.length >= 4 && !hasObsoleteGrade && !hasBrokenBannerInGrid && hasSingleTests && hasStudentRow && isTwoTier) {
           EXCEL_WB.name = parsed.name || EXCEL_WB.name;
           EXCEL_WB.sheets = parsed.sheets;
           EXCEL_WB.activeSheetIndex = 0;
@@ -9166,23 +9226,24 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     studentList = S.evalData.roster;
   } else if (Array.isArray(S.members) && S.members.length > 0) {
     studentList = S.members;
+  } else if (Array.isArray(window.S?.allStudents) && window.S.allStudents.length > 0) {
+    studentList = window.S.allStudents;
   }
 
-  // If classroom does not have members enrolled yet, supply default authentic student rows so sheet is NEVER blank
+  // If classroom does not have members enrolled yet, supply clean blank rows with ZERO scores
   if (!studentList || studentList.length === 0) {
-    const defaultRosterNames = [
-      'GIRDHAR DHAMI', 'HARSHIT JOSHI', 'KAPIL BISHT', 'MANISH TIWARI',
-      'MOHIT ARYA', 'NEERAJ PANDEY', 'PANKAJ SINGH', 'PRADEEP KUMAR',
-      'RAHUL RAWAT', 'ROHIT SHARMA', 'SAURABH NEGI', 'SUMIT CHAUHAN',
-      'VIKAS VERMA', 'AMAN SINGH', 'PRIYA JOSHI'
+    const fallbackNames = [
+      'Girdhar Dhami', 'Aditi Verma', 'Akash Patel', 'Ananya Gupta',
+      'Arjun Rao', 'Bhavya Nair', 'Chirag Joshi', 'Deepika Singh',
+      'Rohan Kulkarni', 'Sneha Patil'
     ];
-    studentList = defaultRosterNames.map((name, i) => ({
+    studentList = fallbackNames.map((name, i) => ({
       class_roll_no: i + 1,
-      official_enrollment_no: `24011F${String(i + 1).padStart(3, '0')}`,
+      official_enrollment_no: `2024IT${String(i + 1).padStart(3, '0')}`,
       full_name: name,
-      attendance_percentage: 85 + (i % 15),
-      assignment_scores: [8, 9, 8.5, 7, 9],
-      exam_scores: [18, 19, 17, 20, 16, 18, 19, 17, 18, 20]
+      attendance_percentage: 0,
+      assignment_scores: [0, 0, 0, 0, 0],
+      exam_scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     }));
   }
 
@@ -9283,7 +9344,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const name = stu.full_name || stu.student_name || stu.name || '';
     const attPct = Math.round(Number(stu.attendance_percentage !== undefined && stu.attendance_percentage !== null ? stu.attendance_percentage : 0));
 
-    const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || existingScoresMap[`idx_${idx}`] || {};
+    const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || {};
 
     let assignAvg = 0;
     if (preserved.assignAvg !== undefined && preserved.assignAvg !== null && preserved.assignAvg !== '') {
@@ -9397,7 +9458,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
     const name = stu.full_name || stu.student_name || stu.name || '';
 
-    const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || existingScoresMap[`idx_${idx}`] || {};
+    const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || {};
 
     setCell(testSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
     setCell(testSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
@@ -9487,7 +9548,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
       const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
       const name = stu.full_name || stu.student_name || stu.name || '';
 
-      const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || existingScoresMap[`idx_${idx}`] || {};
+      const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || {};
 
       setCell(singleTestSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
       setCell(singleTestSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
@@ -9556,7 +9617,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const enroll = stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || roll;
     const name = stu.full_name || stu.student_name || stu.name || '';
 
-    const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || existingScoresMap[`idx_${idx}`] || {};
+    const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || {};
 
     setCell(assignSheet, r, 0, { raw: srNo, v: srNo, s: { align: 'center' } });
     setCell(assignSheet, r, 1, { raw: enroll, v: enroll, s: { align: 'center' } });
@@ -9620,7 +9681,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const name = stu.full_name || stu.student_name || stu.name || '';
     const attPct = Math.round(Number(stu.attendance_percentage !== undefined && stu.attendance_percentage !== null ? stu.attendance_percentage : 0));
 
-    const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || existingScoresMap[`idx_${idx}`] || {};
+    const preserved = existingScoresMap[enroll] || existingScoresMap[roll] || existingScoresMap[name] || {};
 
     let labRecord = (stu.lab_record_marks !== undefined && stu.lab_record_marks !== null) ? Number(stu.lab_record_marks) : 0;
     if (preserved.labRecord !== undefined && preserved.labRecord !== null && preserved.labRecord !== '') {
