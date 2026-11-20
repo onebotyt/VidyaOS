@@ -1,8 +1,35 @@
 /* ══════════════════════════════════════════════════════════════
    OFFICE STUDIO: AUTO-FIT COLUMNS & SCREEN-FIT DISTRIBUTION
    Intelligently proportions columns so institutional sheets & imported
-   sheets fit 100% within the user's viewport without horizontal scrolling.
+   sheets fit 100% within the user's viewport without horizontal scrolling,
+   anchored to the LAST COLUMN THAT CONTAINS DATA (not just 'total').
    ══════════════════════════════════════════════════════════════ */
+
+function findLastDataColumn(sheet) {
+  if (!sheet || !sheet.cells) return 0;
+  const totalCols = sheet.colsCount || 26;
+  const totalRows = Math.min(sheet.rowsCount || 60, 200);
+
+  // Scan backwards from the rightmost column to find the first column with content
+  for (let c = totalCols - 1; c >= 0; c--) {
+    for (let r = 0; r < totalRows; r++) {
+      const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
+      if (!cell) continue;
+
+      const v = cell.v !== undefined && cell.v !== null ? String(cell.v).trim() : '';
+      const raw = cell.raw !== undefined && cell.raw !== null ? String(cell.raw).trim() : '';
+
+      if (v !== '' || raw !== '') {
+        // Exclude full-width institutional banner row from determining column width
+        if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet'))) {
+          continue;
+        }
+        return c; // Found the last column with actual data!
+      }
+    }
+  }
+  return 0;
+}
 
 function autoFitSheetColumns(sheet, force = false) {
   if (!sheet || !sheet.cells) return;
@@ -23,85 +50,97 @@ function autoFitSheetColumns(sheet, force = false) {
   // Subtract row header (42px) + scrollbar/border cushion (16px)
   const availWidth = Math.max(screenW - 58, 640);
 
-  // Identify last active column with content or headers (ignoring merged banner rows)
-  let lastCol = 0;
-  for (let c = 0; c < sheet.colsCount; c++) {
-    for (let r = 0; r < Math.min(sheet.rowsCount || 50, 6); r++) {
-      const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
-      const val = cell.v !== undefined && cell.v !== null ? String(cell.v).trim() : String(cell.raw || '').trim();
-      if (val) {
-        lastCol = Math.max(lastCol, c);
-      }
-    }
-  }
+  // Dynamically find the LAST COLUMN THAT HAS DATA across all rows
+  const lastDataCol = findLastDataColumn(sheet);
+  const activeColCount = Math.max(1, lastDataCol + 1);
 
-  const activeColCount = Math.max(1, lastCol + 1);
-
-  // 1. MASTER EVALUATION SHEET (16 Columns: SR, Roll, Reg, Enroll, Name, Theory cols 5..9, Practical cols 10..14, Grand Total col 15)
-  if (sheet.type === 'evaluation' || (!sheet.type && activeColCount >= 14 && activeColCount <= 18)) {
-    // Curated compact base widths modeled from optimal 100% browser viewport
-    // Baseline sum = 42 + 50 + 76 + 102 + 145 + 68 + 68 + 54 + 68 + 52 + 54 + 68 + 54 + 54 + 52 + 65 = 972px
-    const baseWidths = [42, 50, 76, 102, 145, 68, 68, 54, 68, 52, 54, 68, 54, 54, 52, 65];
-    const sumBase = baseWidths.reduce((a, b) => a + b, 0); // 972px
-
-    if (availWidth >= sumBase) {
-      // Screen is wide enough: distribute extra width gracefully, prioritizing student name
-      const extra = availWidth - sumBase;
-      const nameExtra = Math.floor(extra * 0.28);
-      const perColExtra = Math.floor((extra - nameExtra) / 15);
-      for (let c = 0; c < 16; c++) {
-        if (c === 4) {
-          sheet.colWidths[c] = baseWidths[c] + nameExtra;
-        } else {
-          sheet.colWidths[c] = baseWidths[c] + perColExtra;
-        }
-      }
-    } else {
-      // Screen is narrower (e.g. tablet or split-screen): scale down smoothly while preserving legibility
-      const ratio = Math.max(0.72, availWidth / sumBase);
-      for (let c = 0; c < 16; c++) {
-        sheet.colWidths[c] = Math.max(34, Math.round(baseWidths[c] * ratio));
-      }
-    }
-    return;
-  }
-
-  // 2. UNIT TESTS / COURSEWORK / PRACTICALS / GENERIC INSTITUTIONAL OR IMPORTED SHEETS
-  // Proportionally distribute available width so all active columns through lastCol fit exactly on screen!
-  const colMaxLen = {};
+  // Calculate content-aware base width for each column up to lastDataCol
+  const colMaxChars = {};
   for (let c = 0; c < activeColCount; c++) {
-    colMaxLen[c] = 0;
+    colMaxChars[c] = 0;
   }
 
-  const sampleRows = Math.min(sheet.rowsCount || 40, 50);
-  for (let r = 1; r < sampleRows; r++) { // skip row 0 (may contain full-width banner text)
+  const sampleRows = Math.min(sheet.rowsCount || 40, 60);
+  for (let r = 0; r < sampleRows; r++) {
     for (let c = 0; c < activeColCount; c++) {
       const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
-      const val = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || ''));
-      if (val.length > colMaxLen[c] && val.length < 35) {
-        colMaxLen[c] = val.length;
+      if (!cell) continue;
+      const v = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || '')).trim();
+      // Skip banner row text
+      if (r === 0 && (v.includes('Polytechnic') || v.includes('Institute') || v.includes('Internal Evaluation Sheet'))) {
+        continue;
+      }
+      if (v.length > colMaxChars[c] && v.length < 40) {
+        colMaxChars[c] = v.length;
       }
     }
   }
 
+  // Base width rules for active data columns
   let totalBaseWidth = 0;
-  const initialWidths = [];
+  const baseWidths = [];
+
   for (let c = 0; c < activeColCount; c++) {
-    const chars = Math.max(3, colMaxLen[c] || 5);
-    let autoW = Math.max(45, Math.min(220, chars * 7.5 + 18));
-    if (c === 0 && chars <= 4) autoW = 40;  // SR. NO.
-    if (c === 1 && chars <= 6) autoW = 50;  // ROLL NO.
-    if (c === 2 && chars <= 10) autoW = 76; // REG. NO.
-    if (c === 3 && chars <= 14) autoW = 100; // ENROLL NO.
-    if (c === 4 && chars <= 25) autoW = 145; // NAME
-    initialWidths[c] = autoW;
-    totalBaseWidth += autoW;
+    const chars = Math.max(2, colMaxChars[c] || 4);
+    let baseW = 52; // Default for numbers / short marks
+
+    if (c === 0 && chars <= 4) {
+      baseW = 40;  // SR. NO.
+    } else if (c === 1 && chars <= 6) {
+      baseW = 48;  // ROLL NO.
+    } else if (c === 2 && chars <= 10) {
+      baseW = 76;  // REG. NO.
+    } else if (c === 3 && chars <= 14) {
+      baseW = 98;  // ENROLLMENT NO.
+    } else if (c === 4 && chars <= 28) {
+      baseW = 145; // STUDENT NAME
+    } else {
+      // Data / marks / custom columns
+      if (chars <= 5) {
+        baseW = 52;
+      } else if (chars <= 10) {
+        baseW = 62;
+      } else if (chars <= 16) {
+        baseW = 70;
+      } else if (chars <= 25) {
+        baseW = 85;
+      } else {
+        baseW = Math.min(160, chars * 6.5 + 16);
+      }
+    }
+
+    baseWidths[c] = Math.round(baseW);
+    totalBaseWidth += baseWidths[c];
   }
 
-  // Scale all columns so their sum equals available width (or minimum readable width)
-  const scaleFactor = availWidth / Math.max(totalBaseWidth, 1);
-  for (let c = 0; c < activeColCount; c++) {
-    sheet.colWidths[c] = Math.max(36, Math.round(initialWidths[c] * scaleFactor));
+  // Proportional Distribution: Fit columns 0 through lastDataCol to exact screen width
+  if (availWidth >= totalBaseWidth) {
+    // Screen is wide enough: distribute remaining width
+    const extra = availWidth - totalBaseWidth;
+    // Give 25% of extra space to student name column (c=4) if present
+    const hasNameCol = activeColCount > 4;
+    const nameExtra = hasNameCol ? Math.floor(extra * 0.25) : 0;
+    const perColExtra = Math.floor((extra - nameExtra) / activeColCount);
+
+    for (let c = 0; c < activeColCount; c++) {
+      if (c === 4 && hasNameCol) {
+        sheet.colWidths[c] = baseWidths[c] + nameExtra + perColExtra;
+      } else {
+        sheet.colWidths[c] = baseWidths[c] + perColExtra;
+      }
+    }
+  } else {
+    // Screen is narrower: scale down smoothly while respecting minimum readable widths
+    const ratio = Math.max(0.68, availWidth / Math.max(totalBaseWidth, 1));
+    for (let c = 0; c < activeColCount; c++) {
+      const minW = (c === 0) ? 34 : (c === 4 ? 115 : 36);
+      sheet.colWidths[c] = Math.max(minW, Math.round(baseWidths[c] * ratio));
+    }
+  }
+
+  // Unused columns beyond lastDataCol get a compact default width
+  for (let c = activeColCount; c < sheet.colsCount; c++) {
+    sheet.colWidths[c] = 55;
   }
 }
 
@@ -121,7 +160,7 @@ function triggerFitColumnsToScreen() {
   }
 
   if (typeof showToast === 'function') {
-    showToast('Spreadsheet columns fitted to screen width without scrolling!', 'success');
+    showToast('Columns fitted to screen (up to last data column)!', 'success');
   }
 }
 
@@ -139,6 +178,7 @@ if (typeof window !== 'undefined') {
     }, 150);
   });
 
+  window.findLastDataColumn = findLastDataColumn;
   window.autoFitSheetColumns = autoFitSheetColumns;
   window.triggerFitColumnsToScreen = triggerFitColumnsToScreen;
 }
