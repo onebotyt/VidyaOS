@@ -9918,31 +9918,33 @@ function renderOfficeSubjectsGrid(filterQuery = '') {
     <div class="office-subject-card" data-group-id="${grp.id}">
       <div class="office-subject-card-top">
         <div class="office-subject-badges">
-          <span class="office-code-chip">${escapeHtml(grp.subject_code || ('SUB' + grp.id))}</span>
-          <span class="office-sem-chip">${escapeHtml(grp.class_name || '')} ${grp.semester ? '• Sem ' + grp.semester : ''}</span>
+          <div class="office-badge-group">
+            <span class="office-code-chip">${escapeHtml(grp.subject_code || ('SUB' + grp.id))}</span>
+            <span class="office-sem-chip">${escapeHtml(grp.class_name || '')} ${grp.semester ? '• Sem ' + grp.semester : ''}</span>
+          </div>
         </div>
         <h3 class="office-subject-name" title="${escapeHtml(grp.subject_name || 'Subject')}">${escapeHtml(grp.subject_name || 'Academic Subject')}</h3>
       </div>
       <div class="office-subject-actions-panel">
         <div class="office-actions-label">Open Worksheet:</div>
         <div class="office-sheet-quick-actions">
-          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'evaluation')" title="Consolidated Internal Evaluation">
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'evaluation', this)" title="Consolidated Internal Evaluation">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
             <span>Master Evaluation</span>
           </button>
-          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'tests')" title="Unit Tests (UT1..UT10)">
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'tests', this)" title="Unit Tests (UT1..UT10)">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             <span>Class Tests (UT1-10)</span>
           </button>
-          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'assignments')" title="Assignments Ledger">
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'assignments', this)" title="Assignments Ledger">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             <span>Coursework</span>
           </button>
-          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'practicals')" title="Practicals & Laboratory Records">
+          <button type="button" class="office-sheet-btn" onclick="selectSubjectAndSheet(${grp.id}, 'practicals', this)" title="Practicals & Laboratory Records">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31L4.69 19.3A2 2 0 0 0 6.44 22h11.12a2 2 0 0 0 1.75-2.7L14 9.31V2"/></svg>
             <span>Practicals &amp; Labs</span>
           </button>
-          <button type="button" class="office-sheet-btn office-sheet-btn-blank" onclick="selectSubjectAndSheet(${grp.id}, 'blank')" title="New Blank Worksheet">
+          <button type="button" class="office-sheet-btn office-sheet-btn-blank" onclick="selectSubjectAndSheet(${grp.id}, 'blank', this)" title="New Blank Worksheet">
             <svg class="office-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             <span>+ Blank Sheet</span>
           </button>
@@ -9986,33 +9988,50 @@ function toggleOfficeHomeScreen() {
   }
 }
 
-async function selectSubjectAndSheet(groupId, sheetKey) {
-  closeOfficeHomeScreen();
-  S.groupId = Number(groupId);
-  const grp = (S.allGroups || []).find(g => g.id === S.groupId);
-  if (grp) S.group = grp;
-
-  const title = grp ? `${grp.subject_code || 'SUB'} - ${grp.subject_name}` : `Subject ${groupId}`;
-  recordRecentWorkbook(title, sheetKey, groupId);
-
-  const topSel = document.getElementById('subject-selector');
-  if (topSel) topSel.value = String(groupId);
-
-  const url = new URL(window.location.href);
-  url.searchParams.set('groupId', groupId);
-  if (sheetKey && sheetKey !== 'blank') {
-    url.searchParams.set('sheet', sheetKey);
-  } else {
-    url.searchParams.delete('sheet');
+async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
+  if (clickedEl && clickedEl.classList) {
+    clickedEl.classList.add('office-btn-pulse');
   }
-  url.searchParams.delete('view');
-  window.history.replaceState({}, '', url.toString());
-
-  if (sheetKey === 'blank') {
-    createNewBlankWorksheet();
-  } else {
-    await switchSheetTab(sheetKey, true);
+  const sheetNames = {
+    evaluation: 'Master Evaluation Sheet',
+    tests: 'Class Tests Marksheet',
+    assignments: 'Coursework & Assignments',
+    practicals: 'Practicals & Lab Records',
+    blank: 'New Blank Worksheet'
+  };
+  const label = sheetNames[sheetKey] || 'Worksheet';
+  if (typeof showToast === 'function') {
+    showToast(`Opening ${label}...`, 'info', 2000);
   }
+
+  setTimeout(async () => {
+    closeOfficeHomeScreen();
+    S.groupId = Number(groupId);
+    const grp = (S.allGroups || []).find(g => g.id === S.groupId);
+    if (grp) S.group = grp;
+
+    const title = grp ? `${grp.subject_code || 'SUB'} - ${grp.subject_name}` : `Subject ${groupId}`;
+    recordRecentWorkbook(title, sheetKey, groupId);
+
+    const topSel = document.getElementById('subject-selector');
+    if (topSel) topSel.value = String(groupId);
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('groupId', groupId);
+    if (sheetKey && sheetKey !== 'blank') {
+      url.searchParams.set('sheet', sheetKey);
+    } else {
+      url.searchParams.delete('sheet');
+    }
+    url.searchParams.delete('view');
+    window.history.replaceState({}, '', url.toString());
+
+    if (sheetKey === 'blank') {
+      createNewBlankWorksheet();
+    } else {
+      await switchSheetTab(sheetKey, true);
+    }
+  }, 70);
 }
 
 function createNewBlankWorksheet() {
@@ -10021,23 +10040,42 @@ function createNewBlankWorksheet() {
   }
 }
 
-function createNewWorksheetFromHome() {
-  closeOfficeHomeScreen();
-  createNewBlankWorksheet();
+function createNewWorksheetFromHome(clickedEl) {
+  if (clickedEl && clickedEl.classList) {
+    clickedEl.classList.add('office-btn-pulse');
+  }
+  if (typeof showToast === 'function') {
+    showToast('Creating new blank worksheet...', 'info', 2000);
+  }
+  setTimeout(() => {
+    closeOfficeHomeScreen();
+    createNewBlankWorksheet();
+  }, 70);
 }
 
-function openBlankWorkbookFromHome() {
-  closeOfficeHomeScreen();
-  createNewBlankWorksheet();
+function openBlankWorkbookFromHome(clickedEl) {
+  if (clickedEl && clickedEl.classList) {
+    clickedEl.classList.add('office-btn-pulse');
+  }
+  if (typeof showToast === 'function') {
+    showToast('Opening blank workbook...', 'info', 2000);
+  }
+  setTimeout(() => {
+    closeOfficeHomeScreen();
+    createNewBlankWorksheet();
+  }, 70);
 }
 
-function openSubjectSheetDirect(groupId, sheetKeyOrIdx) {
+function openSubjectSheetDirect(groupId, sheetKeyOrIdx, clickedEl) {
+  if (clickedEl && clickedEl.classList) {
+    clickedEl.classList.add('office-btn-pulse');
+  }
   const targetGroup = groupId || S.groupId || (S.allGroups?.[0]?.id);
   let sheetKey = sheetKeyOrIdx;
   if (sheetKey === 0 || sheetKey === '0') sheetKey = 'evaluation';
   if (sheetKey === 1 || sheetKey === '1') sheetKey = 'tests';
   if (targetGroup) {
-    selectSubjectAndSheet(targetGroup, sheetKey || 'evaluation');
+    selectSubjectAndSheet(targetGroup, sheetKey || 'evaluation', clickedEl);
   } else {
     closeOfficeHomeScreen();
   }
@@ -10465,6 +10503,15 @@ window.addEventListener('resize', () => {
     launch();
   }
 })();
+
+// Global tactile visual feedback on clicks inside Office Studio
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('.office-sheet-btn, .office-template-card, .office-recent-item, .header-office-home-btn, #btn-office-open-file');
+  if (target) {
+    target.classList.add('office-click-active');
+    setTimeout(() => target.classList.remove('office-click-active'), 320);
+  }
+}, { passive: true });
 
 // Window Globals Export
 window.openDropdownOverlay = openDropdownOverlay;
