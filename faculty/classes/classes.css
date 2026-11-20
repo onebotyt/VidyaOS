@@ -752,6 +752,99 @@
   gap: 0.75rem;
 }
 
+.form-grid-compact-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-dates-section-card {
+  background: var(--bg-surface, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.15rem;
+}
+
+[data-theme="dark"] .form-dates-section-card {
+  background: rgba(30, 41, 59, 0.45);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.form-dates-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary, #2563eb);
+}
+
+.form-date-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.73rem;
+  line-height: 1.35;
+  color: var(--text-muted, #64748b);
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+}
+
+[data-theme="dark"] .form-date-hint {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+}
+
+.form-date-hint svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-primary, #2563eb);
+}
+
+.class-card-timeline {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 0.35rem;
+}
+
+.class-card-timeline svg {
+  opacity: 0.85;
+}
+
+.tag-ongoing {
+  color: #86efac;
+  font-weight: 600;
+}
+
+input[type="date"].form-control-input {
+  font-family: inherit;
+  color: var(--text-main);
+  background-color: var(--bg-card);
+  line-height: normal;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+}
+
 .form-field-label {
   font-size: 0.82rem;
   font-weight: 700;
@@ -1400,6 +1493,74 @@
   .form-grid-2col {
     grid-template-columns: 1fr;
     gap: 0.65rem;
+  }
+
+  .form-grid-compact-pair {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Universal VidyaOS Modal Mobile Enhancements */
+  .vidya-modal-backdrop {
+    padding: 0.75rem !important;
+    align-items: center !important;
+  }
+
+  .vidya-modal-dialog {
+    max-height: calc(100dvh - 1.5rem) !important;
+    max-height: calc(100vh - 1.5rem) !important;
+    max-width: 100% !important;
+    border-radius: 18px !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .vidya-modal-header {
+    padding: 0.85rem 1rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .vidya-modal-title {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+  }
+
+  .vidya-modal-body {
+    padding: 0.85rem 1rem 1.25rem !important;
+    gap: 0.65rem !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .vidya-modal-footer {
+    padding: 0.75rem 1rem !important;
+    flex-shrink: 0 !important;
+    gap: 0.5rem !important;
+  }
+
+  .vidya-modal-footer button {
+    flex: 1 !important;
+    height: 42px !important;
+    font-size: 0.88rem !important;
+    border-radius: 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .form-field-label {
+    font-size: 0.78rem !important;
+    margin-bottom: 0.15rem !important;
+  }
+
+  .form-control-input,
+  .form-control-select {
+    height: 38px !important;
+    font-size: 0.85rem !important;
+    border-radius: 8px !important;
+    padding: 0 0.65rem !important;
   }
 }
 

@@ -228,6 +228,13 @@
             <div class="class-card-sub">
               Sem ${semester} &bull; ${escapeHtml(formattedComp)} &bull; ${escapeHtml(ayLabel)}
             </div>
+            ${g.start_date ? `
+              <div class="class-card-timeline">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
+                <span>Started ${new Date(g.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                ${g.end_date ? `<span>&bull; Ends ${new Date(g.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>` : `<span class="tag-ongoing">&bull; Ongoing</span>`}
+              </div>
+            ` : ''}
           </div>
 
           <!-- Primary Action Buttons (Take Attendance + Register) -->
@@ -434,6 +441,18 @@
     loadSessionsForModal('select-class-session');
     const semSelect = document.getElementById('select-class-sem');
     if (semSelect) window.autoUpdateYear(semSelect.value);
+
+    // Default start date to today's local date
+    const startDateInput = document.getElementById('input-class-start-date');
+    if (startDateInput && !startDateInput.value) {
+      const now = new Date();
+      const localToday = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0')
+      ].join('-');
+      startDateInput.value = localToday;
+    }
   };
 
   window.closeCreateGroupModal = function () {
@@ -449,12 +468,16 @@
     const compInput = document.getElementById('select-class-comp');
     const sessionInput = document.getElementById('select-class-session');
     const semInput = document.getElementById('select-class-sem');
+    const startDateInput = document.getElementById('input-class-start-date');
+    const endDateInput = document.getElementById('input-class-end-date');
 
     const subjectName = nameInput?.value?.trim() || 'New Class';
     const sem = parseInt(semInput?.value || '1', 10);
     const yr = Math.ceil(sem / 2);
     const shortName = shortNameInput?.value?.trim() || shortNameInput?.placeholder || '';
     const code = codeInput?.value?.trim() || '';
+    const startDate = startDateInput?.value?.trim() || new Date().toISOString().split('T')[0];
+    const endDate = endDateInput?.value?.trim() || null;
 
     const payload = {
       name: subjectName,
@@ -465,6 +488,8 @@
       academic_year_id: sessionInput?.value ? parseInt(sessionInput.value, 10) : undefined,
       semester: sem,
       year: yr,
+      start_date: startDate,
+      end_date: endDate,
       room_no: code || '101'
     };
 
@@ -527,6 +552,15 @@
       window.autoUpdateEditYear(semSelect.value);
     }
 
+    const startDateInput = document.getElementById('input-edit-class-start-date');
+    if (startDateInput) {
+      startDateInput.value = group.start_date ? group.start_date.split('T')[0] : (group.created_at ? group.created_at.split('T')[0] : '');
+    }
+    const endDateInput = document.getElementById('input-edit-class-end-date');
+    if (endDateInput) {
+      endDateInput.value = group.end_date ? group.end_date.split('T')[0] : '';
+    }
+
     loadSessionsForModal('select-edit-class-session', group.academic_year_id);
     modal.style.display = 'flex';
   };
@@ -547,12 +581,16 @@
     const compInput = document.getElementById('select-edit-class-comp');
     const sessionInput = document.getElementById('select-edit-class-session');
     const semInput = document.getElementById('select-edit-class-sem');
+    const startDateInput = document.getElementById('input-edit-class-start-date');
+    const endDateInput = document.getElementById('input-edit-class-end-date');
 
     const subjectName = nameInput?.value?.trim() || '';
     const sem = parseInt(semInput?.value || '1', 10);
     const yr = Math.ceil(sem / 2);
     const shortName = shortNameInput?.value?.trim() || '';
     const code = codeInput?.value?.trim() || '';
+    const startDate = startDateInput?.value?.trim() || null;
+    const endDate = endDateInput?.value?.trim() || null;
 
     const payload = {
       name: subjectName,
@@ -562,7 +600,9 @@
       component: compInput?.value || 'THEORY',
       academic_year_id: sessionInput?.value ? parseInt(sessionInput.value, 10) : undefined,
       semester: sem,
-      year: yr
+      year: yr,
+      start_date: startDate,
+      end_date: endDate
     };
 
     try {
