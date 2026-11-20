@@ -28,6 +28,22 @@
     else alert(msg);
   };
 
+  function checkIsHod() {
+    try {
+      const raw = localStorage.getItem('user') || localStorage.getItem('auth_user') || localStorage.getItem('currentUser');
+      if (!raw) return false;
+      const user = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!user) return false;
+      if (user.is_hod === true || user.is_hod === 1 || user.is_hod === '1') return true;
+      if (user.role && String(user.role).toUpperCase() === 'HOD') return true;
+      if (Array.isArray(user.roles)) {
+        const uRoles = user.roles.map(r => String(r).toUpperCase());
+        if (uRoles.includes('HOD') || uRoles.includes('DEPT_HEAD') || uRoles.includes('SYSTEM_ADMIN')) return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
   function getInitials(name) {
     if (!name) return 'FA';
     const clean = name.replace(/^(prof\.|dr\.|mr\.|ms\.|mrs\.)\s+/i, '').trim();
@@ -237,11 +253,13 @@
       return;
     }
 
+    const isCurrentUserHod = checkIsHod();
+
     tbody.innerHTML = list.map((f, idx) => {
-      const isHod = (f.employee_id || '').toUpperCase().includes('HOD') || (f.role || '').toUpperCase() === 'HOD';
-      const roleBadge = isHod
+      const isTargetHod = (f.employee_id || '').toUpperCase().includes('HOD') || (f.role || '').toUpperCase() === 'HOD' || (f.designation || '').toLowerCase().includes('head');
+      const roleBadge = isTargetHod
         ? '<span class="fac-role-chip hod">HOD</span>'
-        : '<span class="fac-role-chip lecturer">Lecturer</span>';
+        : `<span class="fac-role-chip lecturer">${esc(f.designation || 'Lecturer')}</span>`;
 
       const initials = getInitials(f.full_name);
 
@@ -267,15 +285,21 @@
                   </svg>
                 </button>
                 <div class="fac-dropdown-menu" id="fac-menu-${f.id}">
-                  <button type="button" class="fac-menu-item" onclick="viewFacultyDetails(${f.id})">
+                  <button type="button" class="fac-menu-item" onclick="viewFacultyDetails(${f.id}, 'view')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     <span>View Details</span>
                   </button>
+                  ${isCurrentUserHod ? `
+                    <button type="button" class="fac-menu-item" onclick="viewFacultyDetails(${f.id}, 'edit')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      <span>Edit Faculty</span>
+                    </button>
+                  ` : ''}
                   <button type="button" class="fac-menu-item" onclick="resetFacultyPassword(${f.id}, '${esc(f.full_name)}')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     <span>Reset Password</span>
                   </button>
-                  ${!isHod ? `
+                  ${!isTargetHod ? `
                     <button type="button" class="fac-menu-item danger" onclick="deleteFacultyMember(${f.id}, '${esc(f.full_name)}')">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                       <span>Remove Faculty</span>
@@ -429,60 +453,363 @@
     document.querySelectorAll('.fac-dropdown-menu.show').forEach(m => m.classList.remove('show'));
   }
 
-  // 7. View Faculty Complete Details Modal
-  function viewFacultyDetails(id) {
-    closeAllMenus();
-    const f = allFaculty.find(item => item.id === id);
-    if (!f) return;
+  // 7. Faculty Details & HOD Edit Modal Management
+  function renderFacultyWorkload(classes) {
+    const container = document.getElementById('detail-fac-subjects-container');
+    const countBadge = document.getElementById('detail-workload-badge');
+    const countHeader = document.getElementById('detail-workload-count');
 
-    currentDetailFacultyId = f.id;
-    const isHod = (f.employee_id || '').toUpperCase().includes('HOD') || (f.role || '').toUpperCase() === 'HOD';
+    const count = Array.isArray(classes) ? classes.length : 0;
+    if (countBadge) countBadge.textContent = count;
+    if (countHeader) countHeader.textContent = `${count} ${count === 1 ? 'Class' : 'Classes'}`;
+
+    if (!container) return;
+
+    if (!classes || classes.length === 0) {
+      container.innerHTML = `
+        <div class="fac-empty-workload">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="margin:0 auto 0.5rem; opacity:0.4; display:block;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          No active teaching classes currently assigned to this faculty member.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = classes.map(c => `
+      <div class="fac-class-card-item">
+        <div class="fac-class-info">
+          <h5 class="fac-class-title">${esc(c.subject_name || c.class_name || 'Academic Class')}</h5>
+          <div class="fac-class-meta">
+            <span class="fac-class-badge">${esc(c.subject_code || 'CODE')}</span>
+            <span>&bull; Sem ${esc(c.semester || '—')}</span>
+            <span>&bull; ${esc(c.component || 'THEORY')}</span>
+            ${c.start_date ? `<span>&bull; Started ${esc(c.start_date)}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderFacultySecurity(f) {
+    const rolesContainer = document.getElementById('detail-fac-roles-list');
+    const googleStatus = document.getElementById('detail-fac-google');
+
+    if (rolesContainer) {
+      let rolesArr = [];
+      if (f.roles) {
+        rolesArr = String(f.roles).split(',').map(r => r.trim()).filter(Boolean);
+      } else if (f.role) {
+        rolesArr = [f.role];
+      } else {
+        rolesArr = ['TEACHER'];
+      }
+      rolesContainer.innerHTML = rolesArr.map(r => {
+        const isHodRole = r.toUpperCase().includes('HOD') || r.toUpperCase().includes('ADMIN');
+        return `<span class="fac-role-chip ${isHodRole ? 'hod' : 'lecturer'}">${esc(r)}</span>`;
+      }).join(' ');
+    }
+
+    if (googleStatus) {
+      if (f.google_linked || f.google_sub) {
+        googleStatus.innerHTML = `<span style="color:var(--status-present, #16a34a); font-weight:700; display:inline-flex; align-items:center; gap:0.25rem;">✓ Linked Google Account</span>`;
+      } else {
+        googleStatus.innerHTML = `<span style="color:var(--text-muted); font-size:0.82rem;">Not Linked (Direct Username/Password)</span>`;
+      }
+    }
+  }
+
+  function populateFacultyModalData(f) {
+    if (!f) return;
+    const isTargetHod = (f.employee_id || '').toUpperCase().includes('HOD') || (f.role || '').toUpperCase() === 'HOD' || (f.designation || '').toLowerCase().includes('head');
+
+    // Hero section
+    const avatarEl = document.getElementById('detail-fac-avatar');
+    if (avatarEl) avatarEl.textContent = getInitials(f.full_name);
+
+    const nameEl = document.getElementById('detail-fac-name');
+    if (nameEl) nameEl.textContent = f.full_name || 'Faculty Member';
+
+    const badgeEl = document.getElementById('detail-fac-badge');
+    if (badgeEl) {
+      badgeEl.className = `fac-role-chip ${isTargetHod ? 'hod' : 'lecturer'}`;
+      badgeEl.textContent = isTargetHod ? 'HOD' : (f.designation || 'Lecturer');
+    }
+
+    const statusEl = document.getElementById('detail-fac-status');
+    if (statusEl) {
+      const st = (f.status || 'ACTIVE').toUpperCase();
+      if (st === 'ACTIVE') {
+        statusEl.className = 'fac-status-indicator active';
+        statusEl.textContent = '● Active Faculty';
+      } else if (st === 'ON_LEAVE') {
+        statusEl.className = 'fac-status-indicator on_leave';
+        statusEl.textContent = '● On Leave';
+      } else {
+        statusEl.className = 'fac-status-indicator inactive';
+        statusEl.textContent = '● Inactive';
+      }
+    }
+
+    const deptPillEl = document.getElementById('detail-fac-dept-pill');
+    if (deptPillEl) deptPillEl.textContent = f.department_name || f.department_code || 'Information Technology';
+
+    // Quick Action Call & Mail buttons
+    const callBtn = document.getElementById('detail-action-call');
+    if (callBtn) {
+      if (f.phone) {
+        callBtn.href = `tel:${f.phone}`;
+        callBtn.title = `Call ${f.phone}`;
+        callBtn.style.display = 'inline-flex';
+      } else {
+        callBtn.style.display = 'none';
+      }
+    }
+
+    const mailBtn = document.getElementById('detail-action-mail');
+    if (mailBtn) {
+      const email = f.email || f.gmail;
+      if (email) {
+        mailBtn.href = `mailto:${email}`;
+        mailBtn.title = `Email ${email}`;
+        mailBtn.style.display = 'inline-flex';
+      } else {
+        mailBtn.style.display = 'none';
+      }
+    }
+
+    // Profile View Cards
+    const empidEl = document.getElementById('detail-fac-empid');
+    if (empidEl) empidEl.textContent = f.employee_id || '—';
+
+    const roleEl = document.getElementById('detail-fac-role');
+    if (roleEl) roleEl.textContent = f.designation || (isTargetHod ? 'Head of Department' : 'Lecturer');
+
+    const emailEl = document.getElementById('detail-fac-email');
+    if (emailEl) emailEl.textContent = f.email || f.gmail || '—';
+
+    const phoneEl = document.getElementById('detail-fac-phone');
+    if (phoneEl) phoneEl.textContent = f.phone || '—';
+
+    const deptEl = document.getElementById('detail-fac-dept');
+    if (deptEl) deptEl.textContent = f.department_name || f.department_code || 'Information Technology';
+
+    const createdEl = document.getElementById('detail-fac-created');
+    if (createdEl) {
+      createdEl.textContent = f.created_at ? new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Active Member';
+    }
+
+    // Pre-fill Edit Form Fields
+    const editName = document.getElementById('edit-fac-name');
+    if (editName) editName.value = f.full_name || '';
+
+    const editEmpid = document.getElementById('edit-fac-empid');
+    if (editEmpid) editEmpid.value = f.employee_id || '';
+
+    const editDesig = document.getElementById('edit-fac-designation');
+    if (editDesig) {
+      const val = f.designation || (isTargetHod ? 'Head of Department' : 'Assistant Professor');
+      let found = false;
+      for (let i = 0; i < editDesig.options.length; i++) {
+        if (editDesig.options[i].value === val) {
+          editDesig.selectedIndex = i;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        const opt = new Option(val, val, true, true);
+        editDesig.add(opt);
+      }
+    }
+
+    const editPhone = document.getElementById('edit-fac-phone');
+    if (editPhone) editPhone.value = f.phone || '';
+
+    const editStatus = document.getElementById('edit-fac-status');
+    if (editStatus) editStatus.value = (f.status || 'ACTIVE').toUpperCase();
+
+    const editEmail = document.getElementById('edit-fac-email');
+    if (editEmail) editEmail.value = f.email || f.gmail || '';
+
+    // Teaching Workload Tab
+    const classes = f.classes || f.subjects || [];
+    renderFacultyWorkload(classes);
+
+    // Security Tab
+    renderFacultySecurity(f);
+  }
+
+  function switchFacultyTab(tabName) {
+    document.querySelectorAll('.fac-details-tabs .fac-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    const tabPanes = {
+      profile: document.getElementById('tab-pane-profile'),
+      workload: document.getElementById('tab-pane-workload'),
+      security: document.getElementById('tab-pane-security')
+    };
+    Object.keys(tabPanes).forEach(k => {
+      if (tabPanes[k]) {
+        tabPanes[k].style.display = (k === tabName) ? 'block' : 'none';
+      }
+    });
+  }
+
+  function toggleFacultyEditMode(isEdit) {
+    const isHod = checkIsHod();
+    if (isEdit && !isHod) {
+      notify('Permission Denied: Only Department Head (HOD) can edit faculty profiles.', 'error');
+      return;
+    }
+
+    const viewWrap = document.getElementById('fac-profile-view-wrap');
+    const editForm = document.getElementById('form-faculty-edit');
+    const footerView = document.getElementById('fac-footer-view-actions');
+    const footerEdit = document.getElementById('fac-footer-edit-actions');
+    const titleEl = document.getElementById('modal-fac-title');
+    const subtitleEl = document.getElementById('modal-fac-subtitle');
+
+    if (isEdit) {
+      switchFacultyTab('profile');
+      if (viewWrap) viewWrap.style.display = 'none';
+      if (editForm) editForm.style.display = 'block';
+      if (footerView) footerView.style.display = 'none';
+      if (footerEdit) footerEdit.style.display = 'flex';
+      if (titleEl) titleEl.textContent = 'Edit Faculty Profile';
+      if (subtitleEl) subtitleEl.textContent = 'Update official credentials & contact info (HOD Only)';
+    } else {
+      if (viewWrap) viewWrap.style.display = 'block';
+      if (editForm) editForm.style.display = 'none';
+      if (footerView) footerView.style.display = 'flex';
+      if (footerEdit) footerEdit.style.display = 'none';
+      if (titleEl) titleEl.textContent = 'Faculty Profile Details';
+      if (subtitleEl) subtitleEl.textContent = 'Instructor Overview & Credentials';
+    }
+  }
+
+  async function viewFacultyDetails(id, mode = 'view') {
+    closeAllMenus();
+    let f = allFaculty.find(item => item.id === id);
+    currentDetailFacultyId = id;
 
     const modal = document.getElementById('modal-faculty-details');
     if (!modal) return;
 
-    // Avatar and titles
-    document.getElementById('detail-fac-avatar').textContent = getInitials(f.full_name);
-    document.getElementById('detail-fac-name').textContent = f.full_name || 'Faculty Member';
-    document.getElementById('detail-fac-empid').textContent = f.employee_id || '—';
+    const isCurrentUserHod = checkIsHod();
+    const isTargetHod = f ? ((f.employee_id || '').toUpperCase().includes('HOD') || (f.role || '').toUpperCase() === 'HOD' || (f.designation || '').toLowerCase().includes('head')) : false;
 
-    const roleBadge = document.getElementById('detail-fac-badge');
-    if (roleBadge) {
-      roleBadge.className = `fac-role-chip ${isHod ? 'hod' : 'lecturer'}`;
-      roleBadge.textContent = isHod ? 'HOD' : 'Lecturer';
+    // Apply initial cached data immediately
+    populateFacultyModalData(f || { id });
+
+    // Always reset to view mode first, then activate edit mode if requested and allowed
+    toggleFacultyEditMode(false);
+    switchFacultyTab('profile');
+
+    // Show/Hide HOD-only Edit button in modal footer
+    const btnEdit = document.getElementById('btn-open-fac-edit');
+    if (btnEdit) {
+      btnEdit.style.display = isCurrentUserHod ? 'inline-flex' : 'none';
     }
 
-    document.getElementById('detail-fac-role').textContent = isHod ? 'Head of Department (HOD)' : (f.designation || 'Lecturer');
-    document.getElementById('detail-fac-email').textContent = f.email || f.gmail || '—';
-    document.getElementById('detail-fac-phone').textContent = f.phone || '—';
-    document.getElementById('detail-fac-dept').textContent = f.department_name || f.department_code || 'Department Faculty';
-    document.getElementById('detail-fac-created').textContent = f.created_at ? new Date(f.created_at).toLocaleDateString() : 'Active Member';
-
-    // Subjects
-    const subjectsEl = document.getElementById('detail-fac-subjects');
-    if (subjectsEl) {
-      if (Array.isArray(f.subjects) && f.subjects.length > 0) {
-        subjectsEl.innerHTML = `<ul style="margin:0; padding-left:1.1rem; display:flex; flex-direction:column; gap:0.25rem;">` +
-          f.subjects.map(s => `<li><strong>${esc(s.name || s.subject_name || s.code)}</strong> <span style="color:var(--text-muted); font-size:0.75rem;">(${esc(s.code || '')})</span></li>`).join('') +
-          `</ul>`;
-      } else if (f.assignment_count > 0) {
-        subjectsEl.textContent = `${f.assignment_count} active teaching subject assignment(s)`;
-      } else {
-        subjectsEl.textContent = 'No current teaching subjects assigned to this faculty member.';
-      }
-    }
-
-    // Hide remove button if this is HOD
+    // Hide delete button if the faculty is HOD
     const delBtn = document.getElementById('detail-btn-delete');
-    if (delBtn) delBtn.style.display = isHod ? 'none' : 'inline-flex';
+    if (delBtn) delBtn.style.display = isTargetHod ? 'none' : 'inline-flex';
+
+    if (mode === 'edit' && isCurrentUserHod) {
+      toggleFacultyEditMode(true);
+    }
 
     modal.style.display = 'flex';
+
+    // Fetch full details from API in background to ensure fresh workload classes & roles
+    try {
+      const res = await api(`/hod/teachers/${id}`);
+      if (res && res.success && res.data) {
+        if (currentDetailFacultyId === id) {
+          populateFacultyModalData(res.data);
+        }
+      }
+    } catch (err) {
+      console.warn('[Faculty] Failed to fetch fresh details:', err.message);
+    }
   }
 
   function closeFacultyDetailsModal() {
     const modal = document.getElementById('modal-faculty-details');
     if (modal) modal.style.display = 'none';
+    toggleFacultyEditMode(false);
     currentDetailFacultyId = null;
+  }
+
+  async function submitFacultyEdit(e) {
+    if (e) e.preventDefault();
+    if (!checkIsHod()) {
+      notify('Forbidden: Only the Department Head (HOD) can modify faculty credentials.', 'error');
+      return;
+    }
+    if (!currentDetailFacultyId) return;
+
+    const fullName = document.getElementById('edit-fac-name')?.value.trim();
+    const employeeId = document.getElementById('edit-fac-empid')?.value.trim();
+    const designation = document.getElementById('edit-fac-designation')?.value;
+    const phone = document.getElementById('edit-fac-phone')?.value.trim();
+    const status = document.getElementById('edit-fac-status')?.value;
+    const email = document.getElementById('edit-fac-email')?.value.trim();
+
+    if (!fullName || !employeeId || !email) {
+      notify('Full name, Employee ID, and Email are required', 'error');
+      return;
+    }
+
+    const saveBtn = document.getElementById('btn-save-fac-edit');
+    const originalText = saveBtn ? saveBtn.innerHTML : '<span>Save Changes</span>';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span>Saving...</span>';
+    }
+
+    try {
+      const res = await api(`/hod/teachers/${currentDetailFacultyId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          full_name: fullName,
+          employee_id: employeeId,
+          designation: designation,
+          phone: phone,
+          status: status,
+          email: email
+        })
+      });
+
+      if (res && res.success) {
+        notify('Faculty member details updated successfully!', 'success');
+        
+        // Reload roster list in background
+        await loadFacultyRoster();
+        
+        // Refresh modal view with updated data
+        const updated = allFaculty.find(f => f.id === currentDetailFacultyId) || {
+          id: currentDetailFacultyId,
+          full_name: fullName,
+          employee_id: employeeId,
+          designation: designation,
+          phone: phone,
+          status: status,
+          email: email
+        };
+        populateFacultyModalData(updated);
+        toggleFacultyEditMode(false);
+      } else {
+        throw new Error(res?.error?.message || 'Failed to update faculty details');
+      }
+    } catch (err) {
+      notify(err.message, 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+      }
+    }
   }
 
   function detailResetPassword() {
@@ -681,6 +1008,10 @@
   window.toggleFacultyMenu = toggleFacultyMenu;
   window.viewFacultyDetails = viewFacultyDetails;
   window.closeFacultyDetailsModal = closeFacultyDetailsModal;
+  window.switchFacultyTab = switchFacultyTab;
+  window.toggleFacultyEditMode = toggleFacultyEditMode;
+  window.submitFacultyEdit = submitFacultyEdit;
+  window.checkIsHod = checkIsHod;
   window.detailResetPassword = detailResetPassword;
   window.detailDeleteFaculty = detailDeleteFaculty;
   window.resetFacultyPassword = resetFacultyPassword;
