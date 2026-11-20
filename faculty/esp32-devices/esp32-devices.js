@@ -806,13 +806,29 @@ function filterEnrollStudentDropdown(filterVal) {
 
   const currentVal = sel.value;
 
-  sel.innerHTML = `<option value="">Choose a student (${students.length} ${filterVal === 'pending' ? 'pending' : 'students'})...</option>` +
-    students.map(s => {
+  // Group students by Year/Cohort for clean, structured navigation
+  const groups = {};
+  students.forEach(s => {
+    const yr = s.year || 1;
+    const key = `Year ${yr} Cohort`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(s);
+  });
+
+  let optionsHtml = `<option value="">Choose a student (${students.length} ${filterVal === 'pending' ? 'pending' : 'students'})...</option>`;
+
+  Object.keys(groups).sort().forEach(grp => {
+    optionsHtml += `<optgroup label="${grp}">`;
+    groups[grp].forEach(s => {
       const isEnrolled = s.biometric_status === 'ENROLLED';
       const tag = isEnrolled ? 'Enrolled' : 'Pending';
       const roll = s.class_roll_no ? `#${s.class_roll_no}` : (s.official_enrollment_no || 'No Roll');
-      return `<option value="${s.student_id}">[${tag}] ${roll} - ${escHtml(s.full_name)} (Yr ${s.year || 1} Sem ${s.semester || 1})</option>`;
-    }).join('');
+      optionsHtml += `<option value="${s.student_id}">[${tag}] ${roll} - ${escHtml(s.full_name)} (Sem ${s.semester || 1})</option>`;
+    });
+    optionsHtml += `</optgroup>`;
+  });
+
+  sel.innerHTML = optionsHtml;
 
   if (currentVal && students.some(s => String(s.student_id) === String(currentVal))) {
     sel.value = currentVal;
