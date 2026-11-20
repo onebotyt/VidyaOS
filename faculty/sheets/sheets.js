@@ -256,14 +256,14 @@ async function initSheetsStudio() {
     await switchSheetTab(initialSheet, false);
     renderExcelGrid(true);
 
-    if (isHomeStart) {
-      openOfficeHomeScreen();
+    if (isHomeStart && document.getElementById('office-home-screen')) {
+      if (typeof openOfficeHomeScreen === 'function') openOfficeHomeScreen();
       if (typeof hideOfficeScreenLoader === 'function') {
         hideOfficeScreenLoader();
       }
       loadTeacherGroupsList().catch(err => console.warn('Background sync error:', err));
     } else {
-      closeOfficeHomeScreen();
+      if (typeof closeOfficeHomeScreen === 'function') closeOfficeHomeScreen();
       // Keep loader visible while we fetch teaching groups and live student roster (max 3.5s)
       try {
         await Promise.race([
@@ -275,6 +275,11 @@ async function initSheetsStudio() {
       }
       if (typeof hideOfficeScreenLoader === 'function') {
         hideOfficeScreenLoader();
+      }
+      if (params.get('action') === 'import') {
+        setTimeout(() => {
+          if (typeof triggerExcelImport === 'function') triggerExcelImport();
+        }, 200);
       }
     }
   } catch (err) {

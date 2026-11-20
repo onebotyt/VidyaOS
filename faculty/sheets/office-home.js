@@ -313,10 +313,8 @@ function filterOfficeSubjects(query) {
 function openOfficeHomeScreen() {
   const scr = document.getElementById('office-home-screen');
   const hdr = document.getElementById('faculty-header');
-  const studio = document.getElementById('studio-main-container');
   if (scr) scr.style.display = 'flex';
   if (hdr) hdr.classList.add('in-home-view');
-  if (studio) studio.style.display = 'none';
   renderOfficeRecentList();
   renderOfficeSubjectsGrid();
   const searchInput = document.getElementById('office-subject-search');
@@ -324,28 +322,17 @@ function openOfficeHomeScreen() {
 }
 
 function closeOfficeHomeScreen() {
-  const scr = document.getElementById('office-home-screen');
-  const hdr = document.getElementById('faculty-header');
-  const studio = document.getElementById('studio-main-container');
-  if (scr) scr.style.display = 'none';
-  if (hdr) hdr.classList.remove('in-home-view');
-  if (studio) studio.style.display = 'flex';
+  window.location.href = '/faculty/sheets/editor.html';
 }
 
 function toggleOfficeHomeScreen() {
-  const scr = document.getElementById('office-home-screen');
-  if (!scr) return;
-  if (scr.style.display === 'flex') {
-    closeOfficeHomeScreen();
-  } else {
-    openOfficeHomeScreen();
-  }
+  window.location.href = '/faculty/sheets/index.html';
 }
 
 /**
- * Click Handlers with Visual Tactile Feedback & Lazy Loading
+ * Click Handlers with Visual Tactile Feedback & Clean Page Routing
  */
-async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
+function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
   if (clickedEl && clickedEl.classList) {
     clickedEl.classList.add('office-btn-pulse');
   }
@@ -362,82 +349,44 @@ async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
     showToast(`Opening ${label}...`, 'info', 2000);
   }
 
-  showOfficeScreenLoader('Loading...');
+  showOfficeScreenLoader('Opening Worksheet...');
 
-  // Small delay allows tactile button pulse to be seen and felt
+  const params = new URLSearchParams();
+  if (groupId) params.set('groupId', groupId);
+  if (sheetKey && sheetKey !== 'blank') params.set('sheet', sheetKey);
+  if (sheetKey === 'blank') params.set('sheet', 'blank');
+
   setTimeout(() => {
-    loadSpreadsheetEngine(async () => {
-      closeOfficeHomeScreen();
-      const targetGroupId = Number(groupId);
-      S.groupId = targetGroupId;
-      const grp = (S.allGroups || []).find(g => Number(g.id) === targetGroupId);
-      if (grp) S.group = grp;
-
-      const title = grp ? `${grp.subject_code || 'SUB'} - ${grp.subject_name}` : `Subject ${targetGroupId}`;
-      recordRecentWorkbook(title, sheetKey, targetGroupId);
-
-      const topSel = document.getElementById('group-switcher-select') || document.getElementById('subject-selector');
-      if (topSel) topSel.value = String(targetGroupId);
-
-      const url = new URL(window.location.href);
-      url.searchParams.set('groupId', targetGroupId);
-      if (sheetKey && sheetKey !== 'blank') {
-        url.searchParams.set('sheet', sheetKey);
-      } else {
-        url.searchParams.delete('sheet');
-      }
-      url.searchParams.delete('view');
-      window.history.replaceState({}, '', url.toString());
-
-      // Directly load authentic classroom metadata and students from database
-      try {
-        if (typeof window.loadGroupMetadata === 'function') {
-          await Promise.race([
-            window.loadGroupMetadata(targetGroupId),
-            new Promise(r => setTimeout(r, 3500))
-          ]);
-        } else if (typeof window.onSwitchGroup === 'function') {
-          await Promise.race([
-            window.onSwitchGroup(targetGroupId, true),
-            new Promise(r => setTimeout(r, 3500))
-          ]);
-        }
-      } catch (err) {
-        console.warn('Error hydrating subject data:', err);
-      }
-
-      try {
-        if (sheetKey === 'blank') {
-          if (typeof createNewWorksheet === 'function') createNewWorksheet('Blank Sheet');
-        } else if (typeof switchSheetTab === 'function') {
-          await switchSheetTab(sheetKey, true);
-        }
-      } catch (_) { }
-
-      hideOfficeScreenLoader();
-    });
-  }, 40);
+    window.location.href = `/faculty/sheets/editor.html?${params.toString()}`;
+  }, 80);
 }
 
 function createNewWorksheetFromHome(clickedEl) {
   if (clickedEl && clickedEl.classList) {
     clickedEl.classList.add('office-btn-pulse');
   }
-  showOfficeScreenLoader('Loading...');
-  if (typeof showToast === 'function') {
-    showToast('Creating new blank worksheet...', 'info', 2000);
-  }
+  showOfficeScreenLoader('Creating Worksheet...');
+  const targetGroupId = S.groupId || (S.allGroups?.[0]?.id) || '';
+  const params = new URLSearchParams();
+  if (targetGroupId) params.set('groupId', targetGroupId);
+  params.set('sheet', 'blank');
   setTimeout(() => {
-    loadSpreadsheetEngine(() => {
-      closeOfficeHomeScreen();
-      if (typeof createNewWorksheet === 'function') createNewWorksheet('Blank Sheet');
-      hideOfficeScreenLoader();
-    });
-  }, 40);
+    window.location.href = `/faculty/sheets/editor.html?${params.toString()}`;
+  }, 80);
 }
 
 function openBlankWorkbookFromHome(clickedEl) {
   createNewWorksheetFromHome(clickedEl);
+}
+
+function openSpreadsheetEditorFromHome() {
+  const targetGroupId = S.groupId || (S.allGroups?.[0]?.id) || '';
+  window.location.href = `/faculty/sheets/editor.html${targetGroupId ? '?groupId=' + targetGroupId : ''}`;
+}
+
+function triggerExcelImport() {
+  const targetGroupId = S.groupId || (S.allGroups?.[0]?.id) || '';
+  window.location.href = `/faculty/sheets/editor.html?action=import${targetGroupId ? '&groupId=' + targetGroupId : ''}`;
 }
 
 function openSubjectSheetDirect(groupId, sheetKeyOrIdx, clickedEl) {
@@ -445,11 +394,7 @@ function openSubjectSheetDirect(groupId, sheetKeyOrIdx, clickedEl) {
   let sheetKey = sheetKeyOrIdx;
   if (sheetKey === 0 || sheetKey === '0') sheetKey = 'evaluation';
   if (sheetKey === 1 || sheetKey === '1') sheetKey = 'tests';
-  if (targetGroup) {
-    selectSubjectAndSheet(targetGroup, sheetKey || 'evaluation', clickedEl);
-  } else {
-    closeOfficeHomeScreen();
-  }
+  selectSubjectAndSheet(targetGroup, sheetKey || 'evaluation', clickedEl);
 }
 
 /**
@@ -531,15 +476,14 @@ async function initOfficePortal() {
         console.warn('Could not load groups via apiFetch, using offline fallback', err);
       });
 
-    if (isHomeStart) {
-      openOfficeHomeScreen();
-      hideOfficeScreenLoader();
-    } else {
-      // Direct deep link to specific sheet -> immediately close home, show brief loader and boot spreadsheet engine
-      closeOfficeHomeScreen();
-      showOfficeScreenLoader('Loading...');
-      loadSpreadsheetEngine();
+    // Deep Link Forwarder: If accessing index.html with specific subject or sheet parameters, cleanly redirect to dedicated editor
+    if (!isHomeStart && (qId || params.get('sheet'))) {
+      window.location.replace('/faculty/sheets/editor.html' + window.location.search);
+      return;
     }
+
+    openOfficeHomeScreen();
+    hideOfficeScreenLoader();
   } catch (err) {
     console.error('Portal boot error:', err);
     openOfficeHomeScreen();
