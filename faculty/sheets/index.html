@@ -35,59 +35,153 @@
   <!-- Top Navigation Bar: Minimal (Logo, VidyaOS, Tools, Profile) -->
   <div class="faculty-app-layout" id="faculty-app-layout">
     <div class="faculty-main-wrap">
-      <!-- Semantic Mount for Dedicated Faculty Header Component -->
-      <div id="faculty-header-mount"></div>
+      <!-- Unified Dedicated Faculty Top Header with Back, Title, Class Switcher, Save Status & Profiles -->
+      <header class="faculty-top-header admin-top-header sheets-top-header" id="faculty-header" aria-label="Faculty Header Bar">
+        <div class="header-left">
+          <!-- Mobile / Desktop Navigation Menu Toggle -->
+          <button type="button" class="header-nav-toggle-btn" id="faculty-nav-toggle"
+            onclick="if(window.innerWidth>=769&&typeof toggleDesktopSidebar==='function'){toggleDesktopSidebar();}else if(typeof toggleSidebar==='function'){toggleSidebar();}"
+            aria-label="Toggle Navigation Menu" title="Toggle Navigation Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <!-- Small Minimal Back Button to Classroom / Registers -->
+          <button type="button" class="btn-icon-minimal header-back-btn excel-back-btn" id="btn-back-bar1"
+            onclick="navigateBackFromSheets()" title="Back to Classroom / Registers" aria-label="Back to Classroom / Registers">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+
+          <!-- VidyaOS Brand Link -->
+          <a href="/faculty/dashboard/index.html" class="header-brand-link" id="header-brand-link" aria-label="VidyaOS Dashboard">
+            <span class="header-brand-logo">
+              <svg class="header-brand-cube" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M16 3.5L27.5 9.8L16 16.2L4.5 9.8L16 3.5Z" fill="var(--color-primary-light, hsl(215 90% 95%))" stroke="var(--color-primary)" stroke-width="1.2" stroke-linejoin="round"/>
+                <path d="M4.5 9.8L16 16.2V28.5L4.5 22.2V9.8Z" fill="var(--color-primary, hsl(217 91% 60%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/>
+                <path d="M16 16.2L27.5 9.8V22.2L16 28.5V16.2Z" fill="var(--color-primary-hover, hsl(224 76% 48%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div class="header-brand-info">
+              <span class="header-brand-title">VidyaOS</span>
+            </div>
+          </a>
+
+          <span class="header-nav-divider"></span>
+
+          <!-- Excel Brand Icon & Editable File Title + Compact Sync Pill -->
+          <div class="excel-brand-block">
+            <div class="excel-file-badge" title="Microsoft Excel Compatible Spreadsheet">
+              <span>XLS</span>
+            </div>
+            <div class="excel-title-wrap">
+              <span class="excel-file-title" id="excel-workbook-title" contenteditable="true" spellcheck="false"
+                title="Click to rename workbook">VidyaOS_Marks_Evaluation.xlsx</span>
+              <span class="excel-sync-pill" id="excel-save-status">
+                <span class="excel-sync-dot"></span>
+                <span id="excel-sync-text">Saved to Local &amp; Cloud</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Class Switch List (Shows [CODE] Name (COMPONENT)) -->
+          <div class="excel-group-select-wrap">
+            <select class="group-selector-select excel-group-select" id="group-switcher-select"
+              onchange="onSwitchGroup(this.value)" title="Switch Teaching Group / Class">
+              <option value="">Loading classes...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Top bar sync status -->
+          <span class="excel-sync-indicator"
+            style="font-size:0.72rem;color:var(--text-muted);display:inline-flex;align-items:center;gap:0.35rem;font-weight:600;">
+            <span class="sync-dot"
+              style="width:6px;height:6px;border-radius:50%;background:var(--color-primary);"></span>
+            <span>Cloud Synced</span>
+          </span>
+
+          <!-- Theme Toggle -->
+          <button type="button" class="header-icon-btn header-theme-toggle" id="theme-toggle-btn"
+            onclick="toggleAppTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
+            <svg class="icon-theme" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Notification Bell -->
+          <button type="button" class="header-icon-btn header-bell-btn" id="header-bell-btn"
+            onclick="toggleNotifications(event)" title="Notifications" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="header-bell-badge" id="header-bell-count" style="display:none;">0</span>
+          </button>
+
+          <!-- Notifications Dropdown -->
+          <div class="header-notifications-dropdown" id="header-notifications-dropdown">
+            <div class="notif-dropdown-header">
+              <span class="notif-header-title">Notifications</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="notif-header-badge" id="notif-header-badge">0 New</span>
+                <button type="button" class="notif-mark-all-btn" onclick="markAllNotificationsAsRead(event)"
+                  style="background:transparent; border:none; color:var(--color-primary); font-size:0.75rem; font-weight:600; cursor:pointer;">Mark all read</button>
+              </div>
+            </div>
+            <div class="notif-items-list" id="notif-items-list">
+              <div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading notifications...</div>
+            </div>
+          </div>
+
+          <!-- User Profile Avatar Trigger -->
+          <button type="button" class="header-profile-round-btn gc-user-avatar" id="header-user-profile"
+            onclick="toggleUserProfile(event)" title="Account Profile" aria-label="Account Profile">
+            <span class="user-avatar-initials" id="header-user-initials">RS</span>
+            <span class="avatar-online-dot"></span>
+          </button>
+
+          <!-- Profile Dropdown Popover -->
+          <div class="header-profile-dropdown" id="header-profile-dropdown">
+            <div class="profile-dropdown-user-card">
+              <div class="dropdown-avatar-circle" id="dropdown-avatar-circle">RS</div>
+              <div class="dropdown-user-meta">
+                <div class="dropdown-full-name" id="dropdown-full-name">Faculty Member</div>
+                <div class="dropdown-email" id="dropdown-email">faculty@college.edu</div>
+                <span class="dropdown-role-pill" id="dropdown-role-pill">Faculty Member</span>
+              </div>
+            </div>
+            <div class="profile-dropdown-divider"></div>
+            <a href="/faculty/profile/index.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span>My Profile</span>
+            </a>
+            <a href="/faculty/timetable/index.html" class="profile-dropdown-item">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span>Weekly Timetable</span>
+            </a>
+            <div class="profile-dropdown-divider"></div>
+            <button type="button" class="profile-dropdown-item dropdown-logout-btn"
+              onclick="if(typeof confirmFacultyLogout==='function'){confirmFacultyLogout();}else if(typeof facultyLogout==='function'){facultyLogout();}else if(typeof logout==='function'){logout();}">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </header>
 
       <!-- Studio Main Content Layout -->
       <main class="sheets-studio-layout excel-theme-layout" id="studio-main-container">
-
-        <!-- ══════════════════════════════════════════════════════════════
-         EXCEL TOP COMMAND BAR: Back + Workbook Title + Group Switcher + Save Status + Actions
-         ══════════════════════════════════════════════════════════════ -->
-        <div class="studio-bar studio-bar-1 sheets-top-command-bar excel-title-bar" id="studio-bar-1">
-          <div class="studio-bar-left excel-bar-left">
-            <!-- Small Minimal Back Button -->
-            <button type="button" class="btn-icon-minimal excel-back-btn" id="btn-back-bar1"
-              onclick="navigateBackFromSheets()" title="Back to Classroom / Registers">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-              </svg>
-            </button>
-
-            <!-- Excel Brand Icon & Editable File Title -->
-            <div class="excel-brand-block">
-              <div class="excel-file-badge" title="Microsoft Excel Compatible Spreadsheet">
-                <span>XLS</span>
-              </div>
-              <div class="excel-title-wrap">
-                <span class="excel-file-title" id="excel-workbook-title" contenteditable="true" spellcheck="false"
-                  title="Click to rename workbook">VidyaOS_Marks_Evaluation.xlsx</span>
-                <span class="excel-sync-pill" id="excel-save-status">
-                  <span class="excel-sync-dot"></span>
-                  <span id="excel-sync-text">Saved to Local &amp; Cloud</span>
-                </span>
-              </div>
-            </div>
-
-            <!-- Class Switch List (Shows [CODE] Name (COMPONENT)) -->
-            <div class="excel-group-select-wrap">
-              <select class="group-selector-select excel-group-select" id="group-switcher-select"
-                onchange="onSwitchGroup(this.value)" title="Switch Teaching Group / Class">
-                <option value="">Loading classes...</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="studio-bar-right excel-bar-right">
-            <!-- Top bar sync status -->
-            <span class="excel-sync-indicator" style="font-size:0.72rem;color:var(--text-muted);display:inline-flex;align-items:center;gap:0.35rem;font-weight:600;">
-              <span class="sync-dot" style="width:6px;height:6px;border-radius:50%;background:var(--color-primary);"></span>
-              <span>Cloud Synced</span>
-            </span>
-          </div>
-        </div>
 
         <!-- ══════════════════════════════════════════════════════════════
          EXCEL RIBBON / TOOLBAR SYSTEM (8 Tabs: File, Home, Insert, Page Layout, Formulas, Data, Review, View)
@@ -111,8 +205,16 @@
               onclick="switchRibbonTab('templates')">Templates</button>
           </nav>
 
-          <!-- Ribbon Tab Panels -->
-          <div class="excel-ribbon-panels" id="excel-ribbon-panels">
+          <!-- Ribbon Panels Outer Container with Left/Right Navigation Chevrons -->
+          <div class="excel-ribbon-panels-container">
+            <button type="button" class="ribbon-scroll-btn ribbon-scroll-left" id="btn-ribbon-scroll-left"
+              onclick="scrollRibbon(-220)" title="Scroll Ribbon Left" aria-label="Scroll Ribbon Left" style="display:none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <!-- Ribbon Tab Panels -->
+            <div class="excel-ribbon-panels" id="excel-ribbon-panels">
 
             <!-- 1. FILE PANEL -->
             <div class="excel-ribbon-panel" id="panel-file">
@@ -891,7 +993,8 @@
                   <button type="button" class="excel-action-btn-large" onclick="openTemplateManagerModal()"
                     title="Open Templates Library &amp; Management">
                     <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2" />
                         <path d="M3 9h18M9 21V9" />
                       </svg>
@@ -901,7 +1004,8 @@
                   <button type="button" class="excel-action-btn-large" onclick="openSaveTemplateDialog()"
                     title="Save Current Spreadsheet Structure as Reusable Template">
                     <span class="excel-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
                         <polyline points="17 21 17 13 7 13 7 21" />
                         <polyline points="7 3 7 8 15 8" />
@@ -915,36 +1019,48 @@
 
               <div class="excel-tool-group">
                 <div class="excel-tool-content" style="display:flex;align-items:center;gap:0.4rem;padding:0.2rem 0;">
-                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('eval')" title="Apply Standard Polytechnic Master Evaluation Template" style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
+                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('eval')"
+                    title="Apply Standard Polytechnic Master Evaluation Template"
+                    style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
                     <span class="excel-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                         <polyline points="14 2 14 8 20 8" />
                       </svg>
                     </span>
                     <span>Polytechnic Master Eval</span>
                   </button>
-                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('test')" title="Apply Unit Test (20 Marks) Format" style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
+                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('test')"
+                    title="Apply Unit Test (20 Marks) Format"
+                    style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
                     <span class="excel-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <path d="M9 11l3 3L22 4" />
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                       </svg>
                     </span>
                     <span>Class Test (20M)</span>
                   </button>
-                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('assignment')" title="Apply Coursework Assignment Assessment Format" style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
+                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('assignment')"
+                    title="Apply Coursework Assignment Assessment Format"
+                    style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
                     <span class="excel-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                         <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
                       </svg>
                     </span>
                     <span>Assignments Roster</span>
                   </button>
-                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('practical')" title="Apply Lab Record &amp; Practicals Format" style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
+                  <button type="button" class="excel-action-btn" onclick="applyPresetTemplate('practical')"
+                    title="Apply Lab Record &amp; Practicals Format"
+                    style="height:38px;padding:0 0.5rem;font-size:0.75rem;font-weight:700;">
                     <span class="excel-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0" />
                       </svg>
                     </span>
@@ -956,6 +1072,13 @@
             </div>
 
             <!-- 8. VIEW PANEL -->
+            </div>
+            <button type="button" class="ribbon-scroll-btn ribbon-scroll-right" id="btn-ribbon-scroll-right"
+              onclick="scrollRibbon(220)" title="Scroll Ribbon Right" aria-label="Scroll Ribbon Right" style="display:none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -1156,7 +1279,8 @@
           ondblclick="makeBannerEditable()" title="Double-click banner to edit college &amp; subject header">
           <div class="banner-row-single" id="hdr-banner-single-container">
             <span class="banner-seg banner-seg-inst" id="hdr-banner-inst" contenteditable="false" spellcheck="false"
-              title="Double-click to edit">Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026-27 (Winter Session)</span>
+              title="Double-click to edit">Uttarakhand Government Institute of Polytechnic, Nainital | Internal
+              Evaluation Sheet 2026-27 (Winter Session)</span>
             <span class="banner-seg-divider">|</span>
             <span class="banner-seg banner-seg-subject" id="hdr-banner-line2" contenteditable="false" spellcheck="false"
               title="Double-click to edit">Internal Evaluation | Subject : Database Management Systems</span>
@@ -2233,12 +2357,13 @@
     <div class="excel-rich-tooltip" id="excel-rich-tooltip" role="tooltip" aria-hidden="true">
       <div class="excel-rich-tooltip-title" id="rich-tooltip-title">Wrap Text</div>
       <div class="excel-rich-tooltip-preview" id="rich-tooltip-preview"></div>
-      <div class="excel-rich-tooltip-desc" id="rich-tooltip-desc">Wrap extra-long text into multiple lines so you can see all of it.</div>
+      <div class="excel-rich-tooltip-desc" id="rich-tooltip-desc">Wrap extra-long text into multiple lines so you can
+        see all of it.</div>
       <div class="excel-rich-tooltip-footer">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="16" x2="12" y2="12"/>
-          <line x1="12" y1="8" x2="12.01" y2="8"/>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
         </svg>
         <span>Tell me more</span>
       </div>

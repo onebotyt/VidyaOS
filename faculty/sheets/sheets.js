@@ -4322,27 +4322,21 @@ function triggerAutoSaveIndicator(isSaving = false) {
    EXPORT ACTIVE SHEET ENGINE
    ══════════════════════════════════════════════════════════════ */
 function toggleExportMenu(e) {
-  if (e && e.stopPropagation) e.stopPropagation();
+  if (e) {
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+  }
   const m = document.getElementById('export-dropdown-menu');
-  if (!m) return;
-  const isHidden = m.style.display === 'none' || !m.classList.contains('open');
-  if (isHidden) {
-    m.classList.add('open');
-    m.style.display = 'flex';
+  const btn = document.getElementById('btn-export-dropdown');
+  if (typeof openDropdownOverlay === 'function') {
+    openDropdownOverlay(m, btn);
   } else {
-    m.classList.remove('open');
-    m.style.display = 'none';
+    if (!m) return;
+    const isHidden = m.style.display === 'none' || !m.classList.contains('open');
+    m.classList.toggle('open', isHidden);
+    m.style.display = isHidden ? 'flex' : 'none';
   }
 }
-
-document.addEventListener('click', (e) => {
-  const btn = document.getElementById('btn-export-dropdown');
-  const menu = document.getElementById('export-dropdown-menu');
-  if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
-    menu.classList.remove('open');
-    menu.style.display = 'none';
-  }
-});
 
 async function exportTableToRealXlsx(tableOrClone, filename, sheetTitle) {
   if (!tableOrClone) return;
@@ -7176,19 +7170,18 @@ function unmergeSelectedCells() {
 
 function toggleMergeAndCenterMenu(e) {
   if (e) {
-    e.preventDefault();
-    e.stopPropagation();
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
   }
   const menu = document.getElementById('menu-merge-cells');
-  if (!menu) return;
-  const isAlreadyOpen = menu.classList.contains('open');
-  document.querySelectorAll('.excel-dropdown-menu.open').forEach(m => {
-    m.classList.remove('open');
-    m.style.display = 'none';
-  });
-  if (!isAlreadyOpen) {
-    menu.classList.add('open');
-    menu.style.display = 'flex';
+  const btn = document.getElementById('btn-merge-cells');
+  if (typeof openDropdownOverlay === 'function') {
+    openDropdownOverlay(menu, btn);
+  } else {
+    if (!menu) return;
+    const isAlreadyOpen = menu.classList.contains('open');
+    menu.classList.toggle('open', !isAlreadyOpen);
+    menu.style.display = isAlreadyOpen ? 'none' : 'flex';
   }
 }
 
@@ -9046,7 +9039,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
         existingScoresMap = extractExistingStudentScores(parsed.sheets);
       }
     }
-  } catch (_) {}
+  } catch (_) { }
   if (EXCEL_WB.sheets && EXCEL_WB.sheets.length > 0) {
     const memScores = extractExistingStudentScores(EXCEL_WB.sheets);
     existingScoresMap = Object.assign(existingScoresMap, memScores);
@@ -9659,6 +9652,8 @@ function reloadGroupAcademicData() {
 function switchRibbonTab(tabName) {
   document.querySelectorAll('.excel-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
   document.querySelectorAll('.excel-ribbon-panel').forEach(p => p.classList.toggle('active', p.id === `panel-${tabName}`));
+  if (typeof closeAllDropdownOverlays === 'function') closeAllDropdownOverlays();
+  if (typeof updateRibbonScrollButtons === 'function') setTimeout(updateRibbonScrollButtons, 30);
 }
 
 function toggleGridlines() {
@@ -9792,9 +9787,17 @@ function toggleInstitutionalBanner() {
 }
 
 function toggleFreezePanesMenu(e) {
-  if (e) e.stopPropagation();
+  if (e) {
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+  }
   const m = document.getElementById('excel-freeze-menu');
-  if (m) m.style.display = m.style.display === 'none' ? 'flex' : 'none';
+  const btn = document.getElementById('btn-home-freeze-panes');
+  if (typeof openDropdownOverlay === 'function') {
+    openDropdownOverlay(m, btn);
+  } else {
+    if (m) m.style.display = m.style.display === 'none' ? 'flex' : 'none';
+  }
 }
 
 function freezeTopRow() {
@@ -10000,22 +10003,105 @@ function togglePrintSignatures() {
   if (sig) sig.style.display = EXCEL_WB.signaturesVisible ? 'flex' : 'none';
 }
 
+/* ══════════════════════════════════════════════════════════════
+   DROPDOWN OVERLAYS (PORTAL / FIXED POSITIONING ENGINE)
+   ══════════════════════════════════════════════════════════════ */
+function openDropdownOverlay(menu, triggerBtn) {
+  if (!menu) return;
+  const isAlreadyOpen = menu.classList.contains('open') && menu.style.display !== 'none';
+  closeAllDropdownOverlays();
+  if (isAlreadyOpen) return;
+
+  if (triggerBtn) {
+    const rect = triggerBtn.getBoundingClientRect();
+    const menuWidth = Math.max(menu.offsetWidth || 0, 180);
+    let top = rect.bottom + 4;
+    let left = rect.left;
+
+    // Prevent overflow right edge of viewport
+    if (left + menuWidth > window.innerWidth - 10) {
+      left = Math.max(10, window.innerWidth - menuWidth - 10);
+    }
+    // Prevent overflow bottom edge of viewport
+    if (top + 220 > window.innerHeight && rect.top > 220) {
+      top = Math.max(10, rect.top - 220);
+    }
+
+    menu.style.position = 'fixed';
+    menu.style.top = top + 'px';
+    menu.style.left = left + 'px';
+    menu.style.right = 'auto';
+    menu.style.bottom = 'auto';
+    menu.style.zIndex = '999999';
+  }
+
+  menu.classList.add('open');
+  menu.style.display = 'flex';
+}
+
+function closeAllDropdownOverlays(exceptMenu) {
+  document.querySelectorAll('.excel-dropdown-menu, .excel-mini-menu, .studio-export-menu').forEach(m => {
+    if (exceptMenu && m === exceptMenu) return;
+    m.classList.remove('open');
+    m.style.display = 'none';
+  });
+}
+
 function toggleBordersMenu(e) {
-  if (e) e.stopPropagation();
+  if (e) {
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+  }
   const m = document.getElementById('excel-borders-menu');
-  if (m) m.style.display = m.style.display === 'none' ? 'flex' : 'none';
+  const btn = document.getElementById('btn-border-dropdown');
+  openDropdownOverlay(m, btn);
 }
 
 function toggleAutoSumMenu(e) {
-  if (e) e.stopPropagation();
+  if (e) {
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+  }
   const m = document.getElementById('excel-autosum-menu');
-  if (m) m.style.display = m.style.display === 'none' ? 'flex' : 'none';
+  const btn = document.getElementById('btn-autosum-dropdown');
+  openDropdownOverlay(m, btn);
 }
 
 function toggleExportMenu(e) {
-  if (e) e.stopPropagation();
+  if (e) {
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+  }
   const m = document.getElementById('export-dropdown-menu');
-  if (m) m.style.display = m.style.display === 'none' ? 'block' : 'none';
+  const btn = document.getElementById('btn-export-dropdown');
+  openDropdownOverlay(m, btn);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RIBBON HORIZONTAL SCROLL ENGINE & CONTROLS
+   ══════════════════════════════════════════════════════════════ */
+function scrollRibbon(delta) {
+  const activePanel = document.querySelector('.excel-ribbon-panel.active');
+  if (!activePanel) return;
+  activePanel.scrollBy({ left: delta, behavior: 'smooth' });
+  setTimeout(updateRibbonScrollButtons, 150);
+}
+
+function updateRibbonScrollButtons() {
+  const activePanel = document.querySelector('.excel-ribbon-panel.active');
+  const btnLeft = document.getElementById('btn-ribbon-scroll-left');
+  const btnRight = document.getElementById('btn-ribbon-scroll-right');
+  if (!activePanel || !btnLeft || !btnRight) return;
+
+  const hasOverflow = activePanel.scrollWidth > activePanel.clientWidth + 5;
+  if (!hasOverflow) {
+    btnLeft.style.display = 'none';
+    btnRight.style.display = 'none';
+    return;
+  }
+
+  btnLeft.style.display = activePanel.scrollLeft > 10 ? 'flex' : 'none';
+  btnRight.style.display = activePanel.scrollLeft < (activePanel.scrollWidth - activePanel.clientWidth - 10) ? 'flex' : 'none';
 }
 
 function auditSheetPassFail() {
@@ -10075,27 +10161,41 @@ function sortActiveColumn(dir = 'asc') {
   markWorkbookUnsaved();
 }
 
-/* Close popup menus on outside click */
+/* Close popup menus on outside click or Escape */
 window.addEventListener('click', (e) => {
-  if (!e.target.closest('#btn-border-dropdown') && !e.target.closest('#excel-borders-menu')) {
-    const m = document.getElementById('excel-borders-menu');
-    if (m) m.style.display = 'none';
+  const isTrigger = e.target.closest('#btn-merge-cells, #btn-border-dropdown, #btn-autosum-dropdown, #btn-home-freeze-panes, #btn-export-dropdown');
+  const isMenu = e.target.closest('.excel-dropdown-menu, .excel-mini-menu, .studio-export-menu');
+  if (!isTrigger && !isMenu) {
+    closeAllDropdownOverlays();
   }
-  if (!e.target.closest('#btn-autosum-dropdown') && !e.target.closest('#excel-autosum-menu')) {
-    const m = document.getElementById('excel-autosum-menu');
-    if (m) m.style.display = 'none';
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAllDropdownOverlays();
   }
-  if (!e.target.closest('#btn-export-dropdown') && !e.target.closest('#export-dropdown-menu')) {
-    const m = document.getElementById('export-dropdown-menu');
-    if (m) m.style.display = 'none';
-  }
+});
+
+window.addEventListener('resize', () => {
+  updateRibbonScrollButtons();
+  closeAllDropdownOverlays();
 });
 
 /* ── Hook Excel Engine into Page Startup ── */
 (function autoStartExcelStudio() {
   const launch = () => {
     initExcelRichTooltips();
+
+    // Attach scroll listeners to ribbon panels for scroll chevrons
+    document.querySelectorAll('.excel-ribbon-panel').forEach(panel => {
+      panel.addEventListener('scroll', () => {
+        updateRibbonScrollButtons();
+        closeAllDropdownOverlays();
+      }, { passive: true });
+    });
+
     setTimeout(() => {
+      updateRibbonScrollButtons();
       if (!EXCEL_WB.sheets || EXCEL_WB.sheets.length === 0) {
         hydrateAcademicSheetsFromGroup(false);
       }
@@ -10108,3 +10208,14 @@ window.addEventListener('click', (e) => {
     launch();
   }
 })();
+
+// Window Globals Export
+window.openDropdownOverlay = openDropdownOverlay;
+window.closeAllDropdownOverlays = closeAllDropdownOverlays;
+window.scrollRibbon = scrollRibbon;
+window.updateRibbonScrollButtons = updateRibbonScrollButtons;
+window.toggleBordersMenu = toggleBordersMenu;
+window.toggleAutoSumMenu = toggleAutoSumMenu;
+window.toggleFreezePanesMenu = toggleFreezePanesMenu;
+window.toggleExportMenu = toggleExportMenu;
+window.switchRibbonTab = switchRibbonTab;
