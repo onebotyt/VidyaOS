@@ -7472,15 +7472,71 @@ function clearSelectedCellContents() {
 /* ══════════════════════════════════════════════════════════════
    ROW & COLUMN OPERATIONS
    ══════════════════════════════════════════════════════════════ */
+function adjustFormulaOnInsertCol(formulaStr, targetCol) {
+  if (!formulaStr || typeof formulaStr !== 'string' || !formulaStr.startsWith('=')) return formulaStr;
+  return formulaStr.replace(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/g, (match, colLock, colLetters, rowLock, rowNum) => {
+    let c = letterToCol(colLetters);
+    const r = parseInt(rowNum, 10);
+    if (!colLock && c >= targetCol) {
+      c += 1;
+    }
+    return (colLock ? '$' : '') + colToLetter(c) + (rowLock ? '$' : '') + r;
+  });
+}
+
+function adjustFormulaOnDeleteCol(formulaStr, targetCol) {
+  if (!formulaStr || typeof formulaStr !== 'string' || !formulaStr.startsWith('=')) return formulaStr;
+  return formulaStr.replace(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/g, (match, colLock, colLetters, rowLock, rowNum) => {
+    let c = letterToCol(colLetters);
+    const r = parseInt(rowNum, 10);
+    if (c === targetCol) {
+      return '#REF!';
+    }
+    if (!colLock && c > targetCol) {
+      c -= 1;
+    }
+    return (colLock ? '$' : '') + colToLetter(c) + (rowLock ? '$' : '') + r;
+  });
+}
+
+function adjustFormulaOnInsertRow(formulaStr, targetRow) {
+  if (!formulaStr || typeof formulaStr !== 'string' || !formulaStr.startsWith('=')) return formulaStr;
+  return formulaStr.replace(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/g, (match, colLock, colLetters, rowLock, rowNum) => {
+    const c = letterToCol(colLetters);
+    let r = parseInt(rowNum, 10) - 1; // 0-based
+    if (!rowLock && r >= targetRow) {
+      r += 1;
+    }
+    return (colLock ? '$' : '') + colToLetter(c) + (rowLock ? '$' : '') + (r + 1);
+  });
+}
+
+function adjustFormulaOnDeleteRow(formulaStr, targetRow) {
+  if (!formulaStr || typeof formulaStr !== 'string' || !formulaStr.startsWith('=')) return formulaStr;
+  return formulaStr.replace(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/g, (match, colLock, colLetters, rowLock, rowNum) => {
+    const c = letterToCol(colLetters);
+    let r = parseInt(rowNum, 10) - 1; // 0-based
+    if (r === targetRow) {
+      return '#REF!';
+    }
+    if (!rowLock && r > targetRow) {
+      r -= 1;
+    }
+    return (colLock ? '$' : '') + colToLetter(c) + (rowLock ? '$' : '') + (r + 1);
+  });
+}
+
 function insertRowAtActive(above = true) {
   const sheet = getActiveSheet();
   if (!sheet) return;
   pushUndoState('Insert Row');
 
-  const targetRow = above ? EXCEL_WB.activeCell.r : EXCEL_WB.activeCell.r + 1;
+  const activeR = EXCEL_WB.activeCell?.r || 0;
+  const targetRow = above ? activeR : activeR + 1;
   const newCells = {};
 
-  for (const [key, cell] of Object.entries(sheet.cells)) {
+  // 1. Shift cells at or below targetRow
+  for (const [key, cell] of Object.entries(sheet.cells || {})) {
     const [r, c] = key.split(',').map(Number);
     if (r >= targetRow) {
       newCells[`${r + 1},${c}`] = cell;
@@ -7489,22 +7545,82 @@ function insertRowAtActive(above = true) {
     }
   }
 
+  // 2. Adjust formula references
+  for (const cell of Object.values(newCells)) {
+    if (cell.f && typeof cell.f === 'string') {
+      cell.f = adjustFormulaOnInsertRow(cell.f, targetRow);
+    }
+  }
+
+  // 3. Shift rowHeights
+  const newRowHeights = {};
+  const currentTotalRows = sheet.rowsCount || 50;
+  for (let r = 0; r < currentTotalRows; r++) {
+    const h = sheet.rowHeights?.[r] || 25;
+    if (r >= targetRow) {
+      newRowHeights[r + 1] = h;
+    } else {
+      newRowHeights[r] = h;
+    }
+  }
+  newRowHeights[targetRow] = 25;
+  sheet.rowHeights = newRowHeights;
+
+  // 4. Update and shift sheet.merges
+  if (Array.isArray(sheet.merges)) {
+    const updatedMerges = [];
+    for (const m of sheet.merges) {
+      const minR = Math.min(m.s.r, m.e.r);
+      const maxR = Math.max(m.s.r, m.e.r);
+      const minC = Math.min(m.s.c, m.e.c);
+      const maxC = Math.max(m.s.c, m.e.c);
+
+      if (minR >= targetRow) {
+        // Entire merge is below targetRow: shift down by 1
+        updatedMerges.push({
+          s: { r: minR + 1, c: minC },
+          e: { r: maxR + 1, c: maxC }
+        });
+      } else if (maxR >= targetRow && minR < targetRow) {
+        // targetRow was inserted INSIDE the merge: expand merge height by 1
+        updatedMerges.push({
+          s: { r: minR, c: minC },
+          e: { r: maxR + 1, c: maxC }
+        });
+      } else {
+        // Entire merge is above targetRow: unchanged
+        updatedMerges.push({
+          s: { r: minR, c: minC },
+          e: { r: maxR, c: maxC }
+        });
+      }
+    }
+    sheet.merges = updatedMerges;
+  }
+
   sheet.cells = newCells;
-  sheet.rowsCount++;
+  sheet.rowsCount = (sheet.rowsCount || 50) + 1;
+
+  if (above && EXCEL_WB.activeCell) {
+    EXCEL_WB.activeCell.r += 1;
+  }
+
   recalculateAllSheetFormulas(true);
   renderExcelGrid(true);
+  updateFormulaBarUI();
   markWorkbookUnsaved();
 }
 
 function deleteActiveRow() {
   const sheet = getActiveSheet();
-  if (!sheet || sheet.rowsCount <= 1) return;
+  if (!sheet || (sheet.rowsCount || 50) <= 1) return;
   pushUndoState('Delete Row');
 
-  const targetRow = EXCEL_WB.activeCell.r;
+  const targetRow = EXCEL_WB.activeCell?.r || 0;
   const newCells = {};
 
-  for (const [key, cell] of Object.entries(sheet.cells)) {
+  // 1. Shift cells
+  for (const [key, cell] of Object.entries(sheet.cells || {})) {
     const [r, c] = key.split(',').map(Number);
     if (r > targetRow) {
       newCells[`${r - 1},${c}`] = cell;
@@ -7513,10 +7629,67 @@ function deleteActiveRow() {
     }
   }
 
+  // 2. Adjust formula references
+  for (const cell of Object.values(newCells)) {
+    if (cell.f && typeof cell.f === 'string') {
+      cell.f = adjustFormulaOnDeleteRow(cell.f, targetRow);
+    }
+  }
+
+  // 3. Shift rowHeights
+  const newRowHeights = {};
+  const maxR = sheet.rowsCount || 50;
+  for (let r = 0; r < maxR; r++) {
+    if (r < targetRow) {
+      newRowHeights[r] = sheet.rowHeights?.[r] || 25;
+    } else if (r > targetRow) {
+      newRowHeights[r - 1] = sheet.rowHeights?.[r] || 25;
+    }
+  }
+  sheet.rowHeights = newRowHeights;
+
+  // 4. Update and shift sheet.merges
+  if (Array.isArray(sheet.merges)) {
+    const updatedMerges = [];
+    for (const m of sheet.merges) {
+      const minR = Math.min(m.s.r, m.e.r);
+      const maxR = Math.max(m.s.r, m.e.r);
+      const minC = Math.min(m.s.c, m.e.c);
+      const maxC = Math.max(m.s.c, m.e.c);
+
+      if (minR === targetRow && maxR === targetRow) {
+        continue;
+      }
+
+      let newMinR = minR;
+      let newMaxR = maxR;
+
+      if (minR > targetRow) newMinR = minR - 1;
+      if (maxR >= targetRow) newMaxR = maxR - 1;
+
+      if (newMaxR >= newMinR && maxC >= minC) {
+        if (newMaxR === newMinR && maxC === minC) {
+          continue;
+        }
+        updatedMerges.push({
+          s: { r: newMinR, c: minC },
+          e: { r: newMaxR, c: maxC }
+        });
+      }
+    }
+    sheet.merges = updatedMerges;
+  }
+
   sheet.cells = newCells;
-  sheet.rowsCount = Math.max(1, sheet.rowsCount - 1);
+  sheet.rowsCount = Math.max(1, (sheet.rowsCount || 50) - 1);
+
+  if (EXCEL_WB.activeCell) {
+    EXCEL_WB.activeCell.r = Math.max(0, Math.min(sheet.rowsCount - 1, EXCEL_WB.activeCell.r));
+  }
+
   recalculateAllSheetFormulas(true);
   renderExcelGrid(true);
+  updateFormulaBarUI();
   markWorkbookUnsaved();
 }
 
@@ -7525,10 +7698,12 @@ function insertColAtActive(left = true) {
   if (!sheet) return;
   pushUndoState('Insert Column');
 
-  const targetCol = left ? EXCEL_WB.activeCell.c : EXCEL_WB.activeCell.c + 1;
+  const activeC = EXCEL_WB.activeCell?.c || 0;
+  const targetCol = left ? activeC : activeC + 1;
   const newCells = {};
 
-  for (const [key, cell] of Object.entries(sheet.cells)) {
+  // 1. Shift cells at or to the right of targetCol
+  for (const [key, cell] of Object.entries(sheet.cells || {})) {
     const [r, c] = key.split(',').map(Number);
     if (c >= targetCol) {
       newCells[`${r},${c + 1}`] = cell;
@@ -7537,22 +7712,86 @@ function insertColAtActive(left = true) {
     }
   }
 
+  // 2. Adjust formula references
+  for (const cell of Object.values(newCells)) {
+    if (cell.f && typeof cell.f === 'string') {
+      cell.f = adjustFormulaOnInsertCol(cell.f, targetCol);
+    }
+  }
+
+  // 3. Shift colWidths
+  const newColWidths = {};
+  const currentTotalCols = sheet.colsCount || 26;
+  for (let c = 0; c < currentTotalCols; c++) {
+    const w = sheet.colWidths?.[c] || 75;
+    if (c >= targetCol) {
+      newColWidths[c + 1] = w;
+    } else {
+      newColWidths[c] = w;
+    }
+  }
+  newColWidths[targetCol] = 75;
+  sheet.colWidths = newColWidths;
+
+  // 4. Update and shift sheet.merges
+  if (Array.isArray(sheet.merges)) {
+    const updatedMerges = [];
+    for (const m of sheet.merges) {
+      const minC = Math.min(m.s.c, m.e.c);
+      const maxC = Math.max(m.s.c, m.e.c);
+      const minR = Math.min(m.s.r, m.e.r);
+      const maxR = Math.max(m.s.r, m.e.r);
+
+      if (minC >= targetCol) {
+        // Entire merge is to the right of targetCol: shift right by 1
+        updatedMerges.push({
+          s: { r: minR, c: minC + 1 },
+          e: { r: maxR, c: maxC + 1 }
+        });
+      } else if (maxC >= targetCol && minC < targetCol) {
+        // targetCol was inserted INSIDE the merge: expand merge width by 1
+        updatedMerges.push({
+          s: { r: minR, c: minC },
+          e: { r: maxR, c: maxC + 1 }
+        });
+      } else {
+        // Entire merge is to the left of targetCol: unchanged
+        updatedMerges.push({
+          s: { r: minR, c: minC },
+          e: { r: maxR, c: maxC }
+        });
+      }
+    }
+    sheet.merges = updatedMerges;
+  }
+
   sheet.cells = newCells;
-  sheet.colsCount++;
+  sheet.colsCount = (sheet.colsCount || 26) + 1;
+
+  if (left && EXCEL_WB.activeCell) {
+    EXCEL_WB.activeCell.c += 1;
+  }
+
+  if (typeof autoFitSheetColumns === 'function' && !EXCEL_WB.isImportedWorkbook) {
+    autoFitSheetColumns(sheet, true);
+  }
+
   recalculateAllSheetFormulas(true);
   renderExcelGrid(true);
+  updateFormulaBarUI();
   markWorkbookUnsaved();
 }
 
 function deleteActiveCol() {
   const sheet = getActiveSheet();
-  if (!sheet || sheet.colsCount <= 1) return;
+  if (!sheet || (sheet.colsCount || 26) <= 1) return;
   pushUndoState('Delete Column');
 
-  const targetCol = EXCEL_WB.activeCell.c;
+  const targetCol = EXCEL_WB.activeCell?.c || 0;
   const newCells = {};
 
-  for (const [key, cell] of Object.entries(sheet.cells)) {
+  // 1. Shift cells
+  for (const [key, cell] of Object.entries(sheet.cells || {})) {
     const [r, c] = key.split(',').map(Number);
     if (c > targetCol) {
       newCells[`${r},${c - 1}`] = cell;
@@ -7561,10 +7800,73 @@ function deleteActiveCol() {
     }
   }
 
+  // 2. Adjust formula references
+  for (const cell of Object.values(newCells)) {
+    if (cell.f && typeof cell.f === 'string') {
+      cell.f = adjustFormulaOnDeleteCol(cell.f, targetCol);
+    }
+  }
+
+  // 3. Shift colWidths
+  const newColWidths = {};
+  const maxC = sheet.colsCount || 26;
+  for (let c = 0; c < maxC; c++) {
+    if (c < targetCol) {
+      newColWidths[c] = sheet.colWidths?.[c] || 75;
+    } else if (c > targetCol) {
+      newColWidths[c - 1] = sheet.colWidths?.[c] || 75;
+    }
+  }
+  sheet.colWidths = newColWidths;
+
+  // 4. Update and shift sheet.merges
+  if (Array.isArray(sheet.merges)) {
+    const updatedMerges = [];
+    for (const m of sheet.merges) {
+      const minC = Math.min(m.s.c, m.e.c);
+      const maxC = Math.max(m.s.c, m.e.c);
+      const minR = Math.min(m.s.r, m.e.r);
+      const maxR = Math.max(m.s.r, m.e.r);
+
+      if (minC === targetCol && maxC === targetCol) {
+        // This single-column merge was deleted
+        continue;
+      }
+
+      let newMinC = minC;
+      let newMaxC = maxC;
+
+      if (minC > targetCol) newMinC = minC - 1;
+      if (maxC >= targetCol) newMaxC = maxC - 1;
+
+      if (newMaxC >= newMinC && maxR >= minR) {
+        if (newMaxC === newMinC && maxR === minR) {
+          // Collapsed to 1x1 cell
+          continue;
+        }
+        updatedMerges.push({
+          s: { r: minR, c: newMinC },
+          e: { r: maxR, c: newMaxC }
+        });
+      }
+    }
+    sheet.merges = updatedMerges;
+  }
+
   sheet.cells = newCells;
-  sheet.colsCount = Math.max(1, sheet.colsCount - 1);
+  sheet.colsCount = Math.max(1, (sheet.colsCount || 26) - 1);
+
+  if (EXCEL_WB.activeCell) {
+    EXCEL_WB.activeCell.c = Math.max(0, Math.min(sheet.colsCount - 1, EXCEL_WB.activeCell.c));
+  }
+
+  if (typeof autoFitSheetColumns === 'function' && !EXCEL_WB.isImportedWorkbook) {
+    autoFitSheetColumns(sheet, true);
+  }
+
   recalculateAllSheetFormulas(true);
   renderExcelGrid(true);
+  updateFormulaBarUI();
   markWorkbookUnsaved();
 }
 
@@ -7636,7 +7938,10 @@ function pushUndoState(actionName) {
     action: actionName,
     cells: JSON.parse(JSON.stringify(sheet.cells)),
     rowsCount: sheet.rowsCount,
-    colsCount: sheet.colsCount
+    colsCount: sheet.colsCount,
+    merges: JSON.parse(JSON.stringify(sheet.merges || [])),
+    colWidths: JSON.parse(JSON.stringify(sheet.colWidths || {})),
+    rowHeights: JSON.parse(JSON.stringify(sheet.rowHeights || {}))
   });
   if (EXCEL_WB.undoStack.length > 50) EXCEL_WB.undoStack.shift();
   EXCEL_WB.redoStack = [];
@@ -7651,14 +7956,21 @@ function excelUndo() {
     action: lastState.action,
     cells: JSON.parse(JSON.stringify(sheet.cells)),
     rowsCount: sheet.rowsCount,
-    colsCount: sheet.colsCount
+    colsCount: sheet.colsCount,
+    merges: JSON.parse(JSON.stringify(sheet.merges || [])),
+    colWidths: JSON.parse(JSON.stringify(sheet.colWidths || {})),
+    rowHeights: JSON.parse(JSON.stringify(sheet.rowHeights || {}))
   });
 
   sheet.cells = lastState.cells;
   sheet.rowsCount = lastState.rowsCount;
   sheet.colsCount = lastState.colsCount;
+  if (lastState.merges) sheet.merges = JSON.parse(JSON.stringify(lastState.merges));
+  if (lastState.colWidths) sheet.colWidths = JSON.parse(JSON.stringify(lastState.colWidths));
+  if (lastState.rowHeights) sheet.rowHeights = JSON.parse(JSON.stringify(lastState.rowHeights));
 
   recalculateAllSheetFormulas(true);
+  renderExcelGrid(true);
   markWorkbookUnsaved();
 }
 
@@ -7671,14 +7983,21 @@ function excelRedo() {
     action: nextState.action,
     cells: JSON.parse(JSON.stringify(sheet.cells)),
     rowsCount: sheet.rowsCount,
-    colsCount: sheet.colsCount
+    colsCount: sheet.colsCount,
+    merges: JSON.parse(JSON.stringify(sheet.merges || [])),
+    colWidths: JSON.parse(JSON.stringify(sheet.colWidths || {})),
+    rowHeights: JSON.parse(JSON.stringify(sheet.rowHeights || {}))
   });
 
   sheet.cells = nextState.cells;
   sheet.rowsCount = nextState.rowsCount;
   sheet.colsCount = nextState.colsCount;
+  if (nextState.merges) sheet.merges = JSON.parse(JSON.stringify(nextState.merges));
+  if (nextState.colWidths) sheet.colWidths = JSON.parse(JSON.stringify(nextState.colWidths));
+  if (nextState.rowHeights) sheet.rowHeights = JSON.parse(JSON.stringify(nextState.rowHeights));
 
   recalculateAllSheetFormulas(true);
+  renderExcelGrid(true);
   markWorkbookUnsaved();
 }
 
