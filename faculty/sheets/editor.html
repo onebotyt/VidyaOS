@@ -17,11 +17,11 @@
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261029">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
 
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-loading.css?v=20261120_v14">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-color-tools.css?v=20261120_v14">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-grid.css?v=20261120_v14">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-ribbon.css?v=20261120_v14">
-  <link rel="stylesheet" href="/faculty/sheets/sheets.css?v=20261120_v14">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-loading.css?v=20261120_v15">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-color-tools.css?v=20261120_v15">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-grid.css?v=20261120_v15">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-ribbon.css?v=20261120_v15">
+  <link rel="stylesheet" href="/faculty/sheets/sheets.css?v=20261120_v15">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -710,18 +710,24 @@
                 </div>
 
                 <!-- Cells Operations Group -->
-                <div class="excel-tool-group">
+                <div class="excel-tool-group excel-cells-group">
                   <div class="excel-tool-row">
                     <button type="button" class="excel-tool-btn" id="btn-insert-row" onclick="insertRowAtActive(true)"
-                      title="Insert Row Above">
-                      <span>+ Row</span>
+                      title="Insert Row Above (Up)">
+                      <span>+ Row ↑</span>
+                    </button>
+                    <button type="button" class="excel-tool-btn" id="btn-insert-row-down" onclick="insertRowAtActive(false)"
+                      title="Insert Row Below (Down)">
+                      <span>+ Row ↓</span>
                     </button>
                     <button type="button" class="excel-tool-btn" id="btn-insert-col" onclick="insertColAtActive(true)"
                       title="Insert Column Left">
-                      <span>+ Col</span>
+                      <span>+ Col ←</span>
                     </button>
-                    <button type="button" class="excel-tool-btn" onclick="openAddRowModal()"
-                      title="Add Enrolled Student Row">+ Student</button>
+                    <button type="button" class="excel-tool-btn" id="btn-insert-col-right" onclick="insertColAtActive(false)"
+                      title="Insert Column Right">
+                      <span>+ Col →</span>
+                    </button>
                   </div>
                   <div class="excel-tool-row">
                     <button type="button" class="excel-tool-btn text-danger" id="btn-delete-row"
@@ -732,7 +738,9 @@
                       onclick="deleteActiveCol()" title="Delete Selected Column">
                       <span>− Col</span>
                     </button>
-                    <button type="button" class="excel-tool-btn" onclick="openEditStudentRosterModal()"
+                    <button type="button" class="excel-tool-btn" id="btn-add-student-row" onclick="openAddRowModal()"
+                      title="Add Enrolled Student Row">+ Student</button>
+                    <button type="button" class="excel-tool-btn" id="btn-open-roster-form" onclick="openEditStudentRosterModal()"
                       title="Open Scores Form Modal">Roster Form</button>
                   </div>
                   <span class="excel-group-label">Cells</span>
@@ -2955,11 +2963,11 @@
     <script src="/faculty/components/header/header.js?v=20261029"></script>
     <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
     <!-- Office Studio Modular Architecture: Lightweight Initial Hub & Loading Overlay (< 35 KB) -->
-    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_v14"></script>
-    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_v14"></script>
-    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v14"></script>
+    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_v15"></script>
+    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_v15"></script>
+    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v15"></script>
     <script src="/faculty/components/core/exceljs.min.js"></script>
-    <script src="/faculty/sheets/sheets.js?v=20261120_v14"></script>
+    <script src="/faculty/sheets/sheets.js?v=20261120_v15"></script>
 </body>
 
 </html>

@@ -80,15 +80,14 @@
 }
 
 /* Merged Multi-Row Cells (Instructions, Questions, Side Panels) */
-.excel-cell[rowspan] {
+.excel-cell.excel-cell-multiroow {
   height: auto;
-  min-height: 48px;
   white-space: pre-wrap;
   word-break: break-word;
   vertical-align: top;
   overflow: auto;
-  padding: 8px 10px;
-  line-height: 1.4;
+  padding: 6px 8px;
+  line-height: 1.35;
 }
 
 /* Section Header Accents (Theory, Practical, Grand Total) */

@@ -6418,9 +6418,17 @@ function renderExcelGrid(rebuildStructure = true) {
           continue;
         }
 
-        const spanAttrs = (mInfo && mInfo.isTopLeft)
-          ? ` rowspan="${mInfo.rowSpan}" colspan="${mInfo.colSpan}"`
-          : '';
+        let spanAttrs = '';
+        let extraCellClasses = '';
+        if (mInfo && mInfo.isTopLeft) {
+          if (mInfo.rowSpan > 1) {
+            spanAttrs += ` rowspan="${mInfo.rowSpan}"`;
+            extraCellClasses += ' excel-cell-multiroow';
+          }
+          if (mInfo.colSpan > 1) {
+            spanAttrs += ` colspan="${mInfo.colSpan}"`;
+          }
+        }
 
         const cell = getCell(sheet, r, c);
         if (cell.f && (cell.v === undefined || cell.v === null || cell.v === '')) {
@@ -6431,7 +6439,7 @@ function renderExcelGrid(rebuildStructure = true) {
         const cellStyle = buildCellInlineStyle(cell.s);
         const displayVal = formatCellDisplayValue(cell.v !== undefined && cell.v !== null ? cell.v : cell.raw, cell.s);
         bodyHtml += `
-          <td class="excel-cell cell-${r}-${c}" data-row="${r}" data-col="${c}"${spanAttrs} style="${cellStyle}" onmousedown="onCellMouseDown(event, ${r}, ${c})" ondblclick="onCellDoubleClick(event, ${r}, ${c})">
+          <td class="excel-cell cell-${r}-${c}${extraCellClasses}" data-row="${r}" data-col="${c}"${spanAttrs} style="${cellStyle}" onmousedown="onCellMouseDown(event, ${r}, ${c})" ondblclick="onCellDoubleClick(event, ${r}, ${c})">
             ${escapeHtml(displayVal)}
           </td>
         `;
@@ -9703,7 +9711,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     frozenCols: 5
   });
   evalSheet.rowHeights[0] = 26;
-  evalSheet.rowHeights[1] = 42;
+  evalSheet.rowHeights[1] = 26;
   evalSheet.rowHeights[2] = 22;
   for (let r = 3; r < 3 + students.length; r++) {
     evalSheet.rowHeights[r] = 24;
@@ -10288,7 +10296,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     frozenRows: 2,
     frozenCols: 5
   });
-  practicalSheet.rowHeights[0] = 34;
+  practicalSheet.rowHeights[0] = 28;
   practicalSheet.rowHeights[1] = 24;
   for (let r = 2; r < 2 + students.length; r++) {
     practicalSheet.rowHeights[r] = 24;
