@@ -17,11 +17,11 @@
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261029">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
 
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-loading.css?v=20261120_v8">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-color-tools.css?v=20261120_v8">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-grid.css?v=20261120_v8">
-  <link rel="stylesheet" href="/faculty/sheets/css/sheets-ribbon.css?v=20261120_v8">
-  <link rel="stylesheet" href="/faculty/sheets/sheets.css?v=20261120_v8">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-loading.css?v=20261120_v9">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-color-tools.css?v=20261120_v9">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-grid.css?v=20261120_v9">
+  <link rel="stylesheet" href="/faculty/sheets/css/sheets-ribbon.css?v=20261120_v9">
+  <link rel="stylesheet" href="/faculty/sheets/sheets.css?v=20261120_v9">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -728,6 +728,13 @@
                     </button>
                     <button type="button" class="excel-tool-btn" onclick="openEditStudentRosterModal()"
                       title="Open Scores Form Modal">Roster Form</button>
+                    <button type="button" class="excel-tool-btn" id="btn-ribbon-fit-screen"
+                      onclick="triggerFitColumnsToScreen()" title="Fit all columns to screen width without scrolling">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                      </svg>
+                      <span>Fit Screen</span>
+                    </button>
                   </div>
                   <span class="excel-group-label">Cells</span>
                 </div>
@@ -966,6 +973,13 @@
                         <button type="button" class="excel-tool-btn" onclick="openEditMarksModal()"
                           title="Edit Total Marks &amp; Scheme">
                           <span>Scheme Weightage</span>
+                        </button>
+                        <button type="button" class="excel-tool-btn" id="btn-layout-fit-screen"
+                          onclick="triggerFitColumnsToScreen()" title="Auto-Fit All Columns to Screen Width">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                          </svg>
+                          <span>Fit Columns to Screen</span>
                         </button>
                       </div>
                     </div>
@@ -1324,6 +1338,16 @@
                 <circle cx="11" cy="11" r="2"></circle>
               </svg>
               <span id="btn-signatures-label">Signatures: ON</span>
+            </button>
+
+            <!-- Fit to Screen (Auto-Fit Columns) Button -->
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-fit-columns-screen"
+              onclick="triggerFitColumnsToScreen()" title="Fit all columns to screen width without scrolling"
+              style="font-size:0.75rem;font-weight:700;padding:0.22rem 0.55rem;display:inline-flex;align-items:center;gap:0.35rem;white-space:nowrap;flex-shrink:0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
+              <span>Fit to Screen</span>
             </button>
 
             <!-- Unified Filters Button (Opens 2-Pane Filter Modal) -->
@@ -2912,11 +2936,11 @@
     <script src="/faculty/components/header/header.js?v=20261029"></script>
     <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
     <!-- Office Studio Modular Architecture: Lightweight Initial Hub & Loading Overlay (< 35 KB) -->
-    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_v8"></script>
-    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_v8"></script>
-    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v8"></script>
+    <script src="/faculty/sheets/js/sheets-loading.js?v=20261120_v9"></script>
+    <script src="/faculty/sheets/js/sheets-color-tools.js?v=20261120_v9"></script>
+    <script src="/faculty/sheets/js/sheets-grid-stretching.js?v=20261120_v9"></script>
     <script src="/faculty/components/core/exceljs.min.js"></script>
-    <script src="/faculty/sheets/sheets.js?v=20261120_v8"></script>
+    <script src="/faculty/sheets/sheets.js?v=20261120_v9"></script>
 </body>
 
 </html>

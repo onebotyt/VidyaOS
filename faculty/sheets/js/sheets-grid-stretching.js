@@ -1,63 +1,144 @@
 /* ══════════════════════════════════════════════════════════════
-   OFFICE STUDIO: AUTO-FIT COLUMNS & CONTAINER WIDTH DISTRIBUTION
-   Eliminates unnecessary empty space and ensures clean full-width grid
+   OFFICE STUDIO: AUTO-FIT COLUMNS & SCREEN-FIT DISTRIBUTION
+   Intelligently proportions columns so institutional sheets & imported
+   sheets fit 100% within the user's viewport without horizontal scrolling.
    ══════════════════════════════════════════════════════════════ */
 
-function autoFitSheetColumns(sheet) {
+function autoFitSheetColumns(sheet, force = false) {
   if (!sheet || !sheet.cells) return;
   if (!sheet.colWidths) sheet.colWidths = {};
 
-  const colMaxLen = {};
+  const isImported = Boolean(window.EXCEL_WB?.isImportedWorkbook);
+  // For imported workbooks, only auto-fit when explicitly requested by user (force = true)
+  if (isImported && !force) {
+    return;
+  }
+
+  // Measure available grid container width
+  const container = document.getElementById('excel-grid-workspace') ||
+    document.getElementById('excel-grid-container') ||
+    document.querySelector('.excel-grid-workspace') ||
+    document.getElementById('sheets-viewport');
+  const screenW = container ? container.clientWidth : (typeof window !== 'undefined' ? window.innerWidth - 80 : 1200);
+  // Subtract row header (42px) + scrollbar/border cushion (16px)
+  const availWidth = Math.max(screenW - 58, 640);
+
+  // Identify last active column with content or headers (ignoring merged banner rows)
+  let lastCol = 0;
   for (let c = 0; c < sheet.colsCount; c++) {
+    for (let r = 0; r < Math.min(sheet.rowsCount || 50, 6); r++) {
+      const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
+      const val = cell.v !== undefined && cell.v !== null ? String(cell.v).trim() : String(cell.raw || '').trim();
+      if (val) {
+        lastCol = Math.max(lastCol, c);
+      }
+    }
+  }
+
+  const activeColCount = Math.max(1, lastCol + 1);
+
+  // 1. MASTER EVALUATION SHEET (16 Columns: SR, Roll, Reg, Enroll, Name, Theory cols 5..9, Practical cols 10..14, Grand Total col 15)
+  if (sheet.type === 'evaluation' || (!sheet.type && activeColCount >= 14 && activeColCount <= 18)) {
+    // Curated compact base widths modeled from optimal 100% browser viewport
+    // Baseline sum = 42 + 50 + 76 + 102 + 145 + 68 + 68 + 54 + 68 + 52 + 54 + 68 + 54 + 54 + 52 + 65 = 972px
+    const baseWidths = [42, 50, 76, 102, 145, 68, 68, 54, 68, 52, 54, 68, 54, 54, 52, 65];
+    const sumBase = baseWidths.reduce((a, b) => a + b, 0); // 972px
+
+    if (availWidth >= sumBase) {
+      // Screen is wide enough: distribute extra width gracefully, prioritizing student name
+      const extra = availWidth - sumBase;
+      const nameExtra = Math.floor(extra * 0.28);
+      const perColExtra = Math.floor((extra - nameExtra) / 15);
+      for (let c = 0; c < 16; c++) {
+        if (c === 4) {
+          sheet.colWidths[c] = baseWidths[c] + nameExtra;
+        } else {
+          sheet.colWidths[c] = baseWidths[c] + perColExtra;
+        }
+      }
+    } else {
+      // Screen is narrower (e.g. tablet or split-screen): scale down smoothly while preserving legibility
+      const ratio = Math.max(0.72, availWidth / sumBase);
+      for (let c = 0; c < 16; c++) {
+        sheet.colWidths[c] = Math.max(34, Math.round(baseWidths[c] * ratio));
+      }
+    }
+    return;
+  }
+
+  // 2. UNIT TESTS / COURSEWORK / PRACTICALS / GENERIC INSTITUTIONAL OR IMPORTED SHEETS
+  // Proportionally distribute available width so all active columns through lastCol fit exactly on screen!
+  const colMaxLen = {};
+  for (let c = 0; c < activeColCount; c++) {
     colMaxLen[c] = 0;
   }
 
-  const sampleRows = Math.min(sheet.rowsCount || 50, 100);
-  for (let r = 0; r < sampleRows; r++) {
-    for (let c = 0; c < sheet.colsCount; c++) {
+  const sampleRows = Math.min(sheet.rowsCount || 40, 50);
+  for (let r = 1; r < sampleRows; r++) { // skip row 0 (may contain full-width banner text)
+    for (let c = 0; c < activeColCount; c++) {
       const cell = typeof getCell === 'function' ? getCell(sheet, r, c) : (sheet.cells[`${r},${c}`] || {});
       const val = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || ''));
-      if (!val) continue;
-      const effectiveLen = (r === 0 && val.length > 28) ? Math.ceil(val.length / 2) : (val.length > 40 ? 30 : val.length);
-      if (effectiveLen > colMaxLen[c]) {
-        colMaxLen[c] = effectiveLen;
+      if (val.length > colMaxLen[c] && val.length < 35) {
+        colMaxLen[c] = val.length;
       }
     }
   }
 
-  // Calculate base required widths
   let totalBaseWidth = 0;
-  for (let c = 0; c < sheet.colsCount; c++) {
-    const maxChars = colMaxLen[c] || 6;
-    let autoW = Math.max(70, Math.min(360, maxChars * 8.5 + 24));
-    if (c === 0) autoW = Math.max(autoW, 55);  // SR. NO.
-    if (c === 1) autoW = Math.max(autoW, 75);  // ROLL NO.
-    if (c === 2) autoW = Math.max(autoW, 125); // REG. NO.
-    if (c === 3) autoW = Math.max(autoW, 125); // ENROLLMENT NO.
-    if (c === 4) autoW = Math.max(autoW, 190); // STUDENT NAME
-    sheet.colWidths[c] = Math.round(autoW);
-    totalBaseWidth += sheet.colWidths[c];
+  const initialWidths = [];
+  for (let c = 0; c < activeColCount; c++) {
+    const chars = Math.max(3, colMaxLen[c] || 5);
+    let autoW = Math.max(45, Math.min(220, chars * 7.5 + 18));
+    if (c === 0 && chars <= 4) autoW = 40;  // SR. NO.
+    if (c === 1 && chars <= 6) autoW = 50;  // ROLL NO.
+    if (c === 2 && chars <= 10) autoW = 76; // REG. NO.
+    if (c === 3 && chars <= 14) autoW = 100; // ENROLL NO.
+    if (c === 4 && chars <= 25) autoW = 145; // NAME
+    initialWidths[c] = autoW;
+    totalBaseWidth += autoW;
   }
 
-  // Distribute remaining screen width to eliminate right-side void
-  try {
-    const container = document.getElementById('excel-grid-container') || document.querySelector('.excel-grid-container');
-    const screenW = container ? container.clientWidth : (typeof window !== 'undefined' ? window.innerWidth - 80 : 1200);
-    const availWidth = Math.max(screenW - 48, 800); // 48px for row header (42px) + scroll margin
-
-    if (availWidth > totalBaseWidth && sheet.colsCount > 0) {
-      const remainingVoid = availWidth - totalBaseWidth;
-      const extraPerCol = Math.floor(remainingVoid / sheet.colsCount);
-      const addPerCol = Math.min(extraPerCol, 36);
-      if (addPerCol > 0) {
-        for (let c = 0; c < sheet.colsCount; c++) {
-          sheet.colWidths[c] += addPerCol;
-        }
-      }
-    }
-  } catch (_) { }
+  // Scale all columns so their sum equals available width (or minimum readable width)
+  const scaleFactor = availWidth / Math.max(totalBaseWidth, 1);
+  for (let c = 0; c < activeColCount; c++) {
+    sheet.colWidths[c] = Math.max(36, Math.round(initialWidths[c] * scaleFactor));
+  }
 }
 
+function triggerFitColumnsToScreen() {
+  const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
+  if (!sheet) {
+    if (typeof showToast === 'function') showToast('Please open an academic workbook first!', 'info');
+    return;
+  }
+
+  if (typeof pushUndoState === 'function') pushUndoState('Fit Columns to Screen');
+
+  autoFitSheetColumns(sheet, true); // force = true so it works on any sheet including imported
+
+  if (typeof renderExcelGrid === 'function') {
+    renderExcelGrid(false);
+  }
+
+  if (typeof showToast === 'function') {
+    showToast('Spreadsheet columns fitted to screen width without scrolling!', 'success');
+  }
+}
+
+// Automatic debounced re-fit on window resize
+let gridResizeTimer = null;
 if (typeof window !== 'undefined') {
+  window.addEventListener('resize', () => {
+    clearTimeout(gridResizeTimer);
+    gridResizeTimer = setTimeout(() => {
+      const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
+      if (sheet && (!window.EXCEL_WB?.isImportedWorkbook)) {
+        autoFitSheetColumns(sheet, false);
+        if (typeof renderExcelGrid === 'function') renderExcelGrid(false);
+      }
+    }, 150);
+  });
+
   window.autoFitSheetColumns = autoFitSheetColumns;
+  window.triggerFitColumnsToScreen = triggerFitColumnsToScreen;
 }

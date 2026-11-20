@@ -3684,14 +3684,15 @@ span.excel-hdr-num-badge {
 }
 
 .excel-select {
-  padding: 0.16rem 0.35rem;
-  font-size: 0.72rem;
+  padding: 0.1rem 0.22rem;
+  font-size: 0.68rem;
   font-weight: 700;
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
   color: var(--text-main);
   border-radius: var(--radius-sm);
   outline: none;
+  height: 21px;
 }
 
 .excel-font-family {
@@ -4547,7 +4548,7 @@ span.excel-hdr-num-badge {
 
 /* Single-Row Institutional Header Banner */
 .sheet-banner-single-row {
-  display: flex !important;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.22rem 0.6rem;

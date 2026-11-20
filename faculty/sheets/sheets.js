@@ -7811,7 +7811,13 @@ function switchWorksheet(idx) {
     updateBannerForSheet(sheet.type === 'single-test' ? sheet.name : (sheet.type || S.activeSheet));
   }
 
-  if (banner) banner.style.display = EXCEL_WB.bannerVisible ? 'block' : 'none';
+  if (banner) {
+    if (EXCEL_WB.bannerVisible !== false) {
+      banner.style.setProperty('display', 'flex', 'important');
+    } else {
+      banner.style.setProperty('display', 'none', 'important');
+    }
+  }
   if (bannerBtn) {
     bannerBtn.classList.toggle('active', Boolean(EXCEL_WB.bannerVisible));
     const lbl = document.getElementById('btn-banner-label');
@@ -9372,22 +9378,11 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   for (let r = 3; r < 3 + students.length; r++) {
     evalSheet.rowHeights[r] = 24;
   }
-  evalSheet.colWidths[0] = 55;  // SR. NO.
-  evalSheet.colWidths[1] = 75;  // ROLL NO.
-  evalSheet.colWidths[2] = 125; // REG. NO.
-  evalSheet.colWidths[3] = 135; // ENROLLMENT NO.
-  evalSheet.colWidths[4] = 200; // STUDENT NAME
-  evalSheet.colWidths[5] = 95;  // Assignment (10)
-  evalSheet.colWidths[6] = 95;  // UTs Total (Best 4)
-  evalSheet.colWidths[7] = 85;  // Attendance
-  evalSheet.colWidths[8] = 105; // Problem Solving Skills/
-  evalSheet.colWidths[9] = 85;  // TOTAL (Theory)
-  evalSheet.colWidths[10] = 105; // Lab Record File
-  evalSheet.colWidths[11] = 135; // Creative Work
-  evalSheet.colWidths[12] = 85; // Attendance
-  evalSheet.colWidths[13] = 85; // Viva Voce
-  evalSheet.colWidths[14] = 85; // TOTAL (Practical)
-  evalSheet.colWidths[15] = 95; // GRAND TOTAL
+  // Default compact screen-fit proportions: All 16 columns fit 100% on standard screens without horizontal scroll
+  const defaultEvalWidths = [42, 50, 76, 102, 145, 68, 68, 54, 68, 52, 54, 68, 54, 54, 52, 65];
+  for (let c = 0; c < 16; c++) {
+    evalSheet.colWidths[c] = defaultEvalWidths[c];
+  }
 
   // Header Row 0: SR. NO., ROLL NO., REG. NO., ENROLLMENT NO., STUDENT NAME, THEORY (cols 5..9), PRACTICAL (cols 10..14), GRAND TOTAL (col 15)
   setCell(evalSheet, 0, 0, { raw: 'SR. NO.', v: 'SR. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
@@ -9560,13 +9555,13 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   for (let r = 2; r < 2 + students.length; r++) {
     testSheet.rowHeights[r] = 24;
   }
-  testSheet.colWidths[0] = 55;  // SR. NO.
-  testSheet.colWidths[1] = 75;  // ROLL NO.
-  testSheet.colWidths[2] = 125; // REG. NO.
-  testSheet.colWidths[3] = 135; // ENROLLMENT NO.
-  testSheet.colWidths[4] = 200; // STUDENT NAME
-  for (let c = 5; c <= 14; c++) testSheet.colWidths[c] = 55;
-  testSheet.colWidths[15] = 140;
+  testSheet.colWidths[0] = 42;  // SR. NO.
+  testSheet.colWidths[1] = 50;  // ROLL NO.
+  testSheet.colWidths[2] = 76; // REG. NO.
+  testSheet.colWidths[3] = 102; // ENROLLMENT NO.
+  testSheet.colWidths[4] = 145; // STUDENT NAME
+  for (let c = 5; c <= 14; c++) testSheet.colWidths[c] = 48;
+  testSheet.colWidths[15] = 95;
 
   const testHeaders = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Final Total (Best 4 Avg)'];
   testHeaders.forEach((h, c) => {
@@ -9637,17 +9632,17 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     for (let r = 2; r < 2 + students.length; r++) {
       singleTestSheet.rowHeights[r] = 24;
     }
-    singleTestSheet.colWidths[0] = 55;  // SR. NO.
-    singleTestSheet.colWidths[1] = 75;  // ROLL NO.
-    singleTestSheet.colWidths[2] = 125; // REG. NO.
-    singleTestSheet.colWidths[3] = 135; // ENROLLMENT NO.
-    singleTestSheet.colWidths[4] = 200; // STUDENT NAME
-    singleTestSheet.colWidths[5] = 55;
-    singleTestSheet.colWidths[6] = 55;
-    singleTestSheet.colWidths[7] = 55;
-    singleTestSheet.colWidths[8] = 55;
-    singleTestSheet.colWidths[9] = 75;
-    singleTestSheet.colWidths[10] = 340;
+    singleTestSheet.colWidths[0] = 42;  // SR. NO.
+    singleTestSheet.colWidths[1] = 50;  // ROLL NO.
+    singleTestSheet.colWidths[2] = 76; // REG. NO.
+    singleTestSheet.colWidths[3] = 102; // ENROLLMENT NO.
+    singleTestSheet.colWidths[4] = 145; // STUDENT NAME
+    singleTestSheet.colWidths[5] = 48;
+    singleTestSheet.colWidths[6] = 48;
+    singleTestSheet.colWidths[7] = 48;
+    singleTestSheet.colWidths[8] = 48;
+    singleTestSheet.colWidths[9] = 65;
+    singleTestSheet.colWidths[10] = 180;
 
     // Header Row 0: SR. NO., ROLL NO., REG. NO., ENROLLMENT NO., STUDENT NAME, Unit Test (Total Marks: 20) [merged 5..9], Details
     setCell(singleTestSheet, 0, 0, { raw: 'SR. NO.', v: 'SR. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
@@ -9729,14 +9724,14 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   for (let r = 2; r < 2 + students.length; r++) {
     assignSheet.rowHeights[r] = 24;
   }
-  assignSheet.colWidths[0] = 55;  // SR. NO.
-  assignSheet.colWidths[1] = 75;  // ROLL NO.
-  assignSheet.colWidths[2] = 125; // REG. NO.
-  assignSheet.colWidths[3] = 135; // ENROLLMENT NO.
-  assignSheet.colWidths[4] = 200; // STUDENT NAME
-  for (let c = 5; c <= 9; c++) assignSheet.colWidths[c] = 55;
-  assignSheet.colWidths[10] = 130;
-  assignSheet.colWidths[11] = 340;
+  assignSheet.colWidths[0] = 42;  // SR. NO.
+  assignSheet.colWidths[1] = 50;  // ROLL NO.
+  assignSheet.colWidths[2] = 76; // REG. NO.
+  assignSheet.colWidths[3] = 102; // ENROLLMENT NO.
+  assignSheet.colWidths[4] = 145; // STUDENT NAME
+  for (let c = 5; c <= 9; c++) assignSheet.colWidths[c] = 48;
+  assignSheet.colWidths[10] = 95;
+  assignSheet.colWidths[11] = 180;
 
   const assignHeaders = [
     'SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME',
@@ -9803,16 +9798,16 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   for (let r = 2; r < 2 + students.length; r++) {
     practicalSheet.rowHeights[r] = 24;
   }
-  practicalSheet.colWidths[0] = 55;  // SR. NO.
-  practicalSheet.colWidths[1] = 75;  // ROLL NO.
-  practicalSheet.colWidths[2] = 125; // REG. NO.
-  practicalSheet.colWidths[3] = 135; // ENROLLMENT NO.
-  practicalSheet.colWidths[4] = 200; // STUDENT NAME
-  practicalSheet.colWidths[5] = 120; // Lab Record File
-  practicalSheet.colWidths[6] = 160; // Creative Work (Model/Chart/Project)
-  practicalSheet.colWidths[7] = 95;  // Attendance
-  practicalSheet.colWidths[8] = 95;  // Viva Voce
-  practicalSheet.colWidths[9] = 95;  // TOTAL
+  practicalSheet.colWidths[0] = 42;  // SR. NO.
+  practicalSheet.colWidths[1] = 50;  // ROLL NO.
+  practicalSheet.colWidths[2] = 76; // REG. NO.
+  practicalSheet.colWidths[3] = 102; // ENROLLMENT NO.
+  practicalSheet.colWidths[4] = 145; // STUDENT NAME
+  practicalSheet.colWidths[5] = 75; // Lab Record File
+  practicalSheet.colWidths[6] = 105; // Creative Work (Model/Chart/Project)
+  practicalSheet.colWidths[7] = 65;  // Attendance
+  practicalSheet.colWidths[8] = 65;  // Viva Voce
+  practicalSheet.colWidths[9] = 65;  // TOTAL
 
   const practicalHeaders = ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'ENROLLMENT NO.', 'STUDENT NAME', 'Lab Record File', 'Creative Work (Model/Chart/Project)', 'Attendance', 'Viva Voce', 'TOTAL'];
   practicalHeaders.forEach((h, c) => {
@@ -10100,9 +10095,15 @@ function saveBannerEdits() {
 }
 
 function toggleInstitutionalBanner() {
-  EXCEL_WB.bannerVisible = !EXCEL_WB.bannerVisible;
+  EXCEL_WB.bannerVisible = (EXCEL_WB.bannerVisible === false) ? true : false;
   const banner = document.getElementById('sheet-institutional-banner');
-  if (banner) banner.style.display = EXCEL_WB.bannerVisible ? 'block' : 'none';
+  if (banner) {
+    if (EXCEL_WB.bannerVisible) {
+      banner.style.setProperty('display', 'flex', 'important');
+    } else {
+      banner.style.setProperty('display', 'none', 'important');
+    }
+  }
 
   const btn = document.getElementById('btn-toggle-college-banner');
   if (btn) {
@@ -10117,10 +10118,13 @@ function toggleInstitutionalBanner() {
     viewBtn.textContent = `College Banner: ${EXCEL_WB.bannerVisible ? 'ON' : 'OFF'}`;
   }
 
-  if (S.autoFit) {
-    setTimeout(() => fitSheetToScreen(false), 40);
+  const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
+  if (sheet && typeof autoFitSheetColumns === 'function' && !EXCEL_WB.isImportedWorkbook) {
+    autoFitSheetColumns(sheet, false);
+    if (typeof renderExcelGrid === 'function') renderExcelGrid(false);
   }
 }
+window.toggleInstitutionalBanner = toggleInstitutionalBanner;
 
 // ══════════════════════════════════════════════════════════════
 // INSTITUTIONAL SIGNATURES BAR CONTROLS
