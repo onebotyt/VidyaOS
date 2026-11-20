@@ -303,26 +303,50 @@
 .excel-templates-dropdown {
   position: fixed !important;
   z-index: 99999999 !important;
-  width: 330px !important;
-  max-width: 360px !important;
+  width: 340px !important;
+  max-width: 95vw !important;
   padding: 0.65rem 0.75rem !important;
   background: var(--bg-card) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-md, 8px) !important;
-  box-shadow: 0 18px 48px hsla(220, 30%, 8%, 0.32), 0 2px 6px hsla(220, 20%, 10%, 0.15) !important;
+  box-shadow: 0 20px 50px hsla(220, 30%, 8%, 0.35), 0 4px 12px hsla(220, 20%, 10%, 0.18) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 0.45rem !important;
   animation: officeFadeIn 0.12s ease-out !important;
   user-select: none !important;
   box-sizing: border-box !important;
+  overflow-y: auto !important;
+}
+
+.excel-templates-dropdown::-webkit-scrollbar,
+.excel-conditional-dropdown::-webkit-scrollbar,
+.excel-color-palette-popup::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.excel-templates-dropdown::-webkit-scrollbar-track,
+.excel-conditional-dropdown::-webkit-scrollbar-track,
+.excel-color-palette-popup::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.excel-templates-dropdown::-webkit-scrollbar-thumb,
+.excel-conditional-dropdown::-webkit-scrollbar-thumb,
+.excel-color-palette-popup::-webkit-scrollbar-thumb {
+  background: var(--border-color) !important;
+  border-radius: 4px !important;
 }
 
 .excel-templates-header {
+  position: sticky !important;
+  top: 0 !important;
+  background: var(--bg-card) !important;
+  z-index: 10 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding-bottom: 0.35rem !important;
+  padding-bottom: 0.4rem !important;
   border-bottom: 1px solid var(--border-color) !important;
   flex-shrink: 0 !important;
 }
@@ -343,7 +367,7 @@
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
   gap: 0.45rem !important;
-  padding-right: 2px !important;
+  padding: 0.2rem 2px 0.2rem 0 !important;
 }
 
 .template-card-btn {
@@ -403,12 +427,16 @@
 }
 
 .template-reset-btn {
+  position: sticky !important;
+  bottom: 0 !important;
+  background: var(--bg-card) !important;
+  z-index: 10 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 0.4rem !important;
   width: 100% !important;
-  padding: 0.38rem 0.5rem !important;
+  padding: 0.4rem 0.5rem !important;
   background: var(--bg-surface) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-sm, 4px) !important;
@@ -418,6 +446,7 @@
   cursor: pointer !important;
   transition: all 0.12s ease !important;
   flex-shrink: 0 !important;
+  margin-top: 0.2rem !important;
 }
 
 .template-reset-btn:hover {

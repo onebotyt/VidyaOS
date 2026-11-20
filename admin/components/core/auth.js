@@ -21,8 +21,8 @@
   function getAuthToken() {
     try {
       return localStorage.getItem('access_token') ||
-             localStorage.getItem('token') ||
-             localStorage.getItem('authToken') || '';
+        localStorage.getItem('token') ||
+        localStorage.getItem('authToken') || '';
     } catch (_) {
       return '';
     }
@@ -68,23 +68,71 @@
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('auth_user', JSON.stringify(user));
       localStorage.setItem('currentUser', JSON.stringify(user));
-    } catch (_) {}
+    } catch (_) { }
   }
 
   function clearAuthSession() {
     try {
-      [
-        'access_token', 'accessToken', 'token', 'authToken', 'auth_token', 'vidyaos_token',
-        'refresh_token', 'user', 'auth_user', 'currentUser', 'vidyaos_user',
-        'user_profile', 'user_roles', 'role', 'roles', 'session_id'
-      ].forEach(k => {
-        try { localStorage.removeItem(k); } catch (_) {}
-      });
-      sessionStorage.clear();
-      document.cookie.split(';').forEach(c => {
-        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
-      });
-    } catch (_) {}
+      // 1. Preserve only the user's explicit theme preference
+      const savedTheme = localStorage.getItem('vidya_theme') || localStorage.getItem('theme');
+
+      // 2. Clear ALL items in localStorage to prevent data leakage/stale session bugs
+      try {
+        localStorage.clear();
+      } catch (_) {
+        const authKeys = [
+          'access_token', 'accessToken', 'token', 'authToken', 'auth_token', 'vidyaos_token',
+          'refresh_token', 'user', 'auth_user', 'currentUser', 'vidyaos_user',
+          'user_profile', 'user_roles', 'role', 'roles', 'session_id', 'vidyaos_device_id',
+          'vidya_user_profile', 'vidya_selected_class', 'vidya_selected_dept', 'vidya_roster_cache'
+        ];
+        authKeys.forEach(k => { try { localStorage.removeItem(k); } catch (_) { } });
+      }
+
+      // Restore user theme preference
+      if (savedTheme) {
+        try { localStorage.setItem('vidya_theme', savedTheme); } catch (_) { }
+      }
+
+      // 3. Clear ALL items in sessionStorage
+      try {
+        sessionStorage.clear();
+      } catch (_) { }
+
+      // 4. Clear all cookies across all paths and subdomains
+      try {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i];
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          if (!name) continue;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname};`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+        }
+      } catch (_) { }
+
+      // 5. Purge CacheStorage (Service Worker / browser HTTP cache)
+      if (typeof window !== 'undefined' && window.caches && window.caches.keys) {
+        window.caches.keys().then(names => {
+          return Promise.all(names.map(name => window.caches.delete(name)));
+        }).catch(() => { });
+      }
+
+      // 6. Clear IndexedDB databases if supported and present
+      if (typeof window !== 'undefined' && window.indexedDB && window.indexedDB.databases) {
+        window.indexedDB.databases().then(dbs => {
+          if (Array.isArray(dbs)) {
+            dbs.forEach(db => {
+              if (db && db.name && !db.name.includes('theme')) {
+                try { window.indexedDB.deleteDatabase(db.name); } catch (_) { }
+              }
+            });
+          }
+        }).catch(() => { });
+      }
+    } catch (_) { }
   }
 
   function handleSessionRevocation(reason = 'session_transferred') {
@@ -93,7 +141,7 @@
       sessionStorage.setItem('vidya_logout_notice', reason === 'session_expired'
         ? 'Your session expired due to inactivity. Please sign in again.'
         : 'Your session has ended because this account was logged into from another device or signed out.');
-    } catch (_) {}
+    } catch (_) { }
     window.location.replace(`/login/index.html?reason=${encodeURIComponent(reason)}`);
   }
 
@@ -112,10 +160,10 @@
         body: JSON.stringify({ device_id: deviceId, refresh_token: refreshToken }),
         keepalive: true,
         credentials: 'include'
-      }).catch(() => {});
-    } catch (_) {}
+      }).catch(() => { });
+    } catch (_) { }
     clearAuthSession();
-    try { sessionStorage.setItem('vidya_logged_out_flag', '1'); } catch (_) {}
+    try { sessionStorage.setItem('vidya_logged_out_flag', '1'); } catch (_) { }
     window.location.replace(`/login/index.html?reason=${encodeURIComponent(reason)}`);
   }
 
@@ -131,8 +179,8 @@
     toast.className = `toast toast-${type}`;
     toast.style.cssText = 'pointer-events:auto;animation:fadeIn 0.2s ease-out;margin-bottom:8px;padding:10px 16px;border-radius:6px;font-size:0.875rem;color:var(--text-white, #fff);box-shadow:var(--shadow-lg), 0 8px 24px rgba(0,0,0,0.18);';
     toast.style.background = type === 'error' ? 'var(--status-absent, #ef4444)' :
-                            (type === 'success' ? 'var(--status-present, #22c55e)' :
-                            (type === 'warning' ? 'var(--status-late, #f59e0b)' : 'var(--color-primary, #2563eb)'));
+      (type === 'success' ? 'var(--status-present, #22c55e)' :
+        (type === 'warning' ? 'var(--status-late, #f59e0b)' : 'var(--color-primary, #2563eb)'));
     toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => {
@@ -176,7 +224,7 @@
             return merged;
           }
         }
-      } catch (_) {} finally {
+      } catch (_) { } finally {
         _syncPromise = null;
       }
       return getCurrentUser();
@@ -210,7 +258,7 @@
             handleSessionRevocation();
           }
         }
-      } catch (_) {}
+      } catch (_) { }
     }, 120000);
   }
 
@@ -218,7 +266,7 @@
     try {
       const saved = localStorage.getItem('app_theme') || localStorage.getItem('theme') || localStorage.getItem('vidya_theme') || 'light';
       document.documentElement.setAttribute('data-theme', saved);
-    } catch (_) {}
+    } catch (_) { }
   }
 
   function toggleAppTheme() {
@@ -229,7 +277,7 @@
       localStorage.setItem('app_theme', next);
       localStorage.setItem('theme', next);
       localStorage.setItem('vidya_theme', next);
-    } catch (_) {}
+    } catch (_) { }
     showToast(`Appearance changed to ${next === 'dark' ? 'Dark Mode' : 'Light Mode'}`, 'info', 2000);
   }
 
@@ -267,7 +315,7 @@
     }
     if (user.role) userRoles.push(String(user.role).toUpperCase());
     if (user.is_admin) { userRoles.push('SYSTEM_ADMIN', 'ADMIN'); }
-    
+
 
     const isAuthorized = userRoles.some(r => normalizedAllowed.includes(r));
     if (!isAuthorized) {
@@ -335,3 +383,19 @@
     window.showToast = showToast;
   }
 })();
+
+// Prevent Back-Forward Cache (bfcache) resurrecting stale authenticated pages after logout
+if (typeof window !== 'undefined') {
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      const token = typeof window.getAuthToken === 'function' ? window.getAuthToken() : (localStorage.getItem('access_token') || localStorage.getItem('token'));
+      const path = window.location.pathname;
+      if (!token && !path.includes('/login') && path !== '/' && !path.includes('/landing')) {
+        if (typeof window.clearAuthSession === 'function') {
+          window.clearAuthSession();
+        }
+        window.location.replace('/login/index.html?reason=session_ended');
+      }
+    }
+  });
+}

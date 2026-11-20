@@ -1667,6 +1667,50 @@ button:disabled.btn-disabled-loading,
   cursor: pointer;
 }
 
+/* Compact Read-Only Display Values (for Dossier / Detail Modal) */
+.stu-compact-display-val {
+  width: 100%;
+  height: 31px;
+  padding: 0 0.65rem;
+  border-radius: 7px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stu-compact-display-val.enrolled {
+  color: var(--status-present);
+  background: var(--status-present-bg);
+  border-color: var(--status-present);
+}
+
+.stu-compact-display-val.transferred {
+  color: var(--status-late);
+  background: var(--status-late-bg);
+  border-color: var(--status-late);
+}
+
+.stu-compact-display-val.withdrawn {
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+}
+
+.stu-edit-details-footer {
+  margin-top: 0.35rem;
+  padding: 0.65rem 0 0 0 !important;
+  border-top: 1px solid var(--border-color);
+  background: transparent !important;
+}
+
 .stu-mono-input {
   font-family: var(--font-family-mono, monospace);
   font-size: 0.80rem;

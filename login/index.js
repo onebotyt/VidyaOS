@@ -12,15 +12,28 @@ const ALL_AUTH_STORAGE_KEYS = [
 ];
 
 function purgeAllStoredAuth() {
-  ALL_AUTH_STORAGE_KEYS.forEach(k => {
-    try { localStorage.removeItem(k); } catch (_) { }
-  });
-  try { sessionStorage.removeItem('vidya_logged_out_flag'); } catch (_) { }
   try {
-    document.cookie.split(";").forEach(c => {
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    const savedTheme = localStorage.getItem('vidya_theme') || localStorage.getItem('theme');
+    ALL_AUTH_STORAGE_KEYS.forEach(k => {
+      try { localStorage.removeItem(k); } catch (_) { }
     });
-  } catch (_) { }
+    try { sessionStorage.clear(); } catch (_) { }
+    try {
+      document.cookie.split(";").forEach(c => {
+        const name = c.split("=")[0].trim();
+        if (name) {
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname};`;
+        }
+      });
+    } catch (_) { }
+    if (typeof window !== 'undefined' && window.caches && window.caches.keys) {
+      window.caches.keys().then(names => names.forEach(name => window.caches.delete(name))).catch(() => {});
+    }
+    if (savedTheme) {
+      try { localStorage.setItem('vidya_theme', savedTheme); } catch (_) {}
+    }
+  } catch (_) {}
 }
 
 /* ── Redirect if already logged in ── */

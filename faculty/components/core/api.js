@@ -211,13 +211,33 @@
 
   function clearAuthData() {
     try {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('token');
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('auth_user');
+      if (typeof window.clearAuthSession === 'function') {
+        window.clearAuthSession();
+        return;
+      }
+      const savedTheme = localStorage.getItem('vidya_theme') || localStorage.getItem('theme');
+      try {
+        localStorage.clear();
+      } catch (_) {
+        ['access_token', 'token', 'authToken', 'refresh_token', 'user', 'auth_user', 'currentUser'].forEach(k => {
+          try { localStorage.removeItem(k); } catch (_) {}
+        });
+      }
+      if (savedTheme) {
+        try { localStorage.setItem('vidya_theme', savedTheme); } catch (_) {}
+      }
       sessionStorage.clear();
+      try {
+        document.cookie.split(';').forEach(c => {
+          const name = c.split('=')[0].trim();
+          if (name) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
+          }
+        });
+      } catch (_) {}
+      if (typeof window !== 'undefined' && window.caches && window.caches.keys) {
+        window.caches.keys().then(names => names.forEach(name => window.caches.delete(name))).catch(() => {});
+      }
     } catch (_) { }
   }
 

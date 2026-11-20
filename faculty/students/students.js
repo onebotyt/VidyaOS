@@ -193,7 +193,16 @@
     if (headerTrash) headerTrash.textContent = trash;
 
     // Update Year Pill Counts (Enrolled)
-    for (let yr = 1; yr <= 3; yr++) {
+    const currentDept = allStudents[0]?.department_name || allStudents[0]?.department_code || '';
+    const isPharma = isPharmaDept(currentDept);
+    const maxYear = isPharma ? 2 : 3;
+
+    const y3Pill = document.querySelector('.stu-pill[data-year="3"]');
+    if (y3Pill) {
+      y3Pill.style.display = isPharma ? 'none' : '';
+    }
+
+    for (let yr = 1; yr <= maxYear; yr++) {
       const badgeYr = document.getElementById(`badge-count-y${yr}`);
       if (badgeYr) {
         const c = enrolledStudents.filter(s => parseInt(s.year || Math.ceil((s.semester || 1) / 2), 10) === yr).length;
@@ -551,6 +560,51 @@
   }
 
   // 8. View Student Dossier Modal
+  function isPharmaDept(deptName) {
+    const name = String(deptName || '').toLowerCase();
+    return name.includes('pharm') || name.includes('d.pharm') || name.includes('d-pharm');
+  }
+
+  function updateSemesterOptions(selectEl, deptName, selectedVal) {
+    if (!selectEl) return;
+    const isPharma = isPharmaDept(deptName);
+    const maxSem = isPharma ? 4 : 6;
+    let html = '';
+    for (let sem = 1; sem <= maxSem; sem++) {
+      const yr = Math.ceil(sem / 2);
+      const isSel = String(sem) === String(selectedVal) ? 'selected' : '';
+      html += `<option value="${sem}" ${isSel}>Sem ${sem} (Year ${yr})</option>`;
+    }
+    selectEl.innerHTML = html;
+    if (selectedVal && Number(selectedVal) <= maxSem) {
+      selectEl.value = String(selectedVal);
+    }
+  }
+
+  function switchDetailTab(tabName) {
+    document.querySelectorAll('#detail-modal-tabs .stu-modal-tab').forEach(tab => {
+      if (tab.dataset.tab === tabName) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    const panels = ['profile', 'academic', 'attendance', 'contact'];
+    panels.forEach(p => {
+      const panelEl = document.getElementById(`detail-tab-${p}`);
+      if (panelEl) {
+        if (p === tabName) {
+          panelEl.style.display = 'flex';
+          panelEl.classList.add('active');
+        } else {
+          panelEl.style.display = 'none';
+          panelEl.classList.remove('active');
+        }
+      }
+    });
+  }
+
   function viewStudentDetails(id) {
     closeAllMenus();
     const st = allStudents.find(s => (s.student_id || s.id) === id);
@@ -560,15 +614,26 @@
     const modal = document.getElementById('modal-student-details');
     if (!modal) return;
 
-    const roll = st.class_roll_no || st.roll_number || '—';
+    const roll = (st.class_roll_no != null && String(st.class_roll_no) !== '') ? String(st.class_roll_no) : (st.roll_number != null ? String(st.roll_number) : '—');
     const yr = st.year || (st.semester ? Math.ceil(st.semester / 2) : 1);
     const sem = st.semester ? `Sem ${st.semester}` : '';
     const pct = typeof st.attendance_pct === 'number' ? `${st.attendance_pct.toFixed(0)}%` : '100%';
+    const initials = getInitials(st.full_name);
+    const isPharma = isPharmaDept(st.department_name || st.department_code);
 
-    document.getElementById('detail-stu-avatar').textContent = getInitials(st.full_name);
+    document.getElementById('detail-stu-avatar').textContent = initials;
     document.getElementById('detail-stu-name').textContent = st.full_name || 'Student';
-    document.getElementById('detail-stu-roll').textContent = `Roll #${roll}`;
-    document.getElementById('detail-stu-cohort').textContent = `Year ${yr} ${sem ? '(' + sem + ')' : ''}`;
+    const displayNameEl = document.getElementById('detail-stu-display-name');
+    if (displayNameEl) displayNameEl.textContent = st.full_name || '—';
+
+    document.getElementById('detail-stu-roll').textContent = roll;
+    document.getElementById('detail-stu-cohort').textContent = sem ? `${sem} (Year ${yr})` : `Year ${yr}`;
+
+    const academicCohortEl = document.getElementById('detail-academic-cohort');
+    if (academicCohortEl) academicCohortEl.textContent = `Year ${yr} • ${sem || 'Sem ' + (yr * 2 - 1)}`;
+
+    const progEl = document.getElementById('detail-academic-prog');
+    if (progEl) progEl.textContent = isPharma ? '2-Year Pharmacy Diploma (D.Pharm)' : '3-Year Polytechnic Engineering Diploma';
 
     const enrollEl = document.getElementById('detail-stu-enroll');
     if (enrollEl) {
@@ -581,7 +646,13 @@
 
     document.getElementById('detail-stu-reg').textContent = st.registration_no || '—';
     document.getElementById('detail-stu-att').textContent = pct;
-    document.getElementById('detail-stu-dept').textContent = st.department_name || st.department_code || 'Department Roster';
+    const attStatusEl = document.getElementById('detail-att-status');
+    if (attStatusEl) {
+      const numPct = typeof st.attendance_pct === 'number' ? st.attendance_pct : 100;
+      attStatusEl.textContent = numPct >= 75 ? 'Regular (Good Standing)' : 'At Risk (< 75% Threshold)';
+    }
+
+    document.getElementById('detail-stu-dept').textContent = st.department_name || st.department_code || 'Information Technology';
     document.getElementById('detail-stu-email').textContent = st.email || '—';
     document.getElementById('detail-stu-phone').textContent = st.phone || '—';
 
@@ -590,13 +661,13 @@
     const isInactive = st.enrollment_status === 'TRANSFERRED' || st.enrollment_status === 'WITHDRAWN';
     if (statusBadge) {
       if (st.enrollment_status === 'TRANSFERRED') {
-        statusBadge.className = 'stu-status-chip transferred';
+        statusBadge.className = 'stu-compact-display-val transferred';
         statusBadge.textContent = 'Transferred';
       } else if (st.enrollment_status === 'WITHDRAWN') {
-        statusBadge.className = 'stu-status-chip withdrawn';
+        statusBadge.className = 'stu-compact-display-val withdrawn';
         statusBadge.textContent = 'Withdrawn';
       } else {
-        statusBadge.className = 'stu-status-chip enrolled';
+        statusBadge.className = 'stu-compact-display-val enrolled';
         statusBadge.textContent = 'Enrolled (Active)';
       }
     }
@@ -609,6 +680,7 @@
     if (btnWithdraw) btnWithdraw.style.display = isInactive ? 'none' : '';
     if (btnReactivate) btnReactivate.style.display = isInactive ? '' : 'none';
 
+    switchDetailTab('profile');
     modal.style.display = 'flex';
   }
 
@@ -1163,7 +1235,14 @@
   // 10. Add Student Modal
   function openAddModal() {
     const m = document.getElementById('modal-add-student');
-    if (m) m.style.display = 'flex';
+    if (m) {
+      const addSemSelect = document.getElementById('add-stu-sem');
+      if (addSemSelect) {
+        const dept = allStudents[0]?.department_name || allStudents[0]?.department_code || '';
+        updateSemesterOptions(addSemSelect, dept, addSemSelect.value || 1);
+      }
+      m.style.display = 'flex';
+    }
   }
 
   function closeAddModal() {
@@ -1329,7 +1408,7 @@
     const semSelect = document.getElementById('edit-stu-sem');
     if (semSelect) {
       const semVal = st.semester || (st.year ? st.year * 2 - 1 : 1);
-      semSelect.value = String(semVal);
+      updateSemesterOptions(semSelect, st.department_name || st.department_code, semVal);
     }
 
     modal.style.display = 'flex';
@@ -1697,6 +1776,7 @@
   window.toggleStudentMenu = toggleStudentMenu;
   window.viewStudentDetails = viewStudentDetails;
   window.closeStudentDetailsModal = closeStudentDetailsModal;
+  window.switchDetailTab = switchDetailTab;
   window.openEditStudentModal = openEditStudentModal;
   window.closeEditStudentModal = closeEditStudentModal;
   window.switchEditTab = switchEditTab;

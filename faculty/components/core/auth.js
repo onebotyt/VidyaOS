@@ -73,17 +73,65 @@
 
   function clearAuthSession() {
     try {
-      [
-        'access_token', 'accessToken', 'token', 'authToken', 'auth_token', 'vidyaos_token',
-        'refresh_token', 'user', 'auth_user', 'currentUser', 'vidyaos_user',
-        'user_profile', 'user_roles', 'role', 'roles', 'session_id'
-      ].forEach(k => {
-        try { localStorage.removeItem(k); } catch (_) {}
-      });
-      sessionStorage.clear();
-      document.cookie.split(';').forEach(c => {
-        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
-      });
+      // 1. Preserve only the user's explicit theme preference
+      const savedTheme = localStorage.getItem('vidya_theme') || localStorage.getItem('theme');
+
+      // 2. Clear ALL items in localStorage to prevent data leakage/stale session bugs
+      try {
+        localStorage.clear();
+      } catch (_) {
+        const authKeys = [
+          'access_token', 'accessToken', 'token', 'authToken', 'auth_token', 'vidyaos_token',
+          'refresh_token', 'user', 'auth_user', 'currentUser', 'vidyaos_user',
+          'user_profile', 'user_roles', 'role', 'roles', 'session_id', 'vidyaos_device_id',
+          'vidya_user_profile', 'vidya_selected_class', 'vidya_selected_dept', 'vidya_roster_cache'
+        ];
+        authKeys.forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
+      }
+
+      // Restore user theme preference
+      if (savedTheme) {
+        try { localStorage.setItem('vidya_theme', savedTheme); } catch (_) {}
+      }
+
+      // 3. Clear ALL items in sessionStorage
+      try {
+        sessionStorage.clear();
+      } catch (_) {}
+
+      // 4. Clear all cookies across all paths and subdomains
+      try {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i];
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          if (!name) continue;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname};`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+        }
+      } catch (_) {}
+
+      // 5. Purge CacheStorage (Service Worker / browser HTTP cache)
+      if (typeof window !== 'undefined' && window.caches && window.caches.keys) {
+        window.caches.keys().then(names => {
+          return Promise.all(names.map(name => window.caches.delete(name)));
+        }).catch(() => {});
+      }
+
+      // 6. Clear IndexedDB databases if supported and present
+      if (typeof window !== 'undefined' && window.indexedDB && window.indexedDB.databases) {
+        window.indexedDB.databases().then(dbs => {
+          if (Array.isArray(dbs)) {
+            dbs.forEach(db => {
+              if (db && db.name && !db.name.includes('theme')) {
+                try { window.indexedDB.deleteDatabase(db.name); } catch (_) {}
+              }
+            });
+          }
+        }).catch(() => {});
+      }
     } catch (_) {}
   }
 
@@ -338,3 +386,19 @@
 
 window.requireFacultyAuth = window.guardRoute;
 window.facultyLogout = window.logout;
+
+// Prevent Back-Forward Cache (bfcache) resurrecting stale authenticated pages after logout
+if (typeof window !== 'undefined') {
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      const token = typeof window.getAuthToken === 'function' ? window.getAuthToken() : (localStorage.getItem('access_token') || localStorage.getItem('token'));
+      const path = window.location.pathname;
+      if (!token && !path.includes('/login') && path !== '/' && !path.includes('/landing')) {
+        if (typeof window.clearAuthSession === 'function') {
+          window.clearAuthSession();
+        }
+        window.location.replace('/login/index.html?reason=session_ended');
+      }
+    }
+  });
+}

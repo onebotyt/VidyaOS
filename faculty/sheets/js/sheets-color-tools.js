@@ -11,21 +11,29 @@ function positionFloatingDropdown(popup, button) {
   }
 
   const rect = button.getBoundingClientRect();
-  const popupW = popup.offsetWidth || 330;
-  const leftPos = Math.max(8, Math.min(rect.left, window.innerWidth - popupW - 16));
-  const topPos = rect.bottom + 4;
+  const popupW = popup.offsetWidth || 340;
+  const leftPos = Math.max(10, Math.min(rect.left, window.innerWidth - popupW - 16));
+  let topPos = rect.bottom + 6;
 
-  const maxAvailHeight = Math.max(200, window.innerHeight - topPos - 16);
-  popup.style.maxHeight = maxAvailHeight + 'px';
-  popup.style.overflowY = 'auto';
+  const availBelow = window.innerHeight - topPos - 16;
+  if (availBelow < 250 && rect.top > 320) {
+    topPos = Math.max(10, rect.top - (popup.offsetHeight || 380) - 6);
+    popup.style.maxHeight = Math.max(200, rect.top - 20) + 'px';
+  } else {
+    popup.style.maxHeight = Math.max(220, availBelow) + 'px';
+  }
 
   popup.style.position = 'fixed';
   popup.style.top = topPos + 'px';
   popup.style.left = leftPos + 'px';
+  popup.style.overflowY = 'auto';
   popup.style.zIndex = '99999999';
 
   // Ensure scroll is reset to very top so header and top cards are fully visible
   popup.scrollTop = 0;
+  requestAnimationFrame(() => {
+    if (popup) popup.scrollTop = 0;
+  });
 }
 
 function toggleColorPalette(type, event) {
