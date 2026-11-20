@@ -333,6 +333,7 @@ async function loadEsp32Overview(deptIdOverride) {
     updateKpiCards(devices, students);
     renderDevicesList(devices);
     renderStudentsBiometricTable();
+    populateEnrollStudentSelect();
     renderRecentScans(recent_scans);
     renderCommandQueue(commands);
     manageCommandPolling(commands);
@@ -427,9 +428,22 @@ function updateKpiCards(devices, students) {
     dot.className = `esp-kpi-dot ${onlineCount > 0 ? 'online' : ''}`;
   }
 
+  const nodeStatusPill = document.getElementById('kpi-dot-status-pill');
+  if (nodeStatusPill) {
+    nodeStatusPill.className = `esp-node-status-pill ${onlineCount > 0 ? 'online' : 'offline'}`;
+  }
+
+  const nodeStatusText = document.getElementById('header-node-status-text');
+  if (nodeStatusText) {
+    nodeStatusText.textContent = `${onlineCount} NODE${onlineCount === 1 ? '' : 'S'} ONLINE`;
+  }
+
   const enrolledCount = students.filter(s => s.biometric_status === 'ENROLLED').length;
   const totalStudents = students.length;
   const coveragePct = totalStudents > 0 ? Math.round((enrolledCount / totalStudents) * 100) : 0;
+
+  const badgeStudents = document.getElementById('badge-students-count');
+  if (badgeStudents) badgeStudents.textContent = String(totalStudents);
 
   const kpiTpl = document.getElementById('kpi-esp-templates');
   if (kpiTpl) kpiTpl.textContent = `${enrolledCount} / ${totalStudents}`;
@@ -745,10 +759,10 @@ function renderStudentsBiometricTable() {
         </td>
         <td data-label="Actions" style="text-align:right;">
           <div style="display:inline-flex; gap:0.35rem; flex-wrap:wrap; justify-content:flex-end;">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="queueEnrollCommandForStudent(${st.student_id}, '${escHtml(st.full_name)}', ${st.class_roll_no || 0})" title="Send remote ENROLL_STUDENT command to selected ESP32">
-              Enroll on ESP32
+            <button type="button" class="btn btn-primary btn-sm" onclick="selectStudentForEnrollment(${st.student_id})" title="Select student in Registration Station and trigger AS608 biometric enrollment">
+              👆 Enroll Biometric
             </button>
-            <button type="button" class="btn btn-primary btn-sm" onclick="simulateStudentBiometric(${st.student_id}, 'ENROLL_TEMPLATE')" title="Capture & encrypt 512-byte AS608 template into MySQL">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="simulateStudentBiometric(${st.student_id}, 'ENROLL_TEMPLATE')" title="Capture & encrypt 512-byte AS608 template into MySQL">
               ${isEnrolled ? 'Update Template' : 'Capture Template'}
             </button>
             ${isEnrolled ? `
@@ -756,7 +770,7 @@ function renderStudentsBiometricTable() {
                 ✓ Test Scan
               </button>
               <button type="button" class="btn btn-danger btn-sm" onclick="removeStudentCloudTemplate(${st.student_id}, '${escHtml(st.full_name)}', '${st.class_roll_no || ''}')" title="Remove student biometric template from cloud vault & ESP32 hardware slots">
-                🗑️ Remove Biometric
+                🗑️ Remove
               </button>
             ` : ''}
           </div>
@@ -764,6 +778,181 @@ function renderStudentsBiometricTable() {
       </tr>
     `;
   }).join('');
+}
+
+// ─── Student Biometric Registration Station Management ──────────────────────
+function populateEnrollStudentSelect() {
+  const sel = document.getElementById('enroll-student-select');
+  if (!sel) return;
+  const students = espOverviewData.students || [];
+  const currentVal = sel.value;
+
+  sel.innerHTML = `<option value="">Choose a student from roster (${students.length} total)...</option>` +
+    students.map(s => {
+      const isEnrolled = s.biometric_status === 'ENROLLED';
+      const tag = isEnrolled ? '✅ Enrolled' : '⚠️ Pending';
+      const roll = s.class_roll_no ? `#${s.class_roll_no}` : (s.official_enrollment_no || 'No Roll');
+      return `<option value="${s.student_id}">[${tag}] ${roll} - ${escHtml(s.full_name)} (Yr ${s.year || 1} Sem ${s.semester || 1})</option>`;
+    }).join('');
+
+  if (currentVal && students.some(s => String(s.student_id) === String(currentVal))) {
+    sel.value = currentVal;
+  } else if (students.length > 0 && !sel.value) {
+    const firstPending = students.find(s => s.biometric_status !== 'ENROLLED') || students[0];
+    sel.value = String(firstPending.student_id);
+  }
+  onSelectEnrollStudent(sel.value);
+}
+
+function onSelectEnrollStudent(studentId) {
+  const student = (espOverviewData.students || []).find(s => String(s.student_id) === String(studentId));
+  const initialsEl = document.getElementById('enroll-chip-initials');
+  const nameEl = document.getElementById('enroll-chip-name');
+  const metaEl = document.getElementById('enroll-chip-meta');
+  const statusPill = document.getElementById('enroll-chip-status-pill');
+  const removeBtn = document.getElementById('btn-remove-selected-bio');
+  const msgEl = document.getElementById('bio-scanner-msg');
+  const visualBox = document.getElementById('bio-scanner-visual-box');
+  const step1 = document.getElementById('step-pill-1');
+  const step2 = document.getElementById('step-pill-2');
+  const step3 = document.getElementById('step-pill-3');
+
+  if (!student) {
+    if (initialsEl) initialsEl.textContent = '--';
+    if (nameEl) nameEl.textContent = 'No Student Selected';
+    if (metaEl) metaEl.textContent = 'Select a student above or click Enroll from vault table below';
+    if (statusPill) {
+      statusPill.className = 'esp-status-pill offline';
+      statusPill.textContent = 'WAITING SELECTION';
+    }
+    if (removeBtn) removeBtn.style.display = 'none';
+    if (visualBox) visualBox.className = 'esp-fingerprint-visual-wrap';
+    return;
+  }
+
+  const isEnrolled = student.biometric_status === 'ENROLLED';
+  const names = (student.full_name || 'S').trim().split(/\s+/);
+  const initials = names.length > 1 ? (names[0][0] + names[names.length - 1][0]).toUpperCase() : names[0].slice(0, 2).toUpperCase();
+
+  if (initialsEl) initialsEl.textContent = initials;
+  if (nameEl) nameEl.textContent = student.full_name;
+  if (metaEl) {
+    const roll = student.class_roll_no ? `Roll #${student.class_roll_no}` : (student.official_enrollment_no || 'No Roll');
+    metaEl.textContent = `${roll} • Yr ${student.year || 1} Sem ${student.semester || 1} • Dept: ${espOverviewData.department?.name || 'Department'}`;
+  }
+
+  if (statusPill) {
+    if (isEnrolled) {
+      statusPill.className = 'esp-status-pill online';
+      statusPill.textContent = '✓ ENROLLED (512B AS608)';
+    } else {
+      statusPill.className = 'esp-status-pill offline';
+      statusPill.textContent = '⚠️ NOT ENROLLED';
+    }
+  }
+
+  if (removeBtn) {
+    removeBtn.style.display = isEnrolled ? 'inline-flex' : 'none';
+  }
+
+  if (step1) step1.className = 'step-pill completed';
+  if (step2) step2.className = 'step-pill';
+  if (step3) step3.className = isEnrolled ? 'step-pill completed' : 'step-pill';
+
+  if (visualBox) {
+    visualBox.className = `esp-fingerprint-visual-wrap ${isEnrolled ? 'success' : ''}`;
+  }
+
+  if (msgEl) {
+    if (isEnrolled) {
+      msgEl.innerHTML = `<strong>${escHtml(student.full_name)}</strong> has an enrolled 512B AS608 template in MySQL cloud vault. Click <strong>"Test Attendance Scan"</strong> to verify verification, or <strong>"Enroll"</strong> to overwrite template.`;
+    } else {
+      msgEl.innerHTML = `<strong>Ready to enroll ${escHtml(student.full_name)}:</strong> Click <strong>"Enroll Fingerprint on ESP32"</strong> below to send enrollment signal to active terminal.`;
+    }
+  }
+}
+
+function focusBiometricEnrollmentSection(studentId) {
+  if (studentId) {
+    const sel = document.getElementById('enroll-student-select');
+    if (sel) {
+      sel.value = String(studentId);
+      onSelectEnrollStudent(studentId);
+    }
+  }
+  const el = document.getElementById('section-bio-enrollment');
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('highlight');
+    setTimeout(() => el.classList.remove('highlight'), 1800);
+  }
+}
+
+function selectStudentForEnrollment(studentId) {
+  focusBiometricEnrollmentSection(studentId);
+  enrollCurrentSelectedStudent();
+}
+
+async function enrollCurrentSelectedStudent() {
+  const sel = document.getElementById('enroll-student-select');
+  const studentId = sel ? sel.value : null;
+  if (!studentId) {
+    showToast('Please select a student to enroll first.', 'warning');
+    if (sel) sel.focus();
+    return;
+  }
+  const student = (espOverviewData.students || []).find(s => String(s.student_id) === String(studentId));
+  if (!student) {
+    showToast('Selected student not found in department roster.', 'error');
+    return;
+  }
+
+  const visualBox = document.getElementById('bio-scanner-visual-box');
+  const msgEl = document.getElementById('bio-scanner-msg');
+  const step2 = document.getElementById('step-pill-2');
+  const step3 = document.getElementById('step-pill-3');
+
+  if (visualBox) {
+    visualBox.classList.remove('success');
+    visualBox.classList.add('scanning');
+  }
+  if (step2) step2.classList.add('active');
+  if (step3) step3.classList.remove('active');
+  if (msgEl) {
+    msgEl.innerHTML = `<strong>Enrolling ${escHtml(student.full_name)}:</strong> Terminal buzzer chiming! Please place finger firmly on AS608 optical sensor.`;
+  }
+
+  await queueEnrollCommandForStudent(student.student_id, student.full_name, student.class_roll_no);
+}
+
+async function simulateCurrentSelectedStudent() {
+  const sel = document.getElementById('enroll-student-select');
+  const studentId = sel ? sel.value : null;
+  if (!studentId) {
+    showToast('Please select a student first.', 'warning');
+    return;
+  }
+  await simulateStudentBiometric(studentId, 'MARK_ATTENDANCE');
+}
+
+async function removeCurrentSelectedStudentTemplate() {
+  const sel = document.getElementById('enroll-student-select');
+  const studentId = sel ? sel.value : null;
+  if (!studentId) return;
+  const student = (espOverviewData.students || []).find(s => String(s.student_id) === String(studentId));
+  if (!student) return;
+  await removeStudentCloudTemplate(student.student_id, student.full_name, student.class_roll_no);
+  onSelectEnrollStudent(studentId);
+}
+
+function switchEspTab(tabName) {
+  const tabs = ['vault', 'wifi', 'feed', 'logs'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tab-btn-${t}`);
+    const panel = document.getElementById(`panel-${t}`);
+    if (btn) btn.classList.toggle('active', t === tabName);
+    if (panel) panel.classList.toggle('active', t === tabName);
+  });
 }
 
 // ─── Queue Fingerprint Enrollment Command ──────────────────────────────────
@@ -1366,6 +1555,9 @@ async function loadDeviceWifiNetworks(deviceId) {
       active_device = res.data.active_device || null;
     }
 
+    const wifiBadge = document.getElementById('badge-wifi-count');
+    if (wifiBadge) wifiBadge.textContent = String(networks.length);
+
     if (badge) {
       if (active_device && active_device.is_online) {
         badge.textContent = `ONLINE: ${escHtml(active_device.ip_address || 'Connected')} (RSSI: ${active_device.wifi_rssi || -55} dBm)`;
@@ -1805,5 +1997,13 @@ window.submitOtaUpdate = submitOtaUpdate;
 window.setOledSimMode = setOledSimMode;
 window.loadDeviceRemoteLogs = loadDeviceRemoteLogs;
 window.clearDeviceRemoteLogs = clearDeviceRemoteLogs;
+window.populateEnrollStudentSelect = populateEnrollStudentSelect;
+window.onSelectEnrollStudent = onSelectEnrollStudent;
+window.focusBiometricEnrollmentSection = focusBiometricEnrollmentSection;
+window.selectStudentForEnrollment = selectStudentForEnrollment;
+window.enrollCurrentSelectedStudent = enrollCurrentSelectedStudent;
+window.simulateCurrentSelectedStudent = simulateCurrentSelectedStudent;
+window.removeCurrentSelectedStudentTemplate = removeCurrentSelectedStudentTemplate;
+window.switchEspTab = switchEspTab;
 
 document.addEventListener('DOMContentLoaded', loadEsp32Overview);

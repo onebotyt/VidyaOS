@@ -1,10 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    HOD ESP32 BIOMETRIC TERMINALS & CLOUD TEMPLATE VAULT STYLES
    Location: /frontend/faculty/esp32-devices/esp32-devices.css
-   Compact, Zero-Hardcoded-Hex, Full Theme Token Compliance
+   Compact, High-Density, Zero-Hardcoded-Hex, Full Theme Token Compliance
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Modal Visibility & Transitions (Fix for lack of visual feedback & overflow bounds) */
+/* Modal Visibility & Transitions */
 .modal-backdrop.open,
 .modal-backdrop.active,
 .modal-backdrop[style*="display: flex"] {
@@ -13,7 +13,7 @@
   pointer-events: auto !important;
   visibility: visible !important;
   overflow-y: auto !important;
-  padding: 1.5rem 1rem !important;
+  padding: 1rem !important;
   align-items: flex-start !important;
   justify-content: center !important;
 }
@@ -28,23 +28,50 @@
 .modal-card {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
   transform: scale(0.96) translateY(8px);
-  max-height: calc(100vh - 3.5rem) !important;
+  max-height: calc(100vh - 3rem) !important;
   overflow-y: auto !important;
   margin: auto !important;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-lg);
 }
 
-/* Page Header */
+/* Main Container Layout */
+.esp-main-container {
+  padding-top: 0.75rem;
+  padding-bottom: 3.5rem;
+  max-width: 1400px;
+}
+
+/* Compact Page Header */
 .esp-page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 0.85rem;
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.esp-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.esp-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .esp-page-title {
-  font-size: 1.35rem;
+  font-size: 1.22rem;
   font-weight: 800;
   color: var(--text-main);
   margin: 0;
@@ -52,39 +79,73 @@
 }
 
 .esp-page-subtitle {
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: var(--text-muted);
   margin: 0;
-  max-width: 820px;
-  line-height: 1.4;
+  max-width: 780px;
+  line-height: 1.35;
 }
 
 .esp-crypto-badge {
-  font-family: var(--font-family-mono, 'JetBrains Mono', monospace);
-  font-size: 0.68rem;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.65rem;
   font-weight: 800;
-  padding: 0.18rem 0.55rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 999px;
   background: var(--color-primary-light);
   color: var(--color-primary);
   border: 1px solid var(--color-primary);
 }
 
-/* Compact KPI Grid */
+.esp-node-status-pill {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.66rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border: 1px solid var(--status-present);
+}
+
+.esp-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.esp-dept-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.esp-control-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Compact 4-KPI Grid */
 .esp-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.65rem;
-  margin-bottom: 0.85rem;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 900px) {
   .esp-kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 520px) {
   .esp-kpi-grid {
     grid-template-columns: 1fr;
   }
@@ -93,8 +154,8 @@
 .esp-kpi-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 10px);
-  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-md, 8px);
+  padding: 0.55rem 0.8rem;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
@@ -105,19 +166,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .esp-kpi-label {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--text-muted);
 }
 
 .esp-kpi-val {
-  font-size: 1.35rem;
+  font-size: 1.18rem;
   font-weight: 800;
   color: var(--text-main);
   font-family: var(--font-family-mono, monospace);
@@ -125,14 +186,14 @@
 }
 
 .esp-kpi-sub {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
 }
 
 .esp-kpi-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--text-muted);
   display: inline-block;
@@ -140,15 +201,16 @@
 
 .esp-kpi-dot.online {
   background: var(--status-present);
-  box-shadow: 0 0 6px var(--status-present);
+  box-shadow: 0 0 5px var(--status-present);
 }
 
-/* Compact Top Split Layout */
+/* Command Center Split Grid */
 .esp-top-split {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 0.85rem;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 0.75rem;
   align-items: stretch;
+  margin-bottom: 0.75rem;
 }
 
 @media (max-width: 1024px) {
@@ -157,310 +219,587 @@
   }
 }
 
+.esp-command-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Student Biometric Registration Station Card */
+.esp-enrollment-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.85rem 1rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.esp-enrollment-card.highlight {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.esp-card-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.esp-quick-badge {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.esp-enroll-form-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  margin: 0.55rem 0;
+  padding: 0.65rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+}
+
+@media (max-width: 768px) {
+  .esp-enroll-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.esp-selected-student-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.45rem 0.65rem;
+}
+
+.esp-student-avatar-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 800;
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.esp-student-details-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.esp-student-chip-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.esp-student-chip-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Interactive Fingerprint Reader Graphic & Live Status */
+.esp-scanner-interactive-box {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.75rem 0.85rem;
+  margin-top: 0.55rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 820px) {
+  .esp-scanner-interactive-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.esp-fingerprint-visual-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.esp-fingerprint-svg {
+  width: 28px;
+  height: 28px;
+  color: var(--color-primary);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.esp-scanner-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 15px;
+  border: 2px solid transparent;
+  pointer-events: none;
+}
+
+.esp-fingerprint-visual-wrap.scanning .esp-scanner-ring {
+  border-color: var(--color-primary);
+  animation: bioPulse 1.2s infinite ease-in-out;
+}
+
+.esp-fingerprint-visual-wrap.scanning .esp-fingerprint-svg {
+  color: var(--color-primary);
+  transform: scale(1.08);
+}
+
+.esp-fingerprint-visual-wrap.success .esp-scanner-ring {
+  border-color: var(--status-present);
+}
+
+.esp-fingerprint-visual-wrap.success .esp-fingerprint-svg {
+  color: var(--status-present);
+}
+
+@keyframes bioPulse {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.7;
+    box-shadow: 0 0 0 0 var(--color-primary-light);
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+    box-shadow: 0 0 8px 2px var(--color-primary);
+  }
+  100% {
+    transform: scale(0.96);
+    opacity: 0.7;
+    box-shadow: 0 0 0 0 var(--color-primary-light);
+  }
+}
+
+.esp-scanner-status-content {
+  flex: 1;
+  min-width: 220px;
+}
+
+.esp-scanner-step-tracker {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.step-pill {
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+}
+
+.step-pill.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.step-pill.completed {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border: 1px solid var(--status-present);
+}
+
+.step-arrow {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+
+.esp-scanner-msg {
+  font-size: 0.74rem;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.esp-scanner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+/* Compact Connected Terminal Quickbar */
+.esp-terminal-quickbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  margin-top: 0.55rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.esp-tbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 220px;
+}
+
+.esp-tbar-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.esp-tbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+/* Section Header Common */
 .esp-section-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .esp-section-title {
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 800;
   color: var(--text-main);
   margin: 0;
 }
 
 .esp-section-sub {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
-  margin: 0.15rem 0 0 0;
+  margin: 0.1rem 0 0 0;
 }
 
-.esp-devices-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.esp-device-card {
+/* Live 0.96" SSD1306 OLED Display Simulator */
+.esp-oled-simulator-card {
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 10px);
-  padding: 0.85rem 1rem;
-  background: var(--bg-surface);
-  cursor: pointer;
-  transition: all 0.16s ease;
-}
-
-.esp-device-card.selected {
-  border-color: var(--color-primary);
-  background: var(--bg-card);
-  box-shadow: 0 0 0 2px var(--color-primary-light);
-}
-
-.esp-dev-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-bottom: 0.65rem;
-}
-
-.esp-dev-metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.5rem;
-  padding-top: 0.65rem;
-  border-top: 1px dashed var(--border-color);
-}
-
-@media (max-width: 640px) {
-  .esp-dev-metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.esp-dev-metric {
+  padding: 0.75rem 0.85rem;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
-.esp-dev-metric .m-lbl {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.esp-dev-metric .m-val {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-/* 0.96" SSD1306 OLED Display Simulator */
 .esp-hardware-bezel {
-  background: #0f172a;
-  border: 2px solid #334155;
-  border-radius: 12px;
-  padding: 0.75rem;
-  color: #f8fafc;
+  background: var(--text-main);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.65rem;
+  color: var(--text-white);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
 .esp-leds-row {
   display: flex;
   justify-content: space-between;
-  gap: 0.4rem;
-  margin-bottom: 0.6rem;
-  font-size: 0.65rem;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .esp-led-item {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.25rem;
 }
 
 .esp-led-bulb {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #334155;
+  background: var(--text-muted);
   display: inline-block;
   transition: all 0.15s ease;
 }
 
 .esp-led-bulb.green.on {
-  background: #22c55e;
-  box-shadow: 0 0 8px #22c55e;
+  background: var(--status-present);
+  box-shadow: 0 0 6px var(--status-present);
 }
 
 .esp-led-bulb.red.on {
-  background: #ef4444;
-  box-shadow: 0 0 8px #ef4444;
+  background: var(--status-absent);
+  box-shadow: 0 0 6px var(--status-absent);
 }
 
 .esp-led-bulb.blue.on {
-  background: #38bdf8;
-  box-shadow: 0 0 8px #38bdf8;
+  background: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary);
 }
 
 .oled-screen {
-  background: #020617;
-  border: 2px solid #1e293b;
-  border-radius: 6px;
+  background: #000000;
+  border: 1px solid #1e293b;
+  border-radius: 5px;
   overflow: hidden;
-  font-family: var(--font-family-mono, 'JetBrains Mono', monospace);
-  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.9);
+  font-family: var(--font-family-mono, monospace);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.95);
+  margin-bottom: 0.5rem;
 }
 
-/* Classic 0.96" Yellow/Cyan Dual-Zone OLED */
 .oled-top-bar {
-  background: #facc15;
-  color: #020617;
-  padding: 0.22rem 0.55rem;
+  background: #000000;
+  color: #fbbf24;
+  border-bottom: 1px solid #fbbf24;
   font-size: 0.68rem;
-  font-weight: 800;
+  font-weight: 700;
+  padding: 0.2rem 0.45rem;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .oled-body {
-  padding: 0.65rem 0.75rem;
-  color: #38bdf8;
+  padding: 0.45rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  min-height: 104px;
+  min-height: 88px;
   justify-content: center;
+  text-align: center;
 }
 
 .oled-headline {
-  font-size: 0.74rem;
+  color: #38bdf8;
+  font-size: 0.75rem;
   font-weight: 800;
-  color: #fde047;
-  letter-spacing: 0.05em;
-  border-bottom: 1px dashed rgba(56, 189, 248, 0.35);
-  padding-bottom: 0.15rem;
-  margin-bottom: 0.15rem;
+  letter-spacing: 0.08em;
 }
 
 .oled-line1 {
-  font-size: 0.92rem;
-  font-weight: 800;
-  color: #38bdf8;
-  text-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 700;
 }
 
 .oled-line2 {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #bae6fd;
+  color: #94a3b8;
+  font-size: 0.68rem;
 }
 
 .oled-line3 {
-  font-size: 0.7rem;
-  color: #7dd3fc;
+  color: #38bdf8;
+  font-size: 0.68rem;
 }
 
 .esp-hw-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-top: 0.6rem;
+  gap: 0.25rem;
+  margin-bottom: 0.45rem;
 }
 
 .hw-chip {
-  font-size: 0.64rem;
   font-family: var(--font-family-mono, monospace);
-  padding: 0.15rem 0.42rem;
-  border-radius: 5px;
-  background: #1e293b;
+  font-size: 0.6rem;
+  background: rgba(255, 255, 255, 0.08);
   color: #cbd5e1;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* Interactive OLED Simulation Controller Buttons */
 .oled-sim-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.65rem;
-  padding-top: 0.5rem;
-  border-top: 1px dashed #334155;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.3rem;
 }
 
 .oled-sim-btn {
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border-radius: 5px;
-  background: #1e293b;
-  color: #94a3b8;
-  border: 1px solid #334155;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 0.25rem 0.35rem;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.14s ease;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+  text-align: center;
 }
 
 .oled-sim-btn:hover {
-  background: #334155;
-  color: #f8fafc;
-  border-color: #64748b;
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .oled-sim-btn.active {
   background: var(--color-primary);
-  color: #ffffff;
   border-color: var(--color-primary);
+  color: var(--text-white);
 }
 
-/* Roster Filters & Table */
-.esp-roster-filters {
+/* High-Density Horizontal Workspace Tabs */
+.esp-nav-tabs {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: 0.4rem;
+  overflow-x: auto;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.15rem;
+}
+
+.esp-tab-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm, 6px) var(--radius-sm, 6px) 0 0;
+  display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.esp-tab-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-surface);
+}
+
+.esp-tab-btn.active {
+  color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+.esp-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+.esp-tab-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.esp-tab-badge.online {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border-color: var(--status-present);
+}
+
+/* Tab Panels */
+.esp-tab-panel {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 0.85rem 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.esp-tab-panel.active {
+  display: block;
+}
+
+/* Tables Styling */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
 }
 
 .esp-table {
   width: 100%;
-  border-collapse: collapse;
-}
-
-.esp-table th,
-.esp-table td {
-  padding: 0.65rem 0.85rem;
-  border-bottom: 1px solid var(--border-color);
-  text-align: left;
-  font-size: 0.82rem;
-  vertical-align: middle;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.8rem;
 }
 
 .esp-table th {
-  background: var(--bg-surface);
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
+  background: var(--table-th-bg, var(--bg-surface));
   color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
   letter-spacing: 0.04em;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.esp-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.esp-table tbody tr:hover td {
+  background: var(--bg-surface-hover, var(--bg-surface));
 }
 
 .esp-roll-badge {
-  display: inline-block;
-  padding: 0.15rem 0.45rem;
-  border-radius: 5px;
   font-family: var(--font-family-mono, monospace);
   font-weight: 800;
   font-size: 0.76rem;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
-.esp-status-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.18rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.esp-status-pill.online {
-  background: var(--status-present-bg);
-  color: var(--status-present);
-}
-
-.esp-status-pill.offline {
   background: var(--bg-surface);
-  color: var(--text-muted);
+  color: var(--text-main);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
   border: 1px solid var(--border-color);
 }
 
@@ -468,10 +807,11 @@
   font-size: 0.68rem;
   font-weight: 700;
   padding: 0.12rem 0.45rem;
-  border-radius: 5px;
+  border-radius: 999px;
   background: var(--bg-surface);
   color: var(--text-muted);
   border: 1px solid var(--border-color);
+  display: inline-block;
 }
 
 .esp-pill-tag.green {
@@ -480,13 +820,43 @@
   border-color: var(--status-present);
 }
 
+.esp-status-pill {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.esp-status-pill.online {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border: 1px solid var(--status-present);
+}
+
+.esp-status-pill.offline {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+/* Roster Filters */
+.esp-roster-filters {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Feed & Queue */
 .esp-bottom-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 0.85rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .esp-bottom-grid {
     grid-template-columns: 1fr;
   }
@@ -495,528 +865,166 @@
 .esp-feed-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
+  max-height: 280px;
+  overflow-y: auto;
 }
 
 .esp-feed-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.55rem 0.75rem;
-  border-radius: var(--radius-md, 8px);
+  padding: 0.45rem 0.65rem;
   background: var(--bg-surface);
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-color);
+  font-size: 0.76rem;
+}
+
+/* Remote Logs Feed */
+.esp-terminal-log-feed {
+  background: var(--text-main);
+  color: var(--text-white);
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.72rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm, 6px);
+  max-height: 320px;
+  overflow-y: auto;
   border: 1px solid var(--border-color);
 }
 
 .esp-code-block {
-  background: #0f172a;
-  color: #38bdf8;
-  padding: 0.85rem;
-  border-radius: 8px;
+  background: var(--bg-surface);
+  color: var(--text-main);
   font-family: var(--font-family-mono, monospace);
-  font-size: 0.76rem;
-  overflow-x: auto;
-  line-height: 1.45;
+  font-size: 0.74rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-color);
+  max-height: 340px;
+  overflow-y: auto;
 }
 
-@media (max-width: 640px) {
-  .esp-table,
-  .esp-table tbody,
-  .esp-table tr,
-  .esp-table td {
-    display: block;
-    width: 100%;
-  }
-  .esp-table thead {
-    display: none;
-  }
-  .esp-table tr {
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 0.65rem;
-    margin-bottom: 0.65rem;
-    background: var(--bg-card);
-  }
-  .esp-table td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.35rem 0;
-    border-bottom: 1px dashed var(--border-color);
-  }
-  .esp-table td:last-child {
-    border-bottom: none;
-  }
-  .esp-table td::before {
-    content: attr(data-label);
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   ESP32 HARDWARE AUTO-DETECTION & ANIMATED LOADING BAR
-   ═══════════════════════════════════════════════════════════════════════════ */
-
+/* Auto-detect card in modal */
 .esp-detect-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 10px);
-  padding: 0.85rem 0.95rem;
-  margin-bottom: 1rem;
-  transition: all 0.25s ease;
-}
-
-.esp-detect-card.detected {
-  border-color: var(--status-present);
-  background: var(--color-primary-light);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .esp-detect-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.55rem;
+  margin-bottom: 0.45rem;
 }
 
 .esp-detect-title-wrap {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.45rem;
 }
 
 .esp-pulse-dot {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--status-pending);
-  box-shadow: 0 0 0 0 var(--status-pending);
-  animation: espPulseRing 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  flex-shrink: 0;
-}
-
-.esp-pulse-dot.detected {
-  background: var(--status-present);
-  box-shadow: 0 0 0 0 var(--status-present);
-  animation: espPulseRingGreen 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes espPulseRing {
-  0% { box-shadow: 0 0 0 0 var(--status-pending); }
-  70% { box-shadow: 0 0 0 8px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
-}
-
-@keyframes espPulseRingGreen {
-  0% { box-shadow: 0 0 0 0 var(--status-present); }
-  70% { box-shadow: 0 0 0 8px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
+  background: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary);
+  display: inline-block;
+  animation: bioPulse 1s infinite alternate;
 }
 
 .esp-detect-title {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-main);
   display: block;
 }
 
 .esp-detect-sub {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
+  display: block;
 }
 
-/* Loading Animation Bar */
 .esp-loading-bar-wrap {
-  position: relative;
-  width: 100%;
-  height: 8px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  height: 5px;
+  background: var(--border-color);
   border-radius: 999px;
   overflow: hidden;
-  margin: 0.45rem 0;
+  margin-bottom: 0.45rem;
 }
 
 .esp-loading-bar-fill {
   height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--color-primary) 0%,
-    var(--primary-color) 45%,
-    var(--status-present) 100%
-  );
-  background-size: 200% 100%;
-  position: relative;
-  transition: width 0.35s ease, background 0.4s ease;
-  animation: espLoadingShimmer 1.8s linear infinite;
-}
-
-.esp-loading-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.28) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.28) 50%,
-    rgba(255, 255, 255, 0.28) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 16px 16px;
-  animation: espStripeMove 1s linear infinite;
-}
-
-.esp-loading-bar-fill.detected {
-  background: var(--status-present);
-  animation: none;
-}
-
-.esp-loading-bar-fill.detected::after {
-  display: none;
-}
-
-@keyframes espLoadingShimmer {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
-}
-
-@keyframes espStripeMove {
-  0% { background-position: 0 0; }
-  100% { background-position: 16px 0; }
+  background: var(--color-primary);
+  transition: width 0.25s ease;
 }
 
 .esp-detect-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.45rem;
-  flex-wrap: wrap;
-  margin-top: 0.3rem;
+  gap: 0.4rem;
 }
 
 .esp-detect-stat-text {
   font-size: 0.72rem;
-  font-family: var(--font-family-mono, monospace);
   color: var(--text-muted);
 }
 
 .esp-detect-actions {
   display: flex;
   gap: 0.35rem;
-  align-items: center;
 }
 
 .esp-detected-banner {
+  margin-top: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  background: var(--status-present-bg);
+  border: 1px solid var(--status-present);
+  border-radius: var(--radius-sm, 6px);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.65rem;
-  padding: 0.55rem 0.7rem;
-  border-radius: var(--radius-sm, 7px);
-  background: var(--bg-card);
-  border: 1px solid var(--status-present);
-  animation: espFadeIn 0.3s ease;
 }
 
 .esp-detected-info {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.45rem;
 }
 
 .esp-detected-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--status-present);
-  color: var(--bg-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--status-present);
   font-weight: 800;
-  font-size: 0.74rem;
-  flex-shrink: 0;
 }
 
-@keyframes espFadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+.scanned-wifi-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 0.5rem;
 }
 
-/* Radar Ping / Live Connection Pulse */
-@keyframes radarPulse {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-}
-
-.radar-pulse {
-  animation: radarPulse 1.6s infinite;
-}
-
-/* Action Button Feedback */
-#btn-add-esp-terminal:active,
-.btn-primary:active,
-.btn-secondary:active {
-  transform: scale(0.97);
-}
-
-.esp-empty-box {
-  text-align: center;
-  padding: 1.5rem 1rem;
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md, 10px);
-  background: var(--bg-surface);
-}
-
-/* Wi-Fi Scanned Network Items */
-.scanned-wifi-item {
+.scanned-wifi-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.65rem 0.8rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
+  padding: 0.45rem 0.65rem;
   background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
   cursor: pointer;
-  transition: all 0.15s ease;
-  margin-bottom: 0.45rem;
+  transition: background 0.12s ease;
 }
 
-.scanned-wifi-item:hover,
-.scanned-wifi-item.active-selection {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
-}
-
-.wifi-security-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.12rem 0.4rem;
-  border-radius: 4px;
-  background: var(--bg-card);
-  color: var(--text-muted);
-  border: 1px solid var(--border-color);
-}
-
-.wifi-security-badge.secure {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.wifi-signal-pill {
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 0.12rem 0.45rem;
-  border-radius: 999px;
-  font-family: var(--font-family-mono, monospace);
-}
-
-.wifi-signal-pill.strong {
-  background: var(--status-present-bg);
-  color: var(--status-present);
-}
-
-.wifi-signal-pill.medium {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
-.wifi-signal-pill.weak {
-  background: var(--bg-surface);
-  color: var(--text-muted);
-  border: 1px solid var(--border-color);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   ANIMATED RADAR SCANNER FOR WI-FI DISCOVERY
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.wifi-radar-scanner-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem 1rem;
-}
-
-.wifi-radar-circle {
-  position: relative;
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  border: 2px solid var(--color-primary);
-  background: radial-gradient(circle, var(--color-primary-light) 0%, var(--bg-surface) 75%);
-  overflow: hidden;
-  box-shadow: 0 0 16px var(--color-primary-light);
-  margin-bottom: 0.85rem;
-}
-
-.wifi-radar-circle::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px dashed var(--color-primary);
-  opacity: 0.55;
-}
-
-.wifi-radar-circle::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid var(--color-primary);
-  opacity: 0.8;
-}
-
-.wifi-radar-sweep {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--color-primary) 0deg, transparent 65deg, transparent 360deg);
-  opacity: 0.45;
-  animation: radarRotate 1.8s linear infinite;
-  transform-origin: center center;
-}
-
-@keyframes radarRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.wifi-radar-blip {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  box-shadow: 0 0 6px var(--color-primary);
-  animation: radarBlink 1.8s ease-in-out infinite;
-}
-
-@keyframes radarBlink {
-  0%, 100% { opacity: 0; transform: scale(0.6); }
-  50% { opacity: 1; transform: scale(1.3); }
-}
-
-.wifi-radar-title {
-  font-size: 0.86rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  margin-bottom: 0.2rem;
-  text-align: center;
-}
-
-.wifi-radar-desc {
-  font-size: 0.74rem;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   DANGER & REMOVE ACTION BUTTONS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.btn-danger {
-  background: var(--status-absent-bg);
-  color: var(--status-absent);
-  border: 1px solid var(--status-absent);
-  font-weight: 600;
-  transition: all 0.15s ease;
-}
-
-.btn-danger:hover {
-  background: var(--status-absent);
-  color: var(--text-light, var(--bg-card));
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   LIVE REMOTE ESP32 SYSTEM LOGS (OVER-THE-INTERNET MONITORING)
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.esp-terminal-log-feed {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  padding: 0.75rem 0.95rem;
-  max-height: 280px;
-  overflow-y: auto;
-  font-family: var(--font-family-mono, monospace);
-  font-size: 0.75rem;
-  line-height: 1.6;
-}
-
-.esp-log-row {
-  display: flex;
-  gap: 0.55rem;
-  align-items: baseline;
-  padding: 0.22rem 0;
-  border-bottom: 1px dashed var(--border-color);
-}
-
-.esp-log-row:last-child {
-  border-bottom: none;
-}
-
-.esp-log-time {
-  color: var(--text-muted);
-  font-size: 0.7rem;
-  white-space: nowrap;
-}
-
-.esp-log-tag {
-  color: var(--color-primary);
-  font-weight: 700;
-  font-size: 0.7rem;
-  white-space: nowrap;
-}
-
-.esp-log-level-badge {
-  font-size: 0.64rem;
-  font-weight: 800;
-  padding: 0.08rem 0.35rem;
-  border-radius: 4px;
-  white-space: nowrap;
-}
-
-.esp-log-level-badge.INFO {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
-.esp-log-level-badge.WARN {
-  background: var(--status-late-bg);
-  color: var(--status-late);
-}
-
-.esp-log-level-badge.ERROR {
-  background: var(--status-absent-bg);
-  color: var(--status-absent);
-}
-
-.esp-log-msg {
-  color: var(--text-main);
-  word-break: break-word;
-  flex: 1;
+.scanned-wifi-card:hover {
+  background: var(--bg-surface-hover, var(--bg-card));
 }
