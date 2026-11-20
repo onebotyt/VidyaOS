@@ -1,155 +1,1562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VidyaOS • Fingerprint Attendance & Wi-Fi</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>VidyaOS • Fingerprint Attendance &amp; Wi-Fi Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+<!-- Standard VidyaOS Core Tokens & Layout Shell -->
+<link rel="stylesheet" href="/faculty/components/core/reset.css">
+<link rel="stylesheet" href="/faculty/components/core/variables.css">
+<link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261116">
+<link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
+<link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
+
 <style>
-:root{--blue:#1768ee;--blue2:#3988ff;--ink:#132b55;--muted:#667896;--glass:rgba(255,255,255,.78);--line:rgba(255,255,255,.8);--shadow:0 16px 40px rgba(29,67,124,.16);--green:#12a86a;--purple:#7650ef;--orange:#f69a15}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;color:var(--ink);background:#dce9ff;min-height:100vh}
-body:before{content:"";position:fixed;inset:0;background:url("assets/campus-daylight.png") center/cover no-repeat;z-index:-2}
-body:after{content:"";position:fixed;inset:0;background:linear-gradient(115deg,rgba(222,237,255,.55),rgba(240,246,255,.48) 50%,rgba(255,255,255,.4));backdrop-filter:blur(2px);z-index:-1}
-.app{min-height:100vh;display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;padding:14px}
-.sidebar,.panel,.quick-card,.top-status{background:var(--glass);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:22px}
-.sidebar{padding:18px 14px;display:flex;flex-direction:column;min-height:calc(100vh - 28px);position:sticky;top:14px}
-.brand{display:flex;align-items:center;gap:10px;padding:7px 8px 22px}.brand-logo{width:44px;height:44px;border-radius:15px;background:linear-gradient(145deg,#0d4db4,#4b9aff);color:white;display:grid;place-items:center;font-size:23px;box-shadow:0 8px 18px #2573ef55}.brand strong{font:800 21px "Plus Jakarta Sans";display:block}.brand small{color:var(--muted);font-size:11px}
-.nav{display:grid;gap:7px}.nav button{border:0;background:transparent;color:#466184;padding:12px 13px;border-radius:13px;text-align:left;font-weight:650;display:flex;align-items:center;gap:11px;cursor:pointer;transition:.2s}.nav button:hover{background:#fff9}.nav button.active{background:linear-gradient(120deg,#1473ff,#398bff);color:white;box-shadow:0 8px 20px #2676ed45}.nav .ico{font-size:18px;width:22px;text-align:center}
-.sidebar-bottom{margin-top:auto;padding:12px 8px 2px}.sidebar-bottom .device-chip{background:#e7f4ff;border:1px solid #cde5ff;border-radius:14px;padding:11px;font-size:12px}.device-chip b{display:block;margin-bottom:5px}.device-chip span{color:#388160}.tag{font-size:10px;font-weight:800;letter-spacing:.07em;background:#e1efff;color:#1764da;border-radius:99px;padding:5px 8px}
-.main{min-width:0}.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:12px 8px 18px}.title-block{display:flex;gap:15px;align-items:center}.title-accent{height:47px;width:3px;border-radius:4px;background:#2677ff}.title-block h1{font:800 clamp(20px,2.1vw,29px) "Plus Jakarta Sans";margin:0}.title-block p{margin:4px 0 0;color:#456387;font-size:13px}.top-right{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}.top-status{padding:9px 13px;border-radius:99px;font-size:12px;display:flex;align-items:center;gap:8px}.dot{width:9px;height:9px;border-radius:50%;background:#13b768;box-shadow:0 0 0 4px #13b76820}
-.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:14px}.quick-card{padding:16px;min-height:148px;position:relative;overflow:hidden}.quick-card:after{content:"";position:absolute;right:-30px;bottom:-45px;width:115px;height:115px;background:var(--accent);opacity:.08;border-radius:50%}.quick-icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:23px;color:white;background:var(--accent);box-shadow:0 8px 16px color-mix(in srgb,var(--accent),transparent 65%)}.quick-card h3{margin:12px 0 5px;font-size:15px}.quick-card p{margin:0;color:#4f6483;font-size:12px;line-height:1.5}.quick-card button{margin-top:10px}
-.workspace{display:grid;grid-template-columns:1.02fr 1.2fr;gap:13px;margin-bottom:14px}.panel{padding:17px;min-width:0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.panel-head h2{font:750 17px "Plus Jakarta Sans";margin:0;display:flex;align-items:center;gap:9px}.panel-head p{margin:4px 0 0;color:var(--muted);font-size:12px}.scanner-panel{min-height:295px}.scanner-body{display:flex;align-items:center;justify-content:center;gap:18px;padding:12px 5px}.scanner-hardware{width:106px;height:157px;border-radius:28px;background:linear-gradient(140deg,#3a4559,#101d31);padding:13px;box-shadow:inset 0 3px 4px #ffffff2a,0 15px 22px #253d6050;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px}.sensor{width:67px;height:62px;border-radius:15px;background:linear-gradient(#051d17,#0b5736);border:4px solid #152a30;box-shadow:0 0 20px #00d77688;display:grid;place-items:center;color:#3bffad;font-size:26px}.fingerprint-box{width:176px;height:157px;border-radius:20px;background:linear-gradient(140deg,#163d78,#0e2353);display:grid;place-items:center;color:#38caff;position:relative;overflow:hidden;box-shadow:inset 0 0 22px #36cfff22}.fingerprint-box .fp{font-size:80px;filter:drop-shadow(0 0 13px #3bd7ff);transition:.2s}.fingerprint-box.scanning .fp{animation:pulse .8s infinite alternate}.corner{position:absolute;width:20px;height:20px;border-color:#42cfff;border-style:solid}.c1{top:12px;left:12px;border-width:3px 0 0 3px}.c2{top:12px;right:12px;border-width:3px 3px 0 0}.c3{bottom:12px;left:12px;border-width:0 0 3px 3px}.c4{bottom:12px;right:12px;border-width:0 3px 3px 0}
-.scan-instruction{text-align:center;font-weight:700;margin:3px 0 4px}.scan-sub{text-align:center;color:var(--muted);font-size:12px}.progress{height:7px;border-radius:99px;background:#cbd8ee;margin:12px 8px 8px;overflow:hidden}.progress span{height:100%;display:block;width:0;background:linear-gradient(90deg,#1477ff,#20d5d3);border-radius:99px;transition:width .5s}.scanner-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.btn{border:1px solid #c7d9f6;background:#fff;color:#28517f;border-radius:11px;padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:.18s}.btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px #224e8220}.btn.primary{background:linear-gradient(110deg,#126dff,#388bff);color:white;border:0}.btn.green{background:#10a76c;color:#fff;border:0}.btn.purple{background:#7050e9;color:#fff;border:0}.btn.orange{background:#f28c14;color:#fff;border:0}.btn.small{padding:7px 10px}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.wifi-panel{min-height:295px}.wifi-list{display:grid;gap:6px}.wifi-row{display:grid;grid-template-columns:30px minmax(0,1fr) 58px 88px;align-items:center;gap:9px;padding:10px;border:1px solid #d7e5fb;background:#ffffff86;border-radius:13px;font-size:12px}.wifi-symbol{font-size:18px}.wifi-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wifi-meta{color:#6d80a0;font-size:10px;margin-top:3px}.wifi-strength{color:#526b91;font-size:13px}.network-status{font-size:10px;color:#158653;background:#dcf8eb;padding:4px 7px;border-radius:99px;width:max-content}.wifi-controls{display:flex;gap:8px;align-items:center;margin-top:11px;flex-wrap:wrap}.wifi-controls input{flex:1;min-width:120px}.input,.select{border:1px solid #c9d8ee;background:#ffffffb8;border-radius:10px;padding:10px 11px;color:#294569;font:inherit;font-size:12px;min-width:0}.add-wifi{display:flex;gap:7px;margin-top:10px;align-items:center}.add-wifi input{min-width:0;flex:1}
-.lower-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:13px}.table-wrap{overflow:auto}.table{border-collapse:collapse;width:100%;font-size:12px;min-width:480px}.table th{font-size:11px;color:#5b7193;text-align:left;background:#ffffff75;padding:10px}.table td{padding:10px;border-top:1px solid #d7e3f6}.status-pill{padding:5px 8px;border-radius:99px;font-size:10px;font-weight:750;background:#d9f8e8;color:#118450;white-space:nowrap}.student-card{display:flex;gap:12px;align-items:center;min-height:128px}.avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(145deg,#b4d9ff,#4c9fff);display:grid;place-items:center;color:#fff;font-size:28px;flex-shrink:0}.student-info h3{margin:0 0 6px;font-size:15px}.student-info p{font-size:11px;color:#607492;margin:4px 0}.attendance-confirm{margin-left:auto;text-align:center;background:#e0faed;border:1px solid #c3f0d9;border-radius:16px;padding:12px;min-width:125px}.attendance-confirm .check{font-size:25px;color:#0baa5c}.attendance-confirm b{display:block;font-size:12px;color:#11814f}.attendance-confirm small{font-size:10px;color:#577b6a}
-.page{display:none}.page.active{display:block}.tab-panel{display:none}.tab-panel.active{display:block}
-.modal-backdrop{display:none;position:fixed;inset:0;background:#142d4d55;backdrop-filter:blur(6px);z-index:50;align-items:center;justify-content:center;padding:16px}.modal-backdrop.show{display:flex}.modal{background:#f7fbff;border:1px solid #ffffff;border-radius:20px;box-shadow:0 24px 60px #17375b55;width:min(520px,100%);padding:22px}.modal h2{margin:0 0 5px;font:800 20px "Plus Jakarta Sans"}.modal p{color:#71829b;font-size:12px;margin:0 0 15px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form-field{display:grid;gap:5px}.form-field label{font-size:11px;font-weight:700;color:#526783}.form-field input,.form-field select{width:100%}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.modal-feedback{margin-top:10px;color:#16834d;font-size:12px}.page-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 13px;flex-wrap:wrap}.search{max-width:300px;width:100%}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.stat{background:#ffffff9c;border:1px solid #ffffffbd;border-radius:15px;padding:13px}.stat small{color:#71829b;font-size:11px}.stat strong{display:block;font-size:22px;margin-top:6px}
-.terminal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.terminal-card{padding:15px;border-radius:17px;background:#ffffff9a;border:1px solid #ffffffcc}.terminal-card h3{margin:0 0 5px}.terminal-card p{font-size:12px;color:#71829b}.leds{display:flex;gap:8px;margin:10px 0}.led{width:11px;height:11px;border-radius:50%;background:#9aa9bc}.led.on{background:#12bb68;box-shadow:0 0 9px #12bb6866}
-.log-list{display:grid;gap:8px}.log-item{padding:11px;border-radius:12px;background:#ffffff90;font-size:12px;display:flex;justify-content:space-between;gap:12px}.log-item small{color:#7586a1}
-.toast{position:fixed;right:18px;bottom:18px;background:#17375c;color:#fff;padding:12px 16px;border-radius:13px;box-shadow:0 10px 30px #12355a55;z-index:90;opacity:0;transform:translateY(10px);transition:.25s;font-size:13px}.toast.show{opacity:1;transform:none}
-footer{margin-top:13px;padding:11px 17px;background:#ffffff78;border:1px solid #ffffffb8;border-radius:15px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;color:#4b6586}
-@keyframes pulse{from{transform:scale(.96);opacity:.65}to{transform:scale(1.05);opacity:1}}
-@media(max-width:1100px){.quick-grid{grid-template-columns:repeat(2,1fr)}.workspace,.lower-grid{grid-template-columns:1fr}.sidebar{min-height:auto;position:static}.app{grid-template-columns:190px 1fr}.topbar{align-items:flex-start}}
-@media(max-width:720px){.app{display:block;padding:9px}.sidebar{padding:10px;margin-bottom:10px}.brand{padding:3px 5px 9px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;padding:9px 11px}.sidebar-bottom{display:none}.topbar{padding:10px 2px;display:block}.top-right{justify-content:flex-start;margin-top:10px}.quick-grid{grid-template-columns:1fr 1fr;gap:9px}.quick-card{padding:12px;min-height:136px}.panel{padding:13px}.scanner-body{gap:9px}.scanner-hardware{width:83px;height:130px}.fingerprint-box{width:140px;height:130px}.fingerprint-box .fp{font-size:67px}.wifi-row{grid-template-columns:25px minmax(0,1fr) 35px 72px;padding:8px}.add-wifi{flex-wrap:wrap}.add-wifi input{flex:1 1 40%}.stats{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.title-block h1{font-size:20px}}
-@media(max-width:430px){.quick-grid{grid-template-columns:1fr 1fr}.quick-card h3{font-size:13px}.quick-card p{font-size:11px}.scanner-body{flex-direction:column}.scanner-hardware{height:92px;width:100px}.sensor{height:45px}.wifi-row{grid-template-columns:22px minmax(0,1fr) 30px 66px}.top-status{font-size:11px}}
-</style></head>
+:root {
+  --blue: #1768ee;
+  --blue2: #3988ff;
+  --ink: #132b55;
+  --muted: #667896;
+  --glass: rgba(255, 255, 255, 0.85);
+  --line: rgba(255, 255, 255, 0.85);
+  --shadow: 0 12px 32px rgba(29, 67, 124, 0.12);
+  --green: #12a86a;
+  --purple: #7650ef;
+  --orange: #f69a15;
+}
+
+/* Glassmorphism Wallpaper Background for the Studio Workspace */
+.esp-studio-container {
+  position: relative;
+  border-radius: 20px;
+  padding: 16px;
+  background: #dce9ff url("assets/campus-daylight.png") center/cover no-repeat;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  min-height: calc(100vh - 120px);
+}
+.esp-studio-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: linear-gradient(115deg, rgba(222, 237, 255, 0.62), rgba(240, 246, 255, 0.55) 50%, rgba(255, 255, 255, 0.48));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 0;
+  pointer-events: none;
+}
+.esp-studio-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Top Return Banner */
+.esp-preview-return-banner {
+  background: linear-gradient(90deg, #1768ee, #7650ef);
+  color: white;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(23, 104, 238, 0.25);
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+.esp-preview-return-btn {
+  color: white !important;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.esp-preview-return-btn:hover {
+  background: rgba(255, 255, 255, 0.38);
+  transform: translateX(-2px);
+}
+
+/* Page Header Panel */
+.preview-title-panel {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 18px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.preview-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.preview-title-accent {
+  height: 38px;
+  width: 4px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #1473ff, #7650ef);
+}
+.preview-title-wrap h1 {
+  font: 800 20px "Plus Jakarta Sans", Inter, sans-serif;
+  margin: 0;
+  color: var(--ink);
+}
+.preview-title-wrap p {
+  margin: 2px 0 0;
+  color: #526b91;
+  font-size: 12px;
+}
+.preview-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Horizontal Top Navigation Bar (Moved from Sidebar) */
+.preview-nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 16px;
+  padding: 7px 9px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+}
+.preview-nav-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+.preview-nav-tabs::-webkit-scrollbar-thumb {
+  background: #cbd8ee;
+  border-radius: 4px;
+}
+.preview-nav-tab {
+  border: 0;
+  background: transparent;
+  color: #466184;
+  padding: 9px 15px;
+  border-radius: 11px;
+  font-weight: 650;
+  font-size: 12.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.preview-nav-tab:hover {
+  background: rgba(255, 255, 255, 0.85);
+  color: #1768ee;
+  transform: translateY(-1px);
+}
+.preview-nav-tab.active {
+  background: linear-gradient(120deg, #1473ff, #398bff);
+  color: white;
+  box-shadow: 0 4px 14px rgba(38, 118, 237, 0.35);
+}
+.preview-nav-tab .ico {
+  font-size: 15px;
+}
+
+/* Studio Panels & Cards */
+.panel {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 20px;
+  padding: 18px;
+  min-width: 0;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+.panel-head h2 {
+  font: 750 16px "Plus Jakarta Sans", sans-serif;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+.panel-head p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Grid Layouts */
+.workspace {
+  display: grid;
+  grid-template-columns: 1.02fr 1.2fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.lower-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 14px;
+}
+
+/* Fingerprint Hardware Visualizer */
+.scanner-panel {
+  min-height: 295px;
+}
+.scanner-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 14px 5px;
+}
+.scanner-hardware {
+  width: 106px;
+  height: 157px;
+  border-radius: 26px;
+  background: linear-gradient(140deg, #3a4559, #101d31);
+  padding: 13px;
+  box-shadow: inset 0 3px 4px #ffffff2a, 0 15px 22px #253d6050;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.sensor {
+  width: 67px;
+  height: 62px;
+  border-radius: 15px;
+  background: linear-gradient(#051d17, #0b5736);
+  border: 4px solid #152a30;
+  box-shadow: 0 0 20px #00d77688;
+  display: grid;
+  place-items: center;
+  color: #3bffad;
+  font-size: 26px;
+}
+.fingerprint-box {
+  width: 176px;
+  height: 157px;
+  border-radius: 20px;
+  background: linear-gradient(140deg, #163d78, #0e2353);
+  display: grid;
+  place-items: center;
+  color: #38caff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 22px #36cfff22;
+}
+.fingerprint-box .fp {
+  font-size: 80px;
+  filter: drop-shadow(0 0 13px #3bd7ff);
+  transition: 0.2s;
+}
+.fingerprint-box.scanning .fp {
+  animation: fp-pulse 0.8s infinite alternate;
+}
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: #42cfff;
+  border-style: solid;
+}
+.c1 { top: 12px; left: 12px; border-width: 3px 0 0 3px; }
+.c2 { top: 12px; right: 12px; border-width: 3px 3px 0 0; }
+.c3 { bottom: 12px; left: 12px; border-width: 0 0 3px 3px; }
+.c4 { bottom: 12px; right: 12px; border-width: 0 3px 3px 0; }
+@keyframes fp-pulse {
+  from { transform: scale(0.96); opacity: 0.65; }
+  to { transform: scale(1.05); opacity: 1; }
+}
+
+.scan-instruction {
+  text-align: center;
+  font-weight: 700;
+  margin: 4px 0;
+  color: var(--ink);
+  font-size: 13px;
+}
+.scan-sub {
+  text-align: center;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+.progress {
+  height: 7px;
+  border-radius: 99px;
+  background: #cbd8ee;
+  margin: 12px 8px 10px;
+  overflow: hidden;
+}
+.progress span {
+  height: 100%;
+  display: block;
+  width: 0;
+  background: linear-gradient(90deg, #1477ff, #20d5d3);
+  border-radius: 99px;
+  transition: width 0.5s;
+}
+.scanner-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+/* Wi-Fi Manager Panel */
+.wifi-panel {
+  min-height: 295px;
+}
+.wifi-list {
+  display: grid;
+  gap: 7px;
+}
+.wifi-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 56px 88px;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid #d7e5fb;
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 13px;
+  font-size: 12px;
+}
+.wifi-symbol {
+  font-size: 17px;
+  color: #1768ee;
+}
+.wifi-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.wifi-meta {
+  color: #6d80a0;
+  font-size: 10.5px;
+  margin-top: 2px;
+}
+.wifi-strength {
+  color: #526b91;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.network-status {
+  font-size: 10px;
+  color: #158653;
+  background: #dcf8eb;
+  padding: 4px 7px;
+  border-radius: 99px;
+  width: max-content;
+  font-weight: 700;
+}
+.add-wifi {
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+  align-items: center;
+}
+.add-wifi input {
+  min-width: 0;
+  flex: 1;
+}
+
+/* Tables & Rosters */
+.table-wrap {
+  overflow: auto;
+}
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+  min-width: 480px;
+}
+.table th {
+  font-size: 11px;
+  color: #5b7193;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 10px;
+  font-weight: 700;
+}
+.table td {
+  padding: 10px;
+  border-top: 1px solid #d7e3f6;
+  color: var(--ink);
+}
+.status-pill {
+  padding: 4px 8px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 750;
+  background: #d9f8e8;
+  color: #118450;
+  white-space: nowrap;
+}
+.student-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 120px;
+}
+.avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #b4d9ff, #4c9fff);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.student-info h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: var(--ink);
+}
+.student-info p {
+  font-size: 11px;
+  color: #607492;
+  margin: 3px 0;
+}
+.attendance-confirm {
+  margin-left: auto;
+  text-align: center;
+  background: #e0faed;
+  border: 1px solid #c3f0d9;
+  border-radius: 14px;
+  padding: 10px 12px;
+  min-width: 120px;
+}
+.attendance-confirm .check {
+  font-size: 22px;
+  color: #0baa5c;
+}
+.attendance-confirm b {
+  display: block;
+  font-size: 11.5px;
+  color: #11814f;
+}
+.attendance-confirm small {
+  font-size: 10px;
+  color: #577b6a;
+}
+
+/* Buttons & Inputs */
+.btn {
+  border: 1px solid #c7d9f6;
+  background: #fff;
+  color: #28517f;
+  border-radius: 10px;
+  padding: 8px 13px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(34, 78, 130, 0.15);
+}
+.btn.primary {
+  background: linear-gradient(110deg, #126dff, #388bff);
+  color: white;
+  border: 0;
+}
+.btn.green { background: #10a76c; color: #fff; border: 0; }
+.btn.purple { background: #7050e9; color: #fff; border: 0; }
+.btn.orange { background: #f28c14; color: #fff; border: 0; }
+.btn.small { padding: 6px 10px; font-size: 11.5px; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.input, .select {
+  border: 1px solid #c9d8ee;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 8px 11px;
+  color: #294569;
+  font: inherit;
+  font-size: 12px;
+  min-width: 0;
+}
+.tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  background: #e1efff;
+  color: #1764da;
+  border-radius: 99px;
+  padding: 4px 8px;
+}
+
+/* Pages Display Controller */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Subpage Toolbars & Grids */
+.page-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 13px;
+  flex-wrap: wrap;
+}
+.search { max-width: 280px; width: 100%; }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.stat {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  padding: 12px;
+}
+.stat small { color: #71829b; font-size: 11px; font-weight: 600; }
+.stat strong { display: block; font-size: 20px; margin-top: 5px; color: var(--ink); }
+
+.terminal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+.terminal-card {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+.terminal-card h3 { margin: 0 0 4px; font-size: 14px; color: var(--ink); }
+.terminal-card p { font-size: 11.5px; color: #71829b; margin: 4px 0; }
+.leds { display: flex; gap: 7px; margin: 9px 0; }
+.led { width: 10px; height: 10px; border-radius: 50%; background: #9aa9bc; }
+.led.on { background: #12bb68; box-shadow: 0 0 8px rgba(18, 187, 104, 0.45); }
+
+.log-list { display: grid; gap: 7px; }
+.log-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink);
+}
+.log-item small { color: #7586a1; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-field { display: grid; gap: 5px; }
+.form-field label { font-size: 11px; font-weight: 700; color: #526783; }
+
+/* Modals */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 45, 77, 0.45);
+  backdrop-filter: blur(6px);
+  z-index: 1050;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  background: #f7fbff;
+  border: 1px solid #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(23, 55, 91, 0.28);
+  width: min(500px, 100%);
+  padding: 20px;
+}
+.modal h2 { margin: 0 0 4px; font: 800 18px "Plus Jakarta Sans", sans-serif; color: var(--ink); }
+.modal p { color: #71829b; font-size: 12px; margin: 0 0 14px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+.modal-feedback { margin-top: 8px; color: #16834d; font-size: 12px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  background: #17375c;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(18, 53, 90, 0.35);
+  z-index: 1080;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: 0.25s ease;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.toast.show { opacity: 1; transform: none; }
+
+/* Responsive Media Queries */
+@media(max-width: 1024px) {
+  .workspace, .lower-grid { grid-template-columns: 1fr; }
+}
+@media(max-width: 768px) {
+  .esp-studio-container { padding: 10px; }
+  .preview-title-panel { padding: 12px; }
+  .scanner-body { gap: 10px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
 <body>
-<div style="background:linear-gradient(90deg, #1768ee, #7650ef); color:white; padding:8px 16px; display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:600; box-shadow:0 2px 8px rgba(0,0,0,0.15); z-index:99; position:relative;">
-  <span>🧪 <strong>VidyaOS ESP32 Studio Redesign Preview Sandbox</strong> &bull; Interactive Test &amp; Polish Mode</span>
-  <a href="/faculty/esp32-devices/index.html" style="color:white; text-decoration:none; background:rgba(255,255,255,0.22); padding:4px 12px; border-radius:99px; font-weight:700; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.22)'">&larr; Return to Live Hardware Console</a>
-</div>
-<div class="app">
-<aside class="sidebar">
-<div class="brand"><div class="brand-logo">🎓</div><div><strong>VidyaOS</strong><small>Smart Campus</small></div></div>
-<nav class="nav" aria-label="Main navigation">
-<button class="active" data-page="dashboard"><span class="ico">⌂</span> Dashboard</button>
-<button data-page="students"><span class="ico">♟</span> Students</button>
-<button data-page="attendance"><span class="ico">▦</span> Attendance</button>
-<button data-page="wifi"><span class="ico">⌁</span> Wi-Fi Manager</button>
-<button data-page="terminals"><span class="ico">▣</span> ESP32 Terminals</button>
-<button data-page="vault"><span class="ico">♧</span> Biometric Vault</button>
-<button data-page="activity"><span class="ico">☷</span> Activity & Logs</button>
-</nav>
-<div class="sidebar-bottom"><div class="device-chip"><b>Terminal status</b><span>● Demo terminal online</span><small style="display:block;margin-top:5px;color:#74859b">ESP32 • AS608 compatible UI</small></div></div>
-</aside>
-<main class="main">
-<header class="topbar"><div class="title-block"><div class="title-accent"></div><div><h1>Fingerprint Attendance & Wi-Fi Manager</h1><p>Smart · Secure · Connected Campus</p></div></div><div class="top-right"><div class="top-status"><span class="dot"></span><b>Demo System Online</b></div><div class="top-status">📅 <span id="clock">—</span></div><button class="btn" onclick="toast('Profile settings are part of this demo UI.')">👤</button></div></header>
+  <!-- VidyaOS Semantic App Layout with Left Sidebar & Top Header -->
+  <div class="faculty-app-layout" id="faculty-app-layout">
+    <div class="faculty-main-wrap">
+      <!-- Standard Faculty Top Header Mounted Here -->
+      <div id="faculty-header-mount"></div>
 
-<section class="page active" id="page-dashboard">
-<div class="quick-grid">
-<div class="quick-card" style="--accent:#1977f5"><div class="quick-icon">👥</div><h3>Student Directory</h3><p>Browse registered students and enroll fingerprints.</p><button class="btn primary small" onclick="switchPage('students')">View Students →</button></div>
-<div class="quick-card" style="--accent:#8253ed"><div class="quick-icon">◎</div><h3>Fingerprint Enrollment</h3><p>Enroll fingerprints for registered students.</p><button class="btn purple small" onclick="switchPage('vault')">Enroll Fingerprint →</button></div>
-<div class="quick-card" style="--accent:#10ae70"><div class="quick-icon">▣</div><h3>Attendance Scanner</h3><p>Verify enrolled students and mark attendance.</p><button class="btn green small" onclick="focusScanner()">Scan Now →</button></div>
-<div class="quick-card" style="--accent:#f29513"><div class="quick-icon">⌁</div><h3>Wi-Fi Manager</h3><p>View networks and manage terminal connectivity.</p><button class="btn orange small" onclick="switchPage('wifi')">Manage Wi-Fi →</button></div>
-</div>
-<div class="workspace">
-<section class="panel scanner-panel" id="scanner-panel">
-<div class="panel-head"><div><h2>◎ Fingerprint Scanner</h2><p>Scanner ready · Demo simulation</p></div><span class="tag">READY</span></div>
-<div class="scanner-body"><div class="scanner-hardware"><div class="sensor">◉</div><div style="color:#b8c8d8;font-size:20px">≋</div></div><div class="fingerprint-box" id="finger-box"><span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span><div class="fp">◎</div></div></div>
-<div class="scan-instruction" id="scan-instruction">Choose an enrolled student to scan</div><div class="scan-sub" id="scan-sub">Only registered students with enrolled fingerprints can mark attendance.</div>
-<div class="progress"><span id="scan-progress"></span></div>
-<div class="scanner-actions"><select class="select" id="scan-student" style="max-width:240px"><option value="">Select enrolled student</option></select><button class="btn primary" id="scan-button" onclick="scanFingerprint()">Start Scan</button></div>
-</section>
-<section class="panel wifi-panel">
-<div class="panel-head"><div><h2>⌁ Wi-Fi Networks</h2><p>Network scan preview · device integration required</p></div><button class="btn primary small" onclick="scanWifi()">⟳ Scan Networks</button></div>
-<div class="wifi-list" id="wifi-list"></div>
-<div class="add-wifi"><span style="font-weight:800;color:#2778ed">＋</span><input class="input" id="manual-ssid" placeholder="Network name (SSID)"><input class="input" id="manual-pass" placeholder="Password" type="password"><button class="btn primary" onclick="addWifi()">Add</button></div>
-<div style="font-size:10px;color:#7586a0;margin-top:7px">Wi-Fi actions are simulated in this browser demo. Real scanning/connection requires device integration.</div>
-</section>
-</div>
-<div class="lower-grid">
-<section class="panel"><div class="panel-head"><h2>▦ Attendance Log</h2><button class="btn small" onclick="switchPage('attendance')">View All →</button></div><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Student Name</th><th>ID</th><th>Date & Time</th><th>Status</th></tr></thead><tbody id="attendance-preview"></tbody></table></div></section>
-<section class="panel"><div class="panel-head"><h2>♟ Student Details</h2><span class="tag">LAST SCAN</span></div><div class="student-card" id="student-detail"><div class="avatar">👨‍🎓</div><div class="student-info"><h3>No scan yet</h3><p>Student profile will appear after a successful scan.</p><p>Registered & enrolled students only</p></div><div class="attendance-confirm"><div class="check">✓</div><b>Awaiting Scan</b><small>Attendance not marked</small></div></div></section>
-</div>
-</section>
+      <main class="container" style="padding-top: 0.75rem; padding-bottom: 3.5rem; max-width: 1400px;">
+        
+        <!-- Studio Sandbox Wallpaper Container -->
+        <div class="esp-studio-container">
+          <div class="esp-studio-content">
+            
+            <!-- Top Return & Context Banner -->
+            <div class="esp-preview-return-banner">
+              <span>🧪 <strong>VidyaOS ESP32 Studio Redesign Sandbox</strong> &bull; Interactive Biometric &amp; Wi-Fi Studio</span>
+              <a href="/faculty/esp32-devices/index.html" class="esp-preview-return-btn">&larr; Return to Live Hardware Console</a>
+            </div>
 
-<section class="page" id="page-students"><section class="panel"><div class="page-toolbar"><div><h2 style="margin:0">Student Directory</h2><p style="margin:5px 0;color:var(--muted);font-size:12px">Registered student records and biometric status</p></div><span class="tag">Roster · Enrollment Only</span><input class="input search" id="student-search" placeholder="Search name, enrollment, branch..." oninput="renderStudents()"></div><div class="table-wrap"><table class="table"><thead><tr><th>Roll</th><th>Name</th><th>Enrollment</th><th>Branch</th><th>Year</th><th>Fingerprint</th><th>Action</th></tr></thead><tbody id="students-table"></tbody></table></div></section></section>
+            <!-- Page Title Bar (Status Cards Removed per Design Request) -->
+            <div class="preview-title-panel">
+              <div class="preview-title-wrap">
+                <div class="preview-title-accent"></div>
+                <div>
+                  <h1>Fingerprint Attendance &amp; Wi-Fi Studio</h1>
+                  <p>Fast Biometric Verification &bull; Multi-Network Failover &bull; Terminal Telemetry</p>
+                </div>
+              </div>
+              <div class="preview-title-actions">
+                <span class="tag" style="background:#dcf8eb; color:#12a86a; font-weight:700; padding:5px 11px; border-radius:99px;">● SIMULATION READY</span>
+                <span class="tag" style="background:#e7f4ff; color:#1768ee; font-weight:600; padding:5px 11px; border-radius:99px;">📅 <span id="clock">—</span></span>
+                <button class="btn primary small" onclick="exportAttendance()">Export CSV</button>
+              </div>
+            </div>
 
-<section class="page" id="page-attendance"><section class="panel"><div class="page-toolbar"><div><h2 style="margin:0">Attendance Overview</h2><p style="margin:5px 0;color:var(--muted);font-size:12px">Attendance can only be marked after a successful fingerprint match.</p></div><button class="btn" onclick="exportAttendance()">Export CSV</button></div><div class="stats"><div class="stat"><small>Registered students</small><strong id="stat-students">0</strong></div><div class="stat"><small>Enrolled fingerprints</small><strong id="stat-enrolled">0</strong></div><div class="stat"><small>Present today</small><strong id="stat-present">0</strong></div><div class="stat"><small>Pending enrollment</small><strong id="stat-pending">0</strong></div></div><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Name</th><th>Student ID</th><th>Time</th><th>Status</th><th>Method</th></tr></thead><tbody id="attendance-table"></tbody></table></div></section></section>
+            <!-- Horizontal Top Navigation Tabs (Moved from Sidebar) -->
+            <nav class="preview-nav-tabs" aria-label="Module Navigation">
+              <button type="button" class="preview-nav-tab active" data-page="dashboard"><span class="ico">⌂</span> Dashboard</button>
+              <button type="button" class="preview-nav-tab" data-page="students"><span class="ico">♟</span> Students</button>
+              <button type="button" class="preview-nav-tab" data-page="attendance"><span class="ico">▦</span> Attendance</button>
+              <button type="button" class="preview-nav-tab" data-page="wifi"><span class="ico">⌁</span> Wi-Fi Manager</button>
+              <button type="button" class="preview-nav-tab" data-page="terminals"><span class="ico">▣</span> ESP32 Terminals</button>
+              <button type="button" class="preview-nav-tab" data-page="vault"><span class="ico">♧</span> Biometric Vault</button>
+              <button type="button" class="preview-nav-tab" data-page="activity"><span class="ico">☷</span> Activity &amp; Logs</button>
+              <button type="button" class="preview-nav-tab" data-page="settings"><span class="ico">⚙</span> Settings</button>
+            </nav>
 
-<section class="page" id="page-wifi"><section class="panel"><div class="page-toolbar"><div><h2 style="margin:0">Wi-Fi Network Manager</h2><p style="margin:5px 0;color:var(--muted);font-size:12px">Preview nearby networks and manage the demo terminal connection.</p></div><button class="btn primary" onclick="scanWifi()">⟳ Refresh scan</button></div><div class="wifi-list" id="wifi-full-list"></div><div class="add-wifi" style="margin-top:15px"><input class="input" id="wifi-add-name" placeholder="Add network SSID"><input class="input" id="wifi-add-pass" placeholder="Password" type="password"><button class="btn primary" onclick="addWifiFull()">Add Network</button></div><p style="font-size:11px;color:var(--muted)">Real network scanning and connecting are restricted in ordinary browser pages; this demo provides UI interactions.</p></section></section>
+            <!-- ── TAB 1: DASHBOARD (Status Cards Removed: Starts directly with Scanner + Wi-Fi) ── -->
+            <section class="page active" id="page-dashboard">
+              <div class="workspace">
+                <!-- Fingerprint Scanner Studio -->
+                <section class="panel scanner-panel" id="scanner-panel">
+                  <div class="panel-head">
+                    <div>
+                      <h2>◎ Fingerprint Scanner</h2>
+                      <p>Scanner ready &bull; AS608 biometric verification</p>
+                    </div>
+                    <span class="tag">READY</span>
+                  </div>
+                  <div class="scanner-body">
+                    <div class="scanner-hardware">
+                      <div class="sensor">◉</div>
+                      <div style="color:#b8c8d8; font-size:20px;">≋</div>
+                    </div>
+                    <div class="fingerprint-box" id="finger-box">
+                      <span class="corner c1"></span>
+                      <span class="corner c2"></span>
+                      <span class="corner c3"></span>
+                      <span class="corner c4"></span>
+                      <div class="fp">◎</div>
+                    </div>
+                  </div>
+                  <div class="scan-instruction" id="scan-instruction">Choose an enrolled student to scan</div>
+                  <div class="scan-sub" id="scan-sub">Only registered students with enrolled fingerprints can mark attendance.</div>
+                  <div class="progress"><span id="scan-progress"></span></div>
+                  <div class="scanner-actions">
+                    <select class="select" id="scan-student" style="max-width:260px;">
+                      <option value="">Select enrolled student</option>
+                    </select>
+                    <button type="button" class="btn primary" id="scan-button" onclick="scanFingerprint()">Start Scan</button>
+                  </div>
+                </section>
 
-<section class="page" id="page-terminals"><section class="panel"><div class="page-toolbar"><div><h2 style="margin:0">ESP32 Terminal Management</h2><p style="margin:5px 0;color:var(--muted);font-size:12px">Device discovery, registration, telemetry and simulator controls.</p></div><button class="btn primary" onclick="openModal('terminal-modal')">＋ Add ESP Terminal</button></div><div class="terminal-grid" id="terminals-grid"></div></section></section>
+                <!-- Wi-Fi Networks Studio -->
+                <section class="panel wifi-panel">
+                  <div class="panel-head">
+                    <div>
+                      <h2>⌁ Wi-Fi Networks</h2>
+                      <p>Network scan preview &bull; Multi-network failover</p>
+                    </div>
+                    <button type="button" class="btn primary small" onclick="scanWifi()">⟳ Scan Networks</button>
+                  </div>
+                  <div class="wifi-list" id="wifi-list"></div>
+                  <!-- Wi-Fi input fields protected from browser email/password autofill -->
+                  <div class="add-wifi">
+                    <span style="font-weight:800; color:#2778ed;">＋</span>
+                    <input class="input" id="manual-ssid" placeholder="Network name (SSID)" autocomplete="off" autocapitalize="off" spellcheck="false">
+                    <input class="input" id="manual-pass" placeholder="Password" type="password" autocomplete="new-password">
+                    <button type="button" class="btn primary" onclick="addWifi()">Add</button>
+                  </div>
+                  <div style="font-size:10.5px; color:#7586a0; margin-top:7px;">
+                    Wi-Fi scanning is simulated in this browser sandbox. Real radio discovery uses the physical ESP32.
+                  </div>
+                </section>
+              </div>
 
-<section class="page" id="page-vault"><section class="panel"><div class="page-toolbar"><div><h2 style="margin:0">Biometric Vault</h2><p style="margin:5px 0;color:var(--muted);font-size:12px">Enrollment status and simulated enrollment workflow. No real biometric templates stored.</p></div><input class="input search" id="vault-search" placeholder="Search student..." oninput="renderVault()"></div><div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Enrollment</th><th>Branch</th><th>Status</th><th>Action</th></tr></thead><tbody id="vault-table"></tbody></table></div></section></section>
+              <!-- Lower Ledger & Recent Scan Details -->
+              <div class="lower-grid">
+                <section class="panel">
+                  <div class="panel-head">
+                    <h2>▦ Attendance Log</h2>
+                    <button type="button" class="btn small" onclick="switchPage('attendance')">View All &rarr;</button>
+                  </div>
+                  <div class="table-wrap">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Student Name</th>
+                          <th>ID</th>
+                          <th>Date &amp; Time</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="attendance-preview"></tbody>
+                    </table>
+                  </div>
+                </section>
 
-<section class="page" id="page-activity"><section class="panel"><div class="page-toolbar"><div><h2 style="margin:0">Activity & System Logs</h2><p style="margin:5px 0;color:var(--muted);font-size:12px">Local demo actions and simulated terminal events.</p></div><button class="btn" onclick="clearLogs()">Clear logs</button></div><div class="log-list" id="log-list"></div></section></section>
-<section class="page" id="page-settings"><section class="panel"><div class="page-toolbar"><div><h2 style="margin:0">Settings</h2><p style="margin:5px 0;color:var(--muted);font-size:12px">Default Wi-Fi and interface preferences.</p></div></div><div class="form-grid"><div class="form-field"><label>Default Wi-Fi network</label><select class="select" id="default-wifi-select"></select></div><div class="form-field"><label>Interface</label><select class="select" id="motion-select"><option value="normal">Normal animations</option><option value="reduced">Reduced motion</option></select></div></div><div class="modal-actions" style="justify-content:flex-start"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn" onclick="setDefaultWifiFromSettings()">Set default Wi-Fi</button></div><p style="font-size:11px;color:var(--muted);margin-top:12px">Demo settings are stored locally in this browser. Actual Wi-Fi behavior needs a device/backend integration.</p></section></section>
-<footer><span>🏛 VidyaOS · Smart Campus Management System</span><span>Building a smarter, connected campus · Demo interface</span><span>⌁ Powered by VidyaOS</span></footer>
-</main></div>
+                <section class="panel">
+                  <div class="panel-head">
+                    <h2>♟ Student Details</h2>
+                    <span class="tag">LAST SCAN</span>
+                  </div>
+                  <div class="student-card" id="student-detail">
+                    <div class="avatar">👨‍🎓</div>
+                    <div class="student-info">
+                      <h3>No scan yet</h3>
+                      <p>Student profile will appear after a successful scan.</p>
+                      <p>Registered &amp; enrolled students only</p>
+                    </div>
+                    <div class="attendance-confirm">
+                      <div class="check">✓</div>
+                      <b>Awaiting Scan</b>
+                      <small>Attendance not marked</small>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </section>
 
-<div class="modal-backdrop" id="wifi-connect-modal"><div class="modal"><h2>Connect to Wi-Fi</h2><p id="wifi-modal-network">Choose network</p><form id="wifi-connect-form"><div class="form-field"><label>Network password</label><input class="input" id="wifi-connect-password" type="password" autocomplete="current-password" placeholder="Enter Wi-Fi password"></div><div class="form-field" style="margin-top:10px"><label><input id="wifi-set-default" type="checkbox"> Set as default network</label></div><div class="modal-actions"><button type="button" class="btn" onclick="closeModal('wifi-connect-modal')">Cancel</button><button class="btn primary" type="submit">Connect</button></div></form><div class="modal-feedback" id="wifi-connect-feedback"></div></div></div>
-<div class="modal-backdrop" id="terminal-modal"><div class="modal"><h2>Register ESP32 Terminal</h2><p>Demo pairing form for the terminal/device management UI.</p><form id="terminal-form"><div class="form-grid"><div class="form-field"><label>Terminal UID</label><input class="input" name="uid" required placeholder="ESP32-IT-01"></div><div class="form-field"><label>Display name</label><input class="input" name="name" required placeholder="IT Lab Entrance"></div><div class="form-field"><label>Department</label><input class="input" name="dept" placeholder="Information Technology"></div><div class="form-field"><label>Pairing key</label><input class="input" name="key" placeholder="Device pairing key"></div></div><div class="modal-actions"><button type="button" class="btn" onclick="closeModal('terminal-modal')">Cancel</button><button class="btn primary">Register Demo Terminal</button></div></form></div></div>
-<div class="toast" id="toast"></div>
-<script>
-const students=[
-{id:1001,name:'Aarav Sharma',enrollment:'2024IT001',roll:1,branch:'Information Technology',year:3,semester:5,enrolled:true},
-{id:1002,name:'Diya Patel',enrollment:'2024IT002',roll:2,branch:'Information Technology',year:3,semester:5,enrolled:false},
-{id:1003,name:'Kabir Verma',enrollment:'2024CS003',roll:3,branch:'Computer Science',year:2,semester:3,enrolled:false},
-{id:1004,name:'Meera Nair',enrollment:'2024EC004',roll:4,branch:'Electronics',year:1,semester:1,enrolled:true},
-{id:1005,name:'Rohan Das',enrollment:'2024IT005',roll:5,branch:'Information Technology',year:3,semester:5,enrolled:true}
-];
-let attendance=[{studentId:1001,time:new Date(),method:'Fingerprint'},{studentId:1004,time:new Date(Date.now()-5*60000),method:'Fingerprint'}];
-let wifi=[{ssid:'EduCampus WiFi',rssi:-42,security:'WPA2',connected:true,isDefault:true,password:'campus123'},{ssid:'VidyaOS Network',rssi:-56,security:'WPA2',connected:false},{ssid:'Campus_5G',rssi:-64,security:'WPA3',connected:false},{ssid:'Guest_WiFi',rssi:-78,security:'Open',connected:false}];
-let terminals=[{uid:'ESP32-IT-01',name:'IT Lab Entrance',department:'Information Technology',status:'Online',battery:'94%',firmware:'v2.4.1',active:true},{uid:'ESP32-LIB-02',name:'Library Gate',department:'Central Library',status:'Online',battery:'87%',firmware:'v2.4.1',active:false}];
-let logs=['Dashboard opened · Demo session initialized','Terminal ESP32-IT-01 connected · simulated telemetry','Fingerprint vault loaded · sample roster'];
-function toast(msg){let el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove('show'),2700)}
-function log(msg){logs.unshift(new Date().toLocaleTimeString()+' · '+msg);renderLogs()}
-function switchPage(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='students')renderStudents();if(page==='attendance')renderAttendance();if(page==='wifi')renderWifi(true);if(page==='vault')renderVault();if(page==='terminals')renderTerminals();if(page==='activity')renderLogs();if(page==='settings')renderSettings()}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));
-function openModal(id){document.getElementById(id).classList.add('show')}function closeModal(id){document.getElementById(id).classList.remove('show')}
-document.querySelectorAll('.modal-backdrop').forEach(b=>b.addEventListener('click',e=>{if(e.target===b)b.classList.remove('show')}));
-function timefmt(t){return new Date(t).toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})}
-function attendanceForToday(id){return attendance.some(a=>a.studentId===id&&new Date(a.time).toDateString()===new Date().toDateString())}
-function enrolledStudents(){return students.filter(s=>s.enrolled)}
-function refreshScanSelect(){let sel=document.getElementById('scan-student');sel.innerHTML='<option value="">Select enrolled student</option>'+enrolledStudents().map(s=>`<option value="${s.id}">${s.name} — ${s.enrollment}</option>`).join('')}
-function renderAttendance(){let rows=attendance.slice().sort((a,b)=>b.time-a.time).map((a,i)=>{let s=students.find(s=>s.id===a.studentId);return `<tr><td>${i+1}</td><td>${s?.name||'—'}</td><td>${s?.enrollment||'—'}</td><td>${timefmt(a.time)}</td><td><span class="status-pill">Present</span></td><td>${a.method}</td></tr>`}).join('');document.getElementById('attendance-table').innerHTML=rows||'<tr><td colspan="6">No attendance yet</td></tr>';document.getElementById('attendance-preview').innerHTML=rows.split('</tr>').slice(0,3).join('</tr>')+(rows?'':'<tr><td colspan="5">No attendance yet</td></tr>');document.getElementById('stat-students').textContent=students.length;document.getElementById('stat-enrolled').textContent=enrolledStudents().length;document.getElementById('stat-present').textContent=attendance.filter(a=>new Date(a.time).toDateString()===new Date().toDateString()).length;document.getElementById('stat-pending').textContent=students.filter(s=>!s.enrolled).length}
-function renderStudents(){let q=(document.getElementById('student-search')?.value||'').toLowerCase();document.getElementById('students-table').innerHTML=students.filter(s=>(s.name+s.enrollment+s.branch).toLowerCase().includes(q)).map(s=>`<tr><td>${s.roll}</td><td><b>${s.name}</b></td><td>${s.enrollment}</td><td>${s.branch}</td><td>${s.year}</td><td><span class="status-pill" style="${s.enrolled?'':'background:#fff1d7;color:#a56a10'}">${s.enrolled?'ENROLLED':'PENDING'}</span></td><td><button class="btn small ${s.enrolled?'':'purple'}" onclick="enroll(${s.id})">${s.enrolled?'View':'Enroll Finger'}</button></td></tr>`).join('')||'<tr><td colspan="7">No students found</td></tr>'}
-function renderVault(){let q=(document.getElementById('vault-search')?.value||'').toLowerCase();document.getElementById('vault-table').innerHTML=students.filter(s=>(s.name+s.enrollment+s.branch).toLowerCase().includes(q)).map(s=>`<tr><td><b>${s.name}</b></td><td>${s.enrollment}</td><td>${s.branch}</td><td><span class="status-pill" style="${s.enrolled?'':'background:#fff1d7;color:#a56a10'}">${s.enrolled?'ENROLLED':'NOT ENROLLED'}</span></td><td><button class="btn small purple" onclick="enroll(${s.id})">${s.enrolled?'View Template':'Start Enrollment'}</button></td></tr>`).join('')}
-function enroll(id){let s=students.find(s=>s.id===id);if(!s)return;if(s.enrolled){toast(`${s.name}: fingerprint already enrolled (demo)`);return}if(!confirm(`Start simulated fingerprint enrollment for ${s.name}?`))return;toast('Enrollment scan started…');setTimeout(()=>{s.enrolled=true;persistDemoState();log(`Fingerprint enrolled for ${s.name} (${s.enrollment})`);refreshScanSelect();renderStudents();renderVault();renderAttendance();toast(`Fingerprint enrollment complete for ${s.name}`)},1300)}
-function scanFingerprint(){let id=+document.getElementById('scan-student').value;if(!id){toast('Select an enrolled student first');return}let s=students.find(s=>s.id===id);if(!s||!s.enrolled){toast('Student not registered or fingerprint not enrolled. Attendance denied.');return}if(attendanceForToday(id)){toast(`${s.name} is already marked present today`);return}let box=document.getElementById('finger-box'),bar=document.getElementById('scan-progress'),btn=document.getElementById('scan-button');box.classList.add('scanning');btn.disabled=true;btn.textContent='Scanning…';document.getElementById('scan-instruction').textContent='Reading fingerprint…';document.getElementById('scan-sub').textContent='Verifying registered student template';bar.style.width='25%';setTimeout(()=>bar.style.width='65%',500);setTimeout(()=>{bar.style.width='100%';box.classList.remove('scanning');btn.disabled=false;btn.textContent='Start Scan';attendance.push({studentId:id,time:new Date(),method:'Fingerprint'});persistDemoState();document.getElementById('scan-instruction').textContent='Fingerprint matched · Attendance marked';document.getElementById('scan-sub').textContent=`Verified ${s.name} · ${s.enrollment}`;document.getElementById('student-detail').innerHTML=`<div class="avatar">👨‍🎓</div><div class="student-info"><h3>${s.name}</h3><p>ID: ${s.enrollment}</p><p>Department: ${s.branch}</p><p>Status: <span class="status-pill">Registered & Enrolled</span></p></div><div class="attendance-confirm"><div class="check">✓</div><b>Attendance Marked!</b><small>${timefmt(new Date())}</small></div>`;log(`Attendance marked for ${s.name} (${s.enrollment})`);renderAttendance();toast('Attendance successfully marked')},1450)}
-function focusScanner(){switchPage('dashboard');document.getElementById('scanner-panel').scrollIntoView({behavior:'smooth',block:'center'})}
-function renderWifi(full=false){let ids=full?['wifi-full-list']:['wifi-list'];ids.forEach(id=>{let target=document.getElementById(id);if(!target)return;target.innerHTML=wifi.map(n=>`<div class="wifi-row"><div class="wifi-symbol">⌁</div><div><div class="wifi-name">${n.ssid} ${n.isDefault?'<span class="network-status" style="background:#dceaff;color:#1764da">DEFAULT</span>':''}</div><div class="wifi-meta">${n.security} · ${n.rssi} dBm</div></div><div class="wifi-strength">${n.rssi>-50?'▮▮▮▮':n.rssi>-65?'▮▮▮':'▮▮'}</div>${n.connected?'<span class="network-status">Connected</span>':`<button class="btn small" onclick="requestWifiConnect('${escapeQuotes(n.ssid)}')">Connect</button>`}</div>`).join('')})}
-function escapeQuotes(s){return s.replace(/'/g,"\\'")}
-function scanWifi(){toast('Scanning nearby networks (demo)…');setTimeout(()=>{if(!wifi.find(n=>n.ssid==='Campus-Lab'))wifi.push({ssid:'Campus-Lab',rssi:-69,security:'WPA2',connected:false,isDefault:false});renderWifi(true);renderWifi();persistDemoState();log('Nearby Wi-Fi scan completed · simulated');toast('Wi-Fi preview refreshed (demo scan)')},800)}
-let pendingWifi=null;
-function requestWifiConnect(name){pendingWifi=wifi.find(n=>n.ssid===name);if(!pendingWifi)return;document.getElementById('wifi-modal-network').textContent='Network: '+name+' · '+pendingWifi.security;document.querySelector('#wifi-connect-modal label').textContent=pendingWifi.security==='Open'?'Password (not required for open network)':'Network password';document.getElementById('wifi-connect-password').value='';document.getElementById('wifi-set-default').checked=!!pendingWifi.isDefault;document.getElementById('wifi-connect-feedback').textContent='';openModal('wifi-connect-modal')}
-function connectWifi(name,password){let n=wifi.find(x=>x.ssid===name);if(!n)return;if(n.security!=='Open'&&(!password||password.length<8)){toast('Enter a valid Wi-Fi password (8+ characters)');return}wifi.forEach(x=>x.connected=x.ssid===name);if(n)n.password=password;if(document.getElementById('wifi-set-default')?.checked){wifi.forEach(x=>x.isDefault=x.ssid===name);localStorage.setItem('vidyaos-default-wifi',name)}renderWifi(true);renderWifi();persistDemoState();log(`Terminal Wi-Fi switched to ${name} · demo connection`);toast(`Connected to ${name} (demo)`)}
-document.getElementById('wifi-connect-form').addEventListener('submit',e=>{e.preventDefault();let pass=document.getElementById('wifi-connect-password').value;if(pendingWifi.security!=='Open'&&pass.length<8){document.getElementById('wifi-connect-feedback').textContent='Password must be at least 8 characters.';return}connectWifi(pendingWifi.ssid,pass);closeModal('wifi-connect-modal')})
-function addWifi(){let ssid=document.getElementById('manual-ssid').value.trim(),pass=document.getElementById('manual-pass').value;if(!ssid){toast('Enter a network name');return}if(wifi.some(n=>n.ssid===ssid)){toast('Network already in list');return}wifi.push({ssid,rssi:-50,security:pass?'WPA2':'Open',connected:false,isDefault:false,password:''});document.getElementById('manual-ssid').value='';document.getElementById('manual-pass').value='';renderWifi();renderWifi(true);persistDemoState();log(`Manual Wi-Fi network added: ${ssid}`);toast(`${ssid} added to list`);if(pass)requestWifiConnect(ssid)}
-function addWifiFull(){let ssid=document.getElementById('wifi-add-name').value.trim(),pass=document.getElementById('wifi-add-pass').value;if(!ssid){toast('Enter SSID first');return}document.getElementById('manual-ssid').value=ssid;document.getElementById('manual-pass').value=pass;addWifi();document.getElementById('wifi-add-name').value='';document.getElementById('wifi-add-pass').value=''}
-function renderTerminals(){document.getElementById('terminals-grid').innerHTML=terminals.map(t=>`<div class="terminal-card"><h3>▣ ${t.name}</h3><p>${t.uid} · ${t.department}</p><span class="status-pill">${t.status}</span><p>Battery: ${t.battery} · Firmware ${t.firmware}</p><div class="leds"><span class="led on" title="Green LED"></span><span class="led" title="Red LED"></span><span class="led on" title="Blue LED"></span></div><div class="scanner-actions"><button class="btn small" onclick="simulateTerminal('${t.uid}','success')">Success signal</button><button class="btn small" onclick="simulateTerminal('${t.uid}','failure')">Error signal</button><button class="btn small" onclick="simulateTerminal('${t.uid}','enroll')">Enroll mode</button></div></div>`).join('')}
-function simulateTerminal(uid,mode){let label={success:'Success LEDs and buzzer triggered',failure:'Failure indicator simulated',enroll:'Enrollment mode activated'}[mode];log(`${uid}: ${label}`);toast(`${uid}: ${label}`)}
-function renderLogs(){document.getElementById('log-list').innerHTML=logs.map(x=>`<div class="log-item"><span>${x}</span><small>LOCAL DEMO</small></div>`).join('')}
-function clearLogs(){logs=[];renderLogs();toast('Local demo log cleared')}
-function exportAttendance(){let csv='Name,Enrollment,Timestamp,Status,Method\\n'+attendance.map(a=>{let s=students.find(s=>s.id===a.studentId);return `"${s?.name||''}","${s?.enrollment||''}","${a.time.toISOString()}","Present","${a.method}"`}).join('\\n');let blob=new Blob([csv],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='vidyaos-attendance.csv';a.click();URL.revokeObjectURL(url);toast('Attendance CSV exported')}
-document.getElementById('terminal-form').addEventListener('submit',e=>{e.preventDefault();let d=new FormData(e.target);terminals.push({uid:d.get('uid'),name:d.get('name'),department:d.get('dept')||'Department',status:'Online (demo)',battery:'—',firmware:'Demo',active:false});closeModal('terminal-modal');e.target.reset();renderTerminals();persistDemoState();log('ESP32 terminal registered in demo UI');toast('Terminal added (demo)')});
-function renderSettings(){let sel=document.getElementById('default-wifi-select');if(!sel)return;sel.innerHTML=wifi.map(n=>`<option value="${n.ssid}" ${n.isDefault?'selected':''}>${n.ssid}</option>`).join('');document.getElementById('motion-select').value=localStorage.getItem('vidyaos-motion')||'normal'}
-function saveSettings(){localStorage.setItem('vidyaos-motion',document.getElementById('motion-select').value);let name=document.getElementById('default-wifi-select').value;if(name){wifi.forEach(n=>n.isDefault=n.ssid===name);localStorage.setItem('vidyaos-default-wifi',name);renderWifi();renderWifi(true)}toast('Settings saved locally');log('Interface settings and default Wi-Fi saved')}
-function setDefaultWifiFromSettings(){let name=document.getElementById('default-wifi-select').value;wifi.forEach(n=>n.isDefault=n.ssid===name);localStorage.setItem('vidyaos-default-wifi',name);renderWifi();renderWifi(true);toast(`${name} set as default Wi-Fi`);log(`Default Wi-Fi changed to ${name}`)}
-function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})}
-function persistDemoState(){try{localStorage.setItem('vidyaos-students',JSON.stringify(students));localStorage.setItem('vidyaos-attendance',JSON.stringify(attendance.map(a=>({...a,time:a.time.toISOString()}))));localStorage.setItem('vidyaos-wifi',JSON.stringify(wifi.map(n=>({ssid:n.ssid,rssi:n.rssi,security:n.security,connected:n.connected,isDefault:n.isDefault}))))}catch(e){}}
-(function loadDemoState(){try{let st=JSON.parse(localStorage.getItem('vidyaos-students')||'null');if(Array.isArray(st)&&st.length)students.splice(0,students.length,...st);let at=JSON.parse(localStorage.getItem('vidyaos-attendance')||'null');if(Array.isArray(at))attendance.splice(0,attendance.length,...at.map(a=>({...a,time:new Date(a.time)})));let nw=JSON.parse(localStorage.getItem('vidyaos-wifi')||'null');if(Array.isArray(nw)&&nw.length)wifi.splice(0,wifi.length,...nw)}catch(e){}})();
-(function(){let saved=localStorage.getItem('vidyaos-default-wifi');if(saved&&wifi.some(n=>n.ssid===saved)){wifi.forEach(n=>n.isDefault=n.ssid===saved)}})();refreshScanSelect();renderAttendance();renderWifi();renderWifi(true);renderStudents();renderVault();renderTerminals();renderLogs();renderSettings();updateClock();setInterval(updateClock,30000);
-</script></body></html>
+            <!-- ── TAB 2: STUDENTS ── -->
+            <section class="page" id="page-students">
+              <section class="panel">
+                <div class="page-toolbar">
+                  <div>
+                    <h2 style="margin:0;">Student Directory</h2>
+                    <p style="margin:5px 0; color:var(--muted); font-size:12px;">Registered student records and biometric status</p>
+                  </div>
+                  <span class="tag">Roster &bull; Enrollment Only</span>
+                  <input class="input search" id="student-search" placeholder="Search name, enrollment, branch..." oninput="renderStudents()">
+                </div>
+                <div class="table-wrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Roll</th>
+                        <th>Name</th>
+                        <th>Enrollment</th>
+                        <th>Branch</th>
+                        <th>Year</th>
+                        <th>Fingerprint</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="students-table"></tbody>
+                  </table>
+                </div>
+              </section>
+            </section>
+
+            <!-- ── TAB 3: ATTENDANCE OVERVIEW ── -->
+            <section class="page" id="page-attendance">
+              <section class="panel">
+                <div class="page-toolbar">
+                  <div>
+                    <h2 style="margin:0;">Attendance Overview</h2>
+                    <p style="margin:5px 0; color:var(--muted); font-size:12px;">Attendance marked after successful local biometric match.</p>
+                  </div>
+                  <button type="button" class="btn" onclick="exportAttendance()">Export CSV</button>
+                </div>
+                <div class="stats">
+                  <div class="stat"><small>Registered students</small><strong id="stat-students">0</strong></div>
+                  <div class="stat"><small>Enrolled fingerprints</small><strong id="stat-enrolled">0</strong></div>
+                  <div class="stat"><small>Present today</small><strong id="stat-present">0</strong></div>
+                  <div class="stat"><small>Pending enrollment</small><strong id="stat-pending">0</strong></div>
+                </div>
+                <div class="table-wrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Student ID</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Method</th>
+                      </tr>
+                    </thead>
+                    <tbody id="attendance-table"></tbody>
+                  </table>
+                </div>
+              </section>
+            </section>
+
+            <!-- ── TAB 4: WI-FI MANAGER ── -->
+            <section class="page" id="page-wifi">
+              <section class="panel">
+                <div class="page-toolbar">
+                  <div>
+                    <h2 style="margin:0;">Wi-Fi Network Manager</h2>
+                    <p style="margin:5px 0; color:var(--muted); font-size:12px;">Preview nearby networks and configure multi-network failover.</p>
+                  </div>
+                  <button type="button" class="btn primary" onclick="scanWifi()">⟳ Refresh scan</button>
+                </div>
+                <div class="wifi-list" id="wifi-full-list"></div>
+                <div class="add-wifi" style="margin-top:15px;">
+                  <input class="input" id="wifi-add-name" placeholder="Add network SSID" autocomplete="off" autocapitalize="off" spellcheck="false">
+                  <input class="input" id="wifi-add-pass" placeholder="Password" type="password" autocomplete="new-password">
+                  <button type="button" class="btn primary" onclick="addWifiFull()">Add Network</button>
+                </div>
+                <p style="font-size:11px; color:var(--muted); margin-top:10px;">
+                  Wi-Fi credentials configured here simulate failover switching for the terminal.
+                </p>
+              </section>
+            </section>
+
+            <!-- ── TAB 5: ESP32 TERMINALS ── -->
+            <section class="page" id="page-terminals">
+              <section class="panel">
+                <div class="page-toolbar">
+                  <div>
+                    <h2 style="margin:0;">ESP32 Terminal Management</h2>
+                    <p style="margin:5px 0; color:var(--muted); font-size:12px;">Device discovery, registration, telemetry and simulator controls.</p>
+                  </div>
+                  <button type="button" class="btn primary" onclick="openModal('terminal-modal')">＋ Add ESP Terminal</button>
+                </div>
+                <div class="terminal-grid" id="terminals-grid"></div>
+              </section>
+            </section>
+
+            <!-- ── TAB 6: BIOMETRIC VAULT ── -->
+            <section class="page" id="page-vault">
+              <section class="panel">
+                <div class="page-toolbar">
+                  <div>
+                    <h2 style="margin:0;">Biometric Vault</h2>
+                    <p style="margin:5px 0; color:var(--muted); font-size:12px;">Enrollment status and simulated enrollment workflow.</p>
+                  </div>
+                  <input class="input search" id="vault-search" placeholder="Search student..." oninput="renderVault()">
+                </div>
+                <div class="table-wrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Enrollment</th>
+                        <th>Branch</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="vault-table"></tbody>
+                  </table>
+                </div>
+              </section>
+            </section>
+
+            <!-- ── TAB 7: ACTIVITY & LOGS ── -->
+            <section class="page" id="page-activity">
+              <section class="panel">
+                <div class="page-toolbar">
+                  <div>
+                    <h2 style="margin:0;">Activity &amp; System Logs</h2>
+                    <p style="margin:5px 0; color:var(--muted); font-size:12px;">Local sandbox actions and simulated terminal telemetry.</p>
+                  </div>
+                  <button type="button" class="btn" onclick="clearLogs()">Clear logs</button>
+                </div>
+                <div class="log-list" id="log-list"></div>
+              </section>
+            </section>
+
+            <!-- ── TAB 8: SETTINGS ── -->
+            <section class="page" id="page-settings">
+              <section class="panel">
+                <div class="page-toolbar">
+                  <div>
+                    <h2 style="margin:0;">Settings</h2>
+                    <p style="margin:5px 0; color:var(--muted); font-size:12px;">Default Wi-Fi and interface preferences.</p>
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-field">
+                    <label>Default Wi-Fi network</label>
+                    <select class="select" id="default-wifi-select"></select>
+                  </div>
+                  <div class="form-field">
+                    <label>Interface Animations</label>
+                    <select class="select" id="motion-select">
+                      <option value="normal">Normal animations</option>
+                      <option value="reduced">Reduced motion</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-actions" style="justify-content:flex-start; margin-top:14px;">
+                  <button type="button" class="btn primary" onclick="saveSettings()">Save Settings</button>
+                  <button type="button" class="btn" onclick="setDefaultWifiFromSettings()">Set default Wi-Fi</button>
+                </div>
+              </section>
+            </section>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Connect Wi-Fi Modal -->
+  <div class="modal-backdrop" id="wifi-connect-modal">
+    <div class="modal">
+      <h2>Connect to Wi-Fi</h2>
+      <p id="wifi-modal-network">Choose network</p>
+      <form id="wifi-connect-form">
+        <div class="form-field">
+          <label>Network password</label>
+          <input class="input" id="wifi-connect-password" type="password" autocomplete="new-password" placeholder="Enter Wi-Fi password">
+        </div>
+        <div class="form-field" style="margin-top:10px;">
+          <label><input id="wifi-set-default" type="checkbox"> Set as default network</label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" onclick="closeModal('wifi-connect-modal')">Cancel</button>
+          <button type="submit" class="btn primary">Connect</button>
+        </div>
+      </form>
+      <div class="modal-feedback" id="wifi-connect-feedback"></div>
+    </div>
+  </div>
+
+  <!-- Register ESP Terminal Modal -->
+  <div class="modal-backdrop" id="terminal-modal">
+    <div class="modal">
+      <h2>Register ESP32 Terminal</h2>
+      <p>Provision pairing credentials for the terminal management UI.</p>
+      <form id="terminal-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Terminal UID</label>
+            <input class="input" name="uid" required placeholder="ESP32-IT-01">
+          </div>
+          <div class="form-field">
+            <label>Display name</label>
+            <input class="input" name="name" required placeholder="IT Lab Entrance">
+          </div>
+          <div class="form-field">
+            <label>Department</label>
+            <input class="input" name="dept" placeholder="Information Technology">
+          </div>
+          <div class="form-field">
+            <label>Pairing key</label>
+            <input class="input" name="key" placeholder="Device pairing key">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" onclick="closeModal('terminal-modal')">Cancel</button>
+          <button type="submit" class="btn primary">Register Demo Terminal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- VidyaOS Institutional Shell Scripts (Header, Sidebar, Auth, UI Helpers) -->
+  <script src="/faculty/components/core/api.js"></script>
+  <script src="/faculty/components/core/auth.js"></script>
+  <script src="/faculty/components/icons.js?v=20261116"></script>
+  <script src="/faculty/components/faculty-ui.js?v=20261116"></script>
+  <script src="/faculty/components/header/header.js?v=20261116"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
+
+  <!-- Interactive Studio Sandbox Controller -->
+  <script>
+  const students = [
+    { id: 1001, name: 'Aarav Sharma', enrollment: '2024IT001', roll: 1, branch: 'Information Technology', year: 3, semester: 5, enrolled: true },
+    { id: 1002, name: 'Diya Patel', enrollment: '2024IT002', roll: 2, branch: 'Information Technology', year: 3, semester: 5, enrolled: false },
+    { id: 1003, name: 'Kabir Verma', enrollment: '2024CS003', roll: 3, branch: 'Computer Science', year: 2, semester: 3, enrolled: false },
+    { id: 1004, name: 'Meera Nair', enrollment: '2024EC004', roll: 4, branch: 'Electronics', year: 1, semester: 1, enrolled: true },
+    { id: 1005, name: 'Rohan Das', enrollment: '2024IT005', roll: 5, branch: 'Information Technology', year: 3, semester: 5, enrolled: true }
+  ];
+  let attendance = [
+    { studentId: 1001, time: new Date(), method: 'Fingerprint' },
+    { studentId: 1004, time: new Date(Date.now() - 5 * 60000), method: 'Fingerprint' }
+  ];
+  let wifi = [
+    { ssid: 'Airtel_neer_3811', rssi: -42, security: 'WPA2_PSK', connected: true, isDefault: true, password: 'air' },
+    { ssid: 'vivot3lite', rssi: -56, security: 'WPA2_PSK', connected: false, isDefault: false },
+    { ssid: 'CAMPUS_WIFI_HIGH_SPEED', rssi: -64, security: 'WPA3_PSK', connected: false, isDefault: false },
+    { ssid: 'IT_FACULTY_ROUTER_2G', rssi: -71, security: 'WPA2_PSK', connected: false, isDefault: false }
+  ];
+  let terminals = [
+    { uid: 'ESP32-IT-LAB-01', name: 'IT Lab Entrance Terminal', department: 'Information Technology', status: 'Online', battery: '84%', firmware: 'v3.1.0', active: true },
+    { uid: 'ESP32-LIB-02', name: 'Library Biometric Gate', department: 'Central Library', status: 'Online', battery: '87%', firmware: 'v3.1.0', active: false }
+  ];
+  let logs = [
+    'ESP32 Studio sandbox initialized',
+    'Terminal ESP32-IT-LAB-01 connected (7.85V / 84% battery)',
+    'Biometric vault loaded with department roster'
+  ];
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => el.classList.remove('show'), 2700);
+  }
+
+  function log(msg) {
+    logs.unshift(new Date().toLocaleTimeString() + ' · ' + msg);
+    renderLogs();
+  }
+
+  function switchPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + page);
+    if (target) target.classList.add('active');
+    
+    // Synchronize both top tabs and any internal buttons
+    document.querySelectorAll('.preview-nav-tab').forEach(b => {
+      b.classList.toggle('active', b.dataset.page === page);
+    });
+
+    if (page === 'students') renderStudents();
+    if (page === 'attendance') renderAttendance();
+    if (page === 'wifi') renderWifi(true);
+    if (page === 'vault') renderVault();
+    if (page === 'terminals') renderTerminals();
+    if (page === 'activity') renderLogs();
+    if (page === 'settings') renderSettings();
+  }
+
+  document.querySelectorAll('.preview-nav-tab').forEach(b => {
+    b.onclick = () => switchPage(b.dataset.page);
+  });
+
+  function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('show');
+  }
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  }
+  document.querySelectorAll('.modal-backdrop').forEach(b => {
+    b.addEventListener('click', e => {
+      if (e.target === b) b.classList.remove('show');
+    });
+  });
+
+  function timefmt(t) {
+    return new Date(t).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function attendanceForToday(id) {
+    return attendance.some(a => a.studentId === id && new Date(a.time).toDateString() === new Date().toDateString());
+  }
+
+  function enrolledStudents() {
+    return students.filter(s => s.enrolled);
+  }
+
+  function refreshScanSelect() {
+    const sel = document.getElementById('scan-student');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Select enrolled student</option>' +
+      enrolledStudents().map(s => `<option value="${s.id}">${s.name} — ${s.enrollment} (Roll #${s.roll})</option>`).join('');
+  }
+
+  function renderAttendance() {
+    const rows = attendance.slice().sort((a, b) => b.time - a.time).map((a, i) => {
+      const s = students.find(x => x.id === a.studentId);
+      return `<tr>
+        <td>${i + 1}</td>
+        <td><strong>${s?.name || '—'}</strong></td>
+        <td>${s?.enrollment || '—'}</td>
+        <td>${timefmt(a.time)}</td>
+        <td><span class="status-pill">Present</span></td>
+        <td>${a.method}</td>
+      </tr>`;
+    }).join('');
+
+    const tbl = document.getElementById('attendance-table');
+    if (tbl) tbl.innerHTML = rows || '<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:#607492;">No attendance records marked yet</td></tr>';
+
+    const prev = document.getElementById('attendance-preview');
+    if (prev) {
+      prev.innerHTML = rows.split('</tr>').slice(0, 3).join('</tr>') + (rows ? '' : '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:#607492;">No attendance records marked yet</td></tr>');
+    }
+
+    const sCount = document.getElementById('stat-students');
+    if (sCount) sCount.textContent = students.length;
+    const eCount = document.getElementById('stat-enrolled');
+    if (eCount) eCount.textContent = enrolledStudents().length;
+    const pCount = document.getElementById('stat-present');
+    if (pCount) pCount.textContent = attendance.filter(a => new Date(a.time).toDateString() === new Date().toDateString()).length;
+    const penCount = document.getElementById('stat-pending');
+    if (penCount) penCount.textContent = students.filter(s => !s.enrolled).length;
+  }
+
+  function renderStudents() {
+    const q = (document.getElementById('student-search')?.value || '').toLowerCase();
+    const rows = students.filter(s => (s.name + s.enrollment + s.branch).toLowerCase().includes(q)).map(s => `
+      <tr>
+        <td>#${s.roll}</td>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.enrollment}</td>
+        <td>${s.branch}</td>
+        <td>Year ${s.year}</td>
+        <td><span class="status-pill" style="${s.enrolled ? '' : 'background:#fff1d7; color:#a56a10'}">${s.enrolled ? 'ENROLLED' : 'PENDING'}</span></td>
+        <td><button type="button" class="btn small ${s.enrolled ? '' : 'purple'}" onclick="enroll(${s.id})">${s.enrolled ? 'View' : 'Enroll Finger'}</button></td>
+      </tr>
+    `).join('');
+    const tbl = document.getElementById('students-table');
+    if (tbl) tbl.innerHTML = rows || '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#607492;">No students found</td></tr>';
+  }
+
+  function renderVault() {
+    const q = (document.getElementById('vault-search')?.value || '').toLowerCase();
+    const rows = students.filter(s => (s.name + s.enrollment + s.branch).toLowerCase().includes(q)).map(s => `
+      <tr>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.enrollment}</td>
+        <td>${s.branch}</td>
+        <td><span class="status-pill" style="${s.enrolled ? '' : 'background:#fff1d7; color:#a56a10'}">${s.enrolled ? 'ENROLLED' : 'NOT ENROLLED'}</span></td>
+        <td><button type="button" class="btn small purple" onclick="enroll(${s.id})">${s.enrolled ? 'View Template' : 'Start Enrollment'}</button></td>
+      </tr>
+    `).join('');
+    const tbl = document.getElementById('vault-table');
+    if (tbl) tbl.innerHTML = rows || '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:#607492;">No student templates found</td></tr>';
+  }
+
+  function enroll(id) {
+    const s = students.find(x => x.id === id);
+    if (!s) return;
+    if (s.enrolled) {
+      toast(`${s.name}: Fingerprint already enrolled in template vault`);
+      return;
+    }
+    if (!confirm(`Start biometric enrollment session for ${s.name}?`)) return;
+    toast('Enrollment scanner active... Place finger on sensor');
+    setTimeout(() => {
+      s.enrolled = true;
+      persistDemoState();
+      log(`Biometric template enrolled for ${s.name} (${s.enrollment})`);
+      refreshScanSelect();
+      renderStudents();
+      renderVault();
+      renderAttendance();
+      toast(`Biometric enrollment complete for ${s.name}`);
+    }, 1300);
+  }
+
+  function scanFingerprint() {
+    const id = +document.getElementById('scan-student').value;
+    if (!id) {
+      toast('Select an enrolled student first');
+      return;
+    }
+    const s = students.find(x => x.id === id);
+    if (!s || !s.enrolled) {
+      toast('Student not enrolled. Biometric check failed.');
+      return;
+    }
+    if (attendanceForToday(id)) {
+      toast(`${s.name} is already marked present today`);
+      return;
+    }
+
+    const box = document.getElementById('finger-box');
+    const bar = document.getElementById('scan-progress');
+    const btn = document.getElementById('scan-button');
+
+    box.classList.add('scanning');
+    btn.disabled = true;
+    btn.textContent = 'Scanning...';
+    document.getElementById('scan-instruction').textContent = 'Reading fingerprint on AS608...';
+    document.getElementById('scan-sub').textContent = 'Verifying local persistent biometric template';
+    bar.style.width = '30%';
+
+    setTimeout(() => bar.style.width = '70%', 450);
+    setTimeout(() => {
+      bar.style.width = '100%';
+      box.classList.remove('scanning');
+      btn.disabled = false;
+      btn.textContent = 'Start Scan';
+      attendance.push({ studentId: id, time: new Date(), method: 'Fingerprint (AS608)' });
+      persistDemoState();
+      
+      document.getElementById('scan-instruction').textContent = 'Fingerprint matched · Attendance marked';
+      document.getElementById('scan-sub').textContent = `Verified ${s.name} · ${s.enrollment}`;
+      
+      const det = document.getElementById('student-detail');
+      if (det) {
+        det.innerHTML = `
+          <div class="avatar">👨‍🎓</div>
+          <div class="student-info">
+            <h3>${s.name}</h3>
+            <p>ID: ${s.enrollment} &bull; Roll #${s.roll}</p>
+            <p>Department: ${s.branch}</p>
+            <p>Status: <span class="status-pill">Biometric Verified</span></p>
+          </div>
+          <div class="attendance-confirm">
+            <div class="check">✓</div>
+            <b>Attendance Marked!</b>
+            <small>${timefmt(new Date())}</small>
+          </div>
+        `;
+      }
+
+      log(`Biometric attendance marked for ${s.name} (${s.enrollment})`);
+      renderAttendance();
+      toast('Attendance marked successfully');
+    }, 1250);
+  }
+
+  function renderWifi(full = false) {
+    const ids = full ? ['wifi-full-list'] : ['wifi-list'];
+    ids.forEach(id => {
+      const target = document.getElementById(id);
+      if (!target) return;
+      target.innerHTML = wifi.map(n => `
+        <div class="wifi-row">
+          <div class="wifi-symbol">⌁</div>
+          <div>
+            <div class="wifi-name">${n.ssid} ${n.isDefault ? '<span class="network-status" style="background:#dceaff; color:#1764da;">DEFAULT</span>' : ''}</div>
+            <div class="wifi-meta">${n.security} &bull; ${n.rssi} dBm</div>
+          </div>
+          <div class="wifi-strength">${n.rssi > -50 ? '▮▮▮▮' : n.rssi > -65 ? '▮▮▮' : '▮▮'}</div>
+          ${n.connected ? '<span class="network-status">Connected</span>' : `<button type="button" class="btn small" onclick="requestWifiConnect('${escapeQuotes(n.ssid)}')">Connect</button>`}
+        </div>
+      `).join('');
+    });
+  }
+
+  function escapeQuotes(s) {
+    return s.replace(/'/g, "\\'");
+  }
+
+  function scanWifi() {
+    toast('Scanning nearby Wi-Fi radio channels...');
+    setTimeout(() => {
+      if (!wifi.find(n => n.ssid === 'Airtel_Ruby')) {
+        wifi.push({ ssid: 'Airtel_Ruby', rssi: -62, security: 'WPA2_PSK', connected: false, isDefault: false });
+      }
+      renderWifi(true);
+      renderWifi();
+      persistDemoState();
+      log('Nearby Wi-Fi discovery scan completed');
+      toast('Wi-Fi discovery refreshed');
+    }, 700);
+  }
+
+  let pendingWifi = null;
+  function requestWifiConnect(name) {
+    pendingWifi = wifi.find(n => n.ssid === name);
+    if (!pendingWifi) return;
+    document.getElementById('wifi-modal-network').textContent = 'Network: ' + name + ' · ' + pendingWifi.security;
+    document.querySelector('#wifi-connect-modal label').textContent = pendingWifi.security === 'Open' ? 'Password (not required for open network)' : 'Network password';
+    document.getElementById('wifi-connect-password').value = '';
+    document.getElementById('wifi-set-default').checked = !!pendingWifi.isDefault;
+    document.getElementById('wifi-connect-feedback').textContent = '';
+    openModal('wifi-connect-modal');
+  }
+
+  function connectWifi(name, password) {
+    const n = wifi.find(x => x.ssid === name);
+    if (!n) return;
+    if (n.security !== 'Open' && (!password || password.length < 8)) {
+      toast('Enter a valid Wi-Fi password (8+ characters)');
+      return;
+    }
+    wifi.forEach(x => x.connected = (x.ssid === name));
+    if (n) n.password = password;
+    if (document.getElementById('wifi-set-default')?.checked) {
+      wifi.forEach(x => x.isDefault = (x.ssid === name));
+      localStorage.setItem('vidyaos-default-wifi', name);
+    }
+    renderWifi(true);
+    renderWifi();
+    persistDemoState();
+    log(`Terminal switched Wi-Fi connection to ${name}`);
+    toast(`Connected to ${name}`);
+  }
+
+  document.getElementById('wifi-connect-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const pass = document.getElementById('wifi-connect-password').value;
+    if (pendingWifi.security !== 'Open' && pass.length < 8) {
+      document.getElementById('wifi-connect-feedback').textContent = 'Password must be at least 8 characters.';
+      return;
+    }
+    connectWifi(pendingWifi.ssid, pass);
+    closeModal('wifi-connect-modal');
+  });
+
+  function addWifi() {
+    const ssid = document.getElementById('manual-ssid').value.trim();
+    const pass = document.getElementById('manual-pass').value;
+    if (!ssid) {
+      toast('Enter a network SSID');
+      return;
+    }
+    if (wifi.some(n => n.ssid === ssid)) {
+      toast('Network already in list');
+      return;
+    }
+    wifi.push({ ssid, rssi: -55, security: pass ? 'WPA2_PSK' : 'Open', connected: false, isDefault: false, password: '' });
+    document.getElementById('manual-ssid').value = '';
+    document.getElementById('manual-pass').value = '';
+    renderWifi();
+    renderWifi(true);
+    persistDemoState();
+    log(`Wi-Fi network added: ${ssid}`);
+    toast(`${ssid} added to failover list`);
+    if (pass) requestWifiConnect(ssid);
+  }
+
+  function addWifiFull() {
+    const ssid = document.getElementById('wifi-add-name').value.trim();
+    const pass = document.getElementById('wifi-add-pass').value;
+    if (!ssid) {
+      toast('Enter SSID first');
+      return;
+    }
+    document.getElementById('manual-ssid').value = ssid;
+    document.getElementById('manual-pass').value = pass;
+    addWifi();
+    document.getElementById('wifi-add-name').value = '';
+    document.getElementById('wifi-add-pass').value = '';
+  }
+
+  function renderTerminals() {
+    const el = document.getElementById('terminals-grid');
+    if (!el) return;
+    el.innerHTML = terminals.map(t => `
+      <div class="terminal-card">
+        <h3>▣ ${t.name}</h3>
+        <p>${t.uid} &bull; ${t.department}</p>
+        <span class="status-pill">${t.status}</span>
+        <p style="margin-top:6px;">Battery: <strong>${t.battery}</strong> &bull; Firmware: <strong>${t.firmware}</strong></p>
+        <div class="leds">
+          <span class="led on" title="Green LED (Active)"></span>
+          <span class="led" title="Red LED"></span>
+          <span class="led on" title="Blue LED (Sync)"></span>
+        </div>
+        <div class="scanner-actions" style="justify-content:flex-start; margin-top:10px;">
+          <button type="button" class="btn small" onclick="simulateTerminal('${t.uid}', 'success')">Success Signal</button>
+          <button type="button" class="btn small" onclick="simulateTerminal('${t.uid}', 'failure')">Error Signal</button>
+          <button type="button" class="btn small" onclick="simulateTerminal('${t.uid}', 'enroll')">Enroll Mode</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function simulateTerminal(uid, mode) {
+    const label = { success: 'Success chime and green LED signal', failure: 'Error alert signal', enroll: 'Enrollment mode active' }[mode];
+    log(`${uid}: ${label}`);
+    toast(`${uid}: ${label}`);
+  }
+
+  function renderLogs() {
+    const el = document.getElementById('log-list');
+    if (!el) return;
+    el.innerHTML = logs.map(x => `
+      <div class="log-item">
+        <span>${x}</span>
+        <small>LOCAL TELEMETRY</small>
+      </div>
+    `).join('');
+  }
+
+  function clearLogs() {
+    logs = [];
+    renderLogs();
+    toast('Local activity log cleared');
+  }
+
+  function exportAttendance() {
+    let csv = 'Name,Enrollment,Timestamp,Status,Method\n' + attendance.map(a => {
+      const s = students.find(x => x.id === a.studentId);
+      return `"${s?.name || ''}","${s?.enrollment || ''}","${a.time.toISOString()}","Present","${a.method}"`;
+    }).join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vidyaos-biometric-attendance.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Attendance CSV exported successfully');
+  }
+
+  document.getElementById('terminal-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const d = new FormData(e.target);
+    terminals.push({
+      uid: d.get('uid'),
+      name: d.get('name'),
+      department: d.get('dept') || 'Information Technology',
+      status: 'Online',
+      battery: '88%',
+      firmware: 'v3.1.0',
+      active: false
+    });
+    closeModal('terminal-modal');
+    e.target.reset();
+    renderTerminals();
+    persistDemoState();
+    log(`ESP32 terminal provisioned: ${d.get('uid')}`);
+    toast('Terminal registered successfully');
+  });
+
+  function renderSettings() {
+    const sel = document.getElementById('default-wifi-select');
+    if (!sel) return;
+    sel.innerHTML = wifi.map(n => `<option value="${n.ssid}" ${n.isDefault ? 'selected' : ''}>${n.ssid}</option>`).join('');
+    const mot = document.getElementById('motion-select');
+    if (mot) mot.value = localStorage.getItem('vidyaos-motion') || 'normal';
+  }
+
+  function saveSettings() {
+    localStorage.setItem('vidyaos-motion', document.getElementById('motion-select').value);
+    const name = document.getElementById('default-wifi-select').value;
+    if (name) {
+      wifi.forEach(n => n.isDefault = (n.ssid === name));
+      localStorage.setItem('vidyaos-default-wifi', name);
+      renderWifi();
+      renderWifi(true);
+    }
+    toast('Settings saved');
+    log('Default Wi-Fi configuration saved');
+  }
+
+  function setDefaultWifiFromSettings() {
+    const name = document.getElementById('default-wifi-select').value;
+    wifi.forEach(n => n.isDefault = (n.ssid === name));
+    localStorage.setItem('vidyaos-default-wifi', name);
+    renderWifi();
+    renderWifi(true);
+    toast(`${name} set as default Wi-Fi`);
+    log(`Default Wi-Fi changed to ${name}`);
+  }
+
+  function updateClock() {
+    const el = document.getElementById('clock');
+    if (el) {
+      el.textContent = new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+  }
+
+  function persistDemoState() {
+    try {
+      localStorage.setItem('vidyaos-students', JSON.stringify(students));
+      localStorage.setItem('vidyaos-attendance', JSON.stringify(attendance.map(a => ({ ...a, time: a.time.toISOString() }))));
+      localStorage.setItem('vidyaos-wifi', JSON.stringify(wifi.map(n => ({ ssid: n.ssid, rssi: n.rssi, security: n.security, connected: n.connected, isDefault: n.isDefault }))));
+    } catch (_) {}
+  }
+
+  (function loadDemoState() {
+    try {
+      const st = JSON.parse(localStorage.getItem('vidyaos-students') || 'null');
+      if (Array.isArray(st) && st.length) students.splice(0, students.length, ...st);
+      const at = JSON.parse(localStorage.getItem('vidyaos-attendance') || 'null');
+      if (Array.isArray(at)) attendance.splice(0, attendance.length, ...at.map(a => ({ ...a, time: new Date(a.time) })));
+      const nw = JSON.parse(localStorage.getItem('vidyaos-wifi') || 'null');
+      if (Array.isArray(nw) && nw.length) wifi.splice(0, wifi.length, ...nw);
+    } catch (_) {}
+  })();
+
+  (function () {
+    const saved = localStorage.getItem('vidyaos-default-wifi');
+    if (saved && wifi.some(n => n.ssid === saved)) {
+      wifi.forEach(n => n.isDefault = (n.ssid === saved));
+    }
+  })();
+
+  refreshScanSelect();
+  renderAttendance();
+  renderWifi();
+  renderWifi(true);
+  renderStudents();
+  renderVault();
+  renderTerminals();
+  renderLogs();
+  renderSettings();
+  updateClock();
+  setInterval(updateClock, 30000);
+  </script>
+</body>
+</html>
