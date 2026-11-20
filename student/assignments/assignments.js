@@ -55,7 +55,7 @@ function initUserProfile() {
   const regEl = document.getElementById('popover-reg-badge');
   if (regEl) {
     const roll = user.class_roll_no !== undefined ? `Roll: ${user.class_roll_no}` : '';
-    const reg = user.registration_no || user.official_enrollment_no ? `Reg: ${user.registration_no || user.official_enrollment_no}` : '';
+    const reg = user.registration_no ? `Reg: ${user.registration_no}` : (user.ubter_roll_no || user.official_enrollment_no ? `UBTER Roll: ${user.ubter_roll_no || user.official_enrollment_no}` : '');
     const meta = [roll, reg].filter(Boolean).join(' • ');
     regEl.innerHTML = `<span class="badge" style="background:var(--col-att-group-bg); color:var(--status-present); font-size:0.75rem;">${escapeHtml(meta || 'Student Member')}</span>`;
   }

@@ -29,7 +29,7 @@ async function loadStudentProfile() {
     // 1. Identity & Hero Header
     const fullName = s.full_name || 'Student';
     document.getElementById('hero-name').innerText = fullName;
-    document.getElementById('hero-enrollment').innerText = s.official_enrollment_no || '--';
+    document.getElementById('hero-enrollment').innerText = s.ubter_roll_no || s.official_enrollment_no || '--';
     document.getElementById('hero-dept').innerText = `${s.department_name || 'Engineering'} (${s.branch_code || s.department_code || 'DEPT'})`;
     document.getElementById('hero-roll-badge').innerText = `Roll: ${s.class_roll_no || '--'}`;
     if (document.getElementById('hero-reg-badge')) {
@@ -54,7 +54,7 @@ async function loadStudentProfile() {
     document.getElementById('hero-avatar').innerText = initials;
 
     // Cohort Details
-    document.getElementById('profile-enrollment-no').innerText = s.official_enrollment_no || '--';
+    document.getElementById('profile-enrollment-no').innerText = s.ubter_roll_no || s.official_enrollment_no || '--';
     document.getElementById('profile-roll-no').innerText = s.class_roll_no ? `${s.class_roll_no}` : '--';
     document.getElementById('profile-reg-no').innerText = s.registration_no || '—';
     document.getElementById('profile-department').innerText = s.department_name || s.branch_name || '--';
@@ -63,7 +63,7 @@ async function loadStudentProfile() {
     document.getElementById('profile-class-teacher').innerText = s.class_teacher_name || 'Faculty Advisor';
 
     // Account Fields
-    document.getElementById('profile-username').value = s.official_enrollment_no || s.username || '';
+    document.getElementById('profile-username').value = s.ubter_roll_no || s.official_enrollment_no || s.username || '';
     document.getElementById('profile-email').value = s.email || '';
 
     // Demographic & KYC Dossier Fields
@@ -412,7 +412,7 @@ async function exportStudentDossier(format) {
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Academic Dossier — ${escapeHtml(p.full_name || 'Student')} (${escapeHtml(p.official_enrollment_no || '')})</title>
+          <title>Academic Dossier — ${escapeHtml(p.full_name || 'Student')} (${escapeHtml(p.ubter_roll_no || p.official_enrollment_no || '')})</title>
           <style>
             body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; padding: 24px; line-height: 1.45; font-size: 13px; }
             .header { border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
@@ -555,7 +555,7 @@ async function exportStudentDossier(format) {
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `Academic_Dossier_${p.official_enrollment_no || 'Student'}_${Date.now()}.csv`;
+      link.download = `Academic_Dossier_${p.ubter_roll_no || p.official_enrollment_no || 'Student'}_${Date.now()}.csv`;
       link.click();
       URL.revokeObjectURL(link.href);
       if (typeof showToast === 'function') showToast('Excel/CSV dossier exported successfully', 'success');
@@ -577,7 +577,7 @@ async function exportStudentDossier(format) {
           <hr/>
           <h3>1. Demographics</h3>
           <table>
-            <tr><td><strong>Name</strong></td><td>${escapeHtml(p.full_name || '')}</td><td><strong>Enrollment</strong></td><td>${escapeHtml(p.official_enrollment_no || '')}</td></tr>
+            <tr><td><strong>Name</strong></td><td>${escapeHtml(p.full_name || '')}</td><td><strong>UBTER Roll No</strong></td><td>${escapeHtml(p.ubter_roll_no || p.official_enrollment_no || '')}</td></tr>
             <tr><td><strong>Roll No</strong></td><td>${escapeHtml(p.class_roll_no ? String(p.class_roll_no) : '')}</td><td><strong>UBTER Reg</strong></td><td>${escapeHtml(p.registration_no || '')}</td></tr>
             <tr><td><strong>Father's Name</strong></td><td>${escapeHtml(p.father_name || '')}</td><td><strong>Mother's Name</strong></td><td>${escapeHtml(p.mother_name || '')}</td></tr>
             <tr><td><strong>DOB / Gender</strong></td><td>${escapeHtml(p.dob || '')} (${escapeHtml(p.gender || '')})</td><td><strong>Category</strong></td><td>${escapeHtml(p.category || '')}</td></tr>
@@ -604,7 +604,7 @@ async function exportStudentDossier(format) {
       const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `Academic_Dossier_${p.official_enrollment_no || 'Student'}_${Date.now()}.doc`;
+      link.download = `Academic_Dossier_${p.ubter_roll_no || p.official_enrollment_no || 'Student'}_${Date.now()}.doc`;
       link.click();
       URL.revokeObjectURL(link.href);
       if (typeof showToast === 'function') showToast('Word (.doc) dossier exported successfully', 'success');

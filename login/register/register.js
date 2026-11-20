@@ -387,14 +387,14 @@ async function handleStudentSubmit(e) {
     enrollNo = null;
   } else {
     if (!enrollNo) {
-      if (enrollError) enrollError.textContent = 'UBTER Enrollment Number is required (or check "Enrollment Number Not Available").';
-      showAlert('Please enter your 11-digit official UBTER enrollment number or check "Enrollment Number Not Available".', 'danger');
+      if (enrollError) enrollError.textContent = 'UBTER Roll Number is required (or check "UBTER Roll Number Not Available").';
+      showAlert('Please enter your 11-digit official UBTER roll number or check "UBTER Roll Number Not Available".', 'danger');
       enrollInput?.focus();
       return;
     }
     if (enrollNo.length !== 11 || !/^\d{11}$/.test(enrollNo)) {
-      if (enrollError) enrollError.textContent = 'UBTER Enrollment Number must be exactly 11 numeric digits.';
-      showAlert('UBTER Enrollment Number must be exactly 11 numeric digits (0–9).', 'danger');
+      if (enrollError) enrollError.textContent = 'UBTER Roll Number must be exactly 11 numeric digits.';
+      showAlert('UBTER Roll Number must be exactly 11 numeric digits (0–9).', 'danger');
       enrollInput?.focus();
       return;
     }
@@ -459,6 +459,7 @@ async function handleStudentSubmit(e) {
     const payload = {
       full_name: fullName,
       official_enrollment_no: isEnrollNotAvailable ? null : enrollNo,
+      ubter_roll_no: isEnrollNotAvailable ? null : enrollNo,
       enrollment_not_available: isEnrollNotAvailable,
       registration_no: ubterNo,
       class_roll_no: classRollNo,
@@ -482,7 +483,7 @@ async function handleStudentSubmit(e) {
         name: fullName,
         role: 'Student',
         email,
-        detailLabel: 'Enrollment Status',
+        detailLabel: 'UBTER Roll Status',
         detailValue: isEnrollNotAvailable ? 'Not Assigned' : (enrollNo || (ubterNo ? 'UBTER: ' + ubterNo : 'Not Assigned')),
         dept: document.getElementById('stu-dept').options[document.getElementById('stu-dept').selectedIndex]?.text
       });
@@ -543,21 +544,21 @@ function showSuccessView(info) {
         stuEnrollInput.placeholder = 'Not Assigned';
         stuEnrollInput.removeAttribute('required');
         if (stuEnrollReq) stuEnrollReq.style.display = 'none';
-        if (stuEnrollHint) stuEnrollHint.textContent = 'Enrollment status will be registered as "Not Assigned".';
+        if (stuEnrollHint) stuEnrollHint.textContent = 'UBTER roll status will be registered as "Not Assigned".';
         if (stuEnrollError) stuEnrollError.textContent = '';
         stuEnrollInput.classList.remove('has-error');
       } else {
         stuEnrollInput.disabled = false;
-        stuEnrollInput.placeholder = '11-digit numeric enrollment';
+        stuEnrollInput.placeholder = '11-digit numeric UBTER roll no';
         stuEnrollInput.setAttribute('required', 'required');
         if (stuEnrollReq) stuEnrollReq.style.display = 'inline';
-        if (stuEnrollHint) stuEnrollHint.textContent = 'Enter your 11-digit official UBTER enrollment number.';
+        if (stuEnrollHint) stuEnrollHint.textContent = 'Enter your 11-digit official UBTER roll number.';
         if (stuEnrollError) stuEnrollError.textContent = '';
       }
     });
   }
 
-  // Enrollment Number numeric 11-digit enforcement
+  // UBTER Roll Number numeric 11-digit enforcement
   if (stuEnrollInput) {
     stuEnrollInput.addEventListener('input', (e) => {
       e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
@@ -570,7 +571,7 @@ function showSuccessView(info) {
       if (chkEnrollNotAvailable && chkEnrollNotAvailable.checked) return;
       const val = e.target.value.trim();
       if (val && val.length !== 11) {
-        if (stuEnrollError) stuEnrollError.textContent = 'UBTER Enrollment number must be exactly 11 numeric digits.';
+        if (stuEnrollError) stuEnrollError.textContent = 'UBTER Roll number must be exactly 11 numeric digits.';
         stuEnrollInput.classList.add('has-error');
       } else if (stuEnrollError) {
         stuEnrollError.textContent = '';

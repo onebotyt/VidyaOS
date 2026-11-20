@@ -830,7 +830,7 @@
           idx + 1,
           st.class_roll_no || idx + 1,
           st.registration_no || '—',
-          st.official_enrollment_no || '—',
+          st.ubter_roll_no || st.official_enrollment_no || '—',
           st.full_name,
           ...(st.question_scores || [0, 0, 0, 0]),
           st.is_absent ? '0 (AB)' : st.total_marks
@@ -855,7 +855,7 @@
           idx + 1,
           st.class_roll_no || idx + 1,
           st.registration_no || '—',
-          st.official_enrollment_no || '—',
+          st.ubter_roll_no || st.official_enrollment_no || '—',
           st.full_name,
           ...scores,
           st.total_marks,
@@ -2668,7 +2668,7 @@
           ${students.map((s, idx) => `
             <tr>
               <td><b>${s.class_roll_no || idx + 1}</b></td>
-              <td>${escapeHtml(s.official_enrollment_no || '')}</td>
+              <td>${escapeHtml(s.ubter_roll_no || s.official_enrollment_no || '')}</td>
               <td>${escapeHtml(s.registration_no || '')}</td>
               <td><b>${escapeHtml(s.full_name || '')}</b></td>
               <td>${escapeHtml(s.father_name || '')}</td>
@@ -2729,7 +2729,7 @@
             ${students.map((s, idx) => `
               <tr>
                 <td><b>${s.class_roll_no || idx + 1}</b></td>
-                <td>${escapeHtml(s.official_enrollment_no || '')}</td>
+                <td>${escapeHtml(s.ubter_roll_no || s.official_enrollment_no || '')}</td>
                 <td><b>${escapeHtml(s.full_name || '')}</b></td>
                 <td>${escapeHtml(s.father_name || '')}</td>
                 <td>${s.dob || ''}</td>

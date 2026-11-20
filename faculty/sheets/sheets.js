@@ -1811,6 +1811,7 @@ function confirmAddStudentRow() {
     student_id: Date.now(),
     class_roll_no: roll,
     full_name: name,
+    ubter_roll_no: enroll,
     official_enrollment_no: enroll,
     registration_no: reg,
     assignment_scores: [],
@@ -1831,6 +1832,7 @@ function confirmAddStudentRow() {
       student_id: newStudentObj.student_id,
       class_roll_no: roll,
       full_name: name,
+      ubter_roll_no: enroll,
       official_enrollment_no: enroll,
       registration_no: reg,
       is_absent: false,
@@ -1841,7 +1843,7 @@ function confirmAddStudentRow() {
   }
 
   // Add to members list
-  S.members.push({ student_id: newStudentObj.student_id, class_roll_no: roll, full_name: name, official_enrollment_no: enroll, registration_no: reg });
+  S.members.push({ student_id: newStudentObj.student_id, class_roll_no: roll, full_name: name, ubter_roll_no: enroll, official_enrollment_no: enroll, registration_no: reg });
   const sbCount = document.getElementById('sb-enrolled-count');
   if (sbCount) sbCount.textContent = `Enrolled: ${S.members.length}`;
 
@@ -2322,7 +2324,7 @@ function renderEvaluationSheetTable() {
     if (q) {
       const name = (st.full_name || '').toLowerCase();
       const roll = String(st.class_roll_no || '');
-      const enrl = (st.official_enrollment_no || '').toLowerCase();
+      const enrl = (st.ubter_roll_no || st.official_enrollment_no || '').toLowerCase();
       const regNo = (st.registration_no || '').toLowerCase();
       if (!name.includes(q) && !roll.includes(q) && !enrl.includes(q) && !regNo.includes(q)) return false;
     }
@@ -2524,7 +2526,7 @@ function renderEvaluationSheetTable() {
           <tr id="eval-row-${s.student_id}">
             <td class="cell-roll col-roll">${esc(s.class_roll_no)}</td>
             <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${esc(s.registration_no || '—')}</td>
-            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${esc(s.official_enrollment_no || '—')}</td>
+            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.78rem; color: var(--text-muted);">${esc(s.ubter_roll_no || s.official_enrollment_no || '—')}</td>
             <td class="cell-student-name col-name">
               <span style="font-weight: 700; text-transform: uppercase;">${esc(s.full_name)}</span>
             </td>
@@ -3228,7 +3230,7 @@ function renderTestSheetTable() {
                   <td class="excel-cell-sr col-sr">${rIdx + 1}</td>
                   <td class="cell-roll col-roll">${esc(r.class_roll_no || rIdx + 1)}</td>
                   <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(r.registration_no || '—')}</td>
-                  <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(r.official_enrollment_no || '—')}</td>
+                  <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(r.ubter_roll_no || r.official_enrollment_no || '—')}</td>
                   <td class="cell-student-name col-name">
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem;">
                       <div class="dyn-student-cell">
@@ -3680,7 +3682,7 @@ function renderAllTestsCombinedTable() {
                   <td class="excel-cell-sr col-sr">${rIdx + 1}</td>
                   <td class="cell-roll col-roll">${esc(s.class_roll_no || rIdx + 1)}</td>
                   <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(s.registration_no || '—')}</td>
-                  <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(s.official_enrollment_no || '—')}</td>
+                  <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(s.ubter_roll_no || s.official_enrollment_no || '—')}</td>
                   <td class="cell-student-name col-name">
                     <span style="font-weight: 700; text-transform: uppercase;">${esc(s.full_name)}</span>
                   </td>
@@ -3961,7 +3963,7 @@ function renderAssignmentsSheetTable() {
             <td class="excel-cell-sr col-sr">${idx + 1}</td>
             <td class="cell-roll col-roll">${esc(st.class_roll_no || idx + 1)}</td>
             <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.registration_no || '—')}</td>
-            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.official_enrollment_no || '—')}</td>
+            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.ubter_roll_no || st.official_enrollment_no || '—')}</td>
             <td class="cell-student-name col-name">
               <div class="dyn-student-cell">
                 <span class="dyn-student-name" style="font-weight:700;" title="${esc(st.full_name)}">${esc(st.full_name)}</span>
@@ -4261,7 +4263,7 @@ function renderPracticalsSheetTable() {
             <td class="excel-cell-sr col-sr">${idx + 1}</td>
             <td class="cell-roll col-roll">${esc(st.class_roll_no || idx + 1)}</td>
             <td class="col-reg" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.registration_no || '—')}</td>
-            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.official_enrollment_no || '—')}</td>
+            <td class="col-enroll" style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(st.ubter_roll_no || st.official_enrollment_no || '—')}</td>
             <td class="cell-student-name col-name">
               <div class="dyn-student-cell">
                 <span class="dyn-student-name" style="font-weight:700;" title="${esc(st.full_name)}">${esc(st.full_name)}</span>
@@ -10188,7 +10190,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
     const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
-    const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.ubter_roll_no || stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
     const name = stu.full_name || stu.student_name || stu.name || '';
     const attPct = Math.round(Number(stu.attendance_percentage !== undefined && stu.attendance_percentage !== null ? stu.attendance_percentage : 0));
 
@@ -10313,7 +10315,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
     const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
-    const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.ubter_roll_no || stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
     const name = stu.full_name || stu.student_name || stu.name || '';
 
     const preserved = existingScoresMap[enroll] || existingScoresMap[regNo] || existingScoresMap[roll] || existingScoresMap[name] || {};
@@ -10580,7 +10582,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
       const srNo = idx + 1;
       const roll = stu.class_roll_no || (idx + 1);
       const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
-      const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
+      const enroll = stu.isPlaceholder ? '' : (stu.ubter_roll_no || stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
       const name = stu.full_name || stu.student_name || stu.name || '';
 
       const preserved = existingScoresMap[enroll] || existingScoresMap[regNo] || existingScoresMap[roll] || existingScoresMap[name] || {};
@@ -10655,7 +10657,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
     const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
-    const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.ubter_roll_no || stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
     const name = stu.full_name || stu.student_name || stu.name || '';
 
     const preserved = existingScoresMap[enroll] || existingScoresMap[regNo] || existingScoresMap[roll] || existingScoresMap[name] || {};
@@ -10724,7 +10726,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     const srNo = idx + 1;
     const roll = stu.class_roll_no || (idx + 1);
     const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
-    const enroll = stu.isPlaceholder ? '' : (stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.ubter_roll_no || stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
     const name = stu.full_name || stu.student_name || stu.name || '';
     const attPct = Math.round(Number(stu.attendance_percentage !== undefined && stu.attendance_percentage !== null ? stu.attendance_percentage : 0));
 
