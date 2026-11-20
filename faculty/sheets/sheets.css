@@ -5326,7 +5326,7 @@ span.excel-hdr-num-badge {
 
 .office-btn-pulse {
   background: var(--color-primary) !important;
-  color: var(--text-white, #fff) !important;
+  color: var(--text-inverse, hsl(0 0% 100%)) !important;
   border-color: var(--color-primary) !important;
 }
 
@@ -5374,4 +5374,179 @@ span.excel-hdr-num-badge {
 .empty-sub {
   font-size: 0.78rem;
   color: var(--text-muted);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OFFICE STUDIO HEADER VIEW STATES (.in-home-view)
+   ══════════════════════════════════════════════════════════════ */
+.office-hub-top-title {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.35rem;
+}
+
+.office-hub-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--status-present, hsl(142 71% 45%));
+  color: var(--text-inverse, hsl(0 0% 100%));
+}
+
+.office-hub-text {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+#faculty-header.in-home-view .excel-brand-block,
+#faculty-header.in-home-view .excel-group-select-wrap,
+#faculty-header.in-home-view .excel-sync-indicator {
+  display: none !important;
+}
+
+#faculty-header.in-home-view .office-hub-top-title {
+  display: inline-flex !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OFFICE ENGINE LAZY LOADER & VISUAL TRANSITION OVERLAY
+   ══════════════════════════════════════════════════════════════ */
+.office-engine-loader {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 950;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsla(220, 20%, 97%, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: officeFadeIn 0.2s ease-out;
+}
+
+[data-theme='dark'] .office-engine-loader {
+  background: hsla(220, 26%, 12%, 0.88);
+}
+
+.office-loader-card {
+  width: 90%;
+  max-width: 380px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 36px hsla(220, 30%, 10%, 0.12);
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  animation: officeCardPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes officeFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes officeCardPop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.office-loader-spinner-wrap {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.office-loader-spinner {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--color-primary);
+  border-right-color: var(--status-present, hsl(142 71% 45%));
+  animation: officeSpin 0.85s linear infinite;
+}
+
+@keyframes officeSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.office-loader-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--text-inverse, hsl(0 0% 100%));
+  background: var(--status-present, hsl(142 71% 45%));
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.35rem;
+}
+
+.office-loader-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.office-loader-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  min-height: 1.2rem;
+}
+
+.office-loader-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.office-loader-progress-inner {
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--status-present, hsl(142 71% 45%)));
+  border-radius: 999px;
+  animation: officeProgress 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes officeProgress {
+  0% {
+    transform: translateX(-50%);
+    width: 25%;
+  }
+  50% {
+    width: 60%;
+  }
+  100% {
+    transform: translateX(180%);
+    width: 35%;
+  }
 }

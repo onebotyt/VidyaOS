@@ -88,6 +88,12 @@
 
           <span class="header-nav-divider"></span>
 
+          <!-- Office Studio Top Title (Visible when in Home View) -->
+          <div class="office-hub-top-title" id="office-hub-top-title">
+            <span class="office-hub-badge">XLS</span>
+            <span class="office-hub-text">Office Studio — Subjects &amp; Documents Hub</span>
+          </div>
+
           <!-- Excel Brand Icon & Editable File Title + Compact Sync Pill -->
           <div class="excel-brand-block">
             <div class="excel-file-badge" title="Microsoft Excel Compatible Spreadsheet">
@@ -191,6 +197,23 @@
           </div>
         </div>
       </header>
+
+      <!-- ══════════════════════════════════════════════════════════════
+       OFFICE ENGINE LAZY LOADER (TRANSITION UX)
+       ══════════════════════════════════════════════════════════════ -->
+      <div id="office-engine-loader" class="office-engine-loader" style="display:none;" aria-live="polite">
+        <div class="office-loader-card">
+          <div class="office-loader-spinner-wrap">
+            <div class="office-loader-spinner"></div>
+            <div class="office-loader-badge">XLS</div>
+          </div>
+          <div class="office-loader-title">Office Studio</div>
+          <div class="office-loader-sub" id="office-loader-status">Initializing Academic Spreadsheet Engine...</div>
+          <div class="office-loader-progress-bar">
+            <div class="office-loader-progress-inner"></div>
+          </div>
+        </div>
+      </div>
 
       <!-- ══════════════════════════════════════════════════════════════
        OFFICE STUDIO MODERN START / HOME SCREEN & SUBJECTS HUB
@@ -2563,9 +2586,8 @@
     <script src="/faculty/components/faculty-ui.js?v=20261029"></script>
     <script src="/faculty/components/header/header.js?v=20261029"></script>
     <script src="/faculty/components/sidebar/sidebar.js?v=20261029"></script>
-    <script src="/faculty/components/core/exceljs.min.js"></script>
-
-    <script src="/faculty/sheets/sheets.js?v=20261025"></script>
+    <!-- Office Studio Modular Architecture: Lightweight Initial Hub Loader (< 20 KB) -->
+    <script src="/faculty/sheets/office-home.js?v=20261120"></script>
 </body>
 
 </html>
