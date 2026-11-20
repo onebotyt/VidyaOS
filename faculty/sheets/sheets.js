@@ -212,11 +212,18 @@ async function initSheetsStudio() {
 
     // Purge any stale mock cache saved under old roster
     try {
-      const testKey = `vidyaos_excel_wb_${S.groupId || 'default'}`;
-      const savedTest = localStorage.getItem(testKey);
-      if (savedTest && (savedTest.includes('24011F') || savedTest.includes('HARSHIT JOSHI') || savedTest.includes('KAPIL BISHT'))) {
-        localStorage.removeItem(testKey);
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (k.startsWith('vidyaos_excel_wb') || k.startsWith('vidyaos_inst_header') || k === 'vidyaos_institution_marks_header') {
+          const val = localStorage.getItem(k);
+          if (val && (val.includes('24011F') || val.includes('HARSHIT JOSHI') || val.includes('KAPIL BISHT') || val.includes('MANISH TIWARI') || val.includes('8.3') || val.includes('1.82'))) {
+            keysToRemove.push(k);
+          }
+        }
       }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
     } catch (_) { }
 
     // Update banner metadata text immediately
@@ -276,8 +283,7 @@ if (document.readyState === 'loading') {
 
 async function loadTeacherGroupsList() {
   try {
-    const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
-    const res = await Promise.race([apiFetch('/teaching-groups?status=ACTIVE'), timeout(4000)]).catch(() => null);
+    const res = await apiFetch('/teaching-groups?status=ACTIVE').catch(() => null);
     if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
       S.allGroups = res.data;
       if (!S.groupId) {
@@ -391,7 +397,6 @@ function renderSheetSelectorDropdownOptions() {
 }
 
 async function loadGroupMetadata(groupId) {
-  const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
   try {
     // 1. Immediately match known group from S.allGroups
     const found = (S.allGroups || []).find(g => Number(g.id) === Number(groupId));
@@ -401,7 +406,7 @@ async function loadGroupMetadata(groupId) {
     }
 
     // 2. Fetch fresh details for this teaching group
-    const groupRes = await Promise.race([apiFetch(`/teaching-groups/${groupId}`), timeout(4000)]).catch(() => null);
+    const groupRes = await apiFetch(`/teaching-groups/${groupId}`).catch(() => null);
     if (groupRes && groupRes.success && groupRes.data) {
       S.group = Object.assign(S.group || {}, groupRes.data);
       S.registerId = S.group.register_id || S.group.linked_register_id || S.registerId || groupId;
@@ -441,10 +446,10 @@ async function loadGroupMetadata(groupId) {
 
     // 4. Concurrently fetch members, assignments, tests, and marks evaluation
     const [memRes, aRes, tRes, evalRes] = await Promise.allSettled([
-      Promise.race([apiFetch(`/teaching-groups/${groupId}/members`), timeout(4000)]),
-      Promise.race([apiFetch(`/teaching-groups/${groupId}/assignments`), timeout(4000)]),
-      Promise.race([apiFetch(`/teaching-groups/${groupId}/tests`), timeout(4000)]),
-      Promise.race([apiFetch(`/faculty/registers/${S.registerId || groupId}/internal-evaluation`), timeout(4000)])
+      apiFetch(`/teaching-groups/${groupId}/members`),
+      apiFetch(`/teaching-groups/${groupId}/assignments`),
+      apiFetch(`/teaching-groups/${groupId}/tests`),
+      apiFetch(`/faculty/registers/${S.registerId || groupId}/internal-evaluation`)
     ]);
 
     if (memRes.status === 'fulfilled' && memRes.value?.success && Array.isArray(memRes.value.data) && memRes.value.data.length > 0) {
@@ -453,11 +458,33 @@ async function loadGroupMetadata(groupId) {
       S.members = S.group.members;
     }
 
-    // If teaching-group has no members enrolled yet, fetch real institutional students from database
+    if (evalRes.status === 'fulfilled' && evalRes.value?.success && evalRes.value?.data) {
+      const d = evalRes.value.data;
+      if (Array.isArray(d.assignments) && d.assignments.length) S.assignments = d.assignments;
+      if (Array.isArray(d.exams) && d.exams.length) S.tests = d.exams;
+      if (Array.isArray(d.roster) && d.roster.length && (!S.members || !S.members.length)) {
+        S.members = d.roster;
+      } else if (Array.isArray(d.students) && d.students.length && (!S.members || !S.members.length)) {
+        S.members = d.students;
+      }
+      S.evalData = d;
+    }
+
+    // Tier 2: If teaching group has no members enrolled yet, query authentic students from student records
     if (!S.members || !S.members.length) {
-      const deptStudentsRes = await Promise.race([apiFetch(`/students?limit=50`), timeout(3000)]).catch(() => null);
-      if (deptStudentsRes && deptStudentsRes.success && Array.isArray(deptStudentsRes.data) && deptStudentsRes.data.length > 0) {
-        S.members = deptStudentsRes.data;
+      const deptId = S.group?.department_id || '';
+      const semFilter = S.group?.semester || '';
+      const recRes = await apiFetch(`/student-records?department_id=${deptId}&semester=${semFilter}`).catch(() => null);
+      if (recRes && recRes.success && Array.isArray(recRes.data) && recRes.data.length > 0) {
+        S.members = recRes.data;
+      }
+    }
+
+    // Tier 3: Fetch institutional student roster from database
+    if (!S.members || !S.members.length) {
+      const allStu = await apiFetch(`/students?limit=100`).catch(() => null);
+      if (allStu && allStu.success && Array.isArray(allStu.data) && allStu.data.length > 0) {
+        S.members = allStu.data;
       }
     }
 
@@ -469,17 +496,6 @@ async function loadGroupMetadata(groupId) {
       if (S.tests.length > 0 && !S.currentTestId) {
         S.currentTestId = S.tests[0].id;
       }
-    }
-    if (evalRes.status === 'fulfilled' && evalRes.value?.success && evalRes.value?.data) {
-      const d = evalRes.value.data;
-      if (Array.isArray(d.assignments) && d.assignments.length) S.assignments = d.assignments;
-      if (Array.isArray(d.exams) && d.exams.length) S.tests = d.exams;
-      if (Array.isArray(d.roster) && d.roster.length) {
-        S.members = d.roster;
-      } else if (Array.isArray(d.students) && d.students.length) {
-        S.members = d.students;
-      }
-      S.evalData = d;
     }
 
     renderGroupSwitcherOptions();
@@ -497,9 +513,13 @@ async function loadGroupMetadata(groupId) {
     if (typeof hideOfficeScreenLoader === 'function') hideOfficeScreenLoader();
   }
 }
+window.loadGroupMetadata = loadGroupMetadata;
 
-async function onSwitchGroup(newGroupId) {
-  if (!newGroupId || Number(newGroupId) === Number(S.groupId)) return;
+async function onSwitchGroup(newGroupId, force = false) {
+  if (!newGroupId) return;
+  if (!force && Number(newGroupId) === Number(S.groupId) && Array.isArray(S.members) && S.members.length > 0) {
+    return;
+  }
 
   if (typeof showOfficeScreenLoader === 'function') {
     showOfficeScreenLoader('Loading...');
@@ -514,7 +534,7 @@ async function onSwitchGroup(newGroupId) {
   S.registerId = S.groupId;
 
   const url = new URL(window.location);
-  url.searchParams.set('id', S.groupId);
+  url.searchParams.set('groupId', S.groupId);
   url.searchParams.delete('view');
   window.history.pushState({}, '', url);
 
@@ -527,6 +547,7 @@ async function onSwitchGroup(newGroupId) {
     hideOfficeScreenLoader();
   }
 }
+window.onSwitchGroup = onSwitchGroup;
 
 /* ══════════════════════════════════════════════════════════════
    SHEET TABS SWITCHER
@@ -9168,35 +9189,33 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     try {
       const saved = localStorage.getItem(key);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        const s0 = parsed?.sheets?.[0];
-        const s0Text = String(getCell(s0, 0, 0)?.v || getCell(s0, 0, 0)?.raw || '');
-        const hasBrokenBannerInGrid = s0Text.includes('Polytechnic') || s0Text.includes('Institute') || s0Text.includes('Uttarakhand');
-        const hasSingleTests = Array.isArray(parsed?.sheets) && parsed.sheets.some(s => s.type === 'single-test');
-        const hasObsoleteGrade = s0 && (getCell(s0, 0, 7)?.v === 'Grade' || String(getCell(s0, 0, 3)?.v || '').includes('(10)'));
-        const isTwoTier = String(getCell(s0, 0, 3)?.v || '').toUpperCase() === 'THEORY';
+        if (saved.includes('24011F') || saved.includes('HARSHIT JOSHI') || saved.includes('KAPIL BISHT') || saved.includes('MANISH TIWARI') || saved.includes('8.3')) {
+          localStorage.removeItem(key);
+        } else {
+          const parsed = JSON.parse(saved);
+          const s0 = parsed?.sheets?.[0];
+          const s0Text = String(getCell(s0, 0, 0)?.v || getCell(s0, 0, 0)?.raw || '');
+          const hasBrokenBannerInGrid = s0Text.includes('Polytechnic') || s0Text.includes('Institute') || s0Text.includes('Uttarakhand');
+          const hasSingleTests = Array.isArray(parsed?.sheets) && parsed.sheets.some(s => s.type === 'single-test');
+          const hasObsoleteGrade = s0 && (getCell(s0, 0, 7)?.v === 'Grade' || String(getCell(s0, 0, 3)?.v || '').includes('(10)'));
+          const isTwoTier = String(getCell(s0, 0, 3)?.v || '').toUpperCase() === 'THEORY';
 
-        // Check if saved workbook contains old mock data
-        const firstStudentRoll = String(getCell(s0, 3, 1)?.v || getCell(s0, 3, 1)?.raw || '');
-        const firstStudentName = String(getCell(s0, 3, 2)?.v || getCell(s0, 3, 2)?.raw || '').toUpperCase();
-        const secondStudentName = String(getCell(s0, 4, 2)?.v || getCell(s0, 4, 2)?.raw || '').toUpperCase();
-        const isMockRoster = firstStudentRoll.startsWith('24011F') || (firstStudentName === 'GIRDHAR DHAMI' && secondStudentName === 'HARSHIT JOSHI');
+          const hasStudentRow = s0 && (
+            Boolean(getCell(s0, 3, 2)?.v || getCell(s0, 3, 2)?.raw) ||
+            Boolean(getCell(s0, 3, 0)?.v || getCell(s0, 3, 0)?.raw)
+          );
 
-        const hasStudentRow = s0 && (
-          Boolean(getCell(s0, 3, 2)?.v || getCell(s0, 3, 2)?.raw) ||
-          Boolean(getCell(s0, 3, 0)?.v || getCell(s0, 3, 0)?.raw)
-        );
-
-        if (!isMockRoster && parsed && Array.isArray(parsed.sheets) && parsed.sheets.length >= 4 && !hasObsoleteGrade && !hasBrokenBannerInGrid && hasSingleTests && hasStudentRow && isTwoTier) {
-          EXCEL_WB.name = parsed.name || EXCEL_WB.name;
-          EXCEL_WB.sheets = parsed.sheets;
-          EXCEL_WB.activeSheetIndex = 0;
-          recalculateAllSheetFormulas(false);
-          renderSheetTabs();
-          renderExcelGrid(true);
-          updateStatusBarStats();
-          initExcelRichTooltips();
-          return;
+          if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length >= 4 && !hasObsoleteGrade && !hasBrokenBannerInGrid && hasSingleTests && hasStudentRow && isTwoTier) {
+            EXCEL_WB.name = parsed.name || EXCEL_WB.name;
+            EXCEL_WB.sheets = parsed.sheets;
+            EXCEL_WB.activeSheetIndex = 0;
+            recalculateAllSheetFormulas(false);
+            renderSheetTabs();
+            renderExcelGrid(true);
+            updateStatusBarStats();
+            initExcelRichTooltips();
+            return;
+          }
         }
       }
     } catch (_) { }
@@ -9206,7 +9225,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
   let existingScoresMap = {};
   try {
     const rawSaved = localStorage.getItem(key);
-    if (rawSaved) {
+    if (rawSaved && !rawSaved.includes('24011F') && !rawSaved.includes('HARSHIT JOSHI') && !rawSaved.includes('KAPIL BISHT') && !rawSaved.includes('MANISH TIWARI')) {
       const parsed = JSON.parse(rawSaved);
       if (parsed && Array.isArray(parsed.sheets)) {
         existingScoresMap = extractExistingStudentScores(parsed.sheets);

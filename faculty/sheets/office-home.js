@@ -113,7 +113,7 @@ async function loadSpreadsheetEngine(onReady) {
     }
 
     // 2. Load the main Sheets Studio engine
-    await loadScript('/faculty/sheets/sheets.js?v=20261120');
+    await loadScript('/faculty/sheets/sheets.js?v=20261120_real');
 
     window.__OFFICE_ENGINE_LOADED = true;
 
@@ -349,18 +349,19 @@ async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
   setTimeout(() => {
     loadSpreadsheetEngine(async () => {
       closeOfficeHomeScreen();
-      S.groupId = Number(groupId);
-      const grp = (S.allGroups || []).find(g => g.id === S.groupId);
+      const targetGroupId = Number(groupId);
+      S.groupId = targetGroupId;
+      const grp = (S.allGroups || []).find(g => Number(g.id) === targetGroupId);
       if (grp) S.group = grp;
 
-      const title = grp ? `${grp.subject_code || 'SUB'} - ${grp.subject_name}` : `Subject ${groupId}`;
-      recordRecentWorkbook(title, sheetKey, groupId);
+      const title = grp ? `${grp.subject_code || 'SUB'} - ${grp.subject_name}` : `Subject ${targetGroupId}`;
+      recordRecentWorkbook(title, sheetKey, targetGroupId);
 
       const topSel = document.getElementById('group-switcher-select') || document.getElementById('subject-selector');
-      if (topSel) topSel.value = String(groupId);
+      if (topSel) topSel.value = String(targetGroupId);
 
       const url = new URL(window.location.href);
-      url.searchParams.set('groupId', groupId);
+      url.searchParams.set('groupId', targetGroupId);
       if (sheetKey && sheetKey !== 'blank') {
         url.searchParams.set('sheet', sheetKey);
       } else {
@@ -369,8 +370,11 @@ async function selectSubjectAndSheet(groupId, sheetKey, clickedEl) {
       url.searchParams.delete('view');
       window.history.replaceState({}, '', url.toString());
 
-      if (typeof window.onSwitchGroup === 'function') {
-        await window.onSwitchGroup(groupId);
+      // Directly load authentic classroom metadata and students from database
+      if (typeof window.loadGroupMetadata === 'function') {
+        await window.loadGroupMetadata(targetGroupId);
+      } else if (typeof window.onSwitchGroup === 'function') {
+        await window.onSwitchGroup(targetGroupId, true);
       }
       if (sheetKey === 'blank') {
         if (typeof createNewWorksheet === 'function') createNewWorksheet('Blank Sheet');
@@ -454,9 +458,24 @@ async function initOfficePortal() {
     const viewParam = params.get('view');
     const isHomeStart = viewParam === 'home' || (!qId && !params.get('sheet'));
 
+    // Purge any stale mock items from localStorage on startup
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (k.startsWith('vidyaos_excel_wb') || k.startsWith('vidyaos_inst_header') || k === 'vidyaos_institution_marks_header') {
+          const val = localStorage.getItem(k);
+          if (val && (val.includes('24011F') || val.includes('HARSHIT JOSHI') || val.includes('KAPIL BISHT') || val.includes('MANISH TIWARI') || val.includes('8.3') || val.includes('1.82'))) {
+            keysToRemove.push(k);
+          }
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+    } catch (_) { }
+
     // Fetch teaching groups lightweight in background without blocking sheet launch
-    const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
-    Promise.race([apiFetch('/teaching-groups?status=ACTIVE'), timeout(2000)])
+    apiFetch('/teaching-groups?status=ACTIVE')
       .then(res => {
         if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
           S.allGroups = res.data;
