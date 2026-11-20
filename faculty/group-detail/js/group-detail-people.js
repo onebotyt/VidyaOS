@@ -34,7 +34,7 @@
     const sl = ById('students-list');
     if (!sl) return;
     if (!S.members.length) {
-      sl.innerHTML = emptyState('students', 'No students enrolled yet', 'Add students using their enrollment number or share the invite code.');
+      sl.innerHTML = emptyState('students', 'No students enrolled yet', 'Add students using their UBTER roll number or share the invite code.');
       return;
     }
     const removeIcon = window.FacultyIcons ? FacultyIcons.get('close', { size: 14 }) : (window.getSvgIcon ? window.getSvgIcon('close', 14) : '&times;');
@@ -63,7 +63,7 @@
     try {
       await apiFetch('/teaching-groups/' + S.groupId + '/members', {
         method: 'POST',
-        body: JSON.stringify({ official_enrollment_no: eno })
+        body: JSON.stringify({ ubter_roll_no: eno, official_enrollment_no: eno })
       });
       inp.value = '';
       toast('Student added!');
@@ -77,7 +77,7 @@
     const member = S.members.find(m => m.student_id === sid);
     const name = member ? member.full_name : 'Student';
     const roll = member ? (member.class_roll_no ? ('Roll #' + member.class_roll_no) : '') : '';
-    const enroll = member ? (member.official_enrollment_no || member.enrollment_no || '') : '';
+    const enroll = member ? (member.ubter_roll_no || member.official_enrollment_no || member.enrollment_no || '') : '';
     const detailStr = [roll, enroll].filter(Boolean).join(' • ');
 
     window._pendingDelete = {

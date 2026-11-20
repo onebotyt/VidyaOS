@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261116">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261116">
-  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261121e">
+  <link rel="stylesheet" href="/faculty/esp32-devices/esp32-devices.css?v=20261121f">
   <script>
     (function () {
       try {
@@ -132,7 +132,7 @@
               <!-- Quick Fallback Footer Bar -->
               <div class="esp-wifi-card-footer">
                 <button type="button" class="btn btn-secondary btn-sm" id="btn-fallback-wifi" onclick="triggerWifiFallback()" title="Trigger fallback to primary default Wi-Fi">Fallback Default</button>
-                <button type="button" class="btn btn-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()" title="Emergency clear saved Wi-Fi">Emergency Reset</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btn-reset-wifi" onclick="triggerWifiReset()" title="Emergency clear saved Wi-Fi">Emergency Reset</button>
               </div>
             </section>
           </div>
@@ -158,20 +158,20 @@
                 <!-- Top Status Bar: 3 Multi-Color Status LEDs & 5V Buzzer Toggle -->
                 <div class="esp-hw-top-toolbar">
                   <div class="esp-leds-row">
-                    <div class="esp-led-item">
+                    <div class="esp-led-item" title="AS608 Sensor OK">
                       <span class="esp-led-bulb green" id="sim-led-green"></span>
-                      <span>GREEN (OK)</span>
+                      <span>OK</span>
                     </div>
-                    <div class="esp-led-item">
+                    <div class="esp-led-item" title="Scan / Auth Alert">
                       <span class="esp-led-bulb red" id="sim-led-red"></span>
-                      <span>RED (Alert)</span>
+                      <span>ALERT</span>
                     </div>
-                    <div class="esp-led-item">
+                    <div class="esp-led-item" title="Enrolling or Cloud Syncing">
                       <span class="esp-led-bulb blue on" id="sim-led-blue"></span>
-                      <span>BLUE (Enroll/Sync)</span>
+                      <span>ENROLL / SYNC</span>
                     </div>
                   </div>
-                  <label class="esp-hw-buzzer-toggle">
+                  <label class="esp-hw-buzzer-toggle" title="Toggle simulated terminal piezo buzzer sound">
                     <input type="checkbox" id="chk-buzzer-audio" checked>
                     <span>5V Buzzer Audio</span>
                   </label>
@@ -179,36 +179,29 @@
 
                 <!-- Hardware Device Center: Side-by-Side AS608 Sensor + Live SSD1306 OLED Screen -->
                 <div class="esp-hw-display-row">
-                  <!-- Left: AS608 Optical Fingerprint Sensor -->
+                  <!-- Left: Unified Clean AS608 Optical Fingerprint Sensor -->
                   <div class="esp-sensor-unit">
-                    <div class="scanner-hardware">
-                      <div class="sensor">
-                        <div class="sensor-led"></div>
-                      </div>
-                      <div class="sensor-waves">
-                        <span></span><span></span><span></span>
-                      </div>
-                      <span class="esp-sensor-label">AS608 OPTICAL</span>
-                    </div>
-                    <!-- Viewfinder touch ring & SVG icon -->
-                    <div class="esp-viewfinder-overlay">
+                    <div class="esp-optical-viewfinder">
                       <span class="corner c1"></span>
                       <span class="corner c2"></span>
                       <span class="corner c3"></span>
                       <span class="corner c4"></span>
                       <div class="esp-scanner-ring" id="bio-scanner-ring"></div>
-                      <svg class="esp-fingerprint-svg fp" id="bio-fingerprint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-                        <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-                        <path d="M2 16h.01" />
-                        <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-                        <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-                        <path d="M5.5 12.8a9 9 0 0 1 14.5-4.8" />
-                        <path d="M4 17.5a13 13 0 0 1 1-5" />
-                        <path d="M8 20.8a12 12 0 0 1-1.5-6" />
-                        <path d="M17 19.5c-.5 1-1.5 2-2.5 2.5" />
-                      </svg>
+                      <div class="esp-sensor-glow-pad">
+                        <svg class="esp-fingerprint-svg fp" id="bio-fingerprint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+                          <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+                          <path d="M2 16h.01" />
+                          <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+                          <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+                          <path d="M5.5 12.8a9 9 0 0 1 14.5-4.8" />
+                          <path d="M4 17.5a13 13 0 0 1 1-5" />
+                          <path d="M8 20.8a12 12 0 0 1-1.5-6" />
+                          <path d="M17 19.5c-.5 1-1.5 2-2.5 2.5" />
+                        </svg>
+                      </div>
                     </div>
+                    <span class="esp-sensor-label">AS608 OPTICAL</span>
                   </div>
 
                   <!-- Right: Live 0.96" SSD1306 OLED Screen (128x64 Yellow/Blue Dual-Zone) -->
@@ -226,16 +219,7 @@
                   </div>
                 </div>
 
-                <!-- Hardware Peripheral Spec Chips -->
-                <div class="esp-hw-chips">
-                  <span class="hw-chip">AS608 UART2 (57600)</span>
-                  <span class="hw-chip">SSD1306 OLED (128&times;64)</span>
-                  <span class="hw-chip">W25Q32 4MB SPI</span>
-                  <span class="hw-chip">Piezo GPIO14</span>
-                  <span class="hw-chip">2S Li-ion ADC34</span>
-                </div>
-
-                <!-- Interactive Display Simulation Modes -->
+                <!-- Interactive Display Simulation Modes (Clean Segmented Toolbar) -->
                 <div class="oled-sim-controls">
                   <button type="button" class="oled-sim-btn active" id="sim-btn-standby" onclick="setOledSimMode('standby')">Clock</button>
                   <button type="button" class="oled-sim-btn" id="sim-btn-success" onclick="setOledSimMode('success')">Verified</button>
@@ -784,7 +768,7 @@
   <script src="/faculty/components/faculty-ui.js?v=20261116"></script>
   <script src="/faculty/components/header/header.js?v=20261116"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261116"></script>
-  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261121e"></script>
+  <script src="/faculty/esp32-devices/esp32-devices.js?v=20261121f"></script>
 </body>
 
 </html>

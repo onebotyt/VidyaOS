@@ -1882,7 +1882,7 @@ function onSelectStudentToEdit(studentId) {
 
   if (rollInput) rollInput.value = s.class_roll_no || '';
   if (nameInput) nameInput.value = s.full_name || s.name || '';
-  if (enrollInput) enrollInput.value = s.official_enrollment_no || '';
+  if (enrollInput) enrollInput.value = s.ubter_roll_no || s.official_enrollment_no || '';
   if (regInput) regInput.value = s.registration_no || '';
 }
 
@@ -1903,6 +1903,7 @@ function confirmUpdateStudentRow() {
       if (s) {
         s.class_roll_no = roll;
         s.full_name = name;
+        s.ubter_roll_no = enroll;
         s.official_enrollment_no = enroll;
         s.registration_no = reg;
       }

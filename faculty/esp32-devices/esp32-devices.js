@@ -1097,7 +1097,7 @@ async function simulateStudentBiometric(studentId, actionType = 'ENROLL_TEMPLATE
           statusLeft: 'SUCCESSFUL',
           statusRight: 'VERIFIED',
           headline: 'SUCCESSFULLY MARKED',
-          line1: `Enroll: ${st?.official_enrollment_no || '2024IT005'}`,
+          line1: `Roll: ${st?.ubter_roll_no || st?.official_enrollment_no || '24011090008'}`,
           line2: st?.full_name || 'Student',
           line3: `Time: ${getCurrentTimeFormatted()}`,
           leds: [true, false, false],

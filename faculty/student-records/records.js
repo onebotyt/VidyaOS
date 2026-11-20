@@ -1848,7 +1848,7 @@
         <table>
           <tr><th>Full Student Name</th><td><b>${escapeHtml(p.full_name || '--')}</b></td></tr>
           <tr><th>Class Roll Number</th><td><b>${escapeHtml(p.class_roll_no || '--')}</b></td></tr>
-          <tr><th>Official Enrollment Number</th><td>${escapeHtml(p.official_enrollment_no || '--')}</td></tr>
+          <tr><th>UBTER Roll Number</th><td>${escapeHtml(p.ubter_roll_no || p.official_enrollment_no || '--')}</td></tr>
           <tr><th>UBTER Registration Number</th><td>${escapeHtml(p.registration_no || '--')}</td></tr>
           <tr><th>Father's Name</th><td>${escapeHtml(p.father_name || '--')}</td></tr>
           <tr><th>Mother's Name</th><td>${escapeHtml(p.mother_name || '--')}</td></tr>
@@ -2382,7 +2382,7 @@
         <h2>Student Demographics</h2>
         <table>
           <tr><th>Name</th><td><b>${escapeHtml(p.full_name || '')}</b></td><th>Class Roll #</th><td><b>${escapeHtml(p.class_roll_no || '')}</b></td></tr>
-          <tr><th>Enrollment #</th><td>${escapeHtml(p.official_enrollment_no || '')}</td><th>Registration #</th><td>${escapeHtml(p.registration_no || '')}</td></tr>
+          <tr><th>UBTER Roll #</th><td>${escapeHtml(p.ubter_roll_no || p.official_enrollment_no || '')}</td><th>Registration #</th><td>${escapeHtml(p.registration_no || '')}</td></tr>
           <tr><th>Father's Name</th><td>${escapeHtml(p.father_name || '')}</td><th>Mother's Name</th><td>${escapeHtml(p.mother_name || '')}</td></tr>
           <tr><th>DOB</th><td>${p.dob || ''}</td><th>Gender / Category</th><td>${escapeHtml(p.gender || '')} / ${escapeHtml(p.category || '')}</td></tr>
           <tr><th>Aadhar #</th><td>${escapeHtml(p.aadhar_number || '')}</td><th>Phone / Email</th><td>${escapeHtml(p.phone || '')} • ${escapeHtml(p.email || '')}</td></tr>

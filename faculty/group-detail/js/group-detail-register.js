@@ -407,7 +407,7 @@
         <div style="font-weight: 700; color: var(--text-main); font-size: 0.74rem; line-height: 1.2; white-space: nowrap;">${esc(st.full_name)}</div>
         <div style="font-size: 0.6rem; color: var(--text-muted); font-family: var(--font-family-mono);
                     border-top: 1px solid var(--border-color); margin-top: 2px; padding-top: 2px;
-                    letter-spacing: 0.01em; white-space: nowrap;" title="UBTER Reg: ${esc(st.registration_no || '—')} | Enroll: ${esc(st.official_enrollment_no || '—')}">${idSubtitle}</div>
+                    letter-spacing: 0.01em; white-space: nowrap;" title="UBTER Reg: ${esc(st.registration_no || '—')} | UBTER Roll: ${esc(st.ubter_roll_no || st.official_enrollment_no || '—')}">${idSubtitle}</div>
       `;
 
       return `
@@ -418,7 +418,7 @@
           <td class="sticky-col-1" style="text-align: center; font-weight: 800; background: var(--table-sticky-bg); color: var(--text-main); font-size: 0.72rem; padding: 0.2rem;">
             ${rollBadge}${cleanRoll}
           </td>
-          <td class="sticky-col-2" style="background: var(--table-sticky-bg); color: var(--text-main); padding: 0.2rem 0.45rem; width: 148px; min-width: 135px; max-width: 165px;" title="${esc(st.full_name)} (${st.registration_no ? 'UBTER: ' + st.registration_no + ' • ' : ''}${st.official_enrollment_no || ''})">
+          <td class="sticky-col-2" style="background: var(--table-sticky-bg); color: var(--text-main); padding: 0.2rem 0.45rem; width: 148px; min-width: 135px; max-width: 165px;" title="${esc(st.full_name)} (${st.registration_no ? 'UBTER Reg: ' + st.registration_no + ' • ' : ''}UBTER Roll: ${st.ubter_roll_no || st.official_enrollment_no || ''})">
             ${nameContent}
           </td>
           ${cellsHtml}

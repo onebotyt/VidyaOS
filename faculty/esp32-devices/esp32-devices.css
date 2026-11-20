@@ -944,75 +944,80 @@
 
 .esp-sensor-unit {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  background: rgba(0, 0, 0, 0.35);
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md, 8px);
-  padding: 0.4rem;
+  border-radius: var(--radius-md, 10px);
+  padding: 0.65rem 0.5rem;
   position: relative;
   overflow: hidden;
   min-height: 105px;
 }
 
-.esp-sensor-unit .scanner-hardware {
-  width: 72px;
-  height: 105px;
-  border-radius: 16px;
-  padding: 6px;
-  gap: 8px;
-  box-shadow: none;
-  background: transparent;
-  border: none;
+.esp-optical-viewfinder {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
 }
 
-.esp-sensor-unit .sensor {
-  width: 48px;
+.esp-sensor-glow-pad {
+  width: 44px;
   height: 44px;
   border-radius: 12px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0, 0, 0, 0.5) 80%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
 }
 
-.esp-sensor-unit .sensor-led {
-  width: 12px;
-  height: 12px;
+.esp-optical-viewfinder .fp {
+  width: 26px;
+  height: 26px;
+  color: var(--status-present, #10b981);
+  transition: transform 0.2s ease, color 0.2s ease;
 }
+
+.esp-hardware-bezel.scanning .esp-sensor-glow-pad {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(0, 0, 0, 0.5) 80%);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.esp-hardware-bezel.scanning .fp {
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+.esp-optical-viewfinder .corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: rgba(255, 255, 255, 0.25);
+  border-style: solid;
+}
+
+.esp-optical-viewfinder .c1 { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.esp-optical-viewfinder .c2 { top: 0; right: 0; border-width: 2px 2px 0 0; }
+.esp-optical-viewfinder .c3 { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.esp-optical-viewfinder .c4 { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 
 .esp-sensor-label {
   font-size: 0.58rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  color: var(--oled-muted, #94a3b8);
   font-family: var(--font-family-mono, monospace);
   display: block;
   text-align: center;
+  white-space: nowrap;
 }
-
-.esp-viewfinder-overlay {
-  position: relative;
-  width: 54px;
-  height: 54px;
-  display: grid;
-  place-items: center;
-  color: var(--color-primary);
-}
-
-.esp-viewfinder-overlay .fp {
-  width: 36px;
-  height: 36px;
-}
-
-.esp-viewfinder-overlay .corner {
-  width: 10px;
-  height: 10px;
-  border-color: var(--color-primary);
-  border-style: solid;
-}
-
-.esp-viewfinder-overlay .c1 { top: 0; left: 0; border-width: 2px 0 0 2px; }
-.esp-viewfinder-overlay .c2 { top: 0; right: 0; border-width: 2px 2px 0 0; }
-.esp-viewfinder-overlay .c3 { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
-.esp-viewfinder-overlay .c4 { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 
 .esp-hw-display-row .oled-screen {
   margin-bottom: 0;
@@ -1116,27 +1121,12 @@
   font-size: 0.68rem;
 }
 
-.esp-hw-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-bottom: 0.35rem;
-}
-
-.hw-chip {
-  font-family: var(--font-family-mono, monospace);
-  font-size: 0.58rem;
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--oled-bright, #f1f5f9);
-  padding: 0.12rem 0.35rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
 .oled-sim-controls {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 0.3rem;
+  gap: 0.25rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 @media (max-width: 768px) {
@@ -1146,27 +1136,29 @@
 }
 
 .oled-sim-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--oled-bright, #f1f5f9);
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   font-weight: 600;
-  padding: 0.25rem 0.35rem;
+  padding: 0.25rem 0.2rem;
   border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
   text-align: center;
 }
 
 .oled-sim-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .oled-sim-btn.active {
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: #ffffff;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.35);
 }
 
 /* High-Density Horizontal Workspace Tabs */
