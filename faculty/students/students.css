@@ -1475,13 +1475,17 @@ button:disabled.btn-disabled-loading,
    ========================================================================== */
 
 .stu-edit-modal-card {
+  width: 100%;
   max-width: 480px;
+  max-height: min(92vh, 680px);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  border-radius: 18px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.25);
   overflow: hidden;
-  animation: stuModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  animation: stuModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes stuModalPop {
@@ -1490,97 +1494,154 @@ button:disabled.btn-disabled-loading,
 }
 
 .stu-edit-header {
-  padding: 0.8rem 1.15rem 0.6rem 1.15rem;
+  padding: 0.9rem 1.15rem 0.65rem 1.15rem;
   border-bottom: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.6rem;
+  flex-shrink: 0;
 }
 
 .stu-edit-title {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 0.96rem;
+  font-weight: 800;
   color: var(--text-main);
   margin: 0;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .stu-edit-title span {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-main);
 }
 
-/* Modal Sub-Navigation Tabs */
+.btn-modal-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.btn-modal-close:hover {
+  color: var(--text-main);
+  background: var(--bg-surface-hover);
+  border-color: var(--text-muted);
+}
+
+/* Modal Sub-Navigation Tabs (Mobile-Friendly Pill Carousel) */
 .stu-modal-tabs {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0 1.15rem;
+  gap: 0.45rem;
+  padding: 0.45rem 1.15rem 0.65rem 1.15rem;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-card);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.stu-modal-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .stu-modal-tab {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 0.4rem 0.1rem 0.5rem 0.1rem;
-  font-size: 0.78rem;
-  font-weight: 600;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0.32rem 0.72rem;
+  font-size: 0.74rem;
+  font-weight: 700;
   color: var(--text-muted);
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: all 0.15s ease;
   white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.2;
 }
 
 .stu-modal-tab:hover {
   color: var(--text-main);
+  border-color: var(--color-primary);
 }
 
 .stu-modal-tab.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-  font-weight: 700;
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 6px hsla(217, 91%, 60%, 0.28);
 }
 
 /* Form Container */
 .stu-edit-form {
-  padding: 0.85rem 1.15rem 1.05rem 1.15rem;
+  padding: 0.85rem 1.15rem 1.15rem 1.15rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Tab Panels */
 .stu-tab-panel {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
-/* Top Layout: Photo on Left, Main on Right */
-.stu-edit-top-grid {
+/* Identity Card: Photo on Left, Name on Right */
+.stu-edit-identity-row {
   display: flex;
-  gap: 0.8rem;
-  align-items: flex-start;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
 }
 
 .stu-edit-photo-col {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  gap: 0.2rem;
+}
+
+.stu-edit-photo-col .stu-compact-label {
+  margin-bottom: 0;
+  font-size: 0.68rem;
 }
 
 .stu-edit-photo-box {
-  width: 66px;
-  height: 66px;
-  border-radius: 9px;
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
   border: 1px solid var(--border-color);
-  background: var(--bg-surface);
+  background: var(--bg-card);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .stu-edit-avatar-img {
@@ -1590,34 +1651,32 @@ button:disabled.btn-disabled-loading,
   border: none !important;
   background: var(--color-primary-light);
   color: var(--color-primary);
-  font-size: 1.25rem;
+  font-size: 1.18rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.stu-edit-main-col {
+.stu-edit-name-col {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
   min-width: 0;
 }
 
+/* Dual Field: UBTER Roll No. & UBTER Reg. # (Full Width 2-Column Row) */
 .stu-edit-dual-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 /* Compact Labels & Inputs */
 .stu-compact-label {
   display: block;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 0.18rem;
+  margin-bottom: 0.22rem;
 }
 
 .stu-compact-label-row {
@@ -1625,33 +1684,35 @@ button:disabled.btn-disabled-loading,
   align-items: center;
   justify-content: space-between;
   gap: 0.25rem;
-  margin-bottom: 0.18rem;
+  margin-bottom: 0.22rem;
 }
 
 .stu-compact-chk {
-  font-size: 0.65rem !important;
+  font-size: 0.66rem !important;
   color: var(--text-muted);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.25rem;
+  font-weight: 600;
 }
 
 .stu-compact-chk input {
   margin: 0;
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
+  accent-color: var(--color-primary);
 }
 
 .stu-compact-input {
   width: 100%;
-  height: 31px;
-  padding: 0 0.65rem;
-  border-radius: 7px;
+  height: 35px;
+  padding: 0 0.7rem;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
   color: var(--text-main);
-  font-size: 0.82rem;
+  font-size: 0.83rem;
   box-sizing: border-box;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -1659,7 +1720,7 @@ button:disabled.btn-disabled-loading,
 .stu-compact-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-light);
+  box-shadow: 0 0 0 3px hsla(217, 91%, 60%, 0.18);
 }
 
 .stu-compact-select {
@@ -1670,13 +1731,13 @@ button:disabled.btn-disabled-loading,
 /* Compact Read-Only Display Values (for Dossier / Detail Modal) */
 .stu-compact-display-val {
   width: 100%;
-  height: 31px;
-  padding: 0 0.65rem;
-  border-radius: 7px;
+  height: 35px;
+  padding: 0 0.7rem;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
   color: var(--text-main);
-  font-size: 0.82rem;
+  font-size: 0.83rem;
   font-weight: 600;
   box-sizing: border-box;
   display: flex;
@@ -1704,16 +1765,9 @@ button:disabled.btn-disabled-loading,
   border-color: var(--border-color);
 }
 
-.stu-edit-details-footer {
-  margin-top: 0.35rem;
-  padding: 0.65rem 0 0 0 !important;
-  border-top: 1px solid var(--border-color);
-  background: transparent !important;
-}
-
 .stu-mono-input {
   font-family: var(--font-family-mono, monospace);
-  font-size: 0.80rem;
+  font-size: 0.82rem;
 }
 
 .uppercase {
@@ -1724,38 +1778,40 @@ button:disabled.btn-disabled-loading,
 .stu-edit-bottom-row {
   display: grid;
   grid-template-columns: 1.35fr 0.75fr 1fr;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
 /* Secondary Tab Panels */
 .stu-compact-tab-info {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  padding: 0.25rem 0;
+  gap: 0.55rem;
+  padding: 0.2rem 0;
 }
 
 .stu-compact-info-tile {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.18rem;
 }
 
 .stu-compact-info-tile .info-label {
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--text-muted);
 }
 
 .stu-compact-info-tile .info-val {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.84rem;
+  font-weight: 700;
   color: var(--text-main);
+  word-break: break-word;
 }
 
 /* Footer: Cancel & Save Changes */
@@ -1763,23 +1819,24 @@ button:disabled.btn-disabled-loading,
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.35rem;
-  padding-top: 0.65rem;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .btn-stu-compact-cancel {
-  height: 31px;
-  padding: 0 0.95rem;
-  border-radius: 7px;
+  height: 36px;
+  padding: 0 1.15rem;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
   color: var(--text-main);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .btn-stu-compact-cancel:hover {
@@ -1788,17 +1845,17 @@ button:disabled.btn-disabled-loading,
 }
 
 .btn-stu-compact-save {
-  height: 31px;
-  padding: 0 1.15rem;
-  border-radius: 7px;
+  height: 36px;
+  padding: 0 1.35rem;
+  border-radius: 8px;
   border: none;
   background: var(--color-primary);
-  color: var(--color-primary-contrast, #ffffff);
-  font-size: 0.78rem;
-  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
-  transition: opacity 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 2px 8px hsla(217, 91%, 60%, 0.35);
+  transition: all 0.15s ease;
 }
 
 .btn-stu-compact-save:hover {
@@ -1809,14 +1866,107 @@ button:disabled.btn-disabled-loading,
   transform: translateY(1px);
 }
 
-@media (max-width: 480px) {
-  .stu-edit-modal-card {
-    max-width: 95vw;
+/* Footer: View Mode Actions */
+.stu-edit-details-footer {
+  margin-top: 0.25rem;
+  padding: 0.75rem 0 0 0 !important;
+  border-top: 1px solid var(--border-color);
+  background: transparent !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.stu-footer-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.stu-footer-primary #detail-btn-edit {
+  flex: 1.4;
+  height: 35px;
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px hsla(217, 91%, 60%, 0.3);
+}
+
+.stu-footer-primary button:not(#detail-btn-edit) {
+  flex: 1;
+  height: 35px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.stu-footer-secondary {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.stu-footer-secondary button {
+  flex: 1;
+  height: 30px;
+  font-size: 0.72rem;
+  border-radius: 6px;
+}
+
+@media (max-width: 640px) {
+  .stu-modal-backdrop {
+    padding: 0.5rem;
   }
+
+  .stu-edit-modal-card {
+    max-width: 100%;
+    border-radius: 16px;
+  }
+
+  .stu-edit-header {
+    padding: 0.75rem 0.95rem 0.5rem 0.95rem;
+  }
+
+  .stu-modal-tabs {
+    padding: 0.35rem 0.95rem 0.55rem 0.95rem;
+    gap: 0.4rem;
+  }
+
+  .stu-edit-form {
+    padding: 0.75rem 0.95rem 0.95rem 0.95rem;
+    gap: 0.65rem;
+  }
+
+  .stu-edit-identity-row {
+    padding: 0.55rem 0.75rem;
+    gap: 0.65rem;
+  }
+
   .stu-edit-bottom-row {
     grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
   }
+
   .stu-edit-bottom-row > div:first-child {
     grid-column: span 2;
+  }
+
+  .stu-edit-footer {
+    gap: 0.5rem;
+  }
+
+  .btn-stu-compact-cancel {
+    flex: 1;
+  }
+
+  .btn-stu-compact-save {
+    flex: 1.4;
   }
 }

@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/delete-modal/delete-modal.css?v=20261117">
-  <link rel="stylesheet" href="/faculty/students/students.css?v=20261117">
+  <link rel="stylesheet" href="/faculty/students/students.css?v=20261121_mobile_v1">
   <script>
     (function () {
       try {
@@ -263,8 +263,8 @@
 
         <!-- Tab Panel 1: Profile Info -->
         <div id="detail-tab-profile" class="stu-tab-panel active">
-          <!-- Top Row: Photo on Left, Name & IDs on Right -->
-          <div class="stu-edit-top-grid">
+          <!-- Top Row: Photo Avatar on Left, Name on Right -->
+          <div class="stu-edit-identity-row">
             <div class="stu-edit-photo-col">
               <label class="stu-compact-label">Photo</label>
               <div class="stu-edit-photo-box" id="detail-stu-photo-box">
@@ -272,44 +272,41 @@
               </div>
             </div>
 
-            <div class="stu-edit-main-col">
-              <!-- Name Display / Input -->
-              <div>
-                <label for="edit-stu-name" class="stu-compact-label">
-                  Name <span class="stu-edit-indicator" style="display:none; color:var(--status-absent);">*</span>
+            <div class="stu-edit-name-col">
+              <label for="edit-stu-name" class="stu-compact-label">
+                Name <span class="stu-edit-indicator" style="display:none; color:var(--status-absent);">*</span>
+              </label>
+              <div id="detail-stu-display-name" class="stu-compact-display-val stu-view-mode">—</div>
+              <input type="text" id="edit-stu-name" required placeholder="Full Name" class="stu-compact-input stu-edit-mode" style="display:none;">
+            </div>
+          </div>
+
+          <!-- Dual Field: UBTER Roll No. & UBTER Reg. # (Full Width Row) -->
+          <div class="stu-edit-dual-row">
+            <div>
+              <div class="stu-compact-label-row">
+                <label for="edit-stu-enroll" class="stu-compact-label" style="margin:0;">
+                  UBTER Roll No. <span id="edit-stu-enroll-req" class="stu-edit-mode" style="display:none; color:var(--status-absent);">*</span>
                 </label>
-                <div id="detail-stu-display-name" class="stu-compact-display-val stu-view-mode">—</div>
-                <input type="text" id="edit-stu-name" required placeholder="Full Name" class="stu-compact-input stu-edit-mode" style="display:none;">
+                <label class="chk-enroll-box stu-compact-chk stu-edit-mode" id="edit-chk-enroll-box" style="display:none;" title="Roll number not available">
+                  <input type="checkbox" id="edit-chk-enroll-not-available">
+                  <span>Not Avail.</span>
+                </label>
               </div>
-
-              <!-- Dual Field: UBTER Roll No. & UBTER Reg. # -->
-              <div class="stu-edit-dual-row">
-                <div>
-                  <div class="stu-compact-label-row">
-                    <label for="edit-stu-enroll" class="stu-compact-label" style="margin:0;">
-                      UBTER Roll No. <span id="edit-stu-enroll-req" class="stu-edit-mode" style="display:none; color:var(--status-absent);">*</span>
-                    </label>
-                    <label class="chk-enroll-box stu-compact-chk stu-edit-mode" id="edit-chk-enroll-box" style="display:none;" title="Roll number not available">
-                      <input type="checkbox" id="edit-chk-enroll-not-available">
-                      <span>Not Avail.</span>
-                    </label>
-                  </div>
-                  <div id="detail-stu-enroll" class="stu-compact-display-val stu-mono-input stu-view-mode">—</div>
-                  <div class="stu-edit-mode" style="display:none;">
-                    <input type="text" id="edit-stu-enroll" placeholder="11-digit numeric" maxlength="11" autocomplete="off" class="stu-compact-input stu-mono-input">
-                    <p class="inp-hint" id="edit-stu-enroll-hint" style="display:none;">Enter your 11-digit official UBTER roll number.</p>
-                    <p class="inp-error" id="edit-stu-enroll-error" style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;"></p>
-                  </div>
-                </div>
-
-                <div>
-                  <label for="edit-stu-reg" class="stu-compact-label">
-                    UBTER Reg. # <span class="stu-edit-mode" style="display:none; font-weight:normal; color:var(--text-muted);">(optional)</span>
-                  </label>
-                  <div id="detail-stu-reg" class="stu-compact-display-val stu-mono-input uppercase stu-view-mode">—</div>
-                  <input type="text" id="edit-stu-reg" placeholder="e.g. 24101054001" autocomplete="off" class="stu-compact-input stu-mono-input uppercase stu-edit-mode" style="display:none;">
-                </div>
+              <div id="detail-stu-enroll" class="stu-compact-display-val stu-mono-input stu-view-mode">—</div>
+              <div class="stu-edit-mode" style="display:none;">
+                <input type="text" id="edit-stu-enroll" placeholder="11-digit numeric" maxlength="11" autocomplete="off" class="stu-compact-input stu-mono-input">
+                <p class="inp-hint" id="edit-stu-enroll-hint" style="display:none;">Enter your 11-digit official UBTER roll number.</p>
+                <p class="inp-error" id="edit-stu-enroll-error" style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;"></p>
               </div>
+            </div>
+
+            <div>
+              <label for="edit-stu-reg" class="stu-compact-label">
+                UBTER Reg. # <span class="stu-edit-mode" style="display:none; font-weight:normal; color:var(--text-muted);">(optional)</span>
+              </label>
+              <div id="detail-stu-reg" class="stu-compact-display-val stu-mono-input uppercase stu-view-mode">—</div>
+              <input type="text" id="edit-stu-reg" placeholder="e.g. 24101054001" autocomplete="off" class="stu-compact-input stu-mono-input uppercase stu-edit-mode" style="display:none;">
             </div>
           </div>
 
