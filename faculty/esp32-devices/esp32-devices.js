@@ -438,6 +438,12 @@ function updateKpiCards(devices, students) {
     nodeStatusText.textContent = `${onlineCount} NODE${onlineCount === 1 ? '' : 'S'} ONLINE`;
   }
 
+  const termCountBadge = document.getElementById('terminal-count-badge');
+  if (termCountBadge) {
+    termCountBadge.textContent = `${devices.length} PAIRED`;
+    termCountBadge.className = `esp-status-pill ${onlineCount > 0 ? 'online' : 'offline'}`;
+  }
+
   const enrolledCount = students.filter(s => s.biometric_status === 'ENROLLED').length;
   const totalStudents = students.length;
   const coveragePct = totalStudents > 0 ? Math.round((enrolledCount / totalStudents) * 100) : 0;

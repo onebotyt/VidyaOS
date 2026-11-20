@@ -204,10 +204,7 @@ function autoFitSheetColumns(sheet, force = false) {
 
 function triggerFitColumnsToScreen() {
   const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
-  if (!sheet) {
-    if (typeof showToast === 'function') showToast('Please open an academic workbook first!', 'info');
-    return;
-  }
+  if (!sheet) return;
 
   if (typeof pushUndoState === 'function') pushUndoState('Fit Columns to Screen');
 
@@ -215,10 +212,6 @@ function triggerFitColumnsToScreen() {
 
   if (typeof renderExcelGrid === 'function') {
     renderExcelGrid(true); // Full structural re-render to apply <th> and <col> widths in DOM
-  }
-
-  if (typeof showToast === 'function') {
-    showToast('Columns fitted to screen (Total: 63px, Grand Total: 65px)!', 'success');
   }
 }
 
