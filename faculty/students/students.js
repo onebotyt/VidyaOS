@@ -319,24 +319,36 @@
       }
 
       return `
-        <tr>
+        <tr class="stu-table-row" onclick="viewStudentDetails(${studentId})" style="cursor: pointer;">
           <td class="col-avatar" style="text-align: center;">
-            <div class="stu-avatar" style="cursor: pointer;" onclick="viewStudentDetails(${studentId})" title="View ${esc(name)}'s Dossier">
+            <div class="stu-avatar" title="View ${esc(name)}'s Dossier">
               ${avatarContent}
             </div>
           </td>
-          <td><span class="stu-roll-badge">${roll}</span></td>
+          <td class="col-roll"><span class="stu-roll-badge">${roll}</span></td>
           <td class="col-reg">${regFormatted}</td>
           <td class="col-enrollment">${enrollFormatted}</td>
-          <td>
+          <td class="col-name">
             <div class="stu-name-wrap">
-              <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+              <div class="stu-desktop-name-row">
                 <a href="#" class="stu-name-cell" onclick="viewStudentDetails(${studentId}); return false;">${esc(name)}</a>
                 ${statusChip}
               </div>
+              <div class="stu-mobile-card-details">
+                <div class="stu-mobile-name-row">
+                  <span class="stu-roll-badge-mobile">#${roll}</span>
+                  <span class="stu-name-mobile">${esc(name)}</span>
+                  ${statusChip}
+                </div>
+                <div class="stu-mobile-sub-row">
+                  ${st.official_enrollment_no ? `<span class="stu-meta-code">${esc(st.official_enrollment_no)}</span>` : (st.registration_no ? `<span class="stu-meta-code">${esc(st.registration_no)}</span>` : '<span class="stu-meta-code pending">Roll Pending</span>')}
+                  <span class="stu-meta-dot">&bull;</span>
+                  <span class="stu-meta-sem">Sem ${st.semester || (st.year ? (st.year * 2 - 1) : 1)}</span>
+                </div>
+              </div>
             </div>
           </td>
-          <td>
+          <td onclick="event.stopPropagation()">
             <div class="stu-actions-cell">
               <div class="stu-menu-wrap">
                 <button type="button" class="btn-kebab" title="Actions" onclick="toggleStudentMenu(event, ${studentId})">
@@ -444,8 +456,8 @@
               ${avatarContent}
             </div>
           </td>
-          <td><span class="stu-roll-badge" style="opacity: 0.7;">${roll}</span></td>
-          <td>
+          <td class="col-roll"><span class="stu-roll-badge" style="opacity: 0.7;">${roll}</span></td>
+          <td class="col-name">
             <div class="stu-name-wrap">
               <span class="stu-name-cell" style="color: var(--text-main); font-weight: 700;">${esc(name)}</span>
               <div class="stu-trash-sub">
@@ -511,13 +523,25 @@
         <td class="col-avatar" style="text-align: center;">
           <div class="stu-avatar">${initials}</div>
         </td>
-        <td><span class="stu-roll-badge">—</span></td>
+        <td class="col-roll"><span class="stu-roll-badge">—</span></td>
         <td class="col-reg">${regFormatted}</td>
         <td class="col-enrollment"><span class="stu-code-mono">${esc(req.official_enrollment_no || 'APPLICANT')}</span></td>
-        <td>
+        <td class="col-name">
           <div class="stu-name-wrap">
-            <strong>${esc(req.full_name)}</strong>
-            <span class="stu-sub-mono">${esc(req.email)} &bull; Year ${esc(req.year || 1)}</span>
+            <div class="stu-desktop-name-row">
+              <strong class="stu-name-cell">${esc(req.full_name)}</strong>
+              <span class="stu-sub-mono" style="margin-left: 0.35rem; font-size: 0.72rem; color: var(--text-muted);">${esc(req.email)} &bull; Year ${esc(req.year || 1)}</span>
+            </div>
+            <div class="stu-mobile-card-details">
+              <div class="stu-mobile-name-row">
+                <span class="stu-name-mobile">${esc(req.full_name)}</span>
+              </div>
+              <div class="stu-mobile-sub-row">
+                <span class="stu-meta-code">${esc(req.official_enrollment_no || req.email || 'Pending')}</span>
+                <span class="stu-meta-dot">&bull;</span>
+                <span class="stu-meta-sem">Year ${esc(req.year || 1)}</span>
+              </div>
+            </div>
           </div>
         </td>
         <td style="text-align: right;">

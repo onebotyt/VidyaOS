@@ -497,6 +497,10 @@ input:checked + .slider:before {
   border-bottom: none;
 }
 
+.fac-table-row {
+  transition: background 0.12s ease;
+}
+
 .fac-table tbody tr:hover td {
   background: var(--bg-surface);
 }
@@ -504,27 +508,100 @@ input:checked + .slider:before {
 .fac-member-cell {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .fac-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-size: 0.78rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-primary, #2563eb), #4338ca);
+  color: #ffffff;
+  font-size: 0.88rem;
   font-weight: 800;
+  letter-spacing: 0.02em;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.22);
+  user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fac-avatar.hod {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.28);
+}
+
+.fac-avatar.lecturer {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.22);
+}
+
+.fac-avatar:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.32);
+}
+
+.fac-member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.fac-member-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.fac-member-link {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.fac-member-link:hover {
+  color: var(--color-primary);
 }
 
 .fac-member-name {
   font-weight: 700;
   color: var(--text-main);
+}
+
+.fac-member-mobile-meta {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.15rem;
+}
+
+.fac-emp-code-mobile {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light, rgba(37, 99, 235, 0.1));
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+}
+
+.fac-load-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.08rem 0.38rem;
+  border-radius: 999px;
 }
 
 .fac-member-email {
@@ -1580,9 +1657,9 @@ input:checked + .slider:before {
     box-sizing: border-box;
   }
 
-  /* Compact Table & Mobile Column Suppression */
+  /* Mobile Table Header & Column Adjustments */
   .fac-table-card {
-    border-radius: 9px;
+    border-radius: 14px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     width: 100%;
@@ -1594,44 +1671,67 @@ input:checked + .slider:before {
     max-width: 100%;
   }
   .fac-table th, .fac-table td {
-    padding: 0.45rem 0.5rem;
-    font-size: 0.74rem;
-  }
-  .fac-member-cell {
-    min-width: 0;
-    overflow: hidden;
-  }
-  .fac-avatar {
-    width: 24px;
-    height: 24px;
-    font-size: 0.66rem;
-    flex-shrink: 0;
-  }
-  .fac-member-name {
+    padding: 0.7rem 0.65rem;
     font-size: 0.76rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 130px;
-    display: inline-block;
   }
-  .fac-member-link {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 130px;
-    display: inline-block;
+  .fac-table thead th {
+    padding: 0.6rem 0.65rem;
   }
-
-  /* Hide Employee ID, Role, and Retention columns on mobile */
+  .fac-table th.col-num,
+  .fac-table td.col-num,
   .col-empid,
   .col-role,
   .col-retention {
     display: none !important;
   }
-
+  .fac-member-cell {
+    min-width: 0;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+  /* Large, crisp, agency-grade avatar on mobile */
+  .fac-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 13px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  }
+  .fac-member-name {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    white-space: normal !important;
+    line-height: 1.25 !important;
+    display: block !important;
+    max-width: none !important;
+  }
+  .fac-member-link {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    white-space: normal !important;
+    line-height: 1.25 !important;
+    display: block !important;
+    max-width: none !important;
+  }
+  .fac-member-mobile-meta {
+    display: flex !important;
+  }
+  .btn-kebab {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 9px !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
   .btn-restore-compact {
-    padding: 0.25rem 0.55rem;
-    font-size: 0.7rem;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.74rem;
   }
 }

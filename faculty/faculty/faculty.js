@@ -262,19 +262,29 @@
         : `<span class="fac-role-chip lecturer">${esc(f.designation || 'Lecturer')}</span>`;
 
       const initials = getInitials(f.full_name);
+      const teachingLoadCount = f.teaching_load || (Array.isArray(f.classes) ? f.classes.length : (Array.isArray(f.subjects) ? f.subjects.length : 0));
 
       return `
-        <tr>
-          <td style="color: var(--text-muted); font-size: 0.75rem; width: 36px;">${idx + 1}</td>
+        <tr class="fac-table-row" onclick="viewFacultyDetails(${f.id})" style="cursor:pointer;">
+          <td class="col-num" style="color: var(--text-muted); font-size: 0.75rem; width: 36px;">${idx + 1}</td>
           <td>
             <div class="fac-member-cell">
-              <div class="fac-avatar" style="cursor:pointer;" onclick="viewFacultyDetails(${f.id})">${initials}</div>
-              <a href="#" class="fac-member-link" onclick="viewFacultyDetails(${f.id}); return false;">${esc(f.full_name)}</a>
+              <div class="fac-avatar ${isTargetHod ? 'hod' : 'lecturer'}" title="${esc(f.full_name)}">${initials}</div>
+              <div class="fac-member-info">
+                <div class="fac-member-name-row">
+                  <span class="fac-member-link">${esc(f.full_name)}</span>
+                </div>
+                <div class="fac-member-mobile-meta">
+                  ${roleBadge}
+                  <span class="fac-emp-code-mobile">${esc(f.employee_id || '—')}</span>
+                  ${teachingLoadCount ? `<span class="fac-load-pill">${teachingLoadCount} ${teachingLoadCount === 1 ? 'class' : 'classes'}</span>` : ''}
+                </div>
+              </div>
             </div>
           </td>
           <td class="col-empid"><span class="fac-emp-code">${esc(f.employee_id || '—')}</span></td>
           <td class="col-role">${roleBadge}</td>
-          <td>
+          <td onclick="event.stopPropagation()">
             <div class="fac-actions-cell">
               <div class="fac-menu-wrap">
                 <button type="button" class="btn-icon-action btn-kebab" title="Actions" onclick="toggleFacultyMenu(event, ${f.id})">
@@ -338,11 +348,17 @@
 
     tbody.innerHTML = list.map((req, idx) => `
       <tr>
-        <td style="color: var(--text-muted); font-size: 0.75rem; width: 36px;">${idx + 1}</td>
+        <td class="col-num" style="color: var(--text-muted); font-size: 0.75rem; width: 36px;">${idx + 1}</td>
         <td>
           <div class="fac-member-cell">
-            <div class="fac-avatar">${getInitials(req.full_name)}</div>
-            <span class="fac-member-name">${esc(req.full_name)}</span>
+            <div class="fac-avatar lecturer">${getInitials(req.full_name)}</div>
+            <div class="fac-member-info">
+              <span class="fac-member-name">${esc(req.full_name)}</span>
+              <div class="fac-member-mobile-meta">
+                <span class="fac-role-chip" style="background:var(--status-late-bg); color:var(--status-late);">Pending Clearance</span>
+                <span class="fac-emp-code-mobile">${esc(req.employee_id || req.email || '—')}</span>
+              </div>
+            </div>
           </div>
         </td>
         <td class="col-empid"><span class="fac-emp-code">${esc(req.employee_id || 'PENDING')}</span></td>
@@ -389,14 +405,14 @@
 
       return `
         <tr>
-          <td style="color: var(--text-muted); font-size: 0.75rem; width: 36px;">${idx + 1}</td>
+          <td class="col-num" style="color: var(--text-muted); font-size: 0.75rem; width: 36px;">${idx + 1}</td>
           <td>
             <div class="fac-member-cell">
-              <div class="fac-avatar" style="opacity: 0.85;">${initials}</div>
-              <div>
+              <div class="fac-avatar lecturer" style="opacity: 0.9;">${initials}</div>
+              <div class="fac-member-info">
                 <span class="fac-member-name">${esc(f.full_name)}</span>
                 <div class="fac-trash-sub">
-                  <span>${esc(f.employee_id || 'ID N/A')}</span>
+                  <span class="fac-emp-code-mobile">${esc(f.employee_id || 'ID N/A')}</span>
                   &bull;
                   <span class="badge-retention-mobile">${daysLeft}d left</span>
                 </div>

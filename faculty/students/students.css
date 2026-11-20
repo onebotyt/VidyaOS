@@ -490,13 +490,13 @@ input:checked+.slider:before {
 }
 
 .stu-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-size: 0.76rem;
-  font-weight: 700;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -504,18 +504,19 @@ input:checked+.slider:before {
   text-transform: uppercase;
   user-select: none;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.22);
 }
 
 .stu-avatar:hover {
-  transform: scale(1.08);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
 }
 
 .stu-avatar-img {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 11px;
   object-fit: cover;
 }
 
@@ -562,6 +563,17 @@ input:checked+.slider:before {
   flex-direction: column;
   gap: 0.1rem;
   min-width: 0;
+}
+
+.stu-desktop-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.stu-mobile-card-details {
+  display: none;
 }
 
 .stu-name-cell {
@@ -810,17 +822,18 @@ input:checked+.slider:before {
 }
 
 .stu-modal-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  font-size: 0.92rem;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  font-size: 1.25rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
   flex-shrink: 0;
 }
 
@@ -1212,23 +1225,125 @@ input:checked+.slider:before {
     display: inline-block;
   }
 
+  /* Mobile Student Table Row & Cards */
+  .col-roll,
+  #th-roll,
+  .col-enrollment,
+  #th-enrollment,
+  .col-reg,
+  #th-reg,
+  .col-retention,
+  #th-retention {
+    display: none !important;
+  }
+
   .col-avatar {
-    width: 34px;
-    padding: 0.45rem 0.35rem !important;
+    width: 52px !important;
+    padding: 0.75rem 0.45rem 0.75rem 0.75rem !important;
     text-align: center;
+    vertical-align: middle;
   }
 
   .stu-avatar {
-    width: 26px;
-    height: 26px;
-    font-size: 0.65rem;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 13px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
   }
 
-  /* Hide Official Enrollment, Registration, and Retention columns on mobile */
-  .col-enrollment,
-  .col-reg,
-  .col-retention {
+  .stu-avatar-img {
+    border-radius: 12px !important;
+  }
+
+  .stu-table td.col-name {
+    padding: 0.75rem 0.4rem !important;
+    vertical-align: middle;
+  }
+
+  .stu-desktop-name-row {
     display: none !important;
+  }
+
+  .stu-mobile-card-details {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .stu-mobile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .stu-roll-badge-mobile {
+    font-family: var(--font-family-mono, monospace);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    padding: 0.1rem 0.38rem;
+    border-radius: 5px;
+    letter-spacing: -0.01em;
+  }
+
+  .stu-name-mobile {
+    font-size: 0.94rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.25;
+  }
+
+  .stu-mobile-sub-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+
+  .stu-meta-code {
+    font-family: var(--font-family-mono, monospace);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    padding: 0.08rem 0.35rem;
+    border-radius: 4px;
+  }
+
+  .stu-meta-code.pending {
+    color: var(--status-late);
+    background: var(--status-late-bg);
+    border-color: rgba(217, 119, 6, 0.2);
+  }
+
+  .stu-meta-dot {
+    color: var(--border-color);
+    font-size: 0.7rem;
+  }
+
+  .stu-meta-sem {
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .btn-kebab {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 9px !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .btn-restore-compact,
