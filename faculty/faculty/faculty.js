@@ -493,13 +493,16 @@
 
     container.innerHTML = classes.map(c => `
       <div class="fac-class-card-item">
+        <div class="fac-class-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        </div>
         <div class="fac-class-info">
           <h5 class="fac-class-title">${esc(c.subject_name || c.class_name || 'Academic Class')}</h5>
           <div class="fac-class-meta">
             <span class="fac-class-badge">${esc(c.subject_code || 'CODE')}</span>
-            <span>&bull; Sem ${esc(c.semester || '—')}</span>
-            <span>&bull; ${esc(c.component || 'THEORY')}</span>
-            ${c.start_date ? `<span>&bull; Started ${esc(c.start_date)}</span>` : ''}
+            <span class="fac-class-meta-text">&bull; Sem ${esc(c.semester || '—')}</span>
+            <span class="fac-class-meta-text">&bull; ${esc(c.component || 'THEORY')}</span>
+            ${c.academic_year || c.session ? `<span class="fac-class-meta-text">&bull; ${esc(c.academic_year || c.session)}</span>` : ''}
           </div>
         </div>
       </div>
@@ -540,7 +543,10 @@
 
     // Hero section
     const avatarEl = document.getElementById('detail-fac-avatar');
-    if (avatarEl) avatarEl.textContent = getInitials(f.full_name);
+    if (avatarEl) {
+      avatarEl.textContent = getInitials(f.full_name);
+      avatarEl.className = `fac-details-avatar ${isTargetHod ? 'hod' : 'lecturer'}`;
+    }
 
     const nameEl = document.getElementById('detail-fac-name');
     if (nameEl) nameEl.textContent = f.full_name || 'Faculty Member';
@@ -601,10 +607,24 @@
     if (roleEl) roleEl.textContent = f.designation || (isTargetHod ? 'Head of Department' : 'Lecturer');
 
     const emailEl = document.getElementById('detail-fac-email');
-    if (emailEl) emailEl.textContent = f.email || f.gmail || '—';
+    if (emailEl) {
+      const email = f.email || f.gmail || '';
+      if (email) {
+        emailEl.innerHTML = `<a href="mailto:${esc(email)}" class="fac-card-link" title="Send email to ${esc(email)}">${esc(email)}</a>`;
+      } else {
+        emailEl.textContent = '—';
+      }
+    }
 
     const phoneEl = document.getElementById('detail-fac-phone');
-    if (phoneEl) phoneEl.textContent = f.phone || '—';
+    if (phoneEl) {
+      const phone = f.phone || '';
+      if (phone) {
+        phoneEl.innerHTML = `<a href="tel:${esc(phone)}" class="fac-card-link" title="Call ${esc(phone)}">${esc(phone)}</a>`;
+      } else {
+        phoneEl.innerHTML = `<span style="color:var(--text-muted); font-style:italic;">Not provided</span>`;
+      }
+    }
 
     const deptEl = document.getElementById('detail-fac-dept');
     if (deptEl) deptEl.textContent = f.department_name || f.department_code || 'Information Technology';
@@ -620,6 +640,9 @@
 
     const editEmpid = document.getElementById('edit-fac-empid');
     if (editEmpid) editEmpid.value = f.employee_id || '';
+
+    const editDept = document.getElementById('edit-fac-dept-display');
+    if (editDept) editDept.value = f.department_name || f.department_code || 'Information Technology';
 
     const editDesig = document.getElementById('edit-fac-designation');
     if (editDesig) {
@@ -684,9 +707,13 @@
     const footerEdit = document.getElementById('fac-footer-edit-actions');
     const titleEl = document.getElementById('modal-fac-title');
     const subtitleEl = document.getElementById('modal-fac-subtitle');
+    const heroActions = document.querySelector('.fac-hero-actions');
+    const tabsNav = document.querySelector('.fac-details-tabs');
 
     if (isEdit) {
       switchFacultyTab('profile');
+      if (tabsNav) tabsNav.style.display = 'none';
+      if (heroActions) heroActions.style.display = 'none';
       if (viewWrap) viewWrap.style.display = 'none';
       if (editForm) editForm.style.display = 'block';
       if (footerView) footerView.style.display = 'none';
@@ -694,6 +721,8 @@
       if (titleEl) titleEl.textContent = 'Edit Faculty Profile';
       if (subtitleEl) subtitleEl.textContent = 'Update official credentials & contact info (HOD Only)';
     } else {
+      if (tabsNav) tabsNav.style.display = 'flex';
+      if (heroActions) heroActions.style.display = 'flex';
       if (viewWrap) viewWrap.style.display = 'block';
       if (editForm) editForm.style.display = 'none';
       if (footerView) footerView.style.display = 'flex';

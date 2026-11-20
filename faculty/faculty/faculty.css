@@ -877,25 +877,49 @@ input:checked + .slider:before {
   opacity: 1;
 }
 
+/* ══════════════════════════════════════════════════════════════
+ * FACULTY COMPLETE DETAILS & HOD EDIT MODAL
+ * 100% Theme Token Compliant & Touch-Optimized
+ * ══════════════════════════════════════════════════════════════ */
+
+/* Modal Backdrop */
+.fac-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom)) 1rem;
+  box-sizing: border-box;
+  opacity: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .fac-details-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 18px;
+  border-radius: 20px;
   width: 100%;
-  max-width: 560px;
-  max-height: calc(100dvh - 2rem);
-  max-height: calc(100vh - 2rem);
+  max-width: 520px;
+  max-height: calc(100dvh - 2.5rem);
+  max-height: calc(100vh - 2.5rem);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.28);
   overflow: hidden;
   box-sizing: border-box;
+  margin: auto;
   opacity: 1;
   transform: none;
 }
 
 .fac-details-header {
-  padding: 0.95rem 1.25rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -924,45 +948,47 @@ input:checked + .slider:before {
 }
 
 .modal-close-btn {
-  background: transparent;
-  border: none;
-  font-size: 1.4rem;
-  line-height: 1;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .modal-close-btn:hover {
-  background: var(--bg-surface-hover);
+  background: var(--bg-surface-hover, rgba(0, 0, 0, 0.05));
   color: var(--text-main);
+  border-color: var(--text-muted);
 }
 
 /* Identity Hero Banner */
 .fac-hero-banner {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.95rem 1.25rem;
+  gap: 0.95rem;
+  padding: 1rem 1.25rem;
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(99, 102, 241, 0.04));
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
 [data-theme="dark"] .fac-hero-banner {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(30, 41, 59, 0.5));
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(30, 41, 59, 0.5));
 }
 
 .fac-details-avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--color-primary, #2563eb), #4f46e5);
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
   color: #ffffff;
   font-size: 1.25rem;
   font-weight: 800;
@@ -970,7 +996,15 @@ input:checked + .slider:before {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  user-select: none;
+}
+
+.fac-details-avatar.hod {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .fac-hero-meta {
@@ -984,12 +1018,12 @@ input:checked + .slider:before {
 .fac-hero-title-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   flex-wrap: wrap;
 }
 
 .fac-hero-title-row h3 {
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   font-weight: 800;
   color: var(--text-main);
   margin: 0;
@@ -999,7 +1033,7 @@ input:checked + .slider:before {
 .fac-hero-sub-row {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   font-size: 0.74rem;
   flex-wrap: wrap;
 }
@@ -1025,13 +1059,13 @@ input:checked + .slider:before {
 }
 
 .fac-hero-dot {
-  color: var(--text-muted);
-  opacity: 0.5;
+  color: var(--border-color);
+  font-size: 0.7rem;
 }
 
 .fac-dept-pill {
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .fac-hero-actions {
@@ -1042,10 +1076,10 @@ input:checked + .slider:before {
 }
 
 .fac-quick-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: var(--bg-surface);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   color: var(--color-primary);
   display: inline-flex;
@@ -1053,6 +1087,7 @@ input:checked + .slider:before {
   justify-content: center;
   text-decoration: none;
   transition: all 0.15s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .fac-quick-btn:hover {
@@ -1060,6 +1095,7 @@ input:checked + .slider:before {
   color: #ffffff;
   border-color: var(--color-primary);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 /* Horizontal Tabs Navigation */
@@ -1069,14 +1105,19 @@ input:checked + .slider:before {
   padding: 0 1rem;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
-  gap: 0.5rem;
+  gap: 0.25rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   flex-shrink: 0;
+  scrollbar-width: none;
+}
+
+.fac-details-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .fac-tab-btn {
-  padding: 0.7rem 0.85rem;
+  padding: 0.75rem 0.85rem;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -1140,28 +1181,64 @@ input:checked + .slider:before {
 .fac-detail-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 0.75rem 0.85rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
   box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.fac-detail-card label {
-  font-size: 0.7rem;
+.fac-detail-card:hover {
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.fac-card-header-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+}
+
+.fac-card-header-line svg {
+  color: var(--color-primary);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.fac-card-header-line label {
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
   margin: 0;
+  user-select: none;
 }
 
-.fac-detail-card span {
+.fac-detail-card span,
+.fac-detail-card .fac-card-link {
   font-size: 0.86rem;
   font-weight: 600;
   color: var(--text-main);
   word-break: break-word;
+  line-height: 1.3;
+}
+
+.fac-card-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.15s ease;
+}
+
+.fac-card-link:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
 }
 
 .fac-mono-badge {
@@ -1180,21 +1257,22 @@ input:checked + .slider:before {
 .fac-edit-form-inner {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
   width: 100%;
 }
 
 .fac-edit-notice {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 0.75rem;
+  gap: 0.55rem;
+  padding: 0.65rem 0.85rem;
   background: rgba(37, 99, 235, 0.08);
   border: 1px solid rgba(37, 99, 235, 0.2);
-  border-radius: 8px;
-  font-size: 0.73rem;
+  border-radius: 10px;
+  font-size: 0.74rem;
+  font-weight: 500;
   color: var(--color-primary);
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 [data-theme="dark"] .fac-edit-notice {
@@ -1209,13 +1287,21 @@ input:checked + .slider:before {
 .form-group-wrap {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.35rem;
 }
 
 .form-field-label {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.required-star {
+  color: var(--status-absent, #dc2626);
+  font-weight: 800;
 }
 
 .form-grid-compact-pair {
@@ -1227,13 +1313,13 @@ input:checked + .slider:before {
 .form-control-input,
 .form-control-select {
   width: 100%;
-  height: 38px;
-  padding: 0 0.75rem;
-  border-radius: 8px;
+  height: 42px;
+  padding: 0 0.85rem;
+  border-radius: 10px;
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
   color: var(--text-main);
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   box-sizing: border-box;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -1241,7 +1327,14 @@ input:checked + .slider:before {
 
 .form-control-mono {
   font-family: var(--font-family-mono, monospace);
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.form-control-disabled {
+  opacity: 0.65;
+  background: var(--bg-surface-hover, rgba(0, 0, 0, 0.04));
+  cursor: not-allowed;
 }
 
 .form-control-input:focus,
@@ -1270,23 +1363,35 @@ input:checked + .slider:before {
 .fac-classes-list {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.6rem;
 }
 
 .fac-class-card-item {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  padding: 0.75rem 0.95rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.65rem;
-  transition: border-color 0.15s ease;
+  gap: 0.75rem;
+  transition: border-color 0.15s ease, transform 0.12s ease;
 }
 
 .fac-class-card-item:hover {
   border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.fac-class-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--color-primary-light, rgba(37, 99, 235, 0.12));
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .fac-class-info {
@@ -1297,7 +1402,7 @@ input:checked + .slider:before {
 }
 
 .fac-class-title {
-  font-size: 0.86rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
@@ -1309,19 +1414,24 @@ input:checked + .slider:before {
 .fac-class-meta {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   font-size: 0.72rem;
   color: var(--text-muted);
   flex-wrap: wrap;
 }
 
 .fac-class-badge {
-  background: rgba(37, 99, 235, 0.1);
+  background: var(--color-primary-light, rgba(37, 99, 235, 0.12));
   color: var(--color-primary);
-  font-size: 0.68rem;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.7rem;
   font-weight: 700;
   padding: 0.1rem 0.4rem;
   border-radius: 6px;
+}
+
+.fac-class-meta-text {
+  color: var(--text-muted);
 }
 
 .fac-empty-workload {
@@ -1343,7 +1453,7 @@ input:checked + .slider:before {
 .fac-danger-zone {
   background: rgba(239, 68, 68, 0.05);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 0.85rem;
   display: flex;
   flex-direction: column;
@@ -1361,19 +1471,19 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: 0.65rem;
   background: var(--bg-surface);
   flex-shrink: 0;
 }
 
 .btn-dialog-cancel {
-  height: 40px;
-  padding: 0 1rem;
+  height: 42px;
+  padding: 0 1.15rem;
   border-radius: 10px;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text-main);
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -1387,19 +1497,19 @@ input:checked + .slider:before {
 }
 
 .btn-dialog-primary {
-  height: 40px;
-  padding: 0 1.25rem;
+  height: 42px;
+  padding: 0 1.35rem;
   border-radius: 10px;
   border: none;
   background: linear-gradient(135deg, var(--color-primary, #2563eb), #1d4ed8);
   color: #ffffff;
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
   transition: all 0.15s ease;
 }
@@ -1421,45 +1531,46 @@ input:checked + .slider:before {
 /* Mobile Responsiveness for Faculty Details Modal */
 @media (max-width: 640px) {
   .fac-modal-backdrop {
-    padding: 0.5rem !important;
+    padding: max(0.65rem, env(safe-area-inset-top)) 0.65rem max(0.65rem, env(safe-area-inset-bottom)) 0.65rem !important;
+    align-items: center !important;
   }
 
   .fac-details-card {
-    max-height: calc(100dvh - 1rem) !important;
-    max-height: calc(100vh - 1rem) !important;
-    border-radius: 16px !important;
+    max-height: calc(100dvh - 1.5rem) !important;
+    max-height: calc(100vh - 1.5rem) !important;
+    border-radius: 18px !important;
   }
 
   .fac-details-header {
-    padding: 0.75rem 1rem !important;
+    padding: 0.85rem 1rem !important;
   }
 
   .fac-modal-title {
-    font-size: 0.96rem !important;
+    font-size: 1rem !important;
   }
 
   .fac-hero-banner {
-    padding: 0.75rem 1rem !important;
-    gap: 0.65rem !important;
+    padding: 0.85rem 1rem !important;
+    gap: 0.75rem !important;
   }
 
   .fac-details-avatar {
-    width: 46px !important;
-    height: 46px !important;
-    font-size: 1.1rem !important;
-    border-radius: 12px !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.15rem !important;
+    border-radius: 14px !important;
   }
 
   .fac-hero-title-row h3 {
-    font-size: 0.96rem !important;
+    font-size: 1rem !important;
   }
 
   .fac-details-tabs {
-    padding: 0 0.5rem !important;
+    padding: 0 0.65rem !important;
   }
 
   .fac-tab-btn {
-    padding: 0.6rem 0.65rem !important;
+    padding: 0.65rem 0.7rem !important;
     font-size: 0.78rem !important;
   }
 
@@ -1473,17 +1584,18 @@ input:checked + .slider:before {
   }
 
   .fac-detail-card {
-    padding: 0.6rem 0.7rem !important;
+    padding: 0.65rem 0.75rem !important;
   }
 
   .fac-details-footer {
-    padding: 0.7rem 1rem !important;
+    padding: 0.75rem 1rem !important;
   }
 
   .fac-details-footer button {
     flex: 1 !important;
-    height: 38px !important;
-    font-size: 0.82rem !important;
+    height: 42px !important;
+    font-size: 0.84rem !important;
+    border-radius: 10px !important;
   }
 }
 
