@@ -8460,8 +8460,92 @@ function insertAutoFormula(type) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   IMPORT & EXPORT COMPATIBILITY ENGINE (EXCELJS + CSV)
+   IMPORT & EXPORT COMPATIBILITY ENGINE (EXCELJS + CSV + PDF + WORD)
    ══════════════════════════════════════════════════════════════ */
+const EXCEL_COLOR_NAME_MAP = {
+  white: '#ffffff',
+  black: '#000000',
+  transparent: '#ffffff',
+  inherit: '#0f172a',
+  red: '#ef4444',
+  green: '#22c55e',
+  blue: '#3b82f6',
+  yellow: '#eab308',
+  gray: '#6b7280',
+  grey: '#6b7280'
+};
+
+const EXCEL_CSS_VAR_MAP = {
+  '--bg-primary': '#ffffff',
+  '--bg-secondary': '#f8fafc',
+  '--bg-tertiary': '#f1f5f9',
+  '--text-primary': '#0f172a',
+  '--text-secondary': '#475569',
+  '--text-muted': '#64748b',
+  '--text-main': '#0f172a',
+  '--border-color': '#cbd5e1',
+  '--primary-color': '#0284c7',
+  '--primary-light': '#e0f2fe',
+  '--table-th-bg': '#f1f5f9',
+  '--status-present-bg': '#dcfce7',
+  '--status-absent-bg': '#fee2e2',
+  '--status-late-bg': '#fef3c7',
+  '--badge-primary-bg': '#e0f2fe',
+  '--badge-primary-text': '#0369a1'
+};
+
+function resolveColorToHex(colorStr, fallbackHex = '#ffffff') {
+  if (!colorStr || typeof colorStr !== 'string') return fallbackHex;
+  let str = colorStr.trim().toLowerCase();
+
+  if (str.startsWith('var(')) {
+    const varNameMatch = str.match(/var\(\s*([^,\)]+)(?:,\s*([^\)]+))?\)/);
+    if (varNameMatch) {
+      const varName = varNameMatch[1].trim();
+      const varFallback = varNameMatch[2]?.trim();
+      let resolved = '';
+      if (typeof window !== 'undefined' && window.getComputedStyle) {
+        try {
+          resolved = window.getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        } catch (_) { }
+      }
+      if (!resolved && EXCEL_CSS_VAR_MAP[varName]) resolved = EXCEL_CSS_VAR_MAP[varName];
+      if (!resolved && varFallback) resolved = varFallback;
+      if (resolved) str = resolved.toLowerCase();
+    }
+  }
+
+  if (EXCEL_COLOR_NAME_MAP[str]) return EXCEL_COLOR_NAME_MAP[str];
+
+  if (str.startsWith('#')) {
+    const raw = str.slice(1);
+    if (raw.length === 3) {
+      return '#' + raw[0] + raw[0] + raw[1] + raw[1] + raw[2] + raw[2];
+    }
+    if (raw.length === 6) {
+      return '#' + raw;
+    }
+    if (raw.length === 8) {
+      return '#' + raw.slice(0, 6);
+    }
+  }
+
+  const rgbMatch = str.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (rgbMatch) {
+    const r = Math.min(255, Math.max(0, parseInt(rgbMatch[1], 10))).toString(16).padStart(2, '0');
+    const g = Math.min(255, Math.max(0, parseInt(rgbMatch[2], 10))).toString(16).padStart(2, '0');
+    const b = Math.min(255, Math.max(0, parseInt(rgbMatch[3], 10))).toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`;
+  }
+
+  return fallbackHex;
+}
+
+function resolveColorToArgb(colorStr, defaultArgb = 'FFFFFFFF') {
+  const hex = resolveColorToHex(colorStr, '#' + defaultArgb.slice(2));
+  return 'FF' + hex.replace('#', '').toUpperCase();
+}
+
 async function exportCurrentSheet(format) {
   const sheet = getActiveSheet();
   if (!sheet) return;
@@ -8572,7 +8656,11 @@ async function exportCurrentSheet(format) {
           const rowObj = worksheet.getRow(excelR);
           const isHeader = r === 0;
           const isMarks = r === 1 && isMarksRow(wsData, 1);
-          rowObj.height = isHeader ? 26 : isMarks ? 22 : 20;
+          if (wsData.rowHeights && typeof wsData.rowHeights[r] === 'number' && wsData.rowHeights[r] > 0) {
+            rowObj.height = Math.round(wsData.rowHeights[r] * 0.75);
+          } else {
+            rowObj.height = isHeader ? 26 : isMarks ? 22 : 20;
+          }
 
           for (let c = 0; c <= maxDataCol; c++) {
             const cell = getCell(wsData, r, c);
@@ -8611,29 +8699,72 @@ async function exportCurrentSheet(format) {
               right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
             };
 
-            if (isHeader) {
-              excelCell.font = { name: 'Segoe UI', bold: true, size: 10, color: { argb: 'FF0F172A' } };
-              excelCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-              excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+            // 1. Resolve Background Color (Cell specific bg overrides header/marks defaults)
+            let bgHex = null;
+            if (cell.s?.bg) {
+              bgHex = resolveColorToHex(cell.s.bg);
+            } else if (isHeader) {
+              bgHex = '#e2e8f0';
             } else if (isMarks) {
-              excelCell.font = { name: 'Segoe UI', bold: true, size: 9, color: { argb: 'FF334155' } };
-              excelCell.alignment = { horizontal: 'center', vertical: 'middle' };
-              excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
-            } else {
-              const align = c === 2 ? 'left' : 'center';
-              excelCell.font = { name: 'Segoe UI', size: 10, bold: cell.s?.bold || false, color: { argb: 'FF1E293B' } };
-              excelCell.alignment = { horizontal: cell.s?.align || align, vertical: 'middle' };
-              if (cell.s?.bg) {
-                excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
-              }
+              bgHex = '#f1f5f9';
             }
+
+            if (bgHex) {
+              excelCell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF' + bgHex.replace('#', '').toUpperCase() }
+              };
+            }
+
+            // 2. Resolve Text / Font Styling
+            let fontColorHex = '#1e293b';
+            if (cell.s?.color) {
+              fontColorHex = resolveColorToHex(cell.s.color);
+            } else if (isHeader) {
+              fontColorHex = '#0f172a';
+            } else if (isMarks) {
+              fontColorHex = '#334155';
+            }
+
+            const isBold = Boolean(cell.s?.bold !== undefined ? cell.s.bold : (isHeader || isMarks));
+            const isItalic = Boolean(cell.s?.italic);
+            const isUnderline = Boolean(cell.s?.underline);
+            const fontSize = cell.s?.fontSize ? Math.round(Number(cell.s.fontSize)) : (isHeader ? 10 : isMarks ? 9 : 10);
+            const fontFamily = cell.s?.fontFamily || 'Segoe UI';
+
+            excelCell.font = {
+              name: fontFamily,
+              size: fontSize,
+              bold: isBold,
+              italic: isItalic,
+              underline: isUnderline,
+              color: { argb: 'FF' + fontColorHex.replace('#', '').toUpperCase() }
+            };
+
+            // 3. Resolve Alignment & Text Wrapping
+            const defaultHAlign = (c === 2 && !isHeader && !isMarks) ? 'left' : 'center';
+            const hAlign = cell.s?.align || defaultHAlign;
+            const vAlign = cell.s?.vAlign || 'middle';
+            const cellValStr = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || ''));
+            const isWrap = Boolean(cell.s?.wrap || isHeader || cellValStr.includes('\n'));
+
+            excelCell.alignment = {
+              horizontal: hAlign,
+              vertical: vAlign,
+              wrapText: isWrap
+            };
           }
           rowObj.commit();
         }
 
-        // 6. Set auto column widths up to maxDataCol
+        // 6. Set custom or auto column widths up to maxDataCol
         for (let c = 0; c <= maxDataCol; c++) {
-          worksheet.getColumn(c + 1).width = Math.max(colMaxLengths[c] || 12, 12);
+          if (wsData.colWidths && typeof wsData.colWidths[c] === 'number' && wsData.colWidths[c] > 0) {
+            worksheet.getColumn(c + 1).width = Math.max(6, Math.round(wsData.colWidths[c] / 7.2));
+          } else {
+            worksheet.getColumn(c + 1).width = Math.max(colMaxLengths[c] || 12, 12);
+          }
         }
 
         // 7. Apply sheet cell merges (shifted if banner prepended)
@@ -8740,11 +8871,18 @@ function exportSheetToPdf(sheet) {
       const spanAttrs = (mInfo && mInfo.isTopLeft) ? ` rowspan="${mInfo.rowSpan}" colspan="${mInfo.colSpan}"` : '';
       const cell = getCell(sheet, r, c);
       const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.raw;
-      const align = (c === 2 && !isHeader && !isMarks) ? 'left' : 'center';
-      const weight = (isHeader || isMarks || cell.s?.bold) ? 'bold' : 'normal';
-      const bg = isHeader ? '#f1f5f9' : isMarks ? '#f8fafc' : '#ffffff';
+      const align = cell.s?.align || ((c === 2 && !isHeader && !isMarks) ? 'left' : 'center');
+      const vAlign = cell.s?.vAlign || (isHeader || isMarks ? 'middle' : 'top');
+      const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isMarks ? 'bold' : 'normal'));
+      const fontStyle = cell.s?.italic ? 'italic' : 'normal';
+      const textDecor = cell.s?.underline ? 'underline' : 'none';
+      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg) : (isHeader ? '#f1f5f9' : isMarks ? '#f8fafc' : '#ffffff');
+      const color = cell.s?.color ? resolveColorToHex(cell.s.color) : (isHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '9pt' : '8.5pt');
+      const fontFamily = cell.s?.fontFamily ? `font-family:${cell.s.fontFamily};` : '';
+      const customW = (sheet.colWidths && sheet.colWidths[c] && (!mInfo || mInfo.colSpan === 1)) ? `width:${sheet.colWidths[c]}px;min-width:${sheet.colWidths[c]}px;` : '';
 
-      tableRowsHtml += `<td${spanAttrs} style="padding:4px 6px;text-align:${align};font-weight:${weight};background:${bg};border:1px solid #94a3b8;font-size:9pt;word-break:break-word;">${escapeHtml(val)}</td>`;
+      tableRowsHtml += `<td${spanAttrs} style="${customW}padding:4px 6px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #94a3b8;font-size:${fontSize};${fontFamily}white-space:pre-wrap;word-break:break-word;">${escapeHtml(val)}</td>`;
     }
     tableRowsHtml += '</tr>';
   }
@@ -8921,12 +9059,39 @@ function exportSheetToWordDoc(sheet) {
   }
   maxDataCol = Math.max(maxDataCol, 3);
 
+  let maxDataRow = 0;
+  for (let r = 0; r < sheet.rowsCount; r++) {
+    for (let c = 0; c <= maxDataCol; c++) {
+      const v = getCell(sheet, r, c).v;
+      if (v !== '' && v !== null && v !== undefined) {
+        if (r > maxDataRow) maxDataRow = r;
+      }
+    }
+  }
+
   const banner1 = document.getElementById('hdr-banner-line1')?.textContent?.trim() || 'Uttarakhand Government Institute of Polytechnic, Nainital | Internal Evaluation Sheet 2026-27 (Winter Session)';
   const banner2 = document.getElementById('hdr-banner-line2')?.textContent?.trim() || (S.group ? `Internal Evaluation | Subject : ${S.group.name || S.group.subject_name || 'Subject'}` : 'Internal Evaluation');
   const banner3 = document.getElementById('hdr-banner-cohort')?.textContent?.trim() || 'Information Technology | Semester 5';
 
   const cell0_0 = String(getCell(sheet, 0, 0).v || getCell(sheet, 0, 0).raw || '');
   const alreadyHasBanner = cell0_0.includes('Polytechnic') || cell0_0.includes('Institute');
+
+  const mergeMap = new Map();
+  if (Array.isArray(sheet.merges)) {
+    sheet.merges.forEach(m => {
+      const minR = Math.min(m.s.r, m.e.r);
+      const maxR = Math.max(m.s.r, m.e.r);
+      const minC = Math.min(m.s.c, m.e.c);
+      const maxC = Math.max(m.s.c, m.e.c);
+      const rowSpan = maxR - minR + 1;
+      const colSpan = maxC - minC + 1;
+      for (let r = minR; r <= maxR; r++) {
+        for (let c = minC; c <= maxC; c++) {
+          mergeMap.set(`${r},${c}`, { isTopLeft: (r === minR && c === minC), rowSpan, colSpan });
+        }
+      }
+    });
+  }
 
   let tableHtml = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-family:Segoe UI,Arial,sans-serif;font-size:11px;width:100%;">';
 
@@ -8936,24 +9101,35 @@ function exportSheetToWordDoc(sheet) {
     tableHtml += `<tr><th colspan="${maxDataCol + 1}" style="background:#f8fafc;color:#475569;font-size:10px;padding:4px;text-align:center;">${escapeHtml(banner3)}</th></tr>`;
   }
 
-  for (let r = 0; r < sheet.rowsCount; r++) {
+  for (let r = 0; r <= maxDataRow; r++) {
     let hasData = false;
     for (let c = 0; c <= maxDataCol; c++) {
       const v = getCell(sheet, r, c).v;
       if (v !== '' && v !== null && v !== undefined) { hasData = true; break; }
     }
-    if (!hasData) continue;
+    if (!hasData && r > 2) continue;
 
     const isHeader = r === 0;
     const isMarks = r === 1 && isMarksRow(sheet, 1);
-    const bg = isHeader ? 'background:#e2e8f0;font-weight:bold;text-align:center;' : isMarks ? 'background:#f1f5f9;font-weight:bold;text-align:center;' : '';
 
-    tableHtml += `<tr style="${bg}">`;
+    tableHtml += '<tr>';
     for (let c = 0; c <= maxDataCol; c++) {
+      const mInfo = mergeMap.get(`${r},${c}`);
+      if (mInfo && !mInfo.isTopLeft) continue;
+
+      const spanAttrs = (mInfo && mInfo.isTopLeft) ? ` rowspan="${mInfo.rowSpan}" colspan="${mInfo.colSpan}"` : '';
       const cell = getCell(sheet, r, c);
       const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.raw;
-      const align = c === 2 && !isHeader && !isMarks ? 'text-align:left;' : 'text-align:center;';
-      tableHtml += `<${isHeader ? 'th' : 'td'} style="${align}padding:5px;">${escapeHtml(val)}</${isHeader ? 'th' : 'td'}>`;
+      const align = cell.s?.align || ((c === 2 && !isHeader && !isMarks) ? 'left' : 'center');
+      const vAlign = cell.s?.vAlign || 'middle';
+      const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isMarks ? 'bold' : 'normal'));
+      const fontStyle = cell.s?.italic ? 'italic' : 'normal';
+      const textDecor = cell.s?.underline ? 'underline' : 'none';
+      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg) : (isHeader ? '#e2e8f0' : isMarks ? '#f1f5f9' : '#ffffff');
+      const color = cell.s?.color ? resolveColorToHex(cell.s.color) : (isHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      const tag = isHeader ? 'th' : 'td';
+
+      tableHtml += `<${tag}${spanAttrs} style="padding:5px 8px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #cbd5e1;white-space:pre-wrap;word-break:break-word;">${escapeHtml(val)}</${tag}>`;
     }
     tableHtml += '</tr>';
   }
