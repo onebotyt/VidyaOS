@@ -29,7 +29,7 @@
 /* Floating Palette Popup - Positioned fixed to guarantee NO overflow clipping by ribbon or formula bar */
 .excel-color-palette-popup {
   position: fixed !important;
-  z-index: 9999999 !important;
+  z-index: 99999999 !important;
   min-width: 240px;
   max-width: 260px;
   padding: 0.65rem 0.75rem;
@@ -170,7 +170,7 @@
    ══════════════════════════════════════════════════════════════ */
 .excel-conditional-dropdown {
   position: fixed !important;
-  z-index: 9999999 !important;
+  z-index: 99999999 !important;
   min-width: 270px;
   padding: 0.55rem;
   background: var(--bg-card);
@@ -302,31 +302,33 @@
    ══════════════════════════════════════════════════════════════ */
 .excel-templates-dropdown {
   position: fixed !important;
-  z-index: 9999999 !important;
-  width: 320px !important;
-  max-width: 350px !important;
+  z-index: 99999999 !important;
+  width: 330px !important;
+  max-width: 360px !important;
   padding: 0.65rem 0.75rem !important;
   background: var(--bg-card) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-md, 8px) !important;
-  box-shadow: 0 18px 48px hsla(220, 30%, 8%, 0.28), 0 2px 6px hsla(220, 20%, 10%, 0.12) !important;
+  box-shadow: 0 18px 48px hsla(220, 30%, 8%, 0.32), 0 2px 6px hsla(220, 20%, 10%, 0.15) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 0.45rem !important;
   animation: officeFadeIn 0.12s ease-out !important;
   user-select: none !important;
+  box-sizing: border-box !important;
 }
 
 .excel-templates-header {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding-bottom: 0.25rem !important;
+  padding-bottom: 0.35rem !important;
   border-bottom: 1px solid var(--border-color) !important;
+  flex-shrink: 0 !important;
 }
 
 .excel-templates-title {
-  font-size: 0.8rem !important;
+  font-size: 0.82rem !important;
   font-weight: 800 !important;
   color: var(--text-main) !important;
 }
@@ -334,14 +336,13 @@
 .excel-templates-subtitle {
   font-size: 0.65rem !important;
   color: var(--text-muted) !important;
+  margin-top: 1px !important;
 }
 
 .excel-templates-grid {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
   gap: 0.45rem !important;
-  max-height: 360px !important;
-  overflow-y: auto !important;
   padding-right: 2px !important;
 }
 
@@ -356,6 +357,7 @@
   cursor: pointer !important;
   text-align: left !important;
   transition: all 0.12s ease !important;
+  box-sizing: border-box !important;
 }
 
 .template-card-btn:hover {
@@ -415,6 +417,7 @@
   font-weight: 700 !important;
   cursor: pointer !important;
   transition: all 0.12s ease !important;
+  flex-shrink: 0 !important;
 }
 
 .template-reset-btn:hover {

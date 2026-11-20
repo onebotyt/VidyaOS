@@ -4,14 +4,28 @@
 
 function positionFloatingDropdown(popup, button) {
   if (!popup || !button) return;
+
+  // DOM Portal: Attach popup directly to document.body to completely bypass all ancestor overflow/clipping/stacking contexts
+  if (popup.parentElement !== document.body) {
+    document.body.appendChild(popup);
+  }
+
   const rect = button.getBoundingClientRect();
-  const popupW = popup.offsetWidth || 260;
+  const popupW = popup.offsetWidth || 330;
   const leftPos = Math.max(8, Math.min(rect.left, window.innerWidth - popupW - 16));
   const topPos = rect.bottom + 4;
+
+  const maxAvailHeight = Math.max(200, window.innerHeight - topPos - 16);
+  popup.style.maxHeight = maxAvailHeight + 'px';
+  popup.style.overflowY = 'auto';
+
   popup.style.position = 'fixed';
   popup.style.top = topPos + 'px';
   popup.style.left = leftPos + 'px';
-  popup.style.zIndex = '9999999';
+  popup.style.zIndex = '99999999';
+
+  // Ensure scroll is reset to very top so header and top cards are fully visible
+  popup.scrollTop = 0;
 }
 
 function toggleColorPalette(type, event) {
@@ -142,7 +156,12 @@ function selectFillColor(color) {
   if (bar) bar.style.backgroundColor = color || 'transparent';
 
   const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
-  if (!sheet) return;
+  if (!sheet) {
+    if (typeof showToast === 'function') {
+      showToast('Please open an academic workbook first to apply color templates!', 'info');
+    }
+    return;
+  }
 
   if (typeof pushUndoState === 'function') pushUndoState('Fill Color');
 
@@ -183,7 +202,12 @@ function selectFontColor(color) {
   if (bar) bar.style.backgroundColor = color || 'inherit';
 
   const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
-  if (!sheet) return;
+  if (!sheet) {
+    if (typeof showToast === 'function') {
+      showToast('Please open an academic workbook first to apply color templates!', 'info');
+    }
+    return;
+  }
 
   if (typeof pushUndoState === 'function') pushUndoState('Font Color');
 
@@ -299,7 +323,12 @@ const SHEET_COLOR_TEMPLATES = {
 function applySheetColorTemplate(templateKey) {
   closeAllColorPalettes();
   const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
-  if (!sheet) return;
+  if (!sheet) {
+    if (typeof showToast === 'function') {
+      showToast('Please open an academic workbook first to apply color templates!', 'info');
+    }
+    return;
+  }
 
   if (typeof pushUndoState === 'function') pushUndoState('Apply Color Template');
 
@@ -420,7 +449,12 @@ function applySheetColorTemplate(templateKey) {
 function applyPresetFormatting(type) {
   closeAllColorPalettes();
   const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
-  if (!sheet) return;
+  if (!sheet) {
+    if (typeof showToast === 'function') {
+      showToast('Please open an academic workbook first to apply color templates!', 'info');
+    }
+    return;
+  }
 
   if (typeof pushUndoState === 'function') pushUndoState(`Apply Preset: ${type}`);
 
@@ -480,7 +514,12 @@ function applyPresetFormatting(type) {
 function applyColorScale(scaleType) {
   closeAllColorPalettes();
   const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
-  if (!sheet) return;
+  if (!sheet) {
+    if (typeof showToast === 'function') {
+      showToast('Please open an academic workbook first to apply color templates!', 'info');
+    }
+    return;
+  }
 
   if (typeof pushUndoState === 'function') pushUndoState(`Apply Color Scale: ${scaleType}`);
 
@@ -577,7 +616,12 @@ function applyColorScale(scaleType) {
 function clearFormattingRules(scope) {
   closeAllColorPalettes();
   const sheet = typeof getActiveSheet === 'function' ? getActiveSheet() : null;
-  if (!sheet) return;
+  if (!sheet) {
+    if (typeof showToast === 'function') {
+      showToast('Please open an academic workbook first to apply color templates!', 'info');
+    }
+    return;
+  }
 
   if (typeof pushUndoState === 'function') pushUndoState('Clear Formatting');
 
