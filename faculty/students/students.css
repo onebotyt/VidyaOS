@@ -1469,3 +1469,310 @@ button:disabled.btn-disabled-loading,
   height: 14px;
   accent-color: var(--color-primary);
 }
+
+/* ==========================================================================
+   Ultra-Compact Modern Student Profile Edit & Dossier Modal (Reference Aligned)
+   ========================================================================== */
+
+.stu-edit-modal-card {
+  max-width: 480px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: stuModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes stuModalPop {
+  0% { transform: scale(0.97); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.stu-edit-header {
+  padding: 0.8rem 1.15rem 0.6rem 1.15rem;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stu-edit-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.stu-edit-title span {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Modal Sub-Navigation Tabs */
+.stu-modal-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0 1.15rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.stu-modal-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.4rem 0.1rem 0.5rem 0.1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.stu-modal-tab:hover {
+  color: var(--text-main);
+}
+
+.stu-modal-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* Form Container */
+.stu-edit-form {
+  padding: 0.85rem 1.15rem 1.05rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* Tab Panels */
+.stu-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* Top Layout: Photo on Left, Main on Right */
+.stu-edit-top-grid {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+
+.stu-edit-photo-col {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.stu-edit-photo-box {
+  width: 66px;
+  height: 66px;
+  border-radius: 9px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stu-edit-avatar-img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stu-edit-main-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.stu-edit-dual-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+/* Compact Labels & Inputs */
+.stu-compact-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.18rem;
+}
+
+.stu-compact-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-bottom: 0.18rem;
+}
+
+.stu-compact-chk {
+  font-size: 0.65rem !important;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.stu-compact-chk input {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.stu-compact-input {
+  width: 100%;
+  height: 31px;
+  padding: 0 0.65rem;
+  border-radius: 7px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stu-compact-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.stu-compact-select {
+  padding-right: 1.25rem;
+  cursor: pointer;
+}
+
+.stu-mono-input {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.80rem;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+/* Bottom Row (3-columns: Program, Roll, Status) */
+.stu-edit-bottom-row {
+  display: grid;
+  grid-template-columns: 1.35fr 0.75fr 1fr;
+  gap: 0.5rem;
+}
+
+/* Secondary Tab Panels */
+.stu-compact-tab-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.stu-compact-info-tile {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.stu-compact-info-tile .info-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.stu-compact-info-tile .info-val {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* Footer: Cancel & Save Changes */
+.stu-edit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-stu-compact-cancel {
+  height: 31px;
+  padding: 0 0.95rem;
+  border-radius: 7px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-stu-compact-cancel:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-muted);
+}
+
+.btn-stu-compact-save {
+  height: 31px;
+  padding: 0 1.15rem;
+  border-radius: 7px;
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast, #ffffff);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.btn-stu-compact-save:hover {
+  opacity: 0.92;
+}
+
+.btn-stu-compact-save:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 480px) {
+  .stu-edit-modal-card {
+    max-width: 95vw;
+  }
+  .stu-edit-bottom-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .stu-edit-bottom-row > div:first-child {
+    grid-column: span 2;
+  }
+}

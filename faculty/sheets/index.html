@@ -1108,6 +1108,110 @@
                         <span class="cond-title">Clear Rules from Entire Sheet</span>
                       </button>
                     </div>
+
+                    <!-- Color Templates / Table Styles (Non-Conditional) -->
+                    <button type="button" class="excel-tool-btn" id="btn-color-templates"
+                      onclick="toggleColorTemplatesMenu(event)" title="Sheet Color Templates & Table Themes">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                      </svg>
+                      <span>Color Templates ▾</span>
+                    </button>
+                    <!-- Floating Sheet Color Templates Menu -->
+                    <div class="excel-templates-dropdown" id="excel-templates-menu" style="display:none;">
+                      <div class="excel-templates-header">
+                        <div>
+                          <div class="excel-templates-title">Sheet Color Templates</div>
+                          <div class="excel-templates-subtitle">Curated palettes for headers, stripes &amp; totals</div>
+                        </div>
+                      </div>
+                      <div class="excel-templates-grid">
+                        <!-- Template 1: Executive Navy -->
+                        <button type="button" class="template-card-btn" onclick="applySheetColorTemplate('navy')">
+                          <div class="template-mini-table">
+                            <div class="template-mini-header" style="background:#1e3a8a;">Header</div>
+                            <div class="template-mini-row" style="background:#ffffff;"></div>
+                            <div class="template-mini-row" style="background:#f0f7ff;"></div>
+                            <div class="template-mini-total" style="background:#dbeafe;color:#1e3a8a;">Total</div>
+                          </div>
+                          <span class="template-card-title">Executive Navy</span>
+                        </button>
+                        <!-- Template 2: Forest Emerald -->
+                        <button type="button" class="template-card-btn" onclick="applySheetColorTemplate('emerald')">
+                          <div class="template-mini-table">
+                            <div class="template-mini-header" style="background:#14532d;">Header</div>
+                            <div class="template-mini-row" style="background:#ffffff;"></div>
+                            <div class="template-mini-row" style="background:#f0fdf4;"></div>
+                            <div class="template-mini-total" style="background:#dcfce7;color:#14532d;">Total</div>
+                          </div>
+                          <span class="template-card-title">Forest Emerald</span>
+                        </button>
+                        <!-- Template 3: Royal Cobalt -->
+                        <button type="button" class="template-card-btn" onclick="applySheetColorTemplate('cobalt')">
+                          <div class="template-mini-table">
+                            <div class="template-mini-header" style="background:#1d4ed8;">Header</div>
+                            <div class="template-mini-row" style="background:#ffffff;"></div>
+                            <div class="template-mini-row" style="background:#eff6ff;"></div>
+                            <div class="template-mini-total" style="background:#bfdbfe;color:#1d4ed8;">Total</div>
+                          </div>
+                          <span class="template-card-title">Royal Cobalt</span>
+                        </button>
+                        <!-- Template 4: Slate Charcoal -->
+                        <button type="button" class="template-card-btn" onclick="applySheetColorTemplate('slate')">
+                          <div class="template-mini-table">
+                            <div class="template-mini-header" style="background:#0f172a;">Header</div>
+                            <div class="template-mini-row" style="background:#ffffff;"></div>
+                            <div class="template-mini-row" style="background:#f8fafc;"></div>
+                            <div class="template-mini-total" style="background:#e2e8f0;color:#0f172a;">Total</div>
+                          </div>
+                          <span class="template-card-title">Slate Charcoal</span>
+                        </button>
+                        <!-- Template 5: Warm Amber -->
+                        <button type="button" class="template-card-btn" onclick="applySheetColorTemplate('amber')">
+                          <div class="template-mini-table">
+                            <div class="template-mini-header" style="background:#78350f;">Header</div>
+                            <div class="template-mini-row" style="background:#ffffff;"></div>
+                            <div class="template-mini-row" style="background:#fffbeb;"></div>
+                            <div class="template-mini-total" style="background:#fef3c7;color:#78350f;">Total</div>
+                          </div>
+                          <span class="template-card-title">Warm Amber</span>
+                        </button>
+                        <!-- Template 6: Royal Purple -->
+                        <button type="button" class="template-card-btn" onclick="applySheetColorTemplate('purple')">
+                          <div class="template-mini-table">
+                            <div class="template-mini-header" style="background:#581c87;">Header</div>
+                            <div class="template-mini-row" style="background:#ffffff;"></div>
+                            <div class="template-mini-row" style="background:#faf5ff;"></div>
+                            <div class="template-mini-total" style="background:#ede9fe;color:#581c87;">Total</div>
+                          </div>
+                          <span class="template-card-title">Royal Purple</span>
+                        </button>
+                        <!-- Template 7: Modern Teal -->
+                        <button type="button" class="template-card-btn" onclick="applySheetColorTemplate('teal')">
+                          <div class="template-mini-table">
+                            <div class="template-mini-header" style="background:#134e4a;">Header</div>
+                            <div class="template-mini-row" style="background:#ffffff;"></div>
+                            <div class="template-mini-row" style="background:#f0fdfa;"></div>
+                            <div class="template-mini-total" style="background:#ccfbf1;color:#134e4a;">Total</div>
+                          </div>
+                          <span class="template-card-title">Modern Teal</span>
+                        </button>
+                        <!-- Template 8: Crimson Wine -->
+                        <button type="button" class="template-card-btn" onclick="applySheetColorTemplate('crimson')">
+                          <div class="template-mini-table">
+                            <div class="template-mini-header" style="background:#881337;">Header</div>
+                            <div class="template-mini-row" style="background:#ffffff;"></div>
+                            <div class="template-mini-row" style="background:#fff1f2;"></div>
+                            <div class="template-mini-total" style="background:#ffe4e6;color:#881337;">Total</div>
+                          </div>
+                          <span class="template-card-title">Crimson Wine</span>
+                        </button>
+                      </div>
+                      <button type="button" class="template-reset-btn" onclick="applySheetColorTemplate('plain')">
+                        <span>✕</span>
+                        <span>Clear Template / Plain White</span>
+                      </button>
+                    </div>
                   </div>
                   <span class="excel-group-label">Styles</span>
                 </div>

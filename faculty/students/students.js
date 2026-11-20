@@ -1252,8 +1252,38 @@
     if (!modal) return;
 
     document.getElementById('edit-stu-id').value = id;
-    document.getElementById('edit-stu-avatar').textContent = getInitials(st.full_name);
+    const initials = getInitials(st.full_name);
+    document.getElementById('edit-stu-avatar').textContent = initials;
     document.getElementById('edit-stu-name').value = st.full_name || '';
+
+    const titleNameEl = document.getElementById('edit-stu-title-name');
+    if (titleNameEl) titleNameEl.textContent = st.full_name || 'Student';
+
+    const statusSelect = document.getElementById('edit-stu-status');
+    if (statusSelect) {
+      if (st.is_active === 0 || st.is_active === false) {
+        statusSelect.value = (st.status === 'Withdrawn' || st.enrollment_status === 'Withdrawn') ? 'Withdrawn' : 'Transferred';
+      } else {
+        statusSelect.value = 'Active';
+      }
+    }
+
+    // Populate tab preview values
+    const yr = st.year || (st.semester ? Math.ceil(st.semester / 2) : 1);
+    const sem = st.semester ? `Sem ${st.semester}` : `Sem ${yr * 2 - 1}`;
+    const cohortVal = document.getElementById('edit-tab-cohort-val');
+    if (cohortVal) cohortVal.textContent = `Year ${yr} • ${sem}`;
+
+    const deptVal = document.getElementById('edit-tab-dept-val');
+    if (deptVal) deptVal.textContent = st.department_name || st.department_code || 'Information Technology';
+
+    const attVal = document.getElementById('edit-tab-att-val');
+    if (attVal) attVal.textContent = typeof st.attendance_pct === 'number' ? `${st.attendance_pct.toFixed(0)}%` : '100%';
+
+    const enrollStatusVal = document.getElementById('edit-tab-enroll-status-val');
+    if (enrollStatusVal) enrollStatusVal.textContent = st.is_active ? 'Enrolled (Active)' : (st.enrollment_status || 'Inactive');
+
+    switchEditTab('profile');
 
     const chkNotAvail = document.getElementById('edit-chk-enroll-not-available');
     const enrollInput = document.getElementById('edit-stu-enroll');
@@ -1303,6 +1333,30 @@
     }
 
     modal.style.display = 'flex';
+  }
+
+  function switchEditTab(tabName) {
+    document.querySelectorAll('.stu-modal-tabs .stu-modal-tab').forEach(tab => {
+      if (tab.dataset.tab === tabName) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    const panels = ['profile', 'academic', 'attendance', 'status'];
+    panels.forEach(p => {
+      const panelEl = document.getElementById(`edit-tab-${p}`);
+      if (panelEl) {
+        if (p === tabName) {
+          panelEl.style.display = 'flex';
+          panelEl.classList.add('active');
+        } else {
+          panelEl.style.display = 'none';
+          panelEl.classList.remove('active');
+        }
+      }
+    });
   }
 
   function closeEditStudentModal() {
@@ -1645,6 +1699,7 @@
   window.closeStudentDetailsModal = closeStudentDetailsModal;
   window.openEditStudentModal = openEditStudentModal;
   window.closeEditStudentModal = closeEditStudentModal;
+  window.switchEditTab = switchEditTab;
   window.detailEditStudent = detailEditStudent;
   window.submitEditStudent = submitEditStudent;
   window.detailResetPassword = detailResetPassword;

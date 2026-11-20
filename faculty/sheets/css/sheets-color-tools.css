@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   EXCEL STUDIO: COLOR FORMATTING & CONDITIONAL STYLING (EXCEL SUITE)
+   EXCEL STUDIO: COLOR FORMATTING, PALETTES & COLOR TEMPLATES SUITE
    ══════════════════════════════════════════════════════════════ */
 
 .excel-color-btn-wrapper {
@@ -31,12 +31,12 @@
   position: fixed !important;
   z-index: 9999999 !important;
   min-width: 240px;
-  max-width: 270px;
+  max-width: 260px;
   padding: 0.65rem 0.75rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
-  box-shadow: 0 16px 48px hsla(220, 30%, 8%, 0.26), 0 2px 6px hsla(220, 20%, 10%, 0.1);
+  box-shadow: 0 16px 48px hsla(220, 30%, 8%, 0.28), 0 2px 6px hsla(220, 20%, 10%, 0.12);
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
@@ -44,116 +44,125 @@
   user-select: none;
 }
 
+.excel-palette-no-color-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+  padding: 0.35rem 0.5rem !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm, 4px) !important;
+  color: var(--text-main) !important;
+  font-size: 0.76rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  transition: all 0.12s ease !important;
+}
+
+.excel-palette-no-color-btn:hover {
+  background: var(--bg-surface-hover, var(--bg-surface)) !important;
+  border-color: var(--color-primary, #2563eb) !important;
+}
+
+.excel-palette-no-color-btn .no-color-box {
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 2px !important;
+  font-size: 0.72rem !important;
+  color: #ef4444 !important;
+  font-weight: 800 !important;
+}
+
+.excel-palette-no-color-btn .no-color-box.font-auto {
+  color: var(--text-main) !important;
+  font-weight: 800 !important;
+}
+
+.excel-palette-section-title,
 .palette-section-title {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 0.2rem 0 0.15rem 0;
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  margin: 0.3rem 0 0.2rem 0 !important;
 }
 
 /* Excel 10-Column Theme Matrix */
 .excel-theme-matrix {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 0.35rem;
+  display: grid !important;
+  grid-template-columns: repeat(10, 20px) !important;
+  gap: 2px !important;
+  margin-bottom: 0.35rem !important;
+  justify-content: center !important;
 }
 
-.excel-theme-row {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 2px;
-}
-
-.excel-theme-row.base-row {
-  margin-bottom: 3px;
-}
-
+.excel-theme-cell,
+.excel-standard-cell,
 .color-swatch {
-  width: 19px;
-  height: 17px;
-  border-radius: 2px;
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.08s ease, outline 0.08s ease;
-  box-sizing: border-box;
+  width: 20px !important;
+  height: 18px !important;
+  min-width: 20px !important;
+  min-height: 18px !important;
+  padding: 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.18) !important;
+  border-radius: 2px !important;
+  cursor: pointer !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  transition: transform 0.08s ease, outline 0.08s ease !important;
+  position: relative !important;
 }
 
+.excel-standard-cell {
+  height: 20px !important;
+  min-height: 20px !important;
+}
+
+.excel-theme-cell:hover,
+.excel-standard-cell:hover,
 .color-swatch:hover {
-  transform: scale(1.22);
-  outline: 1.5px solid var(--color-primary);
-  z-index: 10;
+  transform: scale(1.28) !important;
+  outline: 2px solid var(--color-primary, #2563eb) !important;
+  z-index: 100 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
 }
 
 /* 10 Standard Colors Row */
 .excel-standard-row {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 2px;
-  margin-bottom: 0.35rem;
+  display: grid !important;
+  grid-template-columns: repeat(10, 20px) !important;
+  gap: 2px !important;
+  margin-bottom: 0.35rem !important;
+  justify-content: center !important;
 }
 
-.excel-standard-row .color-swatch {
-  height: 19px;
+.excel-palette-footer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+  padding: 0.35rem 0.2rem 0 !important;
+  border-top: 1px solid var(--border-color) !important;
+  font-size: 0.74rem !important;
+  font-weight: 600 !important;
+  color: var(--text-main) !important;
 }
 
-.palette-action-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.3rem 0.45rem;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm, 4px);
-  color: var(--text-main);
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.12s ease;
-}
-
-.palette-action-btn:hover {
-  background: var(--bg-surface-hover, var(--bg-surface));
-  border-color: var(--border-color);
-}
-
-.palette-action-btn svg {
-  flex-shrink: 0;
-}
-
-.palette-divider {
-  height: 1px;
-  background: var(--border-color);
-  margin: 0.25rem 0;
-}
-
-.palette-custom-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.2rem 0.35rem;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.palette-custom-row input[type="color"] {
-  width: 28px;
-  height: 22px;
-  padding: 0;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  cursor: pointer;
-  background: none;
+.excel-palette-footer input[type="color"] {
+  width: 32px !important;
+  height: 22px !important;
+  padding: 0 !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  background: none !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -162,67 +171,253 @@
 .excel-conditional-dropdown {
   position: fixed !important;
   z-index: 9999999 !important;
-  min-width: 260px;
-  padding: 0.45rem;
+  min-width: 270px;
+  padding: 0.55rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
-  box-shadow: 0 18px 48px hsla(220, 30%, 8%, 0.28), 0 2px 6px hsla(220, 20%, 10%, 0.1);
+  box-shadow: 0 18px 48px hsla(220, 30%, 8%, 0.28), 0 2px 6px hsla(220, 20%, 10%, 0.12);
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.25rem;
   animation: officeFadeIn 0.12s ease-out;
   user-select: none;
 }
 
+.cond-menu-header {
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 0.2rem 0.4rem 0.1rem !important;
+}
+
 .cond-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  width: 100%;
-  padding: 0.38rem 0.55rem;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm, 4px);
-  color: var(--text-main);
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.12s ease;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  width: 100% !important;
+  padding: 0.38rem 0.55rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: var(--radius-sm, 4px) !important;
+  color: var(--text-main) !important;
+  font-size: 0.76rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  transition: all 0.12s ease !important;
 }
 
 .cond-menu-item:hover {
-  background: var(--bg-surface-hover, var(--bg-surface));
-  color: var(--color-primary);
+  background: var(--bg-surface-hover, var(--bg-surface)) !important;
+  color: var(--color-primary) !important;
 }
 
-.cond-item-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  flex-shrink: 0;
+.cond-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 4px !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  flex-shrink: 0 !important;
 }
 
-.cond-item-label {
-  flex: 1;
+.cond-green {
+  background: #dcfce7 !important;
+  color: #166534 !important;
 }
 
-.cond-badge-preview {
-  display: inline-block;
-  padding: 0.12rem 0.4rem;
-  border-radius: 3px;
-  font-size: 0.7rem;
-  font-weight: 700;
+.cond-yellow {
+  background: #fef3c7 !important;
+  color: #854d0e !important;
+}
+
+.cond-red {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+.cond-gray {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+.cond-text {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+}
+
+.cond-title {
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+}
+
+.cond-desc {
+  font-size: 0.65rem !important;
+  color: var(--text-muted) !important;
 }
 
 .cond-scale-bar {
-  display: inline-block;
-  width: 48px;
-  height: 10px;
-  border-radius: 2px;
-  border: 1px solid var(--border-color);
+  display: inline-block !important;
+  width: 48px !important;
+  height: 14px !important;
+  border-radius: 2px !important;
+  border: 1px solid var(--border-color) !important;
+  flex-shrink: 0 !important;
+}
+
+.cond-scale-gyr {
+  background: linear-gradient(to right, #22c55e, #eab308, #ef4444) !important;
+}
+
+.cond-scale-ryg {
+  background: linear-gradient(to right, #ef4444, #eab308, #22c55e) !important;
+}
+
+.cond-scale-bwr {
+  background: linear-gradient(to right, #3b82f6, #ffffff, #ef4444) !important;
+}
+
+.cond-scale-title {
+  font-size: 0.76rem !important;
+  font-weight: 600 !important;
+  color: var(--text-main) !important;
+}
+
+.cond-menu-divider {
+  height: 1px !important;
+  background: var(--border-color) !important;
+  margin: 0.25rem 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EXCEL SHEET COLOR TEMPLATES & TABLE THEMES (NON-CONDITIONAL)
+   ══════════════════════════════════════════════════════════════ */
+.excel-templates-dropdown {
+  position: fixed !important;
+  z-index: 9999999 !important;
+  width: 320px !important;
+  max-width: 350px !important;
+  padding: 0.65rem 0.75rem !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md, 8px) !important;
+  box-shadow: 0 18px 48px hsla(220, 30%, 8%, 0.28), 0 2px 6px hsla(220, 20%, 10%, 0.12) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.45rem !important;
+  animation: officeFadeIn 0.12s ease-out !important;
+  user-select: none !important;
+}
+
+.excel-templates-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding-bottom: 0.25rem !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.excel-templates-title {
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  color: var(--text-main) !important;
+}
+
+.excel-templates-subtitle {
+  font-size: 0.65rem !important;
+  color: var(--text-muted) !important;
+}
+
+.excel-templates-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 0.45rem !important;
+  max-height: 360px !important;
+  overflow-y: auto !important;
+  padding-right: 2px !important;
+}
+
+.template-card-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.3rem !important;
+  padding: 0.4rem !important;
+  background: var(--bg-surface) !important;
+  border: 1.5px solid var(--border-color) !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  transition: all 0.12s ease !important;
+}
+
+.template-card-btn:hover {
+  border-color: var(--color-primary, #2563eb) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px hsla(220, 20%, 10%, 0.12) !important;
+}
+
+.template-mini-table {
+  width: 100% !important;
+  border-radius: 3px !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border-color) !important;
+  font-size: 0.55rem !important;
+}
+
+.template-mini-header {
+  height: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.02em !important;
+}
+
+.template-mini-row {
+  height: 9px !important;
+  width: 100% !important;
+}
+
+.template-mini-total {
+  height: 11px !important;
+  border-top: 1px dashed rgba(0, 0, 0, 0.2) !important;
+  font-weight: 700 !important;
+}
+
+.template-card-title {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+  margin-top: 0.1rem !important;
+}
+
+.template-reset-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  width: 100% !important;
+  padding: 0.38rem 0.5rem !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm, 4px) !important;
+  color: #ef4444 !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.template-reset-btn:hover {
+  background: var(--bg-surface-hover) !important;
+  border-color: #ef4444 !important;
 }
