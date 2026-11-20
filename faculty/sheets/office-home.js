@@ -12,7 +12,7 @@
  */
 
 // Global Shared State (Shared seamlessly with sheets.js when loaded)
-window.S = window.S || {
+var S = window.S = window.S || {
   groupId: null,
   registerId: null,
   allGroups: [],
@@ -21,7 +21,7 @@ window.S = window.S || {
   activeSheet: 'evaluation'
 };
 
-const OFFICE_RECENTS_KEY = 'vidya_office_recents_v1';
+var OFFICE_RECENTS_KEY = window.OFFICE_RECENTS_KEY = window.OFFICE_RECENTS_KEY || 'vidya_office_recents_v1';
 
 /**
  * Helper to escape HTML safely

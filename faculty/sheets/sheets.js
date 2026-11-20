@@ -8,64 +8,67 @@
 /* ══════════════════════════════════════════════════════════════
        UNIFIED SHEETS STUDIO APPLICATION STATE
        ══════════════════════════════════════════════════════════════ */
-const S = {
-  user: null,
-  groupId: null,
-  registerId: null,
-  allGroups: [],
-  group: null,
-  members: [],
-  activeSheet: 'evaluation', // 'evaluation' | 'tests' | 'assignments'
-  searchQuery: '',
-  filterMode: 'ALL',
-  sortMode: 'ROLL_ASC',
-  focusMode: '',
-  zoomScale: 1.0,
-  autoFit: true,
-  density: 'normal',
+var S = window.S = (function () {
+  const defaults = {
+    user: null,
+    groupId: null,
+    registerId: null,
+    allGroups: [],
+    group: null,
+    members: [],
+    activeSheet: 'evaluation', // 'evaluation' | 'tests' | 'assignments'
+    searchQuery: '',
+    filterMode: 'ALL',
+    sortMode: 'ROLL_ASC',
+    focusMode: '',
+    zoomScale: 1.0,
+    autoFit: true,
+    density: 'normal',
 
-  // Column Visibility Map
-  columnVisibility: {
-    roll: true,
-    enroll: true,
-    reg: true,
-    name: true,
-    assign: true,
-    assign_avg: true,
-    test: true,
-    test_avg: true,
-    att_held: true,
-    att_pct: true,
-    pres: true,
-    custom: true,
-    side_panel: true
-  },
+    // Column Visibility Map
+    columnVisibility: {
+      roll: true,
+      enroll: true,
+      reg: true,
+      name: true,
+      assign: true,
+      assign_avg: true,
+      test: true,
+      test_avg: true,
+      att_held: true,
+      att_pct: true,
+      pres: true,
+      custom: true,
+      side_panel: true
+    },
 
-  // Sheet 1: Master Evaluation Data
-  evalData: null,
+    // Sheet 1: Master Evaluation Data
+    evalData: null,
 
-  // Sheet 2: Unit Test Marksheet Data (scanned from tests.html)
-  tests: [],
-  currentTestId: null,
-  currentTestState: null,
+    // Sheet 2: Unit Test Marksheet Data (scanned from tests.html)
+    tests: [],
+    currentTestId: null,
+    currentTestState: null,
 
-  // Sheet 3: Assignments Marksheet Data
-  assignments: [],
-  theoryAssignments: [],
-  practicalAssignments: [],
-  currentPracticalViewMode: 'ALL',
-  currentPracticalId: null,
+    // Sheet 3: Assignments Marksheet Data
+    assignments: [],
+    theoryAssignments: [],
+    practicalAssignments: [],
+    currentPracticalViewMode: 'ALL',
+    currentPracticalId: null,
 
-  // Sheet 4: Attendance Matrix Data
-  attendanceMonth: new Date().getMonth() + 1,
-  attendanceYear: new Date().getFullYear(),
-  attendanceData: null,
+    // Sheet 4: Attendance Matrix Data
+    attendanceMonth: new Date().getMonth() + 1,
+    attendanceYear: new Date().getFullYear(),
+    attendanceData: null,
 
-  // Bar 1 & Bar 2 State
-  isEditMode: false,
-  currentTestViewMode: 'SINGLE',
-  viewMode: (typeof window !== 'undefined' && window.innerWidth <= 768) ? 'dynamic' : 'overview' // 'dynamic' | 'overview'
-};
+    // Bar 1 & Bar 2 State
+    isEditMode: false,
+    currentTestViewMode: 'SINGLE',
+    viewMode: (typeof window !== 'undefined' && window.innerWidth <= 768) ? 'dynamic' : 'overview' // 'dynamic' | 'overview'
+  };
+  return Object.assign(defaults, window.S || {});
+})();
 
 function esc(s) {
   if (s === null || s === undefined) return '';
@@ -9906,7 +9909,7 @@ function applySignatureBarVisibility() {
 // ══════════════════════════════════════════════════════════════
 // OFFICE STUDIO: EXCEL-STYLE START / HOME SCREEN & SUBJECTS HUB
 // ══════════════════════════════════════════════════════════════
-const OFFICE_RECENTS_KEY = 'vidya_office_recents_v1';
+var OFFICE_RECENTS_KEY = window.OFFICE_RECENTS_KEY || 'vidya_office_recents_v1';
 
 function getOfficeRecentWorkbooks() {
   try {
