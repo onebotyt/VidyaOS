@@ -124,22 +124,22 @@
    ───────────────────────────────────────────────────────────── */
 .profile-layout-grid {
   display: grid;
-  grid-template-columns: 390px minmax(0, 1fr);
-  gap: 1.75rem;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 1.25rem;
   align-items: start;
 }
 
 .profile-sidebar-col {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .profile-workspace-col {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -147,69 +147,69 @@
    ───────────────────────────────────────────────────────────── */
 .student-id-hero {
   background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-surface) 100%);
-  border-radius: 20px;
-  padding: 1.6rem;
+  border-radius: 16px;
+  padding: 1.25rem;
   color: var(--text-main);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   position: relative;
   overflow: hidden;
-  border: 1.5px solid var(--border-color);
+  border: 1px solid var(--border-color);
 }
 
 .student-id-hero::before {
   content: '';
   position: absolute;
-  top: -60px;
-  right: -60px;
-  width: 220px;
-  height: 220px;
+  top: -50px;
+  right: -50px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
-  opacity: 0.16;
+  opacity: 0.12;
   pointer-events: none;
 }
 
 .student-id-content {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
   position: relative;
   z-index: 1;
 }
 
 .student-avatar-wrap {
   position: relative;
-  width: 74px;
-  height: 74px;
+  width: 62px;
+  height: 62px;
   flex-shrink: 0;
 }
 
 .student-avatar {
-  width: 74px;
-  height: 74px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary) 0%, #1d4ed8 100%);
   color: #ffffff;
-  font-size: 1.85rem;
+  font-size: 1.5rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid var(--border-color);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  border: 2.5px solid var(--border-color);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.2);
   user-select: none;
 }
 
 .student-beacon {
   position: absolute;
-  bottom: 1px;
-  right: 1px;
-  width: 17px;
-  height: 17px;
+  bottom: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   background: #10b981;
-  border: 2.5px solid var(--bg-card);
-  box-shadow: 0 0 6px #10b981;
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 0 5px #10b981;
 }
 
 .student-meta {
@@ -218,22 +218,22 @@
 }
 
 .student-meta h1 {
-  font-size: 1.4rem;
+  font-size: 1.22rem;
   font-weight: 800;
-  margin: 0 0 0.2rem 0;
-  letter-spacing: -0.02em;
+  margin: 0 0 0.15rem 0;
+  letter-spacing: -0.015em;
   color: var(--text-main);
   line-height: 1.25;
   word-break: break-word;
 }
 
 .student-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  margin: 0 0 0.65rem 0;
+  margin: 0 0 0.45rem 0;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
   flex-wrap: wrap;
 }
 
@@ -245,16 +245,16 @@
 
 .student-badges {
   display: flex;
-  gap: 0.35rem;
+  gap: 0.3rem;
   flex-wrap: wrap;
 }
 
 .std-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.55rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 6px;
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 700;
   line-height: 1;
 }
@@ -266,15 +266,15 @@
 }
 
 .std-badge.regular {
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(16, 185, 129, 0.1);
   color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.22);
 }
 
 .std-badge.defaulter {
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.22);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -282,10 +282,10 @@
    ───────────────────────────────────────────────────────────── */
 .attendance-health-card {
   background: var(--bg-card);
-  border-radius: 18px;
-  border: 1.5px solid var(--border-color);
-  padding: 1.4rem;
-  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  padding: 1.15rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   position: relative;
   overflow: hidden;
 }
@@ -294,24 +294,24 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.9rem;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
 }
 
 .health-title {
-  margin: 0 0 0.25rem 0;
-  font-size: 0.98rem;
-  font-weight: 800;
+  margin: 0 0 0.2rem 0;
+  font-size: 0.92rem;
+  font-weight: 750;
   color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   line-height: 1.3;
 }
 
 .health-desc {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   line-height: 1.35;
 }
@@ -322,7 +322,7 @@
 }
 
 .health-pct-value {
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   font-weight: 800;
   font-family: var(--font-family-mono, monospace);
   line-height: 1;
@@ -330,19 +330,19 @@
 }
 
 .health-tag-value {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  margin-top: 0.2rem;
+  margin-top: 0.15rem;
   color: var(--text-muted);
 }
 
 .progress-bar-wrap {
   width: 100%;
-  height: 9px;
+  height: 7px;
   background: var(--bg-surface-secondary);
   border-radius: 99px;
   overflow: hidden;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.65rem;
   border: 1px solid var(--border-color);
 }
 
@@ -361,9 +361,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
 }
 
@@ -372,10 +372,10 @@
    ───────────────────────────────────────────────────────────── */
 .desktop-dossier-card {
   background: var(--bg-card);
-  border-radius: 18px;
-  border: 1.5px solid var(--border-color);
-  padding: 1.25rem 1.4rem;
-  box-shadow: var(--shadow-sm);
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  padding: 1rem 1.15rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .desktop-dossier-header {
@@ -386,7 +386,7 @@
 
 .desktop-dossier-btns {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .desktop-dossier-btns .btn {
@@ -394,11 +394,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  font-size: 0.78rem;
+  gap: 4px;
+  font-size: 0.76rem;
   font-weight: 700;
-  padding: 8px 10px;
-  border-radius: 8px;
+  padding: 6px 8px;
+  border-radius: 7px;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -416,11 +416,11 @@
 
 .profile-tabs-nav {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   background: var(--bg-surface-secondary);
-  border: 1.5px solid var(--border-color);
-  border-radius: 14px;
-  padding: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 4px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -430,14 +430,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 10px 14px;
-  font-size: 0.86rem;
-  font-weight: 700;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 650;
   color: var(--text-muted);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -446,14 +446,15 @@
 
 .profile-tab-btn:hover {
   color: var(--text-main);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .profile-tab-btn.active {
   background: var(--bg-card);
   color: var(--color-primary);
   border-color: var(--border-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  font-weight: 750;
 }
 
 .profile-tab-panel {
@@ -473,7 +474,7 @@
 /* Show All mode on desktop */
 .profile-workspace-col.show-all .profile-tab-panel {
   display: block !important;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -481,20 +482,20 @@
    ───────────────────────────────────────────────────────────── */
 .card {
   background: var(--bg-card);
-  border-radius: 18px;
-  border: 1.5px solid var(--border-color);
-  padding: 1.6rem;
-  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .card-section-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.05rem;
-  font-weight: 800;
+  gap: 0.45rem;
+  font-size: 0.98rem;
+  font-weight: 750;
   color: var(--text-main);
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 1rem 0;
   line-height: 1.3;
 }
 
@@ -502,8 +503,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.25rem;
-  gap: 0.75rem;
+  margin-bottom: 1rem;
+  gap: 0.65rem;
   flex-wrap: wrap;
 }
 
@@ -511,27 +512,27 @@
 .cohort-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .cohort-item {
   background: var(--bg-surface-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
 }
 
 .cohort-label {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 
 .cohort-val {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-main);
   word-break: break-word;
@@ -550,17 +551,17 @@
 .biometric-box {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
   background: var(--bg-surface-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 1rem 1.15rem;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
 }
 
 .biometric-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   background: rgba(37, 99, 235, 0.1);
   color: var(--color-primary);
   display: flex;
@@ -571,39 +572,39 @@
 
 /* KYC Demographics Dossier */
 .compliance-callout {
-  background: rgba(37, 99, 235, 0.08);
-  border: 1px solid rgba(37, 99, 235, 0.22);
-  border-left: 4px solid var(--color-primary);
-  border-radius: 10px;
-  padding: 0.9rem 1.1rem;
-  font-size: 0.84rem;
+  background: rgba(37, 99, 235, 0.07);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-left: 3.5px solid var(--color-primary);
+  border-radius: 8px;
+  padding: 0.75rem 0.95rem;
+  font-size: 0.8rem;
   line-height: 1.45;
   color: var(--text-main);
-  margin-bottom: 1.35rem;
+  margin-bottom: 1rem;
 }
 
 .form-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .form-grid-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .form-group {
-  margin-bottom: 1.15rem;
+  margin-bottom: 0.85rem;
 }
 
 .form-label {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;
 }
 
 .req-star {
@@ -612,12 +613,12 @@
 
 .form-control {
   width: 100%;
-  padding: 0.65rem 0.95rem;
-  border-radius: 10px;
-  border: 1.5px solid var(--border-color);
+  padding: 0.55rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
   background: var(--bg-surface);
   color: var(--text-main);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   box-sizing: border-box;
   font-family: inherit;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -626,19 +627,19 @@
 .form-control:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .field-hint {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
 }
 
 .form-actions-right {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1.25rem;
+  margin-top: 1rem;
 }
 
 .btn-save-action {
@@ -646,10 +647,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  min-height: 44px;
+  gap: 0.4rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  min-height: 38px;
+  font-size: 0.86rem;
   cursor: pointer;
 }
 
@@ -796,35 +798,100 @@
 /* Small Mobile Screens (<= 768px) */
 @media (max-width: 768px) {
   .profile-main-container {
-    padding-left: 0.85rem;
-    padding-right: 0.85rem;
-    padding-top: 0.85rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.75rem;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 16px));
+  }
+
+  .profile-layout-grid {
+    gap: 0.85rem;
+  }
+
+  .profile-top-bar {
+    margin-bottom: 0.75rem;
   }
 
   .student-id-hero {
-    padding: 1.25rem;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+  }
+
+  .student-id-content {
+    gap: 0.85rem;
   }
 
   .student-avatar-wrap {
-    width: 62px;
-    height: 62px;
+    width: 50px;
+    height: 50px;
   }
 
   .student-avatar {
-    width: 62px;
-    height: 62px;
-    font-size: 1.55rem;
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+    border-width: 2px;
+  }
+
+  .student-beacon {
+    width: 12px;
+    height: 12px;
   }
 
   .student-meta h1 {
-    font-size: 1.26rem;
+    font-size: 1.12rem;
+    margin: 0 0 0.1rem 0;
+  }
+
+  .student-subtitle {
+    font-size: 0.74rem;
+    margin: 0 0 0.35rem 0;
+    gap: 0.25rem;
+  }
+
+  .std-badge {
+    padding: 2px 5px;
+    font-size: 0.68rem;
+  }
+
+  .attendance-health-card {
+    padding: 0.85rem 0.95rem;
+    border-radius: 14px;
+  }
+
+  .health-title {
+    font-size: 0.86rem;
+  }
+
+  .health-pct-value {
+    font-size: 1.3rem;
+  }
+
+  .card {
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+  }
+
+  .card-section-title {
+    font-size: 0.92rem;
+    margin-bottom: 0.75rem;
   }
 
   .form-grid-2,
   .form-grid-3,
   .cohort-grid {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 0.55rem;
+  }
+
+  .cohort-item {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .form-control {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.84rem;
+    min-height: 36px;
   }
 
   .dossier-buttons-row {
@@ -838,10 +905,17 @@
 
   .btn-save-action {
     width: 100%;
+    min-height: 40px;
   }
 
   .profile-tab-btn {
-    padding: 8px 10px;
-    font-size: 0.78rem;
+    padding: 6px 10px;
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+
+  .profile-tab-btn svg {
+    width: 14px;
+    height: 14px;
   }
 }

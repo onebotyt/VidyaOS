@@ -170,7 +170,21 @@
       const remoteVersion = data.version;
       const downloadUrl = data.apkUrl || LATEST_APK_URL;
 
-      if (!remoteVersion || remoteVersion === currentVersion) return;
+      const isNewer = (function (v1, v2) {
+        if (!v1 || !v2) return false;
+        const p1 = String(v1).replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+        const p2 = String(v2).replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+        const len = Math.max(p1.length, p2.length);
+        for (let i = 0; i < len; i++) {
+          const a = p1[i] || 0;
+          const b = p2[i] || 0;
+          if (a > b) return true;
+          if (a < b) return false;
+        }
+        return false;
+      })(remoteVersion, currentVersion);
+
+      if (!remoteVersion || !isNewer) return;
 
       // Check if user dismissed this specific version recently
       const dismissedVer = localStorage.getItem('vidyaos_dismissed_update');

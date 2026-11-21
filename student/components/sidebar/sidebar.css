@@ -376,25 +376,25 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.18rem;
+  gap: 0.22rem;
   text-decoration: none;
   color: var(--text-muted);
-  font-size: 0.68rem;
+  font-size: 0.74rem;
   font-weight: 600;
   min-height: 48px;
   touch-action: manipulation;
-  transition: all 0.15s ease;
-  padding-top: 4px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 4px 0 2px 0;
 }
 
 .student-tab-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  transition: all 0.15s ease;
+  width: 32px;
+  height: 26px;
+  border-radius: 10px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .student-tab-item:active .student-tab-icon {
@@ -403,11 +403,11 @@
 
 .student-tab-item.active {
   color: var(--color-primary);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .student-tab-item.active .student-tab-icon {
-  background-color: var(--color-primary-light);
-  padding: 2px 14px;
-  width: auto;
+  background-color: rgba(37, 99, 235, 0.12);
+  color: var(--color-primary);
+  width: 44px;
 }

@@ -39,25 +39,19 @@
     { key: 'bug-reports', label: 'Report a Bug', shortLabel: 'Bug Report', href: '/student/bug-reports/index.html', icon: 'bug' }
   ];
 
-  // 5 Canonical Mobile Bottom Tabs (Matches native mobile app structure)
+  // Canonical Mobile Bottom Tabs (Classes, Classwork, Settings)
   const MOBILE_TABS = [
     { key: 'classes', label: 'Classes', href: '/student/dashboard/index.html', icon: 'classes' },
-    { key: 'attendance', label: 'Attendance', href: '/student/attendance/index.html', icon: 'attendance' },
-    { key: 'timetable', label: 'Routine', href: '/student/timetable/index.html', icon: 'timetable' },
-    { key: 'scores', label: 'Scores', href: '/student/scores/index.html', icon: 'scores' },
+    { key: 'classwork', label: 'Classwork', href: '/student/assignments/index.html', icon: 'assignments' },
     { key: 'settings', label: 'Settings', href: '/student/settings/index.html', icon: 'settings' }
   ];
 
   function getActiveNavKey() {
     const p = window.location.pathname.toLowerCase();
-    if (p.includes('/attendance')) return 'attendance';
-    if (p.includes('/timetable')) return 'timetable';
-    if (p.includes('/assignments')) return 'assignments';
-    if (p.includes('/scores')) return 'scores';
-    if (p.includes('/leave')) return 'leave';
+    if (p.includes('/assignments')) return 'classwork';
     if (p.includes('/settings')) return 'settings';
-    if (p.includes('/profile')) return 'settings'; // Highlights Settings tab on mobile, maintains active state
-    if (p.includes('/bug-reports')) return 'bug-reports';
+    if (p.includes('/profile')) return 'settings'; // On Profile, Settings bottom tab is highlighted
+    if (p.includes('/bug-reports')) return 'settings';
     return 'classes';
   }
 

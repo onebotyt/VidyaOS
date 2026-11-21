@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/student/components/student-base.css">
   <link rel="stylesheet" href="/student/components/header/header.css">
   <link rel="stylesheet" href="/student/components/sidebar/sidebar.css">
-  <link rel="stylesheet" href="/student/settings/settings.css?v=20261121">
+  <link rel="stylesheet" href="/student/settings/settings.css?v=20261121b">
 </head>
 <body class="page-layout">
   <!-- Semantic Mount Anchors for Isolated Student Components -->
@@ -47,14 +47,11 @@
             <h2 class="profile-name" id="settings-name">Student Full Name</h2>
             <span class="profile-role-tag">STUDENT</span>
           </div>
-          <div class="profile-meta-row">
-            <span id="settings-dept">Department of Information Technology</span>
-            <span class="bullet-sep">•</span>
-            <span id="settings-reg-no" class="mono-reg">--</span>
-          </div>
+          <div class="profile-dept-row" id="settings-dept">Department of Information Technology</div>
           <div class="profile-chips-row">
-            <span class="chip-item chip-sem" id="settings-year-sem">Year -- • Sem --</span>
+            <span class="chip-item chip-mono" id="settings-reg-no">Reg: --</span>
             <span class="chip-item chip-roll" id="settings-roll-no">Roll: --</span>
+            <span class="chip-item chip-sem" id="settings-year-sem">Year -- • Sem --</span>
             <span class="chip-item chip-status" id="settings-standing">Enrolled</span>
           </div>
         </div>
@@ -385,6 +382,6 @@
   <script src="/mobile-bridge.js"></script>
   
   <!-- Scoped Page Script -->
-  <script src="/student/settings/settings.js?v=20261121"></script>
+  <script src="/student/settings/settings.js?v=20261121b"></script>
 </body>
 </html>

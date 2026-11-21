@@ -98,27 +98,36 @@
     }
   }
 
+  function compareSemver(v1, v2) {
+    if (!v1 || !v2) return 0;
+    const p1 = String(v1).replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+    const p2 = String(v2).replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+    const len = Math.max(p1.length, p2.length);
+    for (let i = 0; i < len; i++) {
+      const a = p1[i] || 0;
+      const b = p2[i] || 0;
+      if (a > b) return 1;
+      if (a < b) return -1;
+    }
+    return 0;
+  }
+
   /**
    * Version check & display
    */
   async function initVersionDisplay() {
-    let ver = window.VIDYAOS_APP_VERSION || '1.0.95';
-    try {
-      const r = await fetch('/app-version.json?t=' + Date.now(), { cache: 'no-store' });
-      if (r.ok) {
-        const j = await r.json();
-        if (j.version) ver = j.version;
-      }
-    } catch (_) { }
+    const runningVer = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
+      ? window.NativeAppUpdater.getAppVersionName()
+      : (window.VIDYAOS_APP_VERSION || '1.0.98');
 
     const label = document.getElementById('app-version-label');
     if (label) {
-      label.textContent = `Installed: VidyaOS v${ver} • Release: Stable`;
+      label.textContent = `Installed: VidyaOS v${runningVer} • Release: Stable`;
     }
 
     const buildStr = document.getElementById('footer-build-string');
     if (buildStr) {
-      buildStr.textContent = `Version ${ver} (Build ${new Date().toISOString().slice(0, 10).replace(/-/g, '')}) • All Rights Reserved`;
+      buildStr.textContent = `Version ${runningVer} (Build ${new Date().toISOString().slice(0, 10).replace(/-/g, '')}) • All Rights Reserved`;
     }
   }
 
@@ -177,7 +186,8 @@
 
       await new Promise(res => setTimeout(res, 800)); // Smooth feedback
 
-      if (remoteVer && remoteVer !== currentVer) {
+      const isNewer = compareSemver(remoteVer, currentVer) > 0;
+      if (remoteVer && isNewer) {
         inner.innerHTML = `
           <div class="update-available-box">
             <div style="font-weight:700; color:var(--text-main); font-size:0.92rem; display:flex; align-items:center; gap:6px;">
@@ -306,7 +316,7 @@
   async function loadActiveReportsCount() {
     try {
       if (typeof fetchApi !== 'function') return;
-      const res = await fetchApi('/bug-reports/my-reports');
+      const res = await fetchApi('/bug-reports/my', { suppressToast: true });
       if (res && res.success && Array.isArray(res.data)) {
         const badge = document.getElementById('active-reports-badge');
         if (badge && res.data.length > 0) {
