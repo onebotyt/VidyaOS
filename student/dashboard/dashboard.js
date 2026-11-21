@@ -1131,14 +1131,6 @@ function getInitials(name) {
 function openCompleteProfileModal(student) {
   const modal = document.getElementById('complete-profile-modal');
   if (!modal) return;
-  const s = student || studentDashboardState.profile || {};
-  if (document.getElementById('pop-father-name')) document.getElementById('pop-father-name').value = s.father_name || '';
-  if (document.getElementById('pop-mother-name')) document.getElementById('pop-mother-name').value = s.mother_name || '';
-  if (document.getElementById('pop-dob')) document.getElementById('pop-dob').value = s.dob || '';
-  if (document.getElementById('pop-gender')) document.getElementById('pop-gender').value = s.gender || '';
-  if (document.getElementById('pop-category')) document.getElementById('pop-category').value = s.category || '';
-  if (document.getElementById('pop-aadhar')) document.getElementById('pop-aadhar').value = s.aadhar_number || '';
-  if (document.getElementById('pop-address')) document.getElementById('pop-address').value = s.address || '';
   modal.style.display = 'flex';
 }
 
@@ -1148,70 +1140,14 @@ function closeCompleteProfileModal() {
   sessionStorage.setItem('profile_modal_dismissed', '1');
 }
 
+function redirectToCompleteProfile() {
+  closeCompleteProfileModal();
+  window.location.href = '/student/profile/index.html#kyc';
+}
+
 async function handlePopupProfileSubmit(e) {
-  e.preventDefault();
-  const errBox = document.getElementById('pop-profile-error');
-  if (errBox) errBox.style.display = 'none';
-
-  const father_name = document.getElementById('pop-father-name')?.value.trim();
-  const mother_name = document.getElementById('pop-mother-name')?.value.trim();
-  const dob = document.getElementById('pop-dob')?.value;
-  const gender = document.getElementById('pop-gender')?.value;
-  const category = document.getElementById('pop-category')?.value;
-  const aadhar_number = document.getElementById('pop-aadhar')?.value.trim();
-  const address = document.getElementById('pop-address')?.value.trim();
-  const submitBtn = document.getElementById('pop-submit-btn');
-
-  if (!father_name || !mother_name || !dob || !gender || !category || !aadhar_number || !address) {
-    if (errBox) {
-      errBox.innerText = 'Please complete all required demographic fields.';
-      errBox.style.display = 'block';
-    }
-    return;
-  }
-
-  try {
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'Saving...';
-    }
-
-    const res = await fetchApi('/students/me', {
-      method: 'PUT',
-      body: JSON.stringify({
-        father_name,
-        mother_name,
-        dob,
-        gender,
-        category,
-        aadhar_number,
-        address
-      })
-    });
-
-    if (res && res.success) {
-      if (typeof showToast === 'function') {
-        showToast('Student profile completed successfully!', 'success');
-      }
-      closeCompleteProfileModal();
-      loadStudentDashboard();
-    } else {
-      if (errBox) {
-        errBox.innerText = res?.error?.message || 'Failed to update profile.';
-        errBox.style.display = 'block';
-      }
-    }
-  } catch (err) {
-    if (errBox) {
-      errBox.innerText = err.message || 'Error saving profile.';
-      errBox.style.display = 'block';
-    }
-  } finally {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerText = 'Save & Complete Profile';
-    }
-  }
+  if (e && e.preventDefault) e.preventDefault();
+  redirectToCompleteProfile();
 }
 
 // Window interoperability exports
@@ -1222,6 +1158,7 @@ window.openStudentStream = openStudentStreamModal;
 window.loadEnrolledClasses = loadEnrolledClasses;
 window.openCompleteProfileModal = openCompleteProfileModal;
 window.closeCompleteProfileModal = closeCompleteProfileModal;
+window.redirectToCompleteProfile = redirectToCompleteProfile;
 window.handlePopupProfileSubmit = handlePopupProfileSubmit;
 
 /* --- Three-Dot Menu & Delete Subject Card Modal Handlers --- */
