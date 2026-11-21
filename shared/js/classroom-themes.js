@@ -67,6 +67,40 @@
 
   const THEME_KEYS = Object.keys(THEME_DEFS);
 
+  const BANNER_POOL = [
+    '/uploads/classroom-banners/banner_commerce_2_c285dc.svg',
+    '/uploads/classroom-banners/banner_commerce_2_fe6da7.svg',
+    '/uploads/classroom-banners/banner_android_3_068a91.svg',
+    '/uploads/classroom-banners/banner_literature_4_ace95b.svg',
+    '/uploads/classroom-banners/banner_mathematics_5_0bb160.svg',
+    '/uploads/classroom-banners/banner_programming_1_c065d9.svg',
+    '/uploads/classroom-banners/banner_programming_3_0146f5.svg',
+    '/uploads/classroom-banners/banner_programming_4_dac80b.svg',
+    '/uploads/classroom-banners/banner_programming_5_bba507.svg',
+    '/uploads/classroom-banners/banner_programming_7_de3701.svg',
+    '/uploads/classroom-banners/banner_science_7_e015a5.svg',
+    '/uploads/classroom-banners/theme_android_fallback.svg',
+    '/uploads/classroom-banners/theme_commerce_fallback.svg',
+    '/uploads/classroom-banners/theme_literature_fallback.svg',
+    '/uploads/classroom-banners/theme_mathematics_fallback.svg',
+    '/uploads/classroom-banners/theme_programming_fallback.svg',
+    '/uploads/classroom-banners/theme_science_fallback.svg',
+    '/uploads/classroom-banners/theme_arts_fallback.svg',
+    '/uploads/classroom-banners/theme_general_campus_fallback.svg'
+  ];
+
+  /**
+   * Generates or picks a random authentic Google Classroom banner for a new classroom
+   */
+  function getRandomBanner(group = {}) {
+    const themeKey = resolveThemeKey(group);
+    const matching = BANNER_POOL.filter(b => b.includes(themeKey));
+    if (matching.length > 0) {
+      return matching[Math.floor(Math.random() * matching.length)];
+    }
+    return BANNER_POOL[Math.floor(Math.random() * BANNER_POOL.length)];
+  }
+
   /**
    * Resolves a theme key from class text or ID
    */
@@ -167,12 +201,27 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
             <span>Open Classroom</span>
           </a>
-          ${group.invite_code ? `
-            <button type="button" class="gc-dropdown-item" onclick="ClassroomThemes.copyInviteCode('${escapeHtml(group.invite_code)}')">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              <span>Copy Invite Code (${escapeHtml(group.invite_code)})</span>
+          ${isStudent ? `
+            ${group.invite_code ? `
+              <button type="button" class="gc-dropdown-item" onclick="ClassroomThemes.copyInviteCode('${escapeHtml(group.invite_code)}')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy Invite Code (${escapeHtml(group.invite_code)})</span>
+              </button>
+            ` : ''}
+            <button type="button" class="gc-dropdown-item item-danger" onclick="if(typeof openDeleteSubjectCardModal==='function'){openDeleteSubjectCardModal(${group.id},'${escapeHtml(title)}');}else{alert('Classroom: ${escapeHtml(title)}');}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Hide Subject Card</span>
             </button>
-          ` : ''}
+          ` : `
+            <button type="button" class="gc-dropdown-item" onclick="if(typeof openEditClassModal==='function')openEditClassModal(${group.id});">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              <span>Edit Class</span>
+            </button>
+            <button type="button" class="gc-dropdown-item item-danger" onclick="if(typeof openDeleteClassModal==='function')openDeleteClassModal(${group.id},'${escapeHtml(title)}');">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Move to Trash</span>
+            </button>
+          `}
         </div>
 
         <div class="gc-card-content">
@@ -224,6 +273,7 @@
     THEME_DEFS,
     resolveThemeKey,
     getBannerUrl,
+    getRandomBanner,
     applyHeroBanner,
     renderCard,
     toggleCardMenu,

@@ -159,4 +159,12 @@ if (fs.existsSync(bridgePath)) {
   console.log(`[Mobile Build] Stamped version ${appVersion} and FORCE_NATIVE into mobile-bridge.js`);
 }
 
+// Synchronize into Android native assets if present
+const ANDROID_ASSETS_DIR = path.join(ROOT_DIR, 'android', 'app', 'src', 'main', 'assets', 'public');
+if (fs.existsSync(ANDROID_ASSETS_DIR)) {
+  console.log('[Mobile Build] Synchronizing www/ assets into android/app/src/main/assets/public/...');
+  copyRecursiveSync(WWW_DIR, ANDROID_ASSETS_DIR);
+  console.log('[Mobile Build] ✅ Android assets directory synchronized successfully!');
+}
+
 console.log('[Mobile Build] ✅ Capacitor www directory prepared successfully!');

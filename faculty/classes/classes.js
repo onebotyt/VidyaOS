@@ -487,6 +487,10 @@
     const endDate = endDateInput?.value?.trim() || null;
     const totalUnits = Math.min(20, Math.max(1, parseInt(unitsInput?.value?.replace(/[^0-9]/g, '') || '5', 10) || 5));
 
+    const randomBanner = (typeof ClassroomThemes !== 'undefined' && typeof ClassroomThemes.getRandomBanner === 'function')
+      ? ClassroomThemes.getRandomBanner({ name: subjectName, subject_name: subjectName, subject_code: code })
+      : '/uploads/classroom-banners/banner_programming_1_c065d9.svg';
+
     const payload = {
       name: subjectName,
       subject_name: subjectName,
@@ -499,7 +503,8 @@
       start_date: startDate,
       end_date: endDate,
       room_no: code || '101',
-      total_units: totalUnits
+      total_units: totalUnits,
+      theme_image: randomBanner
     };
 
     try {

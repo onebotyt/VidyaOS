@@ -1657,3 +1657,106 @@ h1 em {
 .credit-link:hover {
   color: #2563eb;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PC LAPTOP & DESKTOP ZERO-OVERFLOW DEFINITIVE OVERRIDE
+   Ensures .login card never overflows vertically on any PC screen
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 900px) {
+  .right {
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .login {
+    width: 100% !important;
+    max-width: 410px !important;
+    max-height: calc(100vh - 20px) !important;
+    overflow-y: auto !important;
+    padding: 12px 18px 8px !important;
+    margin: auto 0 !important;
+    box-sizing: border-box !important;
+  }
+  .lb {
+    gap: 8px !important;
+    margin-bottom: 2px !important;
+  }
+  .lb .logo {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 9px !important;
+  }
+  .lb h3 {
+    font-size: 16.5px !important;
+  }
+  .lb p {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  .login h2 {
+    font-size: 18px !important;
+    margin-top: 2px !important;
+    margin-bottom: 0 !important;
+  }
+  .sub {
+    font-size: 11px !important;
+    margin: 1px 0 6px !important;
+  }
+  .google {
+    height: 36px !important;
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+  }
+  .or {
+    margin: 4px 0 !important;
+    font-size: 10px !important;
+  }
+  .form-label-heading {
+    font-size: 10.5px !important;
+    margin-bottom: 2px !important;
+  }
+  .field {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 2px 10px !important;
+    margin-bottom: 4px !important;
+    border-radius: 8px !important;
+  }
+  .field input {
+    font-size: 12px !important;
+  }
+  .forgot {
+    font-size: 10.5px !important;
+    margin: 0 2px 3px !important;
+  }
+  .signin {
+    height: 36px !important;
+    font-size: 13.5px !important;
+    border-radius: 8px !important;
+    margin-top: 3px !important;
+    margin-bottom: 4px !important;
+  }
+  .desktop-app-actions {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 5px !important;
+    margin-top: 4px !important;
+    margin-bottom: 2px !important;
+  }
+  .app-action-btn {
+    height: 30px !important;
+    font-size: 10.5px !important;
+    padding: 2px 4px !important;
+    border-radius: 7px !important;
+  }
+  .reg {
+    margin-top: 5px !important;
+    margin-bottom: 2px !important;
+    font-size: 11px !important;
+  }
+  footer.bar {
+    padding: 3px 16px !important;
+    font-size: 10px !important;
+  }
+}

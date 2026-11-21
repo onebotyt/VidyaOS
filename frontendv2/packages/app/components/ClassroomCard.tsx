@@ -18,47 +18,53 @@ const THEME_GRADIENTS = [
 export const ClassroomCard: React.FC<ClassroomCardProps> = ({ classroom, onPress }) => {
   const themeIndex = (classroom.id || 0) % THEME_GRADIENTS.length;
   const theme = THEME_GRADIENTS[themeIndex];
+  const pendingCount = classroom.active_tasks_count !== undefined ? classroom.active_tasks_count : 0;
 
   return (
     <Pressable 
-      style={styles.card}
+      style={[styles.card, { backgroundColor: theme.bg }]}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`Classroom: ${classroom.name}`}
     >
-      {/* 1. Header Banner (Google Classroom style) */}
-      <View style={[styles.banner, { backgroundColor: theme.bg }]}>
-        <View style={styles.bannerGlow} />
-        <View style={styles.bannerContent}>
-          <View style={styles.codeRow}>
-            <Text style={[styles.codeBadge, { color: theme.accent }]}>
-              {classroom.subject_code || classroom.code || 'SUB-101'}
-            </Text>
-            <Text style={styles.bannerEmoji}>{theme.icon}</Text>
-          </View>
-          <Text style={styles.title} numberOfLines={2}>
-            {classroom.name || 'Classroom Subject'}
+      {/* Google Classroom Atmospheric Ambient Shapes */}
+      <View style={styles.ambientGlow} />
+      <View style={[styles.ambientDeco, { borderColor: theme.accent }]} />
+
+      {/* Top Header Row: Subject, Subtitle / Cohort, and 3-Dots Kebab */}
+      <View style={styles.topHeader}>
+        <View style={styles.titleArea}>
+          <Text style={styles.title} numberOfLines={1}>
+            {classroom.name || classroom.subject_name || 'Classroom Subject'}
           </Text>
-          <Text style={styles.instructor}>
-            {classroom.teacher_name || 'Department Faculty'}
+          <Text style={styles.cohortText} numberOfLines={1}>
+            {classroom.subject_code ? `${classroom.subject_code} • IT 3rd year` : 'IT 3rd year'}
           </Text>
         </View>
+
+        <Pressable 
+          style={styles.kebabBtn}
+          onPress={(e) => {
+            e.stopPropagation();
+            alert(`Classroom: ${classroom.name}`);
+          }}
+          accessibilityLabel="Options"
+        >
+          <Text style={styles.kebabText}>⋮</Text>
+        </Pressable>
       </View>
 
-      {/* 2. Body Details (Deadlines & Status) */}
-      <View style={styles.body}>
-        <View style={styles.metaRow}>
-          <Text style={styles.metaLabel}>Tasks Due</Text>
-          <View style={styles.taskBadge}>
-            <Text style={styles.taskCount}>
-              {classroom.active_tasks_count !== undefined ? classroom.active_tasks_count : 0} active
-            </Text>
-          </View>
-        </View>
+      {/* Bottom Footer Row: Teacher Name and Tasks Indicator */}
+      <View style={styles.bottomFooter}>
+        <Text style={styles.instructor} numberOfLines={1}>
+          {classroom.teacher_name || 'Rajnish Singh Bhutani'}
+        </Text>
 
-        <View style={styles.footerRow}>
-          <Text style={styles.enterText}>Enter Class →</Text>
-        </View>
+        {pendingCount > 0 && (
+          <View style={[styles.taskChip, { backgroundColor: theme.accent }]}>
+            <Text style={styles.taskChipText}>{pendingCount} due</Text>
+          </View>
+        )}
       </View>
     </Pressable>
   );
@@ -66,101 +72,98 @@ export const ClassroomCard: React.FC<ClassroomCardProps> = ({ classroom, onPress
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
+    height: 140,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
     overflow: 'hidden',
     marginBottom: 14,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  banner: {
-    height: 110,
-    padding: 14,
+    padding: 16,
     justifyContent: 'space-between',
     position: 'relative',
-    overflow: 'hidden',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 3,
   },
-  bannerGlow: {
+  ambientGlow: {
     position: 'absolute',
-    right: -20,
-    top: -20,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    right: -30,
+    bottom: -30,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
-  bannerContent: {
-    zIndex: 1,
+  ambientDeco: {
+    position: 'absolute',
+    right: 25,
+    top: -15,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 1.5,
+    opacity: 0.25,
   },
-  codeRow: {
+  topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+    alignItems: 'flex-start',
+    zIndex: 2,
   },
-  codeBadge: {
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  bannerEmoji: {
-    fontSize: 18,
+  titleArea: {
+    flex: 1,
+    marginRight: 10,
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#ffffff',
+    lineHeight: 22,
+    letterSpacing: -0.3,
+  },
+  cohortText: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.85)',
+    fontWeight: '500',
+    marginTop: 4,
+  },
+  kebabBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+  },
+  kebabText: {
+    fontSize: 18,
     fontWeight: '800',
     color: '#ffffff',
     lineHeight: 20,
-    letterSpacing: -0.3,
+  },
+  bottomFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 2,
   },
   instructor: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.85)',
-    marginTop: 2,
-  },
-  body: {
-    padding: 12,
-    backgroundColor: '#ffffff',
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  metaLabel: {
-    fontSize: 12,
-    color: '#64748b',
+    fontSize: 13,
     fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.92)',
+    flex: 1,
   },
-  taskBadge: {
+  taskChip: {
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    backgroundColor: '#f1f5f9',
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginLeft: 8,
   },
-  taskCount: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#475569',
-  },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    paddingTop: 8,
-  },
-  enterText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#2563eb',
+  taskChipText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#0b1b4d',
+    textTransform: 'uppercase',
   },
 });
 

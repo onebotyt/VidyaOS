@@ -387,6 +387,10 @@ function renderGoogleClassCards() {
   }
 
   grid.innerHTML = visible.map((c, index) => {
+    if (typeof ClassroomThemes !== 'undefined' && typeof ClassroomThemes.renderCard === 'function') {
+      return ClassroomThemes.renderCard(c, { isStudent: true, showTasks: true });
+    }
+
     const paletteClass = `palette-${index % 6}`;
     const isTheory = (c.component || '').toUpperCase() === 'THEORY';
     const isDual = (c.component || '').toUpperCase().includes('PRACTICAL') && (c.component || '').toUpperCase().includes('THEORY');

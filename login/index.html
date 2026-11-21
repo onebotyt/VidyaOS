@@ -203,7 +203,7 @@
 
           <!-- Desktop App Actions: Stable APK, Beta Testing Version & @onebotyt -->
           <div class="desktop-app-actions">
-            <a href="https://github.com/onebotyt/VidyaOS/releases/download/v1.0.100/VidyaOS.apk" class="app-action-btn apk-btn" download title="Download Verified Stable Android APK">
+            <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="app-action-btn apk-btn" download title="Download Verified Stable Android APK (VidyaOS.apk)">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
@@ -211,7 +211,7 @@
               </svg>
               <span>Stable APK</span>
             </a>
-            <button type="button" class="app-action-btn beta-btn" onclick="openDownloadAppModal('pc')" title="Download & Test VidyaOS Beta (PC & Mobile)">
+            <button type="button" class="app-action-btn beta-btn" onclick="openDownloadAppModal('pc')" title="Download & Test VidyaOS Beta / v2app (PC & Mobile)">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect width="20" height="14" x="2" y="3" rx="2"></rect>
                 <line x1="8" x2="16" y1="21" y2="21"></line>
@@ -501,38 +501,61 @@
         </button>
       </div>
 
-      <!-- Tab Content: PC & Desktop (Frontend v2 Beta) -->
+      <!-- Tab Content: PC & Desktop (Frontend v2 Beta & APKs) -->
       <div class="download-tab-panel" id="download-panel-pc" style="display:none;">
         <div class="platform-card-badge pc-badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">
           <span>● Multi-OS PC &amp; Desktop</span>
-          <span>v2.0 Beta</span>
+          <span>v2.0 Beta &amp; Mobile APKs</span>
         </div>
-        <h4 class="platform-title">Launch Frontend v2 for PC</h4>
-        <p class="platform-desc">Experience the brand new unified desktop architecture with custom window controls, adaptive sidebar, multi-column student cockpit, and instant cloud sync.</p>
+        <h4 class="platform-title">Launch Frontend v2 for PC &amp; Direct Downloads</h4>
+        <p class="platform-desc">Experience the brand new unified desktop architecture or download the latest Android application packages (both v2app Beta and Verified Stable APK).</p>
 
         <div class="download-features-list">
           <div class="feature-item">
             <span class="feature-check">✓</span>
-            <span>Desktop titlebar with min/max/close controls</span>
+            <span><strong>v2app.apk:</strong> Unified React multi-OS architecture release</span>
           </div>
           <div class="feature-item">
             <span class="feature-check">✓</span>
-            <span>Installable as desktop app (PWA for Windows / Mac / Linux)</span>
+            <span><strong>VidyaOS.apk:</strong> Production verified attendance &amp; portal app</span>
           </div>
           <div class="feature-item">
             <span class="feature-check">✓</span>
-            <span>Zero build step required — run directly in any browser</span>
+            <span>Desktop titlebar with min/max/close &amp; zero-build browser client</span>
           </div>
         </div>
 
-        <a href="/frontendv2/index.html" class="download-primary-btn pc-btn" target="_blank" rel="noopener noreferrer" style="background: linear-gradient(135deg, #1d4ed8, #2563eb); color:#ffffff;">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="20" height="14" x="2" y="3" rx="2"></rect>
-            <line x1="8" x2="16" y1="21" y2="21"></line>
-            <line x1="12" x2="12" y1="17" y2="21"></line>
-          </svg>
-          <span>Open PC Beta (Frontend v2) →</span>
-        </a>
+        <div style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:8px;">
+          <!-- 1. Download v2app APK -->
+          <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/v2app.apk" class="download-primary-btn" download style="background:linear-gradient(135deg, #059669, #10b981); color:#ffffff; font-weight:700;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download v2app.apk (Universal Mobile &amp; Desktop APK)</span>
+          </a>
+
+          <!-- 2. Download VidyaOS Stable APK -->
+          <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="download-primary-btn" download style="background:#f8fafc; color:#0f172a; border:1px solid #cbd5e1; font-weight:600;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download VidyaOS.apk (Stable Android Release)</span>
+          </a>
+
+          <!-- 3. Launch Frontend v2 for PC in Browser -->
+          <a href="/frontendv2/index.html" class="download-primary-btn pc-btn" target="_blank" rel="noopener noreferrer" style="background: linear-gradient(135deg, #1d4ed8, #2563eb); color:#ffffff;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+              <line x1="8" x2="16" y1="21" y2="21"></line>
+              <line x1="12" x2="12" y1="17" y2="21"></line>
+            </svg>
+            <span>Launch PC Web App (Frontend v2) →</span>
+          </a>
+        </div>
 
         <div class="download-footer-links" style="margin-top:12px;">
           <a href="https://github.com/onebotyt/VidyaOS/tree/main/frontendv2" target="_blank" rel="noopener noreferrer" class="download-secondary-link">
