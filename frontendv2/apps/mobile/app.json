@@ -18,7 +18,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2563eb"
       },
-      "package": "in.ac.ugip.vidyaos.v2"
+      "package": "in.ac.ugip.vidyaos.v2",
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ],
+      "usesCleartextTraffic": true
     }
   }
 }

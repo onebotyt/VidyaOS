@@ -3,18 +3,44 @@
  * Compatible with Web (browser), Desktop (Tauri), and Native Mobile (React Native).
  */
 
+export const DEFAULT_API_BASE = 'https://vidyaos-backend.onrender.com';
+
 export interface ApiOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
   suppressToast?: boolean;
 }
 
 class UniversalApiClient {
-  private baseUrl: string = '';
+  private baseUrl: string = DEFAULT_API_BASE;
   private token: string | null = null;
   private tokenListeners: Set<(token: string | null) => void> = new Set();
 
   constructor() {
+    this.initBaseUrl();
     this.initTokenFromStorage();
+  }
+
+  private initBaseUrl() {
+    try {
+      if (typeof process !== 'undefined' && process.env) {
+        const envUrl = process.env.EXPO_PUBLIC_API_URL || process.env.VITE_API_URL || process.env.REACT_APP_API_URL;
+        if (envUrl) {
+          this.baseUrl = envUrl.replace(/\/+$/, '');
+          return;
+        }
+      }
+      if (typeof window !== 'undefined') {
+        if ((window as any).VIDYAOS_API_BASE) {
+          this.baseUrl = (window as any).VIDYAOS_API_BASE.replace(/\/api\/v1\/?$/, '');
+          return;
+        }
+        if ((window as any).VIDYAOS_CLOUD_BACKEND) {
+          this.baseUrl = (window as any).VIDYAOS_CLOUD_BACKEND.replace(/\/+$/, '');
+          return;
+        }
+      }
+    } catch (_) {}
+    this.baseUrl = DEFAULT_API_BASE;
   }
 
   private initTokenFromStorage() {
@@ -26,7 +52,13 @@ class UniversalApiClient {
   }
 
   public setBaseUrl(url: string) {
-    this.baseUrl = url.replace(/\/+$/, '');
+    if (url) {
+      this.baseUrl = url.replace(/\/+$/, '');
+    }
+  }
+
+  public getBaseUrl(): string {
+    return this.baseUrl || DEFAULT_API_BASE;
   }
 
   public setToken(token: string | null) {
@@ -56,7 +88,8 @@ class UniversalApiClient {
 
   public async request<T = any>(endpoint: string, options: ApiOptions = {}): Promise<T> {
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    let url = `${this.baseUrl}/api/v1${cleanEndpoint}`;
+    const base = (this.baseUrl || DEFAULT_API_BASE).replace(/\/+$/, '');
+    let url = `${base}/api/v1${cleanEndpoint}`;
 
     if (options.params) {
       const searchParams = new URLSearchParams();

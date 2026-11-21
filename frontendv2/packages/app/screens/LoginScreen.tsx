@@ -9,6 +9,7 @@ interface LoginScreenProps {
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -29,7 +30,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
       await authStore.loginWithCredentials(identifier.trim(), password);
       onSuccess();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Invalid credentials');
+      const msg = err.message || 'Invalid credentials';
+      if (msg.toLowerCase().includes('network request failed') || msg.toLowerCase().includes('failed to fetch')) {
+        setErrorMsg('Unable to connect to VidyaOS server. Please check your internet connection.');
+      } else {
+        setErrorMsg(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -107,14 +113,23 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
         />
 
         <Text style={styles.inputLabel}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="••••••••••••"
-          placeholderTextColor="#94a3b8"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="••••••••••••"
+            placeholderTextColor="#94a3b8"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <Pressable 
+            style={styles.eyeBtn}
+            onPress={() => setShowPassword(prev => !prev)}
+            accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+          >
+            <Text style={styles.eyeText}>{showPassword ? '🙈' : '👁️'}</Text>
+          </Pressable>
+        </View>
 
         {errorMsg ? (
           <Text style={styles.errorText}>{errorMsg}</Text>
@@ -152,14 +167,23 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSuccess }) => {
               This Google email matches an existing account. Enter your password once to authorize 1-click login.
             </Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Your current password"
-              placeholderTextColor="#94a3b8"
-              secureTextEntry
-              value={linkPassword}
-              onChangeText={setLinkPassword}
-            />
+            <View style={[styles.passwordContainer, { marginBottom: 16 }]}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Your current password"
+                placeholderTextColor="#94a3b8"
+                secureTextEntry={!showPassword}
+                value={linkPassword}
+                onChangeText={setLinkPassword}
+              />
+              <Pressable 
+                style={styles.eyeBtn}
+                onPress={() => setShowPassword(prev => !prev)}
+                accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+              >
+                <Text style={styles.eyeText}>{showPassword ? '🙈' : '👁️'}</Text>
+              </Pressable>
+            </View>
 
             <View style={styles.modalActions}>
               <Pressable 
@@ -299,6 +323,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#0f172a',
     marginBottom: 8,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
+    marginBottom: 8,
+    paddingRight: 12,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#0f172a',
+  },
+  eyeBtn: {
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  eyeText: {
+    fontSize: 16,
   },
   errorText: {
     color: '#ef4444',
