@@ -236,8 +236,21 @@ async function initiateGoogleSignUp() {
   if (btnText) btnText.textContent = 'Connecting to Google…';
   if (btn) btn.disabled = true;
 
+  // 1. Android Native App: Launch native Google Account Chooser bottom-sheet
+  if (window.NativeAuthBridge && typeof window.NativeAuthBridge.launchGoogleSignIn === 'function') {
+    try {
+      window.NativeAuthBridge.launchGoogleSignIn();
+      return;
+    } catch (e) {
+      console.warn('NativeAuthBridge launch failed in register:', e);
+    }
+  }
+
+  // 2. Web browser flow (OAuth URL)
   try {
-    const origin = window.location.origin;
+    const origin = (window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file:') && !window.location.origin.startsWith('capacitor:'))
+      ? window.location.origin
+      : 'https://vidyaos-pink.vercel.app';
     let res = await fetch(`/api/v1/auth/google/url?mode=STUDENT_REGISTER&origin=${encodeURIComponent(origin)}`).then(r => r.json()).catch(() => null);
     if (!res || !res.success || !res.data?.url) {
       res = await fetch(`https://vidyaos-backend.onrender.com/api/v1/auth/google/url?mode=STUDENT_REGISTER&origin=${encodeURIComponent(origin)}`).then(r => r.json()).catch(() => null);
@@ -262,6 +275,30 @@ async function initiateGoogleSignUp() {
     if (btn) btn.disabled = false;
   }
 }
+
+/* ── Native Google Sign-Up Callbacks ── */
+window.onNativeGoogleSignInSuccess = function(data) {
+  try {
+    const payload = typeof data === 'string' ? JSON.parse(data) : data;
+    const { email, name, sub, idToken } = payload;
+    if (email) {
+      selectGoogleAccount(email, name, sub);
+      if (idToken && S.googleRegistrationData) {
+        S.googleRegistrationData.id_token = idToken;
+      }
+    }
+  } catch (err) {
+    console.error('Native Google auto-fill error:', err);
+  }
+};
+
+window.onNativeGoogleSignInError = function(err) {
+  console.warn('Native Google sign-up cancelled or error:', err);
+  const btn = document.getElementById('google-signup-btn');
+  const btnText = document.getElementById('google-signup-btn-text');
+  if (btnText) btnText.textContent = 'Sign up with Google (Auto-Fill)';
+  if (btn) btn.disabled = false;
+};
 
 window.addEventListener('message', (event) => {
   if (!event.data) return;

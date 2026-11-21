@@ -3,6 +3,7 @@
   "appName": "VidyaOS",
   "webDir": "www",
   "server": {
+    "url": "https://vidyaos-pink.vercel.app",
     "androidScheme": "https",
     "cleartext": true
   },

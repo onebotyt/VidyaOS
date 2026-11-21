@@ -620,34 +620,34 @@ document.getElementById('activation-form').addEventListener('submit', async (e) 
 
 /* ── Google OAuth & Chooser Modal ── */
 async function handleGoogleSignIn() {
-  const isNative = (
-    typeof window !== 'undefined' && (
-      Boolean(window.Capacitor?.isNativePlatform?.()) ||
-      window.location.protocol === 'capacitor:' ||
-      window.location.protocol === 'file:' ||
-      window.VIDYAOS_FORCE_NATIVE === true
-    )
-  );
-
-  if (isNative) {
-    alert('Google Sign-In is available via the Web Portal. On mobile, please log in with your email or ID and password.');
-    return;
-  }
-
   const btn = document.getElementById('google-signin-btn') || document.getElementById('m-google-btn');
   const txt = document.getElementById('google-btn-text') || btn?.querySelector('span');
   if (btn) btn.disabled = true;
   if (txt) txt.textContent = 'Connecting to Google…';
 
+  // 1. Android Native App: Launch native Google Account Chooser bottom-sheet
+  if (window.NativeAuthBridge && typeof window.NativeAuthBridge.launchGoogleSignIn === 'function') {
+    try {
+      window.NativeAuthBridge.launchGoogleSignIn();
+      return;
+    } catch (e) {
+      console.warn('NativeAuthBridge.launchGoogleSignIn failed, falling back to web flow:', e);
+    }
+  }
+
+  // 2. Web browser flow (OAuth URL)
   try {
-    const origin = window.location.origin;
+    const origin = (window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('file:') && !window.location.origin.startsWith('capacitor:'))
+      ? window.location.origin
+      : 'https://vidyaos-pink.vercel.app';
+
     let res = await fetchApi('/auth/google/url?mode=LOGIN&origin=' + encodeURIComponent(origin)).catch(() => null);
     if (!res || !res.success || !res.data?.url) {
       res = await fetch('https://vidyaos-backend.onrender.com/api/v1/auth/google/url?mode=LOGIN&origin=' + encodeURIComponent(origin)).then(r => r.json()).catch(() => null);
     }
 
     if (res && res.data?.url) {
-      // Direct navigation to Google OAuth with prompt=select_account triggers the native Android account chooser
+      // Direct navigation to Google OAuth with prompt=select_account triggers the Android Google account chooser
       window.location.href = res.data.url;
       return;
     }
@@ -661,10 +661,89 @@ async function handleGoogleSignIn() {
     window.location.href = fallbackUrl;
   } catch (err) {
     console.error('Google Sign-In initialization failed:', err);
-    if (txt) txt.textContent = btn?.id === 'm-google-btn' ? 'Sign In with Google' : 'Continue with Google';
-    if (btn) btn.disabled = false;
+    resetGoogleButtons();
   }
 }
+
+function resetGoogleButtons() {
+  const btn = document.getElementById('google-signin-btn');
+  const mBtn = document.getElementById('m-google-btn');
+  const txt = document.getElementById('google-btn-text');
+  if (btn) btn.disabled = false;
+  if (mBtn) mBtn.disabled = false;
+  if (txt) txt.textContent = 'Continue with Google';
+  if (mBtn) {
+    const mTxt = mBtn.querySelector('span');
+    if (mTxt) mTxt.textContent = 'Sign In with Google';
+  }
+}
+
+/* ── Native Google Sign-In Callbacks (from Android Google Play Services) ── */
+window.onNativeGoogleSignInSuccess = async function(data) {
+  const btn = document.getElementById('google-signin-btn') || document.getElementById('m-google-btn');
+  const txt = document.getElementById('google-btn-text') || btn?.querySelector('span');
+  if (txt) txt.textContent = 'Verifying account…';
+
+  try {
+    const payload = typeof data === 'string' ? JSON.parse(data) : data;
+    const { idToken, email, name, sub } = payload;
+    const deviceId = getVidyaDeviceId();
+    const apiBase = window.VIDYAOS_API_BASE || '/api/v1';
+
+    let res = null;
+    try {
+      const response = await fetch(`${apiBase}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_token: idToken || ('google_' + (email || '').toLowerCase()),
+          email: email,
+          name: name,
+          sub: sub,
+          device_id: deviceId
+        })
+      });
+      res = await response.json();
+    } catch (_) {
+      const response = await fetch('https://vidyaos-backend.onrender.com/api/v1/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_token: idToken || ('google_' + (email || '').toLowerCase()),
+          email: email,
+          name: name,
+          sub: sub,
+          device_id: deviceId
+        })
+      });
+      res = await response.json();
+    }
+
+    if (res && res.success && res.data?.access_token) {
+      setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
+      showInlineMsg('Google Sign-In verified! Redirecting…', 'ok');
+      setTimeout(() => redirectAfterLogin(res.data.user), 350);
+    } else if (res && (res.error?.code === 'UNAUTHORIZED' || res.error?.code === 'NOT_REGISTERED' || (res.error?.message && res.error.message.includes('No account found')))) {
+      // Direct routing to student registration with prefilled Google account!
+      window.location.href = `/login/register/index.html?role=student&google_email=${encodeURIComponent(email || '')}&google_name=${encodeURIComponent(name || '')}&google_sub=${encodeURIComponent(sub || '')}&google_id_token=${encodeURIComponent(idToken || '')}`;
+    } else if (res && res.error?.code === 'PENDING_APPROVAL') {
+      window.location.href = `/login/index.html?role=student&google_pending=1&email=${encodeURIComponent(email || '')}`;
+    } else {
+      const msg = res?.error?.message || 'invalid credentials check id and password ';
+      showInlineMsg(msg, 'err');
+      resetGoogleButtons();
+    }
+  } catch (err) {
+    console.error('Native Google Sign-In processing error:', err);
+    showInlineMsg(err.message || 'Google login failed', 'err');
+    resetGoogleButtons();
+  }
+};
+
+window.onNativeGoogleSignInError = function(err) {
+  console.warn('Native Google Sign-In cancelled or error:', err);
+  resetGoogleButtons();
+};
 
 function openGoogleSignInModal() {
   const modal = document.getElementById('google-signin-modal');

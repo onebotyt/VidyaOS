@@ -169,22 +169,23 @@
           </svg>
         </div>
         <div style="flex: 1;">
-          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;">Update Available â€¢ v${version}</div>
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;">Update Available • v${version}</div>
           <div style="font-size: 0.8rem; color: #94a3b8; line-height: 1.35; margin-bottom: 12px;">
             ${releaseNotes || 'A new update of VidyaOS is available with the latest features.'}
           </div>
           <div style="display: flex; gap: 8px;">
-            <a href="${apkUrl}" target="_blank" id="btn-update-apk" style="
+            <button id="btn-update-apk" style="
               display: inline-block;
               background: #2563eb;
               color: #ffffff;
               padding: 6px 14px;
               border-radius: 8px;
+              border: none;
               font-size: 0.82rem;
               font-weight: 600;
-              text-decoration: none;
+              cursor: pointer;
               text-align: center;
-            ">Download Update</a>
+            ">Update Now</button>
             <button id="btn-dismiss-apk" style="
               background: rgba(255, 255, 255, 0.1);
               color: #cbd5e1;
@@ -200,6 +201,25 @@
     `;
 
     document.body.appendChild(banner);
+
+    const updateBtn = document.getElementById('btn-update-apk');
+    if (updateBtn) {
+      updateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.NativeAppUpdater && typeof window.NativeAppUpdater.downloadAndInstall === 'function') {
+          updateBtn.textContent = 'Downloading update…';
+          updateBtn.disabled = true;
+          updateBtn.style.opacity = '0.8';
+          try {
+            window.NativeAppUpdater.downloadAndInstall(apkUrl);
+          } catch (_) {
+            window.open(apkUrl, '_blank');
+          }
+        } else {
+          window.open(apkUrl, '_blank');
+        }
+      });
+    }
 
     document.getElementById('btn-dismiss-apk')?.addEventListener('click', () => {
       localStorage.setItem('vidyaos_dismissed_update', version);
