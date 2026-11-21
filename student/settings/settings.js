@@ -145,7 +145,9 @@
     `;
 
     try {
-      const currentVer = window.VIDYAOS_APP_VERSION || '1.0.95';
+      const currentVer = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
+        ? window.NativeAppUpdater.getAppVersionName()
+        : (window.VIDYAOS_APP_VERSION || '1.0.98');
       let remoteVer = null;
       let downloadUrl = 'https://github.com/onebotyt/VidyaOS/releases';
       let notes = 'Latest performance optimizations and classroom features.';
@@ -183,8 +185,17 @@
               <span>New Update Available: v${escapeHtml(remoteVer)}</span>
             </div>
             <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">${escapeHtml(notes)}</div>
-            <div style="margin-top:6px; display:flex; gap:8px;">
-              <button type="button" class="btn btn-sm btn-primary" onclick="installUpdate('${escapeHtml(downloadUrl)}')" style="font-weight:700; border-radius:8px;">
+            <div id="update-download-progress-wrap" style="display:none; margin-top:8px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-bottom:3px;">
+                <span id="update-progress-label">Downloading update...</span>
+                <span id="update-progress-pct">0%</span>
+              </div>
+              <div style="height:6px; background:var(--border-color); border-radius:99px; overflow:hidden;">
+                <div id="update-progress-fill" style="height:100%; width:0%; background:var(--color-primary); border-radius:99px; transition:width 0.2s ease;"></div>
+              </div>
+            </div>
+            <div style="margin-top:8px; display:flex; gap:8px;">
+              <button type="button" id="btn-start-install" class="btn btn-sm btn-primary" onclick="installUpdate('${escapeHtml(downloadUrl)}')" style="font-weight:700; border-radius:8px;">
                 Download &amp; Install Now
               </button>
             </div>
@@ -201,9 +212,12 @@
         if (btnText) btnText.textContent = 'Up to Date';
       }
     } catch (e) {
+      const curV = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
+        ? window.NativeAppUpdater.getAppVersionName()
+        : (window.VIDYAOS_APP_VERSION || '1.0.98');
       inner.innerHTML = `
         <div style="color:var(--text-muted); font-size:0.82rem;">
-          Could not reach update server. You are running version ${escapeHtml(window.VIDYAOS_APP_VERSION || '1.0.95')}.
+          Could not reach update server. You are running version v${escapeHtml(curV)}.
         </div>
       `;
       if (btnText) btnText.textContent = 'Check Updates';
@@ -213,7 +227,44 @@
   };
 
   window.installUpdate = function (apkUrl) {
+    const installBtn = document.getElementById('btn-start-install');
+    const progWrap = document.getElementById('update-download-progress-wrap');
+    const progFill = document.getElementById('update-progress-fill');
+    const progPct = document.getElementById('update-progress-pct');
+    const progLabel = document.getElementById('update-progress-label');
+
     if (window.NativeAppUpdater && typeof window.NativeAppUpdater.downloadAndInstall === 'function') {
+      if (installBtn) {
+        installBtn.disabled = true;
+        installBtn.textContent = 'Downloading in background...';
+      }
+      if (progWrap) progWrap.style.display = 'block';
+
+      window.onNativeUpdateProgress = function (percent, downloaded, total) {
+        if (progWrap) progWrap.style.display = 'block';
+        if (progFill) progFill.style.width = percent + '%';
+        if (progPct) progPct.textContent = percent + '%';
+        if (installBtn) installBtn.textContent = `Downloading ${percent}%...`;
+      };
+
+      window.onNativeUpdateComplete = function () {
+        if (progLabel) progLabel.textContent = 'Download finished!';
+        if (progPct) progPct.textContent = '100%';
+        if (progFill) progFill.style.width = '100%';
+        if (installBtn) installBtn.textContent = 'Launching package installer...';
+      };
+
+      window.onNativeUpdateError = function (errMsg) {
+        if (progWrap) progWrap.style.display = 'none';
+        if (installBtn) {
+          installBtn.disabled = false;
+          installBtn.textContent = 'Retry Update';
+        }
+        if (typeof showToast === 'function') {
+          showToast('In-app update: ' + errMsg + '. Opening download page...', 'error');
+        }
+      };
+
       try {
         window.NativeAppUpdater.downloadAndInstall(apkUrl);
         return;

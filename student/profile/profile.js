@@ -623,8 +623,15 @@ window.exportStudentDossier = exportStudentDossier;
 // SEGMENTED TAB SWITCHER FOR MOBILE & DESKTOP
 // ══════════════════════════════════════════════════════════════
 function switchProfileTab(tabKey) {
-  const validTabs = ['academic', 'kyc', 'documents', 'security'];
+  const validTabs = ['academic', 'kyc', 'documents', 'security', 'all'];
   const target = validTabs.includes(tabKey) ? tabKey : 'academic';
+  const workspace = document.getElementById('profile-workspace');
+
+  if (target === 'all') {
+    if (workspace) workspace.classList.add('show-all');
+  } else {
+    if (workspace) workspace.classList.remove('show-all');
+  }
 
   // Toggle Tab Buttons
   validTabs.forEach(t => {
@@ -641,10 +648,10 @@ function switchProfileTab(tabKey) {
   });
 
   // Toggle Tab Panels
-  validTabs.forEach(t => {
+  ['academic', 'kyc', 'documents', 'security'].forEach(t => {
     const p = document.getElementById(`tab-panel-${t}`);
     if (p) {
-      if (t === target) {
+      if (target === 'all' || t === target) {
         p.classList.add('active');
       } else {
         p.classList.remove('active');

@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/student/components/student-base.css">
   <link rel="stylesheet" href="/student/components/header/header.css">
   <link rel="stylesheet" href="/student/components/sidebar/sidebar.css">
-  <link rel="stylesheet" href="/student/profile/profile.css?v=20261121">
+  <link rel="stylesheet" href="/student/profile/profile.css?v=20261121b">
 </head>
 <body class="page-layout">
   <!-- Semantic Mount Anchors for Isolated Student Components -->
@@ -23,18 +23,40 @@
   <div id="user-nav" style="display:none;" aria-hidden="true"></div>
 
   <main class="container profile-main-container">
-    <!-- TOP NAVIGATION BAR (Settings link & Quick Return) -->
+    <!-- TOP NAVIGATION & BREADCRUMBS BAR -->
     <div class="profile-top-bar">
-      <a href="/student/settings/index.html" class="profile-back-link">
+      <div class="profile-breadcrumbs">
+        <a href="/student/dashboard/index.html" class="profile-crumb-link">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>Classes Hub</span>
+        </a>
+        <span class="crumb-sep">/</span>
+        <a href="/student/settings/index.html" class="profile-crumb-link">Student Hub</a>
+        <span class="crumb-sep">/</span>
+        <span class="profile-crumb-current">Profile &amp; Academic Credentials</span>
+      </div>
+
+      <!-- Quick Return link on mobile -->
+      <a href="/student/settings/index.html" class="profile-back-link mobile-only-link">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
-        <span>Settings &amp; App Hub</span>
+        <span>Settings Hub</span>
       </a>
+
       <div class="profile-top-actions">
-        <a href="/student/settings/index.html" class="btn-top-settings" title="Open Settings">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button type="button" class="btn-top-dossier" onclick="exportStudentDossier('PDF')" title="Download or print official academic dossier PDF">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9V2h12v7"></path>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          <span class="hide-mobile">Official Dossier</span>
+          <span>PDF</span>
+        </button>
+        <a href="/student/settings/index.html" class="btn-top-settings" title="Open Settings &amp; Preferences">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
@@ -43,278 +65,93 @@
       </div>
     </div>
 
-    <!-- OFFICIAL DIGITAL STUDENT ID HERO -->
-    <div class="student-id-hero">
-      <div class="student-id-content">
-        <div class="student-avatar-wrap">
-          <div class="student-avatar" id="hero-avatar">ST</div>
-          <div class="student-beacon" title="Active Student Account"></div>
-        </div>
-
-        <div class="student-meta" style="flex: 1;">
-          <h1 id="hero-name">Student Full Name</h1>
-          <div class="student-subtitle">
-            <span id="hero-dept">Department of Information Technology</span>
-            <span class="bullet-sep">•</span>
-            <span id="hero-enrollment" class="mono-enrollment">2024IT001</span>
-          </div>
-
-          <div class="student-badges">
-            <span class="std-badge enrolled" id="hero-batch-badge">Batch: --</span>
-            <span class="std-badge enrolled" id="hero-roll-badge">Roll: --</span>
-            <span class="std-badge enrolled" id="hero-reg-badge">UBTER Reg: --</span>
-            <span class="std-badge regular" id="hero-standing-badge">Status: Enrolled</span>
-            <span class="std-badge enrolled" id="hero-term-badge">Year -- • Sem --</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MOBILE-OPTIMIZED SEGMENTED TAB BAR -->
-    <div class="profile-tabs-scroller">
-      <div class="profile-tabs-nav" id="profile-tabs-nav" role="tablist">
-        <button type="button" class="profile-tab-btn active" id="tab-btn-academic" data-tab="academic" role="tab" aria-selected="true" onclick="switchProfileTab('academic')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-          <span>Academic &amp; Attendance</span>
-        </button>
-        <button type="button" class="profile-tab-btn" id="tab-btn-kyc" data-tab="kyc" role="tab" aria-selected="false" onclick="switchProfileTab('kyc')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          <span>KYC &amp; Demographics</span>
-        </button>
-        <button type="button" class="profile-tab-btn" id="tab-btn-documents" data-tab="documents" role="tab" aria-selected="false" onclick="switchProfileTab('documents')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-          <span>Documents &amp; Dossier</span>
-        </button>
-        <button type="button" class="profile-tab-btn" id="tab-btn-security" data-tab="security" role="tab" aria-selected="false" onclick="switchProfileTab('security')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-          <span>Account Security</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- TAB PANEL 1: ACADEMIC & ATTENDANCE -->
-    <div class="profile-tab-panel active" id="tab-panel-academic">
-      <!-- REAL-TIME 75% ATTENDANCE HEALTH CARD -->
-      <div class="attendance-health-card">
-        <div class="health-header-row">
-          <div>
-            <h2 class="health-title">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"></line>
-                <line x1="12" y1="20" x2="12" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="14"></line>
-              </svg>
-              <span>Cumulative Attendance Health &amp; Exam Eligibility</span>
-            </h2>
-            <p class="health-desc">
-              Statutory minimum requirement: <strong>75.0%</strong> across registered subjects.
-            </p>
-          </div>
-
-          <div class="health-stats-col">
-            <div id="health-pct" class="health-pct-value">--%</div>
-            <div id="health-status-tag" class="health-tag-value">Checking records...</div>
-          </div>
-        </div>
-
-        <div class="progress-bar-wrap">
-          <div class="progress-bar-fill" id="health-progress-bar" style="width: 0%;"></div>
-        </div>
-
-        <div class="health-footer-row">
-          <div>
-            Classes Attended: <strong id="health-attended" style="color: var(--text-main);">--</strong> / <span id="health-total">--</span> total conducted
-          </div>
-          <div>
-            Exam Standing: <strong id="health-exam-standing" style="color: var(--status-present);">Calculating...</strong>
-          </div>
-        </div>
-      </div>
-
-      <!-- Official Academic Cohort Details -->
-      <div class="card cohort-card">
-        <h2 class="card-section-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
-          <span>Academic Cohort Details</span>
-        </h2>
-
-        <div class="cohort-grid">
-          <div class="cohort-item">
-            <div class="cohort-label">UBTER Roll Number</div>
-            <div id="profile-enrollment-no" class="cohort-val mono-val">--</div>
-          </div>
-
-          <div class="cohort-item">
-            <div class="cohort-label">Class Roll Number</div>
-            <div id="profile-roll-no" class="cohort-val">--</div>
-          </div>
-
-          <div class="cohort-item">
-            <div class="cohort-label">UBTER Registration No.</div>
-            <div id="profile-reg-no" class="cohort-val mono-val highlight">--</div>
-          </div>
-
-          <div class="cohort-item">
-            <div class="cohort-label">Department / Program</div>
-            <div id="profile-department" class="cohort-val">--</div>
-          </div>
-
-          <div class="cohort-item">
-            <div class="cohort-label">Year / Semester</div>
-            <div id="profile-year-sem" class="cohort-val">--</div>
-          </div>
-
-          <div class="cohort-item">
-            <div class="cohort-label">Academic Batch</div>
-            <div id="profile-batch-label" class="cohort-val mono-val highlight">--</div>
-          </div>
-
-          <div class="cohort-item">
-            <div class="cohort-label">Academic Session</div>
-            <div id="profile-academic-year" class="cohort-val">--</div>
-          </div>
-
-          <div class="cohort-item">
-            <div class="cohort-label">Department Faculty</div>
-            <div id="profile-class-teacher" class="cohort-val highlight">--</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Biometric Terminal Hardware Status -->
-      <div class="card biometric-card">
-        <h2 class="card-section-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>
-          <span>Hardware Biometrics &amp; Terminal</span>
-        </h2>
-
-        <div id="biometric-status-box" class="biometric-box">
-          <div id="biometric-icon" class="biometric-icon-wrap">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>
-          </div>
-          <div style="flex: 1;">
-            <div id="biometric-headline" style="font-weight: 800; font-size: 0.95rem;">Checking Terminal Status...</div>
-            <p id="biometric-sub" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; margin-bottom: 0;">
-              Optical fingerprint sensor registration status
-            </p>
-          </div>
-        </div>
-
-        <div id="biometric-detail-panel" style="display: none; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color); font-size: 0.825rem; color: var(--text-muted);">
-          <div>Assigned Hardware Slot: <strong id="biometric-slot-val" style="color: var(--text-main); font-family: var(--font-family-mono);">--</strong></div>
-          <div style="margin-top: 0.25rem;">Terminal Unit: <span id="biometric-device-val" style="color: var(--text-main); font-weight: 600;">--</span></div>
-          <div style="margin-top: 0.25rem;">Hardware State: <span style="color: var(--status-present); font-weight: 700;">Synchronized &amp; Online</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB PANEL 2: KYC & DEMOGRAPHICS -->
-    <div class="profile-tab-panel" id="tab-panel-kyc">
-      <div class="card" id="demographics-card">
-        <div class="card-header-between">
-          <h2 class="card-section-title" style="margin-bottom:0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>Personal &amp; Demographic Dossier</span>
-          </h2>
-          <span id="profile-completion-badge" class="std-badge defaulter">Status: Incomplete</span>
-        </div>
-
-        <div id="demographic-callout" class="compliance-callout">
-          <strong>Institutional Record Compliance:</strong> Please complete your address, Aadhar number, parents' names, date of birth, gender, and social category. These details are required for institutional scholarships, DBT, university records, and examination eligibility.
-        </div>
-
-        <form id="demographics-form">
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label class="form-label" for="profile-father-name">Father's Full Name <span class="req-star">*</span></label>
-              <input type="text" id="profile-father-name" class="form-control" placeholder="e.g. Rajesh Sharma" required>
+    <!-- MAIN TWO-COLUMN DESKTOP / RESPONSIVE MOBILE GRID -->
+    <div class="profile-layout-grid">
+      <!-- LEFT COLUMN: DIGITAL STUDENT ID & CUMULATIVE HEALTH METRICS -->
+      <aside class="profile-sidebar-col">
+        <!-- OFFICIAL DIGITAL STUDENT ID HERO -->
+        <div class="student-id-hero">
+          <div class="student-id-content">
+            <div class="student-avatar-wrap">
+              <div class="student-avatar" id="hero-avatar">ST</div>
+              <div class="student-beacon" title="Active Student Account"></div>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="profile-mother-name">Mother's Full Name <span class="req-star">*</span></label>
-              <input type="text" id="profile-mother-name" class="form-control" placeholder="e.g. Sunita Sharma" required>
+
+            <div class="student-meta">
+              <h1 id="hero-name">Student Full Name</h1>
+              <div class="student-subtitle">
+                <span id="hero-dept">Department of Information Technology</span>
+                <span class="bullet-sep">•</span>
+                <span id="hero-enrollment" class="mono-enrollment">2024IT001</span>
+              </div>
+
+              <div class="student-badges">
+                <span class="std-badge enrolled" id="hero-batch-badge">Batch: --</span>
+                <span class="std-badge enrolled" id="hero-roll-badge">Roll: --</span>
+                <span class="std-badge enrolled" id="hero-reg-badge">UBTER Reg: --</span>
+                <span class="std-badge regular" id="hero-standing-badge">Status: Enrolled</span>
+                <span class="std-badge enrolled" id="hero-term-badge">Year -- • Sem --</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REAL-TIME 75% ATTENDANCE HEALTH CARD -->
+        <div class="attendance-health-card">
+          <div class="health-header-row">
+            <div>
+              <h2 class="health-title">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                <span>Attendance Health &amp; Exam Eligibility</span>
+              </h2>
+              <p class="health-desc">
+                Statutory minimum requirement: <strong>75.0%</strong> across subjects.
+              </p>
+            </div>
+
+            <div class="health-stats-col">
+              <div id="health-pct" class="health-pct-value">--%</div>
+              <div id="health-status-tag" class="health-tag-value">Checking records...</div>
             </div>
           </div>
 
-          <div class="form-grid-3">
-            <div class="form-group">
-              <label class="form-label" for="profile-dob">Date of Birth <span class="req-star">*</span></label>
-              <input type="date" id="profile-dob" class="form-control" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="profile-gender">Gender <span class="req-star">*</span></label>
-              <select id="profile-gender" class="form-control" required>
-                <option value="">— Select Gender —</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="profile-category">Social Category <span class="req-star">*</span></label>
-              <select id="profile-category" class="form-control" required>
-                <option value="">— Select Category —</option>
-                <option value="General">General</option>
-                <option value="OBC">OBC</option>
-                <option value="SC">SC</option>
-                <option value="ST">ST</option>
-                <option value="EWS">EWS</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="health-progress-bar" style="width: 0%;"></div>
           </div>
 
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label class="form-label" for="profile-aadhar">Aadhar Number (12 Digits) <span class="req-star">*</span></label>
-              <input type="text" id="profile-aadhar" class="form-control" placeholder="e.g. 1234 5678 9012" maxlength="14" required>
-              <div class="field-hint">Used solely for statutory verification &amp; university roll ledger.</div>
+          <div class="health-footer-row">
+            <div>
+              Classes Attended: <strong id="health-attended" style="color: var(--text-main);">--</strong> / <span id="health-total">--</span> conducted
             </div>
-            <div class="form-group">
-              <label class="form-label" for="profile-phone">Student Mobile Number</label>
-              <input type="tel" id="profile-phone" class="form-control" placeholder="10-digit mobile" maxlength="10">
+            <div>
+              Standing: <strong id="health-exam-standing" style="color: var(--status-present);">Calculating...</strong>
             </div>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label class="form-label" for="profile-address">Residential / Permanent Address <span class="req-star">*</span></label>
-            <textarea id="profile-address" class="form-control" rows="3" placeholder="Full residential street address, district, state &amp; PIN code" required></textarea>
-          </div>
-
-          <div id="demographics-feedback" style="display: none; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
-
-          <div class="form-actions-right">
-            <button type="submit" id="save-demographics-btn" class="btn btn-primary btn-save-action">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span>Save Demographic Details</span>
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- TAB PANEL 3: DOCUMENTS & DOSSIER -->
-    <div class="profile-tab-panel" id="tab-panel-documents">
-      <!-- OFFICIAL ACADEMIC DOSSIER EXPORT TOOLBAR -->
-      <div class="card dossier-toolbar-card">
-        <div class="dossier-header-wrap">
-          <div>
-            <h3 class="dossier-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- DESKTOP-ONLY QUICK DOSSIER EXPORT BOX -->
+        <div class="card desktop-dossier-card">
+          <div class="desktop-dossier-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
               </svg>
-              <span>My Academic Dossier &amp; Records</span>
-            </h3>
-            <p class="dossier-desc">
-              Download your official institutional transcript, attendance summary, and assessment marks.
-            </p>
+              <strong style="font-size:0.92rem; color:var(--text-main);">Official Academic Dossier</strong>
+            </div>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Verified Records</span>
           </div>
-          <div class="dossier-buttons-row">
+          <p style="font-size:0.8rem; color:var(--text-muted); margin:0.4rem 0 0.85rem 0; line-height:1.4;">
+            Download your certified institutional transcript, attendance summary, and term scoresheet.
+          </p>
+          <div class="desktop-dossier-btns">
             <button type="button" class="btn btn-secondary btn-sm" onclick="exportStudentDossier('PDF')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-              <span>Print / PDF</span>
+              <span>PDF</span>
             </button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="exportStudentDossier('EXCEL')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
@@ -326,83 +163,312 @@
             </button>
           </div>
         </div>
-      </div>
+      </aside>
 
-      <!-- VERIFIED INSTITUTIONAL DOCUMENTS & CERTIFICATES -->
-      <div class="card" id="student-docs-card">
-        <div class="card-header-between">
-          <h2 class="card-section-title" style="margin-bottom:0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span>Verified Student Certificates &amp; Documents</span>
-          </h2>
-          <span id="docs-count-badge" class="badge">0 Documents</span>
-        </div>
-
-        <div id="student-docs-container" class="docs-list-box">
-          <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.88rem;">
-            Loading verified documents...
+      <!-- RIGHT COLUMN: DESKTOP WORKSPACE & TABS -->
+      <section class="profile-workspace-col" id="profile-workspace">
+        <!-- SEGMENTED TAB BAR (Responsive on Desktop and Mobile) -->
+        <div class="profile-tabs-scroller">
+          <div class="profile-tabs-nav" id="profile-tabs-nav" role="tablist">
+            <button type="button" class="profile-tab-btn active" id="tab-btn-academic" data-tab="academic" role="tab" aria-selected="true" onclick="switchProfileTab('academic')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+              <span>Academic Cohort</span>
+            </button>
+            <button type="button" class="profile-tab-btn" id="tab-btn-kyc" data-tab="kyc" role="tab" aria-selected="false" onclick="switchProfileTab('kyc')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span>KYC &amp; Demographics</span>
+            </button>
+            <button type="button" class="profile-tab-btn" id="tab-btn-documents" data-tab="documents" role="tab" aria-selected="false" onclick="switchProfileTab('documents')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <span>Verified Documents</span>
+            </button>
+            <button type="button" class="profile-tab-btn" id="tab-btn-security" data-tab="security" role="tab" aria-selected="false" onclick="switchProfileTab('security')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Account Security</span>
+            </button>
+            <button type="button" class="profile-tab-btn desktop-only-tab" id="tab-btn-all" data-tab="all" role="tab" aria-selected="false" onclick="switchProfileTab('all')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>All Details</span>
+            </button>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- TAB PANEL 4: SECURITY & ACCOUNT -->
-    <div class="profile-tab-panel" id="tab-panel-security">
-      <div class="card security-card">
-        <h2 class="card-section-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-          <span>Account Credentials &amp; Password</span>
-        </h2>
+        <!-- TAB PANEL 1: ACADEMIC COHORT & HARDWARE BIOMETRICS -->
+        <div class="profile-tab-panel active" id="tab-panel-academic">
+          <!-- Official Academic Cohort Details -->
+          <div class="card cohort-card">
+            <h2 class="card-section-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M15 10v11M12 2L2 7h20L12 2z"></path></svg>
+              <span>Academic Cohort Details</span>
+            </h2>
 
-        <form id="profile-form">
-          <div class="form-group">
-            <label class="form-label">UBTER Roll No. / Login ID</label>
-            <input type="text" id="profile-username" class="form-control" disabled style="background: var(--bg-surface-secondary); color: var(--text-muted); font-family: var(--font-family-mono); font-weight: 700;">
-          </div>
+            <div class="cohort-grid">
+              <div class="cohort-item">
+                <div class="cohort-label">UBTER Roll Number</div>
+                <div id="profile-enrollment-no" class="cohort-val mono-val">--</div>
+              </div>
 
-          <div class="form-group">
-            <label class="form-label" for="profile-email">Contact Gmail Address</label>
-            <input type="email" id="profile-email" class="form-control" placeholder="student@gmail.com" required>
-            <div class="field-hint">Used for institutional attendance notifications and session alerts.</div>
-          </div>
+              <div class="cohort-item">
+                <div class="cohort-label">Class Roll Number</div>
+                <div id="profile-roll-no" class="cohort-val">--</div>
+              </div>
 
-          <div class="security-divider"></div>
+              <div class="cohort-item">
+                <div class="cohort-label">UBTER Registration No.</div>
+                <div id="profile-reg-no" class="cohort-val mono-val highlight">--</div>
+              </div>
 
-          <h3 class="security-subtitle">Change Account Password</h3>
+              <div class="cohort-item">
+                <div class="cohort-label">Department / Program</div>
+                <div id="profile-department" class="cohort-val">--</div>
+              </div>
 
-          <div class="form-group">
-            <label class="form-label" for="current-password">Current Password</label>
-            <div class="password-wrap">
-              <input type="password" id="current-password" class="form-control" placeholder="Required only if changing password">
-              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('current-password', this)" aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+              <div class="cohort-item">
+                <div class="cohort-label">Year / Semester</div>
+                <div id="profile-year-sem" class="cohort-val">--</div>
+              </div>
+
+              <div class="cohort-item">
+                <div class="cohort-label">Academic Batch</div>
+                <div id="profile-batch-label" class="cohort-val mono-val highlight">--</div>
+              </div>
+
+              <div class="cohort-item">
+                <div class="cohort-label">Academic Session</div>
+                <div id="profile-academic-year" class="cohort-val">--</div>
+              </div>
+
+              <div class="cohort-item">
+                <div class="cohort-label">Department Faculty</div>
+                <div id="profile-class-teacher" class="cohort-val highlight">--</div>
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="new-password">New Password (min 8 chars)</label>
-            <div class="password-wrap">
-              <input type="password" id="new-password" class="form-control" placeholder="Minimum 8 characters">
-              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('new-password', this)" aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+          <!-- Biometric Terminal Hardware Status -->
+          <div class="card biometric-card" style="margin-top: 1.25rem;">
+            <h2 class="card-section-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>
+              <span>Hardware Biometrics &amp; Terminal</span>
+            </h2>
+
+            <div id="biometric-status-box" class="biometric-box">
+              <div id="biometric-icon" class="biometric-icon-wrap">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>
+              </div>
+              <div style="flex: 1;">
+                <div id="biometric-headline" style="font-weight: 800; font-size: 0.95rem;">Checking Terminal Status...</div>
+                <p id="biometric-sub" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; margin-bottom: 0;">
+                  Optical fingerprint sensor registration status
+                </p>
+              </div>
+            </div>
+
+            <div id="biometric-detail-panel" style="display: none; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color); font-size: 0.825rem; color: var(--text-muted);">
+              <div>Assigned Hardware Slot: <strong id="biometric-slot-val" style="color: var(--text-main); font-family: var(--font-family-mono);">--</strong></div>
+              <div style="margin-top: 0.25rem;">Terminal Unit: <span id="biometric-device-val" style="color: var(--text-main); font-weight: 600;">--</span></div>
+              <div style="margin-top: 0.25rem;">Hardware State: <span style="color: var(--status-present); font-weight: 700;">Synchronized &amp; Online</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB PANEL 2: KYC & DEMOGRAPHICS -->
+        <div class="profile-tab-panel" id="tab-panel-kyc">
+          <div class="card" id="demographics-card">
+            <div class="card-header-between">
+              <h2 class="card-section-title" style="margin-bottom:0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Personal &amp; Demographic Dossier</span>
+              </h2>
+              <span id="profile-completion-badge" class="std-badge defaulter">Status: Incomplete</span>
+            </div>
+
+            <div id="demographic-callout" class="compliance-callout">
+              <strong>Institutional Record Compliance:</strong> Please complete your address, Aadhar number, parents' names, date of birth, gender, and social category. These details are required for institutional scholarships, DBT, university records, and examination eligibility.
+            </div>
+
+            <form id="demographics-form">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="profile-father-name">Father's Full Name <span class="req-star">*</span></label>
+                  <input type="text" id="profile-father-name" class="form-control" placeholder="e.g. Rajesh Sharma" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profile-mother-name">Mother's Full Name <span class="req-star">*</span></label>
+                  <input type="text" id="profile-mother-name" class="form-control" placeholder="e.g. Sunita Sharma" required>
+                </div>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label class="form-label" for="profile-dob">Date of Birth <span class="req-star">*</span></label>
+                  <input type="date" id="profile-dob" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profile-gender">Gender <span class="req-star">*</span></label>
+                  <select id="profile-gender" class="form-control" required>
+                    <option value="">— Select Gender —</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profile-category">Social Category <span class="req-star">*</span></label>
+                  <select id="profile-category" class="form-control" required>
+                    <option value="">— Select Category —</option>
+                    <option value="General">General</option>
+                    <option value="OBC">OBC</option>
+                    <option value="SC">SC</option>
+                    <option value="ST">ST</option>
+                    <option value="EWS">EWS</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="profile-aadhar">Aadhar Number (12 Digits) <span class="req-star">*</span></label>
+                  <input type="text" id="profile-aadhar" class="form-control" placeholder="e.g. 1234 5678 9012" maxlength="14" required>
+                  <div class="field-hint">Used solely for statutory verification &amp; university roll ledger.</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profile-phone">Student Mobile Number</label>
+                  <input type="tel" id="profile-phone" class="form-control" placeholder="10-digit mobile" maxlength="10">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profile-address">Residential / Permanent Address <span class="req-star">*</span></label>
+                <textarea id="profile-address" class="form-control" rows="3" placeholder="Full residential street address, district, state &amp; PIN code" required></textarea>
+              </div>
+
+              <div id="demographics-feedback" style="display: none; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+              <div class="form-actions-right">
+                <button type="submit" id="save-demographics-btn" class="btn btn-primary btn-save-action">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Save Demographic Details</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB PANEL 3: DOCUMENTS & DOSSIER -->
+        <div class="profile-tab-panel" id="tab-panel-documents">
+          <!-- MOBILE DOSSIER EXPORT CARD -->
+          <div class="card dossier-toolbar-card mobile-only-dossier">
+            <div class="dossier-header-wrap">
+              <div>
+                <h3 class="dossier-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                  <span>My Academic Dossier &amp; Records</span>
+                </h3>
+                <p class="dossier-desc">
+                  Download official transcript, attendance summary, and marks.
+                </p>
+              </div>
+              <div class="dossier-buttons-row">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="exportStudentDossier('PDF')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  <span>PDF</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="exportStudentDossier('EXCEL')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                  <span>Excel</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="exportStudentDossier('DOC')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                  <span>Word</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="confirm-password">Confirm New Password</label>
-            <div class="password-wrap">
-              <input type="password" id="confirm-password" class="form-control" placeholder="Re-enter new password">
-              <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('confirm-password', this)" aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+          <!-- VERIFIED INSTITUTIONAL DOCUMENTS & CERTIFICATES -->
+          <div class="card" id="student-docs-card">
+            <div class="card-header-between">
+              <h2 class="card-section-title" style="margin-bottom:0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Verified Student Certificates &amp; Documents</span>
+              </h2>
+              <span id="docs-count-badge" class="badge">0 Documents</span>
+            </div>
+
+            <div id="student-docs-container" class="docs-list-box">
+              <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.88rem;">
+                Loading verified documents...
+              </div>
             </div>
           </div>
+        </div>
 
-          <div id="profile-feedback" style="display: none; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+        <!-- TAB PANEL 4: SECURITY & ACCOUNT -->
+        <div class="profile-tab-panel" id="tab-panel-security">
+          <div class="card security-card">
+            <h2 class="card-section-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Account Credentials &amp; Password</span>
+            </h2>
 
-          <button type="submit" id="save-profile-btn" class="btn btn-primary btn-save-action">
-            Save Profile &amp; Password
-          </button>
-        </form>
-      </div>
+            <form id="profile-form">
+              <div class="form-group">
+                <label class="form-label">UBTER Roll No. / Login ID</label>
+                <input type="text" id="profile-username" class="form-control" disabled style="background: var(--bg-surface-secondary); color: var(--text-muted); font-family: var(--font-family-mono); font-weight: 700;">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profile-email">Contact Gmail Address</label>
+                <input type="email" id="profile-email" class="form-control" placeholder="student@gmail.com" required>
+                <div class="field-hint">Used for institutional attendance notifications and session alerts.</div>
+              </div>
+
+              <div class="security-divider"></div>
+
+              <h3 class="security-subtitle">Change Account Password</h3>
+
+              <div class="form-group">
+                <label class="form-label" for="current-password">Current Password</label>
+                <div class="password-wrap">
+                  <input type="password" id="current-password" class="form-control" placeholder="Required only if changing password">
+                  <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('current-password', this)" aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="new-password">New Password (min 8 chars)</label>
+                <div class="password-wrap">
+                  <input type="password" id="new-password" class="form-control" placeholder="Minimum 8 characters">
+                  <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('new-password', this)" aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="confirm-password">Confirm New Password</label>
+                <div class="password-wrap">
+                  <input type="password" id="confirm-password" class="form-control" placeholder="Re-enter new password">
+                  <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('confirm-password', this)" aria-label="Toggle password view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+                </div>
+              </div>
+
+              <div id="profile-feedback" style="display: none; padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+              <button type="submit" id="save-profile-btn" class="btn btn-primary btn-save-action">
+                Save Profile &amp; Password
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -419,6 +485,6 @@
   <script src="/mobile-bridge.js"></script>
   
   <!-- Scoped Page Script -->
-  <script src="/student/profile/profile.js?v=20261121"></script>
+  <script src="/student/profile/profile.js?v=20261121b"></script>
 </body>
 </html>

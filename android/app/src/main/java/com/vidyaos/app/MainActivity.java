@@ -27,6 +27,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import android.widget.Toast;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.pm.PackageInfo;
 import org.json.JSONObject;
 
 public class MainActivity extends BridgeActivity {
@@ -257,11 +268,33 @@ public class MainActivity extends BridgeActivity {
     // ─────────────────────────────────────────────────────────────
     // NATIVE IN-APP APK UPDATER & PACKAGE INSTALLER
     // ─────────────────────────────────────────────────────────────
+    private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
+
     public class NativeAppUpdater {
         @JavascriptInterface
         public void downloadAndInstall(String apkUrl) {
             if (apkUrl == null || apkUrl.trim().isEmpty()) return;
-            runOnUiThread(() -> startApkDownload(apkUrl.trim()));
+            startDirectApkDownload(apkUrl.trim());
+        }
+
+        @JavascriptInterface
+        public String getAppVersionName() {
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return pInfo.versionName;
+            } catch (Exception e) {
+                return "1.0.98";
+            }
+        }
+
+        @JavascriptInterface
+        public int getAppVersionCode() {
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return pInfo.versionCode;
+            } catch (Exception e) {
+                return 98;
+            }
         }
 
         @JavascriptInterface
@@ -270,76 +303,157 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
-    private void startApkDownload(String apkUrl) {
-        try {
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(apkUrl));
-            request.setTitle("VidyaOS App Update");
-            request.setDescription("Downloading latest institutional release...");
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            request.setMimeType("application/vnd.android.package-archive");
+    private void startDirectApkDownload(String initialUrl) {
+        runOnUiThread(() -> Toast.makeText(MainActivity.this, "Downloading VidyaOS update in background...", Toast.LENGTH_SHORT).show());
 
-            File downloadsDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-            if (downloadsDir != null && !downloadsDir.exists()) {
-                downloadsDir.mkdirs();
-            }
-            File destinationFile = new File(downloadsDir, "VidyaOS_update.apk");
-            if (destinationFile.exists()) {
-                destinationFile.delete();
-            }
-            request.setDestinationUri(Uri.fromFile(destinationFile));
+        updateExecutor.execute(() -> {
+            HttpURLConnection conn = null;
+            InputStream in = null;
+            FileOutputStream out = null;
+            File destinationFile = null;
 
-            DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-            if (manager == null) {
-                // Fallback to opening in external browser
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(apkUrl));
-                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(browserIntent);
-                return;
-            }
+            try {
+                String currentUrl = initialUrl;
+                int redirects = 0;
 
-            long downloadId = manager.enqueue(request);
+                while (redirects < 8) {
+                    URL url = new URL(currentUrl);
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setInstanceFollowRedirects(true);
+                    conn.setConnectTimeout(30000);
+                    conn.setReadTimeout(30000);
+                    conn.setRequestProperty("User-Agent", "VidyaOS-AppUpdater/1.0");
+                    conn.connect();
 
-            // Register completion broadcast receiver
-            if (downloadReceiver != null) {
-                try { unregisterReceiver(downloadReceiver); } catch (Exception ignored) {}
-            }
+                    int code = conn.getResponseCode();
+                    if (code == HttpURLConnection.HTTP_MOVED_PERM || code == HttpURLConnection.HTTP_MOVED_TEMP ||
+                        code == HttpURLConnection.HTTP_SEE_OTHER || code == 307 || code == 308) {
+                        String location = conn.getHeaderField("Location");
+                        if (location != null && !location.isEmpty()) {
+                            currentUrl = location;
+                            conn.disconnect();
+                            redirects++;
+                            continue;
+                        }
+                    }
+                    break;
+                }
 
-            downloadReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                    if (id == downloadId) {
-                        installApk(destinationFile);
-                        try {
-                            unregisterReceiver(this);
-                            downloadReceiver = null;
-                        } catch (Exception ignored) {}
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    throw new Exception("Update server HTTP " + conn.getResponseCode());
+                }
+
+                long fileLength = conn.getContentLengthLong();
+
+                File targetDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                if (targetDir == null) {
+                    targetDir = getCacheDir();
+                }
+                if (!targetDir.exists()) {
+                    targetDir.mkdirs();
+                }
+
+                destinationFile = new File(targetDir, "VidyaOS_update.apk");
+                if (destinationFile.exists()) {
+                    destinationFile.delete();
+                }
+
+                in = conn.getInputStream();
+                out = new FileOutputStream(destinationFile);
+
+                byte[] buffer = new byte[8192];
+                long total = 0;
+                int count;
+                long lastProgressTime = 0;
+
+                while ((count = in.read(buffer)) != -1) {
+                    total += count;
+                    out.write(buffer, 0, count);
+
+                    long now = System.currentTimeMillis();
+                    if (fileLength > 0 && (now - lastProgressTime > 250 || total == fileLength)) {
+                        lastProgressTime = now;
+                        int pct = (int) ((total * 100) / fileLength);
+                        notifyUpdateProgress(pct, total, fileLength);
                     }
                 }
-            };
+                out.flush();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED);
-            } else {
-                registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                if (destinationFile.length() < 1024 * 1024) {
+                    throw new Exception("Downloaded file is incomplete (" + destinationFile.length() + " bytes)");
+                }
+
+                final File finalFile = destinationFile;
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "Update downloaded! Opening installer...", Toast.LENGTH_SHORT).show();
+                    notifyUpdateComplete();
+                    installApk(finalFile);
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                final String errMsg = e.getMessage() != null ? e.getMessage() : "Download error";
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "In-app download error: " + errMsg + ". Opening browser...", Toast.LENGTH_LONG).show();
+                    notifyUpdateError(errMsg);
+                    try {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(initialUrl));
+                        browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(browserIntent);
+                    } catch (Exception ignored) {}
+                });
+            } finally {
+                try { if (in != null) in.close(); } catch (Exception ignored) {}
+                try { if (out != null) out.close(); } catch (Exception ignored) {}
+                try { if (conn != null) conn.disconnect(); } catch (Exception ignored) {}
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        });
+    }
+
+    private void notifyUpdateProgress(int percent, long downloaded, long total) {
+        runOnUiThread(() -> {
             try {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(apkUrl));
-                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(browserIntent);
+                if (getBridge() != null && getBridge().getWebView() != null) {
+                    String js = "if (typeof window.onNativeUpdateProgress === 'function') { window.onNativeUpdateProgress(" + percent + ", " + downloaded + ", " + total + "); }";
+                    getBridge().getWebView().evaluateJavascript(js, null);
+                }
             } catch (Exception ignored) {}
-        }
+        });
+    }
+
+    private void notifyUpdateComplete() {
+        runOnUiThread(() -> {
+            try {
+                if (getBridge() != null && getBridge().getWebView() != null) {
+                    String js = "if (typeof window.onNativeUpdateComplete === 'function') { window.onNativeUpdateComplete(); }";
+                    getBridge().getWebView().evaluateJavascript(js, null);
+                }
+            } catch (Exception ignored) {}
+        });
+    }
+
+    private void notifyUpdateError(String error) {
+        runOnUiThread(() -> {
+            try {
+                if (getBridge() != null && getBridge().getWebView() != null) {
+                    String js = "if (typeof window.onNativeUpdateError === 'function') { window.onNativeUpdateError(" + JSONObject.quote(error) + "); }";
+                    getBridge().getWebView().evaluateJavascript(js, null);
+                }
+            } catch (Exception ignored) {}
+        });
     }
 
     private void installApk(File apkFile) {
-        if (apkFile == null || !apkFile.exists()) return;
+        if (apkFile == null || !apkFile.exists() || apkFile.length() < 1024 * 1024) {
+            Toast.makeText(this, "Installer file not found or corrupted.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Check Unknown Apps permission on Android 8.0+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!getPackageManager().canRequestPackageInstalls()) {
                 pendingInstallApkPath = apkFile.getAbsolutePath();
+                Toast.makeText(this, "Please enable 'Allow from this source' to install update", Toast.LENGTH_LONG).show();
                 Intent permissionIntent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
                         .setData(Uri.parse(String.format("package:%s", getPackageName())))
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -359,9 +473,18 @@ public class MainActivity extends BridgeActivity {
             installIntent.setDataAndType(apkUri, "application/vnd.android.package-archive");
             installIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // Grant read URI permissions explicitly to matching package installer
+            List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(installIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                grantUriPermission(packageName, apkUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
             startActivity(installIntent);
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(this, "Failed to launch installer: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -383,6 +506,9 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (updateExecutor != null && !updateExecutor.isShutdown()) {
+            updateExecutor.shutdown();
+        }
         if (downloadReceiver != null) {
             try {
                 unregisterReceiver(downloadReceiver);

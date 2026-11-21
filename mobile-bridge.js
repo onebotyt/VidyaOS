@@ -148,6 +148,8 @@
       // Never show mobile update banner on desktop web browser
       const isRealNativeApp = (
         typeof window !== 'undefined' && (
+          Boolean(window.NativeAppUpdater) ||
+          Boolean(window.NativeAuthBridge) ||
           Boolean(window.Capacitor?.isNativePlatform?.()) ||
           window.location.protocol === 'capacitor:' ||
           window.location.protocol === 'file:' ||
@@ -158,7 +160,9 @@
         return;
       }
 
-      const currentVersion = window.VIDYAOS_APP_VERSION || '1.0.0';
+      const currentVersion = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
+        ? window.NativeAppUpdater.getAppVersionName()
+        : (window.VIDYAOS_APP_VERSION || '1.0.98');
       const res = await fetch(GITHUB_VERSION_URL + '?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) return;
 
@@ -252,10 +256,28 @@
 
     const updateBtn = document.getElementById('btn-update-apk');
     if (updateBtn) {
+      window.onNativeUpdateProgress = function (percent) {
+        if (updateBtn) {
+          updateBtn.textContent = `Downloading ${percent}%...`;
+        }
+      };
+      window.onNativeUpdateComplete = function () {
+        if (updateBtn) {
+          updateBtn.textContent = `Opening installer...`;
+        }
+      };
+      window.onNativeUpdateError = function () {
+        if (updateBtn) {
+          updateBtn.disabled = false;
+          updateBtn.textContent = `Retry Update`;
+          updateBtn.style.opacity = '1';
+        }
+      };
+
       updateBtn.addEventListener('click', (e) => {
         e.preventDefault();
         if (window.NativeAppUpdater && typeof window.NativeAppUpdater.downloadAndInstall === 'function') {
-          updateBtn.textContent = 'Downloading update…';
+          updateBtn.textContent = 'Starting download...';
           updateBtn.disabled = true;
           updateBtn.style.opacity = '0.8';
           try {
