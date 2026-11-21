@@ -119,6 +119,21 @@
         <h2>Welcome <em>back</em></h2>
         <p class="sub">Sign in to access your institutional account</p>
 
+        <!-- Launch VidyaOS v2 Universal Web Frontend -->
+        <a href="/v2" class="v2-launch-banner" style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(99,102,241,0.14)); border: 1.5px solid rgba(79,70,229,0.3); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; text-decoration: none; color: inherit; transition: all 0.2s ease;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">⚡</span>
+            <div>
+              <div style="font-weight: 700; font-size: 13px; color: #1e40af; display: flex; align-items: center; gap: 6px;">
+                <span>Try VidyaOS v2 (Universal)</span>
+                <span style="background: #4f46e5; color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px;">NEW</span>
+              </div>
+              <div style="font-size: 11px; color: #64748b;">Fast, lightweight React web frontend</div>
+            </div>
+          </div>
+          <span style="font-size: 12px; font-weight: 700; color: #4f46e5; background: #e0e7ff; padding: 4px 10px; border-radius: 8px;">Launch →</span>
+        </a>
+
         <!-- Google 1-Click Sign-In -->
         <button type="button" class="google" id="google-signin-btn" onclick="handleGoogleSignIn()">
           <svg viewBox="0 0 48 48">
@@ -203,6 +218,12 @@
 
           <!-- Desktop App Actions: Stable APK, Beta Testing Version & @onebotyt -->
           <div class="desktop-app-actions">
+            <a href="/v2" class="app-action-btn v2-btn" style="background:#4f46e5; color:#fff;" title="Launch VidyaOS v2 Web Frontend">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Launch v2</span>
+            </a>
             <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="app-action-btn apk-btn" download title="Download Verified Stable Android APK (VidyaOS.apk)">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -315,6 +336,21 @@
 
       <!-- Main Form Section -->
       <div class="m-form-container">
+        <!-- Launch VidyaOS v2 Universal Web Frontend (Mobile) -->
+        <a href="/v2" class="m-v2-launch-card" style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(99,102,241,0.14)); border: 1.5px solid rgba(79,70,229,0.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; text-decoration: none; color: inherit;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">⚡</span>
+            <div>
+              <div style="font-weight: 700; font-size: 13px; color: #1d4ed8; display: flex; align-items: center; gap: 6px;">
+                <span>VidyaOS v2 Universal</span>
+                <span style="background: #2563eb; color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">NEW</span>
+              </div>
+              <div style="font-size: 11px; color: #64748b;">Fast Next-Gen React Web Frontend</div>
+            </div>
+          </div>
+          <span style="font-size: 12px; font-weight: 700; color: #2563eb; background: #dbeafe; padding: 4px 10px; border-radius: 8px;">Open →</span>
+        </a>
+
         <form id="mobile-login-form" novalidate autocomplete="on">
           <!-- EMAIL / IDENTIFIER -->
           <div class="m-field-group">
@@ -421,7 +457,13 @@
 
           <!-- Mobile App Actions: Stable APK, Beta Testing Version & @onebotyt -->
           <div class="m-actions-subrow">
-            <a href="https://github.com/onebotyt/VidyaOS/releases/download/v1.0.100/VidyaOS.apk" class="m-subaction-btn download-btn" download title="Download Stable Android APK">
+            <a href="/v2" class="m-subaction-btn v2-web-btn" style="background:#4f46e5; color:#fff;" title="Start VidyaOS v2 Web App">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>v2 Web</span>
+            </a>
+            <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="m-subaction-btn download-btn" download title="Download Stable Android APK">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>

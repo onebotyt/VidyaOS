@@ -11,6 +11,18 @@
       "destination": "https://vidyaos-backend.onrender.com/uploads/:path*"
     },
     {
+      "source": "/v2",
+      "destination": "/v2/index.html"
+    },
+    {
+      "source": "/v2/",
+      "destination": "/v2/index.html"
+    },
+    {
+      "source": "/v2/:path*",
+      "destination": "/v2/:path*"
+    },
+    {
       "source": "/login",
       "destination": "/login/index.html"
     },

@@ -3,8 +3,6 @@
  * Checks GitHub Releases API in real-time for immediate updates.
  */
 
-import versionData from '../version.json';
-
 export interface AppReleaseInfo {
   hasUpdate: boolean;
   currentVersion: string;
@@ -15,8 +13,20 @@ export interface AppReleaseInfo {
   publishedAt: string;
 }
 
-export const CURRENT_APP_VERSION = versionData.version || '1.0.119';
-export const CURRENT_BUILD_NUMBER = versionData.buildNumber || 119;
+// Fallback constants guaranteed to never throw at module load
+let resolvedVersion = '1.0.121';
+let resolvedBuild = 121;
+try {
+  // Safe dynamic require to avoid Babel/Hermes ES module JSON import issues
+  const vData = require('../version.json');
+  if (vData && vData.version) {
+    resolvedVersion = String(vData.version);
+    resolvedBuild = Number(vData.buildNumber) || 121;
+  }
+} catch (_) {}
+
+export const CURRENT_APP_VERSION = resolvedVersion;
+export const CURRENT_BUILD_NUMBER = resolvedBuild;
 export const GITHUB_REPO = 'onebotyt/VidyaOS';
 
 export function compareSemver(remote: string, current: string): boolean {

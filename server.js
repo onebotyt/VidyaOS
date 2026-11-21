@@ -61,6 +61,10 @@ const STATIC_REWRITES = [
   // login/index.css and login/index.js live at login/ root
   // (no rewrite needed — direct paths work)
 
+  // Frontend v2 (Universal React)
+  [/^\/v2\/?$/, '/v2/index.html'],
+  [/^\/v2\/(.+)$/, '/v2/$1'],
+
   // Login
   [/^\/login\/?$/, '/login/index.html'],
   [/^\/login\.html$/, '/login/index.html'],
