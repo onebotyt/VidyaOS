@@ -825,9 +825,57 @@
   };
 
   // ── 12. Initialize ──
+  function checkAndMountFacultyGoogleConnect() {
+    try {
+      const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || user.google_linked) return;
+
+      const mustNotify = localStorage.getItem('vidya_notify_google_connect') === '1';
+      const lastDismissed = parseInt(localStorage.getItem('vidya_dismiss_google_connect_classes') || '0', 10);
+      const now = Date.now();
+      if (!mustNotify && (now - lastDismissed < 24 * 60 * 60 * 1000)) {
+        return;
+      }
+
+      if (document.getElementById('faculty-google-connect-banner-classes')) return;
+
+      const banner = document.createElement('div');
+      banner.id = 'faculty-google-connect-banner-classes';
+      banner.setAttribute('role', 'alert');
+      banner.style.cssText = 'background:linear-gradient(90deg, #1e293b, #0f172a); color:#ffffff; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:0.86rem; border-bottom:1px solid #334155; margin-bottom:1rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.12);';
+      banner.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:260px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:#ffffff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg viewBox="0 0 48 48" width="16" height="16">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+          </div>
+          <div>
+            <strong style="color:#ffffff;">Connect Google for 1-Click Login:</strong>
+            <span style="color:#cbd5e1; margin-left:4px;">Sign in instantly on PC and mobile next time without entering passwords.</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" onclick="window.location.href='/faculty/profile/index.html'" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
+            <span>Connect Google</span>
+            <span>→</span>
+          </button>
+          <button type="button" onclick="document.getElementById('faculty-google-connect-banner-classes').remove(); localStorage.setItem('vidya_dismiss_google_connect_classes', Date.now().toString()); localStorage.removeItem('vidya_notify_google_connect');" style="background:transparent; border:none; color:#94a3b8; font-size:18px; cursor:pointer; padding:2px 8px; line-height:1;" title="Dismiss">&times;</button>
+        </div>
+      `;
+
+      const main = document.querySelector('main') || document.querySelector('.container') || document.body;
+      if (main) main.prepend(banner);
+    } catch (_) {}
+  }
+
   function init() {
     updateLiveDateTime();
     setInterval(updateLiveDateTime, 30000);
+    checkAndMountFacultyGoogleConnect();
     loadClasses();
   }
 

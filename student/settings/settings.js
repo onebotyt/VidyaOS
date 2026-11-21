@@ -78,6 +78,26 @@
       const elYrSem = document.getElementById('settings-year-sem');
       if (elYrSem) elYrSem.textContent = `${yr} • ${sem}`;
 
+      // Google SSO status in settings
+      const isGoogleLinked = Boolean(data?.google_linked || data?.google_sub);
+      const elGoogleBadge = document.getElementById('settings-google-badge');
+      const elGoogleDesc = document.getElementById('settings-google-desc');
+      if (elGoogleBadge && elGoogleDesc) {
+        if (isGoogleLinked) {
+          elGoogleBadge.textContent = 'Connected';
+          elGoogleBadge.style.background = '#ecfdf5';
+          elGoogleBadge.style.color = '#047857';
+          elGoogleBadge.style.border = '1px solid #a7f3d0';
+          elGoogleDesc.textContent = `1-Click active for ${data?.email || 'Google'}`;
+        } else {
+          elGoogleBadge.textContent = 'Not Linked';
+          elGoogleBadge.style.background = '#fef3c7';
+          elGoogleBadge.style.color = '#b45309';
+          elGoogleBadge.style.border = '1px solid #fde68a';
+          elGoogleDesc.textContent = 'Connect Google to enable 1-click login without passwords';
+        }
+      }
+
       const elRoll = document.getElementById('settings-roll-no');
       if (elRoll) elRoll.textContent = `Roll: ${rollNo}`;
 

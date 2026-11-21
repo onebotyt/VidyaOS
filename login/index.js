@@ -304,6 +304,15 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         resetSubmitBtn();
         return;
       }
+      if (res.data?.user) {
+        if (!res.data.user.google_linked) {
+          localStorage.setItem('vidya_notify_google_connect', '1');
+          localStorage.setItem('vidya_google_unlinked', '1');
+        } else {
+          localStorage.removeItem('vidya_notify_google_connect');
+          localStorage.removeItem('vidya_google_unlinked');
+        }
+      }
       setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
       setTimeout(() => redirectAfterLogin(res.data.user), 350);
     }
@@ -520,6 +529,15 @@ window.showMobileSplashView = showMobileSplashView;
             if (text) text.textContent = 'Login Now';
             return;
           }
+          if (res.data?.user) {
+            if (!res.data.user.google_linked) {
+              localStorage.setItem('vidya_notify_google_connect', '1');
+              localStorage.setItem('vidya_google_unlinked', '1');
+            } else {
+              localStorage.removeItem('vidya_notify_google_connect');
+              localStorage.removeItem('vidya_google_unlinked');
+            }
+          }
           setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
           if (msg) {
             msg.textContent = 'Login successful! Redirecting...';
@@ -719,6 +737,12 @@ window.onNativeGoogleSignInSuccess = async function(data) {
       res = await response.json();
     }
 
+    if (res && res.requires_password) {
+      resetGoogleButtons();
+      openGoogleLinkPwdModal(res.data || { email, google_sub: sub, google_name: name, google_token: idToken });
+      return;
+    }
+
     if (res && res.success && res.data?.access_token) {
       setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
       showInlineMsg('Google Sign-In verified! Redirecting…', 'ok');
@@ -791,6 +815,12 @@ async function loginWithGoogleEmail(email) {
       })
     }).then(r => r.json());
 
+    if (res.requires_password) {
+      closeGoogleSignInModal();
+      openGoogleLinkPwdModal(res.data || { email: email, google_token: 'google_' + email.toLowerCase() });
+      return;
+    }
+
     if (res.success && res.data?.access_token) {
       closeGoogleSignInModal();
       setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
@@ -813,7 +843,135 @@ async function loginWithGoogleEmail(email) {
   }
 }
 
+/* ── Google Account Password Verification Modal for 1-Click Linking ── */
+let pendingGoogleLinkData = null;
+
+function openGoogleLinkPwdModal(data) {
+  pendingGoogleLinkData = data || {};
+  const modal = document.getElementById('google-link-pwd-modal');
+  if (!modal) return;
+
+  const email = pendingGoogleLinkData.email || '';
+  const name = pendingGoogleLinkData.google_name || pendingGoogleLinkData.username || (email.includes('@') ? email.split('@')[0] : 'User Account');
+  const initial = (name.charAt(0) || email.charAt(0) || 'G').toUpperCase();
+
+  const nameEl = document.getElementById('glp-name');
+  const emailEl = document.getElementById('glp-email');
+  const avatarEl = document.getElementById('glp-avatar');
+  const pwdInp = document.getElementById('glp-password');
+  const errBox = document.getElementById('glp-error');
+  const submitBtn = document.getElementById('glp-submit-btn');
+  const submitText = document.getElementById('glp-submit-text');
+
+  if (nameEl) nameEl.textContent = name;
+  if (emailEl) emailEl.textContent = email;
+  if (avatarEl) avatarEl.textContent = initial;
+  if (pwdInp) pwdInp.value = '';
+  if (errBox) { errBox.textContent = ''; errBox.style.display = 'none'; }
+  if (submitBtn) submitBtn.disabled = false;
+  if (submitText) submitText.textContent = 'Verify & Link Google';
+
+  modal.style.display = 'flex';
+  setTimeout(() => { if (pwdInp) pwdInp.focus(); }, 150);
+}
+
+function closeGoogleLinkPwdModal() {
+  const modal = document.getElementById('google-link-pwd-modal');
+  if (modal) modal.style.display = 'none';
+  pendingGoogleLinkData = null;
+  resetGoogleButtons();
+}
+
+function toggleGlpPasswordVisibility() {
+  const inp = document.getElementById('glp-password');
+  if (!inp) return;
+  inp.type = (inp.type === 'password') ? 'text' : 'password';
+}
+
+async function submitGooglePasswordLink() {
+  if (!pendingGoogleLinkData) return;
+  const pwdInp = document.getElementById('glp-password');
+  const errBox = document.getElementById('glp-error');
+  const submitBtn = document.getElementById('glp-submit-btn');
+  const submitText = document.getElementById('glp-submit-text');
+
+  const password = pwdInp ? pwdInp.value.trim() : '';
+  if (!password) {
+    if (errBox) {
+      errBox.textContent = 'Please enter your VidyaOS account password.';
+      errBox.style.display = 'block';
+    }
+    if (pwdInp) pwdInp.focus();
+    return;
+  }
+
+  if (errBox) errBox.style.display = 'none';
+  if (submitBtn) submitBtn.disabled = true;
+  if (submitText) submitText.textContent = 'Verifying & Linking…';
+
+  try {
+    const deviceId = getVidyaDeviceId();
+    const token = pendingGoogleLinkData.google_token || pendingGoogleLinkData.id_token || ('google_' + (pendingGoogleLinkData.email || '').toLowerCase());
+    const apiBase = window.VIDYAOS_API_BASE || '/api/v1';
+
+    let res = null;
+    try {
+      const response = await fetch(`${apiBase}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_token: token,
+          email: pendingGoogleLinkData.email,
+          password: password,
+          sub: pendingGoogleLinkData.google_sub,
+          device_id: deviceId
+        })
+      });
+      res = await response.json();
+    } catch (_) {
+      const response = await fetch('https://vidyaos-backend.onrender.com/api/v1/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_token: token,
+          email: pendingGoogleLinkData.email,
+          password: password,
+          sub: pendingGoogleLinkData.google_sub,
+          device_id: deviceId
+        })
+      });
+      res = await response.json();
+    }
+
+    if (res && res.success && res.data?.access_token) {
+      closeGoogleLinkPwdModal();
+      setAuthSession(res.data.access_token, res.data.user, res.data.refresh_token);
+      showInlineMsg('Google 1-click login enabled! Redirecting…', 'ok');
+      setTimeout(() => redirectAfterLogin(res.data.user), 350);
+    } else {
+      const msg = res?.error?.message || 'Incorrect account password. Please verify and try again.';
+      if (errBox) {
+        errBox.textContent = msg;
+        errBox.style.display = 'block';
+      }
+      if (submitBtn) submitBtn.disabled = false;
+      if (submitText) submitText.textContent = 'Verify & Link Google';
+    }
+  } catch (err) {
+    if (errBox) {
+      errBox.textContent = err.message || 'Verification failed. Please check network connection and try again.';
+      errBox.style.display = 'block';
+    }
+    if (submitBtn) submitBtn.disabled = false;
+    if (submitText) submitText.textContent = 'Verify & Link Google';
+  }
+}
+
 window.addEventListener('message', (event) => {
+  if (event.data?.type === 'GOOGLE_REQUIRE_PASSWORD_LINK') {
+    openGoogleLinkPwdModal(event.data.payload);
+    return;
+  }
   if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
     const { payload } = event.data;
     if (payload?.access_token) {
@@ -834,6 +992,14 @@ function handleForgotPassword() {
 /* ── Check URL parameters for pending status or messages ── */
 (function handleUrlParams() {
   const params = new URLSearchParams(window.location.search);
+  if (params.get('require_password_link') === '1') {
+    openGoogleLinkPwdModal({
+      email: params.get('email'),
+      google_sub: params.get('google_sub'),
+      google_name: params.get('google_name'),
+      google_token: params.get('google_token') || params.get('id_token')
+    });
+  }
   if (params.get('pending') === '1' || params.get('google_pending') === '1' || params.get('status') === 'pending') {
     const pb = document.getElementById('pending-banner');
     if (pb) {

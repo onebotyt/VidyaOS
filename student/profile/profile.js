@@ -91,6 +91,33 @@ async function loadStudentProfile() {
       }
     }
 
+    // Google SSO 1-Click Status
+    const isGoogleLinked = Boolean(s.google_linked || s.google_sub);
+    const googlePill = document.getElementById('student-google-status-pill');
+    const googleDesc = document.getElementById('student-google-status-desc');
+    const googleBtn = document.getElementById('btn-student-google-action');
+    const googleBtnText = document.getElementById('btn-student-google-text');
+
+    if (googlePill && googleDesc && googleBtn) {
+      if (isGoogleLinked) {
+        googlePill.textContent = 'Connected';
+        googlePill.style.background = '#ecfdf5';
+        googlePill.style.color = '#047857';
+        googlePill.style.border = '1px solid #a7f3d0';
+        googleDesc.textContent = `1-Click Sign-In is active for your account (${s.email || 'verified Google account'}). You can log in instantly with one tap without typing passwords.`;
+        if (googleBtnText) googleBtnText.textContent = 'Re-link Google Account';
+        googleBtn.className = 'btn btn-secondary';
+      } else {
+        googlePill.textContent = 'Not Linked';
+        googlePill.style.background = '#fef3c7';
+        googlePill.style.color = '#b45309';
+        googlePill.style.border = '1px solid #fde68a';
+        googleDesc.textContent = 'Connect your Google account to log in instantly on PC, mobile and web with a single tap.';
+        if (googleBtnText) googleBtnText.textContent = 'Connect with Google';
+        googleBtn.className = 'btn btn-primary';
+      }
+    }
+
     // 2. Attendance Health Stats
     const stats = s.attendance_stats;
     const standingBadge = document.getElementById('hero-standing-badge');
@@ -665,6 +692,98 @@ function switchProfileTab(tabKey) {
   }
 }
 window.switchProfileTab = switchProfileTab;
+
+/* ── Student Google 1-Click Linking ── */
+async function handleStudentGoogleLink() {
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+
+  // 1. Android Native App: Launch native Google Account Chooser bottom-sheet
+  if (window.NativeAuthBridge && typeof window.NativeAuthBridge.launchGoogleSignIn === 'function') {
+    try {
+      window.NativeAuthBridge.launchGoogleSignIn();
+      return;
+    } catch (e) {
+      console.warn('NativeAuthBridge.launchGoogleSignIn failed, using web flow:', e);
+    }
+  }
+
+  // 2. Web browser flow (OAuth URL)
+  try {
+    const origin = (window.location.origin && !window.location.origin.startsWith('file:') && !window.location.origin.startsWith('capacitor:'))
+      ? window.location.origin
+      : 'https://vidyaos-pink.vercel.app';
+
+    const res = await fetchApi('/auth/google/url?mode=LINK&user_id=' + (user?.id || '') + '&origin=' + encodeURIComponent(origin)).catch(() => null);
+    if (res && res.success && res.data?.url) {
+      window.location.href = res.data.url;
+      return;
+    }
+  } catch (_) {}
+
+  // 3. Fallback account picker modal
+  openStudentGoogleModal();
+}
+
+function openStudentGoogleModal() {
+  const modal = document.getElementById('student-google-modal');
+  if (!modal) return;
+
+  const emailInp = document.getElementById('profile-email');
+  const nameEl = document.getElementById('hero-name');
+  const currentEmail = (emailInp ? emailInp.value.trim() : '') || 'student@gmail.com';
+  const currentName = (nameEl ? nameEl.textContent.trim() : '') || 'Student';
+  const initial = (currentEmail.charAt(0) || 'S').toUpperCase();
+
+  const listEl = document.getElementById('student-google-account-list');
+  if (listEl) {
+    const escEmail = currentEmail.replace(/'/g, "\\'");
+    listEl.innerHTML = `
+      <li onclick="linkStudentGoogleAccount('${escEmail}')" style="display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid #e2e8f0; border-radius:10px; cursor:pointer; background:#f8fafc; transition:background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+        <div style="width:36px; height:36px; border-radius:50%; background:#e0f2fe; color:#0369a1; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">${initial}</div>
+        <div style="min-width:0; flex:1;">
+          <div style="font-weight:600; font-size:0.86rem; color:#0f172a;">${currentName}</div>
+          <div style="font-size:0.78rem; color:#64748b;">${currentEmail}</div>
+        </div>
+        <span style="font-size:0.7rem; font-weight:700; background:#ecfdf5; color:#047857; padding:2px 8px; border-radius:10px; border:1px solid #a7f3d0; white-space:nowrap;">Link Account</span>
+      </li>
+    `;
+  }
+
+  modal.style.display = 'flex';
+}
+
+function closeStudentGoogleModal() {
+  const modal = document.getElementById('student-google-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function linkStudentGoogleAccount(email) {
+  try {
+    const res = await fetchApi('/auth/google/link', {
+      method: 'POST',
+      body: JSON.stringify({ id_token: `google_${email.toLowerCase()}` })
+    });
+    if (res && res.success) {
+      closeStudentGoogleModal();
+      if (typeof showToast === 'function') {
+        showToast('Google account linked! You can now use 1-click Google login.', 'success');
+      } else {
+        alert('Google account linked! You can now use 1-click Google login.');
+      }
+      localStorage.removeItem('vidya_notify_google_connect');
+      localStorage.removeItem('vidya_google_unlinked');
+      loadStudentProfile();
+    } else {
+      throw new Error(res?.error?.message || 'Failed to link Google account');
+    }
+  } catch (err) {
+    if (typeof showToast === 'function') {
+      showToast(err.message, 'error');
+    } else {
+      alert(err.message);
+    }
+  }
+}
 
 // Hash and query parameter resolution
 function handleInitialTab() {

@@ -340,10 +340,36 @@
 
       const list = document.getElementById('student-notif-items-list');
       if (list) {
+        let user = null;
+        try {
+          user = (typeof getCurrentUser === 'function') ? getCurrentUser() : JSON.parse(localStorage.getItem('user') || '{}');
+        } catch (_) {}
+
+        let promoHtml = '';
+        if (user && !user.google_linked) {
+          promoHtml = `
+            <div class="notif-item unread" onclick="window.location.href='/student/profile/index.html#security'" style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:8px; margin-bottom:8px; cursor:pointer; background:#eff6ff; border:1px solid #bfdbfe;">
+              <div style="width:24px; height:24px; border-radius:50%; background:#ffffff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg viewBox="0 0 48 48" width="14" height="14">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+              </div>
+              <div class="notif-item-body" style="flex:1; min-width:0;">
+                <div class="notif-item-title" style="font-size:0.82rem; font-weight:700; color:#1e40af;">⚡ Enable 1-Click Login</div>
+                <div class="notif-item-sub" style="font-size:0.75rem; color:#3b82f6; margin-top:2px;">Connect Google to sign in with 1 tap next time.</div>
+              </div>
+              <span style="font-size:0.7rem; font-weight:700; color:#2563eb; align-self:center;">Connect →</span>
+            </div>
+          `;
+        }
+
         if (!items || items.length === 0) {
-          list.innerHTML = `<div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No new notifications</div>`;
+          list.innerHTML = promoHtml || `<div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No new notifications</div>`;
         } else {
-          list.innerHTML = items.map(n => `
+          list.innerHTML = promoHtml + items.map(n => `
             <div class="notif-item ${!n.is_read ? 'unread' : ''}" onclick="handleStudentNotificationClick('${n.id}', '${n.link_url || ''}')" style="display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:8px; margin-bottom:6px; cursor:pointer; background:var(--bg-surface); border:1px solid var(--border-color);">
               <div class="notif-item-body" style="flex:1; min-width:0;">
                 <div class="notif-item-title" style="font-size:0.82rem; font-weight:600; color:var(--text-main);">${escapeHtml(n.title)}</div>
@@ -504,8 +530,71 @@
   window.toggleUserProfile = toggleStudentProfile;
   window.toggleTheme = toggleStudentTheme;
 
+  function checkAndMountGoogleConnectPrompt() {
+    try {
+      let user = null;
+      try {
+        user = (typeof getCurrentUser === 'function') ? getCurrentUser() : JSON.parse(localStorage.getItem('user') || '{}');
+      } catch (_) {}
+
+      if (!user || user.google_linked) return;
+
+      const mustNotify = localStorage.getItem('vidya_notify_google_connect') === '1';
+      const lastDismissed = parseInt(localStorage.getItem('vidya_dismiss_google_connect') || '0', 10);
+      const now = Date.now();
+      if (!mustNotify && (now - lastDismissed < 24 * 60 * 60 * 1000)) {
+        return;
+      }
+
+      if (document.getElementById('vidya-google-connect-banner')) return;
+
+      const banner = document.createElement('div');
+      banner.id = 'vidya-google-connect-banner';
+      banner.setAttribute('role', 'alert');
+      banner.style.cssText = 'background:linear-gradient(90deg, #1e293b, #0f172a); color:#ffffff; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:0.86rem; border-bottom:1px solid #334155; position:sticky; top:64px; z-index:850; box-shadow:0 4px 12px rgba(0,0,0,0.15);';
+      banner.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:260px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:#ffffff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg viewBox="0 0 48 48" width="16" height="16">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+          </div>
+          <div>
+            <strong style="color:#ffffff;">Connect with Google for 1-Click Login:</strong>
+            <span style="color:#cbd5e1; margin-left:4px;">Log in instantly with a single tap next time — no passwords required.</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" onclick="window.location.href='/student/profile/index.html#security'" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
+            <span>Connect Google</span>
+            <span>→</span>
+          </button>
+          <button type="button" onclick="dismissGoogleConnectBanner()" style="background:transparent; border:none; color:#94a3b8; font-size:18px; cursor:pointer; padding:2px 8px; line-height:1;" title="Dismiss">&times;</button>
+        </div>
+      `;
+
+      const nav = document.getElementById('gc-navbar');
+      if (nav && nav.parentNode) {
+        nav.parentNode.insertBefore(banner, nav.nextSibling);
+      } else {
+        document.body.prepend(banner);
+      }
+    } catch (_) {}
+  }
+
+  window.dismissGoogleConnectBanner = function() {
+    const b = document.getElementById('vidya-google-connect-banner');
+    if (b) b.remove();
+    localStorage.setItem('vidya_dismiss_google_connect', Date.now().toString());
+    localStorage.removeItem('vidya_notify_google_connect');
+  };
+
   function initStudentHeader() {
     mountStudentHeader();
+    checkAndMountGoogleConnectPrompt();
     fetchStudentNotifications();
     setInterval(fetchStudentNotifications, 20000);
   }
