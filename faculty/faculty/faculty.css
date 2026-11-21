@@ -1590,7 +1590,6 @@ input:checked + .slider:before {
     padding: 0.75rem 1rem !important;
     flex-shrink: 0 !important;
   }
-  }
 
   .fac-details-footer button {
     flex: 1 !important;
@@ -1607,7 +1606,7 @@ input:checked + .slider:before {
     width: 100%;
     max-width: 100vw;
     box-sizing: border-box;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
   }
   .fac-page-header {
     margin-bottom: 0.45rem;
@@ -1616,13 +1615,16 @@ input:checked + .slider:before {
     justify-content: space-between;
     flex-wrap: nowrap;
     gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
   }
   .fac-title-group h1 {
     font-size: 1rem;
     line-height: 1.2;
+    margin: 0;
   }
   .fac-title-group p {
-    display: none;
+    display: none !important;
   }
   .btn-trash-header {
     padding: 0.28rem 0.55rem;
@@ -1710,92 +1712,110 @@ input:checked + .slider:before {
 
   /* Toolbar: Single-line scrollable pills + side-by-side search & add */
   .fac-toolbar {
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-bottom: 0.55rem;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.4rem !important;
+    margin-bottom: 0.55rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .fac-pills {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 0.3rem;
-    padding-bottom: 2px;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 0.3rem !important;
+    padding-bottom: 2px !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .fac-pills::-webkit-scrollbar {
-    display: none;
+    display: none !important;
   }
   .fac-pill {
-    padding: 0.3rem 0.55rem;
-    font-size: 0.74rem;
-    white-space: nowrap;
-    flex-shrink: 0;
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.74rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
   }
 
   .fac-actions-right {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.35rem;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
   .fac-search-box {
-    flex: 1;
-    min-width: 0;
-    max-width: 100%;
-    box-sizing: border-box;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .fac-search-box input {
-    width: 100%;
-    box-sizing: border-box;
-    height: 32px;
-    padding: 0.3rem 0.45rem 0.3rem 1.85rem;
-    font-size: 0.74rem;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    height: 34px !important;
+    padding: 0.3rem 0.45rem 0.3rem 1.85rem !important;
+    font-size: 0.74rem !important;
   }
   .btn-primary-compact {
-    height: 32px;
-    padding: 0.3rem 0.65rem;
-    font-size: 0.74rem;
-    white-space: nowrap;
-    flex-shrink: 0;
-    box-sizing: border-box;
+    height: 34px !important;
+    padding: 0.3rem 0.65rem !important;
+    font-size: 0.74rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
   }
 
   /* Mobile Table Header & Column Adjustments */
   .fac-table-card {
     border-radius: 14px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .fac-table {
-    width: 100%;
-    max-width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: auto !important;
   }
   .fac-table th, .fac-table td {
-    padding: 0.7rem 0.65rem;
-    font-size: 0.76rem;
+    padding: 0.65rem 0.5rem !important;
+    font-size: 0.76rem !important;
+    box-sizing: border-box !important;
   }
   .fac-table thead th {
-    padding: 0.6rem 0.65rem;
+    padding: 0.6rem 0.5rem !important;
   }
   .fac-table th.col-num,
-  .fac-table td.col-num,
+  .fac-table td.col-num {
+    width: 28px !important;
+    max-width: 32px !important;
+    padding: 0.65rem 0.25rem 0.65rem 0.5rem !important;
+    text-align: center !important;
+  }
+  #th-empid,
   .col-empid,
+  #th-role,
   .col-role,
+  #th-retention,
   .col-retention {
     display: none !important;
+  }
+  .fac-table th#th-actions,
+  .fac-table td:last-child {
+    width: 52px !important;
+    max-width: 56px !important;
+    padding: 0.65rem 0.5rem !important;
+    text-align: right !important;
   }
   .fac-member-cell {
     min-width: 0;
