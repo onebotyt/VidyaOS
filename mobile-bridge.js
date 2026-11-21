@@ -10,7 +10,7 @@
   'use strict';
 
   // Current Client App Version (Stamped during CI/CD build)
-  window.VIDYAOS_APP_VERSION = '1.0.1';
+  window.VIDYAOS_APP_VERSION = '1.0.103';
 
   // 1. Cloud Backend URL
   const CLOUD_BACKEND_URL = 'https://vidyaos-backend.onrender.com';
@@ -162,7 +162,7 @@
 
       const currentVersion = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
         ? window.NativeAppUpdater.getAppVersionName()
-        : (window.VIDYAOS_APP_VERSION || '1.0.98');
+        : (window.VIDYAOS_APP_VERSION || '1.0.103');
       const res = await fetch(GITHUB_VERSION_URL + '?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) return;
 
@@ -316,7 +316,7 @@
     window.VidyaOSMobileBridge = {
       checkForAppUpdates,
       showUpdateNotification,
-      getCurrentVersion: () => window.VIDYAOS_APP_VERSION || '1.0.95',
+      getCurrentVersion: () => window.VIDYAOS_APP_VERSION || '1.0.103',
       GITHUB_VERSION_URL,
       LATEST_APK_URL
     };

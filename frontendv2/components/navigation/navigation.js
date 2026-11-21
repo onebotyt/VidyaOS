@@ -14,9 +14,21 @@ export class NavigationManager {
     this.mobileDock = document.querySelector('#mobile-nav-dock');
     this.sidebar = document.querySelector('#sidebar-nav-container');
 
+    // Canonical Mobile 4-Tab Dock Items
     this.navItems = [
       { key: 'student/home', label: 'Home', icon: 'home', hash: 'student/home' },
       { key: 'student/classes', label: 'Classes', icon: 'classes', hash: 'student/classes' },
+      { key: 'student/classwork', label: 'Classwork', icon: 'classwork', hash: 'student/classwork' },
+      { key: 'student/settings', label: 'Settings', icon: 'settings', hash: 'student/settings' },
+    ];
+
+    // Expanded Desktop Sidebar Items
+    this.sidebarNavItems = [
+      { key: 'student/home', label: 'Home', icon: 'home', hash: 'student/home' },
+      { key: 'student/classes', label: 'Classes', icon: 'classes', hash: 'student/classes' },
+      { key: 'student/routine', label: 'Routine', icon: 'routine', hash: 'student/routine' },
+      { key: 'student/attendance', label: 'Attendance', icon: 'attendance', hash: 'student/attendance' },
+      { key: 'student/scores', label: 'Scores', icon: 'scores', hash: 'student/scores' },
       { key: 'student/classwork', label: 'Classwork', icon: 'classwork', hash: 'student/classwork' },
       { key: 'student/settings', label: 'Settings', icon: 'settings', hash: 'student/settings' },
     ];
@@ -89,7 +101,7 @@ export class NavigationManager {
         </div>
 
         <ul class="sidebar-nav-list">
-          ${this.navItems.map(item => `
+          ${this.sidebarNavItems.map(item => `
             <li class="sidebar-nav-item" data-route="${item.key}">
               <a href="#${item.hash}">
                 ${getIcon(item.icon)}

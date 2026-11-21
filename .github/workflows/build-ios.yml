@@ -1,0 +1,66 @@
+name: Build iOS Package (Xcode & IPA)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/build-ios.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-ios:
+    name: Build iOS Application (Xcode)
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Prepare Web Assets
+        run: node scripts/prepare-mobile.js
+
+      - name: Add Capacitor iOS Platform
+        run: |
+          npx cap add ios || true
+          npx cap sync ios
+
+      - name: Build Xcode Project (Unsigned Ad-hoc IPA)
+        run: |
+          if [ -d "ios/App" ]; then
+            cd ios/App
+            xcodebuild clean build \
+              -workspace App.xcworkspace \
+              -scheme App \
+              -destination 'generic/platform=iOS' \
+              -configuration Release \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY="" || true
+          fi
+
+      - name: Archive Web & iOS Distribution Bundle
+        run: |
+          mkdir -p dist/ios-release
+          cp -r www dist/ios-release/
+          if [ -d "ios" ]; then
+            tar -czf dist/VidyaOS-iOS-XcodeProject.tar.gz ios/
+          fi
+
+      - name: Upload iOS Xcode Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VidyaOS-iOS-Xcode
+          path: dist/VidyaOS-iOS-XcodeProject.tar.gz
+          if-no-files-found: warn

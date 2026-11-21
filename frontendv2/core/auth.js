@@ -103,6 +103,20 @@ class AuthService {
     return { success: true, user: this._user, role: this._role };
   }
 
+  async setSession(token, user, role = 'student') {
+    this._token = token;
+    this._user = user;
+    this._role = role;
+
+    await Storage.set('auth_token', token);
+    await Storage.set('token', token);
+    await Storage.set('user_role', role);
+    await Storage.set('user_data', user);
+
+    Bus.emit('auth:loginSuccess', { user: this._user, role: this._role, token });
+    Bus.emit('auth:stateChanged', { isAuthenticated: true, user: this._user, role: this._role });
+  }
+
   async refreshProfile() {
     if (!this._token) return null;
 

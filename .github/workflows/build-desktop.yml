@@ -1,0 +1,57 @@
+name: Build & Package Desktop PC (Windows & Linux)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontendv2/**'
+      - '.github/workflows/build-desktop.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows PC Application
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Package Desktop Web Distribution
+        shell: bash
+        run: |
+          mkdir -p dist/desktop-bundle
+          cp -r frontendv2 dist/desktop-bundle/
+          
+          # Create Windows Quick-Launch PowerShell and Batch script
+          cat << 'EOF' > dist/desktop-bundle/Launch-VidyaOS.bat
+          @echo off
+          title VidyaOS Desktop Client
+          echo Launching VidyaOS Academic Suite...
+          start "" "%~dp0frontendv2\index.html"
+          exit
+          EOF
+
+      - name: Create Windows Portable Zip Package
+        shell: bash
+        run: |
+          cd dist/desktop-bundle
+          7z a ../VidyaOS-PC-Portable.zip *
+
+      - name: Upload Desktop Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VidyaOS-Windows-PC
+          path: dist/VidyaOS-PC-Portable.zip

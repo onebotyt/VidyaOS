@@ -112,13 +112,28 @@
     return 0;
   }
 
+  async function getRunningAppVersion() {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      try {
+        const info = await window.Capacitor.Plugins.App.getInfo();
+        if (info && info.version) return info.version;
+      } catch (_) {}
+    }
+    if (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function') {
+      try {
+        const v = window.NativeAppUpdater.getAppVersionName();
+        if (v) return v;
+      } catch (_) {}
+    }
+    if (window.VIDYAOS_APP_VERSION) return window.VIDYAOS_APP_VERSION;
+    return '1.0.103';
+  }
+
   /**
    * Version check & display
    */
   async function initVersionDisplay() {
-    const runningVer = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
-      ? window.NativeAppUpdater.getAppVersionName()
-      : (window.VIDYAOS_APP_VERSION || '1.0.98');
+    const runningVer = await getRunningAppVersion();
 
     const label = document.getElementById('app-version-label');
     if (label) {
@@ -154,9 +169,7 @@
     `;
 
     try {
-      const currentVer = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
-        ? window.NativeAppUpdater.getAppVersionName()
-        : (window.VIDYAOS_APP_VERSION || '1.0.98');
+      const currentVer = await getRunningAppVersion();
       let remoteVer = null;
       let downloadUrl = 'https://github.com/onebotyt/VidyaOS/releases';
       let notes = 'Latest performance optimizations and classroom features.';
@@ -222,9 +235,7 @@
         if (btnText) btnText.textContent = 'Up to Date';
       }
     } catch (e) {
-      const curV = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
-        ? window.NativeAppUpdater.getAppVersionName()
-        : (window.VIDYAOS_APP_VERSION || '1.0.98');
+      const curV = await getRunningAppVersion();
       inner.innerHTML = `
         <div style="color:var(--text-muted); font-size:0.82rem;">
           Could not reach update server. You are running version v${escapeHtml(curV)}.

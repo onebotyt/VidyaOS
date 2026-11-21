@@ -17,6 +17,9 @@ import { ToastManager } from './components/toast/toast.js';
 import { renderLoginView } from './views/auth/login.js';
 import { renderStudentHome } from './views/student/home/home.js';
 import { renderStudentClasses } from './views/student/classes/classes.js';
+import { renderStudentRoutine } from './views/student/routine/routine.js';
+import { renderStudentAttendance } from './views/student/attendance/attendance.js';
+import { renderStudentScores } from './views/student/scores/scores.js';
 import { renderStudentClasswork } from './views/student/classwork/classwork.js';
 import { renderStudentProfile } from './views/student/profile/profile.js';
 import { renderStudentSettings } from './views/student/settings/settings.js';
@@ -50,6 +53,24 @@ class VidyaApp {
       requireAuth: true,
       role: 'student',
       title: 'My Classes'
+    });
+
+    Router.register('student/routine', renderStudentRoutine, {
+      requireAuth: true,
+      role: 'student',
+      title: 'Routine & Timetable'
+    });
+
+    Router.register('student/attendance', renderStudentAttendance, {
+      requireAuth: true,
+      role: 'student',
+      title: 'Attendance Studio'
+    });
+
+    Router.register('student/scores', renderStudentScores, {
+      requireAuth: true,
+      role: 'student',
+      title: 'Academic Scores'
     });
 
     Router.register('student/classwork', renderStudentClasswork, {

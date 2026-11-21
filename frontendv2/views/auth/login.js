@@ -42,6 +42,10 @@ export async function renderLoginView(container) {
           <button type="submit" class="btn btn-primary login-submit-btn" id="login-btn">
             Sign In
           </button>
+
+          <button type="button" class="btn btn-outline" id="demo-login-btn" style="width:100%; margin-top:10px; font-weight:600;">
+            Demo Student Quick Login
+          </button>
         </form>
       </div>
     </div>
@@ -102,6 +106,24 @@ export async function renderLoginView(container) {
       btn.textContent = 'Sign In';
       showToast('Connection error during login', 'error');
     }
+  });
+
+  // Demo student instant login
+  const demoBtn = container.querySelector('#demo-login-btn');
+  demoBtn?.addEventListener('click', async () => {
+    Platform.hapticFeedback('success');
+    const mockUser = {
+      id: 101,
+      full_name: 'Girdhar Dhami',
+      email: 'gdhami115@gmail.com',
+      role: 'student',
+      year: 3,
+      semester: 5,
+      department_name: 'Information Technology'
+    };
+    await Auth.setSession('mock_jwt_token_frontendv2', mockUser, 'student');
+    showToast('Signed in as Girdhar Dhami', 'success');
+    Router.navigate('student/home');
   });
 }
 
