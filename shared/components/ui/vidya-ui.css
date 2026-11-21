@@ -1,0 +1,594 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS UNIFIED UI SYSTEM STYLES (vidya-ui.css)
+ * Location: /shared/components/ui/vidya-ui.css
+ * 
+ * 100% Theme Tokenized — Uses CSS Variables from variables.css
+ * Covers:
+ * 1. Toasts & Feedback Alerts
+ * 2. Dynamic Action Modals (Delete, Remove, Transfer, Inactive, Trash, Restore)
+ * 3. Type-to-Confirm Verification Fields
+ * 4. Status / Metric Cards Grid
+ * 5. Management Entity Cards (Faculty & Students)
+ * 6. Classroom Cards Grid
+ * ══════════════════════════════════════════════════════════════
+ */
+
+/* ── 1. Universal Toast Notification Container ── */
+#vidya-toast-container,
+#admin-toast-container,
+#faculty-toast-container,
+#student-toast-container {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+  max-width: 380px;
+  width: calc(100% - 2.5rem);
+}
+
+@media (max-width: 768px) {
+  #vidya-toast-container,
+  #admin-toast-container,
+  #faculty-toast-container,
+  #student-toast-container {
+    top: auto;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    max-width: none;
+  }
+}
+
+.vidya-toast-item,
+.admin-toast-item,
+.faculty-toast-item,
+.student-toast-item,
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md, 10px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast-success,
+.toast.toast-success {
+  background: hsl(142 71% 40%);
+}
+
+.toast-error,
+.toast.toast-error {
+  background: hsl(0 84% 55%);
+}
+
+.toast-warning,
+.toast.toast-warning {
+  background: hsl(38 92% 45%);
+}
+
+.toast-info,
+.toast.toast-info {
+  background: var(--color-primary, hsl(217 82% 52%));
+}
+
+/* ── 2. Accessible Modal Backdrop & Dialog ── */
+.vidya-modal-backdrop,
+.modal-backdrop,
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.vidya-modal-backdrop.open,
+.vidya-modal-backdrop.active,
+.modal-backdrop.open,
+.modal-backdrop.active,
+.modal-overlay.open {
+  display: flex !important;
+  opacity: 1 !important;
+}
+
+.vidya-modal-dialog,
+.modal-dialog,
+.modal-content {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 16px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  box-sizing: border-box;
+  transform: scale(0.96) translateY(8px);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vidya-modal-backdrop.open .vidya-modal-dialog,
+.modal-backdrop.open .modal-dialog,
+.modal-backdrop.active .modal-content {
+  transform: scale(1) translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.15rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.modal-close-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-main);
+}
+
+.modal-body {
+  padding: 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+/* ── 3. Dynamic Action Modal Specifics (Delete, Remove, Transfer, Inactive, Trash) ── */
+.vidya-dialog-hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.vidya-dialog-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vidya-dialog-icon-wrap.danger {
+  background: hsl(0 84% 60% / 0.15);
+  color: hsl(0 84% 55%);
+  border: 1px solid hsl(0 84% 60% / 0.25);
+}
+
+.vidya-dialog-icon-wrap.warning {
+  background: hsl(38 92% 50% / 0.15);
+  color: hsl(38 92% 45%);
+  border: 1px solid hsl(38 92% 50% / 0.25);
+}
+
+.vidya-dialog-icon-wrap.primary {
+  background: var(--color-primary-light, hsl(217 91% 60% / 0.15));
+  color: var(--color-primary, hsl(217 82% 52%));
+  border: 1px solid var(--color-primary-light);
+}
+
+.vidya-dialog-icon-wrap.purple {
+  background: hsl(262 83% 58% / 0.15);
+  color: hsl(262 83% 58%);
+  border: 1px solid hsl(262 83% 58% / 0.25);
+}
+
+.vidya-dialog-icon-wrap.emerald {
+  background: hsl(152 72% 40% / 0.15);
+  color: hsl(152 72% 40%);
+  border: 1px solid hsl(152 72% 40% / 0.25);
+}
+
+.vidya-dialog-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 0.35rem 0;
+}
+
+.vidya-dialog-message {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.vidya-dialog-item-chip {
+  display: inline-block;
+  font-family: monospace;
+  font-weight: 700;
+  background: var(--bg-surface-hover);
+  color: var(--text-main);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  margin: 0.25rem 0;
+}
+
+/* ── 3b. Type-to-Confirm Verification Field ── */
+.vidya-confirm-verify-box {
+  margin-top: 1rem;
+  padding: 0.85rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+}
+
+.vidya-confirm-verify-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.vidya-confirm-verify-keyword {
+  color: var(--status-absent, hsl(0 84% 55%));
+  font-family: monospace;
+  font-weight: 800;
+}
+
+.vidya-confirm-input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vidya-confirm-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light, rgba(37, 99, 235, 0.15));
+}
+
+.vidya-confirm-input.is-matched {
+  border-color: hsl(142 71% 45%);
+  background: hsl(142 71% 45% / 0.05);
+}
+
+/* ── 3c. Dynamic Input / Select in Modal ── */
+.vidya-dialog-input-group {
+  margin-top: 1rem;
+}
+
+.vidya-dialog-select,
+.vidya-dialog-text-input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  box-sizing: border-box;
+  outline: none;
+}
+
+.vidya-dialog-select:focus,
+.vidya-dialog-text-input:focus {
+  border-color: var(--color-primary);
+}
+
+/* ── 4. Dynamic Status / Metric Cards Grid ── */
+.vidya-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.vidya-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  user-select: none;
+}
+
+.vidya-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md, 0 8px 16px rgba(0, 0, 0, 0.08));
+  border-color: var(--border-color-hover, var(--border-color));
+}
+
+.vidya-stat-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vidya-stat-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.vidya-stat-icon-pill {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vidya-stat-icon-pill.primary { background: var(--color-primary-light); color: var(--color-primary); }
+.vidya-stat-icon-pill.success { background: hsl(142 71% 45% / 0.15); color: hsl(142 71% 40%); }
+.vidya-stat-icon-pill.warning { background: hsl(38 92% 50% / 0.15); color: hsl(38 92% 45%); }
+.vidya-stat-icon-pill.danger { background: hsl(0 84% 60% / 0.15); color: hsl(0 84% 55%); }
+
+.vidya-stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+
+.vidya-stat-subtext {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vidya-stat-trend {
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.vidya-stat-trend.up { color: hsl(142 71% 40%); }
+.vidya-stat-trend.down { color: hsl(0 84% 55%); }
+
+/* ── 5. Dynamic Management Entity Cards Grid (Faculty & Students) ── */
+.vidya-entity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.vidya-entity-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  padding: 1.15rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  position: relative;
+  transition: all 0.18s ease;
+}
+
+.vidya-entity-card:hover {
+  border-color: var(--color-primary-light, var(--border-color));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.vidya-entity-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vidya-entity-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.vidya-entity-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vidya-entity-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.vidya-entity-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 0 2px 0;
+}
+
+.vidya-entity-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vidya-entity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.vidya-entity-chip {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.vidya-entity-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+}
+
+/* ── 6. Dynamic Classroom Cards Grid ── */
+.vidya-classroom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.15rem;
+}
+
+.vidya-classroom-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 14px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.vidya-classroom-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.vidya-classroom-card-banner {
+  padding: 1.15rem;
+  background: linear-gradient(135deg, var(--color-primary, #2563eb), hsl(224 76% 48%));
+  color: #ffffff;
+  position: relative;
+}
+
+.vidya-classroom-code-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  display: inline-block;
+  margin-bottom: 0.4rem;
+}
+
+.vidya-classroom-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.25;
+}
+
+.vidya-classroom-teacher {
+  font-size: 0.82rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.vidya-classroom-body {
+  padding: 1rem 1.15rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.vidya-classroom-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.vidya-classroom-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}

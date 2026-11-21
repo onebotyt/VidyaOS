@@ -1,0 +1,364 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS UNIFIED DUAL-STATE SIDEBAR & MOBILE NAVIGATION (sidebar.css)
+ * Location: /shared/components/sidebar/sidebar.css
+ * 
+ * 1. Desktop Persistent Mini-Rail (72px collapsed) & Flyout Overlay (260px)
+ * 2. Zero Desktop Layout Shift: Main page canvas sits permanently at margin-left: 72px
+ * 3. Mobile Slideout Off-Canvas Drawer (280px) & 5-Tab Touch Bottom Dock (64px)
+ * 4. 100% Theme Tokenized — Strict Zero Hardcoded Hex Colors
+ * ══════════════════════════════════════════════════════════════
+ */
+
+/* ── 1. Unified Sidebar Container ── */
+#vidya-sidebar,
+#vidya-admin-sidebar,
+#app-sidebar,
+#faculty-sidebar,
+.admin-sidebar,
+.faculty-sidebar {
+  position: fixed !important;
+  top: 60px !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  height: calc(100dvh - 60px) !important;
+  background: var(--bg-card) !important;
+  border-right: 1px solid var(--border-color) !important;
+  z-index: 10000 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  user-select: none;
+  transform: translateZ(0);
+  will-change: width, transform;
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* ── 2. Desktop Mode (>= 769px) ── */
+@media (min-width: 769px) {
+
+  /* Zero layout shift invariant */
+  .admin-main-wrap,
+  .faculty-main-wrap,
+  .student-main-wrap,
+  .app-main-wrap {
+    margin-left: 72px !important;
+    width: calc(100% - 72px) !important;
+    max-width: calc(100% - 72px) !important;
+    padding-top: 60px !important;
+    min-height: calc(100dvh - 60px) !important;
+    box-sizing: border-box !important;
+    transition: none !important;
+  }
+
+  /* Default 72px Collapsed Rail */
+  #vidya-sidebar,
+  #vidya-admin-sidebar,
+  #app-sidebar,
+  #faculty-sidebar,
+  .admin-sidebar,
+  .faculty-sidebar {
+    width: 72px !important;
+    box-shadow: 1px 0 0 var(--border-color) !important;
+    transform: translateX(0) !important;
+  }
+
+  /* Expanded Flyout Overlay Drawer (260px) */
+  #vidya-sidebar.desktop-open,
+  #vidya-admin-sidebar.desktop-open,
+  #app-sidebar.desktop-open,
+  #faculty-sidebar.desktop-open,
+  .admin-sidebar.desktop-open,
+  .faculty-sidebar.desktop-open {
+    width: 260px !important;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.12), 2px 0 8px rgba(0, 0, 0, 0.06) !important;
+    border-right: 1px solid var(--border-color) !important;
+  }
+
+  /* Hide mobile-only elements on desktop */
+  .mobile-only,
+  .vidya-mobile-bottom-bar,
+  .student-mobile-bottom-bar,
+  .faculty-mobile-bottom-bar {
+    display: none !important;
+  }
+}
+
+/* ── 3. Navigation Scroll Body ── */
+.sidebar-nav-body {
+  flex: 1 1 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0.5rem 0.35rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  scrollbar-width: none !important;
+  box-sizing: border-box !important;
+}
+
+.sidebar-nav-body::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* ── 4. Unified Sidebar Nav Item ── */
+.sidebar-nav-item,
+.student-rail-item {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  border-radius: var(--radius-md, 10px) !important;
+  color: var(--text-muted) !important;
+  text-decoration: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: 0 !important;
+  transition: all 0.16s ease !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+.sidebar-nav-item:hover,
+.student-rail-item:hover {
+  background: var(--bg-surface-hover) !important;
+  color: var(--text-main) !important;
+}
+
+.sidebar-nav-item.active,
+.student-rail-item.active {
+  background: var(--color-primary-light, hsl(217 91% 60% / 0.12)) !important;
+  color: var(--color-primary, hsl(217 82% 52%)) !important;
+  font-weight: 600 !important;
+}
+
+/* Icon Squircle Box in 72px Rail */
+.sidebar-nav-icon,
+.student-rail-icon {
+  width: 72px !important;
+  min-width: 72px !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  transition: transform 0.18s ease !important;
+}
+
+.sidebar-nav-item:hover .sidebar-nav-icon {
+  transform: scale(1.08) !important;
+}
+
+/* Full Label in Expanded Drawer */
+.sidebar-nav-label {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  pointer-events: none;
+  font-size: 0.88rem;
+}
+
+.desktop-open .sidebar-nav-label,
+.open .sidebar-nav-label {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+  pointer-events: auto !important;
+}
+
+/* Short Label under icon in mini rail */
+.sidebar-nav-short-label,
+.student-rail-label {
+  position: absolute;
+  bottom: 3px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.desktop-open .sidebar-nav-short-label {
+  display: none !important;
+}
+
+/* ── 5. Sidebar Footer Controls ── */
+.sidebar-footer {
+  padding: 0.5rem 0.35rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-expand-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.2s ease;
+}
+
+.sidebar-expand-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-main);
+}
+
+.desktop-open .sidebar-expand-btn svg {
+  transform: rotate(180deg);
+}
+
+/* ── 6. Backdrop Overlay (Desktop Flyout & Mobile Drawer) ── */
+#vidya-sidebar-backdrop,
+#sidebar-backdrop,
+#faculty-sidebar-backdrop,
+#student-drawer-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+  z-index: 9999 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease !important;
+}
+
+#vidya-sidebar-backdrop.active,
+#vidya-sidebar-backdrop.open,
+#sidebar-backdrop.active,
+#sidebar-backdrop.open,
+#faculty-sidebar-backdrop.active,
+#faculty-sidebar-backdrop.open,
+#student-drawer-backdrop.active,
+#student-drawer-backdrop.open {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ── 7. Mobile Mode (<= 768px) ── */
+@media (max-width: 768px) {
+
+  /* Mobile Drawer (280px Off-Canvas) */
+  #vidya-sidebar,
+  #vidya-admin-sidebar,
+  #app-sidebar,
+  #faculty-sidebar,
+  .admin-sidebar,
+  .faculty-sidebar {
+    width: 280px !important;
+    top: 0 !important;
+    height: 100dvh !important;
+    transform: translateX(-100%) !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2) !important;
+    padding-top: max(48px, env(safe-area-inset-top, 0px)) !important;
+  }
+
+  #vidya-sidebar.open,
+  #vidya-sidebar.sidebar-open,
+  #vidya-admin-sidebar.open,
+  #app-sidebar.open,
+  #faculty-sidebar.open,
+  .admin-sidebar.open,
+  .faculty-sidebar.open {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-nav-item {
+    height: 44px !important;
+    padding-left: 0.75rem !important;
+  }
+
+  .sidebar-nav-icon {
+    width: 40px !important;
+    min-width: 40px !important;
+  }
+
+  .sidebar-nav-label {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .sidebar-nav-short-label {
+    display: none !important;
+  }
+
+  /* ── 8. Mobile 5-Tab Touch Bottom Dock (<= 768px) ── */
+  .vidya-mobile-bottom-bar,
+  .student-mobile-bottom-bar,
+  .faculty-mobile-bottom-bar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    background: var(--bg-card) !important;
+    border-top: 1px solid var(--border-color) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    z-index: 9998 !important;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06) !important;
+    user-select: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .vidya-bottom-tab-item,
+  .student-tab-item,
+  .faculty-tab-item {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  .vidya-bottom-tab-item.active,
+  .student-tab-item.active,
+  .faculty-tab-item.active {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .vidya-bottom-tab-icon,
+  .student-tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Page container bottom clearance for mobile dock */
+  .admin-main-wrap,
+  .faculty-main-wrap,
+  .student-main-wrap,
+  .page-main-container {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

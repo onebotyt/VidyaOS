@@ -62,24 +62,30 @@ body {
   will-change: transform, opacity;
 }
 
-.s1 {
-  background-image: url("/login/images/bg1-campus.jpg");
-  animation-delay: -2.3s;
-}
+/* 
+ * Desktop-Only Background Slideshow:
+ * Prevents mobile devices and mobile WebViews from decoding ~80MB of high-res bitmaps
+ */
+@media (min-width: 769px) {
+  .s1 {
+    background-image: url("/login/images/bg1-campus.jpg");
+    animation-delay: -2.3s;
+  }
 
-.s2 {
-  background-image: url("/login/images/all.jpg");
-  animation-delay: 4.7s;
-}
+  .s2 {
+    background-image: url("/login/images/all.jpg");
+    animation-delay: 4.7s;
+  }
 
-.s3 {
-  background-image: url("/login/images/bg3-building.jpg");
-  animation-delay: 11.7s;
-}
+  .s3 {
+    background-image: url("/login/images/bg3-building.jpg");
+    animation-delay: 11.7s;
+  }
 
-.s4 {
-  background-image: url("/login/images/academic-teacher.png");
-  animation-delay: 18.7s;
+  .s4 {
+    background-image: url("/login/images/academic-teacher.png");
+    animation-delay: 18.7s;
+  }
 }
 
 @keyframes float {

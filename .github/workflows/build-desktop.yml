@@ -6,43 +6,64 @@ on:
     branches:
       - main
     paths:
-      - 'frontendv2/**'
+      - 'src-tauri/**'
       - '.github/workflows/build-desktop.yml'
+      - 'shared/**'
+      - 'login/**'
+      - 'admin/**'
+      - 'faculty/**'
+      - 'student/**'
 
 permissions:
   contents: write
 
 jobs:
   build-windows:
-    name: Build Windows PC Application
+    name: Build Windows PC Application (Native WebView2)
     runs-on: windows-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Verify Environment
-        run: echo "Packaging Frontend v2 Universal Desktop..."
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: Package Desktop Web Distribution
         shell: bash
         run: |
           mkdir -p dist/desktop-bundle
-          cp -r frontendv2 dist/desktop-bundle/
+          # Copy all core web assets
+          cp -r index.html login admin faculty student shared images css js dist/desktop-bundle/ 2>/dev/null || true
           
-          # Create Windows Quick-Launch PowerShell and Batch script
+          # Create Windows WebView2 Quick-Launch Script
           cat << 'EOF' > dist/desktop-bundle/Launch-VidyaOS.bat
           @echo off
-          title VidyaOS Desktop Client
-          echo Launching VidyaOS Academic Suite...
-          start "" "%~dp0frontendv2\index.html"
+          title VidyaOS Desktop Academic Suite
+          echo Launching VidyaOS Desktop Client (WebView2)...
+          start "" "%~dp0login\index.html"
           exit
           EOF
+
+      - name: Build Tauri Desktop Native Client
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: desktop-v__VERSION__
+          releaseName: 'VidyaOS Desktop v__VERSION__'
+          releaseBody: 'VidyaOS Native Windows WebView2 Desktop Release'
+          releaseDraft: false
+          prerelease: false
+        continue-on-error: true
 
       - name: Create Windows Portable Zip Package
         shell: bash

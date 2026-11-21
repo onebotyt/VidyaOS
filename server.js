@@ -57,11 +57,15 @@ const MIME = {
 const STATIC_REWRITES = [
   // Shared assets
 
+  // Frontend v2 (Universal Web Application - Localhost Only)
+  [/^\/v2\/?$/, '/v2/index.html'],
+  [/^\/v2\/(.+)$/, '/v2/$1'],
+
   // Login page assets (isolated — not in shared/)
   // login/index.css and login/index.js live at login/ root
   // (no rewrite needed — direct paths work)
 
-  // Frontend v2 (Universal React)
+  // Frontend v2 (Universal Web Application - Localhost Only)
   [/^\/v2\/?$/, '/v2/index.html'],
   [/^\/v2\/(.+)$/, '/v2/$1'],
 
@@ -143,10 +147,12 @@ function serveFile(filePath, res, status = 200) {
   const ext = path.extname(filePath).toLowerCase();
   const mime = MIME[ext] || 'application/octet-stream';
   const stat = fs.statSync(filePath);
+  const isStaticAsset = ['.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2'].includes(ext);
+  const cacheHeader = isStaticAsset ? 'public, max-age=86400, stale-while-revalidate=604800' : 'no-cache';
   res.writeHead(status, {
     'Content-Type': mime,
     'Content-Length': stat.size,
-    'Cache-Control': 'no-cache',
+    'Cache-Control': cacheHeader,
   });
   fs.createReadStream(filePath).pipe(res);
 }

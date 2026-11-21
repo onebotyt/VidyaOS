@@ -1,0 +1,303 @@
+/**
+ * ══════════════════════════════════════════════════════════════
+ * VIDYAOS UNIFIED TOP HEADER STYLES (header.css)
+ * Location: /shared/components/header/header.css
+ * 
+ * 100% Theme Tokenized — Zero Hardcoded Hex Colors
+ * Single source of truth for the top application bar across all portals.
+ * ══════════════════════════════════════════════════════════════
+ */
+
+#admin-header-mount,
+#faculty-header-mount,
+#student-header-mount,
+#vidya-header-mount {
+  display: contents !important;
+}
+
+#vidya-header,
+.admin-top-header,
+.faculty-top-header,
+.student-top-navbar,
+.gc-navbar {
+  height: 60px !important;
+  min-height: 60px !important;
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 1.25rem !important;
+  box-sizing: border-box !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  z-index: 10001 !important;
+  user-select: none !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease !important;
+}
+
+@media (max-width: 768px) {
+  #vidya-header,
+  .admin-top-header,
+  .faculty-top-header,
+  .student-top-navbar,
+  .gc-navbar {
+    height: calc(58px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-bottom: 0 !important;
+    padding-left: max(0.85rem, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(0.85rem, env(safe-area-inset-right, 0px)) !important;
+    background: var(--bg-surface) !important;
+    border-bottom: 1.5px solid var(--border-color) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07) !important;
+  }
+}
+
+/* ── Left Section ── */
+.header-left,
+.gc-nav-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  flex-shrink: 0 !important;
+}
+
+.header-mobile-toggle-btn,
+.header-nav-toggle-btn,
+.gc-menu-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-main) !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.header-mobile-toggle-btn:hover,
+.header-nav-toggle-btn:hover,
+.gc-menu-btn:hover {
+  background: var(--bg-surface-hover) !important;
+}
+
+.header-brand-link,
+.gc-brand-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  text-decoration: none !important;
+  color: var(--text-main) !important;
+}
+
+.header-brand-title,
+.gc-brand-title {
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--text-main) !important;
+}
+
+.header-brand-badge,
+.gc-page-badge {
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  padding: 0.15rem 0.45rem !important;
+  border-radius: 4px !important;
+  background: var(--color-primary-light, hsl(217 91% 60% / 0.12)) !important;
+  color: var(--color-primary, hsl(217 82% 52%)) !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ── Right Section ── */
+.header-right,
+.gc-nav-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+}
+
+.header-icon-btn,
+.gc-icon-btn {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  transition: all 0.15s ease !important;
+}
+
+.header-icon-btn:hover,
+.gc-icon-btn:hover {
+  background: var(--bg-surface-hover) !important;
+  color: var(--text-main) !important;
+}
+
+.header-bell-badge {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  padding: 0 4px !important;
+  border-radius: 9999px !important;
+  background: var(--status-absent, hsl(0 84% 60%)) !important;
+  color: #ffffff !important;
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 0 0 2px var(--bg-card) !important;
+}
+
+/* ── Avatar Profile Button ── */
+.header-profile-round-btn,
+.gc-user-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: var(--color-primary, hsl(217 82% 52%)) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  position: relative !important;
+  margin-left: 0.25rem !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.avatar-online-dot {
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: hsl(142 71% 45%) !important;
+  border: 2px solid var(--bg-card) !important;
+}
+
+/* ── Popover Dropdowns ── */
+.header-profile-dropdown,
+.header-notifications-dropdown,
+.user-profile-popover {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg, 12px) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  z-index: 10005 !important;
+  display: none;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.header-profile-dropdown.show,
+.header-notifications-dropdown.show,
+.user-profile-popover.show {
+  display: block !important;
+}
+
+.header-profile-dropdown {
+  width: 250px !important;
+}
+
+.profile-dropdown-user-card {
+  padding: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.dropdown-avatar-circle {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  background: var(--color-primary-light, hsl(217 91% 60% / 0.12)) !important;
+  color: var(--color-primary, hsl(217 82% 52%)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  flex-shrink: 0 !important;
+}
+
+.dropdown-user-meta {
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.dropdown-full-name {
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  color: var(--text-main) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.dropdown-email {
+  font-size: 0.75rem !important;
+  color: var(--text-muted) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.profile-dropdown-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  padding: 0.65rem 1rem !important;
+  color: var(--text-main) !important;
+  text-decoration: none !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  background: transparent !important;
+  border: none !important;
+  width: 100% !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.profile-dropdown-item:hover {
+  background: var(--bg-surface-hover) !important;
+}
+
+.profile-dropdown-divider {
+  height: 1px !important;
+  background: var(--border-color) !important;
+  margin: 0.25rem 0 !important;
+}
+
+.dropdown-logout-btn {
+  color: var(--status-absent, hsl(0 84% 60%)) !important;
+}
