@@ -18,5 +18,8 @@
     "universal-ui"
   ],
   "author": "VidyaOS Team",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@react-native/gradle-plugin": "^0.74.87"
+  }
 }

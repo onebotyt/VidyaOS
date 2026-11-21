@@ -87,32 +87,66 @@ jobs:
           version: 9
 
       - name: Build Native React Native v2app (Expo Prebuild & Gradle)
-        continue-on-error: true
         run: |
           echo "[v2app] Starting Native React Native APK Build from frontendv2..."
           cd frontendv2
+          # Ensure hoisted layout for React Native Gradle Plugin resolution
           pnpm install --no-frozen-lockfile
           cd apps/mobile
-          npx expo prebuild --platform android --no-install || echo "Prebuild step warning, continuing..."
+          npx expo prebuild --platform android --no-install
           if [ -d "android" ]; then
+            echo "[v2app] Prebuild succeeded. Patching settings.gradle for monorepo Gradle plugin resolution..."
+            node -e "
+              const fs = require('fs');
+              const path = require('path');
+              const settingsPath = path.resolve('android/settings.gradle');
+              if (fs.existsSync(settingsPath)) {
+                let content = fs.readFileSync(settingsPath, 'utf8');
+                try {
+                  const pluginPkg = require.resolve('@react-native/gradle-plugin/package.json');
+                  const pluginDir = path.dirname(pluginPkg).replace(/\\\\/g, '/');
+                  console.log('[v2app] Resolved @react-native/gradle-plugin at:', pluginDir);
+                  content = content.replace(
+                    /includeBuild\(new File\(.+@react-native\/gradle-plugin\/package\.json.+\)\.getParentFile\(\)\.toString\(\)\)/g,
+                    'includeBuild(\"' + pluginDir + '\")'
+                  );
+                } catch(e) {
+                  console.warn('[v2app] Warning resolving plugin:', e.message);
+                }
+                try {
+                  const rnPkg = require.resolve('react-native/package.json').replace(/\\\\/g, '/');
+                  content = content.replace(/require\.resolve\('react-native\/package\.json'\)/g, \"'\" + rnPkg + \"'\");
+                } catch(e) {}
+                try {
+                  const expoPkg = require.resolve('expo/package.json').replace(/\\\\/g, '/');
+                  content = content.replace(/require\.resolve\('expo\/package\.json'\)/g, \"'\" + expoPkg + \"'\");
+                } catch(e) {}
+                fs.writeFileSync(settingsPath, content, 'utf8');
+                console.log('[v2app] Patched settings.gradle successfully.');
+              }
+            "
             cd android
             chmod +x gradlew
-            ./gradlew assembleDebug --no-daemon || echo "Native assemble warning, continuing..."
+            ./gradlew assembleDebug --no-daemon --stacktrace
             if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
               cp app/build/outputs/apk/debug/app-debug.apk ../../../../v2app.apk
               echo "[v2app] ✅ Native React Native APK compiled successfully!"
+            else
+              echo "[v2app] ❌ Native React Native APK build did not produce app-debug.apk"
+              exit 1
             fi
             cd ../../..
           else
-            cd ../..
+            echo "[v2app] ❌ Prebuild failed to create android directory"
+            exit 1
           fi
 
       - name: Copy Release APK Artifacts
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk ./VidyaOS.apk
           if [ ! -f "./v2app.apk" ]; then
-            echo "[v2app] Linking binary packaging for v2app..."
-            cp android/app/build/outputs/apk/debug/app-debug.apk ./v2app.apk
+            echo "[v2app] ERROR: Native v2app.apk was not generated. Failing release to prevent incorrect fallback!"
+            exit 1
           fi
           ls -lh ./VidyaOS.apk ./v2app.apk
 

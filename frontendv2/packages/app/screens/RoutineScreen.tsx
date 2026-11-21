@@ -14,24 +14,24 @@ interface Period {
 
 const SAMPLE_ROUTINE: Record<string, Period[]> = {
   Monday: [
-    { period: 1, time: '10:00 - 10:55', subject: 'Android Development', code: '055004', room: 'Lab 2', teacher: 'Rajnish Bhutani' },
-    { period: 2, time: '10:55 - 11:50', subject: 'E-Commerce', code: '125001', room: 'Room 104', teacher: 'Rajnish Bhutani' },
+    { period: 1, time: '10:00 - 10:55', subject: 'Android Development', code: '055004', room: 'Lab 2', teacher: 'Er. Rajesh' },
+    { period: 2, time: '10:55 - 11:50', subject: 'E-Commerce', code: '125001', room: 'Room 104', teacher: 'Prof. Sharma' },
     { period: 3, time: '12:10 - 01:05', subject: 'Minor Project', code: '125002', room: 'Block A', teacher: 'Rajesh Lohani' },
   ],
   Tuesday: [
     { period: 1, time: '10:00 - 10:55', subject: 'Cloud Computing', code: '055008', room: 'Room 102', teacher: 'Navneet Mishra' },
-    { period: 2, time: '10:55 - 11:50', subject: 'Android Development', code: '055004', room: 'Lab 2', teacher: 'Rajnish Bhutani' },
+    { period: 2, time: '10:55 - 11:50', subject: 'Android Development', code: '055004', room: 'Lab 2', teacher: 'Er. Rajesh' },
   ],
   Wednesday: [
-    { period: 1, time: '10:00 - 10:55', subject: 'E-Commerce', code: '125001', room: 'Room 104', teacher: 'Rajnish Bhutani' },
+    { period: 1, time: '10:00 - 10:55', subject: 'E-Commerce', code: '125001', room: 'Room 104', teacher: 'Prof. Sharma' },
     { period: 2, time: '10:55 - 11:50', subject: 'Minor Project', code: '125002', room: 'Block A', teacher: 'Rajesh Lohani' },
   ],
   Thursday: [
-    { period: 1, time: '10:00 - 10:55', subject: 'Android Development', code: '055004', room: 'Lab 2', teacher: 'Rajnish Bhutani' },
+    { period: 1, time: '10:00 - 10:55', subject: 'Android Development', code: '055004', room: 'Lab 2', teacher: 'Er. Rajesh' },
     { period: 2, time: '10:55 - 11:50', subject: 'Cloud Computing', code: '055008', room: 'Room 102', teacher: 'Navneet Mishra' },
   ],
   Friday: [
-    { period: 1, time: '10:00 - 10:55', subject: 'E-Commerce', code: '125001', room: 'Room 104', teacher: 'Rajnish Bhutani' },
+    { period: 1, time: '10:00 - 10:55', subject: 'E-Commerce', code: '125001', room: 'Room 104', teacher: 'Prof. Sharma' },
     { period: 2, time: '10:55 - 11:50', subject: 'Minor Project', code: '125002', room: 'Block A', teacher: 'Rajesh Lohani' },
   ],
   Saturday: [

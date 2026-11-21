@@ -223,6 +223,18 @@
       "destination": "/faculty/students/index.html"
     },
     {
+      "source": "/faculty/settings",
+      "destination": "/faculty/settings/index.html"
+    },
+    {
+      "source": "/faculty/settings/",
+      "destination": "/faculty/settings/index.html"
+    },
+    {
+      "source": "/faculty/settings.html",
+      "destination": "/faculty/settings/index.html"
+    },
+    {
       "source": "/faculty/hod-settings.html",
       "destination": "/faculty/dashboard/index.html"
     },
@@ -701,6 +713,18 @@
     {
       "source": "/student/profile.html",
       "destination": "/student/profile/index.html"
+    },
+    {
+      "source": "/student/settings",
+      "destination": "/student/settings/index.html"
+    },
+    {
+      "source": "/student/settings/",
+      "destination": "/student/settings/index.html"
+    },
+    {
+      "source": "/student/settings.html",
+      "destination": "/student/settings/index.html"
     },
     {
       "source": "/student/theory-classes",

@@ -57,7 +57,7 @@ export const ClassroomCard: React.FC<ClassroomCardProps> = ({ classroom, onPress
       {/* Bottom Footer Row: Teacher Name and Tasks Indicator */}
       <View style={styles.bottomFooter}>
         <Text style={styles.instructor} numberOfLines={1}>
-          {classroom.teacher_name || 'Rajnish Singh Bhutani'}
+          {classroom.teacher_name || 'Faculty Instructor'}
         </Text>
 
         {pendingCount > 0 && (
