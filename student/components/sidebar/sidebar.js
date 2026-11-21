@@ -26,8 +26,9 @@
     return '';
   }
 
-  // Primary Navigation Registry (All 7 Verified Student Modules)
+  // Primary Navigation Registry (All Student Modules)
   const NAV_ITEMS = [
+    { key: 'home', label: 'Home Dashboard', shortLabel: 'Home', href: '/student/home/index.html', icon: 'home' },
     { key: 'classes', label: 'Classes Hub', shortLabel: 'Classes', href: '/student/dashboard/index.html', icon: 'classes' },
     { key: 'attendance', label: 'My Attendance', shortLabel: 'Attend', href: '/student/attendance/index.html', icon: 'attendance' },
     { key: 'timetable', label: 'Weekly Timetable', shortLabel: 'Schedule', href: '/student/timetable/index.html', icon: 'timetable' },
@@ -39,8 +40,9 @@
     { key: 'bug-reports', label: 'Report a Bug', shortLabel: 'Bug Report', href: '/student/bug-reports/index.html', icon: 'bug' }
   ];
 
-  // Canonical Mobile Bottom Tabs (Classes, Classwork, Settings)
+  // Canonical 4-Tab Mobile Bottom Bar (Home, Classes, Classwork, Settings)
   const MOBILE_TABS = [
+    { key: 'home', label: 'Home', href: '/student/home/index.html', icon: 'home' },
     { key: 'classes', label: 'Classes', href: '/student/dashboard/index.html', icon: 'classes' },
     { key: 'classwork', label: 'Classwork', href: '/student/assignments/index.html', icon: 'assignments' },
     { key: 'settings', label: 'Settings', href: '/student/settings/index.html', icon: 'settings' }
@@ -48,11 +50,13 @@
 
   function getActiveNavKey() {
     const p = window.location.pathname.toLowerCase();
+    if (p.includes('/home')) return 'home';
+    if (p.includes('/dashboard') || p.includes('/classes')) return 'classes';
     if (p.includes('/assignments')) return 'classwork';
     if (p.includes('/settings')) return 'settings';
     if (p.includes('/profile')) return 'settings'; // On Profile, Settings bottom tab is highlighted
     if (p.includes('/bug-reports')) return 'settings';
-    return 'classes';
+    return 'home';
   }
 
   function mountStudentSidebar() {

@@ -103,7 +103,7 @@ const mobileIndexHtml = `<!DOCTYPE html>
           const user = typeof userRaw === 'string' ? JSON.parse(userRaw) : userRaw;
           const role = (user.role || (Array.isArray(user.roles) ? user.roles[0] : '') || '').toLowerCase();
           if (role === 'student') {
-            window.location.replace('/student/dashboard/index.html');
+            window.location.replace('/student/home/index.html');
             return;
           } else if (role === 'teacher' || role === 'faculty' || role === 'hod') {
             window.location.replace('/faculty/classes/index.html');

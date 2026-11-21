@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Student Home — VidyaOS</title>
+  <script src="/mobile-bridge.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/student/components/core/reset.css">
+  <link rel="stylesheet" href="/student/components/core/variables.css">
+  <link rel="stylesheet" href="/student/components/student-base.css">
+  <link rel="stylesheet" href="/student/components/header/header.css">
+  <link rel="stylesheet" href="/student/components/sidebar/sidebar.css">
+  <link rel="stylesheet" href="/student/home/home.css?v=20261121">
+</head>
+<body class="student-home-page">
+  <!-- Semantic Mount Anchors for Isolated Student Components -->
+  <div id="student-header-mount"></div>
+  <div id="student-sidebar-mount"></div>
+
+  <!-- Compatibility marker for user-nav & active-session checks -->
+  <div id="user-nav" style="display:none;" aria-hidden="true"></div>
+
+  <main class="container home-main-container">
+    <!-- 1. GREETING & INSTITUTIONAL HEADER -->
+    <section class="home-hero-card">
+      <div class="hero-content-wrap">
+        <div class="hero-text-col">
+          <div class="hero-date-row">
+            <span class="hero-date-tag" id="home-today-date">Today</span>
+            <span class="hero-session-tag" id="home-session-tag">Academic Session</span>
+          </div>
+          <h1 class="hero-greeting" id="home-greeting">Welcome back 👋</h1>
+          <p class="hero-subtitle" id="home-cohort">
+            Uttarakhand Government Institute of Polytechnic Nainital
+          </p>
+        </div>
+        <div class="hero-badge-col">
+          <div class="home-attendance-chip safe" id="home-attendance-badge">
+            <span class="pulse-dot"></span>
+            <span id="home-hero-att-text">75% Attendance Safe</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. "UP NEXT" TODAY'S SCHEDULE HIGHLIGHT -->
+    <section class="home-up-next-card" id="home-up-next-card">
+      <div class="up-next-header">
+        <div class="up-next-tag">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span id="up-next-status-label">UP NEXT TODAY</span>
+        </div>
+        <a href="/student/timetable/index.html" class="up-next-view-link">
+          <span>Full Routine</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+      <div class="up-next-body">
+        <div class="up-next-info">
+          <h2 class="up-next-subject" id="next-class-subject">Loading schedule…</h2>
+          <div class="up-next-meta">
+            <span id="next-class-time" class="time-slot">--:--</span>
+            <span class="bullet-sep">•</span>
+            <span id="next-class-room">Classroom</span>
+            <span class="bullet-sep">•</span>
+            <span id="next-class-faculty" class="teacher-name">Faculty</span>
+          </div>
+        </div>
+        <a href="/student/attendance/index.html" class="btn btn-sm btn-primary btn-checkin-action" id="btn-home-checkin">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>Attendance</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 3. QUICK ACTION DOCK (4 ICON TILES) -->
+    <section class="home-quick-actions">
+      <a href="/student/attendance/index.html" class="quick-tile">
+        <div class="tile-icon-wrap icon-att">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><polyline points="9 15 11 17 15 13"></polyline></svg>
+        </div>
+        <span class="tile-label">Attendance</span>
+      </a>
+
+      <a href="/student/timetable/index.html" class="quick-tile">
+        <div class="tile-icon-wrap icon-routine">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <span class="tile-label">Routine</span>
+      </a>
+
+      <a href="/student/assignments/index.html" class="quick-tile">
+        <div class="tile-icon-wrap icon-tasks">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 12h6"></path><path d="M9 16h6"></path></svg>
+        </div>
+        <span class="tile-label">Classwork</span>
+      </a>
+
+      <a href="/student/leave/index.html" class="quick-tile">
+        <div class="tile-icon-wrap icon-leave">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4 20-7z"></path></svg>
+        </div>
+        <span class="tile-label">Leave</span>
+      </a>
+    </section>
+
+    <!-- 4. DUAL COCKPIT GRID: ATTENDANCE PULSE & PENDING CLASSWORK -->
+    <div class="home-cockpit-grid">
+      <!-- ATTENDANCE HEALTH CARD -->
+      <section class="card home-card-att">
+        <div class="card-header-clean">
+          <div class="header-title-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <h3>75% Attendance Health</h3>
+          </div>
+          <a href="/student/attendance/index.html" class="link-subtle">Details &rarr;</a>
+        </div>
+
+        <div class="att-pulse-row">
+          <div class="att-pct-box">
+            <div class="att-big-number" id="home-att-pct">--%</div>
+            <div class="att-ratio" id="home-att-ratio">Attended: -- / -- hrs</div>
+          </div>
+          <div class="att-gauge-bar-wrap">
+            <div class="att-gauge-fill" id="home-att-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div class="att-advice-banner" id="home-att-advice">
+          Calculating exam eligibility standing…
+        </div>
+      </section>
+
+      <!-- PENDING CLASSWORK & DEADLINES -->
+      <section class="card home-card-tasks">
+        <div class="card-header-clean">
+          <div class="header-title-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            <h3>Upcoming Deadlines</h3>
+          </div>
+          <a href="/student/assignments/index.html" class="link-subtle">View All &rarr;</a>
+        </div>
+
+        <div class="home-tasks-container" id="home-tasks-list">
+          <div class="task-loading-placeholder">
+            <span>Checking active coursework…</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 5. MY ENROLLED CLASSES (FAST CAROUSEL / GRID) -->
+    <section class="home-classes-section">
+      <div class="section-title-row">
+        <div class="title-with-badge">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"></rect><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"></rect><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"></rect><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"></rect></svg>
+          <h2>My Enrolled Classes</h2>
+          <span class="count-bubble" id="home-classes-count">--</span>
+        </div>
+        <a href="/student/dashboard/index.html" class="explore-all-btn">
+          <span>Classes Hub</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+
+      <div class="classes-slider-wrap" id="home-classes-container">
+        <!-- Injected dynamically via home.js -->
+        <div class="class-card-placeholder">Loading enrolled subjects…</div>
+      </div>
+    </section>
+
+    <!-- 6. ACADEMIC ADVISOR & HELPDESK FOOTER STRIP -->
+    <section class="home-footer-support-strip">
+      <div class="support-card-mini">
+        <div class="support-mini-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <div class="support-mini-info">
+          <div class="support-mini-title" id="home-advisor-name">Faculty Advisor</div>
+          <div class="support-mini-sub" id="home-advisor-dept">Department Mentor</div>
+        </div>
+        <a href="/student/settings/index.html" class="btn btn-sm btn-secondary support-mini-btn">Advisor Info</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Shared Security & API Core -->
+  <script src="/student/components/core/api.js"></script>
+  <script src="/student/components/core/auth.js"></script>
+  <script src="/student/components/core/utils.js"></script>
+
+  <!-- Dedicated Student Component Suite -->
+  <script src="/student/components/icons.js"></script>
+  <script src="/student/components/student-ui.js"></script>
+  <script src="/student/components/header/header.js"></script>
+  <script src="/student/components/sidebar/sidebar.js"></script>
+
+  <!-- Scoped Page Script -->
+  <script src="/student/home/home.js?v=20261121"></script>
+</body>
+</html>

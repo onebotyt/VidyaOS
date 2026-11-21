@@ -70,7 +70,7 @@ function purgeAllStoredAuth() {
     const roles = Array.isArray(u.roles) ? u.roles : [];
     const isAdmin = roles.includes('SYSTEM_ADMIN') || roles.includes('ADMIN') || u.role === 'SYSTEM_ADMIN' || u.role === 'ADMIN' || Boolean(u.is_admin);
     if (isAdmin) { window.location.replace('/admin/dashboard/index.html'); return; }
-    if (roles.includes('STUDENT') || u.role === 'STUDENT') { window.location.replace('/student/dashboard/index.html'); return; }
+    if (roles.includes('STUDENT') || u.role === 'STUDENT') { window.location.replace('/student/home/index.html'); return; }
     const isMobile = window.innerWidth <= 768;
     const isHod = roles.includes('HOD') || u.role === 'HOD' || Boolean(u.is_hod);
     if (isMobile && isHod) {
@@ -236,7 +236,7 @@ function redirectAfterLogin(user) {
   const roles = Array.isArray(user.roles) ? user.roles : [];
   const isAdmin = roles.includes('SYSTEM_ADMIN') || roles.includes('ADMIN') || user.role === 'SYSTEM_ADMIN' || user.role === 'ADMIN' || Boolean(user.is_admin);
   if (isAdmin) { window.location.href = '/admin/dashboard/index.html'; return; }
-  if (roles.includes('STUDENT') || user.role === 'STUDENT') { window.location.href = '/student/dashboard/index.html'; return; }
+  if (roles.includes('STUDENT') || user.role === 'STUDENT') { window.location.href = '/student/home/index.html'; return; }
   const isMobile = window.innerWidth <= 768;
   const isHod = roles.includes('HOD') || user.role === 'HOD' || Boolean(user.is_hod);
   if (isMobile && isHod) {
