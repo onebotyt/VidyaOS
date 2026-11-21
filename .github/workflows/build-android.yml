@@ -105,16 +105,31 @@ jobs:
             sed -i '/org.gradle.jvmargs/d' android/gradle.properties || true
             echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
 
+            # Configure react block for offline bundle inclusion and debug signing for release
+            node -e "
+              const fs = require('fs');
+              const file = 'android/app/build.gradle';
+              if (fs.existsSync(file)) {
+                let content = fs.readFileSync(file, 'utf8');
+                content = content.replace(/react\s*\{/, 'react {\n    bundleInDebug = true\n    bundleInRelease = true');
+                content = content.replace(/release\s*\{(\s*signingConfig\s+[^\n]+)?/, 'release {\n            signingConfig signingConfigs.debug');
+                fs.writeFileSync(file, content, 'utf8');
+              }
+            "
+
             cd android
             chmod +x gradlew
             unset _JAVA_OPTIONS
             unset JAVA_TOOL_OPTIONS
-            ./gradlew assembleDebug --no-daemon --stacktrace
-            if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            ./gradlew assembleRelease --no-daemon --stacktrace || ./gradlew assembleDebug --no-daemon --stacktrace
+            if [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+              cp app/build/outputs/apk/release/app-release.apk ../../../../v2app.apk
+              echo "[v2app] ✅ Native React Native Release APK (offline bundle embedded) compiled successfully!"
+            elif [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
               cp app/build/outputs/apk/debug/app-debug.apk ../../../../v2app.apk
-              echo "[v2app] ✅ Native React Native APK compiled successfully!"
+              echo "[v2app] ✅ Native React Native Debug APK (offline bundle embedded) compiled successfully!"
             else
-              echo "[v2app] ❌ Native React Native APK build did not produce app-debug.apk"
+              echo "[v2app] ❌ Native React Native APK build did not produce release or debug APK"
               exit 1
             fi
             cd ../../..
