@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/delete-modal/delete-modal.css?v=20261117">
-  <link rel="stylesheet" href="/faculty/students/students.css?v=20261121_02">
+  <link rel="stylesheet" href="/faculty/students/students.css?v=20261117">
   <script>
     (function () {
       try {
@@ -156,7 +156,7 @@
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
               </span>
-              <input type="search" id="student-search" placeholder="Search by name, roll, enrollment...">
+              <input type="search" id="student-search" placeholder="Search by name, roll, UBTER roll no...">
             </div>
 
             <button type="button" class="btn-stu-compact" onclick="openAddStudentModal()" title="Enroll New Student">
@@ -218,9 +218,9 @@
                     onchange="toggleSelectAllTrash(this.checked)" title="Select all trashed students">
                 </th>
                 <th class="col-avatar" id="th-avatar" style="width: 44px; text-align: center;">Avatar</th>
-                <th class="col-roll" style="width: 55px;" id="th-roll">Roll #</th>
+                <th style="width: 55px;" id="th-roll">Roll #</th>
                 <th class="col-reg" id="th-reg">Registration No</th>
-                <th class="col-enrollment" id="th-enrollment">UBTER Roll No.</th>
+                <th class="col-enrollment" id="th-enrollment">UBTER Roll No</th>
                 <th>Student Name</th>
                 <th class="col-retention" id="th-retention" style="display: none;">Retention</th>
                 <th style="text-align: right; width: 65px;" id="th-actions">Actions</th>
@@ -263,8 +263,8 @@
 
         <!-- Tab Panel 1: Profile Info -->
         <div id="detail-tab-profile" class="stu-tab-panel active">
-          <!-- Top Row: Photo Avatar on Left, Name on Right -->
-          <div class="stu-edit-identity-row">
+          <!-- Top Row: Photo on Left, Name & IDs on Right -->
+          <div class="stu-edit-top-grid">
             <div class="stu-edit-photo-col">
               <label class="stu-compact-label">Photo</label>
               <div class="stu-edit-photo-box" id="detail-stu-photo-box">
@@ -272,41 +272,44 @@
               </div>
             </div>
 
-            <div class="stu-edit-name-col">
-              <label for="edit-stu-name" class="stu-compact-label">
-                Name <span class="stu-edit-indicator" style="display:none; color:var(--status-absent);">*</span>
-              </label>
-              <div id="detail-stu-display-name" class="stu-compact-display-val stu-view-mode">—</div>
-              <input type="text" id="edit-stu-name" required placeholder="Full Name" class="stu-compact-input stu-edit-mode" style="display:none;">
-            </div>
-          </div>
-
-          <!-- Dual Field: UBTER Roll No. & UBTER Reg. # (Full Width Row) -->
-          <div class="stu-edit-dual-row">
-            <div>
-              <div class="stu-compact-label-row">
-                <label for="edit-stu-enroll" class="stu-compact-label" style="margin:0;">
-                  UBTER Roll No. <span id="edit-stu-enroll-req" class="stu-edit-mode" style="display:none; color:var(--status-absent);">*</span>
+            <div class="stu-edit-main-col">
+              <!-- Name Display / Input -->
+              <div>
+                <label for="edit-stu-name" class="stu-compact-label">
+                  Name <span class="stu-edit-indicator" style="display:none; color:var(--status-absent);">*</span>
                 </label>
-                <label class="chk-enroll-box stu-compact-chk stu-edit-mode" id="edit-chk-enroll-box" style="display:none;" title="Roll number not available">
-                  <input type="checkbox" id="edit-chk-enroll-not-available">
-                  <span>Not Avail.</span>
-                </label>
+                <div id="detail-stu-display-name" class="stu-compact-display-val stu-view-mode">—</div>
+                <input type="text" id="edit-stu-name" required placeholder="Full Name" class="stu-compact-input stu-edit-mode" style="display:none;">
               </div>
-              <div id="detail-stu-enroll" class="stu-compact-display-val stu-mono-input stu-view-mode">—</div>
-              <div class="stu-edit-mode" style="display:none;">
-                <input type="text" id="edit-stu-enroll" placeholder="11-digit numeric" maxlength="11" autocomplete="off" class="stu-compact-input stu-mono-input">
-                <p class="inp-hint" id="edit-stu-enroll-hint" style="display:none;">Enter your 11-digit official UBTER roll number.</p>
-                <p class="inp-error" id="edit-stu-enroll-error" style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;"></p>
-              </div>
-            </div>
 
-            <div>
-              <label for="edit-stu-reg" class="stu-compact-label">
-                UBTER Reg. # <span class="stu-edit-mode" style="display:none; font-weight:normal; color:var(--text-muted);">(optional)</span>
-              </label>
-              <div id="detail-stu-reg" class="stu-compact-display-val stu-mono-input uppercase stu-view-mode">—</div>
-              <input type="text" id="edit-stu-reg" placeholder="e.g. 24101054001" autocomplete="off" class="stu-compact-input stu-mono-input uppercase stu-edit-mode" style="display:none;">
+              <!-- Dual Field: UBTER Roll No & UBTER Reg. # -->
+              <div class="stu-edit-dual-row">
+                <div>
+                  <div class="stu-compact-label-row">
+                    <label for="edit-stu-enroll" class="stu-compact-label" style="margin:0;">
+                      UBTER Roll No <span id="edit-stu-enroll-req" class="stu-edit-mode" style="display:none; color:var(--status-absent);">*</span>
+                    </label>
+                    <label class="chk-enroll-box stu-compact-chk stu-edit-mode" id="edit-chk-enroll-box" style="display:none;" title="UBTER roll number not available">
+                      <input type="checkbox" id="edit-chk-enroll-not-available">
+                      <span>Not Avail.</span>
+                    </label>
+                  </div>
+                  <div id="detail-stu-enroll" class="stu-compact-display-val stu-mono-input stu-view-mode">—</div>
+                  <div class="stu-edit-mode" style="display:none;">
+                    <input type="text" id="edit-stu-enroll" placeholder="11-digit numeric" maxlength="11" autocomplete="off" class="stu-compact-input stu-mono-input">
+                    <p class="inp-hint" id="edit-stu-enroll-hint" style="display:none;">Enter exactly 11 numeric digits.</p>
+                    <p class="inp-error" id="edit-stu-enroll-error" style="font-size:0.68rem; color:var(--status-absent); margin:0.15rem 0 0 0; min-height:0.85rem;"></p>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="edit-stu-reg" class="stu-compact-label">
+                    UBTER Reg. # <span class="stu-edit-mode" style="display:none; font-weight:normal; color:var(--text-muted);">(optional)</span>
+                  </label>
+                  <div id="detail-stu-reg" class="stu-compact-display-val stu-mono-input uppercase stu-view-mode">—</div>
+                  <input type="text" id="edit-stu-reg" placeholder="e.g. 24101054001" autocomplete="off" class="stu-compact-input stu-mono-input uppercase stu-edit-mode" style="display:none;">
+                </div>
+              </div>
             </div>
           </div>
 
@@ -534,7 +537,7 @@
             style="font-family:var(--font-family-mono); color:var(--color-primary);">Full Name, UBTER Roll No, Class Roll No, Reg No, Semester</code>
         </p>
         <textarea id="bulk-csv-text" rows="6"
-          placeholder="Aarav Sharma, 2024IT001, 1, 24101054001, 5&#10;Aditi Verma, 2024IT002, 2, 24101054002, 5"
+          placeholder="Aarav Sharma, 24011090008, 1, 24101054001, 5&#10;Aditi Verma, 24011090009, 2, 24101054002, 5"
           style="width:100%; padding:0.65rem 0.75rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-surface); color:var(--text-main); font-size:0.82rem; font-family:var(--font-family-mono); box-sizing:border-box;"></textarea>
         <div style="display:flex; justify-content:flex-end; gap:0.65rem; margin-top:0.5rem;">
           <button type="button" class="btn-stu-outline" onclick="closeBulkModal()">Cancel</button>
@@ -610,7 +613,7 @@
   <script src="/faculty/components/sidebar/sidebar.js?v=20261117"></script>
   <script src="/faculty/components/header/header.js?v=20261117"></script>
   <script src="/faculty/components/delete-modal/delete-modal.js?v=20261117"></script>
-  <script src="/faculty/students/students.js?v=20261121_02"></script>
+  <script src="/faculty/students/students.js?v=20261117"></script>
 </body>
 
 </html>

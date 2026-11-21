@@ -33,7 +33,7 @@ async function loadProfileHeader() {
       if (deptEl) deptEl.textContent = `${s.department_name || 'Department'} (${s.branch_code || s.department_code || ''}) • ${s.academic_year_label || 'Current Session'}`;
       if (rollEl) rollEl.textContent = s.class_roll_no ? `${s.class_roll_no}` : '—';
       if (regEl) regEl.textContent = s.registration_no || '—';
-      if (enrollEl) enrollEl.textContent = s.official_enrollment_no || '—';
+      if (enrollEl) enrollEl.textContent = s.ubter_roll_no || s.official_enrollment_no || '—';
       
       const card = document.getElementById('student-id-card');
       if (card) card.style.display = 'block';

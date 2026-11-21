@@ -236,492 +236,503 @@
     </div> <!-- /.faculty-main-wrap -->
   </div> <!-- /#faculty-app-layout -->
 
-      <!-- Hidden File Input for Direct Uploads -->
-      <input type="file" id="cf-hidden-file-input" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx"
-        onchange="handleDirectFileSelect(event)">
+  <!-- Hidden File Input for Direct Uploads -->
+  <input type="file" id="cf-hidden-file-input" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx"
+    onchange="handleDirectFileSelect(event)">
 
-      <!-- Modal 1: Upload / Replace Document Modal -->
-      <div class="modal" id="modal-upload-doc" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-upload-doc')"></div>
-        <div class="modal-dialog modal-md">
-          <div class="modal-header">
-            <div>
-              <h3 class="modal-title" id="upload-modal-title">Upload Course File Document</h3>
-              <p class="modal-subtitle" id="upload-modal-subtitle">PDF / Document File</p>
-            </div>
-            <button type="button" class="modal-close" onclick="closeModal('modal-upload-doc')">&times;</button>
-          </div>
-          <form id="form-upload-doc" onsubmit="submitDocumentUpload(event)">
-            <input type="hidden" id="upload-item-key">
-            <div class="modal-body">
-              <div class="form-group">
-                <label class="form-label">Document Title</label>
-                <input type="text" id="upload-doc-title" class="form-control" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Select PDF Document</label>
-                <div class="cf-drop-zone" id="cf-drop-zone"
-                  onclick="document.getElementById('upload-file-field').click()">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                    stroke-linecap="round" stroke-linejoin="round"
-                    style="color:var(--color-primary);margin-bottom:0.5rem;">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                  </svg>
-                  <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">Click to Browse or Drag &amp;
-                    Drop
-                    PDF</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">Supported formats: PDF,
-                    DOC,
-                    DOCX, XLS (Max 20 MB)</div>
-                  <div id="upload-selected-file-name"
-                    style="margin-top:0.75rem;font-size:0.82rem;font-weight:700;color:var(--status-present);display:none;">
-                  </div>
-                </div>
-                <input type="file" id="upload-file-field" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx"
-                  onchange="onModalFileSelected(this)">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Notes / Revision Remarks (Optional)</label>
-                <textarea id="upload-doc-notes" class="form-control" rows="2"
-                  placeholder="e.g. Approved in Department Curriculum Meeting on 12/08/2026..."></textarea>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline" onclick="closeModal('modal-upload-doc')">Cancel</button>
-              <button type="submit" class="btn btn-primary" id="btn-submit-upload">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <span>Upload Document</span>
-              </button>
-            </div>
-          </form>
+  <!-- Modal 1: Upload / Replace Document Modal -->
+  <div class="modal" id="modal-upload-doc" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-upload-doc')"></div>
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="upload-modal-title">Upload Course File Document</h3>
+          <p class="modal-subtitle" id="upload-modal-subtitle">PDF / Document File</p>
         </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-upload-doc')">&times;</button>
       </div>
-
-      <!-- Modal 2: PDF Document Viewer Modal -->
-      <div class="modal" id="modal-pdf-preview" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-pdf-preview')"></div>
-        <div class="modal-dialog modal-xl"
-          style="max-width: 950px; height: 90vh; display: flex; flex-direction: column;">
-          <div class="modal-header">
-            <div>
-              <h3 class="modal-title" id="preview-modal-title">Document Preview</h3>
-              <p class="modal-subtitle" id="preview-modal-subtitle">Course File Artifact</p>
-            </div>
-            <div style="display:flex;gap:0.5rem;align-items:center;">
-              <a href="#" id="btn-preview-download" class="btn btn-sm btn-outline" target="_blank" download>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <span>Download</span>
-              </a>
-              <button type="button" class="modal-close" onclick="closeModal('modal-pdf-preview')">&times;</button>
-            </div>
+      <form id="form-upload-doc" onsubmit="submitDocumentUpload(event)">
+        <input type="hidden" id="upload-item-key">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Document Title</label>
+            <input type="text" id="upload-doc-title" class="form-control" required>
           </div>
-          <div class="modal-body" style="flex: 1; padding: 0; overflow: hidden; position: relative;">
-            <iframe id="pdf-preview-frame"
-              style="width: 100%; height: 100%; border: none; background: var(--bg-surface);"
-              src="about:blank"></iframe>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal 3: Live Student Roster View (Item #7) -->
-      <div class="modal" id="modal-student-roster" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-student-roster')"></div>
-        <div class="modal-dialog modal-lg">
-          <div class="modal-header">
-            <div>
-              <h3 class="modal-title">Official Enrolled Student Roster (Item #7)</h3>
-              <p class="modal-subtitle">Auto-Synchronized from VidyaOS Department Database</p>
-            </div>
-            <div style="display:flex;gap:0.5rem;align-items:center;">
-              <button type="button" class="btn btn-sm btn-primary" onclick="printStudentRoster()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                  <rect x="6" y="14" width="12" height="8"></rect>
-                </svg>
-                <span>Print Student List</span>
-              </button>
-              <button type="button" class="modal-close" onclick="closeModal('modal-student-roster')">&times;</button>
-            </div>
-          </div>
-          <div class="modal-body">
-            <div class="cf-roster-summary-bar">
-              <span id="roster-count-badge" class="badge badge-sem">10 Students Enrolled</span>
-              <span style="font-size:0.8rem;color:var(--text-muted);">Includes verified official registration roll and
-                live
-                subject attendance.</span>
-            </div>
-            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-              <table class="data-table" id="table-students-roster">
-                <thead>
-                  <tr>
-                    <th style="width: 70px;">Roll No</th>
-                    <th style="width: 130px;">UBTER Roll No</th>
-                    <th>Student Full Name</th>
-                    <th>Email Address</th>
-                    <th style="width: 90px; text-align: center;">Attended</th>
-                    <th style="width: 100px; text-align: center;">Attendance %</th>
-                  </tr>
-                </thead>
-                <tbody id="tbody-students-roster">
-                  <!-- Injected via JS -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline"
-              onclick="openDirectUploadModal('student_list', 'Student List Signed PDF')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
+          <div class="form-group">
+            <label class="form-label">Select PDF Document</label>
+            <div class="cf-drop-zone" id="cf-drop-zone" onclick="document.getElementById('upload-file-field').click()">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary);margin-bottom:0.5rem;">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="17 8 12 3 7 8"></polyline>
                 <line x1="12" y1="3" x2="12" y2="15"></line>
               </svg>
-              <span>Upload Signed / Certified PDF Roster (Optional)</span>
-            </button>
-            <button type="button" class="btn btn-primary" onclick="closeModal('modal-student-roster')">Close</button>
+              <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">Click to Browse or Drag &amp;
+                Drop
+                PDF</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">Supported formats: PDF,
+                DOC,
+                DOCX, XLS (Max 20 MB)</div>
+              <div id="upload-selected-file-name"
+                style="margin-top:0.75rem;font-size:0.82rem;font-weight:700;color:var(--status-present);display:none;">
+              </div>
+            </div>
+            <input type="file" id="upload-file-field" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx"
+              onchange="onModalFileSelected(this)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes / Revision Remarks (Optional)</label>
+            <textarea id="upload-doc-notes" class="form-control" rows="2"
+              placeholder="e.g. Approved in Department Curriculum Meeting on 12/08/2026..."></textarea>
           </div>
         </div>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-upload-doc')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-upload">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>Upload Document</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-      <!-- Modal 4: Live Classwork Schedule View (Item #14) -->
-      <div class="modal" id="modal-assignment-schedule" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-assignment-schedule')"></div>
-        <div class="modal-dialog modal-lg">
-          <div class="modal-header">
-            <div>
-              <h3 class="modal-title">Assignment &amp; Tutorial Schedule (Item #14)</h3>
-              <p class="modal-subtitle">Auto-Synchronized from Subject Classwork Records</p>
-            </div>
-            <div style="display:flex;gap:0.5rem;align-items:center;">
-              <button type="button" class="btn btn-sm btn-primary" onclick="printAssignmentSchedule()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                  <rect x="6" y="14" width="12" height="8"></rect>
-                </svg>
-                <span>Print Schedule</span>
-              </button>
-              <button type="button" class="modal-close"
-                onclick="closeModal('modal-assignment-schedule')">&times;</button>
-            </div>
-          </div>
-          <div class="modal-body">
-            <div class="cf-roster-summary-bar">
-              <span id="schedule-count-badge" class="badge badge-sem">7 Assignments Issued</span>
-              <span style="font-size:0.8rem;color:var(--text-muted);">Pulled directly from Classwork coursework
-                repository.</span>
-            </div>
-            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-              <table class="data-table" id="table-assignments-schedule">
-                <thead>
-                  <tr>
-                    <th style="width: 50px;">#</th>
-                    <th>Assignment Title</th>
-                    <th style="width: 110px;">Issue Date</th>
-                    <th style="width: 110px;">Due Date</th>
-                    <th style="width: 90px; text-align: center;">Max Marks</th>
-                    <th style="width: 100px; text-align: center;">Submissions</th>
-                  </tr>
-                </thead>
-                <tbody id="tbody-assignments-schedule">
-                  <!-- Injected via JS -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline"
-              onclick="openDirectUploadModal('assignment_schedule', 'Assignment Schedule Signed PDF')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-              <span>Upload Signed Tutorial Schedule PDF (Optional)</span>
-            </button>
-            <button type="button" class="btn btn-primary"
-              onclick="closeModal('modal-assignment-schedule')">Close</button>
-          </div>
+  <!-- Modal 2: PDF Document Viewer Modal -->
+  <div class="modal" id="modal-pdf-preview" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-pdf-preview')"></div>
+    <div class="modal-dialog modal-xl" style="max-width: 950px; height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="preview-modal-title">Document Preview</h3>
+          <p class="modal-subtitle" id="preview-modal-subtitle">Course File Artifact</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <a href="#" id="btn-preview-download" class="btn btn-sm btn-outline" target="_blank" download>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download</span>
+          </a>
+          <button type="button" class="modal-close" onclick="closeModal('modal-pdf-preview')">&times;</button>
         </div>
       </div>
+      <div class="modal-body" style="flex: 1; padding: 0; overflow: hidden; position: relative;">
+        <iframe id="pdf-preview-frame" style="width: 100%; height: 100%; border: none; background: var(--bg-surface);"
+          src="about:blank"></iframe>
+      </div>
+    </div>
+  </div>
 
-      <!-- Modal 5: Internal Assessment Plan Evaluation Sheet (Item #12) -->
-      <div class="modal" id="modal-evaluation-scheme" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-evaluation-scheme')"></div>
-        <div class="modal-dialog modal-md">
-          <div class="modal-header">
-            <div>
-              <h3 class="modal-title">Internal Assessment Plan (Item #12)</h3>
-              <p class="modal-subtitle">Continuous Evaluation Weightage Breakdown</p>
-            </div>
-            <button type="button" class="modal-close" onclick="closeModal('modal-evaluation-scheme')">&times;</button>
-          </div>
-          <form id="form-evaluation-scheme" onsubmit="saveEvaluationScheme(event)">
-            <div class="modal-body">
-              <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
-                Configure the internal continuous assessment weightages. These criteria form the official evaluation
-                rubric
-                submitted to the University/Board.
-              </p>
-              <div class="form-group">
-                <label class="form-label">Mid-Semester / Sessional Tests Weightage (Marks)</label>
-                <input type="number" id="eval-midsem" class="form-control" value="20" min="0" max="100"
-                  oninput="recalcEvalTotal()" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Continuous Classwork &amp; Assignments (Marks)</label>
-                <input type="number" id="eval-assignments" class="form-control" value="10" min="0" max="100"
-                  oninput="recalcEvalTotal()" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Laboratory Work / Practical Performance (Marks)</label>
-                <input type="number" id="eval-lab" class="form-control" value="15" min="0" max="100"
-                  oninput="recalcEvalTotal()" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Attendance Regularity &amp; Discipline (Marks)</label>
-                <input type="number" id="eval-attendance" class="form-control" value="5" min="0" max="100"
-                  oninput="recalcEvalTotal()" required>
-              </div>
-              <div class="cf-eval-total-box">
-                <span>Total Internal Assessment Marks:</span>
-                <strong id="eval-total-display">50 Marks</strong>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline"
-                onclick="openDirectUploadModal('internal_assessment_plan', 'Internal Assessment Plan PDF')">Upload
-                Signed
-                PDF</button>
-              <button type="submit" class="btn btn-primary">Save Evaluation Plan</button>
-            </div>
-          </form>
+  <!-- Modal 3: Live Student Roster View (Item #7) -->
+  <div class="modal" id="modal-student-roster" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-student-roster')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Official Enrolled Student Roster (Item #7)</h3>
+          <p class="modal-subtitle">Auto-Synchronized from VidyaOS Department Database</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="printStudentRoster()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>Print Student List</span>
+          </button>
+          <button type="button" class="modal-close" onclick="closeModal('modal-student-roster')">&times;</button>
         </div>
       </div>
-
-      <!-- Modal 6: Course Outcomes & CO-PO Mapping Matrix (Item #3 & #4) -->
-      <div class="modal" id="modal-copo-matrix" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-copo-matrix')"></div>
-        <div class="modal-dialog modal-lg">
-          <div class="modal-header">
-            <div>
-              <h3 class="modal-title">Course Outcomes &amp; CO-PO Mapping (Items #3 &amp; #4)</h3>
-              <p class="modal-subtitle">NBA / OBE Outcome Based Education Framework</p>
-            </div>
-            <button type="button" class="modal-close" onclick="closeModal('modal-copo-matrix')">&times;</button>
-          </div>
-          <div class="modal-body">
-            <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;color:var(--text-main);">Course Outcomes
-              (CO1
-              - CO6)</h4>
-            <div id="co-list-inputs" style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem;">
+      <div class="modal-body">
+        <div class="cf-roster-summary-bar">
+          <span id="roster-count-badge" class="badge badge-sem">10 Students Enrolled</span>
+          <span style="font-size:0.8rem;color:var(--text-muted);">Includes verified official registration roll and
+            live
+            subject attendance.</span>
+        </div>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+          <table class="data-table" id="table-students-roster">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Roll No</th>
+                <th style="width: 130px;">UBTER Roll No</th>
+                <th>Student Full Name</th>
+                <th>Email Address</th>
+                <th style="width: 90px; text-align: center;">Attended</th>
+                <th style="width: 100px; text-align: center;">Attendance %</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-students-roster">
               <!-- Injected via JS -->
-            </div>
-
-            <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.5rem;color:var(--text-main);">CO-PO Correlation
-              Matrix</h4>
-            <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">Scale: 1 = Low (Slight), 2 =
-              Medium
-              (Moderate), 3 = High (Substantial), Blank = No Correlation</p>
-            <div class="table-responsive" style="max-height: 260px; overflow: auto;">
-              <table class="data-table" id="table-copo-matrix" style="font-size:0.78rem;">
-                <thead>
-                  <tr>
-                    <th style="min-width: 50px;">CO</th>
-                    <th>PO1</th>
-                    <th>PO2</th>
-                    <th>PO3</th>
-                    <th>PO4</th>
-                    <th>PO5</th>
-                    <th>PO6</th>
-                    <th>PO7</th>
-                    <th>PO8</th>
-                    <th>PO9</th>
-                    <th>PO10</th>
-                    <th>PO11</th>
-                    <th>PO12</th>
-                    <th>PSO1</th>
-                    <th>PSO2</th>
-                  </tr>
-                </thead>
-                <tbody id="tbody-copo-matrix">
-                  <!-- Injected via JS -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline"
-              onclick="openDirectUploadModal('copo_matrix', 'CO-PO Matrix PDF')">Upload CO-PO PDF</button>
-            <button type="button" class="btn btn-primary" onclick="saveCopoData()">Save Outcomes &amp; Matrix</button>
-          </div>
+            </tbody>
+          </table>
         </div>
       </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline"
+          onclick="openDirectUploadModal('student_list', 'Student List Signed PDF')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Upload Signed / Certified PDF Roster (Optional)</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="closeModal('modal-student-roster')">Close</button>
+      </div>
+    </div>
+  </div>
 
-      <!-- Modal 7: Advanced & Slow Learners View (Item #9 & #10) -->
-      <div class="modal" id="modal-learners-view" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-learners-view')"></div>
-        <div class="modal-dialog modal-lg">
-          <div class="modal-header">
-            <div>
-              <h3 class="modal-title" id="learners-modal-title">Student Diagnostic Roster</h3>
-              <p class="modal-subtitle" id="learners-modal-subtitle">Learning Diagnostic Categorization</p>
-            </div>
-            <button type="button" class="modal-close" onclick="closeModal('modal-learners-view')">&times;</button>
-          </div>
-          <div class="modal-body">
-            <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th style="width: 70px;">Roll No</th>
-                    <th style="width: 130px;">UBTER Roll No</th>
-                    <th>Full Name</th>
-                    <th style="width: 110px; text-align: center;">Attendance</th>
-                    <th>Diagnostic Status &amp; Mentoring Action</th>
-                  </tr>
-                </thead>
-                <tbody id="tbody-learners-roster">
-                  <!-- Injected via JS -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline" id="btn-learners-upload-pdf">Upload Formal PDF Report</button>
-            <button type="button" class="btn btn-primary" onclick="closeModal('modal-learners-view')">Close</button>
-          </div>
+  <!-- Modal 4: Live Classwork Schedule View (Item #14) -->
+  <div class="modal" id="modal-assignment-schedule" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-assignment-schedule')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Assignment &amp; Tutorial Schedule (Item #14)</h3>
+          <p class="modal-subtitle">Auto-Synchronized from Subject Classwork Records</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="printAssignmentSchedule()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>Print Schedule</span>
+          </button>
+          <button type="button" class="modal-close" onclick="closeModal('modal-assignment-schedule')">&times;</button>
         </div>
       </div>
-
-      <!-- Modal 8: HOD Audit Verification Modal -->
-      <div class="modal" id="modal-hod-audit" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-hod-audit')"></div>
-        <div class="modal-dialog modal-md">
-          <div class="modal-header">
-            <div>
-              <h3 class="modal-title">HOD Quality &amp; Compliance Audit</h3>
-              <p class="modal-subtitle">Official Course File Verification Sign-off</p>
-            </div>
-            <button type="button" class="modal-close" onclick="closeModal('modal-hod-audit')">&times;</button>
-          </div>
-          <form id="form-hod-audit" onsubmit="submitHodAudit(event)">
-            <div class="modal-body">
-              <div class="form-group">
-                <label class="form-label">Audit Decision</label>
-                <select id="audit-decision-status" class="form-control" required>
-                  <option value="APPROVED">APPROVE — Course File Complete &amp; Verified</option>
-                  <option value="REVISION_REQUESTED">REVISION REQUESTED — Missing Required Documents</option>
-                  <option value="AUDITED">AUDITED — In Review</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Audit Remarks / Feedback for Faculty Member</label>
-                <textarea id="audit-remarks-text" class="form-control" rows="4"
-                  placeholder="Enter specific observations, missing items, or praise for NBA/NAAC compliance..."
-                  required></textarea>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline" onclick="closeModal('modal-hod-audit')">Cancel</button>
-              <button type="submit" class="btn btn-primary">Submit Audit Sign-Off</button>
-            </div>
-          </form>
+      <div class="modal-body">
+        <div class="cf-roster-summary-bar">
+          <span id="schedule-count-badge" class="badge badge-sem">7 Assignments Issued</span>
+          <span style="font-size:0.8rem;color:var(--text-muted);">Pulled directly from Classwork coursework
+            repository.</span>
+        </div>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+          <table class="data-table" id="table-assignments-schedule">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Assignment Title</th>
+                <th style="width: 110px;">Issue Date</th>
+                <th style="width: 110px;">Due Date</th>
+                <th style="width: 90px; text-align: center;">Max Marks</th>
+                <th style="width: 100px; text-align: center;">Submissions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-assignments-schedule">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
         </div>
       </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline"
+          onclick="openDirectUploadModal('assignment_schedule', 'Assignment Schedule Signed PDF')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Upload Signed Tutorial Schedule PDF (Optional)</span>
+        </button>
+        <button type="button" class="btn btn-primary" onclick="closeModal('modal-assignment-schedule')">Close</button>
+      </div>
+    </div>
+  </div>
 
-      <!-- Modal 9: Combine & Export Documents Modal -->
-      <div class="modal" id="modal-combine-export" role="dialog" aria-modal="true" style="display:none;">
-        <div class="modal-backdrop" onclick="closeModal('modal-combine-export')"></div>
-        <div class="modal-dialog modal-compact-export" style="max-width: 520px; width: 100%; margin: auto;">
-          <div class="modal-header" style="padding: 0.85rem 1.15rem;">
-            <div>
-              <h3 class="modal-title" style="font-size: 1.05rem; display: flex; align-items: center; gap: 0.45rem;">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary); flex-shrink:0;">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                </svg>
-                <span>Combine &amp; Export Dossier</span>
-              </h3>
-              <p class="modal-subtitle" style="font-size: 0.74rem; margin-top: 0.15rem;">Merge documents into one consolidated PDF with title page &amp; index</p>
-            </div>
-            <button type="button" class="modal-close" onclick="closeModal('modal-combine-export')">&times;</button>
+  <!-- Modal 5: Internal Assessment Plan Evaluation Sheet (Item #12) -->
+  <div class="modal" id="modal-evaluation-scheme" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-evaluation-scheme')"></div>
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Internal Assessment Plan (Item #12)</h3>
+          <p class="modal-subtitle">Continuous Evaluation Weightage Breakdown</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-evaluation-scheme')">&times;</button>
+      </div>
+      <form id="form-evaluation-scheme" onsubmit="saveEvaluationScheme(event)">
+        <div class="modal-body">
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+            Configure the internal continuous assessment weightages. These criteria form the official evaluation
+            rubric
+            submitted to the University/Board.
+          </p>
+          <div class="form-group">
+            <label class="form-label">Mid-Semester / Sessional Tests Weightage (Marks)</label>
+            <input type="number" id="eval-midsem" class="form-control" value="20" min="0" max="100"
+              oninput="recalcEvalTotal()" required>
           </div>
-          <div class="modal-body" style="padding: 0.85rem 1.15rem;">
-            <div style="margin-bottom: 0.65rem;">
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 0.35rem;">Export Scope</label>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                <label class="compact-scope-card">
-                  <input type="radio" name="export-merge-scope" id="scope-current-module" value="current" checked onchange="updateMergeModalPreview()">
-                  <div>
-                    <strong id="lbl-scope-current">Current Module</strong>
-                    <span id="sub-scope-current">Active module only</span>
-                  </div>
-                </label>
-                <label class="compact-scope-card">
-                  <input type="radio" name="export-merge-scope" id="scope-all-modules" value="all" onchange="updateMergeModalPreview()">
-                  <div>
-                    <strong>All 6 Modules</strong>
-                    <span>Theory, Lab, NBA, Perf, Direct, Indirect</span>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            <!-- Document Checklist Summary Card -->
-            <div class="compact-merge-preview-box" style="margin-bottom: 0.65rem;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border-color);">
-                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-main);" id="merge-summary-count">Analyzing documents...</span>
-                <span class="badge" id="merge-summary-badge" style="background: var(--status-present-bg); color: var(--status-present); font-size: 0.68rem; padding: 0.15rem 0.45rem;">0 Uploaded</span>
-              </div>
-              <div id="merge-docs-checklist-preview" style="max-height: 120px; overflow-y: auto; font-size: 0.76rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem;">
-                <!-- Injected via JS -->
-              </div>
-            </div>
-
-            <div style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; background: var(--bg-surface); padding: 0.45rem 0.65rem; border-radius: var(--radius-xs, 4px); border-left: 3px solid var(--color-primary);">
-              ℹ️ <strong>Includes:</strong> UGIP Nainital cover sheet, Department &amp; Teacher metadata, and Table of Contents page index.
-            </div>
+          <div class="form-group">
+            <label class="form-label">Continuous Classwork &amp; Assignments (Marks)</label>
+            <input type="number" id="eval-assignments" class="form-control" value="10" min="0" max="100"
+              oninput="recalcEvalTotal()" required>
           </div>
-          <div class="modal-footer" style="padding: 0.65rem 1.15rem; gap: 0.5rem;">
-            <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="closeModal('modal-combine-export')">Cancel</button>
-            <button type="button" class="btn btn-primary" id="btn-start-merge-export" style="padding: 0.38rem 1rem; font-size: 0.8rem;" onclick="executeCombineExport()">
-              <span id="merge-btn-spinner" style="display:none; margin-right: 0.35rem;">⏳</span>
-              <span id="merge-btn-text">Merge &amp; Download PDF</span>
-            </button>
+          <div class="form-group">
+            <label class="form-label">Laboratory Work / Practical Performance (Marks)</label>
+            <input type="number" id="eval-lab" class="form-control" value="15" min="0" max="100"
+              oninput="recalcEvalTotal()" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Attendance Regularity &amp; Discipline (Marks)</label>
+            <input type="number" id="eval-attendance" class="form-control" value="5" min="0" max="100"
+              oninput="recalcEvalTotal()" required>
+          </div>
+          <div class="cf-eval-total-box">
+            <span>Total Internal Assessment Marks:</span>
+            <strong id="eval-total-display">50 Marks</strong>
           </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline"
+            onclick="openDirectUploadModal('internal_assessment_plan', 'Internal Assessment Plan PDF')">Upload
+            Signed
+            PDF</button>
+          <button type="submit" class="btn btn-primary">Save Evaluation Plan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 6: Course Outcomes & CO-PO Mapping Matrix (Item #3 & #4) -->
+  <div class="modal" id="modal-copo-matrix" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-copo-matrix')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Course Outcomes &amp; CO-PO Mapping (Items #3 &amp; #4)</h3>
+          <p class="modal-subtitle">NBA / OBE Outcome Based Education Framework</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-copo-matrix')">&times;</button>
       </div>
+      <div class="modal-body">
+        <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;color:var(--text-main);">Course Outcomes
+          (CO1
+          - CO6)</h4>
+        <div id="co-list-inputs" style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem;">
+          <!-- Injected via JS -->
+        </div>
 
-      <!-- Print Template Container (Hidden on Screen, Shown during Print) -->
-      <div id="print-dossier-template" class="print-only"></div>
+        <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.5rem;color:var(--text-main);">CO-PO Correlation
+          Matrix</h4>
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">Scale: 1 = Low (Slight), 2 =
+          Medium
+          (Moderate), 3 = High (Substantial), Blank = No Correlation</p>
+        <div class="table-responsive" style="max-height: 260px; overflow: auto;">
+          <table class="data-table" id="table-copo-matrix" style="font-size:0.78rem;">
+            <thead>
+              <tr>
+                <th style="min-width: 50px;">CO</th>
+                <th>PO1</th>
+                <th>PO2</th>
+                <th>PO3</th>
+                <th>PO4</th>
+                <th>PO5</th>
+                <th>PO6</th>
+                <th>PO7</th>
+                <th>PO8</th>
+                <th>PO9</th>
+                <th>PO10</th>
+                <th>PO11</th>
+                <th>PO12</th>
+                <th>PSO1</th>
+                <th>PSO2</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-copo-matrix">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline"
+          onclick="openDirectUploadModal('copo_matrix', 'CO-PO Matrix PDF')">Upload CO-PO PDF</button>
+        <button type="button" class="btn btn-primary" onclick="saveCopoData()">Save Outcomes &amp; Matrix</button>
+      </div>
+    </div>
+  </div>
 
-      <!-- Scripts -->
-      <script src="/faculty/components/core/api.js"></script>
-      <script src="/faculty/components/core/auth.js"></script>
-      <script src="/faculty/components/icons.js?v=20261118"></script>
-      <script src="/faculty/components/faculty-ui.js?v=20261118"></script>
-      <script src="/faculty/components/header/header.js?v=20261118"></script>
-      <script src="/faculty/components/sidebar/sidebar.js?v=20261118"></script>
-      <script src="/faculty/course-file/course-file.js?v=20261118"></script>
+  <!-- Modal 7: Advanced & Slow Learners View (Item #9 & #10) -->
+  <div class="modal" id="modal-learners-view" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-learners-view')"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="learners-modal-title">Student Diagnostic Roster</h3>
+          <p class="modal-subtitle" id="learners-modal-subtitle">Learning Diagnostic Categorization</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-learners-view')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Roll No</th>
+                <th style="width: 130px;">UBTER Roll No</th>
+                <th>Full Name</th>
+                <th style="width: 110px; text-align: center;">Attendance</th>
+                <th>Diagnostic Status &amp; Mentoring Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-learners-roster">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="btn-learners-upload-pdf">Upload Formal PDF Report</button>
+        <button type="button" class="btn btn-primary" onclick="closeModal('modal-learners-view')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 8: HOD Audit Verification Modal -->
+  <div class="modal" id="modal-hod-audit" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-hod-audit')"></div>
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">HOD Quality &amp; Compliance Audit</h3>
+          <p class="modal-subtitle">Official Course File Verification Sign-off</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-hod-audit')">&times;</button>
+      </div>
+      <form id="form-hod-audit" onsubmit="submitHodAudit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Audit Decision</label>
+            <select id="audit-decision-status" class="form-control" required>
+              <option value="APPROVED">APPROVE — Course File Complete &amp; Verified</option>
+              <option value="REVISION_REQUESTED">REVISION REQUESTED — Missing Required Documents</option>
+              <option value="AUDITED">AUDITED — In Review</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Audit Remarks / Feedback for Faculty Member</label>
+            <textarea id="audit-remarks-text" class="form-control" rows="4"
+              placeholder="Enter specific observations, missing items, or praise for NBA/NAAC compliance..."
+              required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-hod-audit')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Audit Sign-Off</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 9: Combine & Export Documents Modal -->
+  <div class="modal" id="modal-combine-export" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-backdrop" onclick="closeModal('modal-combine-export')"></div>
+    <div class="modal-dialog modal-compact-export" style="max-width: 520px; width: 100%; margin: auto;">
+      <div class="modal-header" style="padding: 0.85rem 1.15rem;">
+        <div>
+          <h3 class="modal-title" style="font-size: 1.05rem; display: flex; align-items: center; gap: 0.45rem;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-primary); flex-shrink:0;">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+              </path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span>Combine &amp; Export Dossier</span>
+          </h3>
+          <p class="modal-subtitle" style="font-size: 0.74rem; margin-top: 0.15rem;">Merge documents into one
+            consolidated PDF with title page &amp; index</p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-combine-export')">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 0.85rem 1.15rem;">
+        <div style="margin-bottom: 0.65rem;">
+          <label
+            style="font-size: 0.78rem; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 0.35rem;">Export
+            Scope</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+            <label class="compact-scope-card">
+              <input type="radio" name="export-merge-scope" id="scope-current-module" value="current" checked
+                onchange="updateMergeModalPreview()">
+              <div>
+                <strong id="lbl-scope-current">Current Module</strong>
+                <span id="sub-scope-current">Active module only</span>
+              </div>
+            </label>
+            <label class="compact-scope-card">
+              <input type="radio" name="export-merge-scope" id="scope-all-modules" value="all"
+                onchange="updateMergeModalPreview()">
+              <div>
+                <strong>All 6 Modules</strong>
+                <span>Theory, Lab, NBA, Perf, Direct, Indirect</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Document Checklist Summary Card -->
+        <div class="compact-merge-preview-box" style="margin-bottom: 0.65rem;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border-color);">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-main);"
+              id="merge-summary-count">Analyzing documents...</span>
+            <span class="badge" id="merge-summary-badge"
+              style="background: var(--status-present-bg); color: var(--status-present); font-size: 0.68rem; padding: 0.15rem 0.45rem;">0
+              Uploaded</span>
+          </div>
+          <div id="merge-docs-checklist-preview"
+            style="max-height: 120px; overflow-y: auto; font-size: 0.76rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem;">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <div
+          style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; background: var(--bg-surface); padding: 0.45rem 0.65rem; border-radius: var(--radius-xs, 4px); border-left: 3px solid var(--color-primary);">
+          ℹ️ <strong>Includes:</strong> UGIP Nainital cover sheet, Department &amp; Teacher metadata, and Table of
+          Contents page index.
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.65rem 1.15rem; gap: 0.5rem;">
+        <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;"
+          onclick="closeModal('modal-combine-export')">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-start-merge-export"
+          style="padding: 0.38rem 1rem; font-size: 0.8rem;" onclick="executeCombineExport()">
+          <span id="merge-btn-spinner" style="display:none; margin-right: 0.35rem;">⏳</span>
+          <span id="merge-btn-text">Merge &amp; Download PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print Template Container (Hidden on Screen, Shown during Print) -->
+  <div id="print-dossier-template" class="print-only"></div>
+
+  <!-- Scripts -->
+  <script src="/faculty/components/core/api.js"></script>
+  <script src="/faculty/components/core/auth.js"></script>
+  <script src="/faculty/components/icons.js?v=20261118"></script>
+  <script src="/faculty/components/faculty-ui.js?v=20261118"></script>
+  <script src="/faculty/components/header/header.js?v=20261118"></script>
+  <script src="/faculty/components/sidebar/sidebar.js?v=20261118"></script>
+  <script src="/faculty/course-file/course-file.js?v=20261118"></script>
 </body>
 
 </html>

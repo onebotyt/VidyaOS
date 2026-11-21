@@ -746,8 +746,8 @@ function renderStudentsBiometricTable() {
         <td data-label="Student Name">
           <div style="font-weight:700; color:var(--text-main);">${escHtml(st.full_name)}</div>
         </td>
-        <td data-label="Enrollment #">
-          <span style="font-family:var(--font-family-mono); font-size:0.8rem; font-weight:600; color:var(--color-primary);">${escHtml(st.official_enrollment_no || '—')}</span>
+        <td data-label="UBTER Roll #">
+          <span style="font-family:var(--font-family-mono); font-size:0.8rem; font-weight:600; color:var(--color-primary);">${escHtml(st.ubter_roll_no || st.official_enrollment_no || '—')}</span>
           ${st.registration_no ? `<div style="font-size:0.72rem; color:var(--text-muted);">UBTER: ${escHtml(st.registration_no)}</div>` : ''}
         </td>
         <td data-label="Cohort">
@@ -806,13 +806,29 @@ function filterEnrollStudentDropdown(filterVal) {
 
   const currentVal = sel.value;
 
-  sel.innerHTML = `<option value="">Choose a student (${students.length} ${filterVal === 'pending' ? 'pending' : 'students'})...</option>` +
-    students.map(s => {
+  // Group students by Year/Cohort for clean, structured navigation
+  const groups = {};
+  students.forEach(s => {
+    const yr = s.year || 1;
+    const key = `Year ${yr} Cohort`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(s);
+  });
+
+  let optionsHtml = `<option value="">Choose a student (${students.length} ${filterVal === 'pending' ? 'pending' : 'students'})...</option>`;
+
+  Object.keys(groups).sort().forEach(grp => {
+    optionsHtml += `<optgroup label="${grp}">`;
+    groups[grp].forEach(s => {
       const isEnrolled = s.biometric_status === 'ENROLLED';
-      const tag = isEnrolled ? 'Enrolled' : 'Pending';
-      const roll = s.class_roll_no ? `#${s.class_roll_no}` : (s.official_enrollment_no || 'No Roll');
-      return `<option value="${s.student_id}">[${tag}] ${roll} - ${escHtml(s.full_name)} (Yr ${s.year || 1} Sem ${s.semester || 1})</option>`;
-    }).join('');
+      const statusLabel = isEnrolled ? 'Enrolled' : 'Pending';
+      const roll = s.class_roll_no ? `#${s.class_roll_no}` : (s.official_enrollment_no ? `UBTER ${s.official_enrollment_no}` : 'No Roll');
+      optionsHtml += `<option value="${s.student_id}">${roll} • ${escHtml(s.full_name)} (${statusLabel} — Sem ${s.semester || 1})</option>`;
+    });
+    optionsHtml += `</optgroup>`;
+  });
+
+  sel.innerHTML = optionsHtml;
 
   if (currentVal && students.some(s => String(s.student_id) === String(currentVal))) {
     sel.value = currentVal;
@@ -831,6 +847,7 @@ function onSelectEnrollStudent(studentId) {
   const statusPill = document.getElementById('enroll-chip-status-pill');
   const removeBtn = document.getElementById('btn-remove-selected-bio');
   const msgEl = document.getElementById('bio-scanner-msg');
+  const calloutEl = document.getElementById('bio-scanner-callout');
   const visualBox = document.getElementById('bio-scanner-visual-box');
   const step1 = document.getElementById('step-pill-1');
   const step2 = document.getElementById('step-pill-2');
@@ -845,7 +862,14 @@ function onSelectEnrollStudent(studentId) {
       statusPill.textContent = 'WAITING SELECTION';
     }
     if (removeBtn) removeBtn.style.display = 'none';
-    if (visualBox) visualBox.className = 'esp-fingerprint-visual-wrap';
+    if (visualBox) visualBox.className = 'esp-hardware-bezel';
+    if (calloutEl) calloutEl.className = 'esp-scanner-callout';
+    if (step1) step1.className = 'step-pill active';
+    if (step2) step2.className = 'step-pill';
+    if (step3) step3.className = 'step-pill';
+    if (msgEl) {
+      msgEl.innerHTML = 'Select a student and click <strong>"Enroll Fingerprint"</strong>. Terminal chimes and waits for finger touch.';
+    }
     return;
   }
 
@@ -875,11 +899,15 @@ function onSelectEnrollStudent(studentId) {
   }
 
   if (step1) step1.className = 'step-pill completed';
-  if (step2) step2.className = 'step-pill';
+  if (step2) step2.className = isEnrolled ? 'step-pill completed' : 'step-pill active';
   if (step3) step3.className = isEnrolled ? 'step-pill completed' : 'step-pill';
 
+  if (calloutEl) {
+    calloutEl.className = `esp-scanner-callout ${isEnrolled ? 'success' : ''}`;
+  }
+
   if (visualBox) {
-    visualBox.className = `esp-fingerprint-visual-wrap ${isEnrolled ? 'success' : ''}`;
+    visualBox.className = `esp-hardware-bezel ${isEnrolled ? 'success' : ''}`;
   }
 
   if (msgEl) {
@@ -928,12 +956,16 @@ async function enrollCurrentSelectedStudent() {
 
   const visualBox = document.getElementById('bio-scanner-visual-box');
   const msgEl = document.getElementById('bio-scanner-msg');
+  const calloutEl = document.getElementById('bio-scanner-callout');
   const step2 = document.getElementById('step-pill-2');
   const step3 = document.getElementById('step-pill-3');
 
   if (visualBox) {
     visualBox.classList.remove('success');
     visualBox.classList.add('scanning');
+  }
+  if (calloutEl) {
+    calloutEl.className = 'esp-scanner-callout scanning';
   }
   if (step2) step2.classList.add('active');
   if (step3) step3.classList.remove('active');
@@ -965,7 +997,7 @@ async function removeCurrentSelectedStudentTemplate() {
 }
 
 function switchEspTab(tabName) {
-  const tabs = ['vault', 'wifi', 'feed', 'logs'];
+  const tabs = ['vault', 'feed', 'logs'];
   tabs.forEach(t => {
     const btn = document.getElementById(`tab-btn-${t}`);
     const panel = document.getElementById(`panel-${t}`);
@@ -1081,7 +1113,7 @@ async function simulateStudentBiometric(studentId, actionType = 'ENROLL_TEMPLATE
           statusLeft: 'SUCCESSFUL',
           statusRight: 'VERIFIED',
           headline: 'SUCCESSFULLY MARKED',
-          line1: `Enroll: ${st?.official_enrollment_no || '2024IT005'}`,
+          line1: `Roll: ${st?.ubter_roll_no || st?.official_enrollment_no || '24011090008'}`,
           line2: st?.full_name || 'Student',
           line3: `Time: ${getCurrentTimeFormatted()}`,
           leds: [true, false, false],
@@ -1604,35 +1636,33 @@ async function loadDeviceWifiNetworks(deviceId) {
           </div>
         `;
       } else {
-        cardList.innerHTML = networks.slice(0, 4).map(net => {
+        cardList.innerHTML = networks.map(net => {
           const isDef = Boolean(net.is_default);
           const rssi = net.last_rssi != null ? net.last_rssi : -65;
-          let signalClass = 'medium';
-          if (rssi >= -60) signalClass = 'strong';
-          else if (rssi < -75) signalClass = 'weak';
+          const bars = rssi > -60 ? 4 : rssi > -70 ? 3 : rssi > -80 ? 2 : 1;
 
           return `
             <div class="esp-wifi-compact-item ${isDef ? 'default' : ''}">
               <div class="esp-wifi-item-info">
                 <div class="esp-wifi-item-ssid">${escHtml(net.ssid)}</div>
                 <div class="esp-wifi-item-meta">
-                  <span class="wifi-signal-pill ${signalClass}">${rssi} dBm</span>
-                  <span class="wifi-security-badge" style="font-size:0.6rem; padding:0.1rem 0.3rem;">${escHtml(net.encryption_type || 'WPA2')}</span>
+                  <span class="wifi-security-badge" style="font-size:0.6rem; padding:0.1rem 0.3rem;">${escHtml(net.encryption_type || 'WPA2')} &bull; ${rssi} dBm</span>
                   ${isDef ? `<span class="esp-status-pill online" style="font-size:0.58rem; padding:0.05rem 0.3rem;">DEFAULT</span>` : ''}
                 </div>
               </div>
-              <div class="esp-wifi-item-actions">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="switchDeviceWifiTo(${net.id}, '${escHtml(net.ssid)}')" title="Switch to this network" style="padding:0.18rem 0.45rem; font-size:0.7rem;">Switch</button>
+              <div style="display:inline-flex; align-items:center; gap:0.35rem;">
+                <div class="esp-wifi-signal-bars" title="${rssi} dBm">
+                  <span class="bar bar-1 ${bars >= 1 ? 'active' : ''}"></span>
+                  <span class="bar bar-2 ${bars >= 2 ? 'active' : ''}"></span>
+                  <span class="bar bar-3 ${bars >= 3 ? 'active' : ''}"></span>
+                  <span class="bar bar-4 ${bars >= 4 ? 'active' : ''}"></span>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="switchDeviceWifiTo(${net.id}, '${escHtml(net.ssid)}')" title="Connect/Switch to this network" style="padding:0.18rem 0.45rem; font-size:0.7rem;">Connect</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteWifiNetwork(${net.id}, '${escHtml(net.ssid)}')" title="Remove Wi-Fi credentials" style="padding:0.18rem 0.35rem; font-size:0.7rem; line-height:1;">&times;</button>
               </div>
             </div>
           `;
-        }).join('') + (networks.length > 4 ? `
-          <div style="text-align:center; padding-top:0.15rem;">
-            <button type="button" class="btn btn-link btn-sm" onclick="switchEspTab('wifi')" style="font-size:0.7rem; color:var(--color-primary); cursor:pointer;">
-              View all ${networks.length} networks &rarr;
-            </button>
-          </div>
-        ` : '');
+        }).join('');
       }
     }
 
@@ -2023,6 +2053,52 @@ async function triggerWifiReset() {
   }
 }
 
+// ─── Modern Studio Quick Action Handlers ────────────────────────────────────
+function focusEnrollStation() {
+  const sel = document.getElementById('enroll-student-select');
+  const sec = document.getElementById('section-bio-enrollment');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (sel) {
+    setTimeout(() => { sel.focus(); }, 300);
+  }
+}
+
+function focusAttendanceScanner() {
+  const sec = document.getElementById('section-bio-enrollment');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  simulateCurrentSelectedStudent();
+}
+
+function focusWifiManager() {
+  const sec = document.getElementById('section-esp-wifi');
+  if (sec) {
+    sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    switchEspTab('wifi');
+  }
+}
+
+async function quickAddStudioWifi() {
+  const ssidInput = document.getElementById('studio-quick-ssid');
+  const passInput = document.getElementById('studio-quick-password');
+  const ssid = ssidInput ? ssidInput.value.trim() : '';
+  const pass = passInput ? passInput.value.trim() : '';
+
+  if (!ssid) {
+    showToast('Please enter a Wi-Fi network SSID.', 'warning');
+    return;
+  }
+
+  const manualSsid = document.getElementById('manual-wifi-ssid');
+  const manualPass = document.getElementById('manual-wifi-password');
+  if (manualSsid) manualSsid.value = ssid;
+  if (manualPass) manualPass.value = pass;
+
+  await submitAddWifiManual();
+  if (ssidInput) ssidInput.value = '';
+  if (passInput) passInput.value = '';
+}
+
 // ─── Window Function Exports ───────────────────────────────────────────────
 window.loadEsp32Overview = loadEsp32Overview;
 window.onSwitchDepartment = onSwitchDepartment;
@@ -2073,5 +2149,9 @@ window.enrollCurrentSelectedStudent = enrollCurrentSelectedStudent;
 window.simulateCurrentSelectedStudent = simulateCurrentSelectedStudent;
 window.removeCurrentSelectedStudentTemplate = removeCurrentSelectedStudentTemplate;
 window.switchEspTab = switchEspTab;
+window.focusEnrollStation = focusEnrollStation;
+window.focusAttendanceScanner = focusAttendanceScanner;
+window.focusWifiManager = focusWifiManager;
+window.quickAddStudioWifi = quickAddStudioWifi;
 
 document.addEventListener('DOMContentLoaded', loadEsp32Overview);

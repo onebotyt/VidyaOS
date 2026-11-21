@@ -164,15 +164,15 @@ function autoFitSheetColumns(sheet, force = false) {
       const measuredNameW = Math.round(nameChars * 7.2 + 20);
       dataNeededWidths[c] = Math.max(120, Math.min(150, measuredNameW));
       headerCleanWidths[c] = dataNeededWidths[c]; // "STUDENT NAME" header is compact and fits within name column
-    } else if (headerFullStr.includes('ENROLLMENT') || (!headerFullStr && c === 3)) {
-      const enrollChars = Math.max(10, dataMaxChars[c] || 11);
-      dataNeededWidths[c] = Math.round(enrollChars * 7.5 + 16); // ~98px
-      headerCleanWidths[c] = Math.max(dataNeededWidths[c], 98);
+    } else if (headerFullStr.includes('UBTER ROLL') || headerFullStr.includes('UBTER') || headerFullStr.includes('ENROLLMENT') || (!headerFullStr && c === 3)) {
+      const enrollChars = Math.max(11, dataMaxChars[c] || 11);
+      dataNeededWidths[c] = Math.round(enrollChars * 7.5 + 16); // ~98-102px
+      headerCleanWidths[c] = Math.max(dataNeededWidths[c], 102);
     } else if (headerFullStr.includes('REG') || (!headerFullStr && c === 2)) {
       const regChars = Math.max(8, dataMaxChars[c] || 9);
       dataNeededWidths[c] = Math.round(regChars * 7.5 + 16); // ~76px
       headerCleanWidths[c] = Math.max(dataNeededWidths[c], 76);
-    } else if (headerFullStr.includes('ROLL') || (!headerFullStr && c === 1)) {
+    } else if ((headerFullStr.includes('ROLL') && !headerFullStr.includes('UBTER')) || (!headerFullStr && c === 1)) {
       dataNeededWidths[c] = 48;
       headerCleanWidths[c] = 50;
     } else if (headerFullStr.includes('SR') || (!headerFullStr && c === 0)) {

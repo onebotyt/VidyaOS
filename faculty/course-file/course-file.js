@@ -321,10 +321,10 @@
     }
 
     try {
-      const queryParam = state.currentGroupId 
-        ? `group_id=${state.currentGroupId}` 
+      const queryParam = state.currentGroupId
+        ? `group_id=${state.currentGroupId}`
         : `subject_id=${state.currentSubjectId}`;
-      
+
       const res = await apiFetch(`/course-files?${queryParam}&type=${state.currentType}`);
       if (res && res.success && res.data) {
         state.courseFileData = res.data;
@@ -410,8 +410,8 @@
       barEl.style.background = pct >= 85 ? 'var(--status-present)' : (pct >= 50 ? 'var(--color-primary)' : 'var(--status-late)');
     }
     if (capEl) {
-      capEl.innerText = pct === 100 
-        ? 'Complete — 100% Audit Ready' 
+      capEl.innerText = pct === 100
+        ? 'Complete — 100% Audit Ready'
         : (pct >= 70 ? 'Satisfactory — Final Reviews Pending' : 'Documentation In Progress');
     }
 
@@ -562,8 +562,8 @@
     // Filter by Search Query
     if (state.searchQuery) {
       const q = state.searchQuery.toLowerCase();
-      items = items.filter(i => 
-        (i.title || '').toLowerCase().includes(q) || 
+      items = items.filter(i =>
+        (i.title || '').toLowerCase().includes(q) ||
         (i.desc || '').toLowerCase().includes(q) ||
         String(i.num || '').includes(q)
       );
@@ -887,7 +887,7 @@
     showToast('Merging and generating institutional PDF dossier...', 'info');
 
     const downloadUrl = `/api/v1/course-files/merge-export?group_id=${gid}&type=${state.currentType}&scope=${scope}`;
-    
+
     // Trigger download
     const a = document.createElement('a');
     a.href = downloadUrl;
@@ -926,7 +926,7 @@
           return `
             <tr>
               <td style="font-weight:700;font-family:var(--font-family-mono);">${s.roll_no || '--'}</td>
-              <td style="font-family:var(--font-family-mono);color:var(--text-muted);">${escapeHtml(s.enrollment_no || '--')}</td>
+              <td style="font-family:var(--font-family-mono);color:var(--text-muted);">${escapeHtml(s.ubter_roll_no || s.official_enrollment_no || s.enrollment_no || '--')}</td>
               <td><strong>${escapeHtml(s.full_name)}</strong></td>
               <td style="color:var(--text-muted);font-size:0.8rem;">${escapeHtml(s.email || '--')}</td>
               <td style="text-align:center;font-family:var(--font-family-mono);">${s.attended_sessions || 0} / ${s.total_sessions || 0}</td>
@@ -973,7 +973,7 @@
             ${students.map(s => `
               <tr>
                 <td>${s.roll_no || ''}</td>
-                <td>${s.enrollment_no || ''}</td>
+                <td>${s.ubter_roll_no || s.official_enrollment_no || s.enrollment_no || ''}</td>
                 <td>${s.full_name || ''}</td>
                 <td>${s.email || ''}</td>
                 <td>${s.attended_sessions || 0} / ${s.total_sessions || 0}</td>
@@ -1205,8 +1205,8 @@
   // Modal 7: Open Learners View Modal (Items #15 & #16)
   window.openLearnersModal = function (type) {
     const isAdv = type === 'advanced_learners';
-    const students = isAdv 
-      ? (state.courseFileData?.system_data?.advanced_learners || []) 
+    const students = isAdv
+      ? (state.courseFileData?.system_data?.advanced_learners || [])
       : (state.courseFileData?.system_data?.slow_learners || []);
 
     const titleEl = document.getElementById('learners-modal-title');
@@ -1214,8 +1214,8 @@
     const uploadBtn = document.getElementById('btn-learners-upload-pdf');
 
     if (titleEl) {
-      titleEl.innerText = isAdv 
-        ? `Advanced Learners Identification (Attendance ≥ 80%)` 
+      titleEl.innerText = isAdv
+        ? `Advanced Learners Identification (Attendance ≥ 80%)`
         : `Slow Learners Diagnostic List (Attendance < 75%)`;
     }
 
@@ -1338,9 +1338,9 @@
           </thead>
           <tbody>
             ${items.map((it, idx) => {
-              const doc = it.document;
-              const isOk = it.is_completed;
-              return `
+      const doc = it.document;
+      const isOk = it.is_completed;
+      return `
                 <tr>
                   <td style="text-align:center;font-weight:700;">${idx + 1}</td>
                   <td><strong>${escapeHtml(it.title)}</strong></td>
@@ -1351,7 +1351,7 @@
                   <td style="font-size:8.5pt;">${doc ? `${escapeHtml(doc.file_name)} (${formatBytes(doc.file_size)})` : '—'}</td>
                 </tr>
               `;
-            }).join('')}
+    }).join('')}
           </tbody>
         </table>
 

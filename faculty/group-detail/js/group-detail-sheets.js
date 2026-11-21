@@ -192,7 +192,7 @@
             <tr>
               <td style="font-weight:700;">${m.class_roll_no || idx + 1}</td>
               <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.registration_no || '—')}</td>
-              <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.official_enrollment_no || m.enrollment_no || '—')}</td>
+              <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.ubter_roll_no || m.official_enrollment_no || m.enrollment_no || '—')}</td>
               <td class="cell-student-name">
                 <span class="dyn-student-name" style="font-weight:700;">${esc(m.full_name || '')}</span>
               </td>
@@ -233,7 +233,7 @@
             <tr>
               <td style="font-weight:700;">${m.class_roll_no || idx + 1}</td>
               <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.registration_no || '—')}</td>
-              <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.official_enrollment_no || m.enrollment_no || '—')}</td>
+              <td style="font-family: var(--font-family-mono); font-size: 0.76rem; color: var(--text-muted); text-align: center;">${esc(m.ubter_roll_no || m.official_enrollment_no || m.enrollment_no || '—')}</td>
               <td class="cell-student-name">
                 <span class="dyn-student-name" style="font-weight:700;">${esc(m.full_name || '')}</span>
               </td>
