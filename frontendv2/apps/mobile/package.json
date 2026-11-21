@@ -1,0 +1,19 @@
+{
+  "name": "@vidyaos/mobile",
+  "version": "2.0.0",
+  "private": true,
+  "main": "App.tsx",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "build:android": "eas build -p android --profile preview"
+  },
+  "dependencies": {
+    "@vidyaos/core": "workspace:*",
+    "@vidyaos/app": "workspace:*",
+    "expo": "~51.0.0",
+    "react": "18.2.0",
+    "react-native": "0.74.5"
+  }
+}

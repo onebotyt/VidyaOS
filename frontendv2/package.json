@@ -1,21 +1,21 @@
 {
-  "name": "vidyaos-frontend-v2",
+  "name": "vidyaos-v2-monorepo",
   "version": "2.0.0",
-  "description": "VidyaOS Multi-OS Single-Codebase Universal Frontend (Android, iOS, Windows, macOS, Linux, Web)",
   "private": true,
-  "type": "module",
+  "description": "VidyaOS Universal React Single-Codebase Suite (Web, Native Mobile, Tauri Desktop)",
   "scripts": {
-    "dev": "node ../server.js",
-    "test": "node --check ./app.js"
+    "dev:web": "pnpm --filter @vidyaos/web dev",
+    "build:web": "pnpm --filter @vidyaos/web build",
+    "preview:web": "pnpm --filter @vidyaos/web preview",
+    "dev:mobile": "pnpm --filter @vidyaos/mobile start"
   },
   "keywords": [
     "vidyaos",
-    "multi-os",
-    "cross-platform",
-    "capacitor",
-    "electron",
-    "pwa",
-    "erp"
+    "react",
+    "react-native",
+    "react-native-web",
+    "tauri",
+    "universal-ui"
   ],
   "author": "VidyaOS Team",
   "license": "UNLICENSED"
