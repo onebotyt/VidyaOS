@@ -90,41 +90,17 @@ jobs:
         run: |
           echo "[v2app] Starting Native React Native APK Build from frontendv2..."
           cd frontendv2
-          # Ensure hoisted layout for React Native Gradle Plugin resolution
           pnpm install --no-frozen-lockfile
+          # Locate single @react-native/gradle-plugin inside react-native dependencies
+          PLUGIN_DIR=$(node -e "console.log(require('path').dirname(require.resolve('@react-native/gradle-plugin/package.json', { paths: [process.cwd(), process.cwd() + '/apps/mobile'] })))")
+          echo "[v2app] Found single Gradle plugin at: $PLUGIN_DIR"
+          # Link directly into apps/mobile/node_modules so rootDir execution in Gradle resolves identically
+          mkdir -p apps/mobile/node_modules/@react-native
+          ln -sf "$PLUGIN_DIR" apps/mobile/node_modules/@react-native/gradle-plugin
+
           cd apps/mobile
           npx expo prebuild --platform android --no-install
           if [ -d "android" ]; then
-            echo "[v2app] Prebuild succeeded. Patching settings.gradle for monorepo Gradle plugin resolution..."
-            node -e "
-              const fs = require('fs');
-              const path = require('path');
-              const settingsPath = path.resolve('android/settings.gradle');
-              if (fs.existsSync(settingsPath)) {
-                let content = fs.readFileSync(settingsPath, 'utf8');
-                try {
-                  const pluginPkg = require.resolve('@react-native/gradle-plugin/package.json');
-                  const pluginDir = path.dirname(pluginPkg).replace(/\\\\/g, '/');
-                  console.log('[v2app] Resolved @react-native/gradle-plugin at:', pluginDir);
-                  content = content.replace(
-                    /includeBuild\(new File\(.+@react-native\/gradle-plugin\/package\.json.+\)\.getParentFile\(\)\.toString\(\)\)/g,
-                    'includeBuild(\"' + pluginDir + '\")'
-                  );
-                } catch(e) {
-                  console.warn('[v2app] Warning resolving plugin:', e.message);
-                }
-                try {
-                  const rnPkg = require.resolve('react-native/package.json').replace(/\\\\/g, '/');
-                  content = content.replace(/require\.resolve\('react-native\/package\.json'\)/g, \"'\" + rnPkg + \"'\");
-                } catch(e) {}
-                try {
-                  const expoPkg = require.resolve('expo/package.json').replace(/\\\\/g, '/');
-                  content = content.replace(/require\.resolve\('expo\/package\.json'\)/g, \"'\" + expoPkg + \"'\");
-                } catch(e) {}
-                fs.writeFileSync(settingsPath, content, 'utf8');
-                console.log('[v2app] Patched settings.gradle successfully.');
-              }
-            "
             cd android
             chmod +x gradlew
             ./gradlew assembleDebug --no-daemon --stacktrace
