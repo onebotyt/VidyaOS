@@ -1,0 +1,191 @@
+/**
+ * VidyaOS Multi-OS Adaptive Layout Engine
+ * Adapts between Mobile Dock (<768px), Tablet Mini-Rail (768-1024px), and Desktop Full Shell (>1024px).
+ */
+
+#app-root {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--bg-app);
+}
+
+/* ============================================================
+   1. DESKTOP TITLEBAR (Windows, macOS, Linux)
+   ============================================================ */
+#desktop-titlebar {
+  display: none;
+  height: var(--titlebar-height);
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  -webkit-app-region: drag;
+  z-index: 1000;
+}
+
+.platform-windows #desktop-titlebar,
+.platform-macos #desktop-titlebar,
+.platform-linux #desktop-titlebar,
+.runtime-electron #desktop-titlebar,
+.runtime-tauri #desktop-titlebar {
+  display: flex;
+}
+
+/* Hide on mobile devices even if spoofed */
+.device-mobile #desktop-titlebar {
+  display: none !important;
+}
+
+/* ============================================================
+   2. APP SHELL (Main Viewport Structure)
+   ============================================================ */
+#app-shell {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Left Navigation Rail / Sidebar (Tablet & Desktop) */
+#sidebar-nav-container {
+  display: none;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-subtle);
+  flex-direction: column;
+  z-index: 50;
+  transition: width var(--transition-normal);
+}
+
+.device-desktop #sidebar-nav-container {
+  display: flex;
+  width: var(--sidebar-expanded-width);
+}
+
+.device-tablet #sidebar-nav-container {
+  display: flex;
+  width: var(--sidebar-collapsed-width);
+}
+
+/* Main Content Workspace */
+#main-viewport {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Scrollable View Container */
+#view-mount-point {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  padding-bottom: calc(var(--bottombar-height) + var(--safe-bottom) + 16px);
+}
+
+.device-desktop #view-mount-point,
+.device-tablet #view-mount-point {
+  padding-bottom: 32px;
+}
+
+/* Centered Responsive Container for Views */
+.view-container {
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .view-container {
+    padding: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .view-container {
+    padding: 32px;
+  }
+}
+
+/* ============================================================
+   3. MOBILE BOTTOM NAVIGATION DOCK
+   ============================================================ */
+#mobile-nav-dock {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--bottombar-height) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background-color: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-subtle);
+  z-index: 900;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+}
+
+.device-desktop #mobile-nav-dock,
+.device-tablet #mobile-nav-dock {
+  display: none !important;
+}
+
+/* ============================================================
+   4. TOAST & MODAL PORTALS
+   ============================================================ */
+#toast-container {
+  position: fixed;
+  top: calc(var(--safe-top) + 16px);
+  right: 16px;
+  left: 16px;
+  max-width: 420px;
+  margin: 0 auto;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  #toast-container {
+    left: auto;
+    right: 24px;
+  }
+}
+
+#dialog-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: var(--bg-overlay);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+#dialog-container.active {
+  display: flex;
+  animation: fadeIn var(--transition-fast) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

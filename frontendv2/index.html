@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="VidyaOS - Modern Multi-OS Academic ERP & Classroom Suite">
+
+  <title>VidyaOS</title>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <!-- Core Design Tokens & Layout -->
+  <link rel="stylesheet" href="./design/tokens.css">
+  <link rel="stylesheet" href="./design/reset.css">
+  <link rel="stylesheet" href="./design/layout.css">
+  <link rel="stylesheet" href="./design/components.css">
+
+  <!-- Component Styles -->
+  <link rel="stylesheet" href="./components/titlebar/titlebar.css">
+  <link rel="stylesheet" href="./components/navigation/navigation.css">
+  <link rel="stylesheet" href="./components/header/header.css">
+  <link rel="stylesheet" href="./components/toast/toast.css">
+  <link rel="stylesheet" href="./components/dialog/dialog.css">
+
+  <!-- View Styles -->
+  <link rel="stylesheet" href="./views/auth/login.css">
+  <link rel="stylesheet" href="./views/student/home/home.css">
+  <link rel="stylesheet" href="./views/student/classes/classes.css">
+  <link rel="stylesheet" href="./views/student/classwork/classwork.css">
+  <link rel="stylesheet" href="./views/student/profile/profile.css">
+  <link rel="stylesheet" href="./views/student/settings/settings.css">
+</head>
+<body>
+  <div id="app-root">
+    <!-- Desktop Titlebar (Windows, macOS, Linux) -->
+    <header id="desktop-titlebar"></header>
+
+    <!-- App Shell (Navigation + Workspace) -->
+    <div id="app-shell">
+      <!-- Tablet Rail / Desktop Sidebar -->
+      <aside id="sidebar-nav-container"></aside>
+
+      <!-- Main Viewport -->
+      <div id="main-viewport">
+        <!-- Universal App Header -->
+        <header id="app-header"></header>
+
+        <!-- Scrollable Active View Mount Point -->
+        <main id="view-mount-point" role="main"></main>
+      </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation Dock (4 Canonical Tabs) -->
+    <nav id="mobile-nav-dock" aria-label="Bottom Navigation"></nav>
+
+    <!-- Global Toast Portal -->
+    <div id="toast-container" aria-live="polite"></div>
+
+    <!-- Global Accessible Dynamic Dialog Portal -->
+    <div id="dialog-container"></div>
+  </div>
+
+  <!-- Bootstrapper -->
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

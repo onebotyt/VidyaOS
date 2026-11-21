@@ -1,0 +1,139 @@
+/**
+ * VidyaOS Multi-OS Design Tokens
+ * Fluid typography, elevation, multi-OS safe areas, light & dark theme palettes.
+ */
+
+:root {
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, Monaco, monospace;
+
+  /* Color Palette - Light Default */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-active: #1e40af;
+  --color-primary-subtle: rgba(37, 99, 235, 0.08);
+  --color-primary-focus: rgba(37, 99, 235, 0.25);
+  --text-on-primary: #ffffff;
+
+  /* Backgrounds */
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-surface: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+  --bg-overlay: rgba(15, 23, 42, 0.6);
+  --bg-glass: rgba(255, 255, 255, 0.85);
+
+  /* Borders & Dividers */
+  --border-subtle: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-strong: #94a3b8;
+
+  /* Text & Foreground */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-disabled: #94a3b8;
+
+  /* Status Colors */
+  --status-present: #16a34a;
+  --status-present-bg: #f0fdf4;
+  --status-present-border: #bbf7d0;
+
+  --status-absent: #dc2626;
+  --status-absent-bg: #fef2f2;
+  --status-absent-border: #fecaca;
+
+  --status-late: #d97706;
+  --status-late-bg: #fffbeb;
+  --status-late-border: #fde68a;
+
+  --status-info: #0284c7;
+  --status-info-bg: #f0f9ff;
+  --status-info-border: #bae6fd;
+
+  /* Role Identity Tokens */
+  --chip-student-bg: #dcfce7;
+  --chip-student-color: #166534;
+  --chip-faculty-bg: #ede9fe;
+  --chip-faculty-color: #6b21a8;
+  --chip-admin-bg: #fee2e2;
+  --chip-admin-color: #991b1b;
+  --chip-hod-bg: #fef3c7;
+  --chip-hod-color: #92400e;
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Multi-OS Safe Area Insets */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Layout Dimensions */
+  --titlebar-height: 38px;
+  --topbar-height: 56px;
+  --bottombar-height: 64px;
+  --sidebar-collapsed-width: 68px;
+  --sidebar-expanded-width: 250px;
+  --max-content-width: 1280px;
+
+  /* Motion & Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Theme Palette */
+[data-theme="dark"],
+.theme-dark {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-primary-active: #2563eb;
+  --color-primary-subtle: rgba(59, 130, 246, 0.16);
+  --color-primary-focus: rgba(59, 130, 246, 0.35);
+
+  --bg-app: #0b0f19;
+  --bg-card: #111827;
+  --bg-surface: #1e293b;
+  --bg-surface-hover: #334155;
+  --bg-overlay: rgba(0, 0, 0, 0.75);
+  --bg-glass: rgba(17, 24, 39, 0.85);
+
+  --border-subtle: #1e293b;
+  --border-medium: #334155;
+  --border-strong: #475569;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-disabled: #475569;
+
+  --status-present-bg: rgba(22, 163, 74, 0.15);
+  --status-present-border: rgba(22, 163, 74, 0.3);
+
+  --status-absent-bg: rgba(220, 38, 38, 0.15);
+  --status-absent-border: rgba(220, 38, 38, 0.3);
+
+  --status-late-bg: rgba(217, 119, 6, 0.15);
+  --status-late-border: rgba(217, 119, 6, 0.3);
+
+  --status-info-bg: rgba(2, 132, 199, 0.15);
+  --status-info-border: rgba(2, 132, 199, 0.3);
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+}

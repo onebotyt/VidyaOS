@@ -1,0 +1,22 @@
+{
+  "name": "vidyaos-frontend-v2",
+  "version": "2.0.0",
+  "description": "VidyaOS Multi-OS Single-Codebase Universal Frontend (Android, iOS, Windows, macOS, Linux, Web)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node ../server.js",
+    "test": "node --check ./app.js"
+  },
+  "keywords": [
+    "vidyaos",
+    "multi-os",
+    "cross-platform",
+    "capacitor",
+    "electron",
+    "pwa",
+    "erp"
+  ],
+  "author": "VidyaOS Team",
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,80 @@
+/**
+ * Titlebar Styling for Desktop OS (Windows, macOS, Linux)
+ */
+
+.titlebar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.titlebar-drag-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  height: 100%;
+  -webkit-app-region: drag;
+}
+
+.titlebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.titlebar-brand svg {
+  color: var(--color-primary);
+}
+
+.titlebar-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 26px;
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.titlebar-btn:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.titlebar-btn-close:hover {
+  background-color: var(--status-absent);
+  color: #ffffff;
+}
+
+/* macOS Traffic Lights (Placed on left) */
+.platform-macos .titlebar-inner {
+  flex-direction: row-reverse;
+}
+
+.platform-macos .titlebar-controls {
+  gap: 8px;
+}
+
+.platform-macos .mac-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+}
+
+.platform-macos .mac-close { background: #ff5f56; }
+.platform-macos .mac-minimize { background: #ffbd2e; }
+.platform-macos .mac-maximize { background: #27c93f; }
