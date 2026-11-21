@@ -426,18 +426,17 @@ function renderGoogleClassCards() {
             </div>
           </div>
 
-          <div>
+          <div class="gc-card-header-main">
             <a href="/student/group-detail/index.html?id=${c.id}" class="gc-card-title" title="${escapeHtml(c.subject_name || c.name)}">
               ${escapeHtml(c.name || c.subject_name || 'Subject Class')}
             </a>
-            <div class="gc-card-teacher" title="Instructor: ${escapeHtml(c.teacher_name || 'Faculty')}">
-              ${escapeHtml(c.teacher_name || 'Course Instructor')} • Year ${c.year || Math.ceil((c.semester || 1) / 2)} • Sem ${c.semester || 1}
+            <div class="gc-card-teacher-row">
+              <span class="gc-card-teacher-avatar" title="${escapeHtml(c.teacher_name || 'Instructor')}">${teacherInitials}</span>
+              <div class="gc-card-teacher-meta">
+                <span class="gc-card-teacher-name">${escapeHtml(c.teacher_name || 'Course Instructor')}</span>
+                <span class="gc-card-teacher-cohort">• Year ${c.year || Math.ceil((c.semester || 1) / 2)} • Sem ${c.semester || 1}</span>
+              </div>
             </div>
-          </div>
-
-          <!-- Teacher Avatar Circle -->
-          <div class="gc-card-avatar" title="${escapeHtml(c.teacher_name || 'Instructor')}">
-            ${teacherInitials}
           </div>
         </header>
 

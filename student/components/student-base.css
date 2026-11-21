@@ -65,8 +65,8 @@ body.student-page {
   body.classroom-page,
   body.student-page {
     padding-left: 0 !important;
-    padding-top: calc(58px + max(42px, env(safe-area-inset-top, 0px))) !important;
-    padding-bottom: calc(var(--student-bottom-bar-height, 64px) + max(18px, env(safe-area-inset-bottom, 0px))) !important;
+    padding-top: calc(58px + env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 16px) !important;
   }
 }
 

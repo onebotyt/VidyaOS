@@ -862,3 +862,72 @@ if (document.readyState === 'loading') {
   loadDynamicCampusBanner();
   hideApkButtonsInNativeApp();
 }
+
+// ── Download App Modal Handlers (Android APK & iOS PWA) ──
+function openDownloadAppModal(defaultPlatform) {
+  const modal = document.getElementById('download-app-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+    if (defaultPlatform) {
+      switchDownloadTab(defaultPlatform);
+    }
+  }
+}
+
+function closeDownloadAppModal() {
+  const modal = document.getElementById('download-app-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+  }
+}
+
+function switchDownloadTab(platform) {
+  const androidTab = document.getElementById('tab-btn-android');
+  const iosTab = document.getElementById('tab-btn-ios');
+  const androidPanel = document.getElementById('download-panel-android');
+  const iosPanel = document.getElementById('download-panel-ios');
+
+  if (platform === 'ios') {
+    if (androidTab) { androidTab.classList.remove('active'); androidTab.setAttribute('aria-selected', 'false'); }
+    if (iosTab) { iosTab.classList.add('active'); iosTab.setAttribute('aria-selected', 'true'); }
+    if (androidPanel) androidPanel.style.display = 'none';
+    if (iosPanel) iosPanel.style.display = 'flex';
+  } else {
+    if (iosTab) { iosTab.classList.remove('active'); iosTab.setAttribute('aria-selected', 'false'); }
+    if (androidTab) { androidTab.classList.add('active'); androidTab.setAttribute('aria-selected', 'true'); }
+    if (iosPanel) iosPanel.style.display = 'none';
+    if (androidPanel) androidPanel.style.display = 'flex';
+  }
+}
+
+function copyCurrentWebUrl(btn) {
+  const url = window.location.origin || window.location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      const label = document.getElementById('copy-btn-label');
+      if (label) {
+        const orig = label.innerText;
+        label.innerText = '✓ Link Copied to Clipboard!';
+        setTimeout(() => { label.innerText = orig; }, 2500);
+      }
+    }).catch(() => {
+      prompt('Copy this website link for Safari:', url);
+    });
+  } else {
+    prompt('Copy this website link for Safari:', url);
+  }
+}
+
+// Global keyboard handler for Esc key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeDownloadAppModal();
+  }
+});
+
+window.openDownloadAppModal = openDownloadAppModal;
+window.closeDownloadAppModal = closeDownloadAppModal;
+window.switchDownloadTab = switchDownloadTab;
+window.copyCurrentWebUrl = copyCurrentWebUrl;

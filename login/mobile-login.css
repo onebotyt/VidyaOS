@@ -743,3 +743,101 @@
     margin-top: 4px;
   }
 }
+
+/* ── Mobile Header Right Actions (App Download & GitHub) ── */
+.m-header-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.m-header-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.m-header-chip-btn.m-app-chip {
+  background: rgba(34, 197, 94, 0.22);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+}
+
+.m-header-chip-btn.m-github-chip {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 5px 7px;
+}
+
+/* ── Mobile Actions Subrow below Sign Up ── */
+.m-actions-subrow {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.m-subaction-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.m-subaction-btn.download-btn {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.m-subaction-btn.download-btn:active {
+  background: #dcfce7;
+}
+
+.m-subaction-btn.github-btn {
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+
+.m-subaction-btn.github-btn:active {
+  background: #f1f5f9;
+}
+
+/* Safe area insets for mobile header and footer */
+@media (max-width: 860px) {
+  .m-blue-header {
+    padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+  }
+  .m-bottom-inst-footer {
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+  #download-app-modal {
+    z-index: 100005 !important;
+  }
+  #download-app-modal .download-modal-card {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}

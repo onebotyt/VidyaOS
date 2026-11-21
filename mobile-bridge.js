@@ -32,6 +32,19 @@
   window.VIDYAOS_API_BASE = isCapacitor ? `${CLOUD_BACKEND_URL}/api/v1` : '/api/v1';
   window.VIDYAOS_CLOUD_BACKEND = CLOUD_BACKEND_URL;
 
+  // Status Bar & System Windows Inset Guard for Native Shell
+  if (isCapacitor) {
+    if (document.documentElement) {
+      document.documentElement.classList.add('is-native-shell');
+    }
+    if (window.Capacitor?.Plugins?.StatusBar) {
+      try {
+        window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: false });
+        window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: '#07153e' });
+      } catch (_) {}
+    }
+  }
+
   // 2. Fetch Interceptor for Native App Context
   if (isCapacitor) {
     const originalFetch = window.fetch;

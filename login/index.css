@@ -1108,3 +1108,342 @@ h1 em {
     height: 44px;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   DOWNLOAD VIDYAOS APP MODAL (ANDROID APK & IOS PWA)
+   ══════════════════════════════════════════════════════════════ */
+.download-modal-card {
+  max-width: 460px;
+  width: 92%;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(11, 27, 77, 0.35);
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  text-align: left;
+  animation: downloadModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes downloadModalPop {
+  from { opacity: 0; transform: scale(0.95) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.download-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.download-modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.download-modal-app-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.download-modal-app-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.download-modal-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.download-modal-subtitle {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 2px 0 0;
+}
+
+.download-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.download-modal-close:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+/* Platform Segmented Tabs */
+.download-platform-tabs {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 1.25rem;
+}
+
+.download-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+
+.download-tab-btn svg {
+  flex-shrink: 0;
+}
+
+.download-tab-btn:hover {
+  color: #0f172a;
+}
+
+.download-tab-btn.active {
+  background: #ffffff;
+  color: #2563eb;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Tab Panels */
+.download-tab-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.platform-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  width: fit-content;
+  margin-bottom: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.platform-card-badge.android-badge {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.platform-card-badge.ios-badge {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.platform-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.35rem 0;
+}
+
+.platform-desc {
+  font-size: 0.84rem;
+  color: #475569;
+  line-height: 1.45;
+  margin: 0 0 1rem 0;
+}
+
+/* Features List */
+.download-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  background: #f8fafc;
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.feature-check {
+  color: #16a34a;
+  font-weight: 800;
+}
+
+/* Primary Action CTA */
+.download-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.download-primary-btn.android-btn {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+}
+
+.download-primary-btn.android-btn:hover {
+  background: linear-gradient(135deg, #15803d, #166534);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.4);
+}
+
+.download-primary-btn.ios-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.download-primary-btn.ios-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-1px);
+}
+
+.download-footer-links {
+  text-align: center;
+  margin-top: 0.75rem;
+}
+
+.download-secondary-link {
+  font-size: 0.78rem;
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.download-secondary-link:hover {
+  color: #2563eb;
+}
+
+/* iOS Steps */
+.ios-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+  background: #f8fafc;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.ios-step-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.ios-step-number {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ios-step-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.35;
+}
+
+.ios-step-text strong {
+  color: #0f172a;
+  font-size: 0.84rem;
+}
+
+.ios-symbol {
+  font-weight: 800;
+  color: #2563eb;
+  background: #e0e7ff;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Developer Credit Footer */
+.download-developer-credit {
+  margin-top: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.credit-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  color: #475569;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.credit-link strong {
+  color: #0f172a;
+}
+
+.credit-link:hover {
+  color: #2563eb;
+}
