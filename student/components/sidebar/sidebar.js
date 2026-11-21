@@ -35,16 +35,17 @@
     { key: 'scores', label: 'Marks & Scores', shortLabel: 'Scores', href: '/student/scores/index.html', icon: 'scores' },
     { key: 'leave', label: 'Leave Applications', shortLabel: 'Leave', href: '/student/leave/index.html', icon: 'leave' },
     { key: 'profile', label: 'Profile & Dossier', shortLabel: 'Profile', href: '/student/profile/index.html', icon: 'profile' },
+    { key: 'settings', label: 'Settings & Account', shortLabel: 'Settings', href: '/student/settings/index.html', icon: 'settings' },
     { key: 'bug-reports', label: 'Report a Bug', shortLabel: 'Bug Report', href: '/student/bug-reports/index.html', icon: 'bug' }
   ];
 
-  // 5 Canonical Mobile Bottom Tabs
+  // 5 Canonical Mobile Bottom Tabs (Matches native mobile app structure)
   const MOBILE_TABS = [
     { key: 'classes', label: 'Classes', href: '/student/dashboard/index.html', icon: 'classes' },
     { key: 'attendance', label: 'Attendance', href: '/student/attendance/index.html', icon: 'attendance' },
     { key: 'timetable', label: 'Routine', href: '/student/timetable/index.html', icon: 'timetable' },
     { key: 'scores', label: 'Scores', href: '/student/scores/index.html', icon: 'scores' },
-    { key: 'profile', label: 'Profile', href: '/student/profile/index.html', icon: 'profile' }
+    { key: 'settings', label: 'Settings', href: '/student/settings/index.html', icon: 'settings' }
   ];
 
   function getActiveNavKey() {
@@ -54,7 +55,8 @@
     if (p.includes('/assignments')) return 'assignments';
     if (p.includes('/scores')) return 'scores';
     if (p.includes('/leave')) return 'leave';
-    if (p.includes('/profile')) return 'profile';
+    if (p.includes('/settings')) return 'settings';
+    if (p.includes('/profile')) return 'settings'; // Highlights Settings tab on mobile, maintains active state
     if (p.includes('/bug-reports')) return 'bug-reports';
     return 'classes';
   }

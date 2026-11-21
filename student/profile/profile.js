@@ -619,10 +619,70 @@ var escapeHtml = window.escapeHtml || (typeof esc !== 'undefined' ? esc : (s => 
 window.loadStudentDocuments = loadStudentDocuments;
 window.exportStudentDossier = exportStudentDossier;
 
+// ══════════════════════════════════════════════════════════════
+// SEGMENTED TAB SWITCHER FOR MOBILE & DESKTOP
+// ══════════════════════════════════════════════════════════════
+function switchProfileTab(tabKey) {
+  const validTabs = ['academic', 'kyc', 'documents', 'security'];
+  const target = validTabs.includes(tabKey) ? tabKey : 'academic';
+
+  // Toggle Tab Buttons
+  validTabs.forEach(t => {
+    const btn = document.getElementById(`tab-btn-${t}`);
+    if (btn) {
+      if (t === target) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      }
+    }
+  });
+
+  // Toggle Tab Panels
+  validTabs.forEach(t => {
+    const p = document.getElementById(`tab-panel-${t}`);
+    if (p) {
+      if (t === target) {
+        p.classList.add('active');
+      } else {
+        p.classList.remove('active');
+      }
+    }
+  });
+
+  // Update URL hash without jumping
+  if (history.replaceState) {
+    history.replaceState(null, '', `#${target}`);
+  }
+}
+window.switchProfileTab = switchProfileTab;
+
+// Hash and query parameter resolution
+function handleInitialTab() {
+  const hash = (window.location.hash || '').replace('#', '').toLowerCase();
+  const urlParams = new URLSearchParams(window.location.search);
+
+  if (hash === 'security' || hash === 'password') {
+    switchProfileTab('security');
+  } else if (hash === 'kyc' || hash === 'demographics' || urlParams.get('complete') === '1' || urlParams.get('complete') === 'true') {
+    switchProfileTab('kyc');
+  } else if (hash === 'documents' || hash === 'docs' || hash === 'dossier') {
+    switchProfileTab('documents');
+  } else {
+    switchProfileTab('academic');
+  }
+}
+
+window.addEventListener('hashchange', handleInitialTab);
+document.addEventListener('DOMContentLoaded', handleInitialTab);
+
 // Check URL parameters for ?complete=1
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('complete') === '1' || urlParams.get('complete') === 'true') {
   setTimeout(() => {
+    switchProfileTab('kyc');
     const demoCard = document.getElementById('demographics-card');
     if (demoCard) {
       demoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -633,3 +693,4 @@ if (urlParams.get('complete') === '1' || urlParams.get('complete') === 'true') {
 }
 
 loadStudentProfile();
+handleInitialTab();

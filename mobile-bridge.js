@@ -275,8 +275,16 @@
     });
   }
 
-  // Check for updates shortly after document loads
+  // Export to window for in-app settings & UI interactions
   if (typeof window !== 'undefined') {
+    window.VidyaOSMobileBridge = {
+      checkForAppUpdates,
+      showUpdateNotification,
+      getCurrentVersion: () => window.VIDYAOS_APP_VERSION || '1.0.95',
+      GITHUB_VERSION_URL,
+      LATEST_APK_URL
+    };
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(checkForAppUpdates, 2000));
     } else {

@@ -28,7 +28,8 @@
     { label: 'Tasks', href: '/student/assignments/index.html', icon: 'assignments' },
     { label: 'Marks', href: '/student/scores/index.html', icon: 'scores' },
     { label: 'Leave', href: '/student/leave/index.html', icon: 'leave' },
-    { label: 'Profile', href: '/student/profile/index.html', icon: 'profile' }
+    { label: 'Profile', href: '/student/profile/index.html', icon: 'profile' },
+    { label: 'Settings', href: '/student/settings/index.html', icon: 'settings' }
   ];
 
   function getPageBadgeText() {
@@ -38,6 +39,7 @@
     if (p.includes('/assignments')) return 'COURSEWORK';
     if (p.includes('/scores')) return 'MARKSHEETS';
     if (p.includes('/leave')) return 'LEAVE';
+    if (p.includes('/settings')) return 'SETTINGS';
     if (p.includes('/profile')) return 'PROFILE';
     if (p.includes('/theory-classes')) return 'THEORY';
     if (p.includes('/lab-classes')) return 'PRACTICAL';
@@ -153,6 +155,10 @@
             <a href="/student/profile/index.html" class="profile-popover-item">
               ${getIcon('profile', { width: 17, height: 17 })}
               <span>My Full Profile</span>
+            </a>
+            <a href="/student/settings/index.html" class="profile-popover-item">
+              ${getIcon('settings', { width: 17, height: 17 })}
+              <span>Settings & App Updates</span>
             </a>
             <a href="/student/dashboard/index.html" class="profile-popover-item">
               ${getIcon('classes', { width: 17, height: 17 })}
