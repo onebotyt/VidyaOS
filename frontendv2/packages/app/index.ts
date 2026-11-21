@@ -3,6 +3,7 @@ export * from './components/Header';
 export * from './components/BottomDock';
 export * from './components/ClassroomCard';
 export * from './components/AttendanceGauge';
+export * from './components/UpdateBanner';
 
 export * from './screens/HomeScreen';
 export * from './screens/ClassesScreen';

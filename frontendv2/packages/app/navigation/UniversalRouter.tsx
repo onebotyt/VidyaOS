@@ -3,6 +3,7 @@ import { View, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import { authStore } from '@vidyaos/core';
 import { Header } from '../components/Header';
 import { BottomDock } from '../components/BottomDock';
+import { UpdateBanner } from '../components/UpdateBanner';
 
 import { HomeScreen } from '../screens/HomeScreen';
 import { ClassesScreen } from '../screens/ClassesScreen';
@@ -47,7 +48,12 @@ export const UniversalRouter: React.FC = () => {
 
   // Auth Guard
   if (!isAuthenticated || route === 'login') {
-    return <LoginScreen onSuccess={() => navigate('home')} />;
+    return (
+      <View style={{ flex: 1 }}>
+        <LoginScreen onSuccess={() => navigate('home')} />
+        <UpdateBanner />
+      </View>
+    );
   }
 
   const renderActiveScreen = () => {
@@ -95,6 +101,9 @@ export const UniversalRouter: React.FC = () => {
           currentRoute={route} 
           onNavigate={navigate} 
         />
+
+        {/* Global In-App Update Prompt */}
+        <UpdateBanner />
       </View>
     </SafeAreaView>
   );

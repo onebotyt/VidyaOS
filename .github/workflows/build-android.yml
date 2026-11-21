@@ -106,52 +106,14 @@ jobs:
             echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
 
             # Configure react block: debuggableVariants = [] forces offline bundle generation for all variants
-            # Also patch AndroidManifest for cleartext traffic and MainActivity to clear FLAG_SECURE for screenshots
             node -e "
               const fs = require('fs');
-              const path = require('path');
               const gradleFile = 'android/app/build.gradle';
               if (fs.existsSync(gradleFile)) {
                 let content = fs.readFileSync(gradleFile, 'utf8');
                 content = content.replace(/react\s*\{/, 'react {\n    debuggableVariants = []');
                 fs.writeFileSync(gradleFile, content, 'utf8');
               }
-              const manifestFile = 'android/app/src/main/AndroidManifest.xml';
-              if (fs.existsSync(manifestFile)) {
-                let manifest = fs.readFileSync(manifestFile, 'utf8');
-                if (!manifest.includes('android:usesCleartextTraffic')) {
-                  manifest = manifest.replace('<application', '<application android:usesCleartextTraffic=\"true\"');
-                }
-                if (!manifest.includes('android.permission.INTERNET')) {
-                  manifest = manifest.replace('</manifest>', '  <uses-permission android:name=\"android.permission.INTERNET\" />\n  <uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n</manifest>');
-                }
-                fs.writeFileSync(manifestFile, manifest, 'utf8');
-              }
-              const findFiles = (dir) => {
-                let res = [];
-                if (!fs.existsSync(dir)) return res;
-                fs.readdirSync(dir).forEach(f => {
-                  const p = path.join(dir, f);
-                  if (fs.statSync(p).isDirectory()) res = res.concat(findFiles(p));
-                  else if (f.startsWith('MainActivity.')) res.push(p);
-                });
-                return res;
-              };
-              findFiles('android/app/src/main/java').forEach(actFile => {
-                let act = fs.readFileSync(actFile, 'utf8');
-                if (!act.includes('FLAG_SECURE')) {
-                  if (act.includes('fun onCreate(')) {
-                    act = act.replace(/(fun onCreate\([^)]*\)\s*\{)/, '\$1\n    try { window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE) } catch (e: Exception) {}');
-                  } else {
-                    act = act.replace(/(class MainActivity[^{]*\{)/, '\$1\n  override fun onCreate(savedInstanceState: android.os.Bundle?) {\n    super.onCreate(null)\n    try { window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE) } catch (e: Exception) {}\n  }');
-                  }
-                  if (!act.includes('fun onResume(')) {
-                    act = act.replace(/(class MainActivity[^{]*\{)/, '\$1\n  override fun onResume() {\n    super.onResume()\n    try { window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE) } catch (e: Exception) {}\n  }');
-                  }
-                  fs.writeFileSync(actFile, act, 'utf8');
-                  console.log('[v2app] Patched ' + actFile + ' to allow screenshots');
-                }
-              });
             "
 
             cd android
@@ -226,7 +188,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app-version.json package.json android/app/build.gradle
+          git add app-version.json package.json android/app/build.gradle mobile-bridge.js www/mobile-bridge.js frontendv2/packages/core/src/version.json frontendv2/apps/mobile/app.json
           if [ -f android/app/vidyaos.keystore ]; then
             git add android/app/vidyaos.keystore
           fi

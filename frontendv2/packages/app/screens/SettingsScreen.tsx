@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet, Modal, Platform } from 'react-native';
-import { authStore, type User } from '@vidyaos/core';
+import { View, Text, ScrollView, Pressable, StyleSheet, Modal, Platform, Linking, ActivityIndicator } from 'react-native';
+import { authStore, type User, checkUniversalAppUpdate, CURRENT_APP_VERSION, type AppReleaseInfo } from '@vidyaos/core';
 
 interface SettingsScreenProps {
   onNavigate: (route: string) => void;
@@ -9,10 +9,27 @@ interface SettingsScreenProps {
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const [user, setUser] = useState<User | null>(authStore.getState().user);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateResult, setUpdateResult] = useState<AppReleaseInfo | null>(null);
+  const [updateChecked, setUpdateChecked] = useState(false);
 
   useEffect(() => {
     return authStore.subscribe(state => setUser(state.user));
   }, []);
+
+  const handleCheckUpdate = async () => {
+    setCheckingUpdate(true);
+    setUpdateChecked(false);
+    try {
+      const res = await checkUniversalAppUpdate();
+      setUpdateResult(res);
+      setUpdateChecked(true);
+    } catch (_) {
+      setUpdateChecked(true);
+    } finally {
+      setCheckingUpdate(false);
+    }
+  };
 
   const handleLogout = () => {
     authStore.logout();
@@ -87,6 +104,60 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) =>
                 </View>
               </View>
               <Text style={styles.itemSub}>Single universal React codebase for Web, Native Mobile & Tauri PC.</Text>
+            </View>
+          </View>
+
+          {/* GitHub Live Updater */}
+          <View style={[styles.itemRow, { borderTopWidth: 1, borderTopColor: '#f1f5f9' }]}>
+            <View style={[styles.iconBox, { backgroundColor: '#f0fdf4' }]}>
+              <Text style={{ fontSize: 18 }}>🔄</Text>
+            </View>
+            <View style={styles.itemTextWrap}>
+              <View style={styles.itemHeadingRow}>
+                <Text style={styles.itemTitle}>Release Version</Text>
+                <View style={[styles.statusBadge, { backgroundColor: '#f1f5f9' }]}>
+                  <Text style={[styles.statusBadgeText, { color: '#475569' }]}>v{CURRENT_APP_VERSION}</Text>
+                </View>
+              </View>
+              <Text style={styles.itemSub}>
+                {updateResult?.hasUpdate
+                  ? `Update Available: v${updateResult.latestVersion}`
+                  : updateChecked
+                  ? `You are running the latest version (v${CURRENT_APP_VERSION}).`
+                  : 'Check GitHub releases for latest builds & features.'}
+              </Text>
+
+              <View style={{ marginTop: 8, flexDirection: 'row', gap: 8 }}>
+                {updateResult?.hasUpdate ? (
+                  <Pressable
+                    style={[styles.linkBtn, { backgroundColor: '#16a34a' }]}
+                    onPress={() => {
+                      const url = Platform.OS === 'web'
+                        ? 'https://github.com/onebotyt/VidyaOS/releases/latest'
+                        : updateResult.v2ApkUrl;
+                      Linking.openURL(url);
+                    }}
+                  >
+                    <Text style={[styles.linkBtnText, { color: '#ffffff' }]}>
+                      Install v{updateResult.latestVersion} →
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    style={[styles.linkBtn, { opacity: checkingUpdate ? 0.7 : 1 }]}
+                    onPress={handleCheckUpdate}
+                    disabled={checkingUpdate}
+                  >
+                    {checkingUpdate ? (
+                      <ActivityIndicator size="small" color="#2563eb" />
+                    ) : (
+                      <Text style={styles.linkBtnText}>
+                        {updateChecked ? '✓ Checked Just Now' : 'Check for Updates'}
+                      </Text>
+                    )}
+                  </Pressable>
+                )}
+              </View>
             </View>
           </View>
         </View>

@@ -141,34 +141,47 @@
     });
   }
 
-  // 4. In-App Auto-Update Checker
-  async function checkForAppUpdates() {
+  // 4. In-App Auto-Update Checker (GitHub Releases API + Fallback)
+  async function checkForAppUpdates(force = false) {
     try {
-      // Strictly restrict update checks and banner notifications to native Android APK
-      // Never show mobile update banner on desktop web browser
-      const isRealNativeApp = (
-        typeof window !== 'undefined' && (
-          Boolean(window.NativeAppUpdater) ||
-          Boolean(window.NativeAuthBridge) ||
-          Boolean(window.Capacitor?.isNativePlatform?.()) ||
-          window.location.protocol === 'capacitor:' ||
-          window.location.protocol === 'file:' ||
-          window.VIDYAOS_FORCE_NATIVE === true
-        )
-      );
-      if (!isRealNativeApp) {
-        return;
-      }
-
       const currentVersion = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
         ? window.NativeAppUpdater.getAppVersionName()
-        : (window.VIDYAOS_APP_VERSION || '1.0.103');
-      const res = await fetch(GITHUB_VERSION_URL + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) return;
+        : (window.VIDYAOS_APP_VERSION || '1.0.119');
 
-      const data = await res.json();
-      const remoteVersion = data.version;
-      const downloadUrl = data.apkUrl || LATEST_APK_URL;
+      let remoteVersion = null;
+      let downloadUrl = LATEST_APK_URL;
+      let releaseNotes = '';
+
+      // 1. Primary: Direct GitHub Releases API (Instant, no Fastly CDN cache delay)
+      try {
+        const ghRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
+          headers: { 'Accept': 'application/vnd.github.v3+json' },
+        });
+        if (ghRes.ok) {
+          const ghData = await ghRes.json();
+          remoteVersion = (ghData.tag_name || '').replace(/^v/, '').trim();
+          releaseNotes = ghData.body || '';
+          if (Array.isArray(ghData.assets)) {
+            const asset = ghData.assets.find(a => a.name === 'VidyaOS.apk');
+            if (asset && asset.browser_download_url) downloadUrl = asset.browser_download_url;
+          }
+        }
+      } catch (_) {}
+
+      // 2. Fallback: Raw GitHub main app-version.json
+      if (!remoteVersion) {
+        try {
+          const res = await fetch(GITHUB_VERSION_URL + '?t=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            remoteVersion = data.version;
+            if (data.apkUrl) downloadUrl = data.apkUrl;
+            if (data.releaseNotes) releaseNotes = data.releaseNotes;
+          }
+        } catch (_) {}
+      }
+
+      if (!remoteVersion) return;
 
       const isNewer = (function (v1, v2) {
         if (!v1 || !v2) return false;
@@ -184,13 +197,15 @@
         return false;
       })(remoteVersion, currentVersion);
 
-      if (!remoteVersion || !isNewer) return;
+      if (!isNewer) return;
 
-      // Check if user dismissed this specific version recently
-      const dismissedVer = localStorage.getItem('vidyaos_dismissed_update');
-      if (dismissedVer === remoteVersion) return;
+      // Check if user dismissed this specific version in this session
+      if (!force) {
+        const dismissedVer = sessionStorage.getItem('vidyaos_dismissed_update');
+        if (dismissedVer === remoteVersion) return;
+      }
 
-      showUpdateNotification(remoteVersion, downloadUrl, data.releaseNotes);
+      showUpdateNotification(remoteVersion, downloadUrl, releaseNotes);
     } catch (_) {
       // Non-critical, ignore network error
     }

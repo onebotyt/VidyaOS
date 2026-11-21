@@ -184,27 +184,33 @@
       let downloadUrl = 'https://github.com/onebotyt/VidyaOS/releases';
       let notes = 'Latest performance optimizations and classroom features.';
 
-      // Try local app-version.json or GitHub API
+      // 1. Check GitHub Releases API for true remote version
       try {
-        const r = await fetch('/app-version.json?t=' + Date.now(), { cache: 'no-store' });
-        if (r.ok) {
-          const j = await r.json();
-          remoteVer = j.version;
-          if (j.apkUrl) downloadUrl = j.apkUrl;
-          if (j.releaseNotes) notes = j.releaseNotes;
+        const ghRes = await fetch('https://api.github.com/repos/onebotyt/VidyaOS/releases/latest', {
+          headers: { 'Accept': 'application/vnd.github.v3+json' },
+        });
+        if (ghRes.ok) {
+          const ghData = await ghRes.json();
+          remoteVer = (ghData.tag_name || '').replace(/^v/, '').trim();
+          if (ghData.body) notes = ghData.body;
+          if (Array.isArray(ghData.assets)) {
+            const asset = ghData.assets.find(a => a.name === 'VidyaOS.apk');
+            if (asset && asset.browser_download_url) downloadUrl = asset.browser_download_url;
+          }
         }
-      } catch (_) { }
+      } catch (_) {}
 
-      if (!remoteVer && window.VidyaOSMobileBridge) {
+      // 2. Fallback to raw GitHub main branch
+      if (!remoteVer) {
         try {
-          const r = await fetch(window.VidyaOSMobileBridge.GITHUB_VERSION_URL + '?t=' + Date.now(), { cache: 'no-store' });
+          const r = await fetch('https://raw.githubusercontent.com/onebotyt/VidyaOS/main/app-version.json?t=' + Date.now(), { cache: 'no-store' });
           if (r.ok) {
             const j = await r.json();
             remoteVer = j.version;
             if (j.apkUrl) downloadUrl = j.apkUrl;
             if (j.releaseNotes) notes = j.releaseNotes;
           }
-        } catch (_) { }
+        } catch (_) {}
       }
 
       await new Promise(res => setTimeout(res, 800)); // Smooth feedback
