@@ -778,14 +778,18 @@ h1 em {
   transition: all 0.15s ease;
 }
 
-.app-action-btn.apk-btn {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-  border: 1px solid rgba(34, 197, 94, 0.25);
+.app-action-btn.apk-btn,
+.app-action-btn.beta-btn {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  position: relative;
 }
 
-.app-action-btn.apk-btn:hover {
-  background: rgba(34, 197, 94, 0.18);
+.app-action-btn.apk-btn:hover,
+.app-action-btn.beta-btn:hover {
+  background: rgba(37, 99, 235, 0.18);
+  border-color: #2563eb;
 }
 
 .app-action-btn.github-btn {
@@ -1325,6 +1329,18 @@ h1 em {
   font-family: inherit;
   transition: all 0.15s ease;
   box-sizing: border-box;
+}
+
+.download-primary-btn.pc-btn {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.download-primary-btn.pc-btn:hover {
+  background: linear-gradient(135deg, #1e40af, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
 }
 
 .download-primary-btn.android-btn {

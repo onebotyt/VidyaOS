@@ -948,9 +948,8 @@ function openDownloadAppModal(defaultPlatform) {
   if (modal) {
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
-    if (defaultPlatform) {
-      switchDownloadTab(defaultPlatform);
-    }
+    const platformToSelect = defaultPlatform || (window.innerWidth <= 768 ? 'android' : 'pc');
+    switchDownloadTab(platformToSelect);
   }
 }
 
@@ -963,21 +962,33 @@ function closeDownloadAppModal() {
 }
 
 function switchDownloadTab(platform) {
+  const pcTab = document.getElementById('tab-btn-pc');
   const androidTab = document.getElementById('tab-btn-android');
   const iosTab = document.getElementById('tab-btn-ios');
+  const pcPanel = document.getElementById('download-panel-pc');
   const androidPanel = document.getElementById('download-panel-android');
   const iosPanel = document.getElementById('download-panel-ios');
 
-  if (platform === 'ios') {
-    if (androidTab) { androidTab.classList.remove('active'); androidTab.setAttribute('aria-selected', 'false'); }
+  [pcTab, androidTab, iosTab].forEach(tab => {
+    if (tab) {
+      tab.classList.remove('active');
+      tab.setAttribute('aria-selected', 'false');
+    }
+  });
+
+  [pcPanel, androidPanel, iosPanel].forEach(panel => {
+    if (panel) panel.style.display = 'none';
+  });
+
+  if (platform === 'android') {
+    if (androidTab) { androidTab.classList.add('active'); androidTab.setAttribute('aria-selected', 'true'); }
+    if (androidPanel) androidPanel.style.display = 'flex';
+  } else if (platform === 'ios') {
     if (iosTab) { iosTab.classList.add('active'); iosTab.setAttribute('aria-selected', 'true'); }
-    if (androidPanel) androidPanel.style.display = 'none';
     if (iosPanel) iosPanel.style.display = 'flex';
   } else {
-    if (iosTab) { iosTab.classList.remove('active'); iosTab.setAttribute('aria-selected', 'false'); }
-    if (androidTab) { androidTab.classList.add('active'); androidTab.setAttribute('aria-selected', 'true'); }
-    if (iosPanel) iosPanel.style.display = 'none';
-    if (androidPanel) androidPanel.style.display = 'flex';
+    if (pcTab) { pcTab.classList.add('active'); pcTab.setAttribute('aria-selected', 'true'); }
+    if (pcPanel) pcPanel.style.display = 'flex';
   }
 }
 

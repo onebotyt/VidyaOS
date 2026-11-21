@@ -805,14 +805,16 @@
   font-family: inherit;
 }
 
-.m-subaction-btn.download-btn {
-  background: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
+.m-subaction-btn.download-btn,
+.m-subaction-btn.beta-btn {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
 }
 
-.m-subaction-btn.download-btn:active {
-  background: #dcfce7;
+.m-subaction-btn.download-btn:active,
+.m-subaction-btn.beta-btn:active {
+  background: #dbeafe;
 }
 
 .m-subaction-btn.github-btn {
