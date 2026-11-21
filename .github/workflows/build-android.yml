@@ -105,14 +105,13 @@ jobs:
             sed -i '/org.gradle.jvmargs/d' android/gradle.properties || true
             echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
 
-            # Configure react block for offline bundle inclusion and debug signing for release
+            # Configure react block: debuggableVariants = [] forces offline bundle generation for all variants
             node -e "
               const fs = require('fs');
               const file = 'android/app/build.gradle';
               if (fs.existsSync(file)) {
                 let content = fs.readFileSync(file, 'utf8');
-                content = content.replace(/react\s*\{/, 'react {\n    bundleInDebug = true\n    bundleInRelease = true');
-                content = content.replace(/release\s*\{(\s*signingConfig\s+[^\n]+)?/, 'release {\n            signingConfig signingConfigs.debug');
+                content = content.replace(/react\s*\{/, 'react {\n    debuggableVariants = []');
                 fs.writeFileSync(file, content, 'utf8');
               }
             "
