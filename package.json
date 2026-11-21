@@ -1,6 +1,6 @@
 {
   "name": "vidyaos-frontend",
-  "version": "1.0.94",
+  "version": "1.0.95",
   "description": "VidyaOS Institutional Campus Operating System - Modern Frontend Client & Mobile App",
   "scripts": {
     "start": "node server.js",
