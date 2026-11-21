@@ -32,16 +32,64 @@
   window.VIDYAOS_API_BASE = isCapacitor ? `${CLOUD_BACKEND_URL}/api/v1` : '/api/v1';
   window.VIDYAOS_CLOUD_BACKEND = CLOUD_BACKEND_URL;
 
-  // Status Bar & System Windows Inset Guard for Native Shell
+  // Status Bar & System Windows Dynamic Theming (Meesho-Style Clarity)
+  function syncSystemBarsWithAppTheme() {
+    try {
+      const isDark = document.documentElement.classList.contains('dark') ||
+                     document.body?.classList.contains('dark') ||
+                     document.documentElement.getAttribute('data-theme') === 'dark' ||
+                     document.body?.getAttribute('data-theme') === 'dark' ||
+                     localStorage.getItem('theme') === 'dark';
+
+      const barColor = isDark ? '#0b1220' : '#ffffff';
+
+      // 1. Native Java Bridge (Sets WindowInsetsControllerCompat appearanceLight)
+      if (window.NativeSystemUI && typeof window.NativeSystemUI.setSystemBarTheme === 'function') {
+        try {
+          window.NativeSystemUI.setSystemBarTheme(isDark, barColor, barColor);
+        } catch (_) {}
+      }
+
+      // 2. Capacitor StatusBar Plugin
+      if (window.Capacitor?.Plugins?.StatusBar) {
+        try {
+          window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: false });
+          window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: barColor });
+          if (window.Capacitor.Plugins.StatusBar.setStyle) {
+            // LIGHT style in Capacitor means light icons (for dark bg)
+            // DARK style in Capacitor means dark icons (for light bg, like Meesho)
+            window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+  }
+
+  // Expose global helper for theme switchers
+  window.syncSystemBarsWithAppTheme = syncSystemBarsWithAppTheme;
+
+  // Run immediately and listen for theme changes
+  syncSystemBarsWithAppTheme();
+  if (typeof window !== 'undefined' && typeof MutationObserver !== 'undefined') {
+    const themeObserver = new MutationObserver(() => syncSystemBarsWithAppTheme());
+    if (document.documentElement) {
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+    }
+    if (document.body) {
+      themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        if (document.body) {
+          themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+        }
+        syncSystemBarsWithAppTheme();
+      });
+    }
+  }
+
   if (isCapacitor) {
     if (document.documentElement) {
       document.documentElement.classList.add('is-native-shell');
-    }
-    if (window.Capacitor?.Plugins?.StatusBar) {
-      try {
-        window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: false });
-        window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: '#07153e' });
-      } catch (_) {}
     }
   }
 

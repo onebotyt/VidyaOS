@@ -13,9 +13,12 @@ import android.provider.Settings;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.graphics.Color;
+import android.view.Window;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -42,11 +45,49 @@ public class MainActivity extends BridgeActivity {
         // and finishes before the mobile system navigation bar
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
+        // Configure system bar colors and sharp dark indicators by default (like Meesho)
+        applySystemBarAppearance(false, "#ffffff", "#ffffff");
+
         // Configure Google Sign-In with device account picker
         initGoogleSignInClient();
 
         // Configure webview settings, sanitized User-Agent and native bridges
         setupWebViewBridge();
+    }
+
+    /**
+     * Applies dynamic status bar & navigation bar appearance based on theme.
+     * In light mode: renders sharp DARK icons (clock, battery, 4G, wifi, bottom buttons).
+     * In dark mode: renders LIGHT icons.
+     */
+    public void applySystemBarAppearance(boolean isDark, String statusColorHex, String navColorHex) {
+        runOnUiThread(() -> {
+            try {
+                Window window = getWindow();
+                WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(window, window.getDecorView());
+                if (insetsController != null) {
+                    // appearanceLight = true means DARK icons on LIGHT background (like Meesho)
+                    // appearanceLight = false means LIGHT icons on DARK background
+                    insetsController.setAppearanceLightStatusBars(!isDark);
+                    insetsController.setAppearanceLightNavigationBars(!isDark);
+                }
+
+                int sColor = isDark ? Color.parseColor("#0b1220") : Color.parseColor("#ffffff");
+                int nColor = isDark ? Color.parseColor("#0b1220") : Color.parseColor("#ffffff");
+
+                if (statusColorHex != null && !statusColorHex.isEmpty()) {
+                    try { sColor = Color.parseColor(statusColorHex); } catch (Exception ignored) {}
+                }
+                if (navColorHex != null && !navColorHex.isEmpty()) {
+                    try { nColor = Color.parseColor(navColorHex); } catch (Exception ignored) {}
+                }
+
+                window.setStatusBarColor(sColor);
+                window.setNavigationBarColor(nColor);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void initGoogleSignInClient() {
@@ -83,9 +124,25 @@ public class MainActivity extends BridgeActivity {
                 // 2. Attach JavascriptInterfaces
                 webView.addJavascriptInterface(new NativeAuthBridge(), "NativeAuthBridge");
                 webView.addJavascriptInterface(new NativeAppUpdater(), "NativeAppUpdater");
+                webView.addJavascriptInterface(new NativeSystemUIBridge(), "NativeSystemUI");
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // NATIVE SYSTEM UI BRIDGE (Status Bar & Navigation Bar Theming)
+    // ─────────────────────────────────────────────────────────────
+    public class NativeSystemUIBridge {
+        @JavascriptInterface
+        public void setSystemBarTheme(boolean isDark, String statusColorHex, String navColorHex) {
+            applySystemBarAppearance(isDark, statusColorHex, navColorHex);
+        }
+
+        @JavascriptInterface
+        public void syncTheme(boolean isDark) {
+            applySystemBarAppearance(isDark, isDark ? "#0b1220" : "#ffffff", isDark ? "#0b1220" : "#ffffff");
         }
     }
 

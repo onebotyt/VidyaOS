@@ -7,6 +7,8 @@
 .rec-container {
   padding: 1.25rem 1.5rem;
   max-width: 1400px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
   box-sizing: border-box;
 }
@@ -1704,96 +1706,156 @@
 }
 
 /* ==========================================================================
-   Mobile-Responsive Rules (<= 640px Viewports)
+   Mobile-Responsive Rules (<= 768px Viewports)
    Touch-First Cards, Zero Horizontal Scroll, Fluid Micro-Interactions
    ========================================================================== */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  .faculty-main-wrap {
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
   .rec-container {
-    padding: 0.75rem 0.85rem;
+    padding: 0.75rem 0.85rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .rec-page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.65rem;
-    margin-bottom: 0.85rem;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.65rem !important;
+    margin-bottom: 0.85rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .rec-title-group {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .rec-title-badge-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
   }
 
   .rec-title-group h1 {
-    font-size: 1.18rem;
+    font-size: 1.15rem !important;
+    line-height: 1.25 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .rec-title-chip {
+    font-size: 0.65rem !important;
+    padding: 0.15rem 0.45rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
   }
 
   .rec-title-desc {
-    display: none;
+    display: none !important;
   }
 
   .rec-header-actions {
-    width: 100%;
+    width: 100% !important;
   }
 
   .btn-rec-export-all {
-    width: 100%;
-    justify-content: center;
-    padding: 0.55rem 0.95rem;
-    font-size: 0.82rem;
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.55rem 0.95rem !important;
+    font-size: 0.82rem !important;
   }
 
   /* Filter Card Compact Mobile */
   .rec-filter-card {
-    padding: 0.75rem 0.85rem;
-    margin-bottom: 0.85rem;
-    border-radius: 14px;
-    gap: 0.55rem;
+    padding: 0.75rem 0.85rem !important;
+    margin-bottom: 0.85rem !important;
+    border-radius: 14px !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   .rec-search-row {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .rec-search-box {
-    flex: 1;
-    padding: 0.45rem 0.65rem;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    padding: 0.45rem 0.65rem !important;
   }
 
   .rec-search-box input {
-    font-size: 0.82rem;
+    font-size: 0.82rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .filter-toggle-label {
-    display: none;
+    display: none !important;
   }
 
   .btn-rec-filter-toggle {
-    padding: 0.45rem 0.65rem;
-    font-size: 0.8rem;
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.8rem !important;
+    flex-shrink: 0 !important;
   }
 
   .btn-rec-clear {
-    padding: 0.45rem 0.65rem;
-    font-size: 0.78rem;
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.78rem !important;
+    flex-shrink: 0 !important;
   }
 
   /* Quick Semester Chips Scroll Bar */
   .rec-sem-chips-scroll {
-    padding: 0.1rem 0 0.2rem 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.1rem 0 0.2rem 0 !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .rec-chip-btn {
-    padding: 0.3rem 0.65rem;
-    font-size: 0.74rem;
+    padding: 0.3rem 0.65rem !important;
+    font-size: 0.74rem !important;
+    flex-shrink: 0 !important;
   }
 
   /* Filter Grid Collapsible 2-Column */
   .rec-filter-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0;
-    padding-top: 0.65rem;
-    border-top: 1px solid var(--border-color);
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0 !important;
+    padding-top: 0.65rem !important;
+    border-top: 1px solid var(--border-color) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .rec-filter-grid.is-collapsed {
@@ -1801,25 +1863,40 @@
   }
 
   .rec-filter-item-session {
-    grid-column: span 2;
+    grid-column: span 2 !important;
   }
 
   .rec-filter-item label {
-    font-size: 0.68rem;
+    font-size: 0.68rem !important;
   }
 
   .rec-filter-item select {
-    padding: 0.42rem 0.55rem;
-    font-size: 0.78rem;
+    padding: 0.42rem 0.55rem !important;
+    font-size: 0.78rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   /* Table Card on Mobile */
   .rec-table-card {
-    border-radius: 14px;
+    border-radius: 14px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .rec-table-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .rec-table-meta {
-    padding: 0.65rem 0.85rem;
+    padding: 0.65rem 0.85rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   /* Transform Desktop Table into Touch-Optimized Cards */
@@ -1831,19 +1908,24 @@
   .rec-table tbody {
     display: block !important;
     width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .rec-table tr.rec-student-row {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 0.85rem 0.95rem !important;
+    padding: 0.75rem 0.85rem !important;
     border-bottom: 1px solid var(--border-color) !important;
     background: var(--bg-card) !important;
     cursor: pointer !important;
     transition: background-color 0.15s ease !important;
-    gap: 0.65rem !important;
+    gap: 0.5rem !important;
     box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
   }
 
   .rec-table tr.rec-student-row:last-child {
@@ -1862,24 +1944,28 @@
   }
 
   .rec-student-main-cell {
-    flex: 1 1 auto !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
     padding: 0 !important;
     border-bottom: none !important;
     display: block !important;
+    overflow: hidden !important;
   }
 
   .rec-name-cell {
     display: flex !important;
     align-items: center !important;
-    gap: 0.75rem !important;
+    gap: 0.65rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
   }
 
   .rec-student-avatar-squircle {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 13px !important;
-    font-size: 0.95rem !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 11px !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
     flex-shrink: 0 !important;
   }
 
@@ -1888,41 +1974,58 @@
     flex-direction: column !important;
     gap: 0.22rem !important;
     min-width: 0 !important;
-    flex: 1 !important;
+    flex: 1 1 0% !important;
+    overflow: hidden !important;
   }
 
   .rec-student-title-line {
     display: flex !important;
     align-items: center !important;
-    gap: 0.4rem !important;
+    gap: 0.35rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
   }
 
   .rec-mobile-roll-pill {
     display: inline-flex !important;
     font-family: var(--font-family-mono, monospace) !important;
-    font-size: 0.7rem !important;
+    font-size: 0.68rem !important;
     font-weight: 800 !important;
     color: var(--color-primary) !important;
     background: var(--color-primary-light, rgba(37, 99, 235, 0.1)) !important;
-    padding: 0.08rem 0.38rem !important;
-    border-radius: 5px !important;
+    padding: 0.06rem 0.32rem !important;
+    border-radius: 4px !important;
     flex-shrink: 0 !important;
   }
 
   .rec-student-name {
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     line-height: 1.25 !important;
+    min-width: 0 !important;
+    flex: 1 !important;
   }
 
   .rec-student-sub-line {
     display: flex !important;
     align-items: center !important;
-    gap: 0.35rem !important;
+    gap: 0.28rem !important;
     flex-wrap: wrap !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .rec-student-reg-chip,
+  .rec-student-cohort-chip,
+  .rec-student-att-chip {
+    font-size: 0.68rem !important;
+    padding: 0.08rem 0.35rem !important;
+    border-radius: 5px !important;
+    line-height: 1.3 !important;
+    white-space: nowrap !important;
   }
 
   .rec-action-cell {
@@ -1932,6 +2035,7 @@
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
+    width: 32px !important;
   }
 
   .desktop-only-text {
@@ -1939,15 +2043,19 @@
   }
 
   .btn-rec-dossier-quick {
-    width: 34px !important;
-    height: 34px !important;
-    padding: 0 !important;
-    border-radius: 9px !important;
-    justify-content: center !important;
+    display: none !important; /* Row is already tap-to-open dossier */
   }
 
   .rec-kebab-btn {
-    width: 34px !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 8px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
     height: 34px !important;
     border-radius: 9px !important;
     padding: 0 !important;
