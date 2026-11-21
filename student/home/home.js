@@ -85,11 +85,6 @@
         if (sessionEl) {
           sessionEl.textContent = s.academic_year_label || '2026–27 Session';
         }
-
-        const advisorDeptEl = document.getElementById('home-advisor-dept');
-        if (advisorDeptEl && s.department_name) {
-          advisorDeptEl.textContent = `${s.department_name} Mentor`;
-        }
       }
     } catch (_) { }
   }

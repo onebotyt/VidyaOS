@@ -78,6 +78,10 @@ export class AppHeader {
           ${getIcon(this.currentTheme === 'dark' ? 'sun' : 'moon')}
         </button>
 
+        <button class="header-action-btn" id="header-settings-btn" title="Settings">
+          ${getIcon('settings')}
+        </button>
+
         <div class="header-avatar-btn" id="header-avatar-btn" title="Profile">
           ${initials}
         </div>
@@ -90,6 +94,11 @@ export class AppHeader {
   bindEvents() {
     this.container.querySelector('#theme-toggle-btn')?.addEventListener('click', () => {
       this.toggleTheme();
+    });
+
+    this.container.querySelector('#header-settings-btn')?.addEventListener('click', () => {
+      Platform.hapticFeedback('light');
+      Router.navigate('student/settings');
     });
 
     this.container.querySelector('#header-avatar-btn')?.addEventListener('click', () => {

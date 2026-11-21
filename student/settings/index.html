@@ -126,28 +126,6 @@
 
         <div class="settings-divider"></div>
 
-        <div class="settings-item-row item-clickable" onclick="openAdvisorModal()">
-          <div class="item-icon-box advisor-icon-bg">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-          </div>
-          <div class="item-content-wrap">
-            <div class="item-primary-text">Department Faculty Advisor</div>
-            <div class="item-secondary-text" id="settings-advisor-sub">Assigned academic mentor &amp; attendance coordinator</div>
-          </div>
-          <div class="item-action-wrap">
-            <svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </div>
-
-        <div class="settings-divider"></div>
-
         <div class="settings-item-row item-clickable" onclick="openAttendanceRulesModal()">
           <div class="item-icon-box policy-icon-bg">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -348,28 +326,6 @@
       <div class="modal-actions-row">
         <button type="button" class="btn btn-secondary" onclick="closeLogoutModal()">Cancel</button>
         <button type="button" class="btn btn-danger" id="btn-confirm-logout" onclick="executeLogout()">Sign Out</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: ADVISOR DETAILS -->
-  <div class="custom-modal-backdrop" id="advisor-modal" style="display:none;" onclick="closeAdvisorModal(event)">
-    <div class="custom-modal-card" onclick="event.stopPropagation()">
-      <div class="modal-icon-circle primary">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-        </svg>
-      </div>
-      <h3 class="modal-title">Department Academic Advisor</h3>
-      <div class="advisor-info-box">
-        <div class="advisor-row"><strong>Name:</strong> <span id="advisor-modal-name">Rajnish Bhutani</span></div>
-        <div class="advisor-row"><strong>Department:</strong> <span id="advisor-modal-dept">Information Technology</span></div>
-        <div class="advisor-row"><strong>Role:</strong> Class Teacher &amp; Mentor</div>
-        <div class="advisor-row"><strong>Email:</strong> <span id="advisor-modal-email">advisor.it@ugip.ac.in</span></div>
-      </div>
-      <div class="modal-actions-row">
-        <button type="button" class="btn btn-primary" onclick="closeAdvisorModal()">Got It</button>
       </div>
     </div>
   </div>

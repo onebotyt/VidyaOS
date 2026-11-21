@@ -92,19 +92,6 @@ export async function renderStudentSettings(container) {
               <span style="color: var(--text-muted);">${getIcon('chevronRight')}</span>
             </div>
 
-            <div class="settings-item-row" id="support-mentor-btn">
-              <div class="settings-item-left">
-                <div class="settings-item-icon" style="color: #9333ea;">
-                  ${getIcon('profile')}
-                </div>
-                <div>
-                  <div class="settings-item-title">Department Faculty Advisor</div>
-                  <div class="settings-item-subtitle">Assigned academic mentor & attendance queries</div>
-                </div>
-              </div>
-              <span style="color: var(--text-muted);">${getIcon('chevronRight')}</span>
-            </div>
-
             <div class="settings-item-row" id="report-complaint-btn">
               <div class="settings-item-left">
                 <div class="settings-item-icon" style="color: var(--status-absent);">
@@ -202,16 +189,6 @@ export async function renderStudentSettings(container) {
     Dialog.confirm({
       title: 'Student Campus Helpdesk',
       message: 'Government Polytechnic Nainital support cell is available Monday through Saturday (10:00 AM - 4:00 PM) in Administrative Block 1 or via email at support@gpnainital.ac.in',
-      confirmText: 'Understood',
-      cancelText: 'Close'
-    });
-  });
-
-  // Mentor Modal
-  container.querySelector('#support-mentor-btn')?.addEventListener('click', () => {
-    Dialog.confirm({
-      title: 'Department Faculty Advisor',
-      message: 'Assigned Academic Mentor: Prof. B.S. Bisht (Assistant Professor, Information Technology). Cabin: Block A, Room 102. Office hours: 3:00 - 4:30 PM.',
       confirmText: 'Understood',
       cancelText: 'Close'
     });

@@ -60,7 +60,7 @@ async function loadStudentProfile() {
     document.getElementById('profile-department').innerText = s.department_name || s.branch_name || '--';
     document.getElementById('profile-year-sem').innerText = `Year ${s.year} • Semester ${s.semester}`;
     document.getElementById('profile-academic-year').innerText = s.academic_year_label || 'Current Session';
-    document.getElementById('profile-class-teacher').innerText = s.class_teacher_name || 'Faculty Advisor';
+    document.getElementById('profile-class-teacher').innerText = s.class_teacher_name || 'Class Teacher';
 
     // Account Fields
     document.getElementById('profile-username').value = s.ubter_roll_no || s.official_enrollment_no || s.username || '';

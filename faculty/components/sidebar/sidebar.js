@@ -38,6 +38,7 @@
     { key: 'esp32', label: 'ESP32 Biometric Terminals', shortLabel: 'ESP32', href: '/faculty/esp32-devices/index.html', icon: 'settings' },
     { key: 'timetable', label: 'Timetable', shortLabel: 'Timetable', href: '/faculty/timetable/index.html', icon: 'timetable' },
     { key: 'drive', label: 'Faculty Drive', shortLabel: 'Drive', href: '/faculty/media/index.html', icon: 'drive' },
+    { key: 'settings', label: 'Faculty Settings', shortLabel: 'Settings', href: '/faculty/settings/index.html', icon: 'settings' },
     { key: 'bug-reports', label: 'Report a Bug', shortLabel: 'Bug Report', href: '/faculty/bug-reports/index.html', icon: 'bug' }
   ];
 
@@ -46,7 +47,7 @@
     { key: 'classes', label: 'Classes', href: '/faculty/classes/index.html', icon: 'classes' },
     { key: 'records', label: 'Records', href: '/faculty/student-records/index.html', icon: 'registers' },
     { key: 'students', label: 'Students', href: '/faculty/students/index.html', icon: 'students' },
-    { key: 'settings', label: 'Settings', href: '/faculty/profile/index.html', icon: 'settings' }
+    { key: 'settings', label: 'Settings', href: '/faculty/settings/index.html', icon: 'settings' }
   ];
 
   const HAMBURGER_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
@@ -237,7 +238,7 @@
         { key: 'attendance', label: 'Attendance', href: '/faculty/registers/index.html', icon: 'registers' },
         { key: 'students', label: 'Students', href: '/faculty/students/index.html', icon: 'students' },
         { key: 'faculty', label: 'Faculty', href: '/faculty/faculty/index.html', icon: 'faculty' },
-        { key: 'settings', label: 'Settings', href: '/faculty/profile/index.html', icon: 'settings' }
+        { key: 'settings', label: 'Settings', href: '/faculty/settings/index.html', icon: 'settings' }
       ] : FACULTY_MOBILE_TABS;
 
       const tabsHtml = tabs.map(tab => {
@@ -246,7 +247,7 @@
         else if (tab.key === 'attendance') isActive = currentPath.includes('/faculty/registers');
         else if (tab.key === 'students') isActive = currentPath.includes('/faculty/students');
         else if (tab.key === 'faculty') isActive = currentPath.includes('/faculty/faculty');
-        else if (tab.key === 'settings') isActive = currentPath.includes('/faculty/profile');
+        else if (tab.key === 'settings') isActive = currentPath.includes('/faculty/settings');
         else if (tab.key === 'home') isActive = currentPath === '/faculty' || currentPath.includes('/faculty/dashboard');
 
         const activeCls = isActive ? ' active' : '';

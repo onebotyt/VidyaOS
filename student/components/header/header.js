@@ -100,6 +100,11 @@
             <span id="student-theme-icon">${getIcon('moon', { width: 17, height: 17 })}</span>
           </button>
 
+          <!-- Settings Quick Link Button -->
+          <a href="/student/settings/index.html" class="gc-icon-btn header-settings-btn" id="btn-student-settings" title="Settings & Account" aria-label="Settings">
+            ${getIcon('settings', { width: 17, height: 17 })}
+          </a>
+
           <!-- Notification Bell Button -->
           <button type="button" class="gc-icon-btn header-bell-btn" onclick="toggleStudentNotifications(event)" id="btn-student-bell" title="Notifications" aria-label="Notifications" style="position:relative;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

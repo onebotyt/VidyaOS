@@ -135,23 +135,6 @@ export async function renderStudentHome(container) {
               ${getIcon('check')} Good Standing • 9% above mandate
             </div>
           </div>
-
-          <!-- Academic Advisor Card -->
-          <div class="card" style="padding: 20px;">
-            <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Faculty Mentor</h4>
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 44px; height: 44px; border-radius: var(--radius-full); background: var(--color-primary-subtle); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-weight: 700;">
-                BB
-              </div>
-              <div>
-                <div style="font-size: 14px; font-weight: 600;">Prof. B.S. Bisht</div>
-                <div style="font-size: 12px; color: var(--text-muted);">${deptName}</div>
-              </div>
-            </div>
-            <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
-              Room 102, Academic Block A • Office hours: Mon-Fri 3:00 - 4:30 PM
-            </div>
-          </div>
         </div>
       </div>
     </div>

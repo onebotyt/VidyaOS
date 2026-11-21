@@ -17,7 +17,7 @@
       try { StudentAuth.requireAuth(); } catch (_) { }
     }
 
-    // 2. Load student profile & advisor info
+    // 2. Load student profile info
     await loadStudentProfile();
 
     // 3. Initialize theme switch state
@@ -103,16 +103,6 @@
 
       const elLogoutEmail = document.getElementById('logout-user-email');
       if (elLogoutEmail) elLogoutEmail.textContent = email;
-
-      // Update Advisor info
-      if (data?.class_teacher || data?.faculty_advisor) {
-        const advisorName = data.class_teacher || data.faculty_advisor;
-        const elAdvSub = document.getElementById('settings-advisor-sub');
-        if (elAdvSub) elAdvSub.textContent = `Assigned Advisor: ${advisorName}`;
-
-        const elAdvModalName = document.getElementById('advisor-modal-name');
-        if (elAdvModalName) elAdvModalName.textContent = advisorName;
-      }
     } catch (err) {
       console.warn('Failed to load profile in settings:', err);
     }
@@ -387,16 +377,6 @@
     } catch (_) { }
 
     window.location.href = '/login/index.html';
-  };
-
-  window.openAdvisorModal = function () {
-    const m = document.getElementById('advisor-modal');
-    if (m) m.style.display = 'flex';
-  };
-
-  window.closeAdvisorModal = function () {
-    const m = document.getElementById('advisor-modal');
-    if (m) m.style.display = 'none';
   };
 
   window.openAttendanceRulesModal = function () {
