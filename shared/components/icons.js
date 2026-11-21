@@ -11,6 +11,17 @@
 (function () {
   "use strict";
 
+  function resolveSize(opts = {}, defaultSize = 20) {
+    if (typeof opts === "number") {
+      return { w: opts, h: opts, stroke: 1.8, cls: "" };
+    }
+    const w = (opts && (opts.width || opts.w)) || defaultSize;
+    const h = (opts && (opts.height || opts.h)) || w;
+    const stroke = (opts && (opts.stroke || opts.strokeWidth)) || 1.8;
+    const cls = (opts && (opts.className || opts.cls)) || "";
+    return { w, h, stroke, cls };
+  }
+
   const ICONS = {
 
     // 1. VidyaOS Crisp 3D Isometric Cube Logo
@@ -801,11 +812,16 @@
     if (!name) return "";
     const key = String(name).trim();
     const fn = ICONS[key] || ICONS[key.toLowerCase()] || ICONS.cube || ICONS.brand;
-    const w = options.width || options.w || 20;
-    const h = options.height || options.h || w;
-    const s = options.stroke || options.strokeWidth || 1.8;
-    const c = options.className || options.cls || "";
+    const w = (typeof options === "object" && options ? (options.width || options.w) : options) || 20;
+    const h = (typeof options === "object" && options ? (options.height || options.h) : w) || w;
+    const s = (typeof options === "object" && options ? (options.stroke || options.strokeWidth) : 1.8) || 1.8;
+    const c = (typeof options === "object" && options ? (options.className || options.cls) : "") || "";
     if (typeof fn === "function") {
+      const optsObj = typeof options === "object" && options !== null ? options : { width: w, height: h, stroke: s, cls: c };
+      try {
+        const res = fn(optsObj);
+        if (typeof res === "string" && res.includes("<svg")) return res;
+      } catch (_) {}
       return fn(w, h, s, c);
     }
     return "";

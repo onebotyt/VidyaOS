@@ -129,10 +129,21 @@
     });
   }
 
+  function unmountHeader() {
+    const h = document.getElementById('vidya-header');
+    if (h) h.remove();
+  }
+
   /**
    * Safe Sign Out Handler
    */
+  let customSignOutHandler = null;
+
   function handleSignOut() {
+    if (customSignOutHandler) {
+      customSignOutHandler();
+      return;
+    }
     if (window.VidyaUI && typeof window.VidyaUI.confirm === 'function') {
       window.VidyaUI.confirm({
         title: 'Sign Out',
@@ -163,7 +174,9 @@
    */
   function mountHeader(props = {}) {
     if (typeof document === 'undefined') return;
+    if (props.forceRemount) unmountHeader();
     if (document.getElementById('vidya-header')) return;
+    if (props.onSignOut) customSignOutHandler = props.onSignOut;
 
     const role = detectRole(props.role);
     const roleBadges = {
@@ -172,7 +185,7 @@
       student: 'STUDENT'
     };
     const badgeText = props.pageBadge || roleBadges[role] || 'PORTAL';
-    const brandLinkHref = `/${role}/dashboard/index.html`;
+    const brandLinkHref = props.brandHref || `/${role}/dashboard/index.html`;
 
     const cubeSvg = `<svg class="header-brand-cube" width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 3.5L27.5 9.8L16 16.2L4.5 9.8L16 3.5Z" fill="var(--color-primary-light, hsl(215 90% 95%))" stroke="var(--color-primary)" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.5 9.8L16 16.2V28.5L4.5 22.2V9.8Z" fill="var(--color-primary, hsl(217 91% 60%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 16.2L27.5 9.8V22.2L16 28.5V16.2Z" fill="var(--color-primary-hover, hsl(224 76% 48%))" stroke="var(--color-primary-hover)" stroke-width="1.2" stroke-linejoin="round"/><path d="M16 16.5V27.5" stroke="hsl(0 0% 100% / 0.4)" stroke-width="1.2" stroke-linecap="round"/><path d="M16.5 16L26.5 10.5" stroke="hsl(0 0% 100% / 0.3)" stroke-width="1.2" stroke-linecap="round"/></svg>`;
 
@@ -251,6 +264,7 @@
   // Unified Component Export
   const VidyaHeader = {
     mount: mountHeader,
+    unmount: unmountHeader,
     syncIdentity,
     toggleTheme,
     toggleProfile,

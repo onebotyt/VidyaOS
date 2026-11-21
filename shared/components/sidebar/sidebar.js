@@ -204,18 +204,29 @@
     updateNavToggleIcon(false);
   }
 
+  function unmountSidebar() {
+    const sb = document.getElementById('vidya-sidebar');
+    if (sb) sb.remove();
+    const bd = document.getElementById('vidya-sidebar-backdrop');
+    if (bd) bd.remove();
+    const mb = document.querySelector('.vidya-mobile-bottom-bar');
+    if (mb) mb.remove();
+    document.documentElement.classList.remove('sidebar-collapsed');
+    document.body.classList.remove('sidebar-collapsed');
+  }
+
   /**
    * Declarative Mount Function (React-like component mount)
    */
   function mountSidebar(props = {}) {
     if (typeof document === 'undefined') return;
-    const role = detectRole(props.role);
-    const navItems = NAV_REGISTRY[role] || NAV_REGISTRY.admin;
-    const mobileTabs = MOBILE_TABS[role] || MOBILE_TABS.admin;
-    const currentPath = (window.location.pathname || '').toLowerCase();
-
-    // Check if already mounted
+    if (props.forceRemount) unmountSidebar();
     if (document.getElementById('vidya-sidebar')) return;
+
+    const role = detectRole(props.role);
+    const navItems = props.items || NAV_REGISTRY[role] || NAV_REGISTRY.admin;
+    const mobileTabs = props.mobileTabs || MOBILE_TABS[role] || MOBILE_TABS.admin;
+    const currentPath = (window.location.hash || window.location.pathname || '').toLowerCase();
 
     // Check for user roles (e.g. HOD check for faculty)
     let isHod = false;
@@ -341,6 +352,7 @@
   // Unified Component Export
   const VidyaSidebar = {
     mount: mountSidebar,
+    unmount: unmountSidebar,
     toggle: toggleSidebar,
     open: openSidebar,
     close: closeSidebar,

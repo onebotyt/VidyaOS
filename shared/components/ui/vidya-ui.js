@@ -519,6 +519,139 @@
     initModalDismissal();
   }
 
+  // ─── Atomic Assembly & Micro-Primitives ─────────────────────────
+  function renderInput({ label = '', name = '', type = 'text', value = '', placeholder = '', required = false, disabled = false, hint = '', options = [] } = {}) {
+    const reqHtml = required ? ' <span class="required">*</span>' : '';
+    const labelHtml = label ? `<label class="v-label" for="v-field-${escapeHtml(name)}">${escapeHtml(label)}${reqHtml}</label>` : '';
+    const hintHtml = hint ? `<span class="v-hint">${escapeHtml(hint)}</span>` : '';
+    let controlHtml = '';
+
+    if (type === 'select') {
+      const opts = options.map(opt => {
+        const val = typeof opt === 'object' ? opt.value : opt;
+        const text = typeof opt === 'object' ? opt.label : opt;
+        const selected = String(val) === String(value) ? 'selected' : '';
+        return `<option value="${escapeHtml(val)}" ${selected}>${escapeHtml(text)}</option>`;
+      }).join('');
+      controlHtml = `<select class="v-select" id="v-field-${escapeHtml(name)}" name="${escapeHtml(name)}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''}>${opts}</select>`;
+    } else if (type === 'textarea') {
+      controlHtml = `<textarea class="v-textarea" id="v-field-${escapeHtml(name)}" name="${escapeHtml(name)}" placeholder="${escapeHtml(placeholder)}" rows="3" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''}>${escapeHtml(value)}</textarea>`;
+    } else {
+      controlHtml = `<input class="v-input" type="${escapeHtml(type)}" id="v-field-${escapeHtml(name)}" name="${escapeHtml(name)}" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''}>`;
+    }
+
+    return `<div class="v-form-group">${labelHtml}${controlHtml}${hintHtml}</div>`;
+  }
+
+  function renderRow(items = []) {
+    const content = Array.isArray(items) ? items.join('') : items;
+    return `<div class="v-row">${content}</div>`;
+  }
+
+  function renderGrid({ cols = 2, items = [] } = {}) {
+    const content = Array.isArray(items) ? items.join('') : items;
+    return `<div class="v-grid-${cols}">${content}</div>`;
+  }
+
+  function renderEmptyState({ icon = 'empty', title = 'No items found', message = '', action = null } = {}) {
+    const iconSvg = window.VidyaIcons ? window.VidyaIcons.get(icon) : '';
+    const actionHtml = action ? `<button type="button" class="vidya-btn vidya-btn-primary v-empty-btn">${escapeHtml(action.label || 'Create')}</button>` : '';
+    return `
+      <div class="v-empty-state">
+        <div class="v-empty-icon">${iconSvg || '📭'}</div>
+        <h3 class="v-empty-title">${escapeHtml(title)}</h3>
+        ${message ? `<p class="v-empty-desc">${escapeHtml(message)}</p>` : ''}
+        ${actionHtml}
+      </div>
+    `;
+  }
+
+  function renderSkeleton({ type = 'card', count = 3 } = {}) {
+    let html = '';
+    for (let i = 0; i < count; i++) {
+      if (type === 'card') {
+        html += '<div class="v-skeleton-card v-skeleton-shimmer"></div>';
+      } else {
+        html += '<div class="v-skeleton-row v-skeleton-shimmer"></div>';
+      }
+    }
+    return html;
+  }
+
+  function assembleModal({
+    title = '',
+    subtitle = '',
+    size = 'md',
+    elements = [],
+    actions = []
+  } = {}) {
+    const modalId = 'modal-assembled-' + Math.random().toString(36).substring(2, 9);
+    const elementsHtml = Array.isArray(elements) ? elements.join('') : elements;
+
+    const buttonsHtml = actions.map((act, idx) => {
+      const variantClass = act.variant ? `vidya-btn-${act.variant}` : 'vidya-btn-secondary';
+      const btnType = act.type || 'button';
+      return `<button type="${btnType}" class="vidya-btn ${variantClass}" data-action-idx="${idx}">${escapeHtml(act.label || 'OK')}</button>`;
+    }).join('');
+
+    const modalHtml = `
+      <div class="vidya-modal-backdrop" id="${modalId}" role="dialog" aria-modal="true" aria-labelledby="${modalId}-title">
+        <div class="vidya-modal-box v-modal-${size}">
+          <div class="vidya-modal-header">
+            <div>
+              <h3 class="vidya-modal-title" id="${modalId}-title">${escapeHtml(title)}</h3>
+              ${subtitle ? `<p class="vidya-modal-subtitle">${escapeHtml(subtitle)}</p>` : ''}
+            </div>
+            <button class="vidya-modal-close" data-modal-close aria-label="Close modal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+          <form class="vidya-assembled-form" onsubmit="return false;">
+            <div class="vidya-modal-body" style="display:flex; flex-direction:column; gap:0.75rem;">
+              ${elementsHtml}
+            </div>
+            <div class="vidya-modal-footer">
+              ${buttonsHtml}
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modalEl = document.getElementById(modalId);
+
+    // Bind action callbacks
+    modalEl.querySelectorAll('[data-action-idx]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(btn.getAttribute('data-action-idx'), 10);
+        const action = actions[idx];
+        if (action && typeof action.onClick === 'function') {
+          const formData = {};
+          modalEl.querySelectorAll('[name]').forEach(input => {
+            const name = input.getAttribute('name');
+            if (input.type === 'checkbox') {
+              formData[name] = input.checked;
+            } else if (input.type === 'radio') {
+              if (input.checked) formData[name] = input.value;
+            } else {
+              formData[name] = input.value;
+            }
+          });
+          const result = action.onClick(formData, modalEl);
+          if (result !== false) {
+            closeModal(modalEl);
+          }
+        } else {
+          closeModal(modalEl);
+        }
+      });
+    });
+
+    openModal(modalEl);
+    return modalEl;
+  }
+
   // Unified API Object
   const VidyaUI = {
     toast,
@@ -543,6 +676,12 @@
     renderStatCard,
     renderEntityCard,
     renderClassroomCard,
+    input: renderInput,
+    row: renderRow,
+    grid: renderGrid,
+    emptyState: renderEmptyState,
+    skeleton: renderSkeleton,
+    assembleModal,
     escapeHtml,
     escHtml: escapeHtml,
     esc: escapeHtml

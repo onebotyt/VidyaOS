@@ -51,4 +51,5 @@ newos/
 # Frontend v2 Localhost Development Sandbox (NEVER push to GitHub)
 frontendv2/
 v2/
+v2-server.js
 

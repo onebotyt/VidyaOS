@@ -142,12 +142,20 @@
     return user;
   }
 
+  function isAuthenticated() {
+    return Boolean(getAuthToken());
+  }
+
   // Unified PortalAuth Object
   const PortalAuth = {
     getAuthToken,
+    getToken: getAuthToken,
     getCurrentUser,
+    getUser: getCurrentUser,
     setCurrentUser,
+    setUser: setCurrentUser,
     clearAuthSession,
+    isAuthenticated,
     logout,
     guardRoute,
     requireAuth: guardRoute,
