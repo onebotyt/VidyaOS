@@ -100,7 +100,8 @@
     existingItemsCount: 0,
     attachedFile: null,
     ocrData: null,
-    suppressSync: false
+    suppressSync: false,
+    initialUnit: null
   };
 
   document.addEventListener('DOMContentLoaded', init);
@@ -120,6 +121,7 @@
       : 'assignment';
     state.groupId = urlParams.get('group') || urlParams.get('groupId') || urlParams.get('id') || null;
     state.registerId = urlParams.get('register') || urlParams.get('registerId') || null;
+    state.initialUnit = urlParams.get('unit') || urlParams.get('topic') || null;
 
     // 3. Render icons via JS into HTML
     renderSvgIcons();
@@ -688,6 +690,20 @@
             }
             options += '<option value="__ADD_NEW_UNIT__">+ Add Syllabus Unit...</option>';
             unitSelect.innerHTML = options;
+
+            if (state.initialUnit) {
+              const needle = state.initialUnit.trim().toLowerCase();
+              const found = Array.from(unitSelect.options).find(opt => opt.value.toLowerCase() === needle || opt.textContent.toLowerCase().includes(needle));
+              if (found) {
+                unitSelect.value = found.value;
+              } else {
+                const customOpt = document.createElement('option');
+                customOpt.value = state.initialUnit;
+                customOpt.textContent = state.initialUnit;
+                unitSelect.insertBefore(customOpt, unitSelect.lastElementChild);
+                unitSelect.value = state.initialUnit;
+              }
+            }
           }
 
           await autoIncrementNumber(g);

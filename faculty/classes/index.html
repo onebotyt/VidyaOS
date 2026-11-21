@@ -223,6 +223,17 @@
             </div>
           </div>
 
+          <div class="form-group-wrap" style="margin-bottom:0.85rem;">
+            <label class="form-field-label" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Total Units (Topics) *</span>
+              <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">Only digits (1–20)</span>
+            </label>
+            <input type="number" id="input-class-units" inputmode="numeric" pattern="[0-9]*" min="1" max="20" step="1" value="5" required placeholder="5" class="form-control-input" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <span style="font-size:0.72rem; color:var(--text-muted); margin-top:3px; display:block;">
+              Automatically creates Unit 1 to Unit N topics in Classwork so assignments and tests can be organized under each unit.
+            </span>
+          </div>
+
           <!-- Classroom Timeline & Register Dates -->
           <div class="form-dates-section-card">
             <div class="form-dates-header">
@@ -322,6 +333,17 @@
               <label class="form-field-label">Year (Auto-Derived)</label>
               <input type="text" id="input-edit-class-year" value="3rd Year" readonly class="form-control-input">
             </div>
+          </div>
+
+          <div class="form-group-wrap" style="margin-bottom:0.85rem;">
+            <label class="form-field-label" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Total Units (Topics) *</span>
+              <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">Only digits (1–20)</span>
+            </label>
+            <input type="number" id="input-edit-class-units" inputmode="numeric" pattern="[0-9]*" min="1" max="20" step="1" value="5" required placeholder="5" class="form-control-input" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <span style="font-size:0.72rem; color:var(--text-muted); margin-top:3px; display:block;">
+              Number of syllabus topics for this classroom.
+            </span>
           </div>
 
           <!-- Classroom Timeline & Register Dates -->

@@ -453,6 +453,11 @@
       ].join('-');
       startDateInput.value = localToday;
     }
+
+    const unitsInput = document.getElementById('input-class-units');
+    if (unitsInput && !unitsInput.value) {
+      unitsInput.value = '5';
+    }
   };
 
   window.closeCreateGroupModal = function () {
@@ -470,6 +475,7 @@
     const semInput = document.getElementById('select-class-sem');
     const startDateInput = document.getElementById('input-class-start-date');
     const endDateInput = document.getElementById('input-class-end-date');
+    const unitsInput = document.getElementById('input-class-units');
 
     const subjectName = nameInput?.value?.trim() || 'New Class';
     const sem = parseInt(semInput?.value || '1', 10);
@@ -478,6 +484,7 @@
     const code = codeInput?.value?.trim() || '';
     const startDate = startDateInput?.value?.trim() || new Date().toISOString().split('T')[0];
     const endDate = endDateInput?.value?.trim() || null;
+    const totalUnits = Math.min(20, Math.max(1, parseInt(unitsInput?.value?.replace(/[^0-9]/g, '') || '5', 10) || 5));
 
     const payload = {
       name: subjectName,
@@ -490,7 +497,8 @@
       year: yr,
       start_date: startDate,
       end_date: endDate,
-      room_no: code || '101'
+      room_no: code || '101',
+      total_units: totalUnits
     };
 
     try {
@@ -561,6 +569,11 @@
       endDateInput.value = group.end_date ? group.end_date.split('T')[0] : '';
     }
 
+    const editUnitsInput = document.getElementById('input-edit-class-units');
+    if (editUnitsInput) {
+      editUnitsInput.value = group.total_units || 5;
+    }
+
     loadSessionsForModal('select-edit-class-session', group.academic_year_id);
     modal.style.display = 'flex';
   };
@@ -583,6 +596,7 @@
     const semInput = document.getElementById('select-edit-class-sem');
     const startDateInput = document.getElementById('input-edit-class-start-date');
     const endDateInput = document.getElementById('input-edit-class-end-date');
+    const editUnitsInput = document.getElementById('input-edit-class-units');
 
     const subjectName = nameInput?.value?.trim() || '';
     const sem = parseInt(semInput?.value || '1', 10);
@@ -591,6 +605,7 @@
     const code = codeInput?.value?.trim() || '';
     const startDate = startDateInput?.value?.trim() || null;
     const endDate = endDateInput?.value?.trim() || null;
+    const totalUnits = Math.min(20, Math.max(1, parseInt(editUnitsInput?.value?.replace(/[^0-9]/g, '') || '5', 10) || 5));
 
     const payload = {
       name: subjectName,
@@ -602,7 +617,8 @@
       semester: sem,
       year: yr,
       start_date: startDate,
-      end_date: endDate
+      end_date: endDate,
+      total_units: totalUnits
     };
 
     try {

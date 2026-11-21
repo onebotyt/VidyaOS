@@ -287,6 +287,10 @@
   }
 
   function promptAddWorkToUnit(uKey) {
+    if (window.S && window.S.groupId) {
+      window.location.href = `/faculty/classwork/create.html?type=assignment&group=${encodeURIComponent(window.S.groupId)}&unit=${encodeURIComponent(uKey)}`;
+      return;
+    }
     openCreateAssignmentModal();
     setTimeout(() => {
       const sel = ById('assign-unit');
@@ -735,8 +739,10 @@
     const c = ById('classwork-list');
     if (!c) return;
 
-    if (!items.length) {
-      const emptyMsg = uf !== 'all' ? `No work items found under ${uf}.` :
+    const syllabusUnits = getGroupSyllabusUnits();
+
+    if (!items.length && (!syllabusUnits || syllabusUnits.length === 0 || f !== 'all' || (uf && uf !== 'all'))) {
+      const emptyMsg = (uf && uf !== 'all') ? `No work items found under ${uf}.` :
         f === 'practicals' ? 'No practical assignments or lab work posted yet.' :
           f === 'finaldocs' ? 'No final semester document requests posted yet.' :
             f === 'tests' ? 'No class tests scheduled yet.' :
@@ -756,12 +762,24 @@
 
     // If filtered by specific unit, render items directly
     if (uf && uf !== 'all') {
-      c.innerHTML = items.map(renderWorkCardHtml).join('');
+      if (!items.length) {
+        c.innerHTML = `
+          <div class="empty-state" style="padding:2.5rem 1rem;">
+            <div class="empty-title">No work items under ${esc(uf)}</div>
+            <div class="empty-desc" style="margin-bottom:1rem;">No assignments or tests have been posted for this topic yet.</div>
+            <button type="button" class="btn btn-primary" onclick="promptAddWorkToUnit('${esc(uf)}')" style="display:inline-flex;align-items:center;gap:6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Add Work to ${esc(uf)}</span>
+            </button>
+          </div>
+        `;
+      } else {
+        c.innerHTML = items.map(renderWorkCardHtml).join('');
+      }
       return;
     }
 
     // Default: Show All Units. Group items under units
-    const syllabusUnits = getGroupSyllabusUnits();
     const groups = {};
     const unitMeta = {};
     syllabusUnits.forEach(u => {
@@ -796,34 +814,32 @@
       }
     });
 
-    // Sort units descending by num (e.g. Unit 2, Unit 1), matching the Google Classroom app screenshot
+    // Sort units ascending by num (Unit 1, Unit 2, Unit 3...) for natural syllabus flow
     const orderedUnitKeys = Object.keys(groups).filter(k => k !== otherGroupKey).sort((a, b) => {
       const na = unitMeta[a]?.num || parseInt(a.replace(/\D/g, '')) || 0;
       const nb = unitMeta[b]?.num || parseInt(b.replace(/\D/g, '')) || 0;
-      return nb - na;
+      return na - nb;
     });
 
     if (!S.collapsedUnits) {
-      S.collapsedUnits = new Set(['Unit 5', 'Unit 4', 'Unit 3', 'Unit 1']);
+      S.collapsedUnits = new Set();
     }
     let fullHtml = '';
 
     orderedUnitKeys.forEach(uKey => {
       const groupItems = groups[uKey] || [];
-      if (groupItems.length === 0) return; // Only show unit card if that has active work
       const meta = unitMeta[uKey] || {};
       const uId = uKey.replace(/[^a-zA-Z0-9]/g, '_');
       const isCollapsed = S.collapsedUnits.has(uKey);
       const displayTitle = meta.title && meta.title.trim() ? `${uKey} — ${meta.title.trim()}` : uKey;
-      const subDesc = meta.description && meta.description.trim()
-        ? meta.description.trim()
-        : (uKey === 'Unit 2' ? 'Control structures, if-else, loops, arrays • 0 items' : (uKey === 'Unit 1' ? 'Syntax, variables, datatypes, operators' : ''));
+      const subDesc = meta.description && meta.description.trim() ? meta.description.trim() : '';
 
       fullHtml += `
       <div class="cw-unit-section" id="cw-unit-section-${uId}">
         <div class="cw-unit-section-header ${isCollapsed ? 'is-collapsed' : 'is-expanded'}" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
           <div class="unit-header-left">
             <div class="unit-main-heading">${esc(displayTitle)}</div>
+            ${subDesc ? `<div class="unit-sub-heading" style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">${esc(subDesc)}</div>` : ''}
           </div>
           <div class="unit-header-right">
             <button type="button" class="unit-toggle-btn" aria-label="Toggle Unit" onclick="toggleUnitCollapse('${esc(uKey)}', event)">
@@ -859,7 +875,13 @@
         <div class="cw-unit-section-items" id="unit-items-${uId}" style="${isCollapsed ? 'display:none;' : 'display:flex;flex-direction:column;gap:0.75rem;'}">
           ${groupItems.length > 0
           ? groupItems.map(renderWorkCardHtml).join('')
-          : `<div class="unit-empty-state">No assignments or tests added to this unit yet. <button type="button" class="btn-link" onclick="promptAddWorkToUnit('${esc(uKey)}')" style="color:var(--color-primary);font-weight:600;background:none;border:none;cursor:pointer;margin-left:4px;">+ Add Work</button></div>`
+          : `<div class="unit-empty-state" style="padding:1rem;background:var(--bg-card);border:1px dashed var(--border-color);border-radius:12px;font-size:0.85rem;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+               <span>No assignments or tests added to ${esc(uKey)} yet.</span>
+               <button type="button" class="btn btn-sm btn-outline-primary" onclick="promptAddWorkToUnit('${esc(uKey)}')" style="display:inline-flex;align-items:center;gap:4px;font-weight:600;padding:4px 10px;border-radius:6px;font-size:0.8rem;cursor:pointer;">
+                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                 <span>+ Add Work</span>
+               </button>
+             </div>`
         }
         </div>
       </div>
