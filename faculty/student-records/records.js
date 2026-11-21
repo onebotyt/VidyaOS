@@ -184,7 +184,25 @@
     }
   }
 
-  function renderStudentRecords(students, records = []) {
+  function getStudentInitials(name) {
+    if (!name) return 'ST';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return parts[0].substring(0, 2).toUpperCase();
+  }
+
+  function renderStudentRecords(rawStudents, records = []) {
+    // 0. Deduplicate students by id to ensure clean 1-per-student listing
+    const studentMap = new Map();
+    (rawStudents || []).forEach(s => {
+      if (!studentMap.has(s.id)) {
+        studentMap.set(s.id, s);
+      }
+    });
+    const students = Array.from(studentMap.values());
+
     // 1. SECTION 1: Showing Students
     const tbody = document.getElementById('rec-table-body');
     const stuCountEl = document.getElementById('rec-students-count') || document.getElementById('rec-records-count');
@@ -212,7 +230,11 @@
         tbody.innerHTML = `
           <tr>
             <td colspan="6" class="rec-empty-cell">
-              No student records found matching the active filters.
+              <div class="rec-empty-state-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                <p>No student records found matching the active filters.</p>
+                <button type="button" class="btn-rec-empty-reset" onclick="resetFilters()">Clear Filters</button>
+              </div>
             </td>
           </tr>
         `;
@@ -224,67 +246,95 @@
           const reg = s.registration_no ? `Reg: ${s.registration_no}` : '';
           const cohort = s.current_semester ? `Y${s.current_year || Math.ceil(s.current_semester / 2)} • Sem ${s.current_semester}` : '--';
           const batch = s.batch_label || (s.admission_year ? `Batch ${s.admission_year}` : '--');
+          const initials = getStudentInitials(name);
+          const attPct = typeof s.attendance_percentage === 'number' ? s.attendance_percentage : 100;
+          const attClass = attPct < 75 ? 'low' : (attPct < 85 ? 'warning' : 'good');
 
           return `
-            <tr id="student-row-${s.id}">
-              <td class="rec-roll-cell">${escapeHtml(String(roll))}</td>
-              <td class="col-enrollment rec-enroll-cell">${escapeHtml(enroll)}</td>
-              <td>
+            <tr id="student-row-${s.id}" class="rec-student-row" onclick="handleStudentRowClick(event, ${s.id})" title="Tap to view ${escapeHtml(name)}'s Dossier">
+              <td class="rec-roll-cell">
+                <span class="rec-roll-pill">${escapeHtml(String(roll))}</span>
+              </td>
+              <td class="col-enrollment rec-enroll-cell">
+                <span class="rec-enroll-badge">${escapeHtml(enroll)}</span>
+              </td>
+              <td class="rec-student-main-cell">
                 <div class="rec-name-cell">
-                  <span class="rec-student-name">${escapeHtml(name)}</span>
-                  ${reg ? `<span class="rec-student-reg">${escapeHtml(reg)}</span>` : ''}
+                  <div class="rec-student-avatar-squircle" aria-hidden="true">${initials}</div>
+                  <div class="rec-student-meta-block">
+                    <div class="rec-student-title-line">
+                      <span class="rec-mobile-roll-pill">#${escapeHtml(String(roll))}</span>
+                      <strong class="rec-student-name">${escapeHtml(name)}</strong>
+                    </div>
+                    <div class="rec-student-sub-line">
+                      ${reg ? `<span class="rec-student-reg-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><line x1="15" y1="8" x2="17" y2="8"></line><line x1="15" y1="12" x2="17" y2="12"></line></svg>${escapeHtml(reg)}</span>` : ''}
+                      ${cohort !== '--' ? `<span class="rec-student-cohort-chip">${escapeHtml(cohort)}</span>` : ''}
+                      <span class="rec-student-att-chip ${attClass}">${attPct}% Att.</span>
+                    </div>
+                  </div>
                 </div>
               </td>
-              <td class="col-cohort">${cohort}</td>
-              <td class="col-batch">${escapeHtml(batch)}</td>
-              <td class="rec-action-cell">
-                <button type="button" class="rec-kebab-btn" onclick="toggleRecordKebab(event, ${s.id})" title="Actions" aria-label="Actions">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="5" r="2"></circle>
-                    <circle cx="12" cy="12" r="2"></circle>
-                    <circle cx="12" cy="19" r="2"></circle>
-                  </svg>
-                </button>
-                <div class="rec-dropdown-menu" id="rec-dropdown-${s.id}">
-                  <button type="button" class="rec-dropdown-item" onclick="openStudentDossier(${s.id})">
+              <td class="col-cohort"><span class="rec-cohort-pill">${cohort}</span></td>
+              <td class="col-batch"><span class="rec-batch-pill">${escapeHtml(batch)}</span></td>
+              <td class="rec-action-cell" onclick="event.stopPropagation()">
+                <div class="rec-actions-btn-group">
+                  <button type="button" class="btn-rec-dossier-quick" onclick="openStudentDossier(${s.id})" title="View Academic Dossier">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                       <polyline points="14 2 14 8 20 8"></polyline>
                       <line x1="16" y1="13" x2="8" y2="13"></line>
                       <line x1="16" y1="17" x2="8" y2="17"></line>
-                      <polyline points="10 9 9 9 8 9"></polyline>
                     </svg>
-                    <span>View Academic Dossier</span>
+                    <span class="desktop-only-text">Dossier</span>
                   </button>
-                  <button type="button" class="rec-dropdown-item" onclick="quickExportBioData(${s.id})">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
+                  <button type="button" class="rec-kebab-btn" onclick="toggleRecordKebab(event, ${s.id})" title="Actions" aria-label="Actions">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="5" r="2"></circle>
+                      <circle cx="12" cy="12" r="2"></circle>
+                      <circle cx="12" cy="19" r="2"></circle>
                     </svg>
-                    <span>Export Personal Details (Bio-Data)</span>
                   </button>
-                  <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'excel')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                    </svg>
-                    <span>Export Dossier (.xlsx)</span>
-                  </button>
-                  <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'doc')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                    </svg>
-                    <span>Export Dossier (.doc)</span>
-                  </button>
-                  <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'pdf')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                      <rect x="6" y="14" width="12" height="8"></rect>
-                    </svg>
-                    <span>Export / Print Dossier (PDF)</span>
-                  </button>
+                  <div class="rec-dropdown-menu" id="rec-dropdown-${s.id}">
+                    <button type="button" class="rec-dropdown-item" onclick="openStudentDossier(${s.id})">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                      </svg>
+                      <span>View Academic Dossier</span>
+                    </button>
+                    <button type="button" class="rec-dropdown-item" onclick="quickExportBioData(${s.id})">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                      <span>Export Personal Details (Bio-Data)</span>
+                    </button>
+                    <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'excel')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                      </svg>
+                      <span>Export Dossier (.xlsx)</span>
+                    </button>
+                    <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'doc')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                      </svg>
+                      <span>Export Dossier (.doc)</span>
+                    </button>
+                    <button type="button" class="rec-dropdown-item" onclick="quickExportStudent(${s.id}, 'pdf')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                      </svg>
+                      <span>Export / Print Dossier (PDF)</span>
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -1035,7 +1085,92 @@
     document.querySelectorAll('.rec-dropdown-menu').forEach(d => d.classList.remove('show', 'flip-up'));
   });
 
-  // 4. Filter Handlers
+  // 4. Mobile & Touch Row Click Handler
+  window.handleStudentRowClick = function (event, studentId) {
+    if (
+      event.target.closest('.rec-action-cell') ||
+      event.target.closest('button') ||
+      event.target.closest('a') ||
+      event.target.closest('.rec-dropdown-menu') ||
+      window.getSelection().toString()
+    ) {
+      return;
+    }
+    openStudentDossier(studentId);
+  };
+
+  // Mobile Advanced Filters Toggle
+  window.toggleAdvancedFilters = function () {
+    const grid = document.getElementById('rec-filter-grid');
+    const btn = document.getElementById('btn-toggle-filters');
+    if (!grid) return;
+    const isNowOpen = grid.classList.toggle('is-open');
+    grid.classList.remove('is-collapsed');
+    if (!isNowOpen) {
+      grid.classList.add('is-collapsed');
+    }
+    if (btn) {
+      btn.setAttribute('aria-expanded', String(isNowOpen));
+      btn.classList.toggle('active', isNowOpen);
+    }
+  };
+
+  // Quick 1-Tap Semester Filter Chips
+  window.setSemesterFilterChip = function (sem, el) {
+    document.querySelectorAll('#rec-sem-chips-bar .rec-chip-btn').forEach(btn => btn.classList.remove('active'));
+    if (el) el.classList.add('active');
+
+    const semSelect = document.getElementById('filter-semester');
+    if (semSelect) {
+      semSelect.value = sem;
+    }
+    state.filters.semester = sem;
+    updateActiveFilterBadges();
+    loadStudentRecords();
+  };
+
+  // Clear Search Input
+  window.clearSearchInput = function () {
+    const input = document.getElementById('rec-search-input');
+    const clearBtn = document.getElementById('rec-search-clear-btn');
+    if (input) input.value = '';
+    if (clearBtn) clearBtn.style.display = 'none';
+    state.filters.search = '';
+    updateActiveFilterBadges();
+    loadStudentRecords();
+  };
+
+  function updateActiveFilterBadges() {
+    let count = 0;
+    if (state.filters.semester) count++;
+    if (state.filters.year) count++;
+    if (state.filters.batch) count++;
+    if (state.filters.status && state.filters.status !== 'active') count++;
+    if (state.filters.search && state.filters.search.trim()) count++;
+
+    const badge = document.getElementById('rec-active-filters-badge');
+    const btn = document.getElementById('btn-toggle-filters');
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'inline-flex' : 'none';
+    }
+    if (btn) {
+      btn.classList.toggle('has-active-filters', count > 0);
+    }
+
+    const clearBtn = document.getElementById('rec-search-clear-btn');
+    if (clearBtn) {
+      clearBtn.style.display = (state.filters.search && state.filters.search.trim()) ? 'inline-flex' : 'none';
+    }
+
+    // Sync semester chips bar
+    const currentSem = state.filters.semester || '';
+    document.querySelectorAll('#rec-sem-chips-bar .rec-chip-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-sem') === currentSem);
+    });
+  }
+
+  // 5. Filter Handlers
   window.onFilterChange = function () {
     const session = document.getElementById('filter-session')?.value || '';
     const sem = document.getElementById('filter-semester')?.value || '';
@@ -1047,6 +1182,7 @@
     state.filters.batch = batch;
     state.filters.status = status;
 
+    updateActiveFilterBadges();
     loadStudentRecords();
   };
 
@@ -1075,13 +1211,19 @@
       state.filters.semester = '';
     }
 
+    updateActiveFilterBadges();
     loadStudentRecords();
   };
 
   window.onSearchInput = function (val) {
+    const clearBtn = document.getElementById('rec-search-clear-btn');
+    if (clearBtn) {
+      clearBtn.style.display = (val && val.trim()) ? 'inline-flex' : 'none';
+    }
     clearTimeout(state.searchDebounce);
     state.searchDebounce = setTimeout(() => {
       state.filters.search = (val || '').trim();
+      updateActiveFilterBadges();
       loadStudentRecords();
     }, 280);
   };
@@ -1113,6 +1255,7 @@
       search: ''
     };
 
+    updateActiveFilterBadges();
     loadStudentRecords();
   };
 
