@@ -101,8 +101,15 @@ jobs:
           cd apps/mobile
           npx expo prebuild --platform android --no-install
           if [ -d "android" ]; then
+            # Configure high JVM heap and disable legacy Jetifier on Hermes to prevent OutOfMemory
+            echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
+            echo "android.useAndroidX=true" >> android/gradle.properties
+            echo "android.enableJetifier=false" >> android/gradle.properties
+
             cd android
             chmod +x gradlew
+            export GRADLE_OPTS="-Xmx4096m -XX:MaxMetaspaceSize=1024m"
+            export _JAVA_OPTIONS="-Xmx4096m"
             ./gradlew assembleDebug --no-daemon --stacktrace
             if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
               cp app/build/outputs/apk/debug/app-debug.apk ../../../../v2app.apk
