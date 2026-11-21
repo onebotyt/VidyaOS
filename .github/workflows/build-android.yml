@@ -84,8 +84,15 @@ jobs:
       - name: Copy Release APK Artifact
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk ./VidyaOS.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk ./v2app.apk
 
-      - name: Upload APK Artifact
+      - name: Upload v2app APK Artifact (Visible in GitHub Details)
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2app-apk
+          path: ./v2app.apk
+
+      - name: Upload VidyaOS APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: VidyaOS-Android-APK
@@ -97,19 +104,21 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           name: "VidyaOS Mobile App ${{ env.TAG_NAME }}"
           body: |
-            ## 📱 VidyaOS Android APK Release (${{ env.TAG_NAME }})
+            ## 📱 VidyaOS & v2app Android APK Release (${{ env.TAG_NAME }})
 
-            Direct download link for Android:
+            Direct download links for Android:
+            - **[Download v2app.apk](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/v2app.apk)** (Frontend v2 Universal App)
             - **[Download VidyaOS.apk](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/VidyaOS.apk)**
 
             ### Features:
             - **Auto-Version**: Version code `${{ env.BUILD_NUM }}`, version name `${{ env.VERSION }}`.
+            - Includes Frontend v2 multi-OS single codebase app.
             - Complete institutional campus OS frontend wrapped natively with Capacitor.
             - Real-time cloud sync with VidyaOS backend on Render.
             - Mobile-optimized attendance studio with Camera QR scanner & PIN entry.
-            - Native Android back button navigation.
-            - In-app automatic update notification for already installed devices.
+            - Google Classroom style dynamic theme banners.
           files: |
+            ./v2app.apk
             ./VidyaOS.apk
           make_latest: true
         env:

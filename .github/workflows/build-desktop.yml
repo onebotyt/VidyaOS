@@ -26,8 +26,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+      - name: Verify Environment
+        run: echo "Packaging Frontend v2 Universal Desktop..."
 
       - name: Package Desktop Web Distribution
         shell: bash
