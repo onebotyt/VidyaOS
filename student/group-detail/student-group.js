@@ -138,6 +138,15 @@ function renderHeroBanner() {
   const banner = document.getElementById('hero-banner');
   if (banner) {
     banner.className = `student-hero-banner palette-${S.groupId % 6}`;
+    if (typeof ClassroomThemes !== 'undefined' && typeof ClassroomThemes.applyHeroBanner === 'function') {
+      ClassroomThemes.applyHeroBanner(banner, g);
+    } else {
+      const bannerUrl = g.theme_image || '/uploads/classroom-banners/banner_programming_1_c065d9.svg';
+      banner.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 100%), url('${bannerUrl}')`;
+      banner.style.backgroundSize = 'cover';
+      banner.style.backgroundPosition = 'right center';
+      banner.style.backgroundRepeat = 'no-repeat';
+    }
   }
 
   const navTitle = document.getElementById('nav-class-title');

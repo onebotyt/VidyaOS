@@ -275,8 +275,17 @@ function renderBanner(g) {
   if (ById('info-modal-code')) ById('info-modal-code').textContent = g.invite_code || '——';
 
   const bannerBg = document.querySelector('.classroom-banner-bg');
-  if (bannerBg && g.component === 'PRACTICAL') {
-    bannerBg.style.background = 'linear-gradient(135deg,hsl(142,70%,18%) 0%,hsl(155,65%,28%) 45%,hsl(170,60%,38%) 100%)';
+  const bannerUrl = (typeof ClassroomThemes !== 'undefined' && ClassroomThemes.getBannerUrl(g)) || g.theme_image || '/uploads/classroom-banners/banner_programming_1_c065d9.svg';
+  if (bannerBg) {
+    bannerBg.style.backgroundImage = `linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0) 100%), url('${bannerUrl}')`;
+    bannerBg.style.backgroundSize = 'cover';
+    bannerBg.style.backgroundPosition = 'right center';
+    bannerBg.style.backgroundRepeat = 'no-repeat';
+    bannerBg.style.opacity = '1';
+  }
+  const bannerIllustration = document.querySelector('.banner-illustration');
+  if (bannerIllustration) {
+    bannerIllustration.style.display = 'none';
   }
   if (ById('banner-icon')) {
     ById('banner-icon').innerHTML = g.component === 'PRACTICAL'

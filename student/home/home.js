@@ -305,26 +305,33 @@
       }
 
       container.innerHTML = groups.slice(0, 6).map(g => {
+        if (typeof ClassroomThemes !== 'undefined' && typeof ClassroomThemes.renderCard === 'function') {
+          return ClassroomThemes.renderCard(g, { isStudent: true, showTasks: true });
+        }
+
         const subName = g.subject_name || g.name || 'Subject';
         const subCode = g.subject_code || 'CLASS';
         const teacher = g.teacher_name || g.created_by_name || 'Department Faculty';
-        const tasksCount = g.pending_assignments_count || 0;
+        const bannerUrl = g.theme_image || '/uploads/classroom-banners/banner_programming_1_c065d9.svg';
+        const dept = g.department_name || g.department_code || 'IT Cohort';
 
         return `
-          <div class="home-class-card">
-            <div class="class-card-top">
-              <div>
-                <span class="class-card-code">${escapeHtml(subCode)}</span>
-                <h3 class="class-card-title">${escapeHtml(subName)}</h3>
-                <p class="class-card-teacher">${escapeHtml(teacher)}</p>
+          <div class="google-classroom-card" style="background-image: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.28) 55%, rgba(0,0,0,0) 100%), url('${bannerUrl}');" onclick="window.location.href='/student/group-detail/index.html?id=${g.id}'" role="button" tabindex="0">
+            <button type="button" class="gc-card-kebab-btn" onclick="event.stopPropagation(); alert('Options for ${escapeHtml(subName)}')" title="Classroom Options">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="5" r="2.2"></circle>
+                <circle cx="12" cy="12" r="2.2"></circle>
+                <circle cx="12" cy="19" r="2.2"></circle>
+              </svg>
+            </button>
+            <div class="gc-card-content">
+              <div class="gc-card-header-info">
+                <h2 class="gc-card-heading" title="${escapeHtml(subName)}">${escapeHtml(subName)}</h2>
+                <div class="gc-card-cohort">${escapeHtml(subCode)} • ${escapeHtml(dept)}</div>
               </div>
-            </div>
-            <div class="class-card-bottom">
-              <span class="class-card-tasks-count">${tasksCount} task${tasksCount === 1 ? '' : 's'}</span>
-              <a href="/student/group-detail/index.html?id=${g.id}" class="class-card-enter-btn">
-                <span>Enter Class</span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </a>
+              <div class="gc-card-footer-info">
+                <span class="gc-card-faculty">${escapeHtml(teacher)}</span>
+              </div>
             </div>
           </div>
         `;

@@ -186,11 +186,12 @@
         formattedComp = g.component || 'Theory';
       }
       const ayLabel = g.academic_year_label || 'AY 2026–27';
+      const bannerUrl = (typeof ClassroomThemes !== 'undefined' && ClassroomThemes.getBannerUrl(g)) || g.theme_image || '/uploads/classroom-banners/banner_programming_1_c065d9.svg';
 
       return `
         <div class="class-card" id="class-card-${g.id}">
-          <!-- Card Header Banner -->
-          <div class="class-card-header">
+          <!-- Card Header Banner with Google Classroom Theme Artwork -->
+          <div class="class-card-header" style="background-image: linear-gradient(to right, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0) 100%), url('${bannerUrl}'); background-size: cover; background-position: right center; background-repeat: no-repeat;">
             <div class="class-card-header-top">
               <a href="/faculty/group-detail/index.html?id=${g.id}" class="class-card-title">
                 <span>${escapeHtml(subjectTitle)}</span>

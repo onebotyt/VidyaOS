@@ -402,11 +402,12 @@ function renderGoogleClassCards() {
     const attended = subMatch ? subMatch.attended : 0;
     const conducted = subMatch ? subMatch.conducted : 0;
     const isSafe = pct >= 75;
+    const bannerUrl = (typeof ClassroomThemes !== 'undefined' && ClassroomThemes.getBannerUrl(c)) || c.theme_image || '/uploads/classroom-banners/banner_programming_1_c065d9.svg';
 
     return `
       <article class="gc-class-card" id="class-card-${c.id}">
-        <!-- Gradient Banner Header -->
-        <header class="gc-card-header ${paletteClass}">
+        <!-- Gradient Banner Header with Google Classroom Theme Artwork -->
+        <header class="gc-card-header ${paletteClass}" style="background-image: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0) 100%), url('${bannerUrl}'); background-size: cover; background-position: right center; background-repeat: no-repeat;">
           <div class="gc-card-header-top">
             <div class="gc-card-header-tags">
               <span class="gc-card-code-tag">${escapeHtml(code)}</span>

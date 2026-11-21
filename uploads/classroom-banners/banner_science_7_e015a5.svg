@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="bg-sci" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#041e26" />
+            <stop offset="50%" stop-color="#0b3d4d" />
+            <stop offset="100%" stop-color="#052732" />
+          </linearGradient>
+          <radialGradient id="glow-cyan-sci" cx="70%" cy="50%" r="55%">
+            <stop offset="0%" stop-color="#00cec9" stop-opacity="0.35" />
+            <stop offset="60%" stop-color="#0984e3" stop-opacity="0.12" />
+            <stop offset="100%" stop-color="#041e26" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="liquid-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#55efc4" />
+            <stop offset="100%" stop-color="#00cec9" />
+          </linearGradient>
+          <filter id="sci-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="3" dy="7" stdDeviation="7" flood-color="#000" flood-opacity="0.5" />
+          </filter>
+        </defs>
+
+        <!-- Background -->
+        <rect width="800" height="300" fill="url(#bg-sci)" />
+        <circle cx="630" cy="150" r="280" fill="url(#glow-cyan-sci)" />
+
+        <!-- Floating Bubbles & Atoms -->
+        <circle cx="480" cy="100" r="14" fill="#81ecec" opacity="0.3" />
+        <circle cx="720" cy="80" r="10" fill="#55efc4" opacity="0.35" />
+        <circle cx="510" cy="220" r="18" fill="#81ecec" opacity="0.2" />
+
+        <!-- Atom Model (Elliptical Orbits with Nucleus) -->
+        <g transform="matrix(0.9 0.2 -0.2 0.9 500 120)" opacity="0.75" filter="url(#sci-shadow)">
+          <ellipse cx="0" cy="0" rx="55" ry="20" fill="none" stroke="#81ecec" stroke-width="2" />
+          <ellipse cx="0" cy="0" rx="55" ry="20" fill="none" stroke="#81ecec" stroke-width="2" transform="rotate(60)" />
+          <ellipse cx="0" cy="0" rx="55" ry="20" fill="none" stroke="#81ecec" stroke-width="2" transform="rotate(-60)" />
+          <!-- Nucleus -->
+          <circle cx="0" cy="0" r="10" fill="#fd79a8" />
+          <circle cx="-3" cy="-3" r="5" fill="#ffeaa7" />
+          <!-- Electrons -->
+          <circle cx="52" cy="0" r="5" fill="#ffeaa7" />
+          <circle cx="-26" cy="45" r="5" fill="#ffeaa7" />
+        </g>
+
+        <!-- Test Tube with Orange Fluid -->
+        <g transform="matrix(0.95 -0.25 0.25 0.95 720 120)" filter="url(#sci-shadow)">
+          <rect x="0" y="0" width="22" height="110" rx="11" fill="#dfe6e9" opacity="0.75" stroke="#ffffff" stroke-width="2" />
+          <rect x="2" y="45" width="18" height="63" rx="9" fill="#ff7675" />
+          <!-- Rim -->
+          <rect x="-3" y="0" width="28" height="6" rx="3" fill="#ffffff" />
+          <!-- Measurement Ticks -->
+          <line x1="5" y1="25" x2="11" y2="25" stroke="#2d3436" stroke-width="1.5" />
+          <line x1="5" y1="35" x2="11" y2="35" stroke="#2d3436" stroke-width="1.5" />
+          <line x1="5" y1="45" x2="14" y2="45" stroke="#2d3436" stroke-width="1.5" />
+        </g>
+
+        <!-- Google Classroom Classic Large Erlenmeyer Flask -->
+        <g transform="translate(620, 60)" filter="url(#sci-shadow)">
+          <!-- Glass Body -->
+          <path d="M-14 0 L14 0 L14 45 L58 140 A 18 18 0 0 1 42 165 L-42 165 A 18 18 0 0 1 -58 140 L-14 45 Z" fill="#dfe6e9" opacity="0.4" stroke="#ffffff" stroke-width="3" />
+          
+          <!-- Liquid Inside Flask -->
+          <path d="M-44 110 Q 0 95, 44 110 L42 163 L-42 163 Z" fill="url(#liquid-grad)" opacity="0.92" />
+          <!-- Liquid Meniscus wave -->
+          <path d="M-44 110 Q 0 95, 44 110" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.8" />
+
+          <!-- Rising Bubbles in Liquid -->
+          <circle cx="-10" cy="135" r="5" fill="#ffffff" opacity="0.7" />
+          <circle cx="15" cy="125" r="7" fill="#ffffff" opacity="0.75" />
+          <circle cx="0" cy="115" r="4" fill="#ffffff" opacity="0.8" />
+          <circle cx="-18" cy="148" r="3.5" fill="#ffffff" opacity="0.6" />
+
+          <!-- Top Rim Lip -->
+          <rect x="-18" y="-4" width="36" height="8" rx="4" fill="#ffffff" />
+        </g>
+      </svg>

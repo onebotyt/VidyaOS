@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="bg-arts" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2c0820" />
+            <stop offset="50%" stop-color="#551240" />
+            <stop offset="100%" stop-color="#320622" />
+          </linearGradient>
+          <radialGradient id="glow-pink" cx="70%" cy="50%" r="55%">
+            <stop offset="0%" stop-color="#fd79a8" stop-opacity="0.35" />
+            <stop offset="60%" stop-color="#e84393" stop-opacity="0.12" />
+            <stop offset="100%" stop-color="#2c0820" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="wood-palette" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffeaa7" />
+            <stop offset="100%" stop-color="#fdcb6e" />
+          </linearGradient>
+          <filter id="arts-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="3" dy="7" stdDeviation="7" flood-color="#000" flood-opacity="0.5" />
+          </filter>
+        </defs>
+
+        <!-- Background -->
+        <rect width="800" height="300" fill="url(#bg-arts)" />
+        <circle cx="630" cy="150" r="280" fill="url(#glow-pink)" />
+
+        <!-- Floating Color Swatches -->
+        <circle cx="480" cy="80" r="14" fill="#fd79a8" opacity="0.35" />
+        <circle cx="730" cy="90" r="12" fill="#ffeaa7" opacity="0.35" />
+
+        <!-- Paint Swatch Fan Cards in background -->
+        <g transform="matrix(0.96 0.2 -0.2 0.96 480 120)" filter="url(#arts-shadow)">
+          <rect width="45" height="110" rx="6" fill="#e84393" transform="rotate(-25)" />
+          <rect width="45" height="110" rx="6" fill="#00cec9" transform="rotate(-10)" />
+          <rect width="45" height="110" rx="6" fill="#fdcb6e" transform="rotate(5)" />
+          <circle cx="0" cy="100" r="5" fill="#2d3436" />
+        </g>
+
+        <!-- Classical Painter's Palette with 5 vibrant paint blobs -->
+        <g transform="matrix(0.95 -0.15 0.15 0.95 620 50)" filter="url(#arts-shadow)">
+          <!-- Wood Palette Kidney shape -->
+          <path d="M0 60 C-60 40 -80 130 -10 160 C50 180 110 160 110 90 C110 30 50 -10 0 60 Z" fill="url(#wood-palette)" stroke="#e17055" stroke-width="3" />
+          <!-- Thumb hole -->
+          <ellipse cx="65" cy="115" rx="14" ry="18" fill="#2c0820" />
+
+          <!-- Colorful paint dollops -->
+          <ellipse cx="-25" cy="80" rx="13" ry="10" fill="#e84118" />
+          <ellipse cx="0" cy="30" rx="14" ry="11" fill="#fbc531" />
+          <ellipse cx="45" cy="35" rx="13" ry="10" fill="#00a8ff" />
+          <ellipse cx="80" cy="70" rx="12" ry="9" fill="#4cd137" />
+          <ellipse cx="-35" cy="120" rx="11" ry="9" fill="#9c88ff" />
+        </g>
+
+        <!-- Painter's Brush Crossing Palette -->
+        <g transform="matrix(0.7 0.7 -0.7 0.7 580 30)" filter="url(#arts-shadow)">
+          <!-- Wooden handle -->
+          <polygon points="-6,0 6,0 3,160 -3,160" fill="#d35400" />
+          <!-- Silver ferrule -->
+          <rect x="-6" y="160" width="12" height="25" fill="#bdc3c7" stroke="#7f8c8d" stroke-width="1" />
+          <!-- Dark bristles with paint tip -->
+          <path d="M-6 185 L6 185 L3 215 Q 0 225 -3 215 Z" fill="#2c3e50" />
+          <path d="M-4 205 L4 205 L2 215 Q 0 225 -2 215 Z" fill="#e84393" />
+        </g>
+      </svg>

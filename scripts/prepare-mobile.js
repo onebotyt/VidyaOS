@@ -10,7 +10,7 @@ const path = require('path');
 const ROOT_DIR = path.resolve(__dirname, '..');
 const WWW_DIR = path.join(ROOT_DIR, 'www');
 
-const DIRS_TO_COPY = ['admin', 'faculty', 'student', 'login', 'landing', 'images', 'frontendv2'];
+const DIRS_TO_COPY = ['admin', 'faculty', 'student', 'login', 'landing', 'images', 'frontendv2', 'shared'];
 const FILES_TO_COPY = ['index.html', 'register.html', 'mobile-bridge.js', 'app-version.json'];
 
 function copyRecursiveSync(src, dest) {
