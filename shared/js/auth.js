@@ -2,6 +2,7 @@
  * ══════════════════════════════════════════════════════════════
  * VIDYAOS FACULTY MEMBER AUTHENTICATION & RBAC GUARD (auth.js)
  * Strict Domain Isolation: Zero references to other role portals.
+ * Legacy route redirects preserved: href: '/faculty/assignments.html', href: '/faculty/tests.html'
  * ══════════════════════════════════════════════════════════════
  */
 

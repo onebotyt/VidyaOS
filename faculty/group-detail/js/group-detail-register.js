@@ -299,6 +299,8 @@
           <input type="checkbox" id="matrix-check-all" onchange="toggleSelectAllMatrixStudents(this.checked)" title="Select all students">
         </th>
         <th class="sticky-col-1" rowspan="${mainRowSpan}" style="width: 36px; font-size: 0.65rem; padding: 0.2rem; text-align: center;">Roll<br>No.</th>
+        <th class="print-only-col" rowspan="${mainRowSpan}" style="width: 105px; font-size: 0.65rem; padding: 0.2rem; text-align: center;">UBTER Reg. No.</th>
+        <th class="print-only-col" rowspan="${mainRowSpan}" style="width: 95px; font-size: 0.65rem; padding: 0.2rem; text-align: center;">UBTER Roll No.</th>
         <th class="sticky-col-2" rowspan="${mainRowSpan}" style="width: 148px; min-width: 135px; max-width: 165px; font-size: 0.74rem; padding: 0.2rem 0.45rem; text-align: left;">Name</th>
         <th colspan="${matrixCols.length}" style="background: var(--table-th-bg); color: var(--table-th-color); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.25rem; text-align: center;">
           DATES OF LECTURE — ${monthTitle}
@@ -478,6 +480,12 @@
           <td class="sticky-col-1" style="text-align: center; font-weight: 800; background: var(--table-sticky-bg); color: var(--text-main); font-size: 0.72rem; padding: 0.2rem;">
             ${rollBadge}${cleanRoll}
           </td>
+          <td class="print-only-col" style="text-align: center; font-size: 0.68rem; font-family: var(--font-family-mono); padding: 0.2rem;">
+            ${esc(st.registration_no || '--')}
+          </td>
+          <td class="print-only-col" style="text-align: center; font-size: 0.68rem; font-family: var(--font-family-mono); padding: 0.2rem;">
+            ${esc(st.enrollment_no || st.roll_number || '--')}
+          </td>
           <td class="sticky-col-2" style="background: var(--table-sticky-bg); color: var(--text-main); padding: 0.2rem 0.45rem; width: 148px; min-width: 135px; max-width: 165px;" title="${esc(st.full_name)}">
             ${nameContent}
           </td>
@@ -494,6 +502,8 @@
         <tr>
           <th class="sticky-col-0"></th>
           <th class="sticky-col-1"></th>
+          <th class="print-only-col"></th>
+          <th class="print-only-col"></th>
           <th class="sticky-col-2" style="font-size: 0.68rem; color: var(--status-present); font-weight: 800; text-align: left; padding: 0.2rem 0.45rem; width: 148px; min-width: 135px; max-width: 165px; line-height: 1.1; background: var(--table-sticky-th-bg);" title="Total Present (P)">
             Total Present (P)
           </th>
@@ -502,6 +512,8 @@
         <tr>
           <th class="sticky-col-0"></th>
           <th class="sticky-col-1"></th>
+          <th class="print-only-col"></th>
+          <th class="print-only-col"></th>
           <th class="sticky-col-2" style="font-size: 0.68rem; color: var(--status-absent); font-weight: 800; text-align: left; padding: 0.2rem 0.45rem; width: 148px; min-width: 135px; max-width: 165px; line-height: 1.1; background: var(--table-sticky-th-bg);" title="Total Absent (A)">
             Total Absent (A)
           </th>

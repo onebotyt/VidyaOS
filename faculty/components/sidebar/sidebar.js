@@ -30,7 +30,8 @@
   const FACULTY_NAV_ITEMS = [
     { key: 'dashboard', label: 'Dashboard', shortLabel: 'Home', href: '/faculty/dashboard/index.html', icon: 'home' },
     { key: 'classes', label: 'Classroom', shortLabel: 'Classes', href: '/faculty/classes/index.html', icon: 'classes' },
-    { key: 'records', label: 'Student Records', shortLabel: 'Records', href: '/faculty/student-records/index.html', icon: 'registers' },
+    { key: 'registers', label: 'Attendance Registers', shortLabel: 'Registers', href: '/faculty/registers/index.html', icon: 'registers' },
+    { key: 'records', label: 'Student Records', shortLabel: 'Records', href: '/faculty/student-records/index.html', icon: 'sheets' },
     { key: 'sheets', label: 'Sheet Studio', shortLabel: 'Sheets', href: '/faculty/sheets/index.html', icon: 'sheets' },
     { key: 'leaves', label: 'Leave Request', shortLabel: 'Leave', href: '/faculty/leave-approvals/index.html', icon: 'leaves' },
     { key: 'students', label: 'Students Management', shortLabel: 'Students', href: '/faculty/students/index.html', icon: 'students' },
@@ -180,14 +181,19 @@
       const label = item.label;
 
       let isActive = false;
-      if (item.key === 'students') {
-        isActive = currentPath.includes('/faculty/students');
+      if (item.key === 'registers') {
+        isActive = currentPath.includes('/faculty/registers');
+      } else if (item.key === 'records') {
+        isActive = currentPath.includes('/faculty/student-records');
+      } else if (item.key === 'students') {
+        isActive = currentPath.includes('/faculty/students') && !currentPath.includes('student-records');
       } else if (item.key === 'faculty') {
         isActive = currentPath.includes('/faculty/faculty');
       } else {
         isActive = currentPath.endsWith(item.href) ||
           currentPath.endsWith(item.href.replace('.html', '')) ||
           currentPath.includes(item.key) ||
+          (item.key === 'classes' && (currentPath.includes('/faculty/classes') || currentPath.includes('/faculty/group'))) ||
           (item.key === 'dashboard' && (currentPath === '/faculty/' || currentPath.endsWith('/faculty') || currentPath.endsWith('/faculty/dashboard.html')));
       }
 

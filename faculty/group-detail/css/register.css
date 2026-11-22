@@ -2189,5 +2189,73 @@ body[data-active-tab="register"] .classroom-body,
   border: 1px solid var(--status-absent);
 }
 
+/* ─── PRINT ENGINE: ONLY ROLL NO, UBTER REG NO, UBTER ROLL NO, NAME, DAYS ─── */
+.print-only-col {
+  display: none !important;
+}
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 0.6cm;
+  }
+  body, html {
+    background: var(--bg-surface) !important;
+    color: var(--text-main) !important;
+    font-size: 8pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .faculty-sidebar, #faculty-sidebar, #faculty-sidebar-backdrop,
+  .header, #faculty-header-mount, .faculty-header-container,
+  .classroom-header, .classroom-nav-tabs, .stream-sidebar, .stream-main,
+  .matrix-toolbar, .rollcall-modal-card, .modal-backdrop,
+  .matrix-bulk-bar, #matrix-bulk-bar,
+  .sticky-col-0, #matrix-check-all, .matrix-student-chk,
+  .sticky-r-att-total, .sticky-r-abs-total,
+  .btn-manage-holidays, .today-marker-pill, .btn, button,
+  .gc-action-pill, #class-reg-scope-switcher, #reg-subject-switcher {
+    display: none !important;
+  }
+  .print-only-col {
+    display: table-cell !important;
+    font-size: 7.2pt !important;
+    text-align: center !important;
+  }
+  .classroom-body, .register-matrix-wrapper {
+    overflow: visible !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .register-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: auto !important;
+  }
+  .register-table th, .register-table td {
+    border: 1px solid #777777 !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+    padding: 2px 3px !important;
+  }
+  .pen-mark.p {
+    color: #006600 !important;
+    font-weight: 800 !important;
+  }
+  .pen-mark.a {
+    color: #cc0000 !important;
+    font-weight: 800 !important;
+  }
+  .vertical-holiday-cell {
+    background: #f4f4f4 !important;
+    color: #666666 !important;
+  }
+}
+
+
 
 
