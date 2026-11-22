@@ -246,6 +246,25 @@ function redirectAfterLogin(user) {
   window.location.href = '/faculty/dashboard/index.html';
 }
 
+function setSocialButtonsDisabled(disabled) {
+  const btns = [
+    document.getElementById('google-signin-btn'),
+    document.getElementById('m-google-btn')
+  ];
+  btns.forEach(b => {
+    if (b) {
+      b.disabled = disabled;
+      if (disabled) {
+        b.classList.add('disabled');
+        b.setAttribute('aria-disabled', 'true');
+      } else {
+        b.classList.remove('disabled');
+        b.removeAttribute('aria-disabled');
+      }
+    }
+  });
+}
+
 function resetSubmitBtn() {
   const btn = document.getElementById('submit-btn');
   const text = document.getElementById('submit-text');
@@ -253,6 +272,7 @@ function resetSubmitBtn() {
   if (btn) btn.disabled = false;
   if (text) text.textContent = 'Sign In';
   if (icon) icon.innerHTML = '→';
+  setSocialButtonsDisabled(false);
 }
 
 /* ── Input events: hide banners ── */
@@ -264,6 +284,14 @@ function resetSubmitBtn() {
   }
 });
 
+/* ── Instant lock on Sign In click ── */
+const submitBtnEl = document.getElementById('submit-btn');
+if (submitBtnEl) {
+  submitBtnEl.addEventListener('click', () => {
+    setSocialButtonsDisabled(true);
+  });
+}
+
 /* ── Main login submit ── */
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -271,6 +299,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const pw = document.getElementById('password').value;
   if (!id || !pw) {
     showInlineMsg('invalid credentials check id and password ', 'err');
+    setSocialButtonsDisabled(false);
     return;
   }
 
@@ -278,6 +307,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const text = document.getElementById('submit-text');
   const icon = document.getElementById('signin-icon');
   btn.disabled = true;
+  setSocialButtonsDisabled(true);
   text.textContent = 'Verifying…';
   if (icon) icon.innerHTML = '<span class="spinner"></span>';
   hideBanners();
@@ -638,7 +668,12 @@ document.getElementById('activation-form').addEventListener('submit', async (e) 
 
 /* ── Google OAuth & Chooser Modal ── */
 async function handleGoogleSignIn() {
+  const submitBtn = document.getElementById('submit-btn');
+  if (submitBtn && submitBtn.disabled) return;
+
   const btn = document.getElementById('google-signin-btn') || document.getElementById('m-google-btn');
+  if (btn && (btn.disabled || btn.classList.contains('disabled'))) return;
+
   const txt = document.getElementById('google-btn-text') || btn?.querySelector('span');
   if (btn) btn.disabled = true;
   if (txt) txt.textContent = 'Connecting to Google…';
@@ -1187,3 +1222,221 @@ window.openDownloadAppModal = openDownloadAppModal;
 window.closeDownloadAppModal = closeDownloadAppModal;
 window.switchDownloadTab = switchDownloadTab;
 window.copyCurrentWebUrl = copyCurrentWebUrl;
+
+/* ══════════════════════════════════════════════════════════════
+   UGIP NAINITAL CAMPUS PHOTO GALLERY & STAFF UPLOAD ENGINE
+   (Dev 4 Interactive Campus Photo Gallery Implementation)
+   ══════════════════════════════════════════════════════════════ */
+(() => {
+  const collections = {
+    campus: {
+      title: 'Our Campus',
+      description: 'Campus views, facilities and surroundings',
+      images: [
+        ['/login/images/gallery-campus.jpg', 'UGIP Nainital campus entrance'],
+        ['/login/images/bg1-campus.jpg', 'Campus overview'],
+        ['/login/images/bg3-building.jpg', 'Institutional building'],
+        ['/login/images/image.png', 'Academic and administrative block'],
+        ['/login/images/all.jpg', 'Campus environment']
+      ]
+    },
+    nainital: {
+      title: 'Nainital',
+      description: 'Nainital views and the Himalayan region',
+      images: [
+        ['/login/images/gallery-nainital.jpg', 'Nainital lake and Himalayan peaks'],
+        ['/login/images/bg4-himalaya.jpg', 'Himalayan mountain view'],
+        ['/login/images/gallery-natural-beauty.jpg', 'Natural beauty near Nainital'],
+        ['/login/images/academic.png', 'Himalayan landscape']
+      ]
+    },
+    academic: {
+      title: 'Academic Block',
+      description: 'Classrooms, administrative blocks and academic areas',
+      images: [
+        ['/login/images/image.png', 'Administrative and academic block'],
+        ['/login/images/bg3-building.jpg', 'UGIP building'],
+        ['/login/images/academic.png', 'Academic facilities'],
+        ['/login/images/all.jpg', 'Campus view']
+      ]
+    },
+    nature: {
+      title: 'Natural Beauty',
+      description: 'Scenic beauty, surrounding mountains and lake city landscape',
+      images: [
+        ['/login/images/academic.png', 'Himalayan landscape near Nainital'],
+        ['/login/images/bg4-himalaya.jpg', 'Himalaya range'],
+        ['/login/images/gallery-natural-beauty.jpg', 'Nature near Nainital'],
+        ['/login/images/gallery-nainital.jpg', 'Nainital town']
+      ]
+    }
+  };
+
+  const modal = document.getElementById('galleryModal');
+  if (!modal) return;
+  const title = document.getElementById('galleryTitle');
+  const description = document.getElementById('galleryDescription');
+  const mainImage = document.getElementById('galleryMainImage');
+  const counter = document.getElementById('galleryCounter');
+  const thumbs = document.getElementById('galleryThumbs');
+  const closeButton = document.getElementById('galleryClose');
+  const modalUploadButton = document.getElementById('galleryUploadBtn');
+  const modalUploadInput = document.getElementById('galleryModalUpload');
+
+  let currentCollection = null;
+  let currentIndex = 0;
+  let lastTrigger = null;
+
+  function render() {
+    if (!currentCollection || !collections[currentCollection]) return;
+    const current = collections[currentCollection];
+    const item = current.images[currentIndex];
+    if (!item) return;
+    mainImage.src = item[0];
+    mainImage.alt = item[1];
+    counter.textContent = `${currentIndex + 1} / ${current.images.length}`;
+
+    thumbs.innerHTML = '';
+    current.images.forEach((img, idx) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `gallery-thumb${idx === currentIndex ? ' active' : ''}`;
+      button.innerHTML = `<img src="${img[0]}" alt="${img[1]}"><span>${img[1]}</span>`;
+      button.addEventListener('click', () => {
+        currentIndex = idx;
+        render();
+      });
+      thumbs.appendChild(button);
+    });
+  }
+
+  function openGallery(name, trigger) {
+    if (!collections[name]) return;
+    currentCollection = name;
+    currentIndex = 0;
+    lastTrigger = trigger || null;
+    title.textContent = collections[name].title;
+    description.textContent = collections[name].description;
+    render();
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('gallery-open');
+    if (closeButton) closeButton.focus();
+  }
+
+  function closeGallery() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('gallery-open');
+    if (lastTrigger) lastTrigger.focus();
+  }
+
+  document.querySelectorAll('[data-gallery]').forEach(button => {
+    button.addEventListener('click', () => openGallery(button.dataset.gallery, button));
+  });
+  if (closeButton) closeButton.addEventListener('click', closeGallery);
+
+  const prevBtn = document.getElementById('galleryPrev');
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (!currentCollection || !collections[currentCollection]) return;
+      const count = collections[currentCollection].images.length;
+      currentIndex = (currentIndex - 1 + count) % count;
+      render();
+    });
+  }
+
+  const nextBtn = document.getElementById('galleryNext');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (!currentCollection || !collections[currentCollection]) return;
+      const count = collections[currentCollection].images.length;
+      currentIndex = (currentIndex + 1) % count;
+      render();
+    });
+  }
+
+  modal.addEventListener('click', event => {
+    if (event.target === modal) closeGallery();
+  });
+
+  document.addEventListener('keydown', event => {
+    if (!modal.classList.contains('open')) return;
+    if (event.key === 'Escape') closeGallery();
+    if (event.key === 'ArrowLeft' && prevBtn) prevBtn.click();
+    if (event.key === 'ArrowRight' && nextBtn) nextBtn.click();
+  });
+
+  // Modal upload button (staff permission confirmation)
+  if (modalUploadButton && modalUploadInput) {
+    modalUploadButton.addEventListener('click', () => {
+      const confirmed = window.confirm('Restricted action: only teachers, faculty or administrators may upload or change gallery images. Confirm that you are authorized to continue.');
+      if (confirmed) modalUploadInput.click();
+    });
+    modalUploadInput.addEventListener('change', () => {
+      const files = Array.from(modalUploadInput.files || []).filter(file => file.type.startsWith('image/'));
+      if (!files.length || !currentCollection) return;
+      files.forEach(file => {
+        const url = URL.createObjectURL(file);
+        collections[currentCollection].images.push([url, file.name || 'Uploaded photo']);
+      });
+      currentIndex = collections[currentCollection].images.length - files.length;
+      render();
+      description.textContent = `${collections[currentCollection].description} • ${files.length} photo(s) added for this session`;
+      modalUploadInput.value = '';
+    });
+  }
+
+  window.vidyaGalleryCollections = collections;
+  window.vidyaOpenGallery = openGallery;
+})();
+
+/* Local image upload for the campus gallery (session-only previews) */
+(() => {
+  const uploadButton = document.getElementById('uploadImagesBtn');
+  const uploadInput = document.getElementById('galleryUpload');
+  const galleryGrid = document.querySelector('.gallery');
+  if (!uploadButton || !uploadInput || !galleryGrid) return;
+  let uploadedCard = null;
+  const uploadedUrls = [];
+
+  uploadButton.addEventListener('click', () => {
+    const confirmed = window.confirm('Restricted action: only teachers, faculty or administrators may upload or change gallery images. Confirm that you are authorized to continue.');
+    if (confirmed) uploadInput.click();
+  });
+
+  uploadInput.addEventListener('change', () => {
+    const selected = Array.from(uploadInput.files || []).filter(file => file.type.startsWith('image/'));
+    if (!selected.length) return;
+    const collections = window.vidyaGalleryCollections;
+    if (!collections) return;
+    if (!collections.uploaded) {
+      collections.uploaded = {
+        title: 'My Uploads',
+        description: 'Images you added from this device',
+        images: []
+      };
+    }
+    selected.forEach(file => {
+      const url = URL.createObjectURL(file);
+      uploadedUrls.push(url);
+      collections.uploaded.images.push([url, file.name || 'Uploaded image']);
+    });
+    if (!uploadedCard) {
+      uploadedCard = document.createElement('button');
+      uploadedCard.type = 'button';
+      uploadedCard.className = 'card uploaded-card';
+      uploadedCard.dataset.gallery = 'uploaded';
+      uploadedCard.setAttribute('aria-label', 'Open My Uploads gallery');
+      uploadedCard.innerHTML = '<img alt="Your uploaded images"><span><i>★</i>My Uploads <b class="card-more">View gallery ↗</b></span>';
+      galleryGrid.appendChild(uploadedCard);
+      uploadedCard.addEventListener('click', () => window.vidyaOpenGallery('uploaded', uploadedCard));
+    }
+    uploadedCard.querySelector('img').src = collections.uploaded.images[0][0];
+    uploadedCard.querySelector('img').alt = 'Your uploaded images';
+    uploadButton.innerHTML = '<span>＋</span> Add More Images';
+    uploadInput.value = '';
+  });
+
+  window.addEventListener('beforeunload', () => uploadedUrls.forEach(URL.revokeObjectURL));
+})();

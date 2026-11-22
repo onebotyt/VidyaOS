@@ -78,23 +78,29 @@
         </div>
       </div>
 
-      <div class="gallery">
-        <div class="card">
+      <div class="gallery-tools">
+        <span class="gallery-label">Explore campus gallery</span>
+        <button class="upload-images" type="button" id="uploadImagesBtn" title="Upload photos to campus gallery"><span>＋</span> Upload Images</button>
+        <input type="file" id="galleryUpload" accept="image/*" multiple hidden>
+      </div>
+
+      <div class="gallery" aria-label="Campus photo categories">
+        <button class="card" type="button" data-gallery="campus" aria-label="Open Our Campus photo gallery">
           <img src="/login/images/gallery-campus.jpg" alt="UGIP Nainital campus entrance">
-          <span><i>★</i>Our Campus</span>
-        </div>
-        <div class="card">
+          <span><i>★</i>Our Campus <b class="card-more">View gallery ↗</b></span>
+        </button>
+        <button class="card" type="button" data-gallery="nainital" aria-label="Open Nainital photo gallery">
           <img src="/login/images/gallery-nainital.jpg" alt="Nainital lake and Himalayan peaks">
-          <span><i>★</i>Nainital</span>
-        </div>
-        <div class="card">
+          <span><i>★</i>Nainital <b class="card-more">View gallery ↗</b></span>
+        </button>
+        <button class="card" type="button" data-gallery="academic" aria-label="Open Academic Block photo gallery">
           <img src="/login/images/image.png" alt="Administrative and academic block">
-          <span><i>★</i>Academic Block</span>
-        </div>
-        <div class="card">
+          <span><i>★</i>Academic Block <b class="card-more">View gallery ↗</b></span>
+        </button>
+        <button class="card" type="button" data-gallery="nature" aria-label="Open Natural Beauty photo gallery">
           <img src="/login/images/academic.png" alt="Himalayan landscape near Nainital">
-          <span><i>★</i>Natural Beauty</span>
-        </div>
+          <span><i>★</i>Natural Beauty <b class="card-more">View gallery ↗</b></span>
+        </button>
       </div>
     </section>
 
@@ -669,6 +675,34 @@
           <span>Created by <strong>@onebotyt</strong> • View on GitHub</span>
         </a>
       </div>
+    </div>
+  </div>
+
+  <!-- ══ FULL-SCREEN PHOTO GALLERY MODAL ══ -->
+  <div class="gallery-modal" id="galleryModal" aria-hidden="true" role="dialog" aria-modal="true"
+    aria-labelledby="galleryTitle">
+    <div class="gallery-dialog">
+      <div class="gallery-head">
+        <div>
+          <p class="gallery-kicker">VIDYAOS • PHOTO COLLECTION</p>
+          <h2 id="galleryTitle">Campus Gallery</h2>
+          <p id="galleryDescription">Explore more photos from this collection</p>
+        </div>
+        <button class="gallery-close" id="galleryClose" type="button" aria-label="Close gallery">×</button>
+      </div>
+      <div class="gallery-permissions">
+        <span class="staff-notice">🔒 Uploading or changing gallery photos is reserved for teachers, faculty or
+          administrators.</span>
+        <button class="gallery-upload" id="galleryUploadBtn" type="button">＋ Upload to this gallery</button>
+        <input type="file" id="galleryModalUpload" accept="image/*" multiple hidden>
+      </div>
+      <div class="gallery-feature">
+        <button class="gallery-arrow" id="galleryPrev" type="button" aria-label="Previous image">‹</button>
+        <img id="galleryMainImage" src="" alt="">
+        <button class="gallery-arrow" id="galleryNext" type="button" aria-label="Next image">›</button>
+        <div class="gallery-counter" id="galleryCounter"></div>
+      </div>
+      <div class="gallery-thumbs" id="galleryThumbs" aria-label="Related photos"></div>
     </div>
   </div>
 
