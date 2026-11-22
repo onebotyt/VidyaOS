@@ -46,47 +46,22 @@
   }
 
   /**
-   * Main Orchestrator: Loads Profile, Schedule, Attendance Pulse, Classwork, and Classes
+   * Main Orchestrator: Loads Schedule, Classwork, and Classes
    */
   async function loadHomeData() {
     await Promise.allSettled([
-      loadStudentProfile(),
       loadTodaySchedule(),
-      loadAttendancePulse(),
       loadUpcomingTasks(),
       loadEnrolledClasses()
     ]);
   }
 
   /**
-   * 1. Student Profile & Header
+   * 1. Student Profile & Compatibility Helper
    */
   async function loadStudentProfile() {
-    try {
-      if (typeof fetchApi !== 'function') return;
-      const res = await fetchApi('/students/me');
-      if (res && res.success && res.data) {
-        const s = res.data;
-        const greetingEl = document.getElementById('home-greeting');
-        const firstName = (s.full_name || 'Student').split(' ')[0];
-        if (greetingEl) {
-          greetingEl.textContent = `${getTimeOfDayGreeting()}, ${firstName} 👋`;
-        }
-
-        const cohortEl = document.getElementById('home-cohort');
-        if (cohortEl) {
-          const dept = s.department_name || s.branch_name || 'Information Technology';
-          const yr = s.year || 3;
-          const sem = s.semester || 5;
-          cohortEl.textContent = `${dept} • Year ${yr}, Sem ${sem}`;
-        }
-
-        const sessionEl = document.getElementById('home-session-tag');
-        if (sessionEl) {
-          sessionEl.textContent = s.academic_year_label || '2026–27 Session';
-        }
-      }
-    } catch (_) { }
+    // Retained for backward-compatibility; institution showcase hero is handled by institution-hero.js
+    return;
   }
 
   /**
@@ -142,76 +117,11 @@
   }
 
   /**
-   * 3. 75% Attendance Health Pulse
+   * 3. Attendance Pulse (Deprecated & Purged per Institutional Policy)
    */
   async function loadAttendancePulse() {
-    const pctEl = document.getElementById('home-att-pct');
-    const ratioEl = document.getElementById('home-att-ratio');
-    const fillEl = document.getElementById('home-att-fill');
-    const badgeEl = document.getElementById('home-attendance-badge');
-    const badgeTextEl = document.getElementById('home-hero-att-text');
-    const adviceEl = document.getElementById('home-att-advice');
-
-    try {
-      if (typeof fetchApi !== 'function') return;
-      const res = await fetchApi('/students/me/attendance/stats', { suppressToast: true });
-      let pct = 0;
-      let attended = 0;
-      let total = 0;
-
-      if (res && res.success && res.data) {
-        pct = parseFloat(res.data.current_percentage || res.data.percentage || 0);
-        attended = parseInt(res.data.attended_classes || res.data.attended || 0, 10);
-        total = parseInt(res.data.total_classes || res.data.total || 0, 10);
-      }
-
-      const formattedPct = isNaN(pct) ? '0.0%' : pct.toFixed(1) + '%';
-      if (pctEl) pctEl.textContent = formattedPct;
-      if (ratioEl) ratioEl.textContent = `Attended: ${attended} / ${total} hrs conducted`;
-
-      const isSafe = pct >= 75.0 || total === 0;
-
-      if (fillEl) {
-        fillEl.style.width = Math.min(100, Math.max(0, pct)) + '%';
-        if (isSafe) {
-          fillEl.classList.remove('shortage');
-        } else {
-          fillEl.classList.add('shortage');
-        }
-      }
-
-      if (badgeEl) {
-        if (isSafe) {
-          badgeEl.className = 'home-attendance-chip safe';
-          if (badgeTextEl) badgeTextEl.textContent = `${formattedPct} • Exam Eligible`;
-        } else {
-          badgeEl.className = 'home-attendance-chip shortage';
-          if (badgeTextEl) badgeTextEl.textContent = `${formattedPct} • Shortage Alert`;
-        }
-      }
-
-      if (adviceEl) {
-        if (total === 0) {
-          adviceEl.textContent = 'Academic session just begun. Maintain regular attendance to stay above the 75% statutory bar.';
-        } else if (isSafe) {
-          // Calculate buffer
-          const safeBunks = Math.floor((attended - 0.75 * total) / 0.75);
-          if (safeBunks > 0) {
-            adviceEl.textContent = `✨ Excellent standing! You can safely miss up to ${safeBunks} class${safeBunks > 1 ? 'es' : ''} without falling below 75%.`;
-          } else {
-            adviceEl.textContent = '⚠️ You are currently on track (>75%), but right at the boundary. Attend your next classes to build buffer.';
-          }
-        } else {
-          // Calculate needed
-          const needed = Math.ceil((0.75 * total - attended) / 0.25);
-          adviceEl.textContent = `🚨 Action required: You must attend the next ${needed} consecutive class${needed > 1 ? 'es' : ''} to restore exam eligibility.`;
-        }
-      }
-
-    } catch (_) {
-      if (pctEl) pctEl.textContent = '--%';
-      if (adviceEl) adviceEl.textContent = 'Track and verify official attendance logs daily.';
-    }
+    // Deprecated: Statutory 75% attendance health requirement card purged
+    return;
   }
 
   /**

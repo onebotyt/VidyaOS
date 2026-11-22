@@ -118,12 +118,12 @@ guardRoute(['STUDENT']);
           if (isDef) {
             card.style.borderLeftColor = 'var(--status-absent)';
             badge.className = 'badge badge-absent';
-            badge.innerText = 'Attendance Deficit (< 75%)';
+            badge.innerText = 'Attendance Shortage';
             pctEl.style.color = 'var(--status-absent)';
           } else {
             card.style.borderLeftColor = 'var(--status-present)';
             badge.className = 'badge badge-present';
-            badge.innerText = 'Eligible for Exams';
+            badge.innerText = 'Regular Standing';
             pctEl.style.color = 'var(--status-present)';
           }
         }

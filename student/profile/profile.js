@@ -118,47 +118,11 @@ async function loadStudentProfile() {
       }
     }
 
-    // 2. Attendance Health Stats
-    const stats = s.attendance_stats;
+    // 2. Student Standing Badge
     const standingBadge = document.getElementById('hero-standing-badge');
-    const healthPct = document.getElementById('health-pct');
-    const healthProgressBar = document.getElementById('health-progress-bar');
-    const healthStatusTag = document.getElementById('health-status-tag');
-    const healthAttended = document.getElementById('health-attended');
-    const healthTotal = document.getElementById('health-total');
-    const healthStanding = document.getElementById('health-exam-standing');
-
-    if (stats) {
-      const pct = parseFloat(stats.percentage || 0);
-      healthPct.innerText = `${pct.toFixed(1)}%`;
-      healthProgressBar.style.width = `${Math.min(100, pct)}%`;
-      healthAttended.innerText = stats.total_attended || 0;
-      healthTotal.innerText = stats.total_classes || 0;
-
-      if (pct >= 75) {
-        standingBadge.className = 'std-badge regular';
-        standingBadge.innerText = 'Regular (≥ 75%)';
-        healthPct.style.color = 'var(--status-present)';
-        healthProgressBar.className = 'progress-bar-fill';
-        healthStatusTag.innerText = 'Good Standing';
-        healthStatusTag.style.color = 'var(--status-present)';
-        healthStanding.innerText = 'Eligible for End-Semester Examinations';
-        healthStanding.style.color = 'var(--status-present)';
-      } else {
-        standingBadge.className = 'std-badge defaulter';
-        standingBadge.innerText = 'Below 75%';
-        healthPct.style.color = 'var(--status-absent)';
-        healthProgressBar.className = 'progress-bar-fill defaulter';
-        healthStatusTag.innerText = 'Attendance Shortage';
-        healthStatusTag.style.color = 'var(--status-absent)';
-        healthStanding.innerText = 'Action Required: Minimum 75% needed';
-        healthStanding.style.color = 'var(--status-absent)';
-      }
-    } else {
-      healthPct.innerText = '100%';
-      healthProgressBar.style.width = '100%';
-      healthStatusTag.innerText = 'Verified Standing';
-      healthStanding.innerText = 'Eligible for Examinations';
+    if (standingBadge) {
+      standingBadge.className = 'std-badge enrolled';
+      standingBadge.innerText = 'Active Student';
     }
 
     // 3. Biometrics Hardware Status

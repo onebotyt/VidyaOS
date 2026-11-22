@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="/student/components/student-base.css">
   <link rel="stylesheet" href="/student/components/header/header.css">
   <link rel="stylesheet" href="/student/components/sidebar/sidebar.css">
+  <link rel="stylesheet" href="/global-components/institution-hero/institution-hero.css">
 
   <link rel="stylesheet" href="/student/dashboard/dashboard.css?v=20261028">
 </head>
@@ -39,25 +40,13 @@
       <button id="open-self-attendance-btn" onclick="openSelfAttendanceModal()"></button>
     </div>
 
-    <!-- Institutional Hero (Dynamically Linked to Admin Settings — Matching Faculty Dashboard) -->
-    <section class="hero-card" aria-label="Institutional Showcase">
-      <div class="hero-left">
-        <div class="hero-logo" id="hero-logo-slot">
-          <img src="/images/collegelogo.jpeg" alt="Institution Logo"
-            onerror="this.onerror=null;this.src='/images/collegelogo.jpeg';">
-        </div>
-        <h1 class="hero-title" id="hero-inst-title">Government Polytechnic College</h1>
-      </div>
-      <div class="hero-banner" id="hero-banner-slot">
-        <img src="/images/campus-nainital.jpg" alt="College Campus"
-          onerror="this.onerror=null;this.style.display='none';">
-      </div>
-      <!-- Backward compatibility contract element -->
-      <span id="student-name" style="display:none;" aria-hidden="true">Welcome, Student</span>
-      <span id="student-cohort-info" style="display:none;" aria-hidden="true">Information Technology</span>
-      <span id="student-roll-badge" style="display:none;" aria-hidden="true">Roll: -- • UBTER Reg: --</span>
-      <span id="header-student-name" style="display:none;" aria-hidden="true">Student Portal</span>
-    </section>
+    <!-- Global Institutional Hero Showcase Component (Self-Mounting) -->
+    <div id="global-hero-mount"></div>
+    <!-- Backward compatibility contract elements -->
+    <span id="student-name" style="display:none;" aria-hidden="true">Welcome, Student</span>
+    <span id="student-cohort-info" style="display:none;" aria-hidden="true">Information Technology</span>
+    <span id="student-roll-badge" style="display:none;" aria-hidden="true">Roll: -- • UBTER Reg: --</span>
+    <span id="header-student-name" style="display:none;" aria-hidden="true">Student Portal</span>
 
     <!-- Google Classroom Classes Section -->
     <section style="margin-bottom: 2rem;">
@@ -396,7 +385,7 @@
         Complete Your Student Profile
       </h3>
       <p style="margin: 0 0 1.5rem 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
-        Your official institutional KYC details (parents' names, address, Aadhar, and date of birth) are required for statutory exam eligibility and student records.
+        Your official institutional KYC details (parents' names, address, Aadhar, and date of birth) are required for student records and institutional compliance.
       </p>
 
       <div style="display: flex; gap: 0.75rem; justify-content: center;">
@@ -424,6 +413,7 @@
   <script src="/shared/js/classroom-themes.js"></script>
   <script src="/student/components/header/header.js"></script>
   <script src="/student/components/sidebar/sidebar.js"></script>
+  <script src="/global-components/institution-hero/institution-hero.js"></script>
 
   <!-- Scoped Page Script -->
   <script src="/student/dashboard/dashboard.js?v=20261028"></script>

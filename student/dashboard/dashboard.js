@@ -848,76 +848,11 @@ async function submitPresenceWithToken(qrToken) {
 }
 
 /**
- * Dynamic Institutional Hero Section (Synced from Admin Settings / Faculty parity)
+ * Dynamic Institutional Hero Section (Reuses Global Component: institution-hero.js)
  */
-const INSTITUTION_DEFAULTS = {
-  institution_name: 'Government Polytechnic College',
-  campus_name: 'Nainital Campus',
-  institution_logo_url: '/images/collegelogo.jpeg',
-  institution_banner_url: '/images/campus-nainital.jpg'
-};
-
-function applyInstitutionSettings(settings) {
-  if (!settings) return;
-
-  const logoSlot = document.getElementById('hero-logo-slot');
-  const titleEl = document.getElementById('hero-inst-title');
-  const bannerSlot = document.getElementById('hero-banner-slot');
-
-  function resolveBrandingUrl(url, fallback) {
-    if (!url) return fallback;
-    if (typeof window !== 'undefined' && (window.VIDYAOS_IS_NATIVE || window.VIDYAOS_FORCE_NATIVE)) {
-      if (url.startsWith('/uploads')) {
-        return (window.VIDYAOS_CLOUD_BACKEND || 'https://vidyaos-backend.onrender.com') + url;
-      }
-    }
-    return url;
-  }
-
-  const instName = settings.institution_name || settings.name || INSTITUTION_DEFAULTS.institution_name;
-  const logoUrl = resolveBrandingUrl(settings.institution_logo_url || settings.logo_url || INSTITUTION_DEFAULTS.institution_logo_url, '/images/collegelogo.jpeg');
-  const bannerUrl = resolveBrandingUrl(settings.institution_banner_url || settings.banner_url || INSTITUTION_DEFAULTS.institution_banner_url, '/images/campus-nainital.jpg');
-  const campusName = settings.campus_name || settings.institution_tagline || INSTITUTION_DEFAULTS.campus_name;
-
-  if (titleEl) {
-    titleEl.textContent = instName;
-    document.title = `${instName} — Student Dashboard`;
-  }
-
-  if (logoSlot) {
-    logoSlot.innerHTML = `<img src="${logoUrl}" alt="${instName} Logo" onerror="this.onerror=null;this.src='/images/collegelogo.jpeg';">`;
-  }
-
-  if (bannerSlot) {
-    if (bannerUrl) {
-      bannerSlot.innerHTML = `<img src="${bannerUrl}" alt="${instName} Campus" onerror="this.onerror=null;this.style.display='none';this.parentElement.innerText='${campusName}';">`;
-    } else {
-      bannerSlot.textContent = campusName;
-    }
-  }
-}
-
 async function loadInstitutionBranding() {
-  try {
-    const cached = localStorage.getItem('institutionSettings');
-    if (cached) {
-      applyInstitutionSettings(JSON.parse(cached));
-    }
-  } catch (_) { }
-
-  try {
-    const fetchFn = typeof fetchApi === 'function' ? fetchApi : async (url) => {
-      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
-      const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-      return res.json();
-    };
-    const res = await fetchFn('/settings/institution');
-    if (res && res.success && res.data) {
-      localStorage.setItem('institutionSettings', JSON.stringify(res.data));
-      applyInstitutionSettings(res.data);
-    }
-  } catch (_) {
-    // Non-critical: defaults or cached settings already applied
+  if (typeof window.syncInstitutionBranding === 'function') {
+    await window.syncInstitutionBranding();
   }
 }
 

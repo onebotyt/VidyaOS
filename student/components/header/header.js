@@ -556,11 +556,11 @@
       const banner = document.createElement('div');
       banner.id = 'vidya-google-connect-banner';
       banner.setAttribute('role', 'alert');
-      banner.style.cssText = 'background:linear-gradient(90deg, #1e293b, #0f172a); color:#ffffff; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:0.86rem; border-bottom:1px solid #334155; position:sticky; top:64px; z-index:850; box-shadow:0 4px 12px rgba(0,0,0,0.15);';
+      banner.style.cssText = 'background:linear-gradient(90deg, #1e293b, #0f172a); color:#ffffff; padding:5px 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:0.78rem; border-bottom:1px solid #334155; position:sticky; top:64px; z-index:850; box-shadow:0 2px 8px rgba(0,0,0,0.12);';
       banner.innerHTML = `
-        <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:260px;">
-          <div style="width:28px; height:28px; border-radius:50%; background:#ffffff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-            <svg viewBox="0 0 48 48" width="16" height="16">
+        <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:240px;">
+          <div style="width:22px; height:22px; border-radius:50%; background:#ffffff; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg viewBox="0 0 48 48" width="13" height="13">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
               <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
               <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
@@ -568,16 +568,16 @@
             </svg>
           </div>
           <div>
-            <strong style="color:#ffffff;">Connect with Google for 1-Click Login:</strong>
-            <span style="color:#cbd5e1; margin-left:4px;">Log in instantly with a single tap next time — no passwords required.</span>
+            <strong style="color:#ffffff;">1-Click Google Login:</strong>
+            <span style="color:#cbd5e1; margin-left:4px;">Log in instantly with a single tap — no password needed.</span>
           </div>
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <button type="button" onclick="window.location.href='/student/profile/index.html#security'" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#ffffff; border:none; padding:6px 14px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:5px;">
-            <span>Connect Google</span>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button type="button" onclick="window.location.href='/student/profile/index.html#security'" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#ffffff; border:none; padding:4px 10px; border-radius:6px; font-weight:700; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span>Connect</span>
             <span>→</span>
           </button>
-          <button type="button" onclick="dismissGoogleConnectBanner()" style="background:transparent; border:none; color:#94a3b8; font-size:18px; cursor:pointer; padding:2px 8px; line-height:1;" title="Dismiss">&times;</button>
+          <button type="button" onclick="dismissGoogleConnectBanner()" style="background:transparent; border:none; color:#94a3b8; font-size:16px; cursor:pointer; padding:1px 6px; line-height:1;" title="Dismiss">&times;</button>
         </div>
       `;
 
