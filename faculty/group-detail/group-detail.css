@@ -10,9 +10,9 @@
    - css/sheets.css    : Embedded Spreadsheet Studio, Multi-Sheet Controls, Master Evaluation Grid, Excel/PDF Export
    ══════════════════════════════════════════════════════════════ */
 
-@import './css/core.css';
-@import './css/stream.css';
-@import './css/classwork.css';
-@import './css/people.css';
-@import './css/register.css';
-@import './css/sheets.css';
+@import './css/core.css?v=20261123_v1';
+@import './css/stream.css?v=20261011_v3';
+@import './css/classwork.css?v=20261011_v3';
+@import './css/people.css?v=20261011_v3';
+@import './css/register.css?v=20261123_v1';
+@import './css/sheets.css?v=20261011_v3';

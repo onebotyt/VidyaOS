@@ -467,6 +467,15 @@ body {
   box-sizing: border-box;
 }
 
+/* Full-Screen Fluid Layout for Attendance Register Matrix */
+body[data-active-tab="register"] .classroom-body,
+.classroom-body.fluid-layout {
+  max-width: 100% !important;
+  padding: 1rem 1.25rem 2.5rem !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
 /* Universal Drawer */
 .gc-drawer {
   position: fixed;

@@ -409,6 +409,10 @@ function switchTab(tab, subOption) {
   if (desktopTabs) desktopTabs.style.display = '';
   S.tab = tab;
   document.body.setAttribute('data-active-tab', tab);
+  const bodyEl = document.querySelector('.classroom-body');
+  if (bodyEl) {
+    bodyEl.classList.toggle('fluid-layout', tab === 'register');
+  }
   const url = new URL(location);
   url.searchParams.set('tab', tab);
   if (subOption) url.searchParams.set('sheet', subOption);

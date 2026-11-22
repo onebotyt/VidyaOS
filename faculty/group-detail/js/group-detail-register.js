@@ -296,22 +296,19 @@
       const isToday = col.date === todayStr;
       if (isToday) {
         headHtml += `
-          <th data-today="true" style="min-width: 28px; max-width: 38px; padding: 0.15rem 0.1rem;
-              background: linear-gradient(180deg, var(--color-primary-hover) 0%, var(--color-primary) 100%);
-              color: var(--text-white);
-              position: relative;
-              box-shadow: 0 0 0 2px var(--color-primary) inset;"
-              title="${esc(col.display_title)}">
-            <div style="font-size: 0.68rem; font-weight: 900; font-family: var(--font-family-mono);">${esc(col.display_day)}</div>
-            <div style="font-size: 0.52rem; font-weight: 700; opacity: 0.85;">${col.day_name.slice(0,3)}</div>
-            <div style="position:absolute; bottom: 2px; left:50%; transform:translateX(-50%); width: 5px; height: 5px; background: var(--color-primary-light); border-radius: 50%;"></div>
+          <th data-today="true" class="date-col date-col-today" style="min-width: 28px; padding: 0.25rem 0.15rem; background: var(--color-primary); color: var(--text-white); text-align: center; position: relative;" title="${esc(col.display_title)}">
+            <div style="font-size: 0.72rem; font-weight: 900; font-family: var(--font-family-mono); line-height: 1.1;">${esc(col.display_day)}</div>
+            <div style="font-size: 0.52rem; font-weight: 800; opacity: 0.9; text-transform: uppercase;">${col.day_name.slice(0,3)}</div>
+            <div class="today-marker-pill">TODAY</div>
           </th>
         `;
       } else {
+        const isSun = col.day_name === 'Sunday';
+        const fgColor = isSun ? 'var(--status-absent)' : fg;
         headHtml += `
-          <th style="min-width: 28px; max-width: 38px; padding: 0.15rem 0.1rem; background: ${bg}; color: ${fg}; text-align: center;" title="${esc(col.display_title)}">
-            <div style="font-size: 0.68rem; font-weight: 800; font-family: var(--font-family-mono);">${esc(col.display_day)}</div>
-            <div style="font-size: 0.52rem; font-weight: 600; opacity: 0.75;">${col.day_name.slice(0,3)}</div>
+          <th class="date-col ${isNonInst ? 'date-col-holiday' : ''}" style="min-width: 28px; padding: 0.25rem 0.15rem; background: ${bg}; color: ${fgColor}; text-align: center;" title="${esc(col.display_title)}">
+            <div style="font-size: 0.72rem; font-weight: 800; font-family: var(--font-family-mono); line-height: 1.1; color: ${fgColor};">${esc(col.display_day)}</div>
+            <div style="font-size: 0.52rem; font-weight: 600; opacity: 0.8; text-transform: uppercase;">${col.day_name.slice(0,3)}</div>
             ${eventTag}
           </th>
         `;
@@ -344,13 +341,13 @@
       matrixCols.forEach(col => {
         if (nonInstructionalSpans.has(col.date)) {
           if (sIdx === 0) {
-            const labelWords = (col.holiday_label || 'HOLIDAY').split(' ');
-            const formattedLabel = labelWords.map(w => w.split('').join(' ')).join('   ');
+            const cleanLabel = (col.holiday_label || (col.day_name === 'Sunday' ? 'SUNDAY' : 'HOLIDAY')).trim().toUpperCase();
+            const isTodaySpan = col.date === todayStr;
             cellsHtml += `
-              <td rowspan="${totalStudents}" class="vertical-holiday-cell" title="${esc(col.holiday_label || 'Holiday')} (${col.date})">
+              <td rowspan="${totalStudents}" class="vertical-holiday-cell ${isTodaySpan ? 'date-col-today' : ''}" ${isTodaySpan ? 'data-today="true"' : ''} title="${esc(col.holiday_label || (col.day_name === 'Sunday' ? 'Sunday' : 'Holiday'))} (${col.date})">
                 <div class="vertical-holiday-text">
                   <span class="vertical-arrow-cap">↑</span>
-                  <span>${esc(formattedLabel)}</span>
+                  <span class="vertical-holiday-title">${esc(cleanLabel)}</span>
                   <span class="vertical-arrow-cap">↓</span>
                 </div>
               </td>
@@ -374,11 +371,11 @@
         else if (mark === 'ABSENT') { penClass = 'a'; penChar = 'A'; }
 
         if (isTransferred) {
-          cellsHtml += `<td style="color: var(--text-muted); font-size: 0.7rem; text-align: center;${col.date === todayStr ? ' background: var(--color-primary-light);' : ''}">—</td>`;
+          cellsHtml += `<td class="date-cell" style="color: var(--text-muted); font-size: 0.7rem; text-align: center;${col.date === todayStr ? ' background: var(--color-primary-light);' : ''}">—</td>`;
         } else {
           const isTodayCell = col.date === todayStr;
           cellsHtml += `
-            <td style="padding: 2px; text-align: center;${isTodayCell ? ' background: var(--color-primary-light); border-left: 2px solid var(--color-primary) !important; border-right: 2px solid var(--color-primary) !important;' : ''}">
+            <td class="date-cell ${isTodayCell ? 'date-col-today' : ''}" ${isTodayCell ? 'data-today="true"' : ''} style="padding: 2px; text-align: center;">
               <span class="pen-mark ${penClass}" 
                     id="pen-mark-${st.student_id}-${col.col_key}"
                     onclick="toggleDigitalPen('${col.date}', ${st.student_id}, this, ${col.period_number}, ${col.session_id || 'null'})"
@@ -450,9 +447,12 @@
       let totalMonthA = 0;
 
       matrixCols.forEach(col => {
+        const isTodayCol = col.date === todayStr;
+        const todayStyle = isTodayCol ? ' background: var(--color-primary-light); border-left: 2px solid var(--color-primary); border-right: 2px solid var(--color-primary);' : '';
+
         if (nonInstructionalSpans.has(col.date)) {
-          footP += `<td class="vertical-holiday-cell" style="font-size: 0.7rem; color: var(--col-holiday-color); text-align:center;">—</td>`;
-          footA += `<td class="vertical-holiday-cell" style="font-size: 0.7rem; color: var(--col-holiday-color); text-align:center;">—</td>`;
+          footP += `<td class="vertical-holiday-cell" style="font-size: 0.7rem; color: var(--col-holiday-color); text-align:center;${todayStyle}">—</td>`;
+          footA += `<td class="vertical-holiday-cell" style="font-size: 0.7rem; color: var(--col-holiday-color); text-align:center;${todayStyle}">—</td>`;
           return;
         }
 
@@ -460,8 +460,8 @@
                       (col.col_key && grid.daily_totals?.[col.col_key]) ||
                       grid.daily_totals?.[col.date];
         if (daily) {
-          footP += `<td style="font-weight: 900; color: var(--status-present); font-size: 0.72rem; text-align:center;">P: ${daily.present}</td>`;
-          footA += `<td style="font-weight: 900; color: var(--status-absent); font-size: 0.72rem; text-align:center;">A: ${daily.absent}</td>`;
+          footP += `<td style="font-weight: 900; color: var(--status-present); font-size: 0.72rem; text-align:center;${todayStyle}">P: ${daily.present}</td>`;
+          footA += `<td style="font-weight: 900; color: var(--status-absent); font-size: 0.72rem; text-align:center;${todayStyle}">A: ${daily.absent}</td>`;
           totalMonthP += (daily.present || 0);
           totalMonthA += (daily.absent || 0);
         } else {
@@ -473,8 +473,8 @@
             if (m === 'PRESENT') colP++;
             else if (m === 'ABSENT') colA++;
           });
-          footP += `<td style="font-weight: 800; color: var(--status-present); font-size: 0.72rem; text-align:center;">${colP || '—'}</td>`;
-          footA += `<td style="font-weight: 800; color: var(--status-absent); font-size: 0.72rem; text-align:center;">${colA || '—'}</td>`;
+          footP += `<td style="font-weight: 800; color: var(--status-present); font-size: 0.72rem; text-align:center;${todayStyle}">${colP || '—'}</td>`;
+          footA += `<td style="font-weight: 800; color: var(--status-absent); font-size: 0.72rem; text-align:center;${todayStyle}">${colA || '—'}</td>`;
           totalMonthP += colP;
           totalMonthA += colA;
         }
@@ -496,11 +496,11 @@
     // Update bulk bar state
     updateMatrixBulkBar();
 
-    // Smooth scroll to today's column
+    // Smooth scroll to today's column only if container actually overflows
     setTimeout(() => {
       const wrapper = ById('class-matrix-scroll-wrapper');
       const todayTh = thead?.querySelector('th[data-today="true"]');
-      if (wrapper && todayTh) {
+      if (wrapper && todayTh && wrapper.scrollWidth > wrapper.clientWidth + 5) {
         const stickyRightWidth = 116 + 10;
         const thLeft = todayTh.offsetLeft;
         const thWidth = todayTh.offsetWidth;
