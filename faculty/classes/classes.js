@@ -235,7 +235,7 @@
                 <path d="M17.8 16.7A6 6 0 0 0 18 12a6 6 0 0 0-6-6"></path>
                 <path d="M15.2 13.7A2 2 0 0 0 14 12a2 2 0 0 0-2-2"></path>
               </svg>
-              <span>((•)) Take Attendance</span>
+              <span>Take Attendance</span>
             </a>
             <a href="/faculty/registers/index.html?groupId=${g.id}" class="btn-card-register">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -401,7 +401,7 @@
           return `<option value="${s.id}" ${isSelected ? 'selected' : ''}>${escapeHtml(s.name || s.label)}</option>`;
         }).join('');
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // ── 8. Create Class Modal ──
