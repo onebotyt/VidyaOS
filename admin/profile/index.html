@@ -11,8 +11,8 @@
   <link rel="stylesheet" href="/admin/components/core/reset.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/core/variables.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261114_smooth">
-  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/global-components/sidebar/sidebar.css?v=20261122_3">
+  <link rel="stylesheet" href="/global-components/header/header.css?v=20261122_3">
   <script>
     /* Synchronously apply saved theme and collapsed rail before DOM render */
     (function () {
@@ -27,7 +27,7 @@
       } catch (_) { }
     })();
   </script>
-  <link rel="stylesheet" href="/admin/profile/profile.css?v=20261029">
+  <link rel="stylesheet" href="/admin/profile/profile.css?v=20261122">
 </head>
 <body>
   <div class="admin-app-layout" id="admin-app-layout">
@@ -53,14 +53,19 @@
         <!-- 1. Top Header Banner -->
         <div class="profile-top-banner">
           <div class="profile-top-banner-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </div>
           <div class="profile-top-banner-text">
             <h1 class="profile-top-title">Administrator Profile &amp; Security</h1>
-            <p class="profile-top-subtitle">Manage your profile information and update your password to keep your institutional account secure.</p>
+            <p class="profile-top-subtitle">Manage your profile credentials, 1-Click login, and system administrators.</p>
           </div>
+          <a href="/admin/app-settings/index.html" class="btn btn-secondary btn-sm profile-back-btn" title="Back to Settings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Settings</span>
+          </a>
         </div>
 
         <!-- 2. Profile Hero Card (Accurate to Reference Image) -->
@@ -367,10 +372,10 @@
         </div>
 
         <!-- 6. Institutional Administrators & System Authority Section -->
-        <section class="profile-card" style="margin-top: 1.5rem;" aria-label="Institutional Administrators">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <section class="profile-card" aria-label="Institutional Administrators">
+          <div class="admin-roster-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem;">
             <div>
-              <h3 class="profile-card-title" style="margin-bottom: 0.25rem;">
+              <h3 class="profile-card-title" style="margin-bottom: 0.25rem; border: none; padding-bottom: 0;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>
@@ -379,34 +384,34 @@
                 </svg>
                 Institutional Administrators &amp; Authority
               </h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">
-                Manage master administrator accounts. You can provision permanent database administrators, and then safely retire or remove temporary environment credentials.
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
+                Manage database administrators and authority delegation.
               </p>
             </div>
-            <button type="button" class="btn btn-primary" onclick="openCreateAdminModal()" style="font-weight: 700; font-size: 0.82rem; padding: 0.5rem 0.9rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <button type="button" class="btn btn-primary" onclick="openCreateAdminModal()" style="font-weight: 700; font-size: 0.8rem; padding: 0.45rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              <span>+ New Administrator</span>
+              <span>New Administrator</span>
             </button>
           </div>
 
           <!-- Administrators Table -->
-          <div style="overflow-x: auto;">
-            <table class="table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <div class="admin-table-wrap">
+            <table class="table admin-table" style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
               <thead>
-                <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">
-                  <th style="padding: 0.65rem 0.75rem;">Administrator</th>
-                  <th style="padding: 0.65rem 0.75rem;">Institutional Email</th>
-                  <th style="padding: 0.65rem 0.75rem;">Source / Authority</th>
-                  <th style="padding: 0.65rem 0.75rem;">Status</th>
-                  <th style="padding: 0.65rem 0.75rem; text-align: right;">Actions</th>
+                <tr style="border-bottom: 1px solid var(--border-color); text-align: left; color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase;">
+                  <th style="padding: 0.6rem 0.75rem;">Administrator</th>
+                  <th style="padding: 0.6rem 0.75rem;">Institutional Email</th>
+                  <th style="padding: 0.6rem 0.75rem;">Source / Authority</th>
+                  <th style="padding: 0.6rem 0.75rem;">Status</th>
+                  <th style="padding: 0.6rem 0.75rem; text-align: right;">Actions</th>
                 </tr>
               </thead>
               <tbody id="admin-roster-tbody">
                 <tr>
-                  <td colspan="5" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">
+                  <td colspan="5" style="text-align: center; padding: 1.25rem; color: var(--text-muted);">
                     Loading administrators...
                   </td>
                 </tr>
@@ -485,12 +490,10 @@
     </div> <!-- /.admin-main-wrap -->
   </div> <!-- /#admin-app-layout -->
 
-  <script src="/admin/components/core/api.js?v=20261114"></script>
-  <script src="/admin/components/core/auth.js?v=20261114"></script>
-  <script src="/admin/components/icons.js?v=20261029"></script>
-  <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
-  <script src="/admin/components/header/header.js?v=20261029"></script>
-  <script src="/admin/components/admin-ui.js?v=20261029"></script>
-  <script src="/admin/profile/profile.js?v=20261029"></script>
+  <script src="/student/components/core/api.js"></script>
+  <script src="/student/components/core/auth.js"></script>
+  <script src="/global-components/sidebar/sidebar.js?v=20261122_3"></script>
+  <script src="/global-components/header/header.js?v=20261122_3"></script>
+  <script src="/admin/profile/profile.js?v=20261122"></script>
 </body>
 </html>

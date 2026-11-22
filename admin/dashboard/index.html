@@ -16,9 +16,10 @@
   <link rel="stylesheet" href="/admin/components/core/reset.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/core/variables.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261114_smooth">
-  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
-  <link rel="stylesheet" href="/admin/dashboard/dashboard.css?v=20261114e">
+  <link rel="stylesheet" href="/global-components/sidebar/sidebar.css?v=20261122_3">
+  <link rel="stylesheet" href="/global-components/header/header.css?v=20261122_3">
+  <link rel="stylesheet" href="/global-components/institution-hero/institution-hero.css?v=20261122">
+  <link rel="stylesheet" href="/admin/dashboard/dashboard.css?v=20261122">
   <script>
     /* Synchronously apply saved theme and collapsed rail before DOM render */
     (function () {
@@ -141,7 +142,7 @@
         <section class="dash-quick-section" aria-label="Quick Access Portals">
           <div class="dash-section-header">
             <div class="dash-section-title-wrap">
-              <svg class="dash-bolt-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6"
+              <svg class="dash-bolt-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
               </svg>
@@ -179,20 +180,7 @@
               <span class="dash-tile-name">Faculty<br>Management</span>
             </a>
 
-            <!-- 3. Analytics & Reports -->
-            <a href="/admin/reports/index.html" class="dash-quick-tile" title="Institutional Analytics &amp; Reports">
-              <div class="dash-tile-icon-wrap icon-green">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="20" x2="18" y2="10"></line>
-                  <line x1="12" y1="20" x2="12" y2="4"></line>
-                  <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-              </div>
-              <span class="dash-tile-name">Analytics &amp;<br>Reports</span>
-            </a>
-
-            <!-- 4. Audit Logs -->
+            <!-- 3. Audit Logs -->
             <a href="/admin/audit-logs/index.html" class="dash-quick-tile"
               title="System Audit Trail &amp; Activity Logs">
               <div class="dash-tile-icon-wrap icon-amber">
@@ -245,10 +233,11 @@
   <script src="/admin/components/core/api.js?v=20261114"></script>
   <script src="/admin/components/core/auth.js?v=20261114"></script>
   <script src="/admin/components/icons.js?v=20261029"></script>
-  <script src="/admin/components/sidebar/sidebar.js?v=20261102"></script>
-  <script src="/admin/components/header/header.js?v=20261029"></script>
+  <script src="/global-components/sidebar/sidebar.js?v=20261122_3"></script>
+  <script src="/global-components/header/header.js?v=20261122_3"></script>
+  <script src="/global-components/institution-hero/institution-hero.js?v=20261122"></script>
   <script src="/admin/components/admin-ui.js?v=20261102"></script>
-  <script src="/admin/dashboard/dashboard.js?v=20261114a"></script>
+  <script src="/admin/dashboard/dashboard.js?v=20261122"></script>
 </body>
 
 </html>

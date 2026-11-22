@@ -38,12 +38,47 @@
   box-sizing: border-box;
 }
 
+.excel-corner-th {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 30 !important;
+  width: 44px;
+  min-width: 44px;
+  background: var(--table-th-bg);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.excel-col-th {
+  position: relative;
+  cursor: pointer;
+}
+
+.excel-col-th.col-active-header {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  font-weight: 800;
+}
+
+.excel-col-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 25;
+}
+
 .excel-row-th {
   background: var(--table-th-bg) !important;
   border-right: 1px solid var(--border-color) !important;
   border-bottom: 1px solid var(--border-color) !important;
   width: 42px;
   min-width: 42px;
+  height: 24px;
   text-align: center;
   font-size: 0.7rem;
   color: var(--text-muted);
@@ -52,6 +87,28 @@
   position: sticky;
   left: 0;
   z-index: 15;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.excel-row-th.row-active-header {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  font-weight: 800;
+}
+
+.excel-row-resizer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  cursor: row-resize;
+  z-index: 15;
+}
+
+.excel-grid-table tbody tr {
+  height: 24px;
 }
 
 /* Compact Data Cells - Crisp, no unnecessary padding */
@@ -67,6 +124,21 @@
   background: var(--bg-card);
   color: var(--text-main);
   line-height: 1.25;
+  cursor: cell;
+}
+
+.excel-cell.cell-sticky-col {
+  position: sticky;
+  z-index: 5;
+  background: var(--bg-card);
+}
+
+.excel-cell.cell-sticky-col-roll {
+  left: 44px;
+}
+
+.excel-cell.cell-sticky-col-name {
+  left: 104px;
 }
 
 /* Subtle Alternating Row Zebra Striping */
@@ -132,6 +204,14 @@
 
 .excel-cell.in-range-selection {
   background-color: var(--badge-primary-bg, var(--chip-faculty-bg)) !important;
+}
+
+.excel-selection-box {
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid var(--status-present, var(--color-primary));
+  background: var(--status-present-bg, hsla(142, 70%, 45%, 0.12));
+  z-index: 24;
 }
 
 /* Formula Bar Integration */

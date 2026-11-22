@@ -39,7 +39,6 @@ function toggleTheme() {
 /* ── Global State ── */
 const S = {
   currentRole: 'student',
-  facultyType: 'FACULTY',
   departments: [],
   isCohortRegistrationOpen: true,
   googleRegistrationData: null
@@ -142,23 +141,7 @@ function populateStudentDepartments() {
   });
 }
 
-function populateFacultyDepartments() {
-  const sel = document.getElementById('fac-dept');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">— Select Department —</option>';
-  if (S.facultyType !== 'HOD') {
-    const opt = document.createElement('option');
-    opt.value = 'COMMON';
-    opt.textContent = 'Common Faculty (Multi-Department)';
-    sel.appendChild(opt);
-  }
-  S.departments.forEach(d => {
-    const opt = document.createElement('option');
-    opt.value = d.id;
-    opt.textContent = `${d.name} (${d.code || 'DEPT'})`;
-    sel.appendChild(opt);
-  });
-}
+
 
 /* ── Student Dept & Semester Change ── */
 function handleStudentDeptChange() {
@@ -219,14 +202,7 @@ function updateStudentCallout(target, desc, isOpen = false, isClosed = false) {
   banner.className = 'callout' + (isOpen ? ' open' : isClosed ? ' closed' : '');
 }
 
-function handleFacultyDeptChange() {
-  const val = document.getElementById('fac-dept')?.value;
-  const descEl = document.getElementById('fac-routing-desc');
-  if (!descEl) return;
-  if (val === 'COMMON') descEl.textContent = 'Common faculty registration will be reviewed by Institutional Administration.';
-  else if (S.facultyType === 'HOD') descEl.textContent = 'Head of Department registration will be authorized by Institutional Administration.';
-  else descEl.textContent = 'Department Faculty registration will be reviewed by the Head of Department.';
-}
+
 
 /* ── Google 1-Click Auto-Fill ── */
 async function initiateGoogleSignUp() {

@@ -12,9 +12,9 @@
   <link rel="stylesheet" href="/admin/components/core/reset.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/core/variables.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261114_smooth">
-  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
-  <link rel="stylesheet" href="/admin/bug-reports/admin-bug-reports.css?v=20261119">
+  <link rel="stylesheet" href="/global-components/sidebar/sidebar.css?v=20261122_3">
+  <link rel="stylesheet" href="/global-components/header/header.css?v=20261122_3">
+  <link rel="stylesheet" href="/admin/bug-reports/admin-bug-reports.css?v=20261122">
   <script>
     (function () {
       try {
@@ -49,7 +49,7 @@
             <p>Review, track, and resolve system glitches and website bugs reported by Students and Faculty.</p>
           </div>
           <div>
-            <button type="button" class="btn-reset-filters" onclick="loadAllReports(); loadStatistics();">
+            <button type="button" id="btn-refresh-reports" class="btn-reset-filters btn-refresh-reports" onclick="loadAllReports(); loadStatistics();">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:4px;">
                 <polyline points="23 4 23 10 17 10"></polyline>
                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
@@ -104,6 +104,16 @@
             <option value="FACULTY">Faculty</option>
           </select>
 
+          <!-- Status Filter -->
+          <select id="filter-status" class="filter-select" onchange="applyFilters()">
+            <option value="">All Statuses</option>
+            <option value="New">New</option>
+            <option value="Under Review">Under Review</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+
           <!-- Category Filter -->
           <select id="filter-category" class="filter-select" onchange="applyFilters()">
             <option value="">All Categories</option>
@@ -119,16 +129,6 @@
             <option value="Button / Functionality Not Working">Button / Functionality Not Working</option>
             <option value="UI / Design Problem">UI / Design Problem</option>
             <option value="Other Technical Issue">Other Technical Issue</option>
-          </select>
-
-          <!-- Status Filter -->
-          <select id="filter-status" class="filter-select" onchange="applyFilters()">
-            <option value="">All Statuses</option>
-            <option value="New">New</option>
-            <option value="Under Review">Under Review</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-            <option value="Rejected">Rejected</option>
           </select>
 
           <!-- Date Filter -->
@@ -283,9 +283,9 @@
   <!-- Core Scripts -->
   <script src="/admin/components/core/api.js"></script>
   <script src="/admin/components/core/auth.js"></script>
-  <script src="/admin/components/sidebar/sidebar.js?v=20261114_smooth"></script>
-  <script src="/admin/components/header/header.js?v=20261029"></script>
-  <script src="/admin/bug-reports/admin-bug-reports.js?v=20261119"></script>
+  <script src="/global-components/sidebar/sidebar.js?v=20261122_3"></script>
+  <script src="/global-components/header/header.js?v=20261122_3"></script>
+  <script src="/admin/bug-reports/admin-bug-reports.js?v=20261122"></script>
 </body>
 
 </html>

@@ -140,9 +140,27 @@
   }
 
   /**
-   * Dynamic Confirm Dialog (Eliminates redundant delete confirmation markup)
+   * Dynamic Confirm Dialog (Powered by GlobalConfirmModal)
    */
+  function ensureGlobalConfirm() {
+    if (typeof window.GlobalConfirmModal !== 'undefined') return;
+    if (typeof document !== 'undefined' && !document.getElementById('global-confirm-modal-js')) {
+      const script = document.createElement('script');
+      script.id = 'global-confirm-modal-js';
+      script.src = '/global-components/confirm-modal/confirm-modal.js?v=20261122';
+      document.head.appendChild(script);
+    }
+  }
+
   function confirmAction(options = {}) {
+    if (typeof window.showStyledConfirm === 'function') {
+      return window.showStyledConfirm(options);
+    }
+    if (typeof window.GlobalConfirmModal !== 'undefined' && typeof window.GlobalConfirmModal.confirm === 'function') {
+      return window.GlobalConfirmModal.confirm(options);
+    }
+
+    // Immediate fallback while global component script initializes
     const {
       title = 'Confirm Action',
       message = 'Are you sure you want to proceed?',
@@ -195,6 +213,11 @@
     cancelBtn.onclick = cleanup;
 
     openModal('faculty-dynamic-confirm-modal');
+  }
+
+  // Preload global confirm modal
+  if (typeof document !== 'undefined') {
+    ensureGlobalConfirm();
   }
 
   if (document.readyState === 'loading') {

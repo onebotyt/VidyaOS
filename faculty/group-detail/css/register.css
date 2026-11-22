@@ -189,13 +189,11 @@ body:not([data-active-tab="stream"]) #mobile-stream-actions,
   padding: 0.22rem 0.5rem !important;
 }
 
-/* Sticky right clean summary columns (Total Attended, Total Absent, %) */
+/* Sticky right clean summary columns (Total Attended, Total Absent) */
 .register-table th.sticky-r-att-total,
 .register-table td.sticky-r-att-total,
 .register-table th.sticky-r-abs-total,
-.register-table td.sticky-r-abs-total,
-.register-table th.sticky-r-pct,
-.register-table td.sticky-r-pct {
+.register-table td.sticky-r-abs-total {
   position: sticky !important;
   z-index: 5 !important;
   text-align: center;
@@ -203,10 +201,10 @@ body:not([data-active-tab="stream"]) #mobile-stream-actions,
 
 .register-table th.sticky-r-att-total,
 .register-table td.sticky-r-att-total {
-  right: 98px !important;
-  width: 58px !important;
-  min-width: 54px !important;
-  max-width: 64px !important;
+  right: 56px !important;
+  width: 60px !important;
+  min-width: 56px !important;
+  max-width: 66px !important;
   background: var(--col-att-group-bg) !important;
   color: var(--col-att-group-color, var(--color-primary)) !important;
   border-left: 2px solid var(--border-color) !important;
@@ -216,24 +214,13 @@ body:not([data-active-tab="stream"]) #mobile-stream-actions,
 
 .register-table th.sticky-r-abs-total,
 .register-table td.sticky-r-abs-total {
-  right: 44px !important;
-  width: 54px !important;
-  min-width: 50px !important;
-  max-width: 58px !important;
+  right: 0 !important;
+  width: 56px !important;
+  min-width: 52px !important;
+  max-width: 60px !important;
   background: var(--col-abs-group-bg) !important;
   color: var(--col-abs-group-color, var(--status-absent)) !important;
   border-right: 1px solid var(--border-color) !important;
-  font-weight: 800 !important;
-}
-
-.register-table th.sticky-r-pct,
-.register-table td.sticky-r-pct {
-  right: 0 !important;
-  width: 44px !important;
-  min-width: 44px !important;
-  max-width: 48px !important;
-  background: var(--table-sticky-th-bg) !important;
-  color: var(--table-th-color) !important;
   font-weight: 800 !important;
 }
 

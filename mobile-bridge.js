@@ -18,14 +18,12 @@
   const GITHUB_VERSION_URL = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/app-version.json`;
   const LATEST_APK_URL = `https://github.com/${GITHUB_REPO}/releases/latest/download/VidyaOS.apk`;
 
-  // Detect whether running in Capacitor / Mobile native shell
+  // Detect whether running in Capacitor / Mobile native shell (Strictly false in web browser)
   const isCapacitor = typeof window !== 'undefined' && (
     window.VIDYAOS_FORCE_NATIVE === true ||
-    window.VIDYAOS_IS_NATIVE === true ||
-    Boolean(window.Capacitor?.isNativePlatform?.()) ||
-    Boolean(window.Capacitor) ||
+    (typeof window.Capacitor !== 'undefined' && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
     window.location.protocol === 'capacitor:' ||
-    window.location.protocol === 'file:'
+    (window.location.protocol === 'file:' && /android_asset/i.test(window.location.pathname))
   );
 
   window.VIDYAOS_IS_NATIVE = isCapacitor;
@@ -142,7 +140,11 @@
   }
 
   // 4. In-App Auto-Update Checker (GitHub Releases API + Fallback)
+  // Strictly for Native Android / Mobile App (Capacitor shell) — NEVER show on website/browser
   async function checkForAppUpdates(force = false) {
+    if (!isCapacitor && !force) {
+      return; // Do not display native APK update banners in standard web browser
+    }
     try {
       const currentVersion = (window.NativeAppUpdater && typeof window.NativeAppUpdater.getAppVersionName === 'function')
         ? window.NativeAppUpdater.getAppVersionName()
@@ -212,6 +214,7 @@
   }
 
   function showUpdateNotification(version, apkUrl, releaseNotes) {
+    if (!isCapacitor) return; // Do not display native APK update banner on website
     if (document.getElementById('vidyaos-update-banner')) return;
 
     const banner = document.createElement('div');
@@ -336,10 +339,12 @@
       LATEST_APK_URL
     };
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => setTimeout(checkForAppUpdates, 2000));
-    } else {
-      setTimeout(checkForAppUpdates, 2000);
+    if (isCapacitor) {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(checkForAppUpdates, 2000));
+      } else {
+        setTimeout(checkForAppUpdates, 2000);
+      }
     }
   }
 

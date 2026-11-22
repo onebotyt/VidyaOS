@@ -246,8 +246,31 @@ guardRoute({ roles: ['SYSTEM_ADMIN'] });
       document.getElementById('modal-event-title').innerText = `Audit Event: ${r.event_type || 'Unknown'}`;
       document.getElementById('modal-meta-line').innerText = `${r.created_at} • Actor: ${r.actor_username || r.actor_id || 'System'} (${r.actor_role || 'ADMIN'}) • Target: ${r.target_type || '--'} #${r.target_id || ''}`;
       document.getElementById('modal-json-content').innerText = r.details ? JSON.stringify(r.details, null, 2) : 'No payload details.';
-      document.getElementById('details-modal').classList.add('open');
+      const m = document.getElementById('details-modal');
+      if (m) {
+        m.removeAttribute('inert');
+        m.classList.add('open');
+      }
     }
+
+    function closeModal() {
+      const m = document.getElementById('details-modal');
+      if (!m) return;
+      if (document.activeElement && m.contains(document.activeElement)) {
+        if (typeof document.activeElement.blur === 'function') document.activeElement.blur();
+        if (document.body && typeof document.body.focus === 'function') document.body.focus();
+      }
+      m.setAttribute('inert', '');
+      m.classList.remove('open');
+    }
+
+    window.closeModal = closeModal;
+    window.openDetailsModal = openDetailsModal;
+    window.changePage = changePage;
+    window.applyFilters = applyFilters;
+    window.resetFilters = resetFilters;
+    window.exportLogsJson = exportLogsJson;
+    window.loadAuditLogs = loadAuditLogs;
 
     
 

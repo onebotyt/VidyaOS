@@ -271,8 +271,8 @@ if (typeof guardRoute === 'function') {
   }
 
   function renderAdminProfile(user) {
-    const displayName = user.email || user.username || user.name || 'admin@gmail.com';
-    const email = user.email || 'admin@gmail.com';
+    const displayName = user.full_name || user.name || user.username || 'System Administrator';
+    const email = user.email || 'admin@college.edu';
     const username = user.username || 'admin';
     const initial = (displayName.charAt(0) || 'A').toUpperCase();
     currentUserInitial = initial;
@@ -540,6 +540,7 @@ if (typeof guardRoute === 'function') {
   window.openCreateAdminModal = function () {
     const modal = document.getElementById('create-admin-modal');
     if (modal) {
+      modal.removeAttribute('inert');
       modal.style.display = 'flex';
       const input = document.getElementById('new-admin-name');
       if (input) setTimeout(() => input.focus(), 50);
@@ -549,6 +550,11 @@ if (typeof guardRoute === 'function') {
   window.closeCreateAdminModal = function () {
     const modal = document.getElementById('create-admin-modal');
     if (modal) {
+      if (document.activeElement && modal.contains(document.activeElement)) {
+        if (typeof document.activeElement.blur === 'function') document.activeElement.blur();
+        if (document.body && typeof document.body.focus === 'function') document.body.focus();
+      }
+      modal.setAttribute('inert', '');
       modal.style.display = 'none';
       const form = document.getElementById('create-admin-form');
       if (form) form.reset();
@@ -608,6 +614,7 @@ if (typeof guardRoute === 'function') {
       desc.textContent = `Are you sure you want to delete administrator "${adminEmail}"? All administrative privileges will be revoked immediately.`;
     }
     if (modal) {
+      modal.removeAttribute('inert');
       modal.style.display = 'flex';
     }
   };
@@ -616,6 +623,11 @@ if (typeof guardRoute === 'function') {
     pendingDeleteAdminId = null;
     const modal = document.getElementById('delete-admin-modal');
     if (modal) {
+      if (document.activeElement && modal.contains(document.activeElement)) {
+        if (typeof document.activeElement.blur === 'function') document.activeElement.blur();
+        if (document.body && typeof document.body.focus === 'function') document.body.focus();
+      }
+      modal.setAttribute('inert', '');
       modal.style.display = 'none';
     }
   };

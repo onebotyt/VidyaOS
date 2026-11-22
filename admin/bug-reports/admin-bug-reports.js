@@ -135,19 +135,19 @@
 
         return `
           <tr>
-            <td><span class="report-id-pill">${escapeHtml(r.report_id)}</span></td>
-            <td>
+            <td data-label="Report ID"><span class="report-id-pill">${escapeHtml(r.report_id)}</span></td>
+            <td data-label="User">
               <div style="font-weight:700; color:var(--text-main);">${escapeHtml(r.user_name)}</div>
               <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(r.user_email || 'No email')}</div>
             </td>
-            <td>${rolePill}</td>
-            <td style="font-weight:600; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            <td data-label="Role">${rolePill}</td>
+            <td data-label="Issue" style="font-weight:600; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
               ${escapeHtml(r.issue_title)}
             </td>
-            <td><span style="font-size:0.8rem; color:var(--text-muted);">${escapeHtml(r.issue_category)}</span></td>
-            <td><span style="font-size:0.8rem; color:var(--text-muted);">${formatDate(r.created_at)}</span></td>
-            <td>${getStatusBadge(r.status)}</td>
-            <td style="text-align:right;">
+            <td data-label="Category"><span style="font-size:0.8rem; color:var(--text-muted);">${escapeHtml(r.issue_category)}</span></td>
+            <td data-label="Submitted"><span style="font-size:0.8rem; color:var(--text-muted);">${formatDate(r.created_at)}</span></td>
+            <td data-label="Status">${getStatusBadge(r.status)}</td>
+            <td data-label="Actions" style="text-align:right;">
               <button type="button" class="btn-action-manage" onclick="openManageModal('${r.report_id}')">Review & Manage</button>
             </td>
           </tr>
@@ -226,7 +226,11 @@
     document.getElementById('action-rejection-reason').value = report.rejection_reason || '';
 
     handleStatusSelectChange();
-    document.getElementById('modal-manage-report').classList.add('open');
+    const modalEl = document.getElementById('modal-manage-report');
+    if (modalEl) {
+      modalEl.removeAttribute('inert');
+      modalEl.classList.add('open');
+    }
   }
 
   function handleStatusSelectChange() {
@@ -301,7 +305,15 @@
       vidPlayer.pause();
       vidPlayer.src = '';
     }
-    document.getElementById('modal-manage-report')?.classList.remove('open');
+    const modalEl = document.getElementById('modal-manage-report');
+    if (modalEl) {
+      if (document.activeElement && modalEl.contains(document.activeElement)) {
+        if (typeof document.activeElement.blur === 'function') document.activeElement.blur();
+        if (document.body && typeof document.body.focus === 'function') document.body.focus();
+      }
+      modalEl.setAttribute('inert', '');
+      modalEl.classList.remove('open');
+    }
     _activeReport = null;
   }
 

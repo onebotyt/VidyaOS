@@ -97,11 +97,23 @@
   }
 
   function renderRegisterScopeSwitcher() {
-    const regs = classRegState.groupRegisters || [];
+    const rawRegs = classRegState.groupRegisters || [];
     const activeRegId = classRegState.registerId;
 
     const wrap = ById('class-reg-scope-switcher-wrap');
     const container = ById('class-reg-scope-pill-group');
+
+    // Deduplicate registers by scope so duplicate Theory or duplicate Practical registers never render duplicate tabs
+    const seenScopes = new Set();
+    const regs = [];
+    rawRegs.forEach(r => {
+      const isPract = (r.session_type_scope || '').toUpperCase().includes('PRACT');
+      const scopeKey = isPract ? 'PRACTICAL' : 'THEORY';
+      if (!seenScopes.has(scopeKey)) {
+        seenScopes.add(scopeKey);
+        regs.push(r);
+      }
+    });
 
     if (regs.length <= 1) {
       if (wrap) wrap.style.display = 'none';
@@ -260,14 +272,11 @@
         <th colspan="${matrixCols.length}" style="background: var(--table-th-bg); color: var(--table-th-color); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.25rem; text-align: center;">
           DATES OF LECTURE — ${monthTitle}
         </th>
-        <th class="sticky-r-att-total" rowspan="2" style="background: var(--col-att-group-bg); color: var(--col-att-group-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em; padding: 0.2rem 0.25rem; width: 58px; text-align: center;" title="Total Attended Classes">
+        <th class="sticky-r-att-total" rowspan="2" style="background: var(--col-att-group-bg); color: var(--col-att-group-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em; padding: 0.2rem 0.25rem; width: 60px; text-align: center;" title="Total Attended Classes">
           TOTAL<br>ATTENDED
         </th>
-        <th class="sticky-r-abs-total" rowspan="2" style="background: var(--col-abs-group-bg); color: var(--col-abs-group-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em; padding: 0.2rem 0.25rem; width: 54px; text-align: center;" title="Total Absent Classes">
+        <th class="sticky-r-abs-total" rowspan="2" style="background: var(--col-abs-group-bg); color: var(--col-abs-group-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em; padding: 0.2rem 0.25rem; width: 56px; text-align: center;" title="Total Absent Classes">
           TOTAL<br>ABSENT
-        </th>
-        <th class="sticky-r-pct" rowspan="2" style="background: var(--table-sticky-th-bg); color: var(--table-th-color); font-size: 0.7rem; font-weight: 800; padding: 0.2rem; width: 44px; text-align: center;">
-          %
         </th>
       </tr>
       <tr>
@@ -381,10 +390,7 @@
         }
       });
 
-      // Total Attended, Total Absent, % (Clean columns, Remarks removed)
-      const isDefaulter = st.is_defaulter;
-      const pctColor = isDefaulter ? 'var(--status-absent)' : 'var(--status-present)';
-      const pctBg = isDefaulter ? 'var(--status-absent-bg)' : 'var(--status-present-bg)';
+      // Total Attended, Total Absent (Percentage removed per requirement)
       const summaryHtml = `
         <td class="sticky-r-att-total" style="font-weight: 800; color: var(--col-att-tt-color); background: var(--col-att-tt-bg); text-align: center; font-size: 0.8rem;">
           ${st.total_attended != null ? st.total_attended : '0'}
@@ -392,22 +398,15 @@
         <td class="sticky-r-abs-total" style="font-weight: 800; color: var(--col-abs-tt-color); background: var(--col-abs-tt-bg); text-align: center; font-size: 0.8rem;">
           ${st.total_absent != null ? st.total_absent : '0'}
         </td>
-        <td class="sticky-r-pct" style="font-weight: 900; color: ${pctColor}; background: ${pctBg}; letter-spacing: -0.02em; text-align: center; font-size: 0.78rem;">
-          ${st.percentage != null ? st.percentage : '0'}%
-        </td>
       `;
 
       const rollBadge = isTransferred ? `<span class="badge-transferred" title="Transferred Student">T</span>` : '';
       const cleanRoll = String(st.class_roll_no != null && String(st.class_roll_no) !== 'null' ? st.class_roll_no : (st.roll_number ? st.roll_number : (sIdx + 1))).replace(/^#/, '');
-      const idSubtitle = `${st.registration_no ? `<span style="font-weight: 600; color: var(--text-main);">${esc(st.registration_no)}</span> • ` : ''}${esc(st.official_enrollment_no || '—')}`;
       const nameContent = isTransferred ? `
         <div style="text-decoration: line-through; color: var(--status-absent); font-weight: 700; font-size: 0.74rem; line-height: 1.2; white-space: nowrap;">${esc(st.full_name)}</div>
         <div style="font-size: 0.58rem; color: var(--status-absent); border-top: 1px solid var(--border-color); margin-top: 2px; padding-top: 2px; white-space: nowrap;">TRANSFERRED</div>
       ` : `
         <div style="font-weight: 700; color: var(--text-main); font-size: 0.74rem; line-height: 1.2; white-space: nowrap;">${esc(st.full_name)}</div>
-        <div style="font-size: 0.6rem; color: var(--text-muted); font-family: var(--font-family-mono);
-                    border-top: 1px solid var(--border-color); margin-top: 2px; padding-top: 2px;
-                    letter-spacing: 0.01em; white-space: nowrap;" title="UBTER Reg: ${esc(st.registration_no || '—')} | UBTER Roll: ${esc(st.ubter_roll_no || st.official_enrollment_no || '—')}">${idSubtitle}</div>
       `;
 
       return `
@@ -418,7 +417,7 @@
           <td class="sticky-col-1" style="text-align: center; font-weight: 800; background: var(--table-sticky-bg); color: var(--text-main); font-size: 0.72rem; padding: 0.2rem;">
             ${rollBadge}${cleanRoll}
           </td>
-          <td class="sticky-col-2" style="background: var(--table-sticky-bg); color: var(--text-main); padding: 0.2rem 0.45rem; width: 148px; min-width: 135px; max-width: 165px;" title="${esc(st.full_name)} (${st.registration_no ? 'UBTER Reg: ' + st.registration_no + ' • ' : ''}UBTER Roll: ${st.ubter_roll_no || st.official_enrollment_no || ''})">
+          <td class="sticky-col-2" style="background: var(--table-sticky-bg); color: var(--text-main); padding: 0.2rem 0.45rem; width: 148px; min-width: 135px; max-width: 165px;" title="${esc(st.full_name)}">
             ${nameContent}
           </td>
           ${cellsHtml}
@@ -484,13 +483,11 @@
       footP += `
         <td class="sticky-r-att-total" style="font-weight: 900; color: var(--col-att-tt-color); background: var(--col-att-tt-bg); text-align: center;">${totalMonthP}</td>
         <td class="sticky-r-abs-total" style="text-align: center; color: var(--text-muted);">—</td>
-        <td class="sticky-r-pct" style="text-align: center; color: var(--text-muted);">—</td>
       </tr>`;
 
       footA += `
         <td class="sticky-r-att-total" style="text-align: center; color: var(--text-muted);">—</td>
         <td class="sticky-r-abs-total" style="font-weight: 900; color: var(--col-abs-tt-color); background: var(--col-abs-tt-bg); text-align: center;">${totalMonthA}</td>
-        <td class="sticky-r-pct" style="text-align: center; color: var(--text-muted);">—</td>
       </tr>`;
 
       tfoot.innerHTML = footP + footA;
@@ -504,7 +501,7 @@
       const wrapper = ById('class-matrix-scroll-wrapper');
       const todayTh = thead?.querySelector('th[data-today="true"]');
       if (wrapper && todayTh) {
-        const stickyRightWidth = 156 + 10;
+        const stickyRightWidth = 116 + 10;
         const thLeft = todayTh.offsetLeft;
         const thWidth = todayTh.offsetWidth;
         const target = thLeft - (wrapper.clientWidth - stickyRightWidth - thWidth - 6);

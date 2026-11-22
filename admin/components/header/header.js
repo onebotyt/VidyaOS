@@ -340,10 +340,20 @@
    * 3. Toggle Profile Dropdown
    */
   function toggleAdminProfileMenu(e) {
-    if (e && e.stopPropagation) e.stopPropagation();
+    if (e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+    }
     const dropdown = document.getElementById('header-profile-dropdown');
     const trigger = document.getElementById('header-user-profile');
     if (!dropdown || !trigger) return;
+
+    // Close notifications dropdown if open
+    const notif = document.getElementById('admin-notifications-dropdown');
+    if (notif && notif.classList.contains('open')) {
+      notif.classList.remove('open');
+      notif.setAttribute('aria-hidden', 'true');
+    }
 
     const isOpen = dropdown.classList.contains('open');
     if (isOpen) {

@@ -115,6 +115,23 @@
    * @param {Object} options
    */
   function showConfirmDialog(options = {}) {
+    if (typeof window.showStyledConfirm === 'function') {
+      return window.showStyledConfirm({
+        title: options.title || 'Confirm Action',
+        message: options.message || 'Are you sure you want to proceed?',
+        confirmText: options.confirmText || 'Confirm',
+        cancelText: options.cancelText || 'Cancel',
+        variant: options.variant || (options.isDanger ? 'danger' : 'primary'),
+        confirmKeyword: options.requireInput || options.confirmKeyword || '',
+        onConfirm: async () => {
+          if (typeof options.onConfirm === 'function') {
+            await options.onConfirm();
+          }
+        },
+        onCancel: options.onCancel
+      });
+    }
+
     ensureStyles();
     createDialogDOM();
 

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Faculty Management — Admin Console</title>
   <meta name="description" content="Manage faculty members, Heads of Department, and department appointments.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,8 +13,8 @@
   <link rel="stylesheet" href="/admin/components/core/reset.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/core/variables.css?v=20261114">
   <link rel="stylesheet" href="/admin/components/admin-base.css?v=20261029">
-  <link rel="stylesheet" href="/admin/components/sidebar/sidebar.css?v=20261114_smooth">
-  <link rel="stylesheet" href="/admin/components/header/header.css?v=20261029">
+  <link rel="stylesheet" href="/global-components/sidebar/sidebar.css?v=20261122_3">
+  <link rel="stylesheet" href="/global-components/header/header.css?v=20261122_3">
   <link rel="stylesheet" href="/admin/components/page-header/page-header.css?v=20261102">
   <script>
     /* Synchronously apply saved theme and collapsed rail before DOM render */
@@ -28,9 +30,13 @@
       } catch (_) { }
     })();
   </script>
-  
-  <link rel="stylesheet" href="/admin/faculty-management/faculty.css?v=20261114">
+
+  <link rel="stylesheet" href="/global-components/profile-modal/profile-modal.css?v=20261122_2">
+  <link rel="stylesheet" href="/global-components/roster-filter/roster-filter.css?v=20261122_2">
+  <link rel="stylesheet" href="/global-components/confirm-modal/confirm-modal.css?v=20261122_2">
+  <link rel="stylesheet" href="/admin/faculty-management/faculty.css?v=20261122_3">
 </head>
+
 <body>
   <div class="admin-app-layout" id="admin-app-layout">
 
@@ -45,596 +51,322 @@
 
       <!-- top-nav-bar fallback for test suites / backward compatibility -->
       <nav id="top-nav-bar" class="hidden-nav-bar" style="display:none;" aria-hidden="true"></nav>
-<main class="container" style="padding-top: 1rem; padding-bottom: 5rem;">
+      <main class="container" style="padding-top: 0.4rem; padding-bottom: 5rem;">
 
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 1. HEADLINE, BACK BUTTON & ACTION TOOLBAR                      -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <section class="fac-header-toolbar" aria-label="Faculty Management Header">
-    <div class="fac-header-left">
-      <button type="button" class="btn btn-secondary btn-sm fac-back-btn" onclick="window.history.length > 1 ? window.history.back() : window.location.href='/admin/dashboard/index.html'" title="Go Back">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        <span>Back</span>
-      </button>
-      <div class="fac-header-titles">
-        <h1 class="fac-page-headline">Faculty Management</h1>
-        <p class="fac-page-subtext">Manage teaching faculty, appoint Heads of Department, and monitor departmental leadership</p>
-      </div>
-    </div>
-    <div class="fac-header-right">
-      <button type="button" class="btn btn-secondary btn-sm fac-trash-trigger-btn" onclick="openTrashModal()" title="View soft-deleted faculty (30-day retention)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        <span>Trash</span>
-        <span class="fac-trash-badge" id="kpi-trash-count">0</span>
-      </button>
-      <button type="button" class="btn btn-secondary btn-sm fac-approvals-trigger-btn" id="approvals-tab-btn" onclick="switchFacultyMainTab('approvals')" title="Access pending registration approvals">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Approvals</span>
-        <span class="fac-approvals-badge" id="kpi-approvals-badge">0</span>
-      </button>
-      <button type="button" class="btn btn-secondary btn-sm fac-assign-hod-main-btn" id="btn-open-search-hod" onclick="openSearchAssignHodModal()" title="Search faculty and appoint as HOD">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
-        <span>Assign HOD</span>
-      </button>
-      <button type="button" class="btn btn-primary btn-sm fac-create-btn" id="create-faculty-btn" onclick="openAddFacultyModal()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span>Add Faculty</span>
-      </button>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 2. MAIN WORKSPACE TABS (SEGMENTED CONTROL: DIRECTORY vs APPROVALS) -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <nav class="fac-main-tabs-nav" id="fac-main-tabs-nav" role="tablist" aria-label="Faculty Views">
-    <button type="button" class="fac-main-tab-btn active" id="tab-btn-directory" role="tab" aria-selected="true" onclick="switchFacultyMainTab('directory')">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span class="fac-tab-label"><span class="fac-tab-label-short">Directory</span><span class="fac-tab-label-long">Faculty Directory</span></span>
-      <span class="fac-main-tab-badge" id="tab-badge-directory">0</span>
-    </button>
-    <button type="button" class="fac-main-tab-btn" id="tab-btn-approvals" role="tab" aria-selected="false" onclick="switchFacultyMainTab('approvals')">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span class="fac-tab-label"><span class="fac-tab-label-short">Approvals</span><span class="fac-tab-label-long">Registration Approvals</span></span>
-      <span class="fac-main-tab-badge fac-badge-highlight" id="tab-badge-approvals">0</span>
-    </button>
-  </nav>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 3. PENDING REGISTRATIONS WORKSPACE (APPROVALS TAB VIEW)         -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <section class="fac-section-card" id="pending-hods-card" style="display: none; margin-bottom: 1.25rem;">
-    <div class="fac-card-head fac-approvals-head">
-      <div class="fac-approvals-head-title">
-        <span class="fac-card-head-icon" style="color: var(--status-late, #f59e0b);">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </span>
-        <div class="fac-approvals-title-wrap">
-          <h2 class="fac-approvals-title">Pending Approvals</h2>
-          <p class="fac-approvals-sub">Self-registration requests awaiting verification</p>
-        </div>
-      </div>
-      <div class="fac-approvals-head-actions">
-        <button type="button" class="btn btn-secondary btn-xs fac-icon-btn" onclick="loadPendingHods()" title="Refresh approvals" aria-label="Refresh approvals">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        </button>
-        <span id="pending-hods-badge" class="badge" style="background: var(--status-late-bg, #fef3c7); color: var(--status-late, #d97706); padding: 0.22rem 0.6rem; border-radius: 9999px; font-weight: 700; font-size: 0.74rem; white-space: nowrap;">0 Pending</span>
-      </div>
-    </div>
-    <div class="fac-card-body" id="pending-hods-wrap" style="padding: 0.85rem 1.15rem;">
-      <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem;">Loading pending registrations...</div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- 4. DIRECTORY WORKSPACE (WRAPPED FOR INSTANT TAB SWITCHING)     -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="fac-directory-workspace">
-    <!-- 4A. SELF-REGISTRATION GATE OPTION -->
-    <section class="fac-gate-bar" aria-label="Self-Registration Gates">
-      <div class="fac-gate-info">
-        <div class="fac-gate-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>Self-Registration:</span>
-        </div>
-        <div class="fac-gate-tags" id="fac-gate-tags-container">
-          <!-- Rendered dynamically -->
-          <span class="fac-gate-tag loading">Checking gates...</span>
-        </div>
-      </div>
-      <button type="button" class="btn btn-secondary btn-xs fac-gate-cfg-btn" onclick="openRegGatesModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        <span>Open Registration</span>
-      </button>
-    </section>
-
-    <!-- 4C. FACULTY ROSTER (SINGLE UNIFIED VIEW) -->
-    <section class="fac-roster-section" id="fac-roster-section" aria-label="Faculty Directory">
-    <div class="fac-section-card">
-      <!-- Search & Filter Controls -->
-      <div class="fac-filter-bar">
-        <div class="fac-filter-top-row">
-          <div class="fac-search-box">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="faculty-search-input" placeholder="Search by name, email, employee ID..." oninput="handleFacultySearch()">
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- 1. HEADLINE, BACK BUTTON & ACTION TOOLBAR                      -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section class="fac-header-toolbar" aria-label="Faculty Management Header">
+          <div class="fac-header-left">
+            <button type="button" class="btn btn-secondary btn-sm fac-back-btn"
+              onclick="window.history.length > 1 ? window.history.back() : window.location.href='/admin/dashboard/index.html'"
+              title="Go Back">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <div class="fac-header-titles">
+              <h1 class="fac-page-headline">Faculty Management</h1>
+              <p class="fac-page-subtext">Manage teaching faculty, appoint Heads of Department, and monitor departmental
+                leadership</p>
+            </div>
           </div>
-          <select id="faculty-dept-filter" class="fac-filter-select" onchange="handleFacultyFilterChange()">
-            <option value="ALL">All Departments</option>
-          </select>
-        </div>
-        <div class="fac-chips-row">
-          <button type="button" class="fac-filter-chip active" data-role="ALL" onclick="setFacultyRoleFilter('ALL')">All (<span id="chip-count-all">0</span>)</button>
-          <button type="button" class="fac-filter-chip" data-role="PENDING" onclick="switchFacultyMainTab('approvals')">Approvals (<span id="chip-count-pending">0</span>)</button>
-          <button type="button" class="fac-filter-chip" data-role="TEACHER" onclick="setFacultyRoleFilter('TEACHER')">Teachers (<span id="chip-count-teachers">0</span>)</button>
-          <button type="button" class="fac-filter-chip" data-role="HOD" onclick="setFacultyRoleFilter('HOD')">HODs (<span id="chip-count-hods">0</span>)</button>
-          <button type="button" class="fac-filter-chip" data-role="COMMON" onclick="setFacultyRoleFilter('COMMON')">Common (<span id="chip-count-common">0</span>)</button>
-          <button type="button" class="fac-filter-chip" data-role="ACTIVE" onclick="setFacultyRoleFilter('ACTIVE')">Active (<span id="chip-count-active">0</span>)</button>
-          <button type="button" class="fac-filter-chip" data-role="INACTIVE" onclick="setFacultyRoleFilter('INACTIVE')">Inactive (<span id="chip-count-inactive">0</span>)</button>
-        </div>
-      </div>
+          <div class="fac-header-right">
+            <button type="button" class="btn btn-secondary btn-sm fac-trash-trigger-btn" onclick="openTrashModal()"
+              title="View soft-deleted faculty (30-day retention)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+              <span>Trash</span>
+              <span class="fac-trash-badge" id="kpi-trash-count">0</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm fac-assign-hod-main-btn" id="btn-open-search-hod"
+              onclick="openSearchAssignHodModal()" title="Search faculty and appoint as HOD">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <polyline points="16 11 18 13 22 9" />
+              </svg>
+              <span class="fac-btn-label-full">Assign HOD</span>
+              <span class="fac-btn-label-short">HOD</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm fac-create-btn" id="create-faculty-btn"
+              onclick="openAddFacultyModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span class="fac-btn-label-full">Add Faculty</span>
+              <span class="fac-btn-label-short">Add</span>
+            </button>
+          </div>
+        </section>
 
-      <!-- Desktop Table View (>= 769px) -->
-      <div id="faculty-table-wrap" class="fac-table-wrap">
-        <div class="fac-empty-state">
-          <p class="fac-empty-state-title">Loading faculty directory...</p>
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- 2. DIRECTORY WORKSPACE (GLOBAL ROSTER FILTER)                  -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div id="fac-directory-workspace">
+          <!-- FACULTY ROSTER (POWERED BY GLOBAL ROSTER FILTER) -->
+          <section class="global-roster-section" id="fac-roster-section" aria-label="Faculty Directory">
+            <!-- Initialized dynamically by GlobalRosterFilter -->
+          </section>
         </div>
-      </div>
 
-      <!-- Mobile Minimal Cards Stack (< 769px) -->
-      <div id="faculty-mobile-cards-wrap" class="fac-mini-cards-stack">
-        <div class="fac-empty-state">
-          <p class="fac-empty-state-title">Loading faculty directory...</p>
-        </div>
-      </div>
-    </div>
-  </section>
-  </div>
 
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- MODAL: CONFIGURE REGISTRATION GATES                          -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- MODAL: OPEN REGISTRATION (COMPACT & SIMPLE)                -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="reg-gates-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card fac-reg-modal-compact">
-      <div class="fac-modal-header-compact">
-        <div class="fac-modal-title-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <h2 class="fac-modal-title">Open Registration</h2>
-        </div>
-        <button type="button" class="fac-modal-close-btn" onclick="closeRegGatesModal()">&times;</button>
-      </div>
 
-      <form id="reg-gates-form" onsubmit="submitSaveGatesConfig(event)">
-        <!-- Master Open For All -->
-        <label class="fac-gate-switch-box master">
-          <input type="checkbox" id="gate-open-all" onchange="handleGateAllChange()">
-          <span class="fac-gate-switch-text">
-            <strong>Open for All Departments</strong>
-            <small>Allows faculty self-registration campus-wide</small>
-          </span>
-        </label>
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- MODAL: TRASH / RESTORE FACULTY (30-DAY RETENTION)             -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div id="trash-faculty-modal" class="modal-backdrop" style="display: none;">
+          <div class="modal-card"
+            style="max-width: 580px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div
+                  style="width: 32px; height: 32px; border-radius: 8px; background: rgba(239, 68, 68, 0.12); color: var(--status-absent); display: flex; align-items: center; justify-content: center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Faculty Trash
+                    &amp; Restore</h2>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">30-day retention
+                    window. Records auto-purge after 30 days.</p>
+                </div>
+              </div>
+              <button type="button" onclick="closeTrashModal()"
+                style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
+            </div>
 
-        <!-- Department Wise Checkboxes (Compact 3-col grid) -->
-        <div class="fac-gate-dept-section">
-          <div class="fac-gate-section-label">Department-Wise Access</div>
-          <div id="gate-dept-checkboxes-grid" class="fac-gate-dept-grid-3">
-            <!-- Populated dynamically -->
+            <div id="trash-status-msg"
+              style="display: none; padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); margin-bottom: 0.75rem; font-size: 0.82rem;">
+            </div>
+
+            <!-- Trash List Container -->
+            <div id="trash-list-container"
+              style="display: flex; flex-direction: column; gap: 0.65rem; min-height: 120px;">
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2rem;">Loading
+                trash records...</div>
+            </div>
+
+            <div
+              style="display: flex; justify-content: flex-end; margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="closeTrashModal()">Close</button>
+            </div>
           </div>
         </div>
 
-        <!-- Special Role Gates (Compact inline switches) -->
-        <div class="fac-gate-dept-section">
-          <div class="fac-gate-section-label">Special Roles</div>
-          <div class="fac-gate-roles-row">
-            <label class="fac-gate-switch-box role">
-              <input type="checkbox" id="gate-open-hod">
-              <span>HOD Registration</span>
-            </label>
-            <label class="fac-gate-switch-box role">
-              <input type="checkbox" id="gate-open-cfm">
-              <span>Common Faculty</span>
-            </label>
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- MODAL: SEARCH & ASSIGN HOD                                     -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div id="search-assign-hod-modal" class="modal-backdrop" style="display: none;">
+          <div class="modal-card"
+            style="max-width: 560px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div
+                  style="width: 34px; height: 34px; border-radius: 8px; background: rgba(59, 130, 246, 0.12); color: var(--color-primary, #3b82f6); display: flex; align-items: center; justify-content: center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <polyline points="16 11 18 13 22 9" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Assign Head of
+                    Department (HOD)</h2>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Find faculty by name,
+                    employee ID, Gmail, or phone number</p>
+                </div>
+              </div>
+              <button type="button" onclick="closeSearchAssignHodModal()"
+                style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
+            </div>
+
+            <!-- Search Input Box -->
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+              <div style="position: relative;">
+                <input type="text" id="hod-search-input" class="form-control"
+                  placeholder="Search by name, employee ID, Gmail, phone..." oninput="handleHodLiveSearch()"
+                  autocomplete="off" style="padding-left: 2.2rem; font-size: 0.88rem;">
+                <span
+                  style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- Search Results List -->
+            <div id="hod-search-results-list"
+              style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 260px; overflow-y: auto; margin-bottom: 0.85rem; min-height: 80px; padding: 0.25rem 0;">
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 1.5rem;">Type a
+                name, email, employee ID, or phone to search faculty.</div>
+            </div>
+
+            <!-- Department Selector (appears once a faculty is selected) -->
+            <div id="hod-assign-dept-section"
+              style="display: none; background: var(--bg-surface, rgba(0,0,0,0.02)); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 0.85rem;">
+              <div style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.45rem; color: var(--text-main);">
+                Selected Faculty:</div>
+              <div id="selected-hod-candidate-card" style="margin-bottom: 0.75rem;"></div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="hod-target-department"
+                  style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">Select
+                  Department to Lead <span style="color: var(--status-absent);">*</span></label>
+                <select id="hod-target-department" class="form-control" style="font-size: 0.85rem;">
+                  <option value="">— Choose Academic Department —</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="hod-search-assign-error"
+              style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent);">
+            </div>
+
+            <div
+              style="display: flex; gap: 0.5rem; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+              <button type="button" class="btn btn-secondary btn-sm"
+                onclick="closeSearchAssignHodModal()">Cancel</button>
+              <button type="button" id="btn-proceed-to-confirm-hod" class="btn btn-primary btn-sm"
+                style="display: none;" onclick="proceedToConfirmHodAssignment()">Continue to Confirm</button>
+            </div>
           </div>
         </div>
 
-        <div id="reg-gates-error" class="fac-gate-error" style="display: none;"></div>
+        <!-- DYNAMIC GLOBAL CONFIRM & SAFETY MODAL (REPLACES #safety-assign-hod-modal, #safety-suspend-modal, #safety-remove-modal, #custom-dialog-modal) -->
+        <!-- Injected and managed by /global-components/confirm-modal/confirm-modal.js -->
 
-        <div class="fac-modal-actions-compact">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="closeRegGatesModal()">Cancel</button>
-          <button type="submit" id="btn-save-gates" class="btn btn-primary btn-sm">Save Settings</button>
-        </div>
-      </form>
-    </div>
-  </div>
+        <!-- ADD FACULTY MODAL -->
+        <div id="add-faculty-modal" class="modal-backdrop" style="display: none;">
+          <div class="modal-card"
+            style="max-width: 520px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <div>
+                <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Add Faculty Member
+                </h2>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Register and onboard a
+                  teacher, department head, or common faculty member.</p>
+              </div>
+              <button type="button" onclick="closeAddFacultyModal()"
+                style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
+            </div>
 
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- MODAL: TRASH / RESTORE FACULTY (30-DAY RETENTION)             -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="trash-faculty-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 580px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(239, 68, 68, 0.12); color: var(--status-absent); display: flex; align-items: center; justify-content: center;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </div>
-          <div>
-            <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Faculty Trash &amp; Restore</h2>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">30-day retention window. Records auto-purge after 30 days.</p>
-          </div>
-        </div>
-        <button type="button" onclick="closeTrashModal()" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
-      </div>
+            <form id="add-faculty-form" onsubmit="submitAddFaculty(event)">
+              <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label class="form-label" for="add-fac-name">Full Name <span
+                    style="color: var(--status-absent);">*</span></label>
+                <input type="text" id="add-fac-name" class="form-control" placeholder="e.g. Dr. Ramesh Kumar" required>
+              </div>
 
-      <div id="trash-status-msg" style="display: none; padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); margin-bottom: 0.75rem; font-size: 0.82rem;"></div>
+              <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label class="form-label" for="add-fac-email">Institutional Gmail (Login ID) <span
+                    style="color: var(--status-absent);">*</span></label>
+                <input type="email" id="add-fac-email" class="form-control" placeholder="e.g. ramesh.kumar@vidya.edu"
+                  required>
+              </div>
 
-      <!-- Trash List Container -->
-      <div id="trash-list-container" style="display: flex; flex-direction: column; gap: 0.65rem; min-height: 120px;">
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2rem;">Loading trash records...</div>
-      </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.75rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="add-fac-employee-id">Employee ID / Staff Code</label>
+                  <input type="text" id="add-fac-employee-id" class="form-control" placeholder="e.g. EMP-1042">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="add-fac-phone">Phone Number</label>
+                  <input type="tel" id="add-fac-phone" class="form-control" placeholder="e.g. 9876543210">
+                </div>
+              </div>
 
-      <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeTrashModal()">Close</button>
-      </div>
-    </div>
-  </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.75rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="add-fac-dept">Department / Scope <span
+                      style="color: var(--status-absent);">*</span></label>
+                  <select id="add-fac-dept" class="form-control">
+                    <option value="">— Common Faculty (Cross-Department) —</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="add-fac-role">Designation / Role <span
+                      style="color: var(--status-absent);">*</span></label>
+                  <select id="add-fac-role" class="form-control" required>
+                    <option value="TEACHER">Faculty Teacher</option>
+                    <option value="HOD">Head of Department (HOD)</option>
+                  </select>
+                </div>
+              </div>
 
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- MODAL: SEARCH & ASSIGN HOD                                     -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="search-assign-hod-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 560px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(59, 130, 246, 0.12); color: var(--color-primary, #3b82f6); display: flex; align-items: center; justify-content: center;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
-          </div>
-          <div>
-            <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Assign Head of Department (HOD)</h2>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Find faculty by name, employee ID, Gmail, or phone number</p>
-          </div>
-        </div>
-        <button type="button" onclick="closeSearchAssignHodModal()" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
-      </div>
+              <div class="form-group" style="margin-bottom: 0.85rem;">
+                <label class="form-label" for="add-fac-password">Initial Password <span
+                    style="color: var(--status-absent);">*</span></label>
+                <input type="text" id="add-fac-password" class="form-control" value="Password@123" required>
+                <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; display: block;">The
+                  faculty member can change this upon first login.</span>
+              </div>
 
-      <!-- Search Input Box -->
-      <div class="form-group" style="margin-bottom: 0.75rem;">
-        <div style="position: relative;">
-          <input type="text" id="hod-search-input" class="form-control" placeholder="Search by name, employee ID, Gmail, phone..." oninput="handleHodLiveSearch()" autocomplete="off" style="padding-left: 2.2rem; font-size: 0.88rem;">
-          <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </span>
-        </div>
-      </div>
+              <div id="add-fac-error"
+                style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent);">
+              </div>
 
-      <!-- Search Results List -->
-      <div id="hod-search-results-list" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 260px; overflow-y: auto; margin-bottom: 0.85rem; min-height: 80px; padding: 0.25rem 0;">
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 1.5rem;">Type a name, email, employee ID, or phone to search faculty.</div>
-      </div>
-
-      <!-- Department Selector (appears once a faculty is selected) -->
-      <div id="hod-assign-dept-section" style="display: none; background: var(--bg-surface, rgba(0,0,0,0.02)); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 0.85rem;">
-        <div style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.45rem; color: var(--text-main);">Selected Faculty:</div>
-        <div id="selected-hod-candidate-card" style="margin-bottom: 0.75rem;"></div>
-
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label" for="hod-target-department" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">Select Department to Lead <span style="color: var(--status-absent);">*</span></label>
-          <select id="hod-target-department" class="form-control" style="font-size: 0.85rem;">
-            <option value="">— Choose Academic Department —</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="hod-search-assign-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent);"></div>
-
-      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeSearchAssignHodModal()">Cancel</button>
-        <button type="button" id="btn-proceed-to-confirm-hod" class="btn btn-primary btn-sm" style="display: none;" onclick="proceedToConfirmHodAssignment()">Continue to Confirm</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- MODAL: TYPED SAFETY CONFIRMATION - ASSIGN HOD                  -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="safety-assign-hod-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 450px; margin: auto; text-align: center;">
-      <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); color: var(--color-primary, #3b82f6); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.65rem;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
-      </div>
-      <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.35rem 0; color: var(--text-main);">Confirm HOD Appointment</h3>
-      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; margin: 0 0 1rem 0;">
-        You are appointing <strong id="assign-hod-target-name" style="color: var(--text-main);"></strong> as Head of Department for <strong id="assign-hod-target-dept" style="color: var(--color-primary);"></strong>. This elevates their administrative authority.
-      </p>
-
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem; text-align: left;">
-        <label class="form-label" for="assign-hod-confirm-input" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">
-          Type <code style="background: rgba(59, 130, 246, 0.2); color: var(--color-primary, #3b82f6); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700;">CONFIRM</code> to unlock:
-        </label>
-        <input type="text" id="assign-hod-confirm-input" class="form-control" placeholder="Type CONFIRM" autocomplete="off" oninput="checkAssignHodSafetyInput()" style="text-align: center; font-weight: 700; letter-spacing: 0.08em;">
-      </div>
-
-      <div id="assign-hod-safety-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent); text-align: left;"></div>
-
-      <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAssignHodSafetyModal()">Cancel</button>
-        <button type="button" id="btn-confirm-safety-assign-hod" class="btn btn-primary btn-sm" style="opacity: 0.45; cursor: not-allowed;" disabled onclick="submitAssignHodSafetyConfirm()">Confirm Appointment</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- MODAL: TYPED SAFETY CONFIRMATION - SUSPEND                     -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="safety-suspend-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 440px; margin: auto; text-align: center;">
-      <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(245, 158, 11, 0.15); color: #d97706; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.65rem;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      </div>
-      <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.35rem 0; color: var(--text-main);">Confirm Account Suspension</h3>
-      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; margin: 0 0 1rem 0;">
-        You are about to suspend <strong id="suspend-target-name" style="color: var(--text-main);"></strong>. Login access will be blocked immediately.
-      </p>
-
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem; text-align: left;">
-        <label class="form-label" for="suspend-confirm-input" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">
-          Type <code style="background: rgba(245, 158, 11, 0.2); color: #d97706; padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700;">SUSPEND</code> to unlock:
-        </label>
-        <input type="text" id="suspend-confirm-input" class="form-control" placeholder="Type SUSPEND" autocomplete="off" oninput="checkSuspendSafetyInput()" style="text-align: center; font-weight: 700; letter-spacing: 0.08em;">
-      </div>
-
-      <div id="suspend-safety-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent); text-align: left;"></div>
-
-      <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeSuspendSafetyModal()">Cancel</button>
-        <button type="button" id="btn-confirm-safety-suspend" class="btn btn-primary btn-sm" style="background: #d97706; border-color: #d97706; opacity: 0.45; cursor: not-allowed;" disabled onclick="submitSuspendSafetyConfirm()">Suspend Faculty</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- MODAL: TYPED SAFETY CONFIRMATION - REMOVE TO TRASH             -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="safety-remove-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 450px; margin: auto; text-align: center;">
-      <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--status-absent-bg); color: var(--status-absent); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.65rem;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      </div>
-      <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.35rem 0; color: var(--status-absent);">Move Faculty to Trash</h3>
-      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; margin: 0 0 1rem 0;">
-        You are removing <strong id="remove-target-name" style="color: var(--text-main);"></strong>. The record will be moved to <strong>Trash</strong> with <strong>30-day recovery retention</strong> before permanent deletion.
-      </p>
-
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; margin-bottom: 1rem; text-align: left;">
-        <label class="form-label" for="remove-confirm-input" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">
-          Type <code style="background: var(--status-absent-bg); color: var(--status-absent); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700;">REMOVE</code> to unlock:
-        </label>
-        <input type="text" id="remove-confirm-input" class="form-control" placeholder="Type REMOVE" autocomplete="off" oninput="checkRemoveSafetyInput()" style="text-align: center; font-weight: 700; letter-spacing: 0.08em;">
-      </div>
-
-      <div id="remove-safety-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent); text-align: left;"></div>
-
-      <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeRemoveSafetyModal()">Cancel</button>
-        <button type="button" id="btn-confirm-safety-remove" class="btn btn-primary btn-sm" style="background: var(--status-absent); border-color: var(--status-absent); opacity: 0.45; cursor: not-allowed;" disabled onclick="submitRemoveSafetyConfirm()">Move to Trash</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADD FACULTY MODAL -->
-  <div id="add-faculty-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 520px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-        <div>
-          <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Add Faculty Member</h2>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Register and onboard a teacher, department head, or common faculty member.</p>
-        </div>
-        <button type="button" onclick="closeAddFacultyModal()" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
-      </div>
-
-      <form id="add-faculty-form" onsubmit="submitAddFaculty(event)">
-        <div class="form-group" style="margin-bottom: 0.75rem;">
-          <label class="form-label" for="add-fac-name">Full Name <span style="color: var(--status-absent);">*</span></label>
-          <input type="text" id="add-fac-name" class="form-control" placeholder="e.g. Dr. Ramesh Kumar" required>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 0.75rem;">
-          <label class="form-label" for="add-fac-email">Institutional Gmail (Login ID) <span style="color: var(--status-absent);">*</span></label>
-          <input type="email" id="add-fac-email" class="form-control" placeholder="e.g. ramesh.kumar@vidya.edu" required>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.75rem;">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="add-fac-employee-id">Employee ID / Staff Code</label>
-            <input type="text" id="add-fac-employee-id" class="form-control" placeholder="e.g. EMP-1042">
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="add-fac-phone">Phone Number</label>
-            <input type="tel" id="add-fac-phone" class="form-control" placeholder="e.g. 9876543210">
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeAddFacultyModal()">Cancel</button>
+                <button type="submit" id="btn-submit-add-fac" class="btn btn-primary btn-sm">Create &amp; Register
+                  Faculty</button>
+              </div>
+            </form>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.75rem;">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="add-fac-dept">Department / Scope <span style="color: var(--status-absent);">*</span></label>
-            <select id="add-fac-dept" class="form-control">
-              <option value="">— Common Faculty (Cross-Department) —</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="add-fac-role">Designation / Role <span style="color: var(--status-absent);">*</span></label>
-            <select id="add-fac-role" class="form-control" required>
-              <option value="TEACHER">Faculty Teacher</option>
-              <option value="HOD">Head of Department (HOD)</option>
-            </select>
-          </div>
-        </div>
+        <!-- DYNAMIC GLOBAL PROFILE MODAL (REPLACES #edit-faculty-modal & #view-faculty-modal) -->
+        <!-- Injected and managed by /global-components/profile-modal/profile-modal.js -->
 
-        <div class="form-group" style="margin-bottom: 0.85rem;">
-          <label class="form-label" for="add-fac-password">Initial Password <span style="color: var(--status-absent);">*</span></label>
-          <input type="text" id="add-fac-password" class="form-control" value="Password@123" required>
-          <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; display: block;">The faculty member can change this upon first login.</span>
-        </div>
-
-        <div id="add-fac-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent);"></div>
-
-        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAddFacultyModal()">Cancel</button>
-          <button type="submit" id="btn-submit-add-fac" class="btn btn-primary btn-sm">Create &amp; Register Faculty</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- EDIT FACULTY MODAL -->
-  <div id="edit-faculty-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 500px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-        <div>
-          <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Edit Faculty Profile</h2>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">Update institutional details, contact, and department assignment.</p>
-        </div>
-        <button type="button" onclick="closeEditFacultyModal()" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
-      </div>
-
-      <form id="edit-faculty-form" onsubmit="submitEditFaculty(event)">
-        <input type="hidden" id="edit-fac-id">
-
-        <div class="form-group" style="margin-bottom: 0.75rem;">
-          <label class="form-label" for="edit-fac-name">Full Name <span style="color: var(--status-absent);">*</span></label>
-          <input type="text" id="edit-fac-name" class="form-control" required>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 0.75rem;">
-          <label class="form-label" for="edit-fac-email">Institutional Gmail (Login ID)</label>
-          <input type="email" id="edit-fac-email" class="form-control" readonly style="opacity: 0.85; background: var(--bg-surface); cursor: not-allowed;">
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.75rem;">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="edit-fac-employee-id">Employee ID</label>
-            <input type="text" id="edit-fac-employee-id" class="form-control">
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="edit-fac-phone">Phone Number</label>
-            <input type="tel" id="edit-fac-phone" class="form-control">
+        <!-- RESET FACULTY PASSWORD MODAL -->
+        <div id="reset-faculty-password-modal" class="modal-backdrop" style="display: none;">
+          <div class="modal-card"
+            style="max-width: 440px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Reset Faculty
+                Password</h2>
+              <button type="button" onclick="closeResetFacultyPasswordModal()"
+                style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+              Reset password for <strong id="reset-fac-target-name" style="color: var(--text-main);"></strong> (<span
+                id="reset-fac-target-email" style="font-family: monospace; color: var(--color-primary);"></span>).
+            </p>
+            <form id="reset-fac-form" onsubmit="submitResetFacultyPassword(event)">
+              <input type="hidden" id="reset-fac-id">
+              <div class="form-group" style="margin-bottom: 0.85rem;">
+                <label class="form-label" for="reset-fac-new-password">New Password <span
+                    style="color: var(--status-absent);">*</span></label>
+                <input type="text" id="reset-fac-new-password" class="form-control" value="Password@123" required>
+              </div>
+              <div id="reset-fac-error"
+                style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent);">
+              </div>
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary btn-sm"
+                  onclick="closeResetFacultyPasswordModal()">Cancel</button>
+                <button type="submit" id="btn-submit-reset-fac" class="btn btn-primary btn-sm">Confirm Password
+                  Reset</button>
+              </div>
+            </form>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.75rem;">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="edit-fac-dept">Primary Department <span style="color: var(--status-absent);">*</span></label>
-            <select id="edit-fac-dept" class="form-control" required>
-              <option value="">— Select Department —</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="edit-fac-status">Account Status <span style="color: var(--status-absent);">*</span></label>
-            <select id="edit-fac-status" class="form-control" required>
-              <option value="ACTIVE">ACTIVE (Authorized)</option>
-              <option value="INACTIVE">INACTIVE (Suspended)</option>
-            </select>
-          </div>
-        </div>
 
-        <div id="edit-fac-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent);"></div>
 
-        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="closeEditFacultyModal()">Cancel</button>
-          <button type="submit" id="btn-submit-edit-fac" class="btn btn-primary btn-sm">Save Changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- VIEW FACULTY DETAIL MODAL -->
-  <div id="view-faculty-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 520px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Faculty Profile Details</h2>
-        <button type="button" onclick="closeViewFacultyModal()" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
-      </div>
-
-      <div id="view-faculty-body">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 0.85rem;">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="closeViewFacultyModal()">Close</button>
-        <button type="button" class="btn btn-primary btn-sm" id="view-fac-edit-btn">Edit Details</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- RESET FACULTY PASSWORD MODAL -->
-  <div id="reset-faculty-password-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 440px; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Reset Faculty Password</h2>
-        <button type="button" onclick="closeResetFacultyPasswordModal()" style="font-size: 1.35rem; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">&times;</button>
-      </div>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.85rem;">
-        Reset password for <strong id="reset-fac-target-name" style="color: var(--text-main);"></strong> (<span id="reset-fac-target-email" style="font-family: monospace; color: var(--color-primary);"></span>).
-      </p>
-      <form id="reset-fac-form" onsubmit="submitResetFacultyPassword(event)">
-        <input type="hidden" id="reset-fac-id">
-        <div class="form-group" style="margin-bottom: 0.85rem;">
-          <label class="form-label" for="reset-fac-new-password">New Password <span style="color: var(--status-absent);">*</span></label>
-          <input type="text" id="reset-fac-new-password" class="form-control" value="Password@123" required>
-        </div>
-        <div id="reset-fac-error" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--status-absent);"></div>
-        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="closeResetFacultyPasswordModal()">Cancel</button>
-          <button type="submit" id="btn-submit-reset-fac" class="btn btn-primary btn-sm">Confirm Password Reset</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- APPROVE REGISTRATION MODAL                                    -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="approve-hod-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 520px; max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem); overflow-y: auto; margin: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-main);">Approve Registration</h2>
-        <button type="button" onclick="closeApproveHodModal()" style="font-size: 1.25rem; color: var(--text-muted); background: none; border: none; cursor: pointer;">&times;</button>
-      </div>
-      <div id="approve-hod-body">
-        <!-- Populated dynamically -->
-      </div>
-      <div id="approve-hod-err" style="display: none; background: var(--status-absent-bg); border: 1px solid var(--status-absent); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; margin-top: 0.75rem; font-size: 0.82rem; color: var(--status-absent);"></div>
-      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
-        <button type="button" class="btn btn-secondary" onclick="closeApproveHodModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" id="btn-confirm-approve-hod" onclick="confirmApproveHod()">Confirm &amp; Activate Account</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- CUSTOM STYLED DIALOG MODAL (CONFIRM & PROMPT REPLACEMENT)     -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="custom-dialog-modal" class="modal-backdrop" style="display: none;">
-    <div class="modal-card fac-custom-dialog-card">
-      <div class="fac-dialog-icon-wrap" id="custom-dialog-icon-wrap">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      </div>
-      <h3 class="fac-dialog-title" id="custom-dialog-title">Confirm Action</h3>
-      <p class="fac-dialog-message" id="custom-dialog-message">Are you sure you want to proceed?</p>
-      
-      <!-- Optional Prompt Input Container -->
-      <div id="custom-dialog-input-wrap" style="display: none; margin: 0.85rem 0 0.35rem 0; width: 100%; text-align: left;">
-        <label id="custom-dialog-input-label" class="form-label" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Reason</label>
-        <input type="text" id="custom-dialog-input" class="form-control" style="width: 100%; font-size: 0.88rem;" />
-      </div>
-
-      <div class="fac-dialog-actions">
-        <button type="button" class="btn btn-secondary btn-sm" id="custom-dialog-cancel-btn">Cancel</button>
-        <button type="button" class="btn btn-primary btn-sm" id="custom-dialog-confirm-btn">Confirm</button>
-      </div>
-    </div>
-  </div>
-
-    
     </div> <!-- /.admin-main-wrap -->
   </div> <!-- /#admin-app-layout -->
 
@@ -642,11 +374,14 @@
   <script src="/admin/components/core/api.js?v=20261114"></script>
   <script src="/admin/components/core/auth.js?v=20261114"></script>
   <script src="/admin/components/icons.js?v=20261029"></script>
-  <script src="/admin/components/sidebar/sidebar.js?v=20261029"></script>
-  <script src="/admin/components/header/header.js?v=20261029"></script>
+  <script src="/global-components/sidebar/sidebar.js?v=20261122_3"></script>
+  <script src="/global-components/header/header.js?v=20261122_3"></script>
   <script src="/admin/components/admin-ui.js?v=20261029"></script>
-  <script src="/admin/components/delete-modal/delete-modal.js"></script>
-  
-  <script src="/admin/faculty-management/faculty.js?v=20261114"></script>
+
+  <script src="/global-components/confirm-modal/confirm-modal.js?v=20261122_2"></script>
+  <script src="/global-components/profile-modal/profile-modal.js?v=20261122_2"></script>
+  <script src="/global-components/roster-filter/roster-filter.js?v=20261122_2"></script>
+  <script src="/admin/faculty-management/faculty.js?v=20261122_2"></script>
 </body>
+
 </html>

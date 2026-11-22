@@ -120,7 +120,7 @@ function updateOledScreen({ statusLeft, statusRight, headline, line1, line2, lin
   if (statusLeft !== undefined) document.getElementById('oled-status-left').textContent = statusLeft;
   if (statusRight !== undefined) document.getElementById('oled-status-right').textContent = statusRight;
   if (headline !== undefined) document.getElementById('oled-headline').textContent = headline;
-  
+
   const line1El = document.getElementById('oled-line1');
   if (line1El && line1 !== undefined) {
     line1El.textContent = line1;
@@ -322,10 +322,10 @@ async function loadEsp32Overview(deptIdOverride) {
     if (sel) {
       sel.innerHTML = devices.length
         ? devices.map(d => {
-            const devName = d.name || d.device_name || 'IT Lab Biometric Terminal 01';
-            const devUid = d.device_uid || d.device_uuid || 'ESP32-IT-LAB-01';
-            return `<option value="${d.id}" ${Number(d.id) === Number(selectedDeviceId) ? 'selected' : ''}>${escHtml(devName)} (${escHtml(devUid)})</option>`;
-          }).join('')
+          const devName = d.name || d.device_name || 'IT Lab Biometric Terminal 01';
+          const devUid = d.device_uid || d.device_uuid || 'ESP32-IT-LAB-01';
+          return `<option value="${d.id}" ${Number(d.id) === Number(selectedDeviceId) ? 'selected' : ''}>${escHtml(devName)} (${escHtml(devUid)})</option>`;
+        }).join('')
         : `<option value="">No ESP32 Connected Yet</option>`;
       if (selectedDeviceId) sel.value = String(selectedDeviceId);
     }
@@ -847,7 +847,6 @@ function onSelectEnrollStudent(studentId) {
   const statusPill = document.getElementById('enroll-chip-status-pill');
   const removeBtn = document.getElementById('btn-remove-selected-bio');
   const msgEl = document.getElementById('bio-scanner-msg');
-  const calloutEl = document.getElementById('bio-scanner-callout');
   const visualBox = document.getElementById('bio-scanner-visual-box');
   const step1 = document.getElementById('step-pill-1');
   const step2 = document.getElementById('step-pill-2');
@@ -863,13 +862,6 @@ function onSelectEnrollStudent(studentId) {
     }
     if (removeBtn) removeBtn.style.display = 'none';
     if (visualBox) visualBox.className = 'esp-hardware-bezel';
-    if (calloutEl) calloutEl.className = 'esp-scanner-callout';
-    if (step1) step1.className = 'step-pill active';
-    if (step2) step2.className = 'step-pill';
-    if (step3) step3.className = 'step-pill';
-    if (msgEl) {
-      msgEl.innerHTML = 'Select a student and click <strong>"Enroll Fingerprint"</strong>. Terminal chimes and waits for finger touch.';
-    }
     return;
   }
 
@@ -899,12 +891,8 @@ function onSelectEnrollStudent(studentId) {
   }
 
   if (step1) step1.className = 'step-pill completed';
-  if (step2) step2.className = isEnrolled ? 'step-pill completed' : 'step-pill active';
+  if (step2) step2.className = 'step-pill';
   if (step3) step3.className = isEnrolled ? 'step-pill completed' : 'step-pill';
-
-  if (calloutEl) {
-    calloutEl.className = `esp-scanner-callout ${isEnrolled ? 'success' : ''}`;
-  }
 
   if (visualBox) {
     visualBox.className = `esp-hardware-bezel ${isEnrolled ? 'success' : ''}`;
@@ -956,16 +944,12 @@ async function enrollCurrentSelectedStudent() {
 
   const visualBox = document.getElementById('bio-scanner-visual-box');
   const msgEl = document.getElementById('bio-scanner-msg');
-  const calloutEl = document.getElementById('bio-scanner-callout');
   const step2 = document.getElementById('step-pill-2');
   const step3 = document.getElementById('step-pill-3');
 
   if (visualBox) {
     visualBox.classList.remove('success');
     visualBox.classList.add('scanning');
-  }
-  if (calloutEl) {
-    calloutEl.className = 'esp-scanner-callout scanning';
   }
   if (step2) step2.classList.add('active');
   if (step3) step3.classList.remove('active');
@@ -997,7 +981,7 @@ async function removeCurrentSelectedStudentTemplate() {
 }
 
 function switchEspTab(tabName) {
-  const tabs = ['vault', 'feed', 'logs'];
+  const tabs = ['vault', 'wifi', 'feed', 'logs'];
   tabs.forEach(t => {
     const btn = document.getElementById(`tab-btn-${t}`);
     const panel = document.getElementById(`panel-${t}`);
@@ -1139,7 +1123,7 @@ async function removeStudentCloudTemplate(studentId, studentName = 'Student', ro
     const res = await fetchApi(`/devices/hod/template/${studentId}`, { method: 'DELETE' });
     if (res && res.success) {
       showToast(`Biometric template for "${studentName}" removed from cloud vault.`, 'success');
-      
+
       // Provide visual simulated hardware feedback
       updateOledScreen({
         statusLeft: 'BIOMETRIC REMOVED',
@@ -1636,7 +1620,7 @@ async function loadDeviceWifiNetworks(deviceId) {
           </div>
         `;
       } else {
-        cardList.innerHTML = networks.map(net => {
+        cardList.innerHTML = networks.slice(0, 4).map(net => {
           const isDef = Boolean(net.is_default);
           const rssi = net.last_rssi != null ? net.last_rssi : -65;
           const bars = rssi > -60 ? 4 : rssi > -70 ? 3 : rssi > -80 ? 2 : 1;
@@ -1650,7 +1634,7 @@ async function loadDeviceWifiNetworks(deviceId) {
                   ${isDef ? `<span class="esp-status-pill online" style="font-size:0.58rem; padding:0.05rem 0.3rem;">DEFAULT</span>` : ''}
                 </div>
               </div>
-              <div style="display:inline-flex; align-items:center; gap:0.35rem;">
+              <div style="display:inline-flex; align-items:center; gap:0.5rem;">
                 <div class="esp-wifi-signal-bars" title="${rssi} dBm">
                   <span class="bar bar-1 ${bars >= 1 ? 'active' : ''}"></span>
                   <span class="bar bar-2 ${bars >= 2 ? 'active' : ''}"></span>
@@ -1658,11 +1642,16 @@ async function loadDeviceWifiNetworks(deviceId) {
                   <span class="bar bar-4 ${bars >= 4 ? 'active' : ''}"></span>
                 </div>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="switchDeviceWifiTo(${net.id}, '${escHtml(net.ssid)}')" title="Connect/Switch to this network" style="padding:0.18rem 0.45rem; font-size:0.7rem;">Connect</button>
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteWifiNetwork(${net.id}, '${escHtml(net.ssid)}')" title="Remove Wi-Fi credentials" style="padding:0.18rem 0.35rem; font-size:0.7rem; line-height:1;">&times;</button>
               </div>
             </div>
           `;
-        }).join('');
+        }).join('') + (networks.length > 4 ? `
+          <div style="text-align:center; padding-top:0.15rem;">
+            <button type="button" class="btn btn-link btn-sm" onclick="switchEspTab('wifi')" style="font-size:0.7rem; color:var(--color-primary); cursor:pointer;">
+              View all ${networks.length} networks &rarr;
+            </button>
+          </div>
+        ` : '');
       }
     }
 

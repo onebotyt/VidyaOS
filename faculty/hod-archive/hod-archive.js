@@ -5,11 +5,11 @@
  * ══════════════════════════════════════════════════════════════
  */
 
-// Role verification
+// Role verification (Shared between Faculty and HOD)
 if (typeof requireFacultyAuth === 'function') {
-  requireFacultyAuth(['TEACHER', 'HOD']);
+  requireFacultyAuth(['TEACHER', 'HOD', 'FACULTY', 'SYSTEM_ADMIN']);
 } else if (typeof guardRoute === 'function') {
-  guardRoute({ roles: ['TEACHER'], requireHOD: true });
+  guardRoute({ roles: ['TEACHER', 'HOD', 'FACULTY', 'SYSTEM_ADMIN'] });
 }
 
 // Fallback transparent API handler

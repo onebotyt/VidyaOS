@@ -34,14 +34,130 @@
 
 @media (max-width: 768px) {
   .admin-top-header {
-    height: calc(58px + max(42px, env(safe-area-inset-top, 0px))) !important;
-    padding-top: max(42px, env(safe-area-inset-top, 0px)) !important;
-    padding-bottom: 0.35rem !important;
-    padding-left: max(0.85rem, env(safe-area-inset-left, 0px)) !important;
-    padding-right: max(0.85rem, env(safe-area-inset-right, 0px)) !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 0 0.65rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    overflow: visible !important;
     background: var(--bg-surface) !important;
     border-bottom: 1.5px solid var(--border-color) !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07) !important;
+  }
+
+  .header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .header-mobile-toggle-btn {
+    display: inline-flex !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-brand-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    min-width: 0 !important;
+    text-decoration: none !important;
+  }
+
+  .header-brand-logo svg {
+    width: 24px !important;
+    height: 24px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-brand-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    min-width: 0 !important;
+  }
+
+  .header-brand-title {
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+  }
+
+  .header-brand-badge {
+    display: none !important;
+  }
+
+  .header-right {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin-left: auto !important;
+    gap: 0.4rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-icon-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+  }
+
+  .header-icon-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .header-profile-round-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .user-avatar-initials {
+    font-size: 0.78rem !important;
+  }
+
+  .header-notifications-dropdown {
+    position: fixed !important;
+    top: 60px !important;
+    right: 0.65rem !important;
+    left: auto !important;
+    width: 320px !important;
+    max-width: calc(100vw - 1.3rem) !important;
+    z-index: 100005 !important;
+  }
+
+  .header-profile-dropdown {
+    position: fixed !important;
+    top: 60px !important;
+    right: 0.65rem !important;
+    left: auto !important;
+    width: 240px !important;
+    max-width: calc(100vw - 1.3rem) !important;
+    z-index: 100005 !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .header-profile-dropdown.open {
+    display: flex !important;
   }
 }
 
@@ -118,17 +234,7 @@
   color: var(--color-primary, hsl(217 91% 60%));
 }
 
-@media (max-width: 768px) {
-  .admin-top-header {
-    height: 56px !important;
-    padding: 0 0.85rem !important;
-    display: flex !important;
-  }
 
-  .header-mobile-toggle-btn {
-    display: inline-flex !important;
-  }
-}
 
 /* ── Right Section: Theme Toggle & Round Profile Avatar ── */
 .header-right {

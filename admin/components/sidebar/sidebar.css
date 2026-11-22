@@ -1096,7 +1096,7 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    padding-top: calc(58px + max(42px, env(safe-area-inset-top, 0px))) !important;
+    padding-top: calc(56px + env(safe-area-inset-top, 0px)) !important;
     min-height: calc(100vh - 56px);
     padding-bottom: calc(72px + max(18px, env(safe-area-inset-bottom, 0px))) !important;
   }

@@ -1,7 +1,9 @@
 /**
+ * ══════════════════════════════════════════════════════════════
  * VIDYAOS PAGE LOGIC: SETTINGS & INSTITUTIONAL BRANDING
  * Location: /admin/settings/settings.js
  * 100% Theme Token Compliant (Zero Hardcoded Hex Colors)
+ * ══════════════════════════════════════════════════════════════
  */
 
 guardRoute(['SYSTEM_ADMIN']);
@@ -12,7 +14,7 @@ const DEFAULT_BRANDING = {
   institution_code: 'GP-UBTER-101',
   affiliating_body: 'UBTER (Uttarakhand Board of Technical Education) / IRDT',
   campus_location: 'Uttarakhand, India',
-  institution_logo_url: '\VidyaOS-main\images\WhatsApp Image 2026-11-17 at 12.20.23 AM.jpeg',
+  institution_logo_url: '/images/college-logo.svg',
   institution_banner_url: '/admin/dashboard/campus-nainital.jpg'
 };
 
@@ -43,7 +45,6 @@ async function loadSettings(isManual = false) {
 
       // Update image previews
       updateImagePreviews(logoUrl, bannerUrl);
-      updateLivePreview();
 
       // Synchronize in localStorage for instant access across tabs
       try {
@@ -70,33 +71,13 @@ async function loadSettings(isManual = false) {
 
 function updateImagePreviews(logoUrl, bannerUrl) {
   const pLogo = document.getElementById('preview-logo-img');
-  const mLogo = document.getElementById('mockup-logo-img');
   if (pLogo && logoUrl) pLogo.src = logoUrl;
-  if (mLogo && logoUrl) mLogo.src = logoUrl;
 
   const pBanner = document.getElementById('preview-banner-img');
-  const mBanner = document.getElementById('mockup-banner-img');
   if (pBanner && bannerUrl) pBanner.src = bannerUrl;
-  if (mBanner && bannerUrl) mBanner.src = bannerUrl;
 }
 
-function updateLivePreview() {
-  const name = document.getElementById('setting-inst-name')?.value?.trim() || DEFAULT_BRANDING.institution_name;
-  const tagline = document.getElementById('setting-inst-tagline')?.value?.trim() || DEFAULT_BRANDING.institution_tagline;
-
-  const mName = document.getElementById('mockup-inst-name');
-  if (mName) mName.textContent = name;
-  const mTagline = document.getElementById('mockup-inst-tagline');
-  if (mTagline) mTagline.textContent = tagline;
-}
-
-// Live text update listeners
-['setting-inst-name', 'setting-inst-tagline'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', updateLivePreview);
-});
-
-// Client-side canvas downscaler to prevent huge multi-megabyte payloads from phone camera uploads
+// Client-side canvas downscaler
 function downscaleImage(file, maxWidth, maxHeight, quality = 0.85) {
   return new Promise((resolve) => {
     if (!file) return resolve({ dataUrl: '', blob: null });
@@ -119,193 +100,123 @@ function downscaleImage(file, maxWidth, maxHeight, quality = 0.85) {
         height = Math.round(height * ratio);
       }
       const canvas = document.createElement('canvas');
-      canvas.width = Math.max(1, width);
-      canvas.height = Math.max(1, height);
+      canvas.width = width;
+      canvas.height = height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
-
-      const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-      const dataUrl = canvas.toDataURL(mimeType, quality);
-      canvas.toBlob((blob) => {
-        resolve({ dataUrl, blob: blob || file });
-      }, mimeType, quality);
+      const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+      const dataUrl = canvas.toDataURL(mime, quality);
+      canvas.toBlob((blob) => resolve({ dataUrl, blob: blob || file }), mime, quality);
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      const reader = new FileReader();
-      reader.onload = (e) => resolve({ dataUrl: e.target.result, blob: file });
-      reader.onerror = () => resolve({ dataUrl: '', blob: file });
-      reader.readAsDataURL(file);
+      resolve({ dataUrl: '', blob: file });
     };
     img.src = url;
   });
 }
 
-// Logo File Handler
-async function handleLogoFileSelect(event) {
-  const file = event.target?.files?.[0];
+async function handleLogoFileSelect(e) {
+  const file = e.target.files && e.target.files[0];
   if (!file) return;
 
-  const btn = document.getElementById('save-settings-btn');
-  if (btn) btn.disabled = true;
-
   try {
-    const { dataUrl, blob } = await downscaleImage(file, 512, 512, 0.88);
-    document.getElementById('setting-inst-logo-url').value = dataUrl;
-    updateImagePreviews(dataUrl, document.getElementById('setting-inst-banner-url')?.value);
-
-    // Also attempt server upload
-    await uploadBrandingAsset(blob || file, 'logo');
-  } catch (err) {
-    console.warn('Logo process error:', err);
-  } finally {
-    if (btn) btn.disabled = false;
-  }
-}
-
-// Banner File Handler
-async function handleBannerFileSelect(event) {
-  const file = event.target?.files?.[0];
-  if (!file) return;
-
-  const btn = document.getElementById('save-settings-btn');
-  if (btn) btn.disabled = true;
-
-  try {
-    const { dataUrl, blob } = await downscaleImage(file, 1600, 600, 0.82);
-    document.getElementById('setting-inst-banner-url').value = dataUrl;
-    updateImagePreviews(document.getElementById('setting-inst-logo-url')?.value, dataUrl);
-
-    // Also attempt server upload
-    await uploadBrandingAsset(blob || file, 'banner');
-  } catch (err) {
-    console.warn('Banner process error:', err);
-  } finally {
-    if (btn) btn.disabled = false;
-  }
-}
-
-// Upload file to backend /api/v1/admin/branding/upload
-async function uploadBrandingAsset(fileOrBlob, type) {
-  try {
-    const formData = new FormData();
-    const filename = type === 'logo' ? 'college_logo.png' : 'campus_banner.jpg';
-    formData.append('file', fileOrBlob, filename);
-    formData.append('type', type);
-
-    const res = await fetchApi('/admin/branding/upload', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (res && res.success && res.data?.url) {
-      if (type === 'logo') {
-        document.getElementById('setting-inst-logo-url').value = res.data.url;
-      } else {
-        document.getElementById('setting-inst-banner-url').value = res.data.url;
-      }
-      if (typeof showToast === 'function') {
-        showToast(`${type === 'banner' ? 'Campus banner' : 'College logo'} uploaded and saved!`, 'success');
-      }
+    const { dataUrl } = await downscaleImage(file, 512, 512, 0.9);
+    if (dataUrl) {
+      document.getElementById('setting-inst-logo-url').value = dataUrl;
+      const pLogo = document.getElementById('preview-logo-img');
+      if (pLogo) pLogo.src = dataUrl;
+      showToast('Logo preview updated. Click "Save Changes" to apply.', 'info');
     }
   } catch (err) {
-    console.warn('Server upload fallback active:', err.message);
+    showToast('Failed to read logo image: ' + err.message, 'error');
+  }
+}
+
+async function handleBannerFileSelect(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  try {
+    const { dataUrl } = await downscaleImage(file, 1600, 600, 0.82);
+    if (dataUrl) {
+      document.getElementById('setting-inst-banner-url').value = dataUrl;
+      const pBanner = document.getElementById('preview-banner-img');
+      if (pBanner) pBanner.src = dataUrl;
+      showToast('Campus banner preview updated. Click "Save Changes" to apply.', 'info');
+    }
+  } catch (err) {
+    showToast('Failed to read campus banner: ' + err.message, 'error');
   }
 }
 
 function resetDefaultLogo() {
   document.getElementById('setting-inst-logo-url').value = DEFAULT_BRANDING.institution_logo_url;
-  updateImagePreviews(DEFAULT_BRANDING.institution_logo_url, document.getElementById('setting-inst-banner-url')?.value);
-  if (typeof showToast === 'function') showToast('Default college logo restored', 'info');
+  const pLogo = document.getElementById('preview-logo-img');
+  if (pLogo) pLogo.src = DEFAULT_BRANDING.institution_logo_url;
+  showToast('Reset to default college logo', 'info');
 }
 
 function resetDefaultBanner() {
   document.getElementById('setting-inst-banner-url').value = DEFAULT_BRANDING.institution_banner_url;
-  updateImagePreviews(document.getElementById('setting-inst-logo-url')?.value, DEFAULT_BRANDING.institution_banner_url);
-  if (typeof showToast === 'function') showToast('Default campus building photo restored', 'info');
+  const pBanner = document.getElementById('preview-banner-img');
+  if (pBanner) pBanner.src = DEFAULT_BRANDING.institution_banner_url;
+  showToast('Reset to default campus image', 'info');
 }
 
-function resetToOfficialDefaults() {
-  const elName = document.getElementById('setting-inst-name');
-  const elTagline = document.getElementById('setting-inst-tagline');
-  const elCode = document.getElementById('setting-inst-code');
-  const elAffil = document.getElementById('setting-affiliating-body');
-  const elLoc = document.getElementById('setting-location');
-  const elLogo = document.getElementById('setting-inst-logo-url');
-  const elBanner = document.getElementById('setting-inst-banner-url');
-
-  if (elName) elName.value = DEFAULT_BRANDING.institution_name;
-  if (elTagline) elTagline.value = DEFAULT_BRANDING.institution_tagline;
-  if (elCode) elCode.value = DEFAULT_BRANDING.institution_code;
-  if (elAffil) elAffil.value = DEFAULT_BRANDING.affiliating_body;
-  if (elLoc) elLoc.value = DEFAULT_BRANDING.campus_location;
-  if (elLogo) elLogo.value = DEFAULT_BRANDING.institution_logo_url;
-  if (elBanner) elBanner.value = DEFAULT_BRANDING.institution_banner_url;
-
-  updateImagePreviews(DEFAULT_BRANDING.institution_logo_url, DEFAULT_BRANDING.institution_banner_url);
-  updateLivePreview();
-  if (typeof showToast === 'function') {
-    showToast('Official UBTER defaults loaded. Click "Save Changes" to apply.', 'info');
-  }
-}
-
-const form = document.getElementById('identity-form');
-if (form) {
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('save-settings-btn');
-    if (btn) btn.disabled = true;
-    const originalText = btn ? btn.innerHTML : '';
-    if (btn) btn.innerHTML = `
-      <svg class="spin-anim" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-      <span>Saving...</span>
-    `;
-
-    const settingsPayload = {
-      institution_name: document.getElementById('setting-inst-name')?.value?.trim() || DEFAULT_BRANDING.institution_name,
-      institution_tagline: document.getElementById('setting-inst-tagline')?.value?.trim() || DEFAULT_BRANDING.institution_tagline,
-      institution_code: document.getElementById('setting-inst-code')?.value?.trim() || DEFAULT_BRANDING.institution_code,
-      affiliating_body: document.getElementById('setting-affiliating-body')?.value?.trim() || DEFAULT_BRANDING.affiliating_body,
-      campus_location: document.getElementById('setting-location')?.value?.trim() || DEFAULT_BRANDING.campus_location,
-      institution_logo_url: document.getElementById('setting-inst-logo-url')?.value || DEFAULT_BRANDING.institution_logo_url,
-      institution_banner_url: document.getElementById('setting-inst-banner-url')?.value || DEFAULT_BRANDING.institution_banner_url
-    };
-
-    try {
-      const res = await fetchApi('/admin/settings', {
-        method: 'PUT',
-        body: JSON.stringify({ settings: settingsPayload })
-      });
-      if (res.success) {
-        // Broadcast to localStorage & window event
-        try {
-          localStorage.setItem('institutionSettings', JSON.stringify(settingsPayload));
-          window.dispatchEvent(new CustomEvent('institution-settings-updated', { detail: settingsPayload }));
-        } catch (_) { }
-
-        if (typeof showToast === 'function') showToast('Institutional branding & settings saved successfully', 'success');
-        await loadSettings();
-      } else {
-        throw new Error(res.error?.message || 'Failed to save settings');
-      }
-    } catch (err) {
-      console.error('Error saving settings:', err);
-      if (typeof showToast === 'function') showToast('Failed to save: ' + err.message, 'error');
-    } finally {
+// ── Submit Institutional Settings ──
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('identity-form');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('save-settings-btn');
       if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spin-anim" style="display:inline-block; animation:spin 1s linear infinite;">⏳</span> <span>Saving...</span>`;
       }
-    }
-  });
-}
 
-// Bind functions to window
+      const payload = {
+        institution_name: document.getElementById('setting-inst-name')?.value.trim() || DEFAULT_BRANDING.institution_name,
+        institution_tagline: document.getElementById('setting-inst-tagline')?.value.trim() || '',
+        institution_code: document.getElementById('setting-inst-code')?.value.trim() || DEFAULT_BRANDING.institution_code,
+        affiliating_body: document.getElementById('setting-affiliating-body')?.value.trim() || DEFAULT_BRANDING.affiliating_body,
+        campus_location: document.getElementById('setting-location')?.value.trim() || DEFAULT_BRANDING.campus_location,
+        institution_logo_url: document.getElementById('setting-inst-logo-url')?.value.trim() || DEFAULT_BRANDING.institution_logo_url,
+        institution_banner_url: document.getElementById('setting-inst-banner-url')?.value.trim() || DEFAULT_BRANDING.institution_banner_url
+      };
+
+      try {
+        const res = await fetchApi('/admin/settings', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (res && res.success) {
+          showToast('Institution settings saved successfully', 'success');
+          try {
+            localStorage.setItem('institutionSettings', JSON.stringify(payload));
+          } catch (_) { }
+        } else {
+          showToast(res?.error?.message || 'Failed to save settings', 'error');
+        }
+      } catch (err) {
+        showToast('Error saving settings: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> <span>Save Changes</span>`;
+        }
+      }
+    });
+  }
+
+  loadSettings();
+});
+
+// Window exports for inline handlers
+window.loadSettings = loadSettings;
 window.handleLogoFileSelect = handleLogoFileSelect;
 window.handleBannerFileSelect = handleBannerFileSelect;
 window.resetDefaultLogo = resetDefaultLogo;
 window.resetDefaultBanner = resetDefaultBanner;
-window.resetToOfficialDefaults = resetToOfficialDefaults;
-window.loadSettings = loadSettings;
-
-loadSettings();

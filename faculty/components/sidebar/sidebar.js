@@ -235,7 +235,7 @@
     if (!isClassroom && !document.querySelector('.mobile-bottom-nav')) {
       const tabs = isHod ? [
         { key: 'classes', label: 'Classes', href: '/faculty/classes/index.html', icon: 'classes' },
-        { key: 'attendance', label: 'Attendance', href: '/faculty/registers/index.html', icon: 'registers' },
+        { key: 'records', label: 'Records', href: '/faculty/student-records/index.html', icon: 'registers' },
         { key: 'students', label: 'Students', href: '/faculty/students/index.html', icon: 'students' },
         { key: 'faculty', label: 'Faculty', href: '/faculty/faculty/index.html', icon: 'faculty' },
         { key: 'settings', label: 'Settings', href: '/faculty/settings/index.html', icon: 'settings' }

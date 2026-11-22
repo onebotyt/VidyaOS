@@ -4680,7 +4680,17 @@ async function exportTableToRealXlsx(tableOrClone, filename, sheetTitle) {
             excelCell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFDC2626' } };
             excelCell.alignment = { horizontal: 'center', vertical: 'middle' };
           } else {
-            excelCell.font = { name: 'Calibri', size: 10, bold: Boolean(isName || isHeader) };
+            let cellFontColor = '#0f172a';
+            if (cell.style && cell.style.color) {
+              cellFontColor = resolveColorToHex(cell.style.color, '#0f172a');
+            }
+            let cellBg = null;
+            if (cell.style && cell.style.backgroundColor) {
+              cellBg = resolveColorToHex(cell.style.backgroundColor, '#ffffff');
+              excelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + cellBg.replace('#', '').toUpperCase() } };
+            }
+            cellFontColor = ensureExportContrast(cellFontColor, cellBg);
+            excelCell.font = { name: 'Calibri', size: 10, bold: Boolean(isName || isHeader), color: { argb: 'FF' + cellFontColor.replace('#', '').toUpperCase() } };
             excelCell.alignment = { horizontal: isName ? 'left' : 'center', vertical: 'middle' };
           }
 
@@ -4731,62 +4741,22 @@ async function exportTableToRealXlsx(tableOrClone, filename, sheetTitle) {
       URL.revokeObjectURL(url);
       return true;
     } catch (clientErr) {
-      console.warn('Client-side ExcelJS export failed, trying backend fallback:', clientErr);
+      console.error('Client-side ExcelJS export error:', clientErr);
+      if (typeof showToast === 'function') {
+        showToast('Excel export failed: ' + clientErr.message, 'error');
+      } else {
+        alert('Excel export failed: ' + clientErr.message);
+      }
+      return false;
     }
-  }
-
-  // Backend fallback route
-  try {
-    const rows = [];
-    const trElements = clone.querySelectorAll('tr');
-    trElements.forEach(tr => {
-      const rowCells = [];
-      tr.querySelectorAll('th, td').forEach(c => {
-        rowCells.push({
-          text: c.textContent.replace(/\s+/g, ' ').trim(),
-          colspan: parseInt(c.getAttribute('colspan') || '1', 10),
-          rowspan: parseInt(c.getAttribute('rowspan') || '1', 10),
-          is_blue: c.classList.contains('excel-hdr-blue') || tr.classList.contains('excel-hdr-blue'),
-          is_tan: c.classList.contains('excel-hdr-tan') || tr.classList.contains('excel-hdr-tan'),
-          is_sub: c.classList.contains('excel-hdr-sub') || tr.classList.contains('excel-hdr-sub'),
-          is_summary: c.classList.contains('excel-summary-lbl') || c.classList.contains('excel-summary-avg') || tr.closest('tfoot'),
-          is_label: c.classList.contains('excel-summary-lbl'),
-          is_name: c.classList.contains('cell-student-name'),
-          is_header: c.tagName.toLowerCase() === 'th' || tr.closest('thead'),
-          is_absent: c.classList.contains('is-absent')
-        });
-      });
-      rows.push(rowCells);
-    });
-
-    const token = (typeof getAuthToken === 'function' && getAuthToken()) || localStorage.getItem('token') || '';
-    const resp = await fetch('/api/v1/faculty/export/table-to-excel', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        title: filename,
-        sheet_name: sheetTitle,
-        rows: rows
-      })
-    });
-
-    if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
-    const blob = await resp.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${filename}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    return true;
-  } catch (fallbackErr) {
-    console.error('All XLSX export strategies failed:', fallbackErr);
-    throw fallbackErr;
+  } else {
+    console.error('ExcelJS engine not loaded in window');
+    if (typeof showToast === 'function') {
+      showToast('Excel export engine is still initializing, please try again.', 'error');
+    } else {
+      alert('Excel export engine is still initializing, please try again.');
+    }
+    return false;
   }
 }
 
@@ -8500,21 +8470,57 @@ const EXCEL_CSS_VAR_MAP = {
   '--bg-secondary': '#f8fafc',
   '--bg-tertiary': '#f1f5f9',
   '--text-primary': '#0f172a',
-  '--text-secondary': '#475569',
-  '--text-muted': '#64748b',
+  '--text-secondary': '#334155',
+  '--text-muted': '#475569',
+  '--text-light': '#64748b',
   '--text-main': '#0f172a',
+  '--text-sub': '#334155',
   '--border-color': '#cbd5e1',
+  '--border-subtle': '#e2e8f0',
   '--primary-color': '#0284c7',
   '--primary-light': '#e0f2fe',
   '--table-th-bg': '#f1f5f9',
+  '--table-header-bg': '#f1f5f9',
+  '--table-border': '#cbd5e1',
+  '--table-td-border': '#cbd5e1',
   '--status-present-bg': '#dcfce7',
+  '--status-present-text': '#166534',
   '--status-absent-bg': '#fee2e2',
+  '--status-absent-text': '#991b1b',
   '--status-late-bg': '#fef3c7',
+  '--status-late-text': '#92400e',
   '--badge-primary-bg': '#e0f2fe',
   '--badge-primary-text': '#0369a1'
 };
 
-function resolveColorToHex(colorStr, fallbackHex = '#ffffff') {
+function isColorDark(hex) {
+  if (!hex || typeof hex !== 'string') return false;
+  const c = hex.replace('#', '').trim();
+  if (c.length !== 6) return false;
+  const r = parseInt(c.slice(0, 2), 16) || 0;
+  const g = parseInt(c.slice(2, 4), 16) || 0;
+  const b = parseInt(c.slice(4, 6), 16) || 0;
+  return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 140;
+}
+
+function ensureExportContrast(fontHex, bgHex) {
+  const effectiveBg = bgHex || '#ffffff';
+  const effectiveFont = fontHex || '#0f172a';
+  const isBgDark = isColorDark(effectiveBg);
+  const isFontDark = isColorDark(effectiveFont);
+
+  // If both are dark (e.g. dark text on dark bg), flip font to light
+  if (isBgDark && isFontDark) {
+    return '#ffffff';
+  }
+  // If both are light (e.g. white/light text on white/light bg), flip font to dark
+  if (!isBgDark && !isFontDark) {
+    return '#0f172a';
+  }
+  return effectiveFont;
+}
+
+function resolveColorToHex(colorStr, fallbackHex = '#0f172a') {
   if (!colorStr || typeof colorStr !== 'string') return fallbackHex;
   let str = colorStr.trim().toLowerCase();
 
@@ -8524,13 +8530,16 @@ function resolveColorToHex(colorStr, fallbackHex = '#ffffff') {
       const varName = varNameMatch[1].trim();
       const varFallback = varNameMatch[2]?.trim();
       let resolved = '';
-      if (typeof window !== 'undefined' && window.getComputedStyle) {
+      // 1. Prioritize print-safe light-theme tokens so dark mode does not export white text to white Excel/PDF/Word sheets
+      if (EXCEL_CSS_VAR_MAP[varName]) {
+        resolved = EXCEL_CSS_VAR_MAP[varName];
+      } else if (varFallback && !varFallback.startsWith('var(')) {
+        resolved = varFallback;
+      } else if (typeof window !== 'undefined' && window.getComputedStyle) {
         try {
           resolved = window.getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
         } catch (_) { }
       }
-      if (!resolved && EXCEL_CSS_VAR_MAP[varName]) resolved = EXCEL_CSS_VAR_MAP[varName];
-      if (!resolved && varFallback) resolved = varFallback;
       if (resolved) str = resolved.toLowerCase();
     }
   }
@@ -8769,15 +8778,16 @@ async function exportCurrentSheet(format) {
               };
             }
 
-            // 2. Resolve Text / Font Styling
+            // 2. Resolve Text / Font Styling (Guaranteed high-contrast legibility)
             let fontColorHex = '#1e293b';
             if (cell.s?.color) {
-              fontColorHex = resolveColorToHex(cell.s.color);
+              fontColorHex = resolveColorToHex(cell.s.color, '#1e293b');
             } else if (isHeader || isSubHeader) {
               fontColorHex = '#0f172a';
             } else if (isMarks) {
               fontColorHex = '#334155';
             }
+            fontColorHex = ensureExportContrast(fontColorHex, bgHex);
 
             const isBold = Boolean(cell.s?.bold !== undefined ? cell.s.bold : (isHeader || isSubHeader || isMarks));
             const isItalic = Boolean(cell.s?.italic);
@@ -9001,8 +9011,9 @@ function generateSheetPrintableHtml(sheet) {
       const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isSubHeader || isMarks ? 'bold' : 'normal'));
       const fontStyle = cell.s?.italic ? 'italic' : 'normal';
       const textDecor = cell.s?.underline ? 'underline' : 'none';
-      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg) : (isHeader ? '#f1f5f9' : isSubHeader ? '#f8fafc' : isMarks ? '#f8fafc' : '#ffffff');
-      const color = cell.s?.color ? resolveColorToHex(cell.s.color) : (isHeader || isSubHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg, '#ffffff') : (isHeader ? '#f1f5f9' : isSubHeader ? '#f8fafc' : isMarks ? '#f8fafc' : '#ffffff');
+      let color = cell.s?.color ? resolveColorToHex(cell.s.color, '#1e293b') : (isHeader || isSubHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      color = ensureExportContrast(color, bg);
       const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8.5pt'));
       const fontFamily = cell.s?.fontFamily ? `font-family:${cell.s.fontFamily};` : '';
 
@@ -9412,8 +9423,9 @@ function exportSheetToWordDoc(sheet) {
       const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isSubHeader || isMarks ? 'bold' : 'normal'));
       const fontStyle = cell.s?.italic ? 'italic' : 'normal';
       const textDecor = cell.s?.underline ? 'underline' : 'none';
-      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg) : (isHeader ? '#e2e8f0' : isSubHeader ? '#f8fafc' : isMarks ? '#f1f5f9' : '#ffffff');
-      const color = cell.s?.color ? resolveColorToHex(cell.s.color) : (isHeader || isSubHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg, '#ffffff') : (isHeader ? '#e2e8f0' : isSubHeader ? '#f8fafc' : isMarks ? '#f1f5f9' : '#ffffff');
+      let color = cell.s?.color ? resolveColorToHex(cell.s.color, '#1e293b') : (isHeader || isSubHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
+      color = ensureExportContrast(color, bg);
       const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8pt'));
       const tag = isHeader ? 'th' : 'td';
 
