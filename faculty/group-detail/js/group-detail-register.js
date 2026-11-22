@@ -2205,7 +2205,6 @@
       }
     }
   }
-  }
 
   // ─── ATTENDANCE EXPORT STUDIO CONTROLLER ───
   function openAttendanceExportModal() {
