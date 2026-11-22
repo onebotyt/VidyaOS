@@ -59,25 +59,4 @@ if (fs.existsSync(wwwMbPath)) {
   fs.writeFileSync(wwwMbPath, mb);
 }
 
-// 5. Update frontendv2 version.json
-const v2VersionPath = 'frontendv2/packages/core/src/version.json';
-if (fs.existsSync(v2VersionPath)) {
-  fs.writeFileSync(v2VersionPath, JSON.stringify({ version, buildNumber: buildNum }, null, 2) + '\n');
-}
-
-// 6. Update frontendv2 mobile app.json
-const v2AppJsonPath = 'frontendv2/apps/mobile/app.json';
-if (fs.existsSync(v2AppJsonPath)) {
-  try {
-    const v2App = JSON.parse(fs.readFileSync(v2AppJsonPath, 'utf8'));
-    if (v2App.expo) {
-      v2App.expo.version = version;
-      if (v2App.expo.android) {
-        v2App.expo.android.versionCode = buildNum;
-      }
-    }
-    fs.writeFileSync(v2AppJsonPath, JSON.stringify(v2App, null, 2) + '\n');
-  } catch (_) {}
-}
-
 console.log(`[Version Bumper] Successfully stamped version ${version}`);

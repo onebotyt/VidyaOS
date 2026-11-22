@@ -81,91 +81,10 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Build Native React Native v2app (Expo Prebuild & Gradle)
-        run: |
-          echo "[v2app] Starting Native React Native APK Build from frontendv2..."
-          cd frontendv2
-          pnpm install --no-frozen-lockfile
-
-          # Build Web Frontend v2 and sync to root /v2 directory
-          pnpm --filter @vidyaos/web build
-          cd ..
-          rm -rf v2
-          cp -r frontendv2/apps/web/dist v2
-          cd frontendv2
-
-          # Locate single @react-native/gradle-plugin inside react-native dependencies
-          PLUGIN_DIR=$(node -e "console.log(require('path').dirname(require.resolve('@react-native/gradle-plugin/package.json', { paths: [process.cwd(), process.cwd() + '/apps/mobile'] })))")
-          echo "[v2app] Found single Gradle plugin at: $PLUGIN_DIR"
-          # Link directly into apps/mobile/node_modules so rootDir execution in Gradle resolves identically
-          mkdir -p apps/mobile/node_modules/@react-native
-          ln -sf "$PLUGIN_DIR" apps/mobile/node_modules/@react-native/gradle-plugin
-
-          cd apps/mobile
-          npx expo prebuild --platform android --no-install
-          if [ -d "android" ]; then
-            # Configure 4GB JVM heap for Gradle daemon to ensure Jetify has enough memory without breaking CMake
-            sed -i '/org.gradle.jvmargs/d' android/gradle.properties || true
-            echo "org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
-
-            # Configure androidResources noCompress for bundle and react block
-            node -e "
-              const fs = require('fs');
-              const gradleFile = 'android/app/build.gradle';
-              if (fs.existsSync(gradleFile)) {
-                let content = fs.readFileSync(gradleFile, 'utf8');
-                content = content.replace(/react\s*\{/, 'react {\n    debuggableVariants = []');
-                if (!content.includes('noCompress')) {
-                  content = content.replace(/android\s*\{/, 'android {\n    androidResources {\n        noCompress += [\"bundle\"]\n    }');
-                }
-                fs.writeFileSync(gradleFile, content, 'utf8');
-              }
-            "
-
-            # Pre-generate offline bundle into android/app/src/main/assets/index.android.bundle
-            mkdir -p android/app/src/main/assets
-            npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ || echo "Pre-bundle skipped, relying on Gradle"
-
-            cd android
-            chmod +x gradlew
-            unset _JAVA_OPTIONS
-            unset JAVA_TOOL_OPTIONS
-            ./gradlew assembleRelease --no-daemon --stacktrace || ./gradlew assembleDebug --no-daemon --stacktrace
-            if [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
-              cp app/build/outputs/apk/release/app-release.apk ../../../../v2app.apk
-              echo "[v2app] ✅ Native React Native Release APK (offline bundle embedded) compiled successfully!"
-            elif [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
-              cp app/build/outputs/apk/debug/app-debug.apk ../../../../v2app.apk
-              echo "[v2app] ✅ Native React Native Debug APK (offline bundle embedded) compiled successfully!"
-            else
-              echo "[v2app] ❌ Native React Native APK build did not produce release or debug APK"
-              exit 1
-            fi
-            cd ../../..
-          else
-            echo "[v2app] ❌ Prebuild failed to create android directory"
-            exit 1
-          fi
-
       - name: Copy Release APK Artifacts
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk ./VidyaOS.apk
-          if [ ! -f "./v2app.apk" ]; then
-            echo "[v2app] ERROR: Native v2app.apk was not generated. Failing release to prevent incorrect fallback!"
-            exit 1
-          fi
-          ls -lh ./VidyaOS.apk ./v2app.apk
-
-      - name: Upload v2app APK Artifact (Visible in GitHub Details)
-        uses: actions/upload-artifact@v4
-        with:
-          name: v2app-apk
-          path: ./v2app.apk
+          ls -lh ./VidyaOS.apk
 
       - name: Upload VidyaOS APK Artifact
         uses: actions/upload-artifact@v4
@@ -179,21 +98,18 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           name: "VidyaOS Mobile App ${{ env.TAG_NAME }}"
           body: |
-            ## 📱 VidyaOS & v2app Android APK Release (${{ env.TAG_NAME }})
+            ## 📱 VidyaOS Android APK Release (${{ env.TAG_NAME }})
 
-            Direct download links for Android:
-            - **[Download v2app.apk](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/v2app.apk)** (Frontend v2 Universal App)
+            Direct download link for Android:
             - **[Download VidyaOS.apk](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/VidyaOS.apk)**
 
             ### Features:
             - **Auto-Version**: Version code `${{ env.BUILD_NUM }}`, version name `${{ env.VERSION }}`.
-            - Includes Frontend v2 multi-OS single codebase app.
             - Complete institutional campus OS frontend wrapped natively with Capacitor.
             - Real-time cloud sync with VidyaOS backend on Render.
             - Mobile-optimized attendance studio with Camera QR scanner & PIN entry.
             - Google Classroom style dynamic theme banners.
           files: |
-            ./v2app.apk
             ./VidyaOS.apk
           make_latest: true
         env:
@@ -203,7 +119,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app-version.json package.json android/app/build.gradle mobile-bridge.js frontendv2/packages/core/src/version.json frontendv2/apps/mobile/app.json v2
+          git add app-version.json package.json android/app/build.gradle mobile-bridge.js
           if [ -f android/app/vidyaos.keystore ]; then
             git add android/app/vidyaos.keystore
           fi
