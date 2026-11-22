@@ -1002,20 +1002,38 @@
 
 /* Marks Workspace Redesign (Image 4 - PC & Image 5 - Mobile) */
 .marks-stats-strip {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 0.5rem 0 1.25rem 0;
-  border-bottom: 1px solid var(--border-color);
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 0.25rem 0 0.75rem 0;
+  border-bottom: none;
 }
 
 .marks-stat-item {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-xs, var(--shadow-sm));
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.marks-stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
+}
+
+.marks-stat-info {
+  display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  min-width: 125px;
+  min-width: 0;
 }
 
 .marks-stat-top {
@@ -1028,12 +1046,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-md);
   background: var(--color-primary-light);
   color: var(--color-primary);
   flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.marks-stat-item:hover .marks-stat-icon-badge {
+  transform: scale(1.08);
 }
 
 .marks-stat-icon-pending {
@@ -1045,14 +1068,31 @@
   font-size: 1.85rem;
   font-weight: 800;
   color: var(--text-main);
-  line-height: 1.1;
+  line-height: 1;
   letter-spacing: -0.02em;
 }
 
 .marks-stat-lbl {
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1100px) {
+  .marks-stats-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .marks-stats-strip {
+    display: none;
+  }
 }
 
 /* Mobile Stats Row (Image 5) */
@@ -1232,23 +1272,36 @@
 
 .marks-search-wrapper {
   position: relative;
-  min-width: 240px;
+  flex: 1;
+  max-width: 320px;
+  min-width: 200px;
+}
+
+.marks-search-wrapper .marks-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
 }
 
 #marks-search-input {
   width: 100%;
-  padding: 0.45rem 0.85rem;
+  box-sizing: border-box;
+  padding: 0.45rem 0.85rem 0.45rem 2.25rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-pill);
   background: var(--bg-card);
   color: var(--text-main);
   font-size: 0.82rem;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 #marks-search-input:focus {
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 /* Section Container & Headers */
@@ -1265,9 +1318,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
+  padding: 0.9rem 1.25rem;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-card);
+  gap: 0.75rem;
 }
 
 .marks-section-hdr.collapsible-hdr {
@@ -1324,13 +1378,37 @@
   margin-top: 0.15rem;
 }
 
+.marks-sec-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .marks-sec-help {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
 
+.marks-sec-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
 .mobile-sec-add-btn {
   display: none;
+}
+
+@media (max-width: 768px) {
+  .marks-sec-help {
+    display: none;
+  }
 }
 
 /* Graded Badge & Action Button */

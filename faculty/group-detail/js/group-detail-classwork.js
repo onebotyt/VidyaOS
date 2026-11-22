@@ -3219,12 +3219,6 @@
         const el = ById('marks-' + sec + '-section');
         if (el) el.classList.remove('collapsed');
       });
-    } else {
-      // When search is cleared, restore default collapsed state
-      sections.forEach(sec => {
-        const el = ById('marks-' + sec + '-section');
-        if (el) el.classList.add('collapsed');
-      });
     }
 
     // Filter desktop tables

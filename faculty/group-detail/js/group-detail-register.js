@@ -1052,7 +1052,7 @@
     const reg = classRegState.registerData || {};
     const targetDate = customDate || classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
 
-    const dateInp = ById('sess-date');
+    const dateInp = ById('sess-date') || ById('new-session-date');
     if (dateInp) {
       dateInp.value = targetDate;
       dateInp.onchange = () => updateModalAutoSlot();
@@ -1063,12 +1063,17 @@
 
     // Default preset based on register scope
     const defaultType = (reg.session_type_scope === 'PRACTICAL') ? 'PRACTICAL' : 'THEORY';
-    selectPeriodTypePreset(defaultType);
+    if (typeof selectPeriodTypePreset === 'function') {
+      selectPeriodTypePreset(defaultType);
+    } else {
+      const typeSel = ById('new-session-type');
+      if (typeSel) typeSel.value = defaultType;
+    }
 
     // Reset optional time fields (collapsed by default)
-    const startTimeInp = ById('sess-start-time');
+    const startTimeInp = ById('sess-start-time') || ById('new-session-start');
     if (startTimeInp) startTimeInp.value = '';
-    const endTimeInp = ById('sess-end-time');
+    const endTimeInp = ById('sess-end-time') || ById('new-session-end');
     if (endTimeInp) endTimeInp.value = '';
     const timeFields = ById('period-time-fields');
     if (timeFields) timeFields.style.display = 'none';
@@ -1083,21 +1088,21 @@
   }
 
   function updateModalAutoSlot(optDate) {
-    const targetDate = optDate || ById('sess-date')?.value || classRegState.selectedDate || new Date().toISOString().slice(0, 10);
+    const targetDate = optDate || ById('sess-date')?.value || ById('new-session-date')?.value || classRegState.selectedDate || new Date().toISOString().slice(0, 10);
     const grid = classRegState.gridData || {};
     const finalized = grid.finalized_sessions || [];
     const daySessions = finalized.filter(s => s.session_date === targetDate);
     const maxPeriod = daySessions.reduce((max, s) => Math.max(max, s.period_number || 1), 0);
     const nextSlot = Math.min(Math.max(daySessions.length + 1, maxPeriod + 1), 8);
 
-    const hiddenPeriod = ById('sess-period');
+    const hiddenPeriod = ById('sess-period') || ById('new-session-slot');
     if (hiddenPeriod) hiddenPeriod.value = String(nextSlot);
 
     const slotBadgeText = ById('sess-auto-slot-text');
     if (slotBadgeText) slotBadgeText.textContent = `Auto: Period ${nextSlot}`;
 
-    const labelInp = ById('sess-label');
-    const type = ById('sess-type')?.value || 'THEORY';
+    const labelInp = ById('sess-label') || ById('new-session-label');
+    const type = ById('sess-type')?.value || ById('new-session-type')?.value || 'THEORY';
     if (labelInp && (labelInp.value.startsWith('Theory Class') || !labelInp.value.trim())) {
       labelInp.value = nextSlot === 1 ? 'Theory Class' : `Theory Class (Period ${nextSlot})`;
     }
@@ -1192,13 +1197,13 @@
       return;
     }
 
-    const session_date = ById('sess-date')?.value;
-    const label = ById('sess-label')?.value?.trim();
-    let session_type = ById('sess-type')?.value || 'THEORY';
+    const session_date = ById('sess-date')?.value || ById('new-session-date')?.value;
+    const label = (ById('sess-label')?.value || ById('new-session-label')?.value)?.trim();
+    let session_type = ById('sess-type')?.value || ById('new-session-type')?.value || 'THEORY';
     if (session_type === 'CUSTOM') session_type = 'THEORY';
-    const period_number = parseInt(ById('sess-period')?.value || '1', 10);
-    const startTimeVal = ById('sess-start-time')?.value;
-    const endTimeVal = ById('sess-end-time')?.value;
+    const period_number = parseInt(ById('sess-period')?.value || ById('new-session-slot')?.value || '1', 10);
+    const startTimeVal = ById('sess-start-time')?.value || ById('new-session-start')?.value;
+    const endTimeVal = ById('sess-end-time')?.value || ById('new-session-end')?.value;
 
     if (!session_date) {
       toast('Please select a session date');
@@ -1206,7 +1211,7 @@
     }
     if (!label) {
       toast('Please enter a period title or name');
-      ById('sess-label')?.focus();
+      (ById('sess-label') || ById('new-session-label'))?.focus();
       return;
     }
 
@@ -1219,7 +1224,7 @@
     };
     if (endTimeVal) payload.end_time = `${session_date} ${endTimeVal}:00`;
 
-    const submitBtn = ById('btn-submit-add-period');
+    const submitBtn = ById('btn-submit-add-period') || ById('btn-save-new-session');
     const origHtml = submitBtn ? submitBtn.innerHTML : '';
     if (submitBtn) {
       submitBtn.disabled = true;
