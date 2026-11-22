@@ -41,6 +41,11 @@
       const S = getS();
       const groupId = Number(S.groupId);
 
+      const syncDate = ById('class-sync-date');
+      if (syncDate && !syncDate.value) {
+        syncDate.value = classRegState.selectedDate || new Date().toISOString().slice(0, 10);
+      }
+
       // Fetch all registers to find those linked to this group or subject
       let groupRegisters = (Array.isArray(S.group?.registers) && S.group.registers.length > 0)
         ? [...S.group.registers]
@@ -90,9 +95,32 @@
         renderClassRegisterMatrix();
         renderMobileCompactMatrix();
         checkClassEspStatus();
+      } else {
+        const errMsg = res?.error?.message || 'Failed to load attendance register';
+        console.warn('loadClassRegister error:', errMsg);
+        const tbody = ById('class-matrix-body');
+        if (tbody) {
+          tbody.innerHTML = `<tr><td style="text-align:center;padding:2.5rem;color:var(--color-danger, #ef4444);">
+            <div style="font-weight:600;margin-bottom:0.5rem;">Could not load attendance register</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1rem;">${errMsg}</div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="window.retryLoadClassRegister()" style="display:inline-flex;align-items:center;gap:0.4rem;">
+              🔄 Retry
+            </button>
+          </td></tr>`;
+        }
       }
     } catch (err) {
       console.error('loadClassRegister error:', err);
+      const tbody = ById('class-matrix-body');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td style="text-align:center;padding:2.5rem;color:var(--color-danger, #ef4444);">
+          <div style="font-weight:600;margin-bottom:0.5rem;">Could not load attendance register</div>
+          <div style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1rem;">${err?.message || 'Server error occurred while loading register matrix.'}</div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="window.retryLoadClassRegister()" style="display:inline-flex;align-items:center;gap:0.4rem;">
+            🔄 Retry
+          </button>
+        </td></tr>`;
+      }
     }
   }
 
@@ -1138,9 +1166,9 @@
       session_date,
       label,
       session_type,
-      period_number
+      period_number,
+      start_time: startTimeVal ? `${session_date} ${startTimeVal}:00` : `${session_date} 09:00:00`
     };
-    if (startTimeVal) payload.start_time = `${session_date} ${startTimeVal}:00`;
     if (endTimeVal) payload.end_time = `${session_date} ${endTimeVal}:00`;
 
     const submitBtn = ById('btn-submit-add-period');
@@ -1543,13 +1571,16 @@
           sess = sListRes.data.find(s => s.session_date === dateVal);
         }
         if (!sess) {
+          const sScope = (reg.session_type_scope || grp.component || 'THEORY').toUpperCase();
+          const normSessionType = sScope.includes('PRACT') ? 'PRACTICAL' : 'THEORY';
           const createRes = await apiFetch(`/api/v1/faculty/registers/${regId}/sessions`, {
             method: 'POST',
             body: JSON.stringify({
               session_date: dateVal,
-              session_type: grp.component || 'THEORY',
+              session_type: normSessionType,
               label: 'Class 1 (Period 1)',
-              period_number: 1
+              period_number: 1,
+              start_time: `${dateVal} 09:00:00`
             })
           });
           if (createRes && createRes.success && createRes.data) {
@@ -2069,6 +2100,7 @@
   window.handleExportRangeChange = handleExportRangeChange;
   window.selectExportScope = selectExportScope;
   window.executeAttendanceExport = executeAttendanceExport;
+  window.retryLoadClassRegister = () => loadClassRegister(classRegState.currentMonth);
 
 })();
 
