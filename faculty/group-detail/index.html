@@ -1690,6 +1690,17 @@
                   <span class="roll-call-full-text">Roll Call (Manual, QR &amp; PIN)</span>
                   <span class="roll-call-short-text" style="display:none;">Roll Call</span>
                 </button>
+                <button type="button" class="btn btn-secondary btn-sm btn-manage-holidays" onclick="openHolidayModal()"
+                  style="font-size: 0.78rem; padding: 0.25rem 0.6rem; height: 30px; display:inline-flex; align-items:center; gap:0.35rem;"
+                  title="Manage institutional holidays and working days">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span>Holidays</span>
+                </button>
               </div>
             </div>
 
@@ -1968,10 +1979,10 @@
        ══════════════════════════════════════════════════════════════ -->
       <div id="classroom-roll-modal" class="modal-backdrop" style="display:none;"
         onclick="if(event.target===this)closeClassRollCallModal()">
-        <div class="modal-card" style="max-width: 620px;">
+        <div class="modal-card rollcall-modal-card">
           <div class="rollcall-modal-header">
             <div
-              style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+              style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
               <div>
                 <h2
                   style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.45rem;">
@@ -1979,7 +1990,7 @@
                     stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                   </svg>
-                  <span>Live Roll Call &amp; Attendance</span>
+                  <span>Live Roll Call &amp; Attendance Studio</span>
                 </h2>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">
                   <span id="class-rc-subject" style="font-weight: 700; color: var(--color-primary);">Subject</span> •
@@ -1994,47 +2005,91 @@
             <div class="rollcall-mode-tabs">
               <button type="button" class="rollcall-tab-btn active" id="class-rc-tab-live"
                 onclick="switchClassRollCallMode('live')">
-                Dynamic QR &amp; 6-Digit PIN
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Dynamic QR &amp; PIN</span>
               </button>
               <button type="button" class="rollcall-tab-btn" id="class-rc-tab-manual"
                 onclick="switchClassRollCallMode('manual')">
-                Manual Roll Call Roster
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 11l3 3L22 4"></path>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <span>Manual Roll Call Roster</span>
               </button>
             </div>
           </div>
 
+          <!-- Tab 1: Live QR & PIN -->
           <div id="class-rc-view-live">
-            <div style="text-align: center; padding: 0.5rem 0;">
-              <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.35rem;">Students can scan this
-                Dynamic QR code or enter the PIN on their phones:</div>
-              <div class="roll-pin-display" id="class-rc-pin-display">------</div>
-              <div id="class-rc-qr-wrap" style="display:flex;justify-content:center;margin:1rem 0;">
-                <div id="class-rc-qr-code"
-                  style="padding:10px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:var(--radius-md);display:inline-block;">
-                </div>
+            <div style="text-align: center; padding: 0.25rem 0;">
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                Students can scan this Dynamic QR code or enter the PIN on their phones:
               </div>
-              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">
-                Live Check-in Count: <strong id="class-rc-live-count" style="color:var(--status-present);">0</strong>
-                students checked in
+              <div class="roll-pin-display-card">
+                <div class="roll-pin-display" id="class-rc-pin-display">------</div>
+                <div class="roll-pin-hint">⚡ 6-Digit Live Attendance PIN</div>
+              </div>
+              <div id="class-rc-qr-wrap" style="display:flex;justify-content:center;margin:0.5rem 0;">
+                <div id="class-rc-qr-code" class="roll-qr-card"></div>
+              </div>
+
+              <!-- Live Student Check-Ins Feed -->
+              <div class="rollcall-live-feed-wrap">
+                <div class="rollcall-feed-header">
+                  <div>
+                    Live Student Check-Ins:
+                    <strong id="class-rc-live-count" style="color:var(--status-present);">0</strong> /
+                    <span id="class-rc-total-count">0</span>
+                    (<strong id="class-rc-live-pct" style="color:var(--status-present);">0%</strong>)
+                  </div>
+                  <div style="font-size:0.7rem;color:var(--text-muted);display:flex;align-items:center;gap:0.3rem;">
+                    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--status-present);"></span>
+                    Auto-refreshing
+                  </div>
+                </div>
+                <div class="rollcall-progress-bar-bg">
+                  <div class="rollcall-progress-bar-fill" id="class-rc-progress-bar" style="width: 0%;"></div>
+                </div>
+                <div class="rollcall-feed-list" id="class-rc-live-feed-list">
+                  <div style="text-align:center;padding:1rem;color:var(--text-muted);font-size:0.78rem;">
+                    Waiting for students to check in via QR or PIN...
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
+          <!-- Tab 2: Manual Roster -->
           <div id="class-rc-view-manual" style="display:none;">
-            <div
-              style="max-height: 320px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 1rem;">
-              <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+            <div class="rollcall-manual-toolbar">
+              <input type="text" id="class-rc-search" class="rollcall-filter-input" placeholder="🔍 Search student by name or roll..." oninput="filterClassRollCallRoster(this.value)">
+              <div class="rollcall-quick-actions">
+                <button type="button" class="btn-rc-bulk-present" onclick="bulkSetRollCallStatus('PRESENT')">✓ All Present</button>
+                <button type="button" class="btn-rc-bulk-absent" onclick="bulkSetRollCallStatus('ABSENT')">✕ All Absent</button>
+              </div>
+            </div>
+            <div style="font-size:0.75rem;font-weight:700;color:var(--text-muted);display:flex;gap:0.75rem;align-items:center;margin-bottom:0.45rem;">
+              <span>Total: <b id="rc-stat-total" style="color:var(--text-main);">0</b></span>
+              <span>Present: <b id="rc-stat-present" style="color:var(--status-present);">0</b></span>
+              <span>Absent: <b id="rc-stat-absent" style="color:var(--status-absent);">0</b></span>
+            </div>
+            <div style="max-height: 290px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 0.5rem;">
+              <table class="rollcall-roster-table">
                 <thead>
-                  <tr style="background: var(--bg-surface); border-bottom: 1px solid var(--border-color);">
-                    <th style="padding: 0.45rem 0.6rem; text-align: left;">Roll</th>
-                    <th style="padding: 0.45rem 0.6rem; text-align: left;">Student Name</th>
-                    <th style="padding: 0.45rem 0.6rem; text-align: center;">Status</th>
+                  <tr>
+                    <th style="width: 45px; text-align: center;">Roll</th>
+                    <th>Student Name</th>
+                    <th style="width: 90px; text-align: center;">Status</th>
                   </tr>
                 </thead>
                 <tbody id="class-rc-manual-tbody">
                   <tr>
-                    <td colspan="3" style="text-align:center;padding:1.5rem;color:var(--text-muted);">Loading
-                      students...</td>
+                    <td colspan="3" style="text-align:center;padding:1.5rem;color:var(--text-muted);">Loading students...</td>
                   </tr>
                 </tbody>
               </table>
@@ -2042,16 +2097,95 @@
           </div>
 
           <div
-            style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
-            <button type="button" class="btn btn-secondary" onclick="closeClassRollCallModal()">Close</button>
-            <button type="button" class="btn btn-primary" id="btn-save-class-rollcall" onclick="submitClassRollCall()"
-              style="display:inline-flex;align-items:center;gap:0.4rem;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <span>Confirm &amp; Save Attendance</span>
+            style="display: flex; gap: 0.75rem; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+            <div style="font-size:0.76rem;color:var(--text-muted);">
+              Date: <span id="class-rc-footer-date" style="font-weight:700;color:var(--text-main);">--</span>
+            </div>
+            <div style="display:flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-secondary" onclick="closeClassRollCallModal()">Close</button>
+              <button type="button" class="btn btn-primary" id="btn-save-class-rollcall" onclick="submitClassRollCall()"
+                style="display:inline-flex;align-items:center;gap:0.4rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Confirm &amp; Save Attendance</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════
+       MANAGE HOLIDAYS & WORKING DAYS MODAL
+       ══════════════════════════════════════════════════════════════ -->
+      <div id="manage-holiday-modal" class="modal-backdrop" style="display:none;"
+        onclick="if(event.target===this)closeHolidayModal()">
+        <div class="modal-card" style="max-width: 480px; width: 92%;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;">
+            <div>
+              <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.45rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Manage Holidays &amp; Working Days</span>
+              </h2>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">
+                By default, only Sundays &amp; Second Saturdays are holidays. Customize any date below:
+              </p>
+            </div>
+            <button onclick="closeHolidayModal()"
+              style="font-size: 1.4rem; color: var(--text-muted); line-height: 1; padding: 0.2rem; background: none; border: none; cursor: pointer;"
+              title="Close">&times;</button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div>
+              <label style="display:block; font-size: 0.78rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">
+                Select Date:
+              </label>
+              <input type="date" id="holiday-modal-date" class="form-input" style="width: 100%; padding: 0.45rem 0.65rem;" onchange="onHolidayModalDateChange(this.value)">
+            </div>
+
+            <div id="holiday-current-status-banner" style="padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.78rem; background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-main);">
+              Status for selected date: <strong id="holiday-current-status-text">Sunday (Default Holiday)</strong>
+            </div>
+
+            <div>
+              <label style="display:block; font-size: 0.78rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">
+                Set Date Type:
+              </label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <button type="button" id="btn-type-holiday" class="btn btn-sm" onclick="selectHolidayType('HOLIDAY')" style="border: 2px solid var(--color-primary); background: var(--color-primary-light); color: var(--color-primary); font-weight: 700; padding: 0.5rem;">
+                  🌴 Mark as Holiday
+                </button>
+                <button type="button" id="btn-type-working" class="btn btn-sm btn-secondary" onclick="selectHolidayType('WORKING')" style="padding: 0.5rem; font-weight: 700;">
+                  🏫 Working Class Day
+                </button>
+              </div>
+            </div>
+
+            <div id="holiday-reason-group">
+              <label style="display:block; font-size: 0.78rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;">
+                Holiday Reason / Title (Optional):
+              </label>
+              <input type="text" id="holiday-modal-reason" class="form-input" placeholder="e.g., Annual Sports Day, Local Festival, Special Holiday" style="width: 100%; padding: 0.45rem 0.65rem;">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.65rem; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+            <button type="button" id="btn-reset-holiday" class="btn btn-secondary btn-sm" onclick="resetDayHolidayDefault()" style="color: var(--text-muted);" title="Reset back to system default">
+              ↺ Reset to Default
             </button>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="closeHolidayModal()">Cancel</button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-save-holiday" onclick="submitSaveHoliday()">
+                Save Date Status
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -4084,7 +4218,7 @@
     <script src="/faculty/group-detail/js/group-detail-stream.js?v=20261031_v4"></script>
     <script src="/faculty/group-detail/js/group-detail-people.js?v=20261031_v4"></script>
     <script src="/faculty/group-detail/js/group-detail-classwork.js?v=20261031_v4"></script>
-    <script src="/faculty/group-detail/js/group-detail-register.js?v=20261123_v2"></script>
+    <script src="/faculty/group-detail/js/group-detail-register.js?v=20261123_v3"></script>
     <script src="/faculty/group-detail/group-detail.js?v=20261031_v4"></script>
 </body>
 

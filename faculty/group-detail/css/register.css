@@ -179,6 +179,19 @@ body[data-active-tab="register"] .classroom-body,
   border-collapse: separate;
   border-spacing: 0;
   background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+}
+
+.register-table th,
+.register-table td {
+  border-right: 1px solid var(--table-border, var(--border-color)) !important;
+  border-bottom: 1px solid var(--table-border, var(--border-color)) !important;
+  box-sizing: border-box;
+}
+
+.register-table tbody tr:hover td:not(.vertical-holiday-cell) {
+  background-color: var(--bg-hover, rgba(0, 0, 0, 0.025)) !important;
 }
 
 .register-table th.sticky-col-0,
@@ -1875,5 +1888,306 @@ body[data-active-tab="register"] .classroom-body,
     padding: 0.25rem 0.2rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   MULTI-PERIOD SUB-COLUMNS & CRISP GRID LEDGER STYLES
+   ══════════════════════════════════════════════════════════════ */
+.period-subcol-th {
+  background: var(--table-th-bg, var(--bg-surface)) !important;
+  color: var(--text-muted) !important;
+  font-size: 0.64rem !important;
+  font-weight: 800 !important;
+  font-family: var(--font-family-mono, monospace) !important;
+  text-align: center !important;
+  padding: 0.2rem 0.1rem !important;
+  min-width: 28px !important;
+  border-bottom: 2px solid var(--border-color) !important;
+  border-right: 1px solid var(--table-border, var(--border-color)) !important;
+  user-select: none;
+}
+
+.period-subcol-th[data-today="true"],
+.period-subcol-th.date-col-today {
+  background: var(--color-primary-light, rgba(59, 130, 246, 0.12)) !important;
+  color: var(--color-primary) !important;
+  border-left: 2px solid var(--color-primary) !important;
+  border-right: 2px solid var(--color-primary) !important;
+}
+
+.period-badge-subcol {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: var(--radius-xs, 3px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-size: 0.62rem;
+  line-height: 1.1;
+}
+
+.btn-manage-holidays {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-manage-holidays:hover {
+  background: var(--bg-hover, var(--bg-surface));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LIVE ROLL CALL & ATTENDANCE STUDIO STYLES
+   ══════════════════════════════════════════════════════════════ */
+.rollcall-modal-card {
+  max-width: 640px !important;
+  width: 95% !important;
+  border-radius: var(--radius-lg, 14px) !important;
+  overflow: hidden !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.rollcall-mode-tabs {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill, 999px);
+  margin-top: 0.65rem;
+  margin-bottom: 0.85rem;
+  width: 100%;
+}
+
+.rollcall-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-pill, 999px);
+  border: none;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.rollcall-tab-btn:hover:not(.active) {
+  color: var(--text-main);
+  background: var(--bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.rollcall-tab-btn.active {
+  background: var(--color-primary);
+  color: var(--text-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.roll-pin-display-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary-light, rgba(59, 130, 246, 0.08));
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--radius-md, 10px);
+  margin: 0.5rem auto 0.75rem auto;
+  max-width: 320px;
+}
+
+.roll-pin-display {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 0.28em;
+  color: var(--color-primary);
+  line-height: 1.1;
+  text-indent: 0.28em;
+}
+
+.roll-pin-hint {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.roll-qr-card {
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.05));
+  display: inline-block;
+  margin: 0.35rem auto 0.75rem auto;
+}
+
+.rollcall-live-feed-wrap {
+  margin-top: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.rollcall-feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.rollcall-progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: var(--border-color);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+}
+
+.rollcall-progress-bar-fill {
+  height: 100%;
+  background: var(--status-present);
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+
+.rollcall-feed-list {
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.rollcall-feed-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.6rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+}
+
+.rollcall-manual-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.rollcall-filter-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.38rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.8rem;
+}
+
+.rollcall-quick-actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.btn-rc-bulk-present {
+  padding: 0.32rem 0.65rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--status-present);
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-rc-bulk-absent {
+  padding: 0.32rem 0.65rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--status-absent);
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rollcall-roster-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.rollcall-roster-table th {
+  padding: 0.45rem 0.6rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.rollcall-roster-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.rc-status-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 0.74rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rc-status-btn.present {
+  background: var(--status-present-bg);
+  color: var(--status-present);
+  border: 1px solid var(--status-present);
+}
+
+.rc-status-btn.absent {
+  background: var(--status-absent-bg);
+  color: var(--status-absent);
+  border: 1px solid var(--status-absent);
+}
+
 
 

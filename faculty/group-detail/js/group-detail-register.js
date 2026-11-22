@@ -240,46 +240,47 @@
     const allDays = grid.month_days || [];
     const finalizedSessions = grid.finalized_sessions || [];
 
-    // Expand month days into multi-period columns when multiple class periods exist on a single date
-    const matrixCols = [];
-    allDays.forEach(d => {
+    // Group month days and calculate period sub-columns without duplicating day headers
+    const dayGroups = allDays.map(d => {
       const daySessions = finalizedSessions.filter(s => s.session_date === d.date);
-      if (daySessions.length > 1) {
-        daySessions.forEach((s, sIdx) => {
+      daySessions.sort((a, b) => (a.period_number || 1) - (b.period_number || 1));
+      return {
+        ...d,
+        sessions: daySessions,
+        colCount: Math.max(1, daySessions.length)
+      };
+    });
+
+    const hasAnyMultiPeriod = dayGroups.some(dg => dg.colCount > 1);
+
+    // Expand into individual period matrix columns for student mark lookup
+    const matrixCols = [];
+    dayGroups.forEach(dg => {
+      if (dg.sessions.length > 0) {
+        dg.sessions.forEach((s, sIdx) => {
           const pNum = s.period_number || (sIdx + 1);
           matrixCols.push({
-            ...d,
+            ...dg,
             period_number: pNum,
             session_id: s.id,
-            col_key: `${d.date}_${pNum}`,
+            session_label: s.label || `Period ${pNum}`,
+            col_key: `${dg.date}_${pNum}`,
             session_key: `sess_${s.id}`,
-            display_day: `${d.day} [P${pNum}]`,
-            display_title: `${d.date} (${d.day_name}) — Period ${pNum}${s.label ? ': ' + s.label : ''}`,
-            is_multi: true
+            display_period: `P${pNum}`,
+            display_title: `${dg.date} (${dg.day_name}) — Period ${pNum}${s.label ? ': ' + s.label : ''}`,
+            is_multi: dg.colCount > 1
           });
-        });
-      } else if (daySessions.length === 1) {
-        const s = daySessions[0];
-        const pNum = s.period_number || 1;
-        matrixCols.push({
-          ...d,
-          period_number: pNum,
-          session_id: s.id,
-          col_key: d.date,
-          session_key: `sess_${s.id}`,
-          display_day: pNum > 1 ? `${d.day} [P${pNum}]` : `${d.day}`,
-          display_title: `${d.date} (${d.day_name})${pNum > 1 ? ' — Period ' + pNum : ''}${d.holiday_label ? ' - ' + d.holiday_label : ''}`,
-          is_multi: false
         });
       } else {
         matrixCols.push({
-          ...d,
+          ...dg,
           period_number: 1,
           session_id: null,
-          col_key: d.date,
+          session_label: 'Period 1',
+          col_key: dg.date,
           session_key: null,
-          display_day: `${d.day}`,
-          display_title: `${d.date} (${d.day_name})${d.holiday_label ? ' - ' + d.holiday_label : ''}`,
+          display_period: 'P1',
+          display_title: `${dg.date} (${dg.day_name})${dg.holiday_label ? ' - ' + dg.holiday_label : ''}`,
           is_multi: false
         });
       }
@@ -289,61 +290,96 @@
     const [yr, mo] = (grid.month || todayStr.slice(0, 7)).split('-').map(Number);
     const monthTitle = `${(mNames[mo - 1] || '').toUpperCase()} ${yr}`;
 
-    // 1. TWO-TIER THEAD WITH BULK CHECKBOX & CLEAN TOTAL ATTENDED / ABSENT
+    const mainRowSpan = hasAnyMultiPeriod ? 3 : 2;
+
+    // 1. TIER 1 THEAD: CHECKBOX, ROLL, NAME, DATES TITLE, ATTENDED & ABSENT TOTALS
     let headHtml = `
       <tr>
-        <th class="sticky-col-0" rowspan="2" style="width: 32px; text-align: center; vertical-align: middle;">
+        <th class="sticky-col-0" rowspan="${mainRowSpan}" style="width: 32px; text-align: center; vertical-align: middle;">
           <input type="checkbox" id="matrix-check-all" onchange="toggleSelectAllMatrixStudents(this.checked)" title="Select all students">
         </th>
-        <th class="sticky-col-1" rowspan="2" style="width: 36px; font-size: 0.65rem; padding: 0.2rem; text-align: center;">Roll<br>No.</th>
-        <th class="sticky-col-2" rowspan="2" style="width: 148px; min-width: 135px; max-width: 165px; font-size: 0.74rem; padding: 0.2rem 0.45rem; text-align: left;">Name</th>
+        <th class="sticky-col-1" rowspan="${mainRowSpan}" style="width: 36px; font-size: 0.65rem; padding: 0.2rem; text-align: center;">Roll<br>No.</th>
+        <th class="sticky-col-2" rowspan="${mainRowSpan}" style="width: 148px; min-width: 135px; max-width: 165px; font-size: 0.74rem; padding: 0.2rem 0.45rem; text-align: left;">Name</th>
         <th colspan="${matrixCols.length}" style="background: var(--table-th-bg); color: var(--table-th-color); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.25rem; text-align: center;">
           DATES OF LECTURE — ${monthTitle}
         </th>
-        <th class="sticky-r-att-total" rowspan="2" style="background: var(--col-att-group-bg); color: var(--col-att-group-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em; padding: 0.2rem 0.25rem; width: 60px; text-align: center;" title="Total Attended Classes">
+        <th class="sticky-r-att-total" rowspan="${mainRowSpan}" style="background: var(--col-att-group-bg); color: var(--col-att-group-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em; padding: 0.2rem 0.25rem; width: 60px; text-align: center;" title="Total Attended Classes">
           TOTAL<br>ATTENDED
         </th>
-        <th class="sticky-r-abs-total" rowspan="2" style="background: var(--col-abs-group-bg); color: var(--col-abs-group-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em; padding: 0.2rem 0.25rem; width: 56px; text-align: center;" title="Total Absent Classes">
+        <th class="sticky-r-abs-total" rowspan="${mainRowSpan}" style="background: var(--col-abs-group-bg); color: var(--col-abs-group-color); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.02em; padding: 0.2rem 0.25rem; width: 56px; text-align: center;" title="Total Absent Classes">
           TOTAL<br>ABSENT
         </th>
       </tr>
       <tr>
     `;
 
-    // Sub-headers for Matrix Columns
-    matrixCols.forEach(col => {
-      const isNonInst = col.is_holiday;
+    // 2. TIER 2: DAY DATE HEADERS (DAYS ARE NEVER DUPLICATED)
+    dayGroups.forEach(dg => {
+      const isNonInst = dg.is_holiday;
       const bg = isNonInst ? 'var(--col-holiday-bg)' : 'var(--table-bg)';
       const fg = isNonInst ? 'var(--col-holiday-color)' : 'var(--text-main)';
-      const eventTag = col.event_label ? `
-        <div style="font-size: 0.5rem; color: var(--col-holiday-color); font-weight: 800; line-height: 1; margin-top: 1px; text-transform: uppercase;" title="${esc(col.event_label)}">
-          ${esc(col.event_label.length > 8 ? col.event_label.slice(0, 7) + '…' : col.event_label)}
+      const isSun = dg.day_name === 'Sunday';
+      const fgColor = isSun ? 'var(--status-absent)' : fg;
+      const isToday = dg.date === todayStr;
+
+      const holidayTag = dg.holiday_label ? `
+        <div style="font-size: 0.5rem; color: var(--col-holiday-color); font-weight: 800; line-height: 1; margin-top: 1px; text-transform: uppercase;" title="${esc(dg.holiday_label)}">
+          ${esc(dg.holiday_label.length > 8 ? dg.holiday_label.slice(0, 7) + '…' : dg.holiday_label)}
         </div>
       ` : '';
 
-      const isToday = col.date === todayStr;
+      const spanAttr = dg.colCount > 1 ? `colspan="${dg.colCount}"` : (hasAnyMultiPeriod ? 'rowspan="2"' : '');
+      const minW = dg.colCount > 1 ? `min-width: ${dg.colCount * 28}px;` : 'min-width: 28px;';
+      const clickAction = `onclick="openHolidayModal('${dg.date}')" style="${minW} padding: 0.25rem 0.15rem; cursor: pointer; text-align: center;" title="Click to manage holiday / working status: ${esc(dg.date)} (${dg.day_name})"`;
+
+      // Single period badge if single session with period_number > 1
+      const singlePeriodBadge = (dg.colCount === 1 && dg.sessions.length === 1 && dg.sessions[0].period_number > 1) ? `
+        <div style="font-size: 0.52rem; font-weight: 800; color: var(--color-primary); margin-top: 1px;">[P${dg.sessions[0].period_number}]</div>
+      ` : '';
+
       if (isToday) {
         headHtml += `
-          <th data-today="true" class="date-col date-col-today" style="min-width: 28px; padding: 0.25rem 0.15rem; background: var(--color-primary); color: var(--text-white); text-align: center; position: relative;" title="${esc(col.display_title)}">
-            <div style="font-size: 0.72rem; font-weight: 900; font-family: var(--font-family-mono); line-height: 1.1;">${esc(col.display_day)}</div>
-            <div style="font-size: 0.52rem; font-weight: 800; opacity: 0.9; text-transform: uppercase;">${col.day_name.slice(0,3)}</div>
+          <th data-today="true" class="date-col date-col-today" ${spanAttr} ${clickAction}>
+            <div style="font-size: 0.72rem; font-weight: 900; font-family: var(--font-family-mono); line-height: 1.1; color: var(--text-white);">${dg.day}</div>
+            <div style="font-size: 0.52rem; font-weight: 800; opacity: 0.9; text-transform: uppercase; color: var(--text-white);">${dg.day_name.slice(0,3)}</div>
+            ${singlePeriodBadge}
+            ${holidayTag}
             <div class="today-marker-pill">TODAY</div>
           </th>
         `;
       } else {
-        const isSun = col.day_name === 'Sunday';
-        const fgColor = isSun ? 'var(--status-absent)' : fg;
         headHtml += `
-          <th class="date-col ${isNonInst ? 'date-col-holiday' : ''}" style="min-width: 28px; padding: 0.25rem 0.15rem; background: ${bg}; color: ${fgColor}; text-align: center;" title="${esc(col.display_title)}">
-            <div style="font-size: 0.72rem; font-weight: 800; font-family: var(--font-family-mono); line-height: 1.1; color: ${fgColor};">${esc(col.display_day)}</div>
-            <div style="font-size: 0.52rem; font-weight: 600; opacity: 0.8; text-transform: uppercase;">${col.day_name.slice(0,3)}</div>
-            ${eventTag}
+          <th class="date-col ${isNonInst ? 'date-col-holiday' : ''}" ${spanAttr} ${clickAction}>
+            <div style="font-size: 0.72rem; font-weight: 800; font-family: var(--font-family-mono); line-height: 1.1; color: ${fgColor};">${dg.day}</div>
+            <div style="font-size: 0.52rem; font-weight: 600; opacity: 0.8; text-transform: uppercase; color: ${fgColor};">${dg.day_name.slice(0,3)}</div>
+            ${singlePeriodBadge}
+            ${holidayTag}
           </th>
         `;
       }
     });
 
     headHtml += `</tr>`;
+
+    // 3. TIER 3: PERIOD SUB-ROW (ONLY WHEN A DAY HAS MULTIPLE PERIODS)
+    if (hasAnyMultiPeriod) {
+      headHtml += `<tr class="period-subcol-row">`;
+      dayGroups.forEach(dg => {
+        if (dg.colCount > 1) {
+          dg.sessions.forEach((s, sIdx) => {
+            const pNum = s.period_number || (sIdx + 1);
+            const isToday = dg.date === todayStr;
+            headHtml += `
+              <th class="period-subcol-th ${isToday ? 'date-col-today' : ''}" style="min-width: 26px; padding: 0.15rem 0.1rem; text-align: center; font-size: 0.6rem; font-weight: 800; font-family: var(--font-family-mono); background: var(--bg-surface); color: ${isToday ? 'var(--text-white)' : 'var(--text-muted)'};" title="${esc(dg.date)} — Period ${pNum}${s.label ? ': ' + s.label : ''}">
+                <span class="period-badge-subcol">P${pNum}</span>
+              </th>
+            `;
+          });
+        }
+      });
+      headHtml += `</tr>`;
+    }
+
     if (thead) thead.innerHTML = headHtml;
 
     // 2. IDENTIFY SUNDAYS/HOLIDAYS WITH NO CLASS HELD (VERTICAL SPAN)
@@ -1518,6 +1554,78 @@
      ══════════════════════════════════════════════════════════════ */
   let _classRollSession = null;
   let _classRollPollInterval = null;
+  let _classRollManualStatus = {}; // student_id -> 'PRESENT' | 'ABSENT'
+
+  function updateRollCallSummaryCounts() {
+    const totalEl = ById('rc-stat-total');
+    const presEl = ById('rc-stat-present');
+    const absEl = ById('rc-stat-absent');
+    const students = (classRegState.gridData?.students && classRegState.gridData.students.length)
+      ? classRegState.gridData.students
+      : (getS().members || []);
+    
+    let presentCount = 0;
+    let absentCount = 0;
+    students.forEach(st => {
+      const sid = st.student_id || st.id;
+      const status = _classRollManualStatus[sid] || 'PRESENT';
+      if (status === 'PRESENT') presentCount++;
+      else absentCount++;
+    });
+
+    if (totalEl) totalEl.textContent = students.length;
+    if (presEl) presEl.textContent = presentCount;
+    if (absEl) absEl.textContent = absentCount;
+  }
+
+  function filterClassRollCallRoster(q) {
+    const query = (q || '').trim().toLowerCase();
+    const rows = document.querySelectorAll('#class-rc-manual-tbody tr');
+    rows.forEach(tr => {
+      const text = tr.textContent.toLowerCase();
+      tr.style.display = (!query || text.includes(query)) ? '' : 'none';
+    });
+  }
+
+  function bulkSetRollCallStatus(status) {
+    const students = (classRegState.gridData?.students && classRegState.gridData.students.length)
+      ? classRegState.gridData.students
+      : (getS().members || []);
+    
+    students.forEach(st => {
+      const sid = st.student_id || st.id;
+      _classRollManualStatus[sid] = status;
+      const btn = ById(`rc-btn-toggle-${sid}`);
+      if (btn) {
+        if (status === 'PRESENT') {
+          btn.className = 'rc-status-btn present';
+          btn.textContent = 'Present';
+        } else {
+          btn.className = 'rc-status-btn absent';
+          btn.textContent = 'Absent';
+        }
+      }
+    });
+    updateRollCallSummaryCounts();
+  }
+
+  function toggleRollCallStudent(studentId) {
+    const current = _classRollManualStatus[studentId] || 'PRESENT';
+    const next = current === 'PRESENT' ? 'ABSENT' : 'PRESENT';
+    _classRollManualStatus[studentId] = next;
+
+    const btn = ById(`rc-btn-toggle-${studentId}`);
+    if (btn) {
+      if (next === 'PRESENT') {
+        btn.className = 'rc-status-btn present';
+        btn.textContent = 'Present';
+      } else {
+        btn.className = 'rc-status-btn absent';
+        btn.textContent = 'Absent';
+      }
+    }
+    updateRollCallSummaryCounts();
+  }
 
   async function openClassRollCallModal() {
     const modal = ById('classroom-roll-modal');
@@ -1648,6 +1756,54 @@
       }
     }
 
+    // Total students count
+    const students = (classRegState.gridData?.students && classRegState.gridData.students.length)
+      ? classRegState.gridData.students
+      : (S.members || []);
+    const totalStudents = students.length;
+
+    const totalEl = ById('class-rc-total-count');
+    if (totalEl) totalEl.textContent = totalStudents;
+
+    const footDateEl = ById('class-rc-footer-date');
+    if (footDateEl) footDateEl.textContent = dateVal;
+
+    // Reset manual status and search
+    _classRollManualStatus = {};
+    students.forEach(st => {
+      const sid = st.student_id || st.id;
+      _classRollManualStatus[sid] = 'PRESENT';
+    });
+
+    const searchInput = ById('class-rc-search');
+    if (searchInput) searchInput.value = '';
+
+    // Render manual roster
+    const tbody = ById('class-rc-manual-tbody');
+    if (tbody) {
+      if (students.length) {
+        tbody.innerHTML = students.map((m, i) => {
+          const roll = String(m.class_roll_no != null && String(m.class_roll_no) !== 'null' ? m.class_roll_no : (m.roll_number || i + 1)).replace(/^#/, '');
+          const name = m.full_name || m.name || 'Student';
+          const sid = m.student_id || m.id;
+          return `
+            <tr style="border-bottom: 1px solid var(--border-color);" id="rc-roster-row-${sid}">
+              <td style="padding: 0.45rem 0.6rem; font-weight: 700; text-align: center; color: var(--text-main);">${roll}</td>
+              <td style="padding: 0.45rem 0.6rem; font-weight: 600; color: var(--text-main);">${esc(name)}</td>
+              <td style="padding: 0.45rem 0.6rem; text-align: center;">
+                <button type="button" class="rc-status-btn present" id="rc-btn-toggle-${sid}" onclick="toggleRollCallStudent(${sid})">
+                  Present
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:1.5rem;color:var(--text-muted);">No enrolled students found in cohort roster.</td></tr>`;
+      }
+    }
+    updateRollCallSummaryCounts();
+
     // Setup live student claims polling
     if (_classRollPollInterval) {
       clearInterval(_classRollPollInterval);
@@ -1658,38 +1814,63 @@
         try {
           const cRes = await apiFetch(`/api/v1/attendance/sessions/${sess.id}/self-attendance`);
           if (cRes && cRes.success && Array.isArray(cRes.data)) {
+            const checkins = cRes.data;
             const countEl = ById('class-rc-live-count');
-            if (countEl) countEl.textContent = cRes.data.length;
+            if (countEl) countEl.textContent = checkins.length;
+
+            const pct = totalStudents > 0 ? Math.min(100, Math.round((checkins.length / totalStudents) * 100)) : 0;
+            const pctEl = ById('class-rc-live-pct');
+            if (pctEl) pctEl.textContent = `${pct}%`;
+
+            const barEl = ById('class-rc-progress-bar');
+            if (barEl) barEl.style.width = `${pct}%`;
+
+            const feedEl = ById('class-rc-live-feed-list');
+            if (feedEl) {
+              if (checkins.length === 0) {
+                feedEl.innerHTML = `
+                  <div style="text-align:center;padding:1rem;color:var(--text-muted);font-size:0.78rem;">
+                    Waiting for students to check in via QR or PIN...
+                  </div>
+                `;
+              } else {
+                feedEl.innerHTML = checkins.map(chk => {
+                  const sName = chk.student_name || chk.full_name || 'Student';
+                  const initials = sName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                  const timeStr = chk.created_at ? new Date(chk.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now';
+                  const methodStr = chk.auth_method === 'PIN' ? 'PIN' : (chk.auth_method === 'QR' ? 'QR Code' : 'Mobile Check-in');
+                  return `
+                    <div class="rollcall-feed-item">
+                      <div class="rollcall-feed-avatar">${esc(initials)}</div>
+                      <div class="rollcall-feed-details">
+                        <div class="rollcall-feed-name">${esc(sName)}</div>
+                        <div class="rollcall-feed-time">Verified via ${methodStr} • ${timeStr}</div>
+                      </div>
+                      <span style="background:var(--status-present-bg);color:var(--status-present);font-size:0.68rem;font-weight:800;padding:0.2rem 0.5rem;border-radius:var(--radius-pill);">CHECKED IN</span>
+                    </div>
+                  `;
+                }).join('');
+              }
+            }
+
+            // Sync checked-in students to manual roster
+            checkins.forEach(chk => {
+              const sid = chk.student_id;
+              if (sid) {
+                _classRollManualStatus[sid] = 'PRESENT';
+                const btn = ById(`rc-btn-toggle-${sid}`);
+                if (btn && !btn.classList.contains('present')) {
+                  btn.className = 'rc-status-btn present';
+                  btn.textContent = 'Present';
+                }
+              }
+            });
+            updateRollCallSummaryCounts();
           }
         } catch (_) {}
       };
       pollLiveCheckins();
       _classRollPollInterval = setInterval(pollLiveCheckins, 3000);
-    }
-
-    // Populate manual roster view
-    const students = (classRegState.gridData?.students && classRegState.gridData.students.length)
-      ? classRegState.gridData.students
-      : (S.members || []);
-
-    const tbody = ById('class-rc-manual-tbody');
-    if (tbody && students.length) {
-      tbody.innerHTML = students.map((m, i) => {
-        const roll = m.class_roll_no || m.roll_no || i + 1;
-        const name = m.full_name || m.name || 'Student';
-        const sid = m.student_id || m.id;
-        return `
-          <tr style="border-bottom: 1px solid var(--border-color);">
-            <td style="padding: 0.45rem 0.6rem; font-weight: 700;">${roll}</td>
-            <td style="padding: 0.45rem 0.6rem;">${esc(name)}</td>
-            <td style="padding: 0.45rem 0.6rem; text-align: center;">
-              <button type="button" class="btn btn-secondary btn-xs" id="rc-btn-toggle-${sid}" onclick="toggleRollCallStudent(${sid})" style="font-size:0.75rem;padding:0.2rem 0.5rem;">
-                Present
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
     }
   }
 
@@ -1724,26 +1905,6 @@
     if (manView) manView.style.display = mode === 'manual' ? '' : 'none';
   }
 
-  function toggleRollCallStudent(studentId) {
-    const btn = ById(`rc-btn-toggle-${studentId}`);
-    if (btn) {
-      const isAbsent = btn.textContent.trim().toLowerCase() === 'absent';
-      if (isAbsent) {
-        btn.className = 'btn btn-secondary btn-xs';
-        btn.textContent = 'Present';
-        btn.style.color = '';
-        btn.style.background = '';
-        btn.style.border = '';
-      } else {
-        btn.className = 'btn btn-xs';
-        btn.style.background = 'var(--status-absent-bg)';
-        btn.style.color = 'var(--status-absent)';
-        btn.style.border = '1px solid var(--status-absent)';
-        btn.textContent = 'Absent';
-      }
-    }
-  }
-
   async function submitClassRollCall() {
     const regId = classRegState.registerId;
     if (!regId) {
@@ -1762,32 +1923,33 @@
 
     try {
       let presentStudentIds = [];
+      const students = (classRegState.gridData?.students && classRegState.gridData.students.length)
+        ? classRegState.gridData.students
+        : (S.members || []);
+
       if (isLive) {
         const sessId = _classRollSession?.id || _classRollSession?.session_id;
         if (sessId) {
-          const cRes = await apiFetch(`/api/v1/attendance/sessions/${sessId}/self-attendance`);
-          if (cRes && cRes.success && Array.isArray(cRes.data)) {
-            presentStudentIds = cRes.data.map(req => Number(req.student_id)).filter(Boolean);
-          }
+          try {
+            const cRes = await apiFetch(`/api/v1/attendance/sessions/${sessId}/self-attendance`);
+            if (cRes && cRes.success && Array.isArray(cRes.data)) {
+              presentStudentIds = cRes.data.map(req => Number(req.student_id)).filter(Boolean);
+            }
+          } catch (_) {}
         }
+        // Fallback to manual status if no live check-ins or combined
         if (!presentStudentIds.length) {
-          toast('No students have checked in via QR or PIN yet.');
-          if (saveBtn) {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = origHtml;
-          }
-          return;
+          students.forEach(st => {
+            const sid = st.student_id || st.id;
+            if (_classRollManualStatus[sid] === 'PRESENT') {
+              presentStudentIds.push(Number(sid));
+            }
+          });
         }
       } else {
-        const students = (classRegState.gridData?.students && classRegState.gridData.students.length)
-          ? classRegState.gridData.students
-          : (S.members || []);
-
         students.forEach(st => {
           const sid = st.student_id || st.id;
-          const btn = ById(`rc-btn-toggle-${sid}`);
-          const isAbsent = btn && btn.textContent.trim().toLowerCase() === 'absent';
-          if (!isAbsent) {
+          if (_classRollManualStatus[sid] === 'PRESENT') {
             presentStudentIds.push(Number(sid));
           }
         });
@@ -1816,6 +1978,212 @@
       if (saveBtn) {
         saveBtn.disabled = false;
         saveBtn.innerHTML = origHtml;
+      }
+    }
+  }
+
+  // ─── HOLIDAY & WORKING DAYS CONTROLLER ───
+  let _selectedHolidayType = 'HOLIDAY';
+
+  function openHolidayModal(dateStr) {
+    const modal = ById('manage-holiday-modal');
+    if (!modal) return;
+    if (typeof openModal === 'function') {
+      openModal('manage-holiday-modal');
+    } else {
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+    }
+
+    const targetDate = dateStr || classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
+    const dateInput = ById('holiday-modal-date');
+    if (dateInput) {
+      dateInput.value = targetDate;
+      onHolidayModalDateChange(targetDate);
+    }
+  }
+
+  function closeHolidayModal() {
+    const modal = ById('manage-holiday-modal');
+    if (modal) {
+      if (typeof closeModal === 'function') {
+        closeModal('manage-holiday-modal');
+      } else {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    }
+  }
+
+  function onHolidayModalDateChange(dateVal) {
+    if (!dateVal) return;
+    const dObj = classRegState.gridData?.month_days?.find(d => d.date === dateVal);
+    
+    let isHoliday = false;
+    let label = '';
+    
+    if (dObj) {
+      isHoliday = Boolean(dObj.is_holiday);
+      label = dObj.holiday_label || '';
+    } else {
+      const dt = new Date(dateVal + 'T00:00:00');
+      const dayOfWeek = dt.getDay();
+      const dNum = dt.getDate();
+      const isSun = dayOfWeek === 0;
+      const is2ndSat = dayOfWeek === 6 && dNum >= 8 && dNum <= 14;
+      isHoliday = isSun || is2ndSat;
+      label = isSun ? 'Sunday' : (is2ndSat ? 'Second Saturday' : '');
+    }
+
+    const statusBanner = ById('holiday-current-status-banner');
+    const statusText = ById('holiday-current-status-text');
+    if (statusBanner && statusText) {
+      if (isHoliday) {
+        statusBanner.style.background = 'var(--col-holiday-bg)';
+        statusBanner.style.borderColor = 'var(--col-holiday-color)';
+        statusText.style.color = 'var(--col-holiday-color)';
+        statusText.textContent = `🌴 Marked as HOLIDAY${label ? ' (' + label + ')' : ''}`;
+      } else {
+        statusBanner.style.background = 'var(--bg-surface)';
+        statusBanner.style.borderColor = 'var(--border-color)';
+        statusText.style.color = 'var(--color-primary)';
+        statusText.textContent = `🏫 Marked as WORKING CLASS DAY`;
+      }
+    }
+
+    selectHolidayType(isHoliday ? 'HOLIDAY' : 'WORKING', false);
+    const reasonInput = ById('holiday-modal-reason');
+    if (reasonInput) reasonInput.value = label || '';
+  }
+
+  function selectHolidayType(type, clearReason = true) {
+    _selectedHolidayType = type;
+    const btnHol = ById('btn-type-holiday');
+    const btnWrk = ById('btn-type-working');
+    const reasonGroup = ById('holiday-reason-group');
+
+    if (btnHol && btnWrk) {
+      if (type === 'HOLIDAY') {
+        btnHol.className = 'btn btn-sm btn-primary';
+        btnHol.style.border = '2px solid var(--color-primary)';
+        btnHol.style.background = 'var(--color-primary)';
+        btnHol.style.color = 'var(--text-white)';
+
+        btnWrk.className = 'btn btn-sm btn-secondary';
+        btnWrk.style.border = '1px solid var(--border-color)';
+        btnWrk.style.background = 'var(--bg-surface)';
+        btnWrk.style.color = 'var(--text-main)';
+
+        if (reasonGroup) reasonGroup.style.display = 'block';
+      } else {
+        btnWrk.className = 'btn btn-sm btn-primary';
+        btnWrk.style.border = '2px solid var(--status-present)';
+        btnWrk.style.background = 'var(--status-present)';
+        btnWrk.style.color = 'var(--text-white)';
+
+        btnHol.className = 'btn btn-sm btn-secondary';
+        btnHol.style.border = '1px solid var(--border-color)';
+        btnHol.style.background = 'var(--bg-surface)';
+        btnHol.style.color = 'var(--text-main)';
+
+        if (reasonGroup) reasonGroup.style.display = 'none';
+        if (clearReason) {
+          const reasonInput = ById('holiday-modal-reason');
+          if (reasonInput) reasonInput.value = '';
+        }
+      }
+    }
+  }
+
+  async function submitSaveHoliday() {
+    const regId = classRegState.registerId;
+    if (!regId) {
+      toast('Register not found');
+      return;
+    }
+    const dateVal = ById('holiday-modal-date')?.value;
+    if (!dateVal) {
+      toast('Please select a date');
+      return;
+    }
+
+    const isWorking = _selectedHolidayType === 'WORKING';
+    const reason = ById('holiday-modal-reason')?.value?.trim();
+    const saveBtn = ById('btn-save-holiday');
+    const origText = saveBtn ? saveBtn.textContent : '';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+    }
+
+    try {
+      const res = await apiFetch(`/api/v1/faculty/registers/${regId}/holidays`, {
+        method: 'POST',
+        body: JSON.stringify({
+          date: dateVal,
+          holiday_name: isWorking ? null : (reason || 'Holiday'),
+          is_working_day: isWorking ? 1 : 0
+        })
+      });
+
+      if (res && res.success) {
+        toast(isWorking ? `Date ${dateVal} set as Working Day!` : `Date ${dateVal} marked as Holiday!`);
+        closeHolidayModal();
+        if (typeof loadClassRegister === 'function') {
+          await loadClassRegister(classRegState.currentMonth);
+        }
+      } else {
+        toast(res?.error?.message || 'Failed to save date status');
+      }
+    } catch (err) {
+      toast('Error updating date status: ' + err.message);
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = origText;
+      }
+    }
+  }
+
+  async function resetDayHolidayDefault() {
+    const regId = classRegState.registerId;
+    if (!regId) {
+      toast('Register not found');
+      return;
+    }
+    const dateVal = ById('holiday-modal-date')?.value;
+    if (!dateVal) {
+      toast('Please select a date');
+      return;
+    }
+
+    const resetBtn = ById('btn-reset-holiday');
+    const origText = resetBtn ? resetBtn.textContent : '';
+    if (resetBtn) {
+      resetBtn.disabled = true;
+      resetBtn.textContent = 'Resetting...';
+    }
+
+    try {
+      const res = await apiFetch(`/api/v1/faculty/registers/${regId}/holidays/${dateVal}`, {
+        method: 'DELETE'
+      });
+
+      if (res && res.success) {
+        toast(`Date ${dateVal} reset to system default!`);
+        closeHolidayModal();
+        if (typeof loadClassRegister === 'function') {
+          await loadClassRegister(classRegState.currentMonth);
+        }
+      } else {
+        toast(res?.error?.message || 'Failed to reset date');
+      }
+    } catch (err) {
+      toast('Error resetting date: ' + err.message);
+    } finally {
+      if (resetBtn) {
+        resetBtn.disabled = false;
+        resetBtn.textContent = origText;
       }
     }
   }
@@ -2092,6 +2460,15 @@
   window.switchClassRollCallMode = switchClassRollCallMode;
   window.toggleRollCallStudent = toggleRollCallStudent;
   window.submitClassRollCall = submitClassRollCall;
+  window.filterClassRollCallRoster = filterClassRollCallRoster;
+  window.bulkSetRollCallStatus = bulkSetRollCallStatus;
+  window.updateRollCallSummaryCounts = updateRollCallSummaryCounts;
+  window.openHolidayModal = openHolidayModal;
+  window.closeHolidayModal = closeHolidayModal;
+  window.onHolidayModalDateChange = onHolidayModalDateChange;
+  window.selectHolidayType = selectHolidayType;
+  window.submitSaveHoliday = submitSaveHoliday;
+  window.resetDayHolidayDefault = resetDayHolidayDefault;
   window.confirmDeletePeriod = confirmDeletePeriod;
   window.confirmDeleteCurrentPeriod = confirmDeleteCurrentPeriod;
   window.openAttendanceExportModal = openAttendanceExportModal;
