@@ -104,7 +104,7 @@
             <div style="font-weight:600;margin-bottom:0.5rem;">Could not load attendance register</div>
             <div style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1rem;">${errMsg}</div>
             <button type="button" class="btn btn-secondary btn-sm" onclick="window.retryLoadClassRegister()" style="display:inline-flex;align-items:center;gap:0.4rem;">
-              🔄 Retry
+              Retry
             </button>
           </td></tr>`;
         }
@@ -117,7 +117,7 @@
           <div style="font-weight:600;margin-bottom:0.5rem;">Could not load attendance register</div>
           <div style="font-size:0.875rem;color:var(--text-muted);margin-bottom:1rem;">${err?.message || 'Server error occurred while loading register matrix.'}</div>
           <button type="button" class="btn btn-secondary btn-sm" onclick="window.retryLoadClassRegister()" style="display:inline-flex;align-items:center;gap:0.4rem;">
-            🔄 Retry
+            Retry
           </button>
         </td></tr>`;
       }
@@ -1757,10 +1757,10 @@
     if (qrWrap) {
       if (qrPayload) {
         const encoded = encodeURIComponent(qrPayload);
-        qrWrap.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encoded}&margin=4" alt="Dynamic Attendance QR Code" style="width:160px;height:160px;display:block;border-radius:var(--radius-sm);">`;
+        qrWrap.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encoded}&margin=2" alt="Dynamic Attendance QR Code" style="width:125px;height:125px;display:block;border-radius:var(--radius-sm);">`;
       } else {
         qrWrap.innerHTML = `
-          <svg width="150" height="150" viewBox="0 0 100 100" fill="var(--text-main)">
+          <svg width="120" height="120" viewBox="0 0 100 100" fill="var(--text-main)">
             <rect width="100" height="100" fill="var(--bg-surface)" />
             <path d="M10 10h30v30h-30zM15 15v20h20v-20zM22 22h6v6h-6zM60 10h30v30h-30zM65 15v20h20v-20zM72 22h6v6h-6zM10 60h30v30h-30zM15 65v20h20v-20zM22 72h6v6h-6zM50 15h5v5h-5zM50 30h5v15h-5zM60 60h10v10h-10zM75 60h15v5h-15zM60 75h5v15h-5zM75 75h15v15h-15z" />
           </svg>
@@ -2008,7 +2008,7 @@
     }
 
     const targetDate = dateStr || classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
-    const dateInput = ById('holiday-modal-date');
+    const dateInput = ById('holiday-modal-date') || ById('holiday-modal-date-picker');
     if (dateInput) {
       dateInput.value = targetDate;
       onHolidayModalDateChange(targetDate);
@@ -2048,34 +2048,40 @@
     }
 
     const statusBanner = ById('holiday-current-status-banner');
-    const statusText = ById('holiday-current-status-text');
-    if (statusBanner && statusText) {
+    const statusText = ById('holiday-current-status-text') || ById('holiday-modal-date-display');
+    if (statusText) {
       if (isHoliday) {
-        statusBanner.style.background = 'var(--col-holiday-bg)';
-        statusBanner.style.borderColor = 'var(--col-holiday-color)';
+        if (statusBanner) {
+          statusBanner.style.background = 'var(--col-holiday-bg)';
+          statusBanner.style.borderColor = 'var(--col-holiday-color)';
+        }
         statusText.style.color = 'var(--col-holiday-color)';
-        statusText.textContent = `🌴 Marked as HOLIDAY${label ? ' (' + label + ')' : ''}`;
+        statusText.textContent = `Marked as Holiday${label ? ' (' + label + ')' : ''}`;
       } else {
-        statusBanner.style.background = 'var(--bg-surface)';
-        statusBanner.style.borderColor = 'var(--border-color)';
+        if (statusBanner) {
+          statusBanner.style.background = 'var(--bg-surface)';
+          statusBanner.style.borderColor = 'var(--border-color)';
+        }
         statusText.style.color = 'var(--color-primary)';
-        statusText.textContent = `🏫 Marked as WORKING CLASS DAY`;
+        statusText.textContent = `Marked as Active Working Day`;
       }
     }
 
     selectHolidayType(isHoliday ? 'HOLIDAY' : 'WORKING', false);
-    const reasonInput = ById('holiday-modal-reason');
+    const reasonInput = ById('holiday-modal-reason') || ById('holiday-name-input');
     if (reasonInput) reasonInput.value = label || '';
   }
 
   function selectHolidayType(type, clearReason = true) {
-    _selectedHolidayType = type;
-    const btnHol = ById('btn-type-holiday');
-    const btnWrk = ById('btn-type-working');
-    const reasonGroup = ById('holiday-reason-group');
+    const isHol = String(type || '').toUpperCase().startsWith('HOL');
+    _selectedHolidayType = isHol ? 'HOLIDAY' : 'WORKING';
+
+    const btnHol = ById('btn-type-holiday') || ById('btn-holiday-off');
+    const btnWrk = ById('btn-type-working') || ById('btn-holiday-work');
+    const reasonGroup = ById('holiday-reason-group') || ById('holiday-name-wrap');
 
     if (btnHol && btnWrk) {
-      if (type === 'HOLIDAY') {
+      if (_selectedHolidayType === 'HOLIDAY') {
         btnHol.className = 'btn btn-sm btn-primary';
         btnHol.style.border = '2px solid var(--color-primary)';
         btnHol.style.background = 'var(--color-primary)';
@@ -2100,7 +2106,7 @@
 
         if (reasonGroup) reasonGroup.style.display = 'none';
         if (clearReason) {
-          const reasonInput = ById('holiday-modal-reason');
+          const reasonInput = ById('holiday-modal-reason') || ById('holiday-name-input');
           if (reasonInput) reasonInput.value = '';
         }
       }
@@ -2113,15 +2119,15 @@
       toast('Register not found');
       return;
     }
-    const dateVal = ById('holiday-modal-date')?.value;
+    const dateVal = (ById('holiday-modal-date') || ById('holiday-modal-date-picker'))?.value;
     if (!dateVal) {
       toast('Please select a date');
       return;
     }
 
     const isWorking = _selectedHolidayType === 'WORKING';
-    const reason = ById('holiday-modal-reason')?.value?.trim();
-    const saveBtn = ById('btn-save-holiday');
+    const reason = (ById('holiday-modal-reason') || ById('holiday-name-input'))?.value?.trim();
+    const saveBtn = ById('btn-save-holiday') || ById('btn-save-holiday-config');
     const origText = saveBtn ? saveBtn.textContent : '';
     if (saveBtn) {
       saveBtn.disabled = true;
@@ -2163,13 +2169,13 @@
       toast('Register not found');
       return;
     }
-    const dateVal = ById('holiday-modal-date')?.value;
+    const dateVal = (ById('holiday-modal-date') || ById('holiday-modal-date-picker'))?.value;
     if (!dateVal) {
       toast('Please select a date');
       return;
     }
 
-    const resetBtn = ById('btn-reset-holiday');
+    const resetBtn = ById('btn-reset-holiday') || ById('btn-reset-holiday-default');
     const origText = resetBtn ? resetBtn.textContent : '';
     if (resetBtn) {
       resetBtn.disabled = true;
@@ -2198,6 +2204,7 @@
         resetBtn.textContent = origText;
       }
     }
+  }
   }
 
   // ─── ATTENDANCE EXPORT STUDIO CONTROLLER ───
