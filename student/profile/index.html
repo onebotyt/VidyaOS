@@ -130,6 +130,31 @@
 
       <!-- RIGHT COLUMN: DESKTOP WORKSPACE & TABS -->
       <section class="profile-workspace-col" id="profile-workspace">
+        <!-- MOBILE TAB DROPDOWN SELECTOR (Visible on mobile <= 820px) -->
+        <div class="profile-tab-dropdown-wrap" id="profile-tab-dropdown-wrap">
+          <label for="profile-tab-select" class="profile-tab-dropdown-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span>Profile Section</span>
+          </label>
+          <div class="profile-tab-select-container">
+            <div class="profile-tab-select-leading-icon" id="profile-tab-leading-icon" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+            </div>
+            <select id="profile-tab-select" class="profile-tab-select" aria-label="Select Profile Section" onchange="switchProfileTab(this.value)">
+              <option value="academic">Academic Cohort</option>
+              <option value="kyc">KYC &amp; Demographics</option>
+              <option value="documents">Verified Documents</option>
+              <option value="security">Account Security</option>
+              <option value="all">All Details</option>
+            </select>
+            <div class="profile-tab-select-chevron" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+
         <!-- SEGMENTED TAB BAR (Responsive on Desktop and Mobile) -->
         <div class="profile-tabs-scroller">
           <div class="profile-tabs-nav" id="profile-tabs-nav" role="tablist">
