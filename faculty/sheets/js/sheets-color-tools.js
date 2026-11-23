@@ -165,11 +165,21 @@ function selectFillColor(color) {
 
   if (typeof pushUndoState === 'function') pushUndoState('Fill Color');
 
-  const selectedRange = typeof getActiveSelectionRange === 'function' ? getActiveSelectionRange() : null;
+  const selRange = (typeof getActiveSelectionRange === 'function' ? getActiveSelectionRange() : null) || (window.EXCEL_WB?.selectedRange ? {
+    startR: Math.min(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
+    endR: Math.max(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
+    startC: Math.min(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2),
+    endC: Math.max(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2)
+  } : (window.EXCEL_WB?.activeCell ? {
+    startR: window.EXCEL_WB.activeCell.r,
+    endR: window.EXCEL_WB.activeCell.r,
+    startC: window.EXCEL_WB.activeCell.c,
+    endC: window.EXCEL_WB.activeCell.c
+  } : null));
 
-  if (selectedRange && (selectedRange.startR !== selectedRange.endR || selectedRange.startC !== selectedRange.endC)) {
-    for (let r = selectedRange.startR; r <= selectedRange.endR; r++) {
-      for (let c = selectedRange.startC; c <= selectedRange.endC; c++) {
+  if (selRange) {
+    for (let r = selRange.startR; r <= selRange.endR; r++) {
+      for (let c = selRange.startC; c <= selRange.endC; c++) {
         const cell = getCell(sheet, r, c);
         cell.s = cell.s || {};
         if (color) {
@@ -180,19 +190,11 @@ function selectFillColor(color) {
         setCell(sheet, r, c, cell);
       }
     }
-  } else if (EXCEL_WB?.activeCell) {
-    const { r, c } = EXCEL_WB.activeCell;
-    const cell = getCell(sheet, r, c);
-    cell.s = cell.s || {};
-    if (color) {
-      cell.s.bg = color;
-    } else {
-      delete cell.s.bg;
-    }
-    setCell(sheet, r, c, cell);
   }
 
   if (typeof renderExcelGrid === 'function') renderExcelGrid(false);
+  if (typeof markWorkbookUnsaved === 'function') markWorkbookUnsaved();
+  if (typeof syncRibbonStateWithActiveCell === 'function') syncRibbonStateWithActiveCell();
   if (typeof triggerAutoSaveIndicator === 'function') triggerAutoSaveIndicator();
 }
 
@@ -211,11 +213,21 @@ function selectFontColor(color) {
 
   if (typeof pushUndoState === 'function') pushUndoState('Font Color');
 
-  const selectedRange = typeof getActiveSelectionRange === 'function' ? getActiveSelectionRange() : null;
+  const selRange = (typeof getActiveSelectionRange === 'function' ? getActiveSelectionRange() : null) || (window.EXCEL_WB?.selectedRange ? {
+    startR: Math.min(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
+    endR: Math.max(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
+    startC: Math.min(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2),
+    endC: Math.max(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2)
+  } : (window.EXCEL_WB?.activeCell ? {
+    startR: window.EXCEL_WB.activeCell.r,
+    endR: window.EXCEL_WB.activeCell.r,
+    startC: window.EXCEL_WB.activeCell.c,
+    endC: window.EXCEL_WB.activeCell.c
+  } : null));
 
-  if (selectedRange && (selectedRange.startR !== selectedRange.endR || selectedRange.startC !== selectedRange.endC)) {
-    for (let r = selectedRange.startR; r <= selectedRange.endR; r++) {
-      for (let c = selectedRange.startC; c <= selectedRange.endC; c++) {
+  if (selRange) {
+    for (let r = selRange.startR; r <= selRange.endR; r++) {
+      for (let c = selRange.startC; c <= selRange.endC; c++) {
         const cell = getCell(sheet, r, c);
         cell.s = cell.s || {};
         if (color) {
@@ -226,19 +238,11 @@ function selectFontColor(color) {
         setCell(sheet, r, c, cell);
       }
     }
-  } else if (EXCEL_WB?.activeCell) {
-    const { r, c } = EXCEL_WB.activeCell;
-    const cell = getCell(sheet, r, c);
-    cell.s = cell.s || {};
-    if (color) {
-      cell.s.color = color;
-    } else {
-      delete cell.s.color;
-    }
-    setCell(sheet, r, c, cell);
   }
 
   if (typeof renderExcelGrid === 'function') renderExcelGrid(false);
+  if (typeof markWorkbookUnsaved === 'function') markWorkbookUnsaved();
+  if (typeof syncRibbonStateWithActiveCell === 'function') syncRibbonStateWithActiveCell();
   if (typeof triggerAutoSaveIndicator === 'function') triggerAutoSaveIndicator();
 }
 

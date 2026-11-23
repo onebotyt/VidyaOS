@@ -182,7 +182,7 @@ function setOledSimMode(mode) {
         statusRight: isOnline ? `${battPct} ${battVolts}` : '--',
         headline: 'VIDYAOS BIOMETRIC',
         line1: getCurrentTimeFormatted(),
-        line2: isOnline ? 'AS608 Ready • W25Q32 OK' : 'ESP32 Standby • Touch Wake',
+        line2: isOnline ? 'AS608 Optical • Ready' : 'ESP32 Standby • Touch Wake',
         line3: 'Place Finger to Scan',
         leds: isOnline ? [true, false, false] : [false, false, false],
         isClock: true
@@ -535,7 +535,7 @@ function renderDevicesList(devices) {
     wrap.innerHTML = `
       <div class="esp-empty-box">
         <div style="font-weight:700; font-size:0.95rem; margin-bottom:0.35rem;">No ESP32 Biometric Terminal Paired Yet</div>
-        <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.85rem;">Connect your department's ESP32 + AS608 + OLED + W25Q32 node to start enrolling fingerprints and marking attendance.</div>
+        <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.85rem;">Connect your department's ESP32 + AS608 + OLED node to start enrolling fingerprints and marking attendance.</div>
         <button type="button" class="btn btn-primary btn-sm" id="btn-add-esp-first" onclick="openRegisterDeviceModal()">+ Add ESP Terminal</button>
       </div>
     `;
@@ -582,7 +582,7 @@ function renderDevicesList(devices) {
             <span class="m-val">${isOnline ? (d.wifi_rssi || -55) + ' dBm' : 'Standby'}</span>
           </div>
           <div class="esp-dev-metric">
-            <span class="m-lbl">W25Q32 Queue</span>
+            <span class="m-lbl">Offline Queue</span>
             <span class="m-val">${d.offline_queue_count || 0} Pending</span>
           </div>
           <div class="esp-dev-metric">
@@ -1448,7 +1448,6 @@ function simulateEspDetection() {
     name: 'IT Lab Biometric Terminal 01',
     ip: '192.168.1.20',
     as608Ok: true,
-    w25q32Ok: true,
     fwVersion: 'v3.1.0-AES256-GCM'
   });
 }
@@ -1497,7 +1496,7 @@ function onEspDeviceDetected(dev) {
   if (banner) {
     banner.style.display = 'flex';
     document.getElementById('esp-detected-name').textContent = dev.name || 'ESP32 Biometric Terminal';
-    document.getElementById('esp-detected-details').textContent = `UID: ${dev.uid} • IP: ${dev.ip || '192.168.1.20'} • AS608 OK • W25Q32 OK`;
+    document.getElementById('esp-detected-details').textContent = `UID: ${dev.uid} • IP: ${dev.ip || '192.168.1.20'} • AS608 Optical OK`;
   }
 
   const uidInput = document.getElementById('esp-uid-input');

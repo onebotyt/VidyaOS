@@ -202,16 +202,21 @@
   position: relative;
 }
 
-.excel-cell.in-range-selection {
-  background-color: var(--badge-primary-bg, var(--chip-faculty-bg)) !important;
+.excel-cell.in-range-selection:not([style*="background-color"]) {
+  background-color: var(--badge-primary-bg, var(--chip-faculty-bg));
 }
 
 .excel-selection-box {
   position: absolute;
   pointer-events: none;
   border: 2px solid var(--status-present, var(--color-primary));
-  background: var(--status-present-bg, hsla(142, 70%, 45%, 0.12));
+  background: transparent !important;
   z-index: 24;
+  box-sizing: border-box;
+}
+
+.excel-selection-box.is-range {
+  background: rgba(16, 185, 129, 0.08) !important;
 }
 
 /* Formula Bar Integration */

@@ -6603,8 +6603,85 @@ function updateSelectionBoxUI() {
   box.style.width = `${width}px`;
   box.style.height = `${height}px`;
 
+  // Toggle is-range for subtle tint only on multi-cell drag ranges
+  const isRange = (startR !== endR || startC !== endC);
+  box.classList.toggle('is-range', isRange);
+
   // Update formula bar & name box
   updateFormulaBarUI();
+  // Synchronize ribbon tools (font size, font family, bold, colors, alignments) live
+  syncRibbonStateWithActiveCell();
+}
+
+function getActiveSelectionRange() {
+  if (!EXCEL_WB?.selectedRange) return null;
+  return {
+    startR: Math.min(EXCEL_WB.selectedRange.r1, EXCEL_WB.selectedRange.r2),
+    endR: Math.max(EXCEL_WB.selectedRange.r1, EXCEL_WB.selectedRange.r2),
+    startC: Math.min(EXCEL_WB.selectedRange.c1, EXCEL_WB.selectedRange.c2),
+    endC: Math.max(EXCEL_WB.selectedRange.c1, EXCEL_WB.selectedRange.c2)
+  };
+}
+
+function syncRibbonStateWithActiveCell() {
+  const sheet = getActiveSheet();
+  if (!sheet || !EXCEL_WB?.activeCell) return;
+  const { r, c } = EXCEL_WB.activeCell;
+  const cell = getCell(sheet, r, c);
+  const s = cell.s || {};
+
+  // Font Size selector
+  const sizeSelect = document.getElementById('font-size-select');
+  if (sizeSelect) {
+    const curSize = s.fontSize || 11;
+    sizeSelect.value = String(curSize);
+  }
+
+  // Font Family selector
+  const famSelect = document.getElementById('font-family-select');
+  if (famSelect) {
+    const curFam = s.fontFamily || 'Inter, sans-serif';
+    famSelect.value = curFam;
+  }
+
+  // Bold, italic, underline buttons
+  const btnBold = document.getElementById('btn-font-bold');
+  if (btnBold) btnBold.classList.toggle('active', Boolean(s.bold));
+
+  const btnItalic = document.getElementById('btn-font-italic');
+  if (btnItalic) btnItalic.classList.toggle('active', Boolean(s.italic));
+
+  const btnUnder = document.getElementById('btn-font-underline');
+  if (btnUnder) btnUnder.classList.toggle('active', Boolean(s.underline));
+
+  // Alignments
+  const btnAlignLeft = document.getElementById('btn-align-left');
+  const btnAlignCenter = document.getElementById('btn-align-center');
+  const btnAlignRight = document.getElementById('btn-align-right');
+  const curAlign = s.align || 'left';
+  if (btnAlignLeft) btnAlignLeft.classList.toggle('active', curAlign === 'left');
+  if (btnAlignCenter) btnAlignCenter.classList.toggle('active', curAlign === 'center');
+  if (btnAlignRight) btnAlignRight.classList.toggle('active', curAlign === 'right');
+
+  // Vertical alignments
+  const btnVTop = document.getElementById('btn-valign-top');
+  const btnVMid = document.getElementById('btn-valign-middle');
+  const btnVBot = document.getElementById('btn-valign-bottom');
+  const curVAlign = s.vAlign || 'middle';
+  if (btnVTop) btnVTop.classList.toggle('active', curVAlign === 'top');
+  if (btnVMid) btnVMid.classList.toggle('active', curVAlign === 'middle');
+  if (btnVBot) btnVBot.classList.toggle('active', curVAlign === 'bottom');
+
+  // Colors
+  const fillBar = document.getElementById('fill-color-bar');
+  if (fillBar) fillBar.style.backgroundColor = s.bg || '#ffffff';
+
+  const fontBar = document.getElementById('font-color-bar');
+  if (fontBar) fontBar.style.backgroundColor = s.color || '#0f172a';
+
+  // Number format dropdown
+  const numSelect = document.getElementById('number-format-select');
+  if (numSelect) numSelect.value = s.format || 'general';
 }
 
 function updateHeaderHighlights() {
@@ -7217,6 +7294,7 @@ function toggleFontBold() {
   const curCell = getCell(sheet, EXCEL_WB.activeCell.r, EXCEL_WB.activeCell.c);
   const isBold = !(curCell.s && curCell.s.bold);
   applyFormattingToRange(s => { s.bold = isBold; });
+  syncRibbonStateWithActiveCell();
 }
 
 function toggleFontItalic() {
@@ -7224,6 +7302,7 @@ function toggleFontItalic() {
   const curCell = getCell(sheet, EXCEL_WB.activeCell.r, EXCEL_WB.activeCell.c);
   const isItalic = !(curCell.s && curCell.s.italic);
   applyFormattingToRange(s => { s.italic = isItalic; });
+  syncRibbonStateWithActiveCell();
 }
 
 function toggleFontUnderline() {
@@ -7231,30 +7310,37 @@ function toggleFontUnderline() {
   const curCell = getCell(sheet, EXCEL_WB.activeCell.r, EXCEL_WB.activeCell.c);
   const isUnder = !(curCell.s && curCell.s.underline);
   applyFormattingToRange(s => { s.underline = isUnder; });
+  syncRibbonStateWithActiveCell();
 }
 
 function applyFontFamily(fam) {
   applyFormattingToRange(s => { s.fontFamily = fam; });
+  syncRibbonStateWithActiveCell();
 }
 
 function applyFontSize(sz) {
   applyFormattingToRange(s => { s.fontSize = parseInt(sz, 10); });
+  syncRibbonStateWithActiveCell();
 }
 
 function applyFontColor(color) {
   applyFormattingToRange(s => { s.color = color; });
+  syncRibbonStateWithActiveCell();
 }
 
 function applyFillColor(color) {
   applyFormattingToRange(s => { s.bg = color; });
+  syncRibbonStateWithActiveCell();
 }
 
 function applyHAlign(align) {
   applyFormattingToRange(s => { s.align = align; });
+  syncRibbonStateWithActiveCell();
 }
 
 function applyVAlign(vAlign) {
   applyFormattingToRange(s => { s.vAlign = vAlign; });
+  syncRibbonStateWithActiveCell();
 }
 
 function toggleWrapText() {
@@ -7262,6 +7348,7 @@ function toggleWrapText() {
   const curCell = getCell(sheet, EXCEL_WB.activeCell.r, EXCEL_WB.activeCell.c);
   const isWrap = !(curCell.s && curCell.s.wrap);
   applyFormattingToRange(s => { s.wrap = isWrap; });
+  syncRibbonStateWithActiveCell();
 }
 
 function mergeAndCenter() {
@@ -9020,6 +9107,33 @@ function generateSheetPrintableHtml(sheet) {
     });
   }
 
+  // Institutional Guarantee: Ensure single-test sheets always have strict 2-tier merges for student identity columns 0..4
+  if (sheet.type === 'single-test') {
+    for (let c = 0; c <= 4; c++) {
+      mergeMap.set(`0,${c}`, { isTopLeft: true, rowSpan: 2, colSpan: 1 });
+      mergeMap.set(`1,${c}`, { isTopLeft: false, rowSpan: 2, colSpan: 1 });
+    }
+    mergeMap.set(`0,5`, { isTopLeft: true, rowSpan: 1, colSpan: 5 });
+    for (let c = 6; c <= 9; c++) {
+      mergeMap.set(`0,${c}`, { isTopLeft: false, rowSpan: 1, colSpan: 5 });
+    }
+  }
+
+  // Institutional Guarantee: Ensure single-test sheets always have strict 2-tier merges for student identity columns 0..4
+  if (sheet.type === 'single-test') {
+    for (let c = 0; c <= 4; c++) {
+      mergeMap.set(`0,${c}`, { isTopLeft: true, rowSpan: 2, colSpan: 1 });
+      mergeMap.set(`1,${c}`, { isTopLeft: false, rowSpan: 2, colSpan: 1 });
+    }
+    mergeMap.set(`0,5`, { isTopLeft: true, rowSpan: 1, colSpan: 5 });
+    for (let c = 6; c <= 9; c++) {
+      mergeMap.set(`0,${c}`, { isTopLeft: false, rowSpan: 1, colSpan: 5 });
+    }
+  }
+
+  // Determine header cutoff: only tests (consolidated) has 3-tier headers (r <= 2); single-test, assignments & practicals have 2-tier (r <= 1)
+  const maxHeaderRow = (sheet.type === 'tests' || (sheet.frozenRows === 3)) ? 2 : 1;
+
   let theadRowsHtml = '';
   let tbodyRowsHtml = '';
   for (let r = 0; r <= maxDataRow; r++) {
@@ -9031,12 +9145,14 @@ function generateSheetPrintableHtml(sheet) {
         break;
       }
     }
-    if (!rowHasData && r > 2) continue;
+    if (!rowHasData && r > maxHeaderRow) continue;
 
     const isHeader = (r === 0);
     const isSubHeader = (r === 1 && !isMarksRow(sheet, 1));
     const isMarks = (r === 1 && isMarksRow(sheet, 1));
-    let rowHtml = '<tr>';
+    const isStudentRow = (r > maxHeaderRow);
+    const rowHeightStyle = isStudentRow ? 'height:22px;' : (isHeader ? 'height:26px;' : 'height:22px;');
+    let rowHtml = `<tr style="${rowHeightStyle}">`;
 
     for (let c = 0; c <= maxDataCol; c++) {
       const mInfo = mergeMap.get(`${r},${c}`);
@@ -9066,14 +9182,24 @@ function generateSheetPrintableHtml(sheet) {
       const bg = cell.s?.bg ? resolveColorToHex(cell.s.bg, '#ffffff') : (isHeader ? '#f1f5f9' : isSubHeader ? '#f8fafc' : isMarks ? '#f8fafc' : '#ffffff');
       let color = cell.s?.color ? resolveColorToHex(cell.s.color, '#1e293b') : (isHeader || isSubHeader ? '#0f172a' : isMarks ? '#334155' : '#1e293b');
       color = ensureExportContrast(color, bg);
-      const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8.5pt'));
+      let fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8.5pt'));
+      let lineHeight = '1.15';
+      let padding = '2.5px 2px';
+
+      // Special compact treatment for single-test Column 10 instructions block
+      if (c === 10 && sheet.type === 'single-test') {
+        fontSize = '7.5pt';
+        lineHeight = '1.2';
+        padding = '3px 5px';
+      }
+
       const fontFamily = cell.s?.fontFamily ? `font-family:${cell.s.fontFamily};` : '';
 
-      rowHtml += `<td${spanAttrs} style="padding:2.5px 2px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:0.75pt solid #475569;font-size:${fontSize};${fontFamily}line-height:1.15;white-space:pre-wrap;word-break:break-word;overflow:hidden;box-sizing:border-box;">${escapeHtml(val)}</td>`;
+      rowHtml += `<td${spanAttrs} style="padding:${padding};text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:0.75pt solid #475569;font-size:${fontSize};${fontFamily}line-height:${lineHeight};white-space:pre-wrap;word-break:break-word;overflow:hidden;box-sizing:border-box;">${escapeHtml(val)}</td>`;
     }
     rowHtml += '</tr>';
 
-    if (r <= 2) {
+    if (r <= maxHeaderRow) {
       theadRowsHtml += rowHtml;
     } else {
       tbodyRowsHtml += rowHtml;
@@ -9411,6 +9537,18 @@ function exportSheetToWordDoc(sheet) {
         }
       }
     });
+  }
+
+  // Institutional Guarantee: Ensure single-test sheets always have strict 2-tier merges for student identity columns 0..4
+  if (sheet.type === 'single-test') {
+    for (let c = 0; c <= 4; c++) {
+      mergeMap.set(`0,${c}`, { isTopLeft: true, rowSpan: 2, colSpan: 1 });
+      mergeMap.set(`1,${c}`, { isTopLeft: false, rowSpan: 2, colSpan: 1 });
+    }
+    mergeMap.set(`0,5`, { isTopLeft: true, rowSpan: 1, colSpan: 5 });
+    for (let c = 6; c <= 9; c++) {
+      mergeMap.set(`0,${c}`, { isTopLeft: false, rowSpan: 1, colSpan: 5 });
+    }
   }
 
   // Calculate total widths and column percentages for Word document A4 Landscape
@@ -10283,6 +10421,10 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
                   setCell(s, 1, c, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
                   s.merges.push({ s: { r: 0, c }, e: { r: 1, c } });
                 }
+                const detailsCell = getCell(s, 2, 10);
+                if (detailsCell && detailsCell.s) {
+                  detailsCell.s.fontSize = 8;
+                }
               }
             });
 
@@ -10825,7 +10967,7 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     setCell(singleTestSheet, 2, 10, {
       raw: testDetailsBlock,
       v: testDetailsBlock,
-      s: { align: 'left', vAlign: 'top', wrap: true, fontSize: 11 }
+      s: { align: 'left', vAlign: 'top', wrap: true, fontSize: 8 }
     });
 
     // Blank out subordinate merged rows in Column 10
@@ -11999,6 +12141,10 @@ window.addEventListener('resize', () => {
       }, { passive: true });
     });
 
+    // Dual-bind input event on font selectors for immediate live changes
+    document.getElementById('font-size-select')?.addEventListener('input', (e) => applyFontSize(e.target.value));
+    document.getElementById('font-family-select')?.addEventListener('input', (e) => applyFontFamily(e.target.value));
+
     setTimeout(() => {
       updateRibbonScrollButtons();
       if (!EXCEL_WB.sheets || EXCEL_WB.sheets.length === 0) {
@@ -12063,3 +12209,5 @@ window.exportSheetToPdf = exportSheetToPdf;
 window.loadGroupMetadata = loadGroupMetadata;
 window.loadSubjectAcademicContext = loadGroupMetadata;
 window.hydrateAcademicSheetsFromGroup = hydrateAcademicSheetsFromGroup;
+window.getActiveSelectionRange = getActiveSelectionRange;
+window.syncRibbonStateWithActiveCell = syncRibbonStateWithActiveCell;
