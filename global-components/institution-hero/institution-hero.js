@@ -70,12 +70,16 @@
       }
     } catch (_) { }
 
-    // 2. Fetch fresh from API
+    // 2. Fetch fresh from public branding API (accessible to students, faculty, admin & visitors)
     try {
-      const fetchFn = window.fetchApi || window.fetch;
-      if (!fetchFn) return;
+      let res = null;
+      if (typeof window.fetchApi === 'function') {
+        res = await window.fetchApi('/auth/branding', { suppressToast: true }).catch(() => null);
+      }
+      if (!res || !res.success) {
+        res = await fetch('/api/v1/auth/branding', { credentials: 'include' }).then(r => r.json()).catch(() => null);
+      }
 
-      const res = await (window.fetchApi ? window.fetchApi('/admin/settings') : fetch('/api/v1/admin/settings', { credentials: 'include' }).then(r => r.json()));
       if (res && res.success && res.data) {
         const s = res.data.map || res.data || {};
         const payload = {

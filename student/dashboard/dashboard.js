@@ -697,8 +697,9 @@ function initDropdownCloseListeners() {
     }
 
     // Subject Card Dropdowns
-    if (!e.target.closest('.gc-card-header-right-meta')) {
+    if (!e.target.closest('.gc-card-header-right-meta') && !e.target.closest('.gc-card-kebab-btn')) {
       document.querySelectorAll('.gc-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+      document.querySelectorAll('.gc-card-menu-dropdown.active').forEach(m => m.classList.remove('active'));
     }
   });
 
@@ -713,6 +714,7 @@ function initDropdownCloseListeners() {
       closeStudentStreamModal();
       closeDeleteSubjectCardModal();
       document.querySelectorAll('.gc-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+      document.querySelectorAll('.gc-card-menu-dropdown.active').forEach(m => m.classList.remove('active'));
     }
   });
 }

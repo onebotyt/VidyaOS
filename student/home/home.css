@@ -502,10 +502,10 @@
   position: absolute;
   top: 48px;
   right: 12px;
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   padding: 6px;
   min-width: 170px;
   z-index: 20;
@@ -526,7 +526,7 @@
   padding: 8px 12px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-main);
   border: none;
   background: transparent;
   width: 100%;
