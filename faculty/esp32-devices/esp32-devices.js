@@ -625,11 +625,18 @@ async function checkDeviceConnection(deviceId) {
         badge.className = 'esp-status-pill online radar-pulse';
         badge.textContent = `● ONLINE (${d.seconds_ago}s ago)`;
       }
-      showToast(`ESP32 Connected! Ping: ${latency}ms • IP: ${d.ip_address || '192.168.1.20'} • RSSI: ${d.wifi_rssi || -54} dBm`, 'success');
+      showToast(`ESP32 Connected! Ping: ${latency}ms • Signal sent to physical ESP32 OLED display.`, 'success');
       updateOledScreen({
         statusLeft: `WiFi ${d.wifi_rssi || -54}dB`,
-        statusRight: `${d.battery_pct || 84}% ${d.battery_voltage ? Number(d.battery_voltage).toFixed(1) + 'V' : '7.8V'}`
+        statusRight: `${d.battery_pct || 84}% ${d.battery_voltage ? Number(d.battery_voltage).toFixed(1) + 'V' : '7.8V'}`,
+        headline: 'SERVER PING OK',
+        line1: 'LINK VERIFIED',
+        line2: `IP: ${d.ip_address || '192.168.1.36'} • RSSI: ${d.wifi_rssi || -54}dB`,
+        line3: 'Console Ping Active',
+        leds: [true, false, false],
+        isClock: false
       });
+      beepAttendanceSuccess();
     } else {
       if (badge) {
         badge.className = 'esp-status-pill offline';
