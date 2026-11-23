@@ -158,21 +158,29 @@ function setOledSimMode(mode) {
   document.getElementById(`sim-btn-${mode}`)?.classList.add('active');
 
   const curDev = (espOverviewData.devices || []).find(d => Number(d.id) === Number(selectedDeviceId)) || {};
-  const battVolts = curDev.battery_voltage ? Number(curDev.battery_voltage).toFixed(1) : '7.8';
-  const battPct = curDev.battery_pct != null ? curDev.battery_pct : 84;
   const isOnline = Boolean(curDev.is_online);
-  const rssi = curDev.wifi_rssi || -58;
+  const battVolts = curDev.battery_voltage ? Number(curDev.battery_voltage).toFixed(1) + 'V' : (isOnline ? '7.8V' : '--V');
+  const battPct = curDev.battery_pct != null ? `${curDev.battery_pct}%` : (isOnline ? '84%' : '--%');
+  const rssi = curDev.wifi_rssi != null ? `WiFi ${curDev.wifi_rssi}dB` : (isOnline ? 'WiFi OK' : 'WiFi Offline');
+
+  // Find currently selected student in dropdown if any
+  const selStudentId = document.getElementById('enroll-student-select')?.value;
+  const selStudent = (espOverviewData.students || []).find(s => String(s.student_id) === String(selStudentId));
+  const sName = selStudent ? selStudent.full_name : null;
+  const sRoll = selStudent ? (selStudent.class_roll_no ? `Roll: #${selStudent.class_roll_no}` : (selStudent.official_enrollment_no ? `UBTER: ${selStudent.official_enrollment_no}` : 'Roster Student')) : null;
+  const sCohort = selStudent ? `Yr ${selStudent.year || 1} Sem ${selStudent.semester || 1}` : null;
+  const sSlot = selStudent?.biometric_slot ? `Slot #${selStudent.biometric_slot}` : 'Slot: AUTO';
 
   switch (mode) {
     case 'standby':
       updateOledScreen({
-        statusLeft: isOnline ? `WiFi ${rssi}dB` : 'WiFi -58dB',
-        statusRight: `${battPct}% ${battVolts}V`,
+        statusLeft: rssi,
+        statusRight: isOnline ? `${battPct} ${battVolts}` : '--',
         headline: 'VIDYAOS BIOMETRIC',
         line1: getCurrentTimeFormatted(),
-        line2: 'AS608 Ready • W25Q32 OK',
+        line2: isOnline ? 'AS608 Ready • W25Q32 OK' : 'ESP32 Standby • Touch Wake',
         line3: 'Place Finger to Scan',
-        leds: [false, false, true],
+        leds: isOnline ? [true, false, false] : [false, false, false],
         isClock: true
       });
       break;
@@ -182,8 +190,8 @@ function setOledSimMode(mode) {
         statusLeft: 'SUCCESSFUL',
         statusRight: 'VERIFIED',
         headline: 'SUCCESSFULLY MARKED',
-        line1: 'Enroll: 2024IT005',
-        line2: 'Arjun Rao',
+        line1: sName || 'Attendance Marked',
+        line2: sRoll ? `${sRoll} • ${sCohort}` : 'Biometric Match OK',
         line3: `Time: ${getCurrentTimeFormatted()}`,
         leds: [true, false, false],
         isClock: false
@@ -196,8 +204,8 @@ function setOledSimMode(mode) {
         statusLeft: 'ATTENDANCE FAILED',
         statusRight: 'ERROR',
         headline: 'ATTENDANCE FAILED',
-        line1: 'Class / Register Error',
-        line2: 'Retry or Check Admin',
+        line1: sName || 'Attendance Error',
+        line2: sRoll ? `${sRoll} • Unverified` : 'Biometric Mismatch',
         line3: `Time: ${getCurrentTimeFormatted()}`,
         leds: [false, true, false],
         isClock: false
@@ -210,8 +218,8 @@ function setOledSimMode(mode) {
         statusLeft: 'NOT REGISTERED',
         statusRight: 'ALERT',
         headline: 'NOT REGISTERED',
-        line1: 'Finger Not Found',
-        line2: 'Slot Unassigned',
+        line1: sName ? sName : 'Finger Not Found',
+        line2: sRoll ? `${sRoll} • No Template` : 'Slot Unassigned',
         line3: 'Contact HOD Office',
         leds: [false, true, false],
         isClock: false
@@ -222,11 +230,11 @@ function setOledSimMode(mode) {
     case 'enroll':
       updateOledScreen({
         statusLeft: 'ENROLL MODE',
-        statusRight: 'Slot #1',
+        statusRight: sSlot,
         headline: 'ENROLL FINGERPRINT',
-        line1: 'Amit Kumar',
-        line2: 'Roll: #1 (2024IT011)',
-        line3: '1. Place Finger',
+        line1: sName || 'Select Student',
+        line2: sRoll ? `${sRoll} • ${sCohort}` : 'Choose from Roster',
+        line3: '1. Place Finger on AS608',
         leds: [false, false, true],
         isClock: false
       });
@@ -338,8 +346,11 @@ async function loadEsp32Overview(deptIdOverride) {
     renderCommandQueue(commands);
     manageCommandPolling(commands);
 
-    // Sync OLED screen with selected device
-    setOledSimMode('standby');
+    // Sync OLED screen with selected device or active student
+    const currentSelStudent = document.getElementById('enroll-student-select')?.value;
+    if (!currentSelStudent) {
+      setOledSimMode('standby');
+    }
     startLiveOledClock();
 
     if (selectedDeviceId) {
@@ -458,27 +469,41 @@ function updateKpiCards(devices, students) {
   if (kpiCov) kpiCov.textContent = `${coveragePct}% students stored in MySQL cloud vault`;
 
   const activeDev = devices.find(d => Number(d.id) === Number(selectedDeviceId)) || devices[0];
-  if (activeDev) {
-    const volts = activeDev.battery_voltage ? Number(activeDev.battery_voltage).toFixed(2) : '7.85';
-    const pct = activeDev.battery_pct != null ? activeDev.battery_pct : 84;
-    const kpiBatt = document.getElementById('kpi-esp-battery');
-    if (kpiBatt) kpiBatt.textContent = `${volts}V (${pct}%)`;
+  const kpiBatt = document.getElementById('kpi-esp-battery');
+  const battTag = document.getElementById('kpi-batt-status');
+  const kpiOff = document.getElementById('kpi-esp-offline');
 
-    const battTag = document.getElementById('kpi-batt-status');
+  if (activeDev) {
+    const isOnline = Boolean(activeDev.is_online);
+    const volts = activeDev.battery_voltage != null ? Number(activeDev.battery_voltage).toFixed(2) + 'V' : (isOnline ? '7.85V' : '--V');
+    const pct = activeDev.battery_pct != null ? `${activeDev.battery_pct}%` : (isOnline ? '84%' : '--%');
+    if (kpiBatt) kpiBatt.textContent = `${volts} (${pct})`;
+
     if (battTag) {
-      if (pct <= 20) {
+      if (activeDev.battery_pct != null && activeDev.battery_pct <= 20) {
         battTag.textContent = 'LOW BATTERY';
         battTag.className = 'esp-pill-tag';
         battTag.style.color = 'var(--status-absent)';
-      } else {
+      } else if (activeDev.battery_pct != null) {
         battTag.textContent = '7.4V Pack';
         battTag.className = 'esp-pill-tag green';
+        battTag.style.color = '';
+      } else {
+        battTag.textContent = isOnline ? 'ONLINE' : 'STANDBY';
+        battTag.className = `esp-pill-tag ${isOnline ? 'green' : ''}`;
         battTag.style.color = '';
       }
     }
 
-    const kpiOff = document.getElementById('kpi-esp-offline');
     if (kpiOff) kpiOff.textContent = `${activeDev.offline_queue_count || 0} Records`;
+  } else {
+    if (kpiBatt) kpiBatt.textContent = '--V (--%)';
+    if (battTag) {
+      battTag.textContent = 'NO TERMINAL';
+      battTag.className = 'esp-pill-tag';
+      battTag.style.color = '';
+    }
+    if (kpiOff) kpiOff.textContent = '0 Records';
   }
 }
 
@@ -637,7 +662,7 @@ function openOtaUpdateModal(deviceId) {
   otaTargetDeviceId = deviceId || selectedDeviceId;
   const dev = (espOverviewData.devices || []).find(d => Number(d.id) === Number(otaTargetDeviceId));
   const uidLabel = document.getElementById('ota-device-uid-label');
-  if (uidLabel) uidLabel.textContent = dev ? (d.device_uid || d.device_uuid || `Device #${otaTargetDeviceId}`) : `Device #${otaTargetDeviceId}`;
+  if (uidLabel) uidLabel.textContent = dev ? (dev.device_uid || dev.device_uuid || `Device #${otaTargetDeviceId}`) : `Device #${otaTargetDeviceId}`;
   const fwLabel = document.getElementById('ota-current-firmware-label');
   if (fwLabel) fwLabel.textContent = dev?.firmware_version || 'v3.1.0-STABLE';
 
@@ -862,18 +887,23 @@ function onSelectEnrollStudent(studentId) {
     }
     if (removeBtn) removeBtn.style.display = 'none';
     if (visualBox) visualBox.className = 'esp-hardware-bezel';
+    if (step1) step1.className = 'step-pill active';
+    if (step2) step2.className = 'step-pill';
+    if (step3) step3.className = 'step-pill';
+    setOledSimMode('standby');
     return;
   }
 
   const isEnrolled = student.biometric_status === 'ENROLLED';
   const names = (student.full_name || 'S').trim().split(/\s+/);
   const initials = names.length > 1 ? (names[0][0] + names[names.length - 1][0]).toUpperCase() : names[0].slice(0, 2).toUpperCase();
+  const roll = student.class_roll_no ? `Roll #${student.class_roll_no}` : (student.official_enrollment_no || 'No Roll');
+  const cohort = `Yr ${student.year || 1} Sem ${student.semester || 1}`;
 
   if (initialsEl) initialsEl.textContent = initials;
   if (nameEl) nameEl.textContent = student.full_name;
   if (metaEl) {
-    const roll = student.class_roll_no ? `Roll #${student.class_roll_no}` : (student.official_enrollment_no || 'No Roll');
-    metaEl.textContent = `${roll} • Yr ${student.year || 1} Sem ${student.semester || 1} • Dept: ${espOverviewData.department?.name || 'Department'}`;
+    metaEl.textContent = `${roll} • ${cohort} • Dept: ${espOverviewData.department?.name || 'Department'}`;
   }
 
   if (statusPill) {
@@ -891,7 +921,7 @@ function onSelectEnrollStudent(studentId) {
   }
 
   if (step1) step1.className = 'step-pill completed';
-  if (step2) step2.className = 'step-pill';
+  if (step2) step2.className = 'step-pill active';
   if (step3) step3.className = isEnrolled ? 'step-pill completed' : 'step-pill';
 
   if (visualBox) {
@@ -900,10 +930,41 @@ function onSelectEnrollStudent(studentId) {
 
   if (msgEl) {
     if (isEnrolled) {
-      msgEl.innerHTML = `<strong>${escHtml(student.full_name)}</strong> has an enrolled 512B AS608 template in MySQL cloud vault. Click <strong>"Test Attendance Scan"</strong> to verify verification, or <strong>"Enroll"</strong> to overwrite template.`;
+      msgEl.innerHTML = `<strong>${escHtml(student.full_name)}</strong> has an enrolled 512B AS608 template in MySQL cloud vault. Click <strong>"Test Scan"</strong> to verify attendance, or <strong>"Enroll"</strong> to overwrite template.`;
     } else {
       msgEl.innerHTML = `<strong>Ready to enroll ${escHtml(student.full_name)}:</strong> Click <strong>"Enroll Fingerprint on ESP32"</strong> below to send enrollment signal to active terminal.`;
     }
+  }
+
+  // ── UPDATE LIVE 0.96" OLED DISPLAY IMMEDIATELY FOR SELECTED STUDENT ──
+  currentOledMode = isEnrolled ? 'success' : 'enroll';
+  const curDev = (espOverviewData.devices || []).find(d => Number(d.id) === Number(selectedDeviceId)) || {};
+  const isOnline = Boolean(curDev.is_online);
+  const leftStatus = isEnrolled ? 'ENROLLED' : 'READY TO ENROLL';
+  const rightStatus = student.biometric_slot ? `Slot #${student.biometric_slot}` : (curDev.wifi_rssi ? `WiFi ${curDev.wifi_rssi}dB` : (isOnline ? 'ONLINE' : 'STANDBY'));
+
+  updateOledScreen({
+    statusLeft: leftStatus,
+    statusRight: rightStatus,
+    headline: isEnrolled ? 'BIOMETRIC VERIFIED' : 'ENROLL FINGERPRINT',
+    line1: student.full_name,
+    line2: `${roll} • ${cohort}`,
+    line3: isEnrolled ? 'Ready • Place Finger to Scan' : 'Touch AS608 to Register',
+    leds: isEnrolled ? [true, false, false] : [false, false, true],
+    isClock: false
+  });
+
+  // Keep simulated mode buttons highlighted in sync
+  document.querySelectorAll('.oled-sim-btn').forEach(b => b.classList.remove('active'));
+  const activeSimBtn = isEnrolled ? document.getElementById('sim-btn-success') : document.getElementById('sim-btn-enroll');
+  if (activeSimBtn) activeSimBtn.classList.add('active');
+
+  // Trigger optical ring scanner pulse animation
+  const ring = document.getElementById('bio-scanner-ring');
+  if (ring) {
+    ring.classList.remove('radar-pulse');
+    void ring.offsetWidth;
+    ring.classList.add('radar-pulse');
   }
 }
 
@@ -998,13 +1059,17 @@ async function queueEnrollCommandForStudent(studentId, fullName, rollNo) {
     return;
   }
 
+  const student = (espOverviewData.students || []).find(s => String(s.student_id) === String(studentId));
+  const slotText = student?.biometric_slot ? `Slot #${student.biometric_slot}` : 'Slot: AUTO';
+  const rollText = rollNo ? `Roll: #${rollNo}` : (student?.official_enrollment_no ? `UBTER: ${student.official_enrollment_no}` : 'Roster Student');
+
   updateOledScreen({
-    statusLeft: 'ENROLL MODE',
-    statusRight: 'Slot #1',
+    statusLeft: 'ENROLLING...',
+    statusRight: slotText,
     headline: 'ENROLL FINGERPRINT',
     line1: fullName,
-    line2: `Roll: #${rollNo || '1'}`,
-    line3: '1. Place Finger',
+    line2: rollText,
+    line3: '1. Place Finger on AS608',
     leds: [false, false, true],
     isClock: false
   });
@@ -1092,13 +1157,15 @@ async function simulateStudentBiometric(studentId, actionType = 'ENROLL_TEMPLATE
         });
         chimeEnrollSuccess();
       } else {
+        const rollLabel = st?.class_roll_no ? `Roll #${st.class_roll_no}` : (st?.ubter_roll_no || st?.official_enrollment_no || 'Roster Student');
+        const cohortLabel = st?.year ? `Yr ${st.year} Sem ${st.semester || 1}` : '';
         showToast(`Attendance Verified for ${st?.full_name || 'Student'}!`, 'success');
         updateOledScreen({
           statusLeft: 'SUCCESSFUL',
           statusRight: 'VERIFIED',
           headline: 'SUCCESSFULLY MARKED',
-          line1: `Roll: ${st?.ubter_roll_no || st?.official_enrollment_no || '24011090008'}`,
-          line2: st?.full_name || 'Student',
+          line1: st?.full_name || 'Student',
+          line2: cohortLabel ? `${rollLabel} • ${cohortLabel}` : rollLabel,
           line3: `Time: ${getCurrentTimeFormatted()}`,
           leds: [true, false, false],
           isClock: false
