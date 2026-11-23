@@ -69,8 +69,13 @@ function playPiezoBuzzerSequence(notes) {
 }
 
 function playBeep(freq = 800, durMs = 300, gapMs = 25) {
-  playPiezoBuzzerSequence([[freq, durMs, gapMs]]);
+  try {
+    if (typeof playPiezoBuzzerSequence === 'function') {
+      playPiezoBuzzerSequence([[freq, durMs, gapMs]]);
+    }
+  } catch (_) { }
 }
+window.playBeep = playBeep;
 
 // Sound Profiles from oled_buzzer_ui.h
 function beepAttendanceSuccess() {
@@ -1214,7 +1219,9 @@ async function removeStudentCloudTemplate(studentId, studentName = 'Student', ro
         leds: [false, true, false],
         isClock: false
       });
-      playBeep(800, 300);
+      if (typeof playBeep === 'function') {
+        playBeep(800, 300);
+      }
 
       await loadEsp32Overview();
     } else {
@@ -1826,9 +1833,20 @@ async function triggerScanNearbyWifi(forceRescan = false) {
     isClock: false
   });
 
+  const oledEl = document.getElementById('oled-screen');
+  const viewFinderEl = document.querySelector('.esp-optical-viewfinder');
+  if (oledEl) oledEl.classList.add('scanning');
+  if (viewFinderEl) viewFinderEl.classList.add('scanning');
+
+  const stopScanningAnimation = () => {
+    if (oledEl) oledEl.classList.remove('scanning');
+    if (viewFinderEl) viewFinderEl.classList.remove('scanning');
+  };
+
   try {
     const res = await fetchApi(`/devices/hod/${selectedDeviceId}/wifi/scan`, { method: 'POST' });
     if (!res || !res.success) {
+      stopScanningAnimation();
       showToast(res?.message || 'Failed to dispatch scan command.', 'error');
       return;
     }
@@ -1844,6 +1862,7 @@ async function triggerScanNearbyWifi(forceRescan = false) {
 
       if (scansRes && scansRes.success && scanList.length > 0) {
         clearInterval(wifiScanPollingTimer);
+        stopScanningAnimation();
         renderScannedWifiList(scanList);
 
         // Update simulated OLED display to reflect discovered network count
@@ -1857,12 +1876,14 @@ async function triggerScanNearbyWifi(forceRescan = false) {
           leds: [true, false, false],
           isClock: false
         });
-      } else if (attempts >= 8) {
+      } else if (attempts >= 15) {
         clearInterval(wifiScanPollingTimer);
+        stopScanningAnimation();
         renderScannedWifiList([]);
       }
     }, 1200);
   } catch (err) {
+    stopScanningAnimation();
     if (list) list.innerHTML = `<div style="text-align:center; padding:1.5rem; color:var(--status-absent);">Error scanning networks.</div>`;
   }
 }
