@@ -563,6 +563,7 @@ function renderDevicesList(devices) {
             <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); checkDeviceConnection(${d.id})" title="Ping ESP32 node and check live connection">Ping</button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openOtaUpdateModal(${d.id})" title="Wireless Over-The-Air firmware update">OTA</button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showEspConfigModal(${d.id})" title="View C++ config.h for this ESP32">config.h</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openAs608SlotManagerModal(${d.id})" title="Audit all 300 AS608 hardware slots &amp; detect duplicates">Slots &amp; Duplicates</button>
             <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); triggerTemplateSyncToDevice(${d.id})" title="Push all stored student templates from MySQL to this ESP32">Sync Templates</button>
           </div>
         </div>
@@ -2155,6 +2156,318 @@ async function quickAddStudioWifi() {
   if (passInput) passInput.value = '';
 }
 
+// ─── 11. AS608 Hardware Slot Manager & Duplicate Data Explorer ─────────────
+let currentSlotModalDeviceId = null;
+let currentSlotModalData = null;
+let currentSlotViewMode = 'occupied'; // 'occupied' | 'all' | 'duplicates'
+
+async function openAs608SlotManagerModal(deviceId) {
+  const targetId = deviceId || selectedDeviceId || (espOverviewData?.devices && espOverviewData.devices[0]?.id);
+  if (!targetId) {
+    showToast('No ESP32 terminal paired yet. Please connect an ESP terminal.', 'warning');
+    return;
+  }
+  currentSlotModalDeviceId = targetId;
+  const modal = document.getElementById('as608-slot-manager-modal');
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+  }
+  const searchInput = document.getElementById('slot-search-input');
+  if (searchInput) searchInput.value = '';
+  setSlotModalViewMode('occupied');
+  await loadAndRenderAs608Slots();
+}
+
+function closeAs608SlotManagerModal() {
+  const modal = document.getElementById('as608-slot-manager-modal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+  }
+}
+
+function setSlotModalViewMode(mode) {
+  currentSlotViewMode = mode;
+  ['occupied', 'all', 'duplicates'].forEach(m => {
+    const btn = document.getElementById(`slot-tab-${m}`);
+    if (btn) {
+      if (m === mode) {
+        btn.className = 'btn btn-sm btn-primary slot-tab-btn active';
+      } else {
+        btn.className = 'btn btn-sm btn-secondary slot-tab-btn';
+      }
+    }
+  });
+  renderAs608SlotsTable();
+}
+
+async function loadAndRenderAs608Slots() {
+  const tbody = document.getElementById('as608-slots-tbody');
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">Auditing AS608 hardware slots via terminal connection...</td></tr>`;
+  }
+  try {
+    const res = await fetchApi(`/devices/hod/${currentSlotModalDeviceId}/slots`);
+    if (!res || !res.success || !res.data) {
+      showToast(res?.error?.message || 'Could not fetch hardware slots data.', 'error');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--status-absent);">Failed to load slots: ${escHtml(res?.error?.message || 'Unknown error')}</td></tr>`;
+      }
+      return;
+    }
+
+    currentSlotModalData = res.data;
+    const { device = {}, summary = {}, occupied_slots = [], duplicates = [] } = currentSlotModalData;
+
+    // Header info
+    const devUidEl = document.getElementById('slot-modal-device-uid');
+    if (devUidEl) devUidEl.textContent = `${device.device_uid || device.name} (${device.ip_address || '192.168.1.36'})`;
+
+    const termPill = document.getElementById('slot-modal-terminal-pill');
+    if (termPill) {
+      termPill.textContent = `${device.name || device.device_uid || 'Active Node'}`;
+    }
+
+    // KPI ribbon
+    const kpiOcc = document.getElementById('slot-kpi-occupied');
+    if (kpiOcc) kpiOcc.textContent = `${summary.occupied_slots || occupied_slots.length} / 300`;
+
+    const kpiFree = document.getElementById('slot-kpi-free');
+    if (kpiFree) kpiFree.textContent = `${summary.free_slots != null ? summary.free_slots : (300 - occupied_slots.length)}`;
+
+    const kpiStu = document.getElementById('slot-kpi-students');
+    if (kpiStu) kpiStu.textContent = `${summary.unique_students_enrolled || 0}`;
+
+    const kpiDup = document.getElementById('slot-kpi-duplicates');
+    if (kpiDup) {
+      kpiDup.textContent = `${duplicates.length}`;
+      kpiDup.style.color = duplicates.length > 0 ? 'var(--status-absent)' : 'var(--status-present)';
+    }
+
+    // Duplicate alert box
+    const dupBox = document.getElementById('slot-duplicate-alert-box');
+    const dupTitle = document.getElementById('slot-duplicate-title');
+    const dupList = document.getElementById('slot-duplicate-list');
+
+    if (dupBox) {
+      if (duplicates.length > 0) {
+        dupBox.style.display = 'block';
+        if (dupTitle) dupTitle.textContent = `${duplicates.length} Duplicate Anomalies Detected`;
+        if (dupList) {
+          dupList.innerHTML = duplicates.map(d => `
+            <li style="margin-bottom:0.25rem;">
+              <strong>${escHtml(d.type)}:</strong> ${escHtml(d.description)}
+            </li>
+          `).join('');
+        }
+      } else {
+        dupBox.style.display = 'none';
+      }
+    }
+
+    renderAs608SlotsTable();
+  } catch (err) {
+    console.error('[Slot Manager] Error:', err);
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--status-absent);">Error loading slots: ${escHtml(err.message)}</td></tr>`;
+    }
+  }
+}
+
+function filterAs608SlotsTable() {
+  renderAs608SlotsTable();
+}
+
+function renderAs608SlotsTable() {
+  const tbody = document.getElementById('as608-slots-tbody');
+  if (!tbody || !currentSlotModalData) return;
+
+  const { occupied_slots = [], duplicates = [] } = currentSlotModalData;
+  const searchVal = (document.getElementById('slot-search-input')?.value || '').trim().toLowerCase();
+
+  // Create full 300 slots representation
+  const occupiedBySlotNum = new Map();
+  occupied_slots.forEach(slot => {
+    occupiedBySlotNum.set(Number(slot.slot_number), slot);
+  });
+
+  let rowsToDisplay = [];
+
+  if (currentSlotViewMode === 'occupied') {
+    rowsToDisplay = occupied_slots;
+  } else if (currentSlotViewMode === 'duplicates') {
+    rowsToDisplay = occupied_slots.filter(s => s.has_duplicate_issue || (s.duplicate_reasons && s.duplicate_reasons.length > 0));
+  } else {
+    // 'all' 300 slots
+    for (let i = 1; i <= 300; i++) {
+      if (occupiedBySlotNum.has(i)) {
+        rowsToDisplay.push(occupiedBySlotNum.get(i));
+      } else {
+        rowsToDisplay.push({
+          slot_number: i,
+          is_free: true
+        });
+      }
+    }
+  }
+
+  // Filter by search string
+  if (searchVal) {
+    rowsToDisplay = rowsToDisplay.filter(r => {
+      if (String(r.slot_number).includes(searchVal)) return true;
+      if (r.full_name && r.full_name.toLowerCase().includes(searchVal)) return true;
+      if (r.class_roll_no && String(r.class_roll_no).toLowerCase().includes(searchVal)) return true;
+      if (r.official_enrollment_no && r.official_enrollment_no.toLowerCase().includes(searchVal)) return true;
+      if (r.template_sha256 && r.template_sha256.toLowerCase().includes(searchVal)) return true;
+      return false;
+    });
+  }
+
+  if (!rowsToDisplay.length) {
+    const emptyMsg = currentSlotViewMode === 'duplicates'
+      ? 'No duplicate slot anomalies detected on this terminal!'
+      : (searchVal ? `No slots matching "${escHtml(searchVal)}"` : 'No occupied slots found on this terminal.');
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">${emptyMsg}</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rowsToDisplay.map(r => {
+    if (r.is_free) {
+      return `
+        <tr style="opacity:0.65;">
+          <td>
+            <span style="font-family:var(--font-family-mono); font-weight:700; color:var(--text-muted);">Slot #${r.slot_number}</span>
+          </td>
+          <td colspan="2" style="color:var(--text-muted); font-style:italic;">
+            Free AS608 EEPROM Hardware Slot (Available for student enrollment)
+          </td>
+          <td>
+            <span class="esp-status-pill offline" style="font-size:0.7rem;">FREE</span>
+          </td>
+          <td style="text-align:right;">
+            <span style="font-size:0.72rem; color:var(--text-muted);">Auto-Assignable</span>
+          </td>
+        </tr>
+      `;
+    }
+
+    const hasDup = Boolean(r.has_duplicate_issue || (r.duplicate_reasons && r.duplicate_reasons.length > 0));
+    const names = (r.full_name || 'Student').trim().split(/\s+/);
+    const initials = names.length > 1 ? (names[0][0] + names[names.length - 1][0]).toUpperCase() : names[0].slice(0, 2).toUpperCase();
+    const rollLabel = r.class_roll_no ? `Roll: #${r.class_roll_no}` : (r.official_enrollment_no ? `UBTER: ${r.official_enrollment_no}` : 'Roster Student');
+    const cohortLabel = r.year ? `Yr ${r.year} Sem ${r.semester || 1}` : (r.department_name || 'IT Dept');
+    const shaPreview = r.template_sha256 ? `${r.template_sha256.slice(0, 8)}...${r.template_sha256.slice(-6)}` : '512B AS608 Raw';
+    const quality = r.quality_score != null ? `${r.quality_score}%` : 'High';
+    const enrolledDate = r.enrolled_at ? new Date(r.enrolled_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Registered';
+
+    return `
+      <tr style="${hasDup ? 'background:var(--color-primary-light);' : ''}">
+        <td>
+          <div style="font-family:var(--font-family-mono); font-weight:800; font-size:0.85rem; color:var(--color-primary);">Slot #${r.slot_number}</div>
+          ${hasDup ? '<span class="esp-status-pill offline" style="font-size:0.65rem; color:var(--status-absent);">DUPLICATE</span>' : ''}
+        </td>
+        <td>
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <div style="width:28px; height:28px; border-radius:50%; background:var(--bg-surface); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.72rem; color:var(--color-primary); flex-shrink:0;">
+              ${initials}
+            </div>
+            <div>
+              <strong style="color:var(--text-main); font-size:0.82rem;">${escHtml(r.full_name || 'Unknown Student')}</strong>
+              <div style="font-size:0.72rem; color:var(--text-muted); margin-top:1px;">
+                ${escHtml(rollLabel)} &bull; ${escHtml(cohortLabel)}
+              </div>
+            </div>
+          </div>
+          ${hasDup && r.duplicate_reasons ? `
+            <div style="font-size:0.7rem; color:var(--status-absent); margin-top:3px;">
+              ${r.duplicate_reasons.map(reason => `&bull; ${escHtml(reason)}`).join('<br>')}
+            </div>
+          ` : ''}
+        </td>
+        <td>
+          <div style="font-family:var(--font-family-mono); font-size:0.74rem; color:var(--text-main);">
+            SHA: <span style="color:var(--color-primary);">${escHtml(shaPreview)}</span>
+          </div>
+          <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+            512B AS608 &bull; Quality: ${quality} &bull; ${enrolledDate}
+          </div>
+        </td>
+        <td>
+          <span class="esp-status-pill ${hasDup ? 'offline' : 'online'}" style="font-size:0.7rem;">
+            ${hasDup ? 'ANOMALY' : 'OCCUPIED'}
+          </span>
+        </td>
+        <td style="text-align:right;">
+          <div style="display:inline-flex; gap:0.35rem; align-items:center;">
+            ${r.student_id ? `
+              <button type="button" class="btn btn-secondary btn-sm" onclick="simulateStudentBiometric(${r.student_id}, 'MARK_ATTENDANCE')" title="Simulate attendance verification scan for this student">
+                Test Scan
+              </button>
+            ` : ''}
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteSpecificDeviceSlot(${r.slot_number}, '${escHtml(r.full_name || 'Student')}')" title="Delete slot from physical AS608 hardware memory and MySQL">
+              Remove
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function deleteSpecificDeviceSlot(slotNumber, studentName = 'Student') {
+  if (!currentSlotModalDeviceId) return;
+  const confirmMsg = `Remove AS608 Slot #${slotNumber} (${studentName})?\n\nThis will send a DELETE_TEMPLATE instruction to physical AS608 hardware memory and clear slot #${slotNumber} in MySQL.`;
+  if (!confirm(confirmMsg)) return;
+
+  try {
+    const res = await fetchApi(`/devices/hod/${currentSlotModalDeviceId}/slots/${slotNumber}`, {
+      method: 'DELETE'
+    });
+    if (res && res.success) {
+      showToast(res.message || `Slot #${slotNumber} removed from AS608 and unassigned!`, 'success');
+      await loadAndRenderAs608Slots();
+      await loadEsp32Overview();
+    } else {
+      showToast(res?.error?.message || 'Failed to remove slot.', 'error');
+    }
+  } catch (err) {
+    showToast('Error removing slot: ' + err.message, 'error');
+  }
+}
+
+async function cleanDuplicatesOnSelectedDevice() {
+  if (!currentSlotModalDeviceId) return;
+  const confirmMsg = `Auto-Resolve & Clean Duplicate Biometric Slots:\n\nThis will audit all 300 hardware slots on this terminal, retain the active template for each student, delete duplicate slots from physical AS608 EEPROM, and reconcile database pointers.\n\nProceed?`;
+  if (!confirm(confirmMsg)) return;
+
+  const btn = document.getElementById('btn-clean-duplicates-now');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Resolving Duplicates...';
+  }
+
+  try {
+    const res = await fetchApi(`/devices/hod/${currentSlotModalDeviceId}/clean-duplicates`, {
+      method: 'POST'
+    });
+    if (res && res.success) {
+      showToast(res.message || 'Duplicate slots successfully resolved and cleared from AS608!', 'success');
+      await loadAndRenderAs608Slots();
+      await loadEsp32Overview();
+    } else {
+      showToast(res?.error?.message || 'Failed to clean duplicates.', 'error');
+    }
+  } catch (err) {
+    showToast('Error cleaning duplicates: ' + err.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Auto-Resolve & Clean Duplicates';
+    }
+  }
+}
+
 // ─── Window Function Exports ───────────────────────────────────────────────
 window.loadEsp32Overview = loadEsp32Overview;
 window.onSwitchDepartment = onSwitchDepartment;
@@ -2209,5 +2522,12 @@ window.focusEnrollStation = focusEnrollStation;
 window.focusAttendanceScanner = focusAttendanceScanner;
 window.focusWifiManager = focusWifiManager;
 window.quickAddStudioWifi = quickAddStudioWifi;
+window.openAs608SlotManagerModal = openAs608SlotManagerModal;
+window.closeAs608SlotManagerModal = closeAs608SlotManagerModal;
+window.setSlotModalViewMode = setSlotModalViewMode;
+window.loadAndRenderAs608Slots = loadAndRenderAs608Slots;
+window.filterAs608SlotsTable = filterAs608SlotsTable;
+window.deleteSpecificDeviceSlot = deleteSpecificDeviceSlot;
+window.cleanDuplicatesOnSelectedDevice = cleanDuplicatesOnSelectedDevice;
 
 document.addEventListener('DOMContentLoaded', loadEsp32Overview);

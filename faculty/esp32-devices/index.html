@@ -98,9 +98,12 @@
                   </div>
                   <p class="esp-section-sub">Select active terminal to manage telemetry, sync templates, or trigger wireless OTA.</p>
                 </div>
-                <select id="active-device-select" class="form-select form-select-sm" style="max-width:200px;" onchange="onSelectActiveDevice(this.value)">
-                  <option value="">Select Active ESP32...</option>
-                </select>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-open-as608-slots" onclick="openAs608SlotManagerModal()" title="View AS608 Hardware Slots & Clean Duplicates">Slots &amp; Duplicates</button>
+                  <select id="active-device-select" class="form-select form-select-sm" style="max-width:200px;" onchange="onSelectActiveDevice(this.value)">
+                    <option value="">Select Active ESP32...</option>
+                  </select>
+                </div>
               </div>
 
               <div id="esp-devices-list" class="esp-devices-grid">
@@ -335,12 +338,12 @@
                     </svg>
                     <span>Test Scan</span>
                   </button>
-                  <button type="button" class="btn btn-danger btn-sm esp-btn-remove-bio" id="btn-remove-selected-bio" onclick="removeCurrentSelectedStudentTemplate()" style="display:none;" title="Delete fingerprint template from cloud vault">
+                  <button type="button" class="btn btn-danger btn-sm esp-btn-remove-bio" id="btn-remove-selected-bio" onclick="removeCurrentSelectedStudentTemplate()" style="display:none;" title="Delete fingerprint template from physical AS608 memory &amp; cloud vault">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <polyline points="3 6 5 6 21 6"></polyline>
                       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     </svg>
-                    <span>Remove</span>
+                    <span>Remove from AS608</span>
                   </button>
                 </div>
               </div>
@@ -745,6 +748,104 @@
           <button type="submit" class="btn btn-primary" id="btn-submit-ota">Update Firmware Now (OTA)</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL 6: AS608 HARDWARE SLOTS & DUPLICATE AUDIT MANAGER -->
+  <div id="as608-slot-manager-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" style="max-width:960px; width:100%; max-height:90vh; display:flex; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-shrink:0;">
+        <div>
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <h2 style="font-size:1.15rem; font-weight:800; margin:0; color:var(--text-main);">AS608 Hardware Slots &amp; Duplicate Audit</h2>
+            <span class="esp-status-pill online" id="slot-modal-terminal-pill">ACTIVE TERMINAL</span>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin:0.2rem 0 0 0;">Audit all 300 physical AS608 EEPROM slots, mapped student records, and automated duplicate anomaly detection.</p>
+        </div>
+        <button type="button" onclick="closeAs608SlotManagerModal()"
+          style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-muted);">&times;</button>
+      </div>
+
+      <!-- KPI Summary Ribbon -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.5rem; margin-bottom:0.75rem; flex-shrink:0;">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:8px; padding:0.55rem 0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Total Capacity</div>
+          <div style="font-size:1.1rem; font-weight:800; color:var(--text-main); font-family:var(--font-family-mono);">300 Slots</div>
+        </div>
+        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:8px; padding:0.55rem 0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Occupied Slots</div>
+          <div style="font-size:1.1rem; font-weight:800; color:var(--color-primary); font-family:var(--font-family-mono);" id="slot-kpi-occupied">0</div>
+        </div>
+        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:8px; padding:0.55rem 0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Free Slots</div>
+          <div style="font-size:1.1rem; font-weight:800; color:var(--status-present); font-family:var(--font-family-mono);" id="slot-kpi-free">300</div>
+        </div>
+        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:8px; padding:0.55rem 0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Enrolled Students</div>
+          <div style="font-size:1.1rem; font-weight:800; color:var(--text-main); font-family:var(--font-family-mono);" id="slot-kpi-students">0</div>
+        </div>
+        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:8px; padding:0.55rem 0.75rem;">
+          <div style="font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Duplicate Issues</div>
+          <div style="font-size:1.1rem; font-weight:800; font-family:var(--font-family-mono);" id="slot-kpi-duplicates">0</div>
+        </div>
+      </div>
+
+      <!-- Duplicate Alert Banner -->
+      <div id="slot-duplicate-alert-box" style="display:none; background:var(--color-primary-light); border:1px solid var(--status-absent); border-radius:8px; padding:0.65rem 0.85rem; margin-bottom:0.75rem; flex-shrink:0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <div>
+            <div style="font-weight:700; font-size:0.84rem; color:var(--status-absent);" id="slot-duplicate-title">Duplicate Anomalies Detected</div>
+            <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;" id="slot-duplicate-desc">Multiple slots mapped to one student or duplicate template records.</div>
+          </div>
+          <button type="button" class="btn btn-danger btn-sm" id="btn-clean-duplicates-now" onclick="cleanDuplicatesOnSelectedDevice()">
+            Auto-Resolve &amp; Clean Duplicates
+          </button>
+        </div>
+        <ul id="slot-duplicate-list" style="margin:0.4rem 0 0 1rem; padding:0; font-size:0.74rem; color:var(--text-main);"></ul>
+      </div>
+
+      <!-- Filter & Search Controls Toolbar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.65rem; flex-shrink:0;">
+        <div style="display:flex; gap:0.35rem; align-items:center;">
+          <button type="button" class="btn btn-sm btn-primary slot-tab-btn" id="slot-tab-occupied" onclick="setSlotModalViewMode('occupied')">Occupied Slots</button>
+          <button type="button" class="btn btn-sm btn-secondary slot-tab-btn" id="slot-tab-all" onclick="setSlotModalViewMode('all')">All 300 Slots</button>
+          <button type="button" class="btn btn-sm btn-secondary slot-tab-btn" id="slot-tab-duplicates" onclick="setSlotModalViewMode('duplicates')">Duplicates Only</button>
+        </div>
+        <div style="display:flex; gap:0.4rem; align-items:center; flex:1; max-width:380px;">
+          <input type="search" id="slot-search-input" class="form-control form-control-sm" placeholder="Filter by student name, roll #, or slot..." oninput="filterAs608SlotsTable()">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="loadAndRenderAs608Slots()" title="Reload hardware slots">Refresh</button>
+        </div>
+      </div>
+
+      <!-- Slots Table Container -->
+      <div style="overflow-y:auto; flex:1; min-height:220px; border:1px solid var(--border-color); border-radius:8px;">
+        <table class="table" style="width:100%; margin:0; font-size:0.78rem;">
+          <thead style="position:sticky; top:0; background:var(--bg-surface); z-index:2; border-bottom:1px solid var(--border-color);">
+            <tr>
+              <th style="width:85px;">Slot #</th>
+              <th>Student Roster Mapping</th>
+              <th>Biometric Template &amp; Hash</th>
+              <th style="width:120px;">Slot Status</th>
+              <th style="width:170px; text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="as608-slots-tbody">
+            <tr>
+              <td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading AS608 hardware slots audit...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; flex-shrink:0;">
+        <div style="font-size:0.75rem; color:var(--text-muted);" id="slot-modal-device-info">
+          Terminal: <span style="font-family:var(--font-family-mono); font-weight:700; color:var(--color-primary);" id="slot-modal-device-uid">--</span>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeAs608SlotManagerModal()">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 

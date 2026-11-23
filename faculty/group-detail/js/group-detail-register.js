@@ -2273,28 +2273,46 @@
   }
 
   function selectExportFormat(fmt) {
-    ['xlsx', 'pdf', 'doc'].forEach(f => {
-      const card = ById(`card-format-${f}`);
-      if (card) {
-        if (f === fmt) {
-          card.classList.add('active');
-          const radio = card.querySelector('input[type="radio"]');
-          if (radio) radio.checked = true;
-        } else {
-          card.classList.remove('active');
-        }
+    const norm = (fmt === 'docx' || fmt === 'doc') ? 'doc' : fmt;
+    document.querySelectorAll('.export-format-card').forEach(card => {
+      const cFmt = card.getAttribute('data-format') || card.id.replace('card-format-', '');
+      const cNorm = (cFmt === 'docx' || cFmt === 'doc') ? 'doc' : cFmt;
+      if (cNorm === norm || cFmt === fmt) {
+        card.classList.add('active');
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+      } else {
+        card.classList.remove('active');
       }
     });
   }
 
   function handleExportRangeChange(range) {
-    const ranges = ['overview_only', 'all_months', 'month', 'week', 'day'];
+    const dropdown = ById('export-range-type');
+    if (dropdown && dropdown.value !== range) {
+      // Find matching option
+      const options = Array.from(dropdown.options).map(o => o.value);
+      if (options.includes(range)) {
+        dropdown.value = range;
+      } else if (range === 'all_months' && options.includes('all-months')) {
+        dropdown.value = 'all-months';
+      } else if (range === 'month' && options.includes('current-month')) {
+        dropdown.value = 'current-month';
+      }
+    }
+
+    const customDiv = ById('export-custom-range');
+    if (customDiv) {
+      customDiv.style.display = (range === 'custom') ? 'block' : 'none';
+    }
+
+    const ranges = ['overview_only', 'all_months', 'all-months', 'month', 'current-month', 'week', 'day', 'custom'];
     ranges.forEach(r => {
-      const key = r === 'overview_only' ? 'overview' : (r === 'all_months' ? 'all' : r);
+      const key = r === 'overview_only' ? 'overview' : ((r === 'all_months' || r === 'all-months') ? 'all' : r);
       const label = ById(`label-range-${key}`);
       const radio = ById(`range-opt-${key}`);
       if (label) {
-        if (r === range) {
+        if (r === range || (range === 'all-months' && r === 'all_months') || (range === 'current-month' && r === 'month')) {
           label.classList.add('active');
           if (radio) radio.checked = true;
         } else {
@@ -2306,7 +2324,7 @@
     // Contextual inputs: only visible and active when Specific Month or Specific Day is selected
     const monthRow = ById('export-context-month-row');
     const dayRow = ById('export-context-day-row');
-    if (monthRow) monthRow.style.display = (range === 'month') ? 'flex' : 'none';
+    if (monthRow) monthRow.style.display = (range === 'month' || range === 'current-month') ? 'flex' : 'none';
     if (dayRow) dayRow.style.display = (range === 'day') ? 'flex' : 'none';
 
     updateExportRangeHint(range);
@@ -2318,10 +2336,13 @@
 
     const hints = {
       'all_months': '<b>Full Semester:</b> Complete Day 1–31 daily matrix for all months + final summary.',
+      'all-months': '<b>Full Semester:</b> Complete Day 1–31 daily matrix for all months + final summary.',
       'overview_only': '<b>Summary Only:</b> Student attendance % and totals only (no daily day-by-day grids).',
       'week': '<b>Current Week:</b> Monday to Saturday daily attendance for the active week.',
       'month': '<b>Selected Month:</b> Day 1–31 ledger for the chosen month only.',
-      'day': '<b>Single Day:</b> Daily session check-in roster for the chosen date.'
+      'current-month': '<b>Current Month:</b> Day 1–31 ledger for the current month only.',
+      'day': '<b>Single Day:</b> Daily session check-in roster for the chosen date.',
+      'custom': '<b>Custom Range:</b> Export attendance within the specified dates.'
     };
 
     hintText.innerHTML = hints[range] || hints['all_months'];
@@ -2352,11 +2373,29 @@
       return;
     }
 
-    const fmtRadio = document.querySelector('input[name="export-format"]:checked');
-    const format = fmtRadio ? fmtRadio.value : 'xlsx';
+    // 1. Detect format (cards first, then radio)
+    let format = 'xlsx';
+    const activeFormatCard = document.querySelector('.export-format-card.active');
+    if (activeFormatCard) {
+      format = activeFormatCard.getAttribute('data-format') || 'xlsx';
+    } else {
+      const fmtRadio = document.querySelector('input[name="export-format"]:checked');
+      if (fmtRadio) format = fmtRadio.value;
+    }
+    if (format === 'word') format = 'docx';
 
-    const rangeRadio = document.querySelector('input[name="export-range"]:checked');
-    const range = rangeRadio ? rangeRadio.value : 'all_months';
+    // 2. Detect range (dropdown first, then radio)
+    let range = 'all_months';
+    const rangeSelect = ById('export-range-type');
+    if (rangeSelect) {
+      const val = rangeSelect.value;
+      if (val === 'current-month') range = 'month';
+      else if (val === 'all-months') range = 'all_months';
+      else range = val;
+    } else {
+      const rangeRadio = document.querySelector('input[name="export-range"]:checked');
+      if (rangeRadio) range = rangeRadio.value;
+    }
 
     const monthSelect = ById('export-month-select');
     const targetMonth = monthSelect ? monthSelect.value : (classRegState.currentMonth || new Date().toISOString().slice(0, 7));
@@ -2364,11 +2403,16 @@
     const dayInput = ById('export-day-input');
     const targetDay = dayInput ? dayInput.value : new Date().toISOString().slice(0, 10);
 
+    const fromInput = ById('export-date-from');
+    const toInput = ById('export-date-to');
+    const dateFrom = fromInput ? fromInput.value : '';
+    const dateTo = toInput ? toInput.value : '';
+
     const scopeVal = ById('export-scope-val');
     const scope = scopeVal ? scopeVal.value : 'BOTH';
 
-    const btn = ById('btn-execute-export');
-    const lbl = ById('lbl-export-btn');
+    const btn = ById('btn-execute-export') || ById('btn-do-export');
+    const lbl = ById('lbl-export-btn') || ById('export-btn-label');
     const originalText = lbl ? lbl.innerText : 'Download Report';
 
     try {
@@ -2383,7 +2427,9 @@
         range,
         month: targetMonth,
         day: targetDay,
-        scope
+        scope,
+        date_from: dateFrom,
+        date_to: dateTo
       };
 
       const resp = await fetch(`/api/v1/faculty/registers/${regId}/export/attendance`, {
