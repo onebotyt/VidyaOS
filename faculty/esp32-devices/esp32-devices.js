@@ -68,6 +68,10 @@ function playPiezoBuzzerSequence(notes) {
   } catch (_) { }
 }
 
+function playBeep(freq = 800, durMs = 300, gapMs = 25) {
+  playPiezoBuzzerSequence([[freq, durMs, gapMs]]);
+}
+
 // Sound Profiles from oled_buzzer_ui.h
 function beepAttendanceSuccess() {
   playPiezoBuzzerSequence([[2400, 2000, 50]]);
@@ -2529,5 +2533,7 @@ window.loadAndRenderAs608Slots = loadAndRenderAs608Slots;
 window.filterAs608SlotsTable = filterAs608SlotsTable;
 window.deleteSpecificDeviceSlot = deleteSpecificDeviceSlot;
 window.cleanDuplicatesOnSelectedDevice = cleanDuplicatesOnSelectedDevice;
+window.playBeep = playBeep;
+window.playPiezoBuzzerSequence = playPiezoBuzzerSequence;
 
 document.addEventListener('DOMContentLoaded', loadEsp32Overview);

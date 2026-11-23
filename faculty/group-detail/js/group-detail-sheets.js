@@ -412,62 +412,13 @@
         URL.revokeObjectURL(url);
         return true;
       } catch (clientErr) {
-        console.warn('Client-side ExcelJS export failed, trying backend fallback:', clientErr);
+        console.error('Client-side ExcelJS export error:', clientErr);
+        if (typeof toast === 'function') toast('Excel export failed: ' + (clientErr.message || 'Unknown error'));
+        return false;
       }
-    }
-
-    // Backend fallback route
-    try {
-      const rows = [];
-      const trElements = clone.querySelectorAll('tr');
-      trElements.forEach(tr => {
-        const rowCells = [];
-        tr.querySelectorAll('th, td').forEach(c => {
-          rowCells.push({
-            text: c.textContent.replace(/\s+/g, ' ').trim(),
-            colspan: parseInt(c.getAttribute('colspan') || '1', 10),
-            rowspan: parseInt(c.getAttribute('rowspan') || '1', 10),
-            is_blue: c.classList.contains('excel-hdr-blue') || tr.classList.contains('excel-hdr-blue'),
-            is_tan: c.classList.contains('excel-hdr-tan') || tr.classList.contains('excel-hdr-tan'),
-            is_sub: c.classList.contains('excel-hdr-sub') || tr.classList.contains('excel-hdr-sub'),
-            is_summary: c.classList.contains('excel-summary-lbl') || c.classList.contains('excel-summary-avg') || tr.closest('tfoot'),
-            is_label: c.classList.contains('excel-summary-lbl'),
-            is_name: c.classList.contains('cell-student-name'),
-            is_header: c.tagName.toLowerCase() === 'th' || tr.closest('thead'),
-            is_absent: c.classList.contains('is-absent')
-          });
-        });
-        rows.push(rowCells);
-      });
-
-      const token = (typeof getAuthToken === 'function' && getAuthToken()) || localStorage.getItem('token') || '';
-      const resp = await fetch('/api/v1/faculty/export/table-to-excel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          title: filename,
-          sheet_name: sheetTitle,
-          rows: rows
-        })
-      });
-
-      if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
-      const blob = await resp.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${filename}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      return true;
-    } catch (fallbackErr) {
-      console.error('All XLSX export strategies failed:', fallbackErr);
-      throw fallbackErr;
+    } else {
+      if (typeof toast === 'function') toast('Excel export engine not loaded. Please refresh the page.');
+      return false;
     }
   }
 

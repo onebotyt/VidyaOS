@@ -8596,7 +8596,11 @@ async function exportCurrentSheet(format) {
       const banner3 = document.getElementById('hdr-banner-cohort')?.textContent?.trim() || 'Information Technology | Semester 5';
 
       EXCEL_WB.sheets.forEach(wsData => {
-        const worksheet = workbook.addWorksheet(wsData.name || 'Sheet');
+        const cleanSheetName = (wsData.name || 'Sheet')
+          .replace(/[*?:/\\\[\]]/g, ' ')
+          .trim()
+          .substring(0, 31) || 'Sheet1';
+        const worksheet = workbook.addWorksheet(cleanSheetName);
 
         // 1. Find the highest column index that actually has data in this worksheet
         let maxDataCol = 0;
@@ -8805,7 +8809,20 @@ async function exportCurrentSheet(format) {
             };
 
             // 3. Resolve Alignment & Text Wrapping
-            const defaultHAlign = (c === 2 && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center';
+            let isNameCol = false;
+            for (let hr = 0; hr <= 2; hr++) {
+              const hCell = getCell(wsData, hr, c);
+              const txt = String(hCell?.v !== undefined && hCell?.v !== null ? hCell.v : (hCell?.raw || '')).toUpperCase();
+              if (txt.includes('NAME') || txt.includes('STUDENT')) {
+                isNameCol = true;
+                break;
+              }
+            }
+            if (!isNameCol && ((maxDataCol >= 4 && c === 4) || (maxDataCol < 4 && c === 2))) {
+              isNameCol = true;
+            }
+
+            const defaultHAlign = (isNameCol && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center';
             const hAlign = cell.s?.align || defaultHAlign;
             const vAlign = cell.s?.vAlign || 'middle';
             const cellValStr = String(cell.v !== undefined && cell.v !== null ? cell.v : (cell.raw || ''));
@@ -8920,6 +8937,7 @@ function generateSheetPrintableHtml(sheet) {
   }
 
   // Calculate total widths and column percentages for A4 Landscape
+  const colEffectiveWidths = [];
   let sumColWidths = 0;
   for (let c = 0; c <= maxDataCol; c++) {
     let colHeaderStr = '';
@@ -8936,12 +8954,13 @@ function generateSheetPrintableHtml(sheet) {
       sheet.colWidths[c] = 63; // User explicit requirement: Total = 63px
     }
     const w = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : (c === 0 ? 42 : c === 1 ? 50 : c === 2 ? 76 : c === 3 ? 102 : c === 4 ? 145 : 68);
+    colEffectiveWidths[c] = w;
     sumColWidths += w;
   }
 
   let colGroupHtml = '<colgroup>';
   for (let c = 0; c <= maxDataCol; c++) {
-    const w = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : 68;
+    const w = colEffectiveWidths[c];
     const pct = ((w / sumColWidths) * 100).toFixed(2);
     colGroupHtml += `<col style="width:${pct}%;">`;
   }
@@ -9006,7 +9025,20 @@ function generateSheetPrintableHtml(sheet) {
       const spanAttrs = (mInfo && mInfo.isTopLeft) ? ` rowspan="${mInfo.rowSpan}" colspan="${mInfo.colSpan}"` : '';
       const cell = getCell(sheet, r, c);
       const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.raw;
-      const align = cell.s?.align || ((c === 2 && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center');
+      let isNameCol = false;
+      for (let hr = 0; hr <= 2; hr++) {
+        const hCell = getCell(sheet, hr, c);
+        const txt = String(hCell?.v !== undefined && hCell?.v !== null ? hCell.v : (hCell?.raw || '')).toUpperCase();
+        if (txt.includes('NAME') || txt.includes('STUDENT')) {
+          isNameCol = true;
+          break;
+        }
+      }
+      if (!isNameCol && ((maxDataCol >= 4 && c === 4) || (maxDataCol < 4 && c === 2))) {
+        isNameCol = true;
+      }
+      const defaultAlign = (isNameCol && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center';
+      const align = cell.s?.align || defaultAlign;
       const vAlign = cell.s?.vAlign || 'middle';
       const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isSubHeader || isMarks ? 'bold' : 'normal'));
       const fontStyle = cell.s?.italic ? 'italic' : 'normal';
@@ -9362,6 +9394,7 @@ function exportSheetToWordDoc(sheet) {
   }
 
   // Calculate total widths and column percentages for Word document A4 Landscape
+  const colEffectiveWidths = [];
   let sumColWidths = 0;
   for (let c = 0; c <= maxDataCol; c++) {
     let colHeaderStr = '';
@@ -9378,12 +9411,13 @@ function exportSheetToWordDoc(sheet) {
       sheet.colWidths[c] = 63; // User explicit requirement: Total = 63px
     }
     const w = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : (c === 0 ? 42 : c === 1 ? 50 : c === 2 ? 76 : c === 3 ? 102 : c === 4 ? 145 : 68);
+    colEffectiveWidths[c] = w;
     sumColWidths += w;
   }
 
   let colGroupHtml = '<colgroup>';
   for (let c = 0; c <= maxDataCol; c++) {
-    const w = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : 68;
+    const w = colEffectiveWidths[c];
     const pct = ((w / sumColWidths) * 100).toFixed(2);
     colGroupHtml += `<col style="width:${pct}%;">`;
   }
@@ -9418,7 +9452,20 @@ function exportSheetToWordDoc(sheet) {
       const spanAttrs = (mInfo && mInfo.isTopLeft) ? ` rowspan="${mInfo.rowSpan}" colspan="${mInfo.colSpan}"` : '';
       const cell = getCell(sheet, r, c);
       const val = cell.v !== undefined && cell.v !== null ? cell.v : cell.raw;
-      const align = cell.s?.align || ((c === 2 && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center');
+      let isNameCol = false;
+      for (let hr = 0; hr <= 2; hr++) {
+        const hCell = getCell(sheet, hr, c);
+        const txt = String(hCell?.v !== undefined && hCell?.v !== null ? hCell.v : (hCell?.raw || '')).toUpperCase();
+        if (txt.includes('NAME') || txt.includes('STUDENT')) {
+          isNameCol = true;
+          break;
+        }
+      }
+      if (!isNameCol && ((maxDataCol >= 4 && c === 4) || (maxDataCol < 4 && c === 2))) {
+        isNameCol = true;
+      }
+      const defaultAlign = (isNameCol && !isHeader && !isSubHeader && !isMarks) ? 'left' : 'center';
+      const align = cell.s?.align || defaultAlign;
       const vAlign = cell.s?.vAlign || 'middle';
       const weight = (cell.s?.bold !== undefined ? (cell.s.bold ? 'bold' : 'normal') : (isHeader || isSubHeader || isMarks ? 'bold' : 'normal'));
       const fontStyle = cell.s?.italic ? 'italic' : 'normal';
@@ -9429,7 +9476,7 @@ function exportSheetToWordDoc(sheet) {
       const fontSize = cell.s?.fontSize ? `${cell.s.fontSize}pt` : (isHeader ? '8pt' : isSubHeader ? '7.5pt' : (maxDataCol >= 12 ? '7.5pt' : '8pt'));
       const tag = isHeader ? 'th' : 'td';
 
-      const colW = (sheet.colWidths && sheet.colWidths[c]) ? sheet.colWidths[c] : 68;
+      const colW = colEffectiveWidths[c];
       const cellPct = ((colW / sumColWidths) * 100).toFixed(2);
       tableHtml += `<${tag}${spanAttrs} width="${cellPct}%" style="width:${cellPct}%;padding:3px 2px;text-align:${align};vertical-align:${vAlign};font-weight:${weight};font-style:${fontStyle};text-decoration:${textDecor};background-color:${bg};color:${color};border:1px solid #cbd5e1;font-size:${fontSize};white-space:pre-wrap;word-break:break-word;box-sizing:border-box;">${escapeHtml(val)}</${tag}>`;
     }
@@ -10686,8 +10733,12 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     }
     setCell(singleTestSheet, 0, 10, { raw: 'Unit Test Details (Mode : OFFLINE, Posted in VidyaOS as well)', v: 'Unit Test Details (Mode : OFFLINE, Posted in VidyaOS as well)', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)', wrap: true } });
 
-    // Merges for Header Row 0
+    // Merges for Header Row 0 & 1
     singleTestSheet.merges.push({ s: { r: 0, c: 5 }, e: { r: 0, c: 9 } });
+    singleTestSheet.merges.push({ s: { r: 0, c: 0 }, e: { r: 1, c: 0 } });
+    singleTestSheet.merges.push({ s: { r: 0, c: 1 }, e: { r: 1, c: 1 } });
+    singleTestSheet.merges.push({ s: { r: 0, c: 2 }, e: { r: 1, c: 2 } });
+    singleTestSheet.merges.push({ s: { r: 0, c: 3 }, e: { r: 1, c: 3 } });
 
     // Header Row 1: Questions and Total marks
     setCell(singleTestSheet, 1, 0, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
