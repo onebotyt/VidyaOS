@@ -453,14 +453,34 @@ async function initOfficePortal() {
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (!k) continue;
-        if (k.startsWith('vidyaos_excel_wb') || k.startsWith('vidyaos_inst_header') || k === 'vidyaos_institution_marks_header') {
+        if (k.startsWith('vidyaos_excel_wb') || k.startsWith('vidyaos_inst_header') || k === 'vidyaos_institution_marks_header' || k === 'vidyaos_excel_templates') {
           const val = localStorage.getItem(k);
-          if (val && (
-            val.includes('24011F') || val.includes('HARSHIT JOSHI') || val.includes('KAPIL BISHT') || val.includes('MANISH TIWARI') ||
-            val.includes('8.3') || val.includes('1.82') ||
-            !val.includes('REG. NO.') || val.includes('ROUND(D') || val.includes('ROUND(I')
-          )) {
-            keysToRemove.push(k);
+          if (val) {
+            let shouldPurge = false;
+            if (
+              val.includes('24011F') || val.includes('HARSHIT JOSHI') || val.includes('KAPIL BISHT') || val.includes('MANISH TIWARI') ||
+              val.includes('8.3') || val.includes('1.82') ||
+              !val.includes('REG. NO.') || val.includes('ROUND(D') || val.includes('ROUND(I')
+            ) {
+              shouldPurge = true;
+            } else if (k.startsWith('vidyaos_excel_wb')) {
+              try {
+                const parsed = JSON.parse(val);
+                const hasBrokenSingleTest = Array.isArray(parsed?.sheets) && parsed.sheets.some(s => s.type === 'single-test' && (
+                  !s.cells?.['0,2']?.v ||
+                  !String(s.cells['0,2'].v).includes('REG') ||
+                  !s.cells?.['0,3']?.v ||
+                  !String(s.cells['0,3'].v).includes('UBTER') ||
+                  !s.cells?.['0,4']?.v ||
+                  !String(s.cells['0,4'].v).includes('NAME') ||
+                  !(s.merges || []).some(m => m.s.r === 0 && m.e.r === 1 && m.s.c === 4)
+                ));
+                if (hasBrokenSingleTest) shouldPurge = true;
+              } catch (_) { }
+            } else if (k === 'vidyaos_excel_templates' && val.includes('"0,2"') && !val.includes('REG. NO.')) {
+              shouldPurge = true;
+            }
+            if (shouldPurge) keysToRemove.push(k);
           }
         }
       }

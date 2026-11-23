@@ -236,20 +236,40 @@ async function initSheetsStudio() {
       }
     }
 
-    // Purge any stale mock cache saved under old roster
+    // Purge any stale mock cache saved under old roster or broken test sheet structures
     try {
       const keysToRemove = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (!k) continue;
-        if (k.startsWith('vidyaos_excel_wb') || k.startsWith('vidyaos_inst_header') || k === 'vidyaos_institution_marks_header') {
+        if (k.startsWith('vidyaos_excel_wb') || k.startsWith('vidyaos_inst_header') || k === 'vidyaos_institution_marks_header' || k === 'vidyaos_excel_templates') {
           const val = localStorage.getItem(k);
-          if (val && (
-            val.includes('24011F') || val.includes('HARSHIT JOSHI') || val.includes('KAPIL BISHT') || val.includes('MANISH TIWARI') ||
-            val.includes('8.3') || val.includes('1.82') ||
-            !val.includes('REG. NO.') || val.includes('ROUND(D') || val.includes('ROUND(I')
-          )) {
-            keysToRemove.push(k);
+          if (val) {
+            let shouldPurge = false;
+            if (
+              val.includes('24011F') || val.includes('HARSHIT JOSHI') || val.includes('KAPIL BISHT') || val.includes('MANISH TIWARI') ||
+              val.includes('8.3') || val.includes('1.82') ||
+              !val.includes('REG. NO.') || val.includes('ROUND(D') || val.includes('ROUND(I')
+            ) {
+              shouldPurge = true;
+            } else if (k.startsWith('vidyaos_excel_wb')) {
+              try {
+                const parsed = JSON.parse(val);
+                const hasBrokenSingleTest = Array.isArray(parsed?.sheets) && parsed.sheets.some(s => s.type === 'single-test' && (
+                  !s.cells?.['0,2']?.v ||
+                  !String(s.cells['0,2'].v).includes('REG') ||
+                  !s.cells?.['0,3']?.v ||
+                  !String(s.cells['0,3'].v).includes('UBTER') ||
+                  !s.cells?.['0,4']?.v ||
+                  !String(s.cells['0,4'].v).includes('NAME') ||
+                  !(s.merges || []).some(m => m.s.r === 0 && m.e.r === 1 && m.s.c === 4)
+                ));
+                if (hasBrokenSingleTest) shouldPurge = true;
+              } catch (_) { }
+            } else if (k === 'vidyaos_excel_templates' && val.includes('"0,2"') && !val.includes('REG. NO.')) {
+              shouldPurge = true;
+            }
+            if (shouldPurge) keysToRemove.push(k);
           }
         }
       }
@@ -10213,12 +10233,13 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     try {
       const saved = localStorage.getItem(key);
       if (saved) {
+        let isStale = false;
         if (
           saved.includes('24011F') || saved.includes('HARSHIT JOSHI') || saved.includes('KAPIL BISHT') || saved.includes('MANISH TIWARI') ||
           saved.includes('8.3') || saved.includes('1.82') ||
           !saved.includes('REG. NO.') || saved.includes('ROUND(D') || saved.includes('ROUND(I')
         ) {
-          localStorage.removeItem(key);
+          isStale = true;
         } else {
           const parsed = JSON.parse(saved);
           const s0 = parsed?.sheets?.[0];
@@ -10235,7 +10256,36 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
             Boolean(getCell(s0, 3, 0)?.v || getCell(s0, 3, 0)?.raw)
           );
 
-          if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length >= 4 && !hasObsoleteGrade && !hasBrokenBannerInGrid && hasSingleTests && hasStudentRow && isTwoTier && hasFiveCols) {
+          const hasBrokenSingleTest = Array.isArray(parsed?.sheets) && parsed.sheets.some(s => s.type === 'single-test' && (
+            !s.cells?.['0,2']?.v ||
+            !String(s.cells['0,2'].v).includes('REG') ||
+            !s.cells?.['0,3']?.v ||
+            !String(s.cells['0,3'].v).includes('UBTER') ||
+            !s.cells?.['0,4']?.v ||
+            !String(s.cells['0,4'].v).includes('NAME') ||
+            !(s.merges || []).some(m => m.s.r === 0 && m.e.r === 1 && m.s.c === 4)
+          ));
+
+          if (isStale || hasBrokenSingleTest || !parsed || !Array.isArray(parsed.sheets) || parsed.sheets.length < 4 || hasObsoleteGrade || hasBrokenBannerInGrid || !hasSingleTests || !hasStudentRow || !isTwoTier || !hasFiveCols) {
+            localStorage.removeItem(key);
+          } else {
+            // Auto-heal single-test and other sheet headers if any subtle attribute was missing
+            parsed.sheets.forEach(s => {
+              if (s.type === 'single-test') {
+                setCell(s, 0, 0, { raw: 'SR. NO.', v: 'SR. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+                setCell(s, 0, 1, { raw: 'ROLL NO.', v: 'ROLL NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+                setCell(s, 0, 2, { raw: 'REG. NO.', v: 'REG. NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+                setCell(s, 0, 3, { raw: 'UBTER ROLL NO.', v: 'UBTER ROLL NO.', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+                setCell(s, 0, 4, { raw: 'STUDENT NAME', v: 'STUDENT NAME', s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+                if (!s.merges) s.merges = [];
+                s.merges = s.merges.filter(m => !(m.s.r <= 1 && m.e.r <= 1 && m.s.c <= 4));
+                for (let c = 0; c <= 4; c++) {
+                  setCell(s, 1, c, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
+                  s.merges.push({ s: { r: 0, c }, e: { r: 1, c } });
+                }
+              }
+            });
+
             EXCEL_WB.name = parsed.name || EXCEL_WB.name;
             EXCEL_WB.sheets = parsed.sheets;
             EXCEL_WB.activeSheetIndex = 0;
@@ -10739,13 +10789,14 @@ function hydrateAcademicSheetsFromGroup(forceRefresh = false) {
     singleTestSheet.merges.push({ s: { r: 0, c: 1 }, e: { r: 1, c: 1 } });
     singleTestSheet.merges.push({ s: { r: 0, c: 2 }, e: { r: 1, c: 2 } });
     singleTestSheet.merges.push({ s: { r: 0, c: 3 }, e: { r: 1, c: 3 } });
+    singleTestSheet.merges.push({ s: { r: 0, c: 4 }, e: { r: 1, c: 4 } });
 
     // Header Row 1: Questions and Total marks
     setCell(singleTestSheet, 1, 0, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
     setCell(singleTestSheet, 1, 1, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
     setCell(singleTestSheet, 1, 2, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
     setCell(singleTestSheet, 1, 3, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
-    setCell(singleTestSheet, 1, 4, { raw: 'Question No. -->', v: 'Question No. -->', s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+    setCell(singleTestSheet, 1, 4, { raw: '', v: '', s: { align: 'center', bg: 'var(--bg-surface)' } });
     questions.slice(0, 4).forEach((q, qIdx) => {
       setCell(singleTestSheet, 1, 5 + qIdx, { raw: q.num || (qIdx + 1), v: q.num || (qIdx + 1), s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
     });
@@ -11579,21 +11630,25 @@ function getSavedTemplates() {
           id: 'tmpl_gp_standard',
           name: 'Government Polytechnic Nainital Standard',
           createdAt: new Date().toISOString(),
-          colWidths: { 0: 55, 1: 105, 2: 180, 3: 95, 4: 95, 5: 95, 6: 95, 7: 85, 8: 95, 9: 95, 10: 85, 11: 85, 12: 85 },
+          colWidths: { 0: 42, 1: 50, 2: 76, 3: 102, 4: 145, 5: 95, 6: 95, 7: 95, 8: 95, 9: 85, 10: 95, 11: 95, 12: 85 },
           rowHeights: { 0: 28, 1: 24, 2: 24 },
           merges: [
             { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
             { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } },
             { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } },
-            { s: { r: 0, c: 3 }, e: { r: 0, c: 7 } },
-            { s: { r: 0, c: 8 }, e: { r: 0, c: 12 } }
+            { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } },
+            { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } },
+            { s: { r: 0, c: 5 }, e: { r: 0, c: 9 } },
+            { s: { r: 0, c: 10 }, e: { r: 0, c: 14 } }
           ],
           cellsFormat: {
             '0,0': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--table-th-bg)' }, label: 'SR. NO.' },
             '0,1': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--table-th-bg)' }, label: 'ROLL NO.' },
-            '0,2': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--table-th-bg)' }, label: 'STUDENT NAME' },
-            '0,3': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--chip-faculty-bg)' }, label: 'THEORY EVALUATION' },
-            '0,8': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--bg-surface-secondary)' }, label: 'PRACTICAL EVALUATION' }
+            '0,2': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--table-th-bg)' }, label: 'REG. NO.' },
+            '0,3': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--table-th-bg)' }, label: 'UBTER ROLL NO.' },
+            '0,4': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--table-th-bg)' }, label: 'STUDENT NAME' },
+            '0,5': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--chip-faculty-bg)' }, label: 'THEORY EVALUATION' },
+            '0,10': { s: { bold: true, align: 'center', vAlign: 'middle', bg: 'var(--bg-surface-secondary)' }, label: 'PRACTICAL EVALUATION' }
           }
         }
       ];
