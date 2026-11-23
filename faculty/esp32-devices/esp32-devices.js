@@ -422,7 +422,7 @@ function manageCommandPolling(commands = []) {
           }
         }
       } catch (_) { }
-    }, 3000);
+    }, 1000);
   } else if (pendingCmds.length === 0 && cmdPollingTimer) {
     clearInterval(cmdPollingTimer);
     cmdPollingTimer = null;
