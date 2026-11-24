@@ -214,9 +214,16 @@ function togglePw() {
   inp.type = show ? 'text' : 'password';
   if (btn) {
     btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    btn.classList.toggle('text-blue-700', show);
+    btn.classList.toggle('text-blue-600', !show);
     btn.innerHTML = show
-      ? '<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'
-      : '<svg viewBox="0 0 24 24"><path d="M1.500 12S5.500 5 12 5s10.500 7 10.500 7-4 7-10.500 7S1.500 12 1.500 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+      ? `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+         </svg>`
+      : `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+         </svg>`;
   }
 }
 
@@ -1494,7 +1501,7 @@ window.copyCurrentWebUrl = copyCurrentWebUrl;
 /* ══════════════════════════════════════════════════════════════════════════
    MODERN DUAL-TONE 70/30 CAROUSEL, PROJECT TEAM & LIGHTBOX ENGINE
    ══════════════════════════════════════════════════════════════════════════ */
-const CAMPUS_IMAGES = [
+const DEFAULT_CAMPUS_IMAGES = [
   {
     id: 'campus',
     title: 'UGIP Main Campus',
@@ -1536,6 +1543,65 @@ const CAMPUS_IMAGES = [
     fallback: '/login/images/bg4-himalaya.jpg'
   }
 ];
+
+let CAMPUS_IMAGES = [...DEFAULT_CAMPUS_IMAGES];
+let carouselSwitchSpeed = 5500;
+let carouselAutoplayEnabled = true;
+
+// Load persisted carousel configuration
+function loadCarouselConfig() {
+  try {
+    const raw = localStorage.getItem('vidyaos_carousel_config');
+    if (raw) {
+      const cfg = JSON.parse(raw);
+      if (Array.isArray(cfg.images) && cfg.images.length > 0) {
+        CAMPUS_IMAGES = cfg.images;
+      }
+      if (typeof cfg.switch_speed === 'number' && cfg.switch_speed >= 1000) {
+        carouselSwitchSpeed = cfg.switch_speed;
+      }
+      if (typeof cfg.autoplay === 'boolean') {
+        carouselAutoplayEnabled = cfg.autoplay;
+      }
+    }
+  } catch (_) {}
+
+  // Fetch from public backend API asynchronously
+  if (typeof fetch === 'function') {
+    fetch('/api/v1/auth/carousel', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.success && res.data) {
+          let needsUpdate = false;
+          if (Array.isArray(res.data.images) && res.data.images.length > 0) {
+            CAMPUS_IMAGES = res.data.images;
+            needsUpdate = true;
+          }
+          if (typeof res.data.switch_speed === 'number' && res.data.switch_speed >= 1000) {
+            carouselSwitchSpeed = res.data.switch_speed;
+            needsUpdate = true;
+          }
+          if (typeof res.data.autoplay === 'boolean') {
+            carouselAutoplayEnabled = res.data.autoplay;
+            needsUpdate = true;
+          }
+          if (needsUpdate) {
+            try {
+              localStorage.setItem('vidyaos_carousel_config', JSON.stringify({
+                images: CAMPUS_IMAGES,
+                switch_speed: carouselSwitchSpeed,
+                autoplay: carouselAutoplayEnabled
+              }));
+            } catch (_) {}
+            renderSlides();
+            renderBottomCards();
+            startCarouselAutoplay();
+          }
+        }
+      })
+      .catch(() => {});
+  }
+}
 
 const TEAM_MEMBERS = [
   {
@@ -1774,7 +1840,18 @@ function prevCarouselSlide() {
   updateCarousel(activeSlideIndex - 1);
 }
 
+function startCarouselAutoplay() {
+  if (carouselTimer) clearInterval(carouselTimer);
+  if (!carouselAutoplayEnabled) return;
+  carouselTimer = setInterval(() => {
+    if (!isCarouselHovered) {
+      nextCarouselSlide();
+    }
+  }, carouselSwitchSpeed);
+}
+
 function initCarousel() {
+  loadCarouselConfig();
   renderSlides();
 
   const prevBtn = document.getElementById('carouselPrevBtn');
@@ -1796,12 +1873,17 @@ function initCarousel() {
   });
 
   // Autoplay
-  if (carouselTimer) clearInterval(carouselTimer);
-  carouselTimer = setInterval(() => {
-    if (!isCarouselHovered) {
-      nextCarouselSlide();
+  startCarouselAutoplay();
+
+  // Cross-tab synchronization via storage events
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'vidyaos_carousel_config') {
+      loadCarouselConfig();
+      renderSlides();
+      renderBottomCards();
+      startCarouselAutoplay();
     }
-  }, 5500);
+  });
 }
 
 /* ── Bottom Campus Photo Thumbnails (Pure Image Showcase) ── */

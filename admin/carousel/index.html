@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Carousel &amp; Gallery Manager — VidyaOS Institutional Campus OS</title>
+  <meta name="description" content="Manage institutional login carousel images, upload campus photos, and configure autoplay transition switch speed.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .slide-enter {
+      animation: slidePop 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes slidePop {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- ── TOP NAVIGATION BAR ── -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="/admin/dashboard/index.html" class="flex items-center gap-2.5 text-slate-900 group">
+          <div class="w-8 h-8 rounded-lg bg-blue-700 text-white flex items-center justify-center font-bold shadow-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0120 17.5c-2.5 1.333-5.167 2-8 2s-5.5-.667-8-2a12.083 12.083 0 011.84-6.922L12 14z" />
+            </svg>
+          </div>
+          <div>
+            <div class="text-sm font-bold leading-tight group-hover:text-blue-700 transition">VidyaOS Admin</div>
+            <div class="text-[10px] text-slate-500">UGIP Nainital Campus OS</div>
+          </div>
+        </a>
+        <span class="text-slate-300">/</span>
+        <span class="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">Carousel Manager</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="/login/index.html?reason=user_logout" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          <span>View Login Page</span>
+        </a>
+        <button id="saveTopBtn" onclick="saveAllSettings()" type="button" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-700 hover:bg-blue-800 shadow-xs transition active:scale-95 cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Save Changes</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+
+    <!-- Page Header & Notification Banner -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+      <div>
+        <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full mb-1 border border-blue-200/60">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+          Institutional Media &amp; Carousel Engine
+        </div>
+        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Login Carousel &amp; Gallery Controller</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Control login page photos, upload campus highlights, and fine-tune transition switch speed.</p>
+      </div>
+
+      <div class="flex items-center gap-2 self-start sm:self-center">
+        <button type="button" onclick="resetToDefaultsConfirm()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 border border-slate-200 transition cursor-pointer">
+          Restore Defaults
+        </button>
+        <button type="button" onclick="testTransitionNow()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition cursor-pointer flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Test Transition
+        </button>
+      </div>
+    </div>
+
+    <!-- Alert / Status Toast -->
+    <div id="toast" class="hidden p-3 rounded-xl text-xs font-medium border flex items-center justify-between shadow-sm"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- ══ LEFT PANEL (4 COLS): SPEED CONTROLLER & UPLOAD TOOL ══ -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- 1. Transition Switch Speed Setting Card -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-900 leading-none">Switch Speed</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5">Autoplay rotation interval</p>
+              </div>
+            </div>
+
+            <!-- Autoplay Toggle -->
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input id="autoplayToggle" type="checkbox" checked onchange="toggleAutoplay(this.checked)" class="sr-only peer">
+              <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+              <span id="autoplayLabel" class="ml-2 text-xs font-semibold text-slate-700">Autoplay</span>
+            </label>
+          </div>
+
+          <!-- Speed Slider & Input -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-600">Slide Display Duration:</span>
+              <div class="flex items-center gap-1">
+                <input
+                  id="speedInput"
+                  type="number"
+                  min="1.5"
+                  max="20"
+                  step="0.5"
+                  value="5.5"
+                  onchange="onSpeedInputChange(this.value)"
+                  class="w-16 h-8 text-center text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                />
+                <span class="text-xs font-semibold text-slate-500">sec</span>
+              </div>
+            </div>
+
+            <input
+              id="speedRange"
+              type="range"
+              min="2"
+              max="15"
+              step="0.5"
+              value="5.5"
+              oninput="onSpeedSliderChange(this.value)"
+              class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            />
+
+            <!-- Presets -->
+            <div class="grid grid-cols-4 gap-1.5 pt-1">
+              <button type="button" onclick="setSpeedPreset(3)" class="speed-preset-btn py-1.5 px-2 text-[10px] font-semibold rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 text-slate-700 transition">
+                ⚡ 3.0s (Fast)
+              </button>
+              <button type="button" onclick="setSpeedPreset(5.5)" class="speed-preset-btn py-1.5 px-2 text-[10px] font-semibold rounded-lg border border-blue-600 bg-blue-50 text-blue-700 transition">
+                🎯 5.5s (Norm)
+              </button>
+              <button type="button" onclick="setSpeedPreset(8)" class="speed-preset-btn py-1.5 px-2 text-[10px] font-semibold rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 text-slate-700 transition">
+                🌿 8.0s (Relax)
+              </button>
+              <button type="button" onclick="setSpeedPreset(12)" class="speed-preset-btn py-1.5 px-2 text-[10px] font-semibold rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 text-slate-700 transition">
+                ⏳ 12s (Slow)
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Progress Indicator -->
+          <div class="pt-2">
+            <div class="flex items-center justify-between text-[10px] text-slate-500 mb-1">
+              <span id="countdownStatus">Live Preview Autoplay</span>
+              <span id="countdownSeconds">5.5s remaining</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div id="liveProgressBar" class="h-full bg-blue-600 transition-all duration-100" style="width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Image Upload & Add Slide Card -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 leading-none">Upload New Photo</h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">Add a new campus card to the carousel</p>
+            </div>
+          </div>
+
+          <form id="newSlideForm" onsubmit="handleAddNewSlide(event)" class="space-y-3">
+            <!-- Dropzone or File Picker -->
+            <div
+              id="dropzone"
+              onclick="document.getElementById('slideFileInput').click()"
+              class="border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[120px] relative overflow-hidden"
+            >
+              <img id="uploadPreviewImg" src="" alt="" class="hidden absolute inset-0 w-full h-full object-cover">
+              <div id="dropzoneContent" class="space-y-1 relative z-10">
+                <svg class="w-6 h-6 text-slate-400 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <div class="text-xs font-semibold text-slate-700">Click to upload photo or drag &amp; drop</div>
+                <div class="text-[10px] text-slate-400">JPG, PNG, WEBP up to 25MB</div>
+              </div>
+              <input id="slideFileInput" type="file" accept="image/*" class="hidden" onchange="handleFileSelected(this)">
+            </div>
+
+            <!-- Or Image URL input -->
+            <div>
+              <label for="slideUrlInput" class="block text-[11px] font-semibold text-slate-700 mb-1">Or paste photo URL</label>
+              <input
+                id="slideUrlInput"
+                type="url"
+                placeholder="https://images.unsplash.com/... or /login/images/..."
+                oninput="onUrlInputChanged(this.value)"
+                class="w-full h-8 px-3 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+              />
+            </div>
+
+            <!-- Category Presets & Input -->
+            <div>
+              <label for="slideCategoryInput" class="block text-[11px] font-semibold text-slate-700 mb-1">Category Badge</label>
+              <div class="flex flex-wrap gap-1 mb-1.5">
+                <button type="button" onclick="setCategoryPreset('Our Campus')" class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 transition">Our Campus</button>
+                <button type="button" onclick="setCategoryPreset('Nainital Lake')" class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 transition">Nainital Lake</button>
+                <button type="button" onclick="setCategoryPreset('Academic Block')" class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 transition">Academic Block</button>
+                <button type="button" onclick="setCategoryPreset('Computing Lab')" class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 transition">Computing Lab</button>
+                <button type="button" onclick="setCategoryPreset('Natural Beauty')" class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 transition">Natural Beauty</button>
+              </div>
+              <input
+                id="slideCategoryInput"
+                type="text"
+                required
+                value="Our Campus"
+                placeholder="e.g. Computing Lab, Sports Arena, Library"
+                class="w-full h-8 px-3 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+              />
+            </div>
+
+            <!-- Title & Subtitle -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label for="slideTitleInput" class="block text-[11px] font-semibold text-slate-700 mb-1">Slide Title</label>
+                <input
+                  id="slideTitleInput"
+                  type="text"
+                  required
+                  placeholder="e.g. Digital Electronics Lab"
+                  class="w-full h-8 px-3 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                />
+              </div>
+              <div>
+                <label for="slideSubtitleInput" class="block text-[11px] font-semibold text-slate-700 mb-1">Slide Subtitle</label>
+                <input
+                  id="slideSubtitleInput"
+                  type="text"
+                  placeholder="e.g. High-Speed Workstations"
+                  class="w-full h-8 px-3 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                />
+              </div>
+            </div>
+
+            <button
+              id="addSlideBtn"
+              type="submit"
+              class="w-full h-9 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer mt-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Add Slide to Carousel</span>
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- ══ RIGHT PANEL (7 COLS): LIVE PREVIEW & SLIDES MANAGER ══ -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- 1. Live Carousel Preview Card -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <h3 class="text-sm font-bold text-slate-900">Live Carousel Preview</h3>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="prevSlide()" class="w-7 h-7 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 transition cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <span id="previewCounter" class="text-[11px] font-bold text-slate-600 px-2">1 / 5</span>
+              <button type="button" onclick="nextSlide()" class="w-7 h-7 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 transition cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview Stage -->
+          <div class="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-inner group">
+            <img id="previewImg" src="/login/images/bg1-campus.jpg" alt="" class="w-full h-full object-cover transition-all duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent"></div>
+            
+            <!-- Category Badge -->
+            <div class="absolute top-3 left-3 z-10">
+              <span id="previewBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-900/70 text-white backdrop-blur-xs border border-white/20">
+                Our Campus
+              </span>
+            </div>
+
+            <!-- Title & Subtitle -->
+            <div class="absolute inset-x-0 bottom-0 p-4 text-white z-10">
+              <h4 id="previewTitle" class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">UGIP Main Campus</h4>
+              <p id="previewSubtitle" class="text-xs text-slate-200 mt-0.5">Government Polytechnic Nainital, Uttarakhand</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Slides List & Order Manager Card -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 leading-none">Carousel Slides List</h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">Reorder, edit, or remove slides from rotation</p>
+            </div>
+            <span id="slideCountBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+              5 Slides Active
+            </span>
+          </div>
+
+          <div id="slidesListContainer" class="space-y-2.5 max-h-[460px] overflow-y-auto pr-1 custom-scrollbar">
+            <!-- Dynamic Slide Rows Rendered via JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="bg-white border-t border-slate-200 mt-auto py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>&copy; 2026 Government Polytechnic Nainital (UGIP) &amp; VidyaOS. All rights reserved.</div>
+      <div class="flex items-center gap-3">
+        <a href="/login/index.html" class="hover:text-blue-700 underline">Login Portal</a>
+        <span>&bull;</span>
+        <a href="/admin/dashboard/index.html" class="hover:text-blue-700 underline">Admin Console</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── SCRIPT LOGIC ── -->
+  <script>
+    const DEFAULT_SLIDES = [
+      {
+        id: 'campus',
+        title: 'UGIP Main Campus',
+        subtitle: 'Government Polytechnic Nainital, Uttarakhand',
+        category: 'Our Campus',
+        src: '/login/images/bg1-campus.jpg',
+        fallback: '/login/images/all.jpg'
+      },
+      {
+        id: 'nainital',
+        title: 'Nainital Lake',
+        subtitle: 'Scenic Naini Lake, Uttarakhand',
+        category: 'Nainital',
+        src: '/login/images/gallery-nainital.jpg',
+        fallback: '/login/images/bg4-himalaya.jpg'
+      },
+      {
+        id: 'academic',
+        title: 'Academic & Administrative Block',
+        subtitle: 'Government Polytechnic Nainital (UGIP)',
+        category: 'Academic Block',
+        src: '/login/images/bg3-building.jpg',
+        fallback: '/login/images/academic.png'
+      },
+      {
+        id: 'lab',
+        title: 'IT & Computing Lab',
+        subtitle: 'Mountain-View Workstations & Digital Classroom',
+        category: 'Computing Lab',
+        src: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80',
+        fallback: '/login/images/all.jpg'
+      },
+      {
+        id: 'nature',
+        title: 'Himalayan Forest Panorama',
+        subtitle: 'Snow-Capped Himalayan Views & Natural Beauty',
+        category: 'Natural Beauty',
+        src: '/login/images/gallery-natural-beauty.jpg',
+        fallback: '/login/images/bg4-himalaya.jpg'
+      }
+    ];
+
+    let state = {
+      slides: [...DEFAULT_SLIDES],
+      switchSpeed: 5.5, // in seconds
+      autoplay: true,
+      activeIndex: 0,
+      timer: null,
+      countdownTimer: null,
+      remainingMs: 5500
+    };
+
+    // Load initial config from localStorage or Backend
+    function init() {
+      try {
+        const raw = localStorage.getItem('vidyaos_carousel_config');
+        if (raw) {
+          const cfg = JSON.parse(raw);
+          if (Array.isArray(cfg.images) && cfg.images.length > 0) state.slides = cfg.images;
+          if (typeof cfg.switch_speed === 'number') state.switchSpeed = cfg.switch_speed / 1000;
+          if (typeof cfg.autoplay === 'boolean') state.autoplay = cfg.autoplay;
+        }
+      } catch (_) {}
+
+      // Update inputs
+      document.getElementById('speedInput').value = state.switchSpeed;
+      document.getElementById('speedRange').value = state.switchSpeed;
+      document.getElementById('autoplayToggle').checked = state.autoplay;
+
+      renderSlidesList();
+      updatePreview();
+      startCountdown();
+
+      // Also try to fetch from backend API
+      fetch('/api/v1/auth/carousel')
+        .then(r => r.json())
+        .then(res => {
+          if (res && res.success && res.data) {
+            if (Array.isArray(res.data.images) && res.data.images.length > 0) {
+              state.slides = res.data.images;
+            }
+            if (res.data.switch_speed) {
+              state.switchSpeed = res.data.switch_speed / 1000;
+              document.getElementById('speedInput').value = state.switchSpeed;
+              document.getElementById('speedRange').value = state.switchSpeed;
+            }
+            if (typeof res.data.autoplay === 'boolean') {
+              state.autoplay = res.data.autoplay;
+              document.getElementById('autoplayToggle').checked = state.autoplay;
+            }
+            renderSlidesList();
+            updatePreview();
+            startCountdown();
+          }
+        })
+        .catch(() => {});
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.className = type === 'success'
+        ? 'p-3 rounded-xl text-xs font-medium border flex items-center justify-between shadow-sm bg-emerald-50 text-emerald-800 border-emerald-200'
+        : 'p-3 rounded-xl text-xs font-medium border flex items-center justify-between shadow-sm bg-rose-50 text-rose-800 border-rose-200';
+      t.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span>${type === 'success' ? '✓' : '⚠'}</span>
+          <span>${msg}</span>
+        </div>
+        <button onclick="this.parentElement.classList.add('hidden')" class="text-xs font-bold px-2">&times;</button>
+      `;
+      t.classList.remove('hidden');
+      setTimeout(() => { t.classList.add('hidden'); }, 5000);
+    }
+
+    function updatePreview() {
+      if (!state.slides.length) return;
+      state.activeIndex = (state.activeIndex + state.slides.length) % state.slides.length;
+      const s = state.slides[state.activeIndex];
+
+      document.getElementById('previewImg').src = s.src;
+      document.getElementById('previewBadge').textContent = s.category;
+      document.getElementById('previewTitle').textContent = s.title;
+      document.getElementById('previewSubtitle').textContent = s.subtitle;
+      document.getElementById('previewCounter').textContent = `${state.activeIndex + 1} / ${state.slides.length}`;
+      document.getElementById('slideCountBadge').textContent = `${state.slides.length} Slides Active`;
+    }
+
+    function nextSlide() {
+      state.activeIndex++;
+      updatePreview();
+      resetCountdown();
+    }
+
+    function prevSlide() {
+      state.activeIndex--;
+      updatePreview();
+      resetCountdown();
+    }
+
+    function testTransitionNow() {
+      nextSlide();
+      showToast('Triggered slide transition test.', 'success');
+    }
+
+    function startCountdown() {
+      if (state.countdownTimer) clearInterval(state.countdownTimer);
+      state.remainingMs = state.switchSpeed * 1000;
+
+      const totalMs = state.switchSpeed * 1000;
+      const stepMs = 100;
+
+      state.countdownTimer = setInterval(() => {
+        if (!state.autoplay) {
+          document.getElementById('countdownStatus').textContent = 'Autoplay Paused';
+          document.getElementById('countdownSeconds').textContent = 'Paused';
+          document.getElementById('liveProgressBar').style.width = '100%';
+          return;
+        }
+
+        state.remainingMs -= stepMs;
+        if (state.remainingMs <= 0) {
+          state.activeIndex = (state.activeIndex + 1) % state.slides.length;
+          updatePreview();
+          state.remainingMs = totalMs;
+        }
+
+        const pct = Math.max(0, Math.min(100, (state.remainingMs / totalMs) * 100));
+        document.getElementById('liveProgressBar').style.width = pct + '%';
+        document.getElementById('countdownStatus').textContent = 'Next Slide In';
+        document.getElementById('countdownSeconds').textContent = (state.remainingMs / 1000).toFixed(1) + 's';
+      }, stepMs);
+    }
+
+    function resetCountdown() {
+      state.remainingMs = state.switchSpeed * 1000;
+    }
+
+    function toggleAutoplay(val) {
+      state.autoplay = val;
+      document.getElementById('autoplayLabel').textContent = val ? 'Autoplay' : 'Paused';
+      resetCountdown();
+    }
+
+    function onSpeedSliderChange(val) {
+      state.switchSpeed = parseFloat(val);
+      document.getElementById('speedInput').value = state.switchSpeed;
+      highlightActivePreset();
+      resetCountdown();
+    }
+
+    function onSpeedInputChange(val) {
+      let num = parseFloat(val);
+      if (isNaN(num) || num < 1) num = 1;
+      if (num > 30) num = 30;
+      state.switchSpeed = num;
+      document.getElementById('speedRange').value = Math.min(15, num);
+      highlightActivePreset();
+      resetCountdown();
+    }
+
+    function setSpeedPreset(sec) {
+      state.switchSpeed = sec;
+      document.getElementById('speedInput').value = sec;
+      document.getElementById('speedRange').value = sec;
+      highlightActivePreset();
+      resetCountdown();
+      showToast(`Set carousel speed to ${sec} seconds.`, 'success');
+    }
+
+    function highlightActivePreset() {
+      const btns = document.querySelectorAll('.speed-preset-btn');
+      btns.forEach(b => {
+        const text = b.textContent;
+        if (text.includes(state.switchSpeed + 's')) {
+          b.className = 'speed-preset-btn py-1.5 px-2 text-[10px] font-semibold rounded-lg border border-blue-600 bg-blue-50 text-blue-700 transition';
+        } else {
+          b.className = 'speed-preset-btn py-1.5 px-2 text-[10px] font-semibold rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 text-slate-700 transition';
+        }
+      });
+    }
+
+    function setCategoryPreset(cat) {
+      document.getElementById('slideCategoryInput').value = cat;
+    }
+
+    function onUrlInputChanged(val) {
+      if (val && val.startsWith('http')) {
+        document.getElementById('uploadPreviewImg').src = val;
+        document.getElementById('uploadPreviewImg').classList.remove('hidden');
+        document.getElementById('dropzoneContent').classList.add('opacity-0');
+      } else {
+        document.getElementById('uploadPreviewImg').classList.add('hidden');
+        document.getElementById('dropzoneContent').classList.remove('opacity-0');
+      }
+    }
+
+    function handleFileSelected(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('uploadPreviewImg').src = e.target.result;
+        document.getElementById('uploadPreviewImg').classList.remove('hidden');
+        document.getElementById('dropzoneContent').classList.add('opacity-0');
+        if (!document.getElementById('slideTitleInput').value) {
+          const rawName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+          document.getElementById('slideTitleInput').value = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function handleAddNewSlide(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('slideFileInput');
+      const urlInput = document.getElementById('slideUrlInput').value.trim();
+      const category = document.getElementById('slideCategoryInput').value.trim();
+      const title = document.getElementById('slideTitleInput').value.trim();
+      const subtitle = document.getElementById('slideSubtitleInput').value.trim() || 'Government Polytechnic Nainital';
+
+      let imgSrc = urlInput;
+
+      // If file uploaded, attempt server upload, fallback to local Data URL
+      if (fileInput.files && fileInput.files[0]) {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        try {
+          const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+          const uploadRes = await fetch('/api/v1/admin/carousel/upload', {
+            method: 'POST',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            body: formData
+          }).then(r => r.json());
+
+          if (uploadRes && uploadRes.success && uploadRes.data && uploadRes.data.url) {
+            imgSrc = uploadRes.data.url;
+          }
+        } catch (_) {}
+
+        if (!imgSrc && document.getElementById('uploadPreviewImg').src) {
+          imgSrc = document.getElementById('uploadPreviewImg').src;
+        }
+      }
+
+      if (!imgSrc) {
+        showToast('Please select an image file or provide a valid image URL.', 'error');
+        return;
+      }
+
+      const newSlide = {
+        id: 'slide_' + Date.now(),
+        title,
+        subtitle,
+        category,
+        src: imgSrc,
+        fallback: '/login/images/all.jpg'
+      };
+
+      state.slides.push(newSlide);
+      state.activeIndex = state.slides.length - 1;
+
+      renderSlidesList();
+      updatePreview();
+      saveAllSettings();
+
+      // Reset form
+      document.getElementById('newSlideForm').reset();
+      document.getElementById('uploadPreviewImg').classList.add('hidden');
+      document.getElementById('dropzoneContent').classList.remove('opacity-0');
+
+      showToast(`Added slide "${title}" to carousel.`, 'success');
+    }
+
+    function renderSlidesList() {
+      const container = document.getElementById('slidesListContainer');
+      container.innerHTML = '';
+
+      state.slides.forEach((s, idx) => {
+        const row = document.createElement('div');
+        row.className = 'slide-enter flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:border-blue-400 hover:shadow-xs transition';
+        row.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-6 text-center text-xs font-bold text-slate-400 shrink-0">#${idx + 1}</span>
+            <div class="relative w-16 h-11 rounded-lg overflow-hidden bg-slate-900 shrink-0 border border-slate-200">
+              <img src="${s.src}" alt="${s.title}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${s.fallback || '/login/images/all.jpg'}';" />
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/60 uppercase tracking-wider">${s.category}</span>
+                <span class="text-xs font-bold text-slate-900 truncate">${s.title}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 truncate mt-0.5">${s.subtitle}</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 shrink-0">
+            <button type="button" onclick="moveSlideUp(${idx})" ${idx === 0 ? 'disabled' : ''} class="w-7 h-7 rounded-lg border border-slate-200 enabled:hover:bg-slate-50 disabled:opacity-30 text-slate-600 flex items-center justify-center transition cursor-pointer" title="Move Up">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+            </button>
+            <button type="button" onclick="moveSlideDown(${idx})" ${idx === state.slides.length - 1 ? 'disabled' : ''} class="w-7 h-7 rounded-lg border border-slate-200 enabled:hover:bg-slate-50 disabled:opacity-30 text-slate-600 flex items-center justify-center transition cursor-pointer" title="Move Down">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <button type="button" onclick="deleteSlide(${idx})" class="w-7 h-7 rounded-lg border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition cursor-pointer ml-1" title="Delete Slide">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function moveSlideUp(index) {
+      if (index <= 0) return;
+      const tmp = state.slides[index];
+      state.slides[index] = state.slides[index - 1];
+      state.slides[index - 1] = tmp;
+      state.activeIndex = index - 1;
+      renderSlidesList();
+      updatePreview();
+      saveAllSettings();
+    }
+
+    function moveSlideDown(index) {
+      if (index >= state.slides.length - 1) return;
+      const tmp = state.slides[index];
+      state.slides[index] = state.slides[index + 1];
+      state.slides[index + 1] = tmp;
+      state.activeIndex = index + 1;
+      renderSlidesList();
+      updatePreview();
+      saveAllSettings();
+    }
+
+    function deleteSlide(index) {
+      if (state.slides.length <= 1) {
+        showToast('Carousel must have at least one active slide.', 'error');
+        return;
+      }
+      const title = state.slides[index].title;
+      state.slides.splice(index, 1);
+      state.activeIndex = Math.max(0, index - 1);
+      renderSlidesList();
+      updatePreview();
+      saveAllSettings();
+      showToast(`Removed "${title}" from carousel.`, 'success');
+    }
+
+    function resetToDefaultsConfirm() {
+      if (!confirm('Reset carousel to the 5 official UGIP Nainital campus photographs with 5.5s switch speed?')) return;
+      state.slides = JSON.parse(JSON.stringify(DEFAULT_SLIDES));
+      state.switchSpeed = 5.5;
+      state.autoplay = true;
+      document.getElementById('speedInput').value = 5.5;
+      document.getElementById('speedRange').value = 5.5;
+      document.getElementById('autoplayToggle').checked = true;
+      renderSlidesList();
+      updatePreview();
+      saveAllSettings();
+      showToast('Carousel restored to official UGIP default photographs & 5.5s speed.', 'success');
+    }
+
+    function saveAllSettings() {
+      const payload = {
+        images: state.slides,
+        switch_speed: Math.round(state.switchSpeed * 1000),
+        autoplay: state.autoplay
+      };
+
+      // 1. Save to local storage for immediate browser sync
+      try {
+        localStorage.setItem('vidyaos_carousel_config', JSON.stringify(payload));
+      } catch (_) {}
+
+      // 2. Persist to Backend API if admin token exists
+      const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+      fetch('/api/v1/admin/carousel', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.success) {
+          showToast('Changes saved! Live login page is instantly synchronized.', 'success');
+        } else {
+          showToast('Changes saved locally. Login carousel is updated!', 'success');
+        }
+      })
+      .catch(() => {
+        showToast('Changes saved to browser storage. Login carousel updated!', 'success');
+      });
+    }
+
+    // Run on mount
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+
+</html>

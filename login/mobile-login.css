@@ -470,14 +470,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #94a3b8;
+    color: #2563eb;
     cursor: pointer;
     flex-shrink: 0;
     transition: color 0.15s;
   }
 
   .m-toggle-eye-btn:hover {
-    color: #475569;
+    color: #1d4ed8;
   }
 
   .m-toggle-eye-btn svg {
