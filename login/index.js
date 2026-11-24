@@ -2108,25 +2108,238 @@ function initAmbientCanvas() {
   animate();
 }
 
-/* ── Sign In / Sign Up View Toggling ── */
-function setupViewToggles() {
-  const showSignUpBtn = document.getElementById('showSignUpBtn');
-  const showSignInBtn = document.getElementById('showSignInBtn');
+/* ── In-Panel Student Registration Controller (Replaces Login Area) ── */
+let regDepartments = [];
+
+async function loadRegistrationDepartments() {
+  const sel = document.getElementById('reg-dept');
+  if (!sel) return;
+  try {
+    const res = await fetch('/api/v1/auth/departments').then(r => r.json()).catch(() => null);
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+      regDepartments = res.data;
+      sel.innerHTML = '<option value="">— Select Branch —</option>';
+      res.data.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = `${d.name} (${d.code || 'DEPT'})`;
+        opt.dataset.duration = d.degree_duration_years || 3;
+        sel.appendChild(opt);
+      });
+      // Default to Information Technology if present
+      const itOpt = Array.from(sel.options).find(o => o.text.includes('Information Technology'));
+      if (itOpt) {
+        itOpt.selected = true;
+        handleRegDeptChange();
+      }
+    }
+  } catch (_) {}
+}
+
+function handleRegDeptChange() {
+  const deptSel = document.getElementById('reg-dept');
+  const semSel = document.getElementById('reg-sem');
+  if (!deptSel || !semSel) return;
+  const opt = deptSel.options[deptSel.selectedIndex];
+  if (!deptSel.value) {
+    semSel.innerHTML = '<option value="">— Select branch first —</option>';
+    return;
+  }
+  const duration = parseInt(opt?.dataset?.duration || '3', 10);
+  const maxSem = duration * 2;
+  semSel.innerHTML = '';
+  for (let s = 1; s <= maxSem; s++) {
+    const o = document.createElement('option');
+    o.value = s;
+    o.textContent = `Semester ${s} (Year ${Math.ceil(s / 2)})`;
+    if (s === 5 || (s === maxSem && maxSem < 5)) o.selected = true;
+    semSel.appendChild(o);
+  }
+}
+
+function toggleRollNotAvailable(checked) {
+  const inp = document.getElementById('reg-ubter-roll');
+  if (!inp) return;
+  if (checked) {
+    inp.value = '';
+    inp.disabled = true;
+    inp.placeholder = 'Not Assigned Yet (Roll pending)';
+    inp.classList.add('bg-slate-100', 'text-slate-400');
+  } else {
+    inp.disabled = false;
+    inp.placeholder = '11-digit numeric UBTER roll no';
+    inp.classList.remove('bg-slate-100', 'text-slate-400');
+    inp.focus();
+  }
+}
+
+function toggleRegPw(inputId, btnId) {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  if (!inp) return;
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  if (btn) {
+    btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    btn.classList.toggle('text-blue-700', show);
+    btn.classList.toggle('text-blue-600', !show);
+    btn.innerHTML = show
+      ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+         </svg>`
+      : `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+         </svg>`;
+  }
+}
+
+function showSignUpView() {
   const signInView = document.getElementById('signInView');
   const signUpView = document.getElementById('signUpView');
+  const panel = document.getElementById('desktopLoginPanel');
+  if (signInView && signUpView) {
+    signInView.classList.add('hidden');
+    signUpView.classList.remove('hidden');
+    if (panel) panel.scrollTop = 0;
+    loadRegistrationDepartments();
+  }
+}
 
-  if (showSignUpBtn && signInView && signUpView) {
-    showSignUpBtn.addEventListener('click', () => {
-      signInView.classList.add('hidden');
-      signUpView.classList.remove('hidden');
-    });
+function showSignInView() {
+  const signInView = document.getElementById('signInView');
+  const signUpView = document.getElementById('signUpView');
+  const panel = document.getElementById('desktopLoginPanel');
+  if (signInView && signUpView) {
+    signUpView.classList.add('hidden');
+    signInView.classList.remove('hidden');
+    if (panel) panel.scrollTop = 0;
+  }
+}
+
+async function handleStudentRegisterSubmit(e) {
+  e.preventDefault();
+  const msgBox = document.getElementById('reg-msg');
+  const submitBtn = document.getElementById('reg-submit-btn');
+  const submitText = document.getElementById('reg-submit-text');
+
+  const fullName = document.getElementById('reg-full-name')?.value?.trim();
+  const deptId = document.getElementById('reg-dept')?.value;
+  const semester = document.getElementById('reg-sem')?.value;
+  const email = document.getElementById('reg-email')?.value?.trim();
+  const phone = document.getElementById('reg-phone')?.value?.trim();
+  const isRollPending = Boolean(document.getElementById('reg-roll-not-available')?.checked);
+  const ubterRoll = document.getElementById('reg-ubter-roll')?.value?.trim();
+  const password = document.getElementById('reg-password')?.value;
+  const confirmPassword = document.getElementById('reg-confirm-password')?.value;
+  const ubterRegNo = document.getElementById('reg-ubter-reg')?.value?.trim();
+  const classRollNo = document.getElementById('reg-class-roll')?.value?.trim();
+
+  function showRegError(text) {
+    if (msgBox) {
+      msgBox.className = 'p-2.5 rounded-lg text-xs leading-tight font-medium bg-rose-50 text-rose-800 border border-rose-200 block';
+      msgBox.innerHTML = `<strong>Error:</strong> ${text}`;
+      msgBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
-  if (showSignInBtn && signInView && signUpView) {
-    showSignInBtn.addEventListener('click', () => {
-      signUpView.classList.add('hidden');
-      signInView.classList.remove('hidden');
-    });
+  if (!fullName || !deptId || !semester || !email || !phone || !password || !confirmPassword) {
+    showRegError('Please complete all required fields.');
+    return;
+  }
+
+  if (phone.length !== 10 || !/^[6-9]\d{9}$/.test(phone)) {
+    showRegError('Please enter a valid 10-digit Indian mobile number (starts with 6, 7, 8, or 9).');
+    document.getElementById('reg-phone')?.focus();
+    return;
+  }
+
+  if (!isRollPending) {
+    if (!ubterRoll) {
+      showRegError('UBTER Roll number required (or check "Roll number not available yet").');
+      document.getElementById('reg-ubter-roll')?.focus();
+      return;
+    }
+    if (!/^\d{11}$/.test(ubterRoll)) {
+      showRegError('UBTER Roll number must be exactly 11 numeric digits (e.g. 2401050012).');
+      document.getElementById('reg-ubter-roll')?.focus();
+      return;
+    }
+  }
+
+  if (password.length < 8) {
+    showRegError('Password must be at least 8 characters long.');
+    document.getElementById('reg-password')?.focus();
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    showRegError('Password and Confirm Password do not match.');
+    document.getElementById('reg-confirm-password')?.focus();
+    return;
+  }
+
+  try {
+    if (submitBtn) submitBtn.disabled = true;
+    if (submitText) submitText.textContent = 'Submitting Request...';
+
+    const payload = {
+      full_name: fullName,
+      department_id: Number(deptId),
+      semester: Number(semester),
+      email: email,
+      phone: phone,
+      ubter_roll_no: isRollPending ? null : ubterRoll,
+      official_enrollment_no: isRollPending ? null : ubterRoll,
+      enrollment_not_available: isRollPending,
+      password: password,
+      registration_no: ubterRegNo || null,
+      class_roll_no: classRollNo || null
+    };
+
+    const res = await fetch('/api/v1/auth/student/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(r => r.json());
+
+    if (res && res.success) {
+      const signUpView = document.getElementById('signUpView');
+      if (signUpView) {
+        signUpView.innerHTML = `
+          <div class="text-center py-6 space-y-4">
+            <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-sm">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Registration Submitted!</h3>
+              <p class="text-xs text-slate-500 mt-1">Your enrollment request has been submitted to your Department Faculty for review.</p>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-1">
+              <div><span class="text-slate-400">Student:</span> <strong class="text-slate-800">${fullName}</strong></div>
+              <div><span class="text-slate-400">Email:</span> <strong class="text-slate-800">${email}</strong></div>
+              <div><span class="text-slate-400">Roll No:</span> <strong class="text-slate-800">${isRollPending ? 'Pending Assignment' : ubterRoll}</strong></div>
+            </div>
+            <button
+              type="button"
+              onclick="showSignInView()"
+              class="w-full h-9 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
+            >
+              Return to Sign In
+            </button>
+          </div>
+        `;
+      }
+    } else {
+      showRegError(res?.error?.message || 'Registration failed. Please check your details and try again.');
+    }
+  } catch (err) {
+    showRegError(err.message || 'Network error while submitting registration. Please try again.');
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+    if (submitText) submitText.textContent = 'Register Now';
   }
 }
 
@@ -2138,6 +2351,12 @@ window.openLightboxModal = openLightboxModal;
 window.closeLightboxModal = closeLightboxModal;
 window.nextLightboxSlide = nextLightboxSlide;
 window.prevLightboxSlide = prevLightboxSlide;
+window.showSignUpView = showSignUpView;
+window.showSignInView = showSignInView;
+window.handleRegDeptChange = handleRegDeptChange;
+window.toggleRollNotAvailable = toggleRollNotAvailable;
+window.toggleRegPw = toggleRegPw;
+window.handleStudentRegisterSubmit = handleStudentRegisterSubmit;
 
 // Initializer
 if (document.readyState === 'loading') {
@@ -2145,9 +2364,17 @@ if (document.readyState === 'loading') {
     initCarousel();
     renderBottomCards();
     initAmbientCanvas();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'register' || window.location.hash === '#register') {
+      showSignUpView();
+    }
   });
 } else {
   initCarousel();
   renderBottomCards();
   initAmbientCanvas();
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('action') === 'register' || window.location.hash === '#register') {
+    showSignUpView();
+  }
 }
