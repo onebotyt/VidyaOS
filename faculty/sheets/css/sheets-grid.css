@@ -202,7 +202,7 @@
   position: relative;
 }
 
-.excel-cell.in-range-selection:not([style*="background-color"]) {
+.excel-cell.in-range-selection:not([style*="background"]) {
   background-color: var(--badge-primary-bg, var(--chip-faculty-bg));
 }
 

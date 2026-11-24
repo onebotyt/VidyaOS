@@ -163,38 +163,51 @@ function selectFillColor(color) {
     return;
   }
 
-  if (typeof pushUndoState === 'function') pushUndoState('Fill Color');
+  if (typeof window.applyFillColor === 'function') {
+    window.applyFillColor(color);
+  } else if (typeof window.applyFormattingToRange === 'function') {
+    window.applyFormattingToRange(s => {
+      if (color) s.bg = color;
+      else delete s.bg;
+    });
+  } else {
+    if (typeof pushUndoState === 'function') pushUndoState('Fill Color');
+    const selRange = (typeof getActiveSelectionRange === 'function' ? getActiveSelectionRange() : null) || (window.EXCEL_WB?.selectedRange ? {
+      startR: Math.min(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
+      endR: Math.max(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
+      startC: Math.min(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2),
+      endC: Math.max(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2)
+    } : (window.EXCEL_WB?.activeCell ? {
+      startR: window.EXCEL_WB.activeCell.r,
+      endR: window.EXCEL_WB.activeCell.r,
+      startC: window.EXCEL_WB.activeCell.c,
+      endC: window.EXCEL_WB.activeCell.c
+    } : null));
 
-  const selRange = (typeof getActiveSelectionRange === 'function' ? getActiveSelectionRange() : null) || (window.EXCEL_WB?.selectedRange ? {
-    startR: Math.min(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
-    endR: Math.max(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
-    startC: Math.min(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2),
-    endC: Math.max(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2)
-  } : (window.EXCEL_WB?.activeCell ? {
-    startR: window.EXCEL_WB.activeCell.r,
-    endR: window.EXCEL_WB.activeCell.r,
-    startC: window.EXCEL_WB.activeCell.c,
-    endC: window.EXCEL_WB.activeCell.c
-  } : null));
-
-  if (selRange) {
-    for (let r = selRange.startR; r <= selRange.endR; r++) {
-      for (let c = selRange.startC; c <= selRange.endC; c++) {
-        const cell = getCell(sheet, r, c);
-        cell.s = cell.s || {};
-        if (color) {
-          cell.s.bg = color;
-        } else {
-          delete cell.s.bg;
+    if (selRange) {
+      const tbody = document.getElementById('excel-tbody');
+      for (let r = selRange.startR; r <= selRange.endR; r++) {
+        for (let c = selRange.startC; c <= selRange.endC; c++) {
+          const cell = getCell(sheet, r, c);
+          cell.s = cell.s || {};
+          if (color) {
+            cell.s.bg = color;
+          } else {
+            delete cell.s.bg;
+          }
+          setCell(sheet, r, c, cell);
+          const td = tbody ? tbody.querySelector(`.cell-${r}-${c}`) : null;
+          if (td) {
+            td.style.cssText = typeof buildCellInlineStyle === 'function' ? buildCellInlineStyle(cell.s) : '';
+          }
         }
-        setCell(sheet, r, c, cell);
       }
     }
+    if (typeof updateSelectionBoxUI === 'function') updateSelectionBoxUI();
+    if (typeof markWorkbookUnsaved === 'function') markWorkbookUnsaved();
+    if (typeof syncRibbonStateWithActiveCell === 'function') syncRibbonStateWithActiveCell();
   }
 
-  if (typeof renderExcelGrid === 'function') renderExcelGrid(false);
-  if (typeof markWorkbookUnsaved === 'function') markWorkbookUnsaved();
-  if (typeof syncRibbonStateWithActiveCell === 'function') syncRibbonStateWithActiveCell();
   if (typeof triggerAutoSaveIndicator === 'function') triggerAutoSaveIndicator();
 }
 
@@ -211,38 +224,51 @@ function selectFontColor(color) {
     return;
   }
 
-  if (typeof pushUndoState === 'function') pushUndoState('Font Color');
+  if (typeof window.applyFontColor === 'function') {
+    window.applyFontColor(color);
+  } else if (typeof window.applyFormattingToRange === 'function') {
+    window.applyFormattingToRange(s => {
+      if (color) s.color = color;
+      else delete s.color;
+    });
+  } else {
+    if (typeof pushUndoState === 'function') pushUndoState('Font Color');
+    const selRange = (typeof getActiveSelectionRange === 'function' ? getActiveSelectionRange() : null) || (window.EXCEL_WB?.selectedRange ? {
+      startR: Math.min(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
+      endR: Math.max(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
+      startC: Math.min(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2),
+      endC: Math.max(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2)
+    } : (window.EXCEL_WB?.activeCell ? {
+      startR: window.EXCEL_WB.activeCell.r,
+      endR: window.EXCEL_WB.activeCell.r,
+      startC: window.EXCEL_WB.activeCell.c,
+      endC: window.EXCEL_WB.activeCell.c
+    } : null));
 
-  const selRange = (typeof getActiveSelectionRange === 'function' ? getActiveSelectionRange() : null) || (window.EXCEL_WB?.selectedRange ? {
-    startR: Math.min(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
-    endR: Math.max(window.EXCEL_WB.selectedRange.r1, window.EXCEL_WB.selectedRange.r2),
-    startC: Math.min(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2),
-    endC: Math.max(window.EXCEL_WB.selectedRange.c1, window.EXCEL_WB.selectedRange.c2)
-  } : (window.EXCEL_WB?.activeCell ? {
-    startR: window.EXCEL_WB.activeCell.r,
-    endR: window.EXCEL_WB.activeCell.r,
-    startC: window.EXCEL_WB.activeCell.c,
-    endC: window.EXCEL_WB.activeCell.c
-  } : null));
-
-  if (selRange) {
-    for (let r = selRange.startR; r <= selRange.endR; r++) {
-      for (let c = selRange.startC; c <= selRange.endC; c++) {
-        const cell = getCell(sheet, r, c);
-        cell.s = cell.s || {};
-        if (color) {
-          cell.s.color = color;
-        } else {
-          delete cell.s.color;
+    if (selRange) {
+      const tbody = document.getElementById('excel-tbody');
+      for (let r = selRange.startR; r <= selRange.endR; r++) {
+        for (let c = selRange.startC; c <= selRange.endC; c++) {
+          const cell = getCell(sheet, r, c);
+          cell.s = cell.s || {};
+          if (color) {
+            cell.s.color = color;
+          } else {
+            delete cell.s.color;
+          }
+          setCell(sheet, r, c, cell);
+          const td = tbody ? tbody.querySelector(`.cell-${r}-${c}`) : null;
+          if (td) {
+            td.style.cssText = typeof buildCellInlineStyle === 'function' ? buildCellInlineStyle(cell.s) : '';
+          }
         }
-        setCell(sheet, r, c, cell);
       }
     }
+    if (typeof updateSelectionBoxUI === 'function') updateSelectionBoxUI();
+    if (typeof markWorkbookUnsaved === 'function') markWorkbookUnsaved();
+    if (typeof syncRibbonStateWithActiveCell === 'function') syncRibbonStateWithActiveCell();
   }
 
-  if (typeof renderExcelGrid === 'function') renderExcelGrid(false);
-  if (typeof markWorkbookUnsaved === 'function') markWorkbookUnsaved();
-  if (typeof syncRibbonStateWithActiveCell === 'function') syncRibbonStateWithActiveCell();
   if (typeof triggerAutoSaveIndicator === 'function') triggerAutoSaveIndicator();
 }
 

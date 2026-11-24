@@ -112,11 +112,13 @@ const STATIC_REWRITES = [
   [/^\/student\/profile\/?$/, '/student/profile/index.html'],
   [/^\/faculty\/group[ -]detail(\/index\.html)?\/?$/, '/faculty/group-detail/index.html'],
   [/^\/student\/group[ -]detail(\/index\.html)?\/?$/, '/student/group-detail/index.html'],
-  [/^\/faculty\/student[ -_]performance(\/index\.html)?\/?$/, '/faculty/student-performance/index.html'],
-  [/^\/faculty\/direct[ -_]assessment(\/index\.html)?\/?$/, '/faculty/direct-assessment/index.html'],
-  [/^\/faculty\/indirect[ -_]assessment(\/index\.html)?\/?$/, '/faculty/indirect-assessment/index.html'],
-  [/^\/faculty\/assessment[ -_]process(\/index\.html)?\/?$/, '/faculty/assessment-process/index.html'],
-  [/^\/faculty\/course[ -_]file(\/index\.html)?\/?$/, '/faculty/course-file/index.html'],
+  [/^\/faculty\/theory[ -_]classes(\.html|\/index\.html)?\/?$/, '/faculty/course-file/index.html?type=theory'],
+  [/^\/faculty\/lab[ -_]classes(\.html|\/index\.html)?\/?$/, '/faculty/course-file/index.html?type=lab'],
+  [/^\/faculty\/student[ -_]performance(\.html|\/index\.html)?\/?$/, '/faculty/course-file/index.html?type=performance'],
+  [/^\/faculty\/direct[ -_]assessment(\.html|\/index\.html)?\/?$/, '/faculty/course-file/index.html?type=direct'],
+  [/^\/faculty\/indirect[ -_]assessment(\.html|\/index\.html)?\/?$/, '/faculty/course-file/index.html?type=indirect'],
+  [/^\/faculty\/assessment[ -_]process(\.html|\/index\.html)?\/?$/, '/faculty/course-file/index.html?type=nba'],
+  [/^\/faculty\/course[ -_]file(\.html|\/index\.html)?\/?$/, '/faculty/course-file/index.html'],
 
   // Generic section/:page pattern
   [/^\/(admin|faculty|student)\/([a-zA-Z0-9_ -]+)\/?$/, '/$1/$2/index.html'],

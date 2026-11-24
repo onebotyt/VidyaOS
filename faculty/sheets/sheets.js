@@ -6384,7 +6384,7 @@ function renderExcelGrid(rebuildStructure = true) {
     });
   }
 
-  if (rebuildStructure || thead.children.length === 0 || sheet.merges?.length > 0) {
+  if (rebuildStructure || thead.children.length === 0 || tbody.children.length === 0) {
     // 1. Column Headers (Corner + A, B, C, D...)
     let headHtml = `<tr><th class="excel-corner-th" onclick="selectAllSheetCells()" title="Select All (Ctrl+A)"></th>`;
     for (let c = 0; c < cols; c++) {
@@ -6485,15 +6485,15 @@ function renderExcelGrid(rebuildStructure = true) {
 function buildCellInlineStyle(s) {
   if (!s) return '';
   let styles = [];
-  if (s.bold) styles.push('font-weight:800');
-  if (s.italic) styles.push('font-style:italic');
-  if (s.underline) styles.push('text-decoration:underline');
-  if (s.fontFamily) styles.push(`font-family:${s.fontFamily}`);
-  if (s.fontSize) styles.push(`font-size:${s.fontSize}px`);
-  if (s.color) styles.push(`color:${s.color}`);
-  if (s.bg) styles.push(`background-color:${s.bg}`);
-  if (s.align) styles.push(`text-align:${s.align}`);
-  if (s.vAlign) styles.push(`vertical-align:${s.vAlign}`);
+  if (s.bold) styles.push('font-weight:800 !important');
+  if (s.italic) styles.push('font-style:italic !important');
+  if (s.underline) styles.push('text-decoration:underline !important');
+  if (s.fontFamily) styles.push(`font-family:${s.fontFamily} !important`);
+  if (s.fontSize) styles.push(`font-size:${s.fontSize}px !important`);
+  if (s.color) styles.push(`color:${s.color} !important`);
+  if (s.bg) styles.push(`background:${s.bg} !important`);
+  if (s.align) styles.push(`text-align:${s.align} !important`);
+  if (s.vAlign) styles.push(`vertical-align:${s.vAlign} !important`);
   if (s.wrap) styles.push('white-space:pre-wrap;word-break:break-word;line-height:1.35');
 
   if (s.border === 'all') styles.push('border:1px solid var(--border-color)');
@@ -6572,7 +6572,11 @@ function updateSelectionBoxUI() {
   if (!endTd) endTd = startTd;
 
   if (!startTd || !endTd) {
-    box.style.display = 'none';
+    if (EXCEL_WB?.selectedRange) {
+      requestAnimationFrame(() => updateSelectionBoxUI());
+    } else {
+      box.style.display = 'none';
+    }
     return;
   }
 
@@ -6582,7 +6586,7 @@ function updateSelectionBoxUI() {
   const endRect = endTd.getBoundingClientRect();
 
   if (startRect.width === 0 && startRect.height === 0 && endRect.width === 0 && endRect.height === 0) {
-    box.style.display = 'none';
+    requestAnimationFrame(() => updateSelectionBoxUI());
     return;
   }
 
@@ -6662,6 +6666,9 @@ function syncRibbonStateWithActiveCell() {
   if (btnAlignLeft) btnAlignLeft.classList.toggle('active', curAlign === 'left');
   if (btnAlignCenter) btnAlignCenter.classList.toggle('active', curAlign === 'center');
   if (btnAlignRight) btnAlignRight.classList.toggle('active', curAlign === 'right');
+
+  const btnWrap = document.getElementById('btn-wrap-text');
+  if (btnWrap) btnWrap.classList.toggle('active', Boolean(s.wrap));
 
   // Vertical alignments
   const btnVTop = document.getElementById('btn-valign-top');
@@ -7268,13 +7275,21 @@ function closeExcelContextMenu() {
 function applyFormattingToRange(fn) {
   const sheet = getActiveSheet();
   if (!sheet) return;
+  if (EXCEL_WB.isEditing) commitInlineEditor();
   pushUndoState('Format Cells');
 
-  const { r1, c1, r2, c2 } = EXCEL_WB.selectedRange;
-  const startR = Math.min(r1, r2);
-  const endR = Math.max(r1, r2);
-  const startC = Math.min(c1, c2);
-  const endC = Math.max(c1, c2);
+  const sel = (EXCEL_WB.selectedRange && EXCEL_WB.selectedRange.r1 !== undefined) ? EXCEL_WB.selectedRange : {
+    r1: EXCEL_WB.activeCell?.r || 0,
+    c1: EXCEL_WB.activeCell?.c || 0,
+    r2: EXCEL_WB.activeCell?.r || 0,
+    c2: EXCEL_WB.activeCell?.c || 0
+  };
+  const startR = Math.min(sel.r1, sel.r2);
+  const endR = Math.max(sel.r1, sel.r2);
+  const startC = Math.min(sel.c1, sel.c2);
+  const endC = Math.max(sel.c1, sel.c2);
+
+  const tbody = document.getElementById('excel-tbody');
 
   for (let r = startR; r <= endR; r++) {
     for (let c = startC; c <= endC; c++) {
@@ -7282,11 +7297,18 @@ function applyFormattingToRange(fn) {
       if (!cell.s) cell.s = {};
       fn(cell.s);
       setCell(sheet, r, c, cell);
+      const td = tbody ? tbody.querySelector(`.cell-${r}-${c}`) : null;
+      if (td) {
+        td.style.cssText = buildCellInlineStyle(cell.s);
+        const displayVal = formatCellDisplayValue(cell.v !== undefined && cell.v !== null ? cell.v : cell.raw, cell.s);
+        td.textContent = displayVal;
+      }
     }
   }
 
-  renderExcelGrid(false);
+  updateSelectionBoxUI();
   markWorkbookUnsaved();
+  syncRibbonStateWithActiveCell();
 }
 
 function toggleFontBold() {
@@ -7294,7 +7316,6 @@ function toggleFontBold() {
   const curCell = getCell(sheet, EXCEL_WB.activeCell.r, EXCEL_WB.activeCell.c);
   const isBold = !(curCell.s && curCell.s.bold);
   applyFormattingToRange(s => { s.bold = isBold; });
-  syncRibbonStateWithActiveCell();
 }
 
 function toggleFontItalic() {
@@ -7302,7 +7323,6 @@ function toggleFontItalic() {
   const curCell = getCell(sheet, EXCEL_WB.activeCell.r, EXCEL_WB.activeCell.c);
   const isItalic = !(curCell.s && curCell.s.italic);
   applyFormattingToRange(s => { s.italic = isItalic; });
-  syncRibbonStateWithActiveCell();
 }
 
 function toggleFontUnderline() {
@@ -7310,37 +7330,40 @@ function toggleFontUnderline() {
   const curCell = getCell(sheet, EXCEL_WB.activeCell.r, EXCEL_WB.activeCell.c);
   const isUnder = !(curCell.s && curCell.s.underline);
   applyFormattingToRange(s => { s.underline = isUnder; });
-  syncRibbonStateWithActiveCell();
 }
 
 function applyFontFamily(fam) {
   applyFormattingToRange(s => { s.fontFamily = fam; });
-  syncRibbonStateWithActiveCell();
 }
 
 function applyFontSize(sz) {
   applyFormattingToRange(s => { s.fontSize = parseInt(sz, 10); });
-  syncRibbonStateWithActiveCell();
 }
 
 function applyFontColor(color) {
-  applyFormattingToRange(s => { s.color = color; });
-  syncRibbonStateWithActiveCell();
+  applyFormattingToRange(s => {
+    if (color) s.color = color;
+    else delete s.color;
+  });
+  const bar = document.getElementById('font-color-bar');
+  if (bar) bar.style.backgroundColor = color || 'inherit';
 }
 
 function applyFillColor(color) {
-  applyFormattingToRange(s => { s.bg = color; });
-  syncRibbonStateWithActiveCell();
+  applyFormattingToRange(s => {
+    if (color) s.bg = color;
+    else delete s.bg;
+  });
+  const bar = document.getElementById('fill-color-bar');
+  if (bar) bar.style.backgroundColor = color || 'transparent';
 }
 
 function applyHAlign(align) {
   applyFormattingToRange(s => { s.align = align; });
-  syncRibbonStateWithActiveCell();
 }
 
 function applyVAlign(vAlign) {
   applyFormattingToRange(s => { s.vAlign = vAlign; });
-  syncRibbonStateWithActiveCell();
 }
 
 function toggleWrapText() {
@@ -12145,6 +12168,16 @@ window.addEventListener('resize', () => {
     document.getElementById('font-size-select')?.addEventListener('input', (e) => applyFontSize(e.target.value));
     document.getElementById('font-family-select')?.addEventListener('input', (e) => applyFontFamily(e.target.value));
 
+    // Prevent ribbon tools, popups & swatches from stealing focus and deselecting grid cells
+    document.addEventListener('mousedown', (e) => {
+      const isRibbonOrMenu = e.target.closest('#excel-ribbon, .excel-color-palette-popup, .excel-color-btn-wrapper, .excel-dropdown-menu, .excel-mini-menu, .excel-conditional-dropdown, .excel-templates-dropdown');
+      if (isRibbonOrMenu) {
+        if (!e.target.closest('select, input:not([type="button"]):not([type="submit"]), textarea:not([readonly])')) {
+          e.preventDefault();
+        }
+      }
+    });
+
     setTimeout(() => {
       updateRibbonScrollButtons();
       if (!EXCEL_WB.sheets || EXCEL_WB.sheets.length === 0) {
@@ -12211,3 +12244,14 @@ window.loadSubjectAcademicContext = loadGroupMetadata;
 window.hydrateAcademicSheetsFromGroup = hydrateAcademicSheetsFromGroup;
 window.getActiveSelectionRange = getActiveSelectionRange;
 window.syncRibbonStateWithActiveCell = syncRibbonStateWithActiveCell;
+window.applyFormattingToRange = applyFormattingToRange;
+window.applyFillColor = applyFillColor;
+window.applyFontColor = applyFontColor;
+window.toggleFontBold = toggleFontBold;
+window.toggleFontItalic = toggleFontItalic;
+window.toggleFontUnderline = toggleFontUnderline;
+window.applyFontFamily = applyFontFamily;
+window.applyFontSize = applyFontSize;
+window.applyHAlign = applyHAlign;
+window.applyVAlign = applyVAlign;
+window.toggleWrapText = toggleWrapText;
