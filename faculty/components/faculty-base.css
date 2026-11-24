@@ -414,7 +414,7 @@ html, body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1050;
+  z-index: 100200 !important;
   background: hsl(0 0% 0% / 0.55);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
@@ -430,6 +430,7 @@ html, body {
 
 .modal-backdrop.open,
 .modal-backdrop.active {
+  display: flex !important;
   opacity: 1;
   pointer-events: auto;
 }

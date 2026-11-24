@@ -98,10 +98,11 @@
     selectEl.innerHTML = _allTeacherRegisters.map(r => {
       const isSel = r.id === selectedRegId;
       const sName = r.name || r.subject_name || 'Subject';
-      const sCode = r.subject_code ? `[${r.subject_code}]` : '';
+      const sCode = (r.subject_code && !sName.includes(r.subject_code)) ? `[${r.subject_code}]` : '';
       const sSem = r.semester ? `Sem ${r.semester}` : '';
       const sScope = (r.session_type_scope || 'THEORY').toUpperCase();
-      const label = `${sName} ${sCode} • ${sSem} • ${sScope}`;
+      const parts = [sName, sCode, sSem, sScope].filter(Boolean);
+      const label = parts.join(' • ').replace(' • [', ' [');
       return `<option value="${r.id}" ${isSel ? 'selected' : ''}>${label}</option>`;
     }).join('');
   }

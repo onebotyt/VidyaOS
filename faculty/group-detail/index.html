@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261029">
 
   <link rel="stylesheet" href="/faculty/group-detail/group-detail.css?v=20261123_v1">
-  <link rel="stylesheet" href="/faculty/group-detail/css/register.css?v=20261123_v4">
+  <link rel="stylesheet" href="/faculty/group-detail/css/register.css?v=20261124_v8">
   <script>
     function openSheetStudio(sheetName) {
       const gid = (window.S && window.S.groupId) || new URLSearchParams(location.search).get('id') || 1;
@@ -1823,15 +1823,6 @@
                     </div>
                   </div>
                   <div class="day-roster-right">
-                    <button type="button" class="btn-roster-del-period" id="btn-mobile-del-class"
-                      onclick="confirmDeleteCurrentPeriod()" style="display:none;" title="Remove this period">
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      </svg>
-                      <span id="btn-mobile-del-text">Remove P2</span>
-                    </button>
                     <!-- Live Headcount Summary (P / A) -->
                     <div class="day-roster-counts">
                       <span class="roster-count-item" title="Present Count Today">
@@ -1847,22 +1838,34 @@
                 </div>
 
 
-                <!-- Sleek Horizontal Classes / Period Bar with Add Period Button -->
+                <!-- Sleek Horizontal Classes / Period Bar with Delete & Add Period Buttons -->
                 <div class="mobile-period-bar">
                   <div class="mobile-period-pills-wrap">
                     <div class="mobile-period-pills" id="mobile-period-pills-container">
                       <button type="button" class="mobile-period-btn active" id="btn-period-single">P1</button>
                     </div>
                   </div>
-                  <button type="button" class="mobile-add-class-btn" id="btn-mobile-add-class"
-                    onclick="openAddPeriodModal()" title="Add Theory, Practical, or Custom Period">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    <span>Add Period</span>
-                  </button>
+                  <div class="mobile-period-actions">
+                    <button type="button" class="mobile-del-class-btn" id="btn-mobile-del-class"
+                      onclick="confirmDeleteCurrentPeriod()" style="display:none;" title="Delete this period">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      <span id="btn-mobile-del-text">Delete P2</span>
+                    </button>
+                    <button type="button" class="mobile-add-class-btn" id="btn-mobile-add-class"
+                      onclick="openAddPeriodModal()" title="Add Theory, Practical, or Custom Period">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      <span>Add Period</span>
+                    </button>
+                  </div>
+                </div>
                 </div>
 
                 <!-- Mobile Quick Search Filter -->
@@ -4251,7 +4254,7 @@
     <script src="/faculty/group-detail/js/group-detail-stream.js?v=20261031_v4"></script>
     <script src="/faculty/group-detail/js/group-detail-people.js?v=20261031_v4"></script>
     <script src="/faculty/group-detail/js/group-detail-classwork.js?v=20261031_v4"></script>
-    <script src="/faculty/group-detail/js/group-detail-register.js?v=20261123_v4"></script>
+    <script src="/faculty/group-detail/js/group-detail-register.js?v=20261124_v8"></script>
     <script src="/faculty/group-detail/group-detail.js?v=20261031_v4"></script>
 </body>
 

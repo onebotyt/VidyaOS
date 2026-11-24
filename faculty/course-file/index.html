@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261118">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261118">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261118">
-  <link rel="stylesheet" href="/faculty/course-file/course-file.css?v=20261118">
+  <link rel="stylesheet" href="/faculty/course-file/course-file.css?v=20261124_v3">
   <script>
     /* Always start closed (72px collapsed mini-rail) when page opens */
     (function () {
@@ -104,60 +104,69 @@
             </div>
 
             <div class="cf-actions-right">
-              <!-- Combine & Export All Documents Action Button -->
-              <button type="button" class="btn btn-primary btn-combine-export" id="btn-combine-export"
-                onclick="openCombineExportModal()"
-                title="Merge all uploaded documents into one consolidated institutional PDF dossier">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path
-                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
-                  </path>
-                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                </svg>
-                <span>Combine &amp; Export All</span>
-              </button>
+              <!-- Export Actions Group -->
+              <div class="cf-btn-group-export">
+                <button type="button" class="btn btn-primary btn-combine-export" id="btn-combine-export"
+                  onclick="openCombineExportModal()"
+                  title="Merge all uploaded documents into one consolidated institutional PDF dossier">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                    </path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                  <span class="lbl-desktop">Combine &amp; Export All</span>
+                  <span class="lbl-mobile">Export Dossier</span>
+                </button>
 
-              <button type="button" class="btn btn-outline" onclick="printDossierIndex()"
-                title="Print complete institutional dossier index and cover sheet">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                  <rect x="6" y="14" width="12" height="8"></rect>
-                </svg>
-                <span>Print Dossier Index</span>
-              </button>
-              <a href="#" id="btn-quick-rollcall" class="btn btn-outline" title="Launch attendance roll call">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-                <span>Take Attendance</span>
-              </a>
-              <a href="#" id="btn-quick-register" class="btn btn-outline"
-                title="Open 31-day attendance matrix register">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                </svg>
-                <span>Register</span>
-              </a>
-              <a href="#" id="btn-quick-classwork" class="btn btn-outline" title="Coursework &amp; assignments">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                </svg>
-                <span>Classwork</span>
-              </a>
-              <div id="cf-hod-audit-trigger" style="display:none;">
+                <button type="button" class="btn btn-outline btn-print-dossier" onclick="printDossierIndex()"
+                  title="Print complete institutional dossier index and cover sheet">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                  <span class="lbl-desktop">Print Dossier Index</span>
+                  <span class="lbl-mobile">Print Index</span>
+                </button>
+              </div>
+
+              <!-- Quick Navigation Links Group -->
+              <div class="cf-btn-group-nav">
+                <a href="#" id="btn-quick-rollcall" class="btn btn-outline" title="Launch attendance roll call">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  <span class="lbl-desktop">Take Attendance</span>
+                  <span class="lbl-mobile">Attendance</span>
+                </a>
+                <a href="#" id="btn-quick-register" class="btn btn-outline"
+                  title="Open 31-day attendance matrix register">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                  </svg>
+                  <span>Register</span>
+                </a>
+                <a href="#" id="btn-quick-classwork" class="btn btn-outline" title="Coursework &amp; assignments">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                  <span>Classwork</span>
+                </a>
+              </div>
+              <div id="cf-hod-audit-trigger" style="display:none; width:100%;">
                 <button type="button" class="btn btn-outline" onclick="openHodAuditModal()"
-                  title="HOD Quality &amp; Compliance Audit Verification">
+                  title="HOD Quality &amp; Compliance Audit Verification" style="width:100%; justify-content:center;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -340,7 +349,7 @@
           <h3 class="modal-title">Official Enrolled Student Roster (Item #7)</h3>
           <p class="modal-subtitle">Auto-Synchronized from VidyaOS Department Database</p>
         </div>
-        <div style="display:flex;gap:0.5rem;align-items:center;">
+        <div style="display:flex;gap:0.4rem;align-items:center;">
           <button type="button" class="btn btn-sm btn-primary" onclick="printStudentRoster()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
@@ -348,28 +357,25 @@
               <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
               <rect x="6" y="14" width="12" height="8"></rect>
             </svg>
-            <span>Print Student List</span>
+            <span class="lbl-desktop">Print Student List</span>
+            <span class="lbl-mobile">Print</span>
           </button>
           <button type="button" class="modal-close" onclick="closeModal('modal-student-roster')">&times;</button>
         </div>
       </div>
       <div class="modal-body">
         <div class="cf-roster-summary-bar">
-          <span id="roster-count-badge" class="badge badge-sem">10 Students Enrolled</span>
-          <span style="font-size:0.8rem;color:var(--text-muted);">Includes verified official registration roll and
-            live
-            subject attendance.</span>
+          <span id="roster-count-badge" class="badge badge-sem">13 Students</span>
+          <span class="cf-roster-summary-subtext">Verified Subject Attendance Roster</span>
         </div>
         <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
           <table class="data-table" id="table-students-roster">
             <thead>
               <tr>
-                <th style="width: 70px;">Roll No</th>
-                <th style="width: 130px;">UBTER Roll No</th>
+                <th style="width: 44px; text-align: center;">#</th>
                 <th>Student Full Name</th>
-                <th>Email Address</th>
-                <th style="width: 90px; text-align: center;">Attended</th>
-                <th style="width: 100px; text-align: center;">Attendance %</th>
+                <th style="width: 75px; text-align: center;">Attended</th>
+                <th style="width: 65px; text-align: center;">%</th>
               </tr>
             </thead>
             <tbody id="tbody-students-roster">
@@ -379,7 +385,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline"
+        <button type="button" class="btn btn-outline modal-footer-btn-main"
           onclick="openDirectUploadModal('student_list', 'Student List Signed PDF')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -387,7 +393,8 @@
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <span>Upload Signed / Certified PDF Roster (Optional)</span>
+          <span class="lbl-desktop">Upload Signed / Certified PDF Roster (Optional)</span>
+          <span class="lbl-mobile">Upload PDF Roster</span>
         </button>
         <button type="button" class="btn btn-primary" onclick="closeModal('modal-student-roster')">Close</button>
       </div>
@@ -400,10 +407,10 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-header">
         <div>
-          <h3 class="modal-title">Assignment &amp; Tutorial Schedule (Item #14)</h3>
+          <h3 class="modal-title">Assignment &amp; Tutorial Schedule</h3>
           <p class="modal-subtitle">Auto-Synchronized from Subject Classwork Records</p>
         </div>
-        <div style="display:flex;gap:0.5rem;align-items:center;">
+        <div style="display:flex;gap:0.4rem;align-items:center;">
           <button type="button" class="btn btn-sm btn-primary" onclick="printAssignmentSchedule()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
@@ -411,27 +418,25 @@
               <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
               <rect x="6" y="14" width="12" height="8"></rect>
             </svg>
-            <span>Print Schedule</span>
+            <span class="lbl-desktop">Print Schedule</span>
+            <span class="lbl-mobile">Print</span>
           </button>
           <button type="button" class="modal-close" onclick="closeModal('modal-assignment-schedule')">&times;</button>
         </div>
       </div>
       <div class="modal-body">
         <div class="cf-roster-summary-bar">
-          <span id="schedule-count-badge" class="badge badge-sem">7 Assignments Issued</span>
-          <span style="font-size:0.8rem;color:var(--text-muted);">Pulled directly from Classwork coursework
-            repository.</span>
+          <span id="schedule-count-badge" class="badge badge-sem">14 Tasks</span>
+          <span class="cf-roster-summary-subtext">Subject Classwork Records</span>
         </div>
         <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
           <table class="data-table" id="table-assignments-schedule">
             <thead>
               <tr>
-                <th style="width: 50px;">#</th>
-                <th>Assignment Title</th>
-                <th style="width: 110px;">Issue Date</th>
-                <th style="width: 110px;">Due Date</th>
-                <th style="width: 90px; text-align: center;">Max Marks</th>
-                <th style="width: 100px; text-align: center;">Submissions</th>
+                <th style="width: 35px; text-align: center;">#</th>
+                <th>Assignment Title &amp; Due Date</th>
+                <th class="col-marks-desktop" style="width: 65px; text-align: center;">Marks</th>
+                <th style="width: 90px; text-align: center;">Turned In</th>
               </tr>
             </thead>
             <tbody id="tbody-assignments-schedule">
@@ -441,7 +446,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline"
+        <button type="button" class="btn btn-outline modal-footer-btn-main"
           onclick="openDirectUploadModal('assignment_schedule', 'Assignment Schedule Signed PDF')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -449,7 +454,8 @@
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <span>Upload Signed Tutorial Schedule PDF (Optional)</span>
+          <span class="lbl-desktop">Upload Signed Tutorial Schedule PDF (Optional)</span>
+          <span class="lbl-mobile">Upload Schedule PDF</span>
         </button>
         <button type="button" class="btn btn-primary" onclick="closeModal('modal-assignment-schedule')">Close</button>
       </div>

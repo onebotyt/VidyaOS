@@ -17,6 +17,20 @@
   // Shared application state reference
   const getS = () => window.S || {};
 
+  // Safe Universal Toast Dispatcher
+  function toast(msg, type = 'info') {
+    if (typeof window.showToast === 'function') {
+      window.showToast(msg, type);
+    } else if (typeof window.facultyToast === 'function') {
+      window.facultyToast(msg, type);
+    } else if (typeof window.toast === 'function' && window.toast !== toast) {
+      window.toast(msg, type);
+    } else {
+      console.log(`[Toast ${type}]:`, msg);
+    }
+  }
+  window.toast = toast;
+
   /* ══════════════════════════════════════════════════════════════
      CLASSROOM REGISTER MATRIX CONTROLLER (Scoped to THIS subject only)
      ══════════════════════════════════════════════════════════════ */
@@ -268,7 +282,9 @@
             session_key: `sess_${s.id}`,
             display_period: `P${pNum}`,
             display_title: `${dg.date} (${dg.day_name}) — Period ${pNum}${s.label ? ': ' + s.label : ''}`,
-            is_multi: dg.colCount > 1
+            is_multi: dg.colCount > 1,
+            is_first_subcol: sIdx === 0,
+            is_last_subcol: sIdx === dg.sessions.length - 1
           });
         });
       } else {
@@ -281,7 +297,9 @@
           session_key: null,
           display_period: 'P1',
           display_title: `${dg.date} (${dg.day_name})${dg.holiday_label ? ' - ' + dg.holiday_label : ''}`,
-          is_multi: false
+          is_multi: false,
+          is_first_subcol: true,
+          is_last_subcol: true
         });
       }
     });
@@ -371,9 +389,24 @@
           dg.sessions.forEach((s, sIdx) => {
             const pNum = s.period_number || (sIdx + 1);
             const isToday = dg.date === todayStr;
+            const isFirst = sIdx === 0;
+            const isLast = sIdx === dg.sessions.length - 1;
+            const todayThBorder = isToday ? (
+              (isFirst && isLast) ? 'border-left: 2px solid var(--color-primary); border-right: 2px solid var(--color-primary);' :
+              (isFirst ? 'border-left: 2px solid var(--color-primary); border-right: 1px dashed rgba(255,255,255,0.4);' :
+              (isLast ? 'border-right: 2px solid var(--color-primary); border-left: none;' :
+              'border-right: 1px dashed rgba(255,255,255,0.4); border-left: none;'))
+            ) : '';
             headHtml += `
-              <th class="period-subcol-th ${isToday ? 'date-col-today' : ''}" style="min-width: 26px; padding: 0.15rem 0.1rem; text-align: center; font-size: 0.6rem; font-weight: 800; font-family: var(--font-family-mono); background: var(--bg-surface); color: ${isToday ? 'var(--text-white)' : 'var(--text-muted)'};" title="${esc(dg.date)} — Period ${pNum}${s.label ? ': ' + s.label : ''}">
-                <span class="period-badge-subcol">P${pNum}</span>
+              <th class="period-subcol-th ${isToday ? 'date-col-today' : ''}" style="min-width: 28px; padding: 0.2rem 0.15rem; text-align: center; font-size: 0.62rem; font-weight: 800; font-family: var(--font-family-mono); vertical-align: middle; ${todayThBorder}" title="${esc(dg.date)} — Period ${pNum}${s.label ? ': ' + s.label : ''}">
+                <span class="period-badge-subcol">
+                  P${pNum}
+                  ${s.id && pNum > 1 ? `
+                    <button type="button" class="desktop-matrix-del-period" onclick="confirmDeletePeriod(${s.id}, ${pNum}, event)" title="Delete Period ${pNum}">
+                      <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  ` : ''}
+                </span>
               </th>
             `;
           });
@@ -423,10 +456,15 @@
         }
 
         let mark = null;
-        if (col.session_key && st.attendance_marks?.[col.session_key]) {
+        const sMarks = st.session_marks || {};
+        if (col.session_id && sMarks[col.session_id]) {
+          mark = sMarks[col.session_id];
+        } else if (col.session_key && st.attendance_marks?.[col.session_key]) {
           mark = st.attendance_marks[col.session_key];
         } else if (col.col_key && st.attendance_marks?.[col.col_key]) {
           mark = st.attendance_marks[col.col_key];
+        } else if (st.attendance_marks?.[`${col.date}_p${col.period_number}`]) {
+          mark = st.attendance_marks[`${col.date}_p${col.period_number}`];
         } else if (st.attendance_marks?.[col.date]) {
           mark = st.attendance_marks[col.date];
         }
@@ -440,8 +478,20 @@
           cellsHtml += `<td class="date-cell" style="color: var(--text-muted); font-size: 0.7rem; text-align: center;${col.date === todayStr ? ' background: var(--color-primary-light);' : ''}">—</td>`;
         } else {
           const isTodayCell = col.date === todayStr;
+          let todayCellBorder = '';
+          if (isTodayCell) {
+            if (col.is_first_subcol && col.is_last_subcol) {
+              todayCellBorder = 'border-left: 2px solid var(--color-primary) !important; border-right: 2px solid var(--color-primary) !important;';
+            } else if (col.is_first_subcol) {
+              todayCellBorder = 'border-left: 2px solid var(--color-primary) !important; border-right: 1px dashed rgba(59, 130, 246, 0.3) !important;';
+            } else if (col.is_last_subcol) {
+              todayCellBorder = 'border-right: 2px solid var(--color-primary) !important; border-left: none !important;';
+            } else {
+              todayCellBorder = 'border-right: 1px dashed rgba(59, 130, 246, 0.3) !important; border-left: none !important;';
+            }
+          }
           cellsHtml += `
-            <td class="date-cell ${isTodayCell ? 'date-col-today' : ''}" ${isTodayCell ? 'data-today="true"' : ''} style="padding: 2px; text-align: center;">
+            <td class="date-cell ${isTodayCell ? 'date-col-today' : ''}" ${isTodayCell ? 'data-today="true"' : ''} style="padding: 2px; text-align: center; ${todayCellBorder}">
               <span class="pen-mark ${penClass}" 
                     id="pen-mark-${st.student_id}-${col.col_key}"
                     onclick="toggleDigitalPen('${col.date}', ${st.student_id}, this, ${col.period_number}, ${col.session_id || 'null'})"
@@ -524,7 +574,18 @@
 
       matrixCols.forEach(col => {
         const isTodayCol = col.date === todayStr;
-        const todayStyle = isTodayCol ? ' background: var(--color-primary-light); border-left: 2px solid var(--color-primary); border-right: 2px solid var(--color-primary);' : '';
+        let todayStyle = '';
+        if (isTodayCol) {
+          if (col.is_first_subcol && col.is_last_subcol) {
+            todayStyle = ' background: var(--color-primary-light); border-left: 2px solid var(--color-primary); border-right: 2px solid var(--color-primary);';
+          } else if (col.is_first_subcol) {
+            todayStyle = ' background: var(--color-primary-light); border-left: 2px solid var(--color-primary); border-right: 1px dashed rgba(59, 130, 246, 0.3);';
+          } else if (col.is_last_subcol) {
+            todayStyle = ' background: var(--color-primary-light); border-right: 2px solid var(--color-primary); border-left: none;';
+          } else {
+            todayStyle = ' background: var(--color-primary-light); border-right: 1px dashed rgba(59, 130, 246, 0.3); border-left: none;';
+          }
+        }
 
         if (nonInstructionalSpans.has(col.date)) {
           footP += `<td class="vertical-holiday-cell" style="font-size: 0.7rem; color: var(--col-holiday-color); text-align:center;${todayStyle}">—</td>`;
@@ -666,9 +727,15 @@
         daySessions.forEach(s => {
           const pNum = s.period_number || 1;
           const fullLabel = s.label || (s.session_type === 'PRACTICAL' ? 'Practical Lab' : `Period ${pNum}`);
+          const canDel = pNum > 1 && s.id;
           pillsHtml += `
             <button type="button" class="mobile-period-btn ${classRegState.mobilePeriod === pNum ? 'active' : ''}" onclick="setMobilePeriodFilter(${pNum})" title="Period ${pNum}: ${esc(fullLabel)}">
               <span>P${pNum}</span>
+              ${canDel ? `
+                <span class="period-tab-del-btn" onclick="confirmDeletePeriod(${s.id}, ${pNum}, event)" title="Delete Period ${pNum}">
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+              ` : ''}
             </button>
           `;
         });
@@ -676,20 +743,26 @@
       }
     }
 
-    // Update Remove Period Action Button (Only allowed for Period 2 and above, never Period 1)
+    // Update Remove/Delete Period Action Button
     const delBtn = ById('btn-mobile-del-class');
     const delText = ById('btn-mobile-del-text');
     if (delBtn) {
       const currentPeriodNum = parseInt(classRegState.mobilePeriod, 10);
+      const removableSessions = daySessions.filter(s => (s.period_number || 1) > 1 && s.id);
       if (classRegState.mobilePeriod !== 'ALL' && currentPeriodNum > 1) {
         const curSess = daySessions.find(s => (s.period_number || 1) === currentPeriodNum);
         if (curSess && curSess.id) {
           delBtn.style.display = 'inline-flex';
-          if (delText) delText.textContent = `Remove P${currentPeriodNum}`;
-          delBtn.onclick = () => confirmDeletePeriod(curSess.id, currentPeriodNum);
+          if (delText) delText.textContent = `Delete P${currentPeriodNum}`;
+          delBtn.onclick = (e) => confirmDeletePeriod(curSess.id, currentPeriodNum, e);
         } else {
           delBtn.style.display = 'none';
         }
+      } else if (classRegState.mobilePeriod === 'ALL' && removableSessions.length > 0) {
+        const latestSess = removableSessions[removableSessions.length - 1];
+        delBtn.style.display = 'inline-flex';
+        if (delText) delText.textContent = `Delete P${latestSess.period_number}`;
+        delBtn.onclick = (e) => confirmDeletePeriod(latestSess.id, latestSess.period_number, e);
       } else {
         delBtn.style.display = 'none';
       }
@@ -769,8 +842,8 @@
       let periodButtonsHtml = '';
       effectiveSessions.forEach((s, sIdx) => {
         const pNum = s.period_number || (sIdx + 1);
-        const pKey = s.id ? `sess_${s.id}` : (pNum > 1 ? `${targetDate}_${pNum}` : targetDate);
-        const markVal = marks[pKey] || (pNum === 1 ? marks[targetDate] : null) || null;
+        const sMarks = st.session_marks || {};
+        const markVal = (s.id && sMarks[s.id]) || marks[`${targetDate}_p${pNum}`] || marks[`${targetDate}_${pNum}`] || marks[`sess_${s.id}`] || (pNum === 1 ? marks[targetDate] : null) || null;
         const markStatus = typeof markVal === 'string' ? markVal : (markVal?.status || null);
 
         let pChar = '·';
@@ -1075,12 +1148,20 @@
     if (startTimeInp) startTimeInp.value = '';
     const endTimeInp = ById('sess-end-time') || ById('new-session-end');
     if (endTimeInp) endTimeInp.value = '';
-    const timeFields = ById('period-time-fields');
+    const timeFields = ById('period-time-fields') || ById('custom-time-inputs');
     if (timeFields) timeFields.style.display = 'none';
     const timeLabel = ById('period-time-toggle-label');
     if (timeLabel) timeLabel.textContent = '+ Add class timing (optional)';
 
-    openModal('add-session-modal');
+    const modal = ById('add-session-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('open', 'active');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+    if (typeof openModal === 'function') {
+      openModal('add-session-modal');
+    }
   }
 
   function openAddSessionModal() {
@@ -1116,13 +1197,14 @@
           const pNum = s.period_number || 1;
           const sLabel = s.label || `Period ${pNum}`;
           return `
-            <div style="display:inline-flex; align-items:center; gap:4px; padding:2px 6px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-xs, 4px); font-size:0.7rem; color:var(--text-main);">
+            <div style="display:inline-flex; align-items:center; gap:6px; padding:3px 8px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-sm, 6px); font-size:0.72rem; color:var(--text-main);">
               <strong>P${pNum}</strong>: ${esc(sLabel)}
-              ${pNum > 1 ? `
-                <button type="button" class="btn-period-del-mini" onclick="confirmDeletePeriod(${s.id}, ${pNum}, event)" title="Remove Period ${pNum}" style="margin-left:3px;">
+              ${pNum > 1 && s.id ? `
+                <button type="button" class="btn-period-del-badge" onclick="confirmDeletePeriod(${s.id}, ${pNum}, event)" title="Delete Period ${pNum}">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Delete</span>
                 </button>
-              ` : ''}
+              ` : '<span style="font-size:0.62rem; color:var(--text-muted);">(Main)</span>'}
             </div>
           `;
         }).join('');
@@ -1198,7 +1280,7 @@
     }
 
     const session_date = ById('sess-date')?.value || ById('new-session-date')?.value;
-    const label = (ById('sess-label')?.value || ById('new-session-label')?.value)?.trim();
+    let label = (ById('sess-label')?.value || ById('new-session-label')?.value)?.trim();
     let session_type = ById('sess-type')?.value || ById('new-session-type')?.value || 'THEORY';
     if (session_type === 'CUSTOM') session_type = 'THEORY';
     const period_number = parseInt(ById('sess-period')?.value || ById('new-session-slot')?.value || '1', 10);
@@ -1210,9 +1292,7 @@
       return;
     }
     if (!label) {
-      toast('Please enter a period title or name');
-      (ById('sess-label') || ById('new-session-label'))?.focus();
-      return;
+      label = `${session_type === 'PRACTICAL' ? 'Practical Lab' : 'Theory Class'} (Period ${period_number})`;
     }
 
     const payload = {
@@ -1238,8 +1318,15 @@
       });
       if (res && res.success) {
         toast(`Added ${label}!`);
-        closeModal('add-session-modal');
-        classRegState.mobilePeriod = period_number;
+        const modal = ById('add-session-modal');
+        if (modal) {
+          if (modal.contains(document.activeElement)) document.activeElement.blur();
+          modal.classList.remove('open', 'active');
+          modal.setAttribute('aria-hidden', 'true');
+          modal.style.display = 'none';
+        }
+        if (typeof closeModal === 'function') closeModal('add-session-modal');
+        classRegState.mobilePeriod = 'ALL';
         classRegState.selectedDate = session_date;
         const syncDate = ById('class-sync-date');
         if (syncDate) syncDate.value = session_date;
@@ -1282,8 +1369,15 @@
       });
       if (res && res.success) {
         toast(`Removed ${pLabel}!`);
-        closeModal('add-session-modal');
-        classRegState.mobilePeriod = 1;
+        const modal = ById('add-session-modal');
+        if (modal) {
+          if (modal.contains(document.activeElement)) document.activeElement.blur();
+          modal.classList.remove('open', 'active');
+          modal.setAttribute('aria-hidden', 'true');
+          modal.style.display = 'none';
+        }
+        if (typeof closeModal === 'function') closeModal('add-session-modal');
+        classRegState.mobilePeriod = 'ALL';
         await loadClassRegister(classRegState.currentMonth);
       } else {
         toast(res?.error?.message || 'Failed to remove period');
@@ -1298,15 +1392,20 @@
     const finalized = grid.finalized_sessions || [];
     const dateStr = classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
     const daySessions = finalized.filter(s => s.session_date === dateStr);
+    daySessions.sort((a, b) => (a.period_number || 1) - (b.period_number || 1));
+    const removableSessions = daySessions.filter(s => (s.period_number || 1) > 1 && s.id);
+
     let target = null;
     const currentPeriodNum = parseInt(classRegState.mobilePeriod, 10);
     if (classRegState.mobilePeriod !== 'ALL' && currentPeriodNum > 1) {
       target = daySessions.find(s => (s.period_number || 1) === currentPeriodNum);
+    } else if (removableSessions.length > 0) {
+      target = removableSessions[removableSessions.length - 1];
     }
     if (target && target.id) {
       confirmDeletePeriod(target.id, target.period_number || currentPeriodNum);
     } else {
-      toast('Please select Period 2 or higher to remove');
+      toast('No removable extra periods found for this date');
     }
   }
 
@@ -2005,11 +2104,11 @@
   function openHolidayModal(dateStr) {
     const modal = ById('manage-holiday-modal');
     if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('open', 'active');
+    modal.setAttribute('aria-hidden', 'false');
     if (typeof openModal === 'function') {
       openModal('manage-holiday-modal');
-    } else {
-      modal.classList.add('open');
-      modal.style.display = 'flex';
     }
 
     const targetDate = dateStr || classRegState.selectedDate || ById('class-sync-date')?.value || new Date().toISOString().slice(0, 10);
@@ -2023,11 +2122,14 @@
   function closeHolidayModal() {
     const modal = ById('manage-holiday-modal');
     if (modal) {
+      if (modal.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
+      modal.classList.remove('open', 'active');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
       if (typeof closeModal === 'function') {
         closeModal('manage-holiday-modal');
-      } else {
-        modal.classList.remove('open');
-        modal.style.display = 'none';
       }
     }
   }
@@ -2038,10 +2140,11 @@
     
     let isHoliday = false;
     let label = '';
+    const hasOverride = Boolean(dObj && (dObj.is_working_day_override || dObj.is_custom_holiday));
     
     if (dObj) {
       isHoliday = Boolean(dObj.is_holiday);
-      label = dObj.holiday_label || '';
+      label = dObj.holiday_reason || dObj.holiday_label || '';
     } else {
       const dt = new Date(dateVal + 'T00:00:00');
       const dayOfWeek = dt.getDay();
@@ -2057,19 +2160,24 @@
     if (statusText) {
       if (isHoliday) {
         if (statusBanner) {
-          statusBanner.style.background = 'var(--col-holiday-bg)';
-          statusBanner.style.borderColor = 'var(--col-holiday-color)';
+          statusBanner.style.background = 'var(--col-holiday-bg, #fef2f2)';
+          statusBanner.style.borderColor = 'var(--col-holiday-color, #ef4444)';
         }
-        statusText.style.color = 'var(--col-holiday-color)';
+        statusText.style.color = 'var(--col-holiday-color, #ef4444)';
         statusText.textContent = `Marked as Holiday${label ? ' (' + label + ')' : ''}`;
       } else {
         if (statusBanner) {
-          statusBanner.style.background = 'var(--bg-surface)';
-          statusBanner.style.borderColor = 'var(--border-color)';
+          statusBanner.style.background = 'var(--bg-surface, #f8fafc)';
+          statusBanner.style.borderColor = 'var(--border-color, #e2e8f0)';
         }
-        statusText.style.color = 'var(--color-primary)';
+        statusText.style.color = 'var(--color-primary, #3b82f6)';
         statusText.textContent = `Marked as Active Working Day`;
       }
+    }
+
+    const resetBtn = ById('btn-reset-holiday') || ById('btn-reset-holiday-default');
+    if (resetBtn) {
+      resetBtn.style.display = hasOverride ? 'inline-block' : 'none';
     }
 
     selectHolidayType(isHoliday ? 'HOLIDAY' : 'WORKING', false);

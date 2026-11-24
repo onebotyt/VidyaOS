@@ -17,9 +17,9 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261117">
-  <link rel="stylesheet" href="/faculty/group-detail/group-detail.css?v=20261123_v1">
-  <link rel="stylesheet" href="/faculty/group-detail/css/register.css?v=20261123_v4">
-  <link rel="stylesheet" href="/faculty/registers/registers.css?v=20261123_v1">
+  <link rel="stylesheet" href="/faculty/group-detail/group-detail.css?v=20261124_v5">
+  <link rel="stylesheet" href="/faculty/group-detail/css/register.css?v=20261124_v8">
+  <link rel="stylesheet" href="/faculty/registers/registers.css?v=20261124_v8">
   <script>
     (function () {
       try {
@@ -243,8 +243,8 @@
                 </svg>
                 <span>Holidays</span>
               </button>
-              <button type="button" class="btn btn-secondary btn-sm btn-add-period" id="btn-add-period-pc" onclick="openAddPeriodModal()"
-                style="font-size: 0.78rem; padding: 0.25rem 0.6rem; height: 30px; display:inline-flex; align-items:center; gap:0.35rem;"
+              <button type="button" class="btn btn-secondary btn-sm btn-add-period hide-on-mobile" id="btn-add-period-pc" onclick="openAddPeriodModal()"
+                style="font-size: 0.78rem; padding: 0.25rem 0.6rem; height: 30px; align-items:center; gap:0.35rem;"
                 title="Add extra class period or session for this subject">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -343,15 +343,6 @@
                   </div>
                 </div>
                 <div class="day-roster-right">
-                  <button type="button" class="btn-roster-del-period" id="btn-mobile-del-class"
-                    onclick="confirmDeleteCurrentPeriod()" style="display:none;" title="Remove this period">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                    <span id="btn-mobile-del-text">Remove P2</span>
-                  </button>
                   <div class="day-roster-counts">
                     <span class="roster-count-item" title="Present Count Today">
                       <span style="color:var(--status-present);font-weight:800;">P</span>
@@ -365,30 +356,72 @@
                 </div>
               </div>
 
-              <!-- Sleek Horizontal Classes / Period Bar with Add Period Button -->
-              <div class="class-periods-bar" id="mobile-periods-bar">
-                <div class="period-pills-scroll" id="mobile-period-pills-wrap">
-                  <button type="button" class="period-pill active" data-period="ALL"
-                    onclick="switchMobilePeriod('ALL')">
-                    All Day (Combined)
+              <!-- Sleek Horizontal Classes / Period Bar with Delete & Add Period Buttons -->
+              <div class="mobile-period-bar">
+                <div class="mobile-period-pills-wrap">
+                  <div class="mobile-period-pills" id="mobile-period-pills-container">
+                    <button type="button" class="mobile-period-btn active" id="btn-period-single">P1</button>
+                  </div>
+                </div>
+                <div class="mobile-period-actions">
+                  <button type="button" class="mobile-del-class-btn" id="btn-mobile-del-class"
+                    onclick="confirmDeleteCurrentPeriod()" style="display:none;" title="Delete this period">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span id="btn-mobile-del-text">Delete P2</span>
+                  </button>
+                  <button type="button" class="mobile-add-class-btn" id="btn-mobile-add-class"
+                    onclick="openAddPeriodModal()" title="Add Theory, Practical, or Custom Period">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Add Period</span>
                   </button>
                 </div>
-                <button type="button" class="btn-add-second-period" onclick="openAddSessionModal()"
-                  title="Add an extra class period for this date">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  <span>Add Class Period</span>
-                </button>
               </div>
 
-              <!-- Student Cards Container -->
-              <div class="mobile-roster-cards" id="mobile-roster-cards-container">
-                <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.85rem;">
-                  Loading attendance roster...
+              <!-- Mobile Quick Search Filter -->
+              <div class="mobile-filter-strip">
+                <div class="mobile-search-box">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0;">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="mobile-student-search-input" class="mobile-search-input"
+                    placeholder="Quick search student by name or roll..." oninput="filterMobileStudents(this.value)">
+                  <button type="button" id="mobile-search-clear-btn" class="mobile-search-clear"
+                    onclick="clearMobileStudentSearch()" style="display:none;" title="Clear search">&times;</button>
                 </div>
+              </div>
+
+              <!-- Ultra-compact Table: Checkbox | Roll | Name | Period(s) | Attended -->
+              <div style="overflow-x: auto;">
+                <table class="mobile-compact-table" id="mobile-compact-matrix-table">
+                  <thead>
+                    <tr id="mobile-compact-thead-tr">
+                      <th style="width: 28px; text-align: center;">
+                        <input type="checkbox" id="mobile-check-all"
+                          onchange="toggleSelectAllMobileStudents(this.checked)" title="Select all students">
+                      </th>
+                      <th style="width: 36px; text-align: center;">Roll</th>
+                      <th style="text-align: left; padding-left: 0.5rem;">Student Name</th>
+                      <th id="m-th-p1" style="width: 52px; text-align: center;">Class 1</th>
+                      <th id="m-th-p2" style="width: 52px; text-align: center; display: none;">Class 2</th>
+                      <th id="m-th-attended" style="width: 58px; text-align: center;">Attended</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mobile-compact-tbody">
+                    <tr>
+                      <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading students...</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -621,7 +654,7 @@
             </div>
             <div style="display: flex; gap: 0.45rem;">
               <button type="button" class="btn btn-secondary btn-sm" onclick="closeHolidayModal()">Cancel</button>
-              <button type="button" class="btn btn-primary btn-sm" onclick="submitSaveHoliday()">Save Configuration</button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-save-holiday" onclick="submitSaveHoliday()">Save Configuration</button>
             </div>
           </div>
         </div>
@@ -906,6 +939,46 @@
     </div>
   </div>
 
+  <!-- Mobile Floating Bulk Attendance Action Dock -->
+  <div id="mobile-bulk-bar" class="mobile-bulk-bar mobile-bulk-floating-dock" style="display: none;">
+    <div class="bulk-dock-info">
+      <span class="bulk-dock-badge" title="Selected students">
+        <span id="mobile-bulk-count">0</span><span class="bulk-dock-sel-text"> sel</span>
+      </span>
+    </div>
+    <div class="bulk-dock-actions">
+      <button type="button" class="btn-dock-mark btn-dock-present" onclick="bulkMarkAttendance('PRESENT', true)"
+        title="Mark all selected students Present">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>Present</span>
+      </button>
+      <button type="button" class="btn-dock-mark btn-dock-absent" onclick="bulkMarkAttendance('ABSENT', true)"
+        title="Mark all selected students Absent">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        <span>Absent</span>
+      </button>
+      <button type="button" class="btn-dock-clear" onclick="bulkMarkAttendance('CLEAR', true)"
+        title="Clear attendance for selected students">
+        <span>Clear</span>
+      </button>
+      <button type="button" class="btn-dock-dismiss" onclick="deselectAllMobileStudents()" title="Cancel selection"
+        aria-label="Cancel selection">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
   <!-- Shared Notification Toast Container -->
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
@@ -941,10 +1014,11 @@
   <script src="/faculty/components/core/api.js"></script>
   <script src="/faculty/components/core/auth.js"></script>
   <script src="/faculty/components/icons.js?v=20261117"></script>
+  <script src="/faculty/components/faculty-ui.js?v=20261124_v5"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261123_v1"></script>
   <script src="/faculty/components/header/header.js?v=20261117"></script>
-  <script src="/faculty/group-detail/js/group-detail-register.js?v=20261123_v4"></script>
-  <script src="/faculty/registers/registers.js?v=20261123_v1"></script>
+  <script src="/faculty/group-detail/js/group-detail-register.js?v=20261124_v8"></script>
+  <script src="/faculty/registers/registers.js?v=20261124_v8"></script>
 </body>
 
 </html>

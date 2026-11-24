@@ -191,7 +191,7 @@
       return `
         <div class="class-card" id="class-card-${g.id}">
           <!-- Card Header Banner with Google Classroom Theme Artwork -->
-          <div class="class-card-header" style="background-image: linear-gradient(to right, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0) 100%), url('${bannerUrl}'); background-size: cover; background-position: right center; background-repeat: no-repeat;">
+          <div class="class-card-header" style="background-image: linear-gradient(to right, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0) 100%), url('${bannerUrl}') !important; background-size: cover !important; background-position: right center !important; background-repeat: no-repeat !important;">
             <div class="class-card-header-top">
               <a href="/faculty/group-detail/index.html?id=${g.id}" class="class-card-title">
                 <span>${escapeHtml(subjectTitle)}</span>
@@ -229,18 +229,26 @@
             <div class="class-card-sub">
               Sem ${semester} &bull; ${escapeHtml(formattedComp)} &bull; ${escapeHtml(ayLabel)}
             </div>
-            ${g.start_date ? `
+            <div class="class-card-footer-strip">
               <div class="class-card-timeline">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
-                <span>Started ${new Date(g.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                <span>${g.start_date ? `Started ${new Date(g.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : 'Active'}</span>
                 ${g.end_date ? `<span>&bull; Ends ${new Date(g.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>` : `<span class="tag-ongoing">&bull; Ongoing</span>`}
               </div>
-            ` : ''}
+              <a href="/faculty/group-detail/index.html?id=${g.id}" class="btn-card-click-to-open" title="Open ${escapeHtml(subjectTitle)}">
+                <span>Click to Open</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
           </div>
 
           <!-- Primary Action Buttons (Take Attendance + Register) -->
           <div class="class-card-primary-actions">
-            <a href="/faculty/group-detail/index.html?id=${g.id}&tab=register&action=rollcall" class="btn-card-take-att">
+            <a href="/faculty/group-detail/index.html?id=${g.id}&tab=register&action=rollcall" class="btn-card-take-att" title="Take Live Attendance">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2a10 10 0 0 0-10 10c0 3.1 1.4 5.9 3.6 7.8"></path>
                 <path d="M12 6a6 6 0 0 0-6 6c0 1.9.9 3.6 2.2 4.7"></path>
@@ -251,7 +259,7 @@
               </svg>
               <span>Take Attendance</span>
             </a>
-            <a href="/faculty/registers/index.html?groupId=${g.id}" class="btn-card-register">
+            <a href="/faculty/registers/index.html?groupId=${g.id}" class="btn-card-register" title="Open Attendance Register">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>

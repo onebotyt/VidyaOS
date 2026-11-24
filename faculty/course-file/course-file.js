@@ -173,10 +173,6 @@
           openStudentRosterModal();
         } else if (item.key === 'assignment_schedule') {
           openAssignmentScheduleModal();
-        } else if (item.key === 'internal_assessment_plan') {
-          openEvaluationSchemeModal();
-        } else if (item.key === 'copo_matrix' || item.key === 'course_outcomes') {
-          openCopoMatrixModal();
         } else if (item.key === 'advanced_learners' || item.key === 'slow_learners') {
           openLearnersModal(item.key);
         } else {
@@ -630,10 +626,6 @@
           extraBtn = `<button type="button" class="cf-card-btn" onclick="openStudentRosterModal()">Live Roster</button>`;
         } else if (item.key === 'assignment_schedule') {
           extraBtn = `<button type="button" class="cf-card-btn" onclick="openAssignmentScheduleModal()">Classwork Tasks</button>`;
-        } else if (item.key === 'internal_assessment_plan') {
-          extraBtn = `<button type="button" class="cf-card-btn" onclick="openEvaluationSchemeModal()">Rubric Scheme</button>`;
-        } else if (item.key === 'course_outcomes' || item.key === 'copo_matrix') {
-          extraBtn = `<button type="button" class="cf-card-btn" onclick="openCopoMatrixModal()">CO-PO Matrix</button>`;
         }
 
         actionsHtml = `
@@ -914,23 +906,22 @@
     const tbody = document.getElementById('tbody-students-roster');
     const badge = document.getElementById('roster-count-badge');
 
-    if (badge) badge.innerText = `${students.length} Students Enrolled`;
+    if (badge) badge.innerText = `${students.length} Students`;
 
     if (tbody) {
       if (students.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">No enrolled students found in this subject class.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted);">No enrolled students found in this subject class.</td></tr>`;
       } else {
-        tbody.innerHTML = students.map(s => {
+        tbody.innerHTML = students.map((s, idx) => {
+          const rollDisplay = s.roll_no && s.roll_no !== '--' ? s.roll_no : (idx + 1);
           const pct = s.attendance_pct != null ? `${s.attendance_pct}%` : '—';
           const pctClass = s.attendance_pct != null && s.attendance_pct >= 75 ? 'badge-present' : (s.attendance_pct != null ? 'badge-absent' : 'badge-sem');
           return `
             <tr>
-              <td style="font-weight:700;font-family:var(--font-family-mono);">${s.roll_no || '--'}</td>
-              <td style="font-family:var(--font-family-mono);color:var(--text-muted);">${escapeHtml(s.ubter_roll_no || s.official_enrollment_no || s.enrollment_no || '--')}</td>
-              <td><strong>${escapeHtml(s.full_name)}</strong></td>
-              <td style="color:var(--text-muted);font-size:0.8rem;">${escapeHtml(s.email || '--')}</td>
-              <td style="text-align:center;font-family:var(--font-family-mono);">${s.attended_sessions || 0} / ${s.total_sessions || 0}</td>
-              <td style="text-align:center;"><span class="badge ${pctClass}">${pct}</span></td>
+              <td style="font-weight:700;font-family:var(--font-family-mono);font-size:0.8rem;text-align:center;width:44px;">${rollDisplay}</td>
+              <td><strong style="line-height:1.25;font-size:0.84rem;color:var(--text-main);">${escapeHtml(s.full_name)}</strong></td>
+              <td style="text-align:center;font-family:var(--font-family-mono);font-size:0.8rem;white-space:nowrap;">${s.attended_sessions || 0} / ${s.total_sessions || 0}</td>
+              <td style="text-align:center;"><span class="badge ${pctClass}" style="font-size:0.7rem;padding:0.15rem 0.4rem;">${pct}</span></td>
             </tr>
           `;
         }).join('');
@@ -966,16 +957,14 @@
         <table>
           <thead>
             <tr>
-              <th>Roll No</th><th>UBTER Roll No</th><th>Full Name</th><th>Email</th><th>Attended</th><th>Attendance %</th>
+              <th>Roll No</th><th>Full Name</th><th>Attended</th><th>Attendance %</th>
             </tr>
           </thead>
           <tbody>
-            ${students.map(s => `
+            ${students.map((s, idx) => `
               <tr>
-                <td>${s.roll_no || ''}</td>
-                <td>${s.ubter_roll_no || s.official_enrollment_no || s.enrollment_no || ''}</td>
+                <td>${s.roll_no && s.roll_no !== '--' ? s.roll_no : (idx + 1)}</td>
                 <td>${s.full_name || ''}</td>
-                <td>${s.email || ''}</td>
                 <td>${s.attended_sessions || 0} / ${s.total_sessions || 0}</td>
                 <td>${s.attendance_pct != null ? s.attendance_pct + '%' : '—'}</td>
               </tr>
@@ -1000,20 +989,23 @@
     const tbody = document.getElementById('tbody-assignments-schedule');
     const badge = document.getElementById('schedule-count-badge');
 
-    if (badge) badge.innerText = `${assignments.length} Tasks Scheduled`;
+    if (badge) badge.innerText = `${assignments.length} Tasks`;
 
     if (tbody) {
       if (assignments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">No coursework assignments scheduled for this class.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted);">No coursework assignments scheduled for this class.</td></tr>`;
       } else {
         tbody.innerHTML = assignments.map((a, idx) => `
           <tr>
-            <td style="font-weight:700;font-family:var(--font-family-mono);">${idx + 1}</td>
-            <td><strong>${escapeHtml(a.title)}</strong></td>
-            <td style="color:var(--text-muted);font-size:0.8rem;">${formatDate(a.created_at)}</td>
-            <td style="color:var(--text-muted);font-size:0.8rem;">${formatDate(a.due_date)}</td>
-            <td style="text-align:center;font-weight:600;">${a.max_marks || 100}</td>
-            <td style="text-align:center;"><span class="badge badge-sem">${a.submission_count || 0} Turned In</span></td>
+            <td style="font-weight:700;font-family:var(--font-family-mono);font-size:0.8rem;text-align:center;width:35px;">${idx + 1}</td>
+            <td>
+              <div style="font-weight:600;line-height:1.25;font-size:0.83rem;color:var(--text-main);">${escapeHtml(a.title)}</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;">
+                Due: ${formatDate(a.due_date)}${a.max_marks ? ` • ${a.max_marks} Marks` : ''}
+              </div>
+            </td>
+            <td class="col-marks-desktop" style="text-align:center;font-weight:600;font-size:0.8rem;">${a.max_marks || 100}</td>
+            <td style="text-align:center;"><span class="badge badge-sem" style="font-size:0.7rem;padding:0.15rem 0.4rem;white-space:nowrap;">${a.submission_count || 0} Turned In</span></td>
           </tr>
         `).join('');
       }

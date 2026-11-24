@@ -90,6 +90,7 @@
   function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) return;
+    modal.style.display = 'flex';
     modal.classList.add('open', 'active');
     modal.setAttribute('aria-hidden', 'false');
     const firstInput = modal.querySelector('input, select, textarea, button:not(.modal-close-btn)');
@@ -108,6 +109,9 @@
       modal = modalId;
     }
     if (!modal) return;
+    if (modal.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
     modal.classList.remove('open', 'active');
     modal.setAttribute('aria-hidden', 'true');
     modal.style.display = 'none';
@@ -229,6 +233,7 @@
   // Export to global scope
   window.escapeHtml = escapeHtml;
   window.esc = escapeHtml;
+  window.toast = showToast;
   window.showToast = showToast;
   window.facultyToast = showToast;
   window.openModal = openModal;
@@ -237,6 +242,7 @@
   window.FacultyUI = {
     escapeHtml,
     esc: escapeHtml,
+    toast: showToast,
     showToast,
     openModal,
     closeModal,

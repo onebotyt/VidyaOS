@@ -322,6 +322,21 @@
   flex-wrap: wrap;
 }
 
+.cf-btn-group-export,
+.cf-btn-group-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lbl-desktop {
+  display: inline;
+}
+
+.lbl-mobile {
+  display: none;
+}
+
 /* HOD Remarks Banner */
 .cf-remarks-banner {
   background: var(--status-late-bg);
@@ -698,11 +713,11 @@
 .modal {
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: 100060 !important;
   display: none;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 2.5rem 1rem 3rem;
+  padding: 1.5rem 1rem;
   box-sizing: border-box;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -715,10 +730,10 @@
 .modal .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: hsl(0 0% 0% / 0.6);
+  background: hsl(0 0% 0% / 0.65);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  z-index: 1;
+  z-index: 100060 !important;
   display: block !important;
   cursor: pointer;
 }
@@ -731,12 +746,12 @@
   box-shadow: var(--shadow-lg), 0 20px 45px hsl(0 0% 0% / 0.28);
   width: 100%;
   max-width: 620px;
-  max-height: calc(100vh - 4rem);
+  max-height: calc(100vh - 3rem);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  z-index: 2;
+  z-index: 100061 !important;
   box-sizing: border-box;
   animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -947,30 +962,103 @@
   align-items: center;
 }
 
-/* Responsive Bottom Sheet on Small Displays */
+/* Responsive Compact Modal on Small Displays */
 @media (max-width: 768px) {
   .modal {
-    padding: 0.5rem 0.5rem calc(72px + env(safe-area-inset-bottom, 0px)) 0.5rem;
-    align-items: flex-end;
+    padding: max(10px, env(safe-area-inset-top, 0px)) 0.5rem max(10px, env(safe-area-inset-bottom, 0px)) !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .modal-dialog {
     max-width: 100% !important;
-    max-height: calc(100vh - 84px - env(safe-area-inset-bottom, 0px)) !important;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 -8px 30px hsl(0 0% 0% / 0.35);
+    width: 100% !important;
+    max-height: calc(100vh - 20px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    margin: auto 0 !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: 0 10px 40px hsl(0 0% 0% / 0.5) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
   }
 
   .modal-header {
-    padding: 1rem 1.15rem;
+    padding: 0.75rem 0.95rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .modal-title {
+    font-size: 0.92rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .modal-subtitle {
+    font-size: 0.7rem !important;
+    margin-top: 0.15rem !important;
   }
 
   .modal-body {
-    padding: 1rem 1.15rem;
+    padding: 0.75rem 0.85rem !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
   }
 
   .modal-footer {
-    padding: 0.85rem 1.15rem;
+    padding: 0.65rem 0.85rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+  }
+
+  .modal-footer .modal-footer-btn-main {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    justify-content: center !important;
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .modal-footer .btn {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+  }
+
+  .cf-roster-summary-bar {
+    padding: 0.45rem 0.65rem !important;
+    gap: 0.35rem !important;
+    margin-bottom: 0.55rem !important;
+  }
+
+  .cf-roster-summary-subtext {
+    font-size: 0.7rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Compact Modal Tables */
+  .col-email-modal,
+  .col-issue-date,
+  .col-marks-desktop {
+    display: none !important;
+  }
+
+  .col-ubter {
+    font-size: 0.72rem !important;
+    max-width: 85px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.45rem 0.4rem !important;
+    font-size: 0.76rem !important;
+  }
+
+  .table-responsive {
+    max-height: 52vh !important;
   }
 
   /* Main Container Mobile Clearance (Clears bottom navigation bar) */
@@ -1238,4 +1326,323 @@
   border-color: var(--color-primary);
   background: var(--bg-card);
   color: var(--text-main);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COMPREHENSIVE MOBILE RESPONSIVE ADAPTATIONS (Zero Overflow)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  .lbl-desktop {
+    display: none !important;
+  }
+
+  .lbl-mobile {
+    display: inline !important;
+  }
+
+  /* Main Container */
+  .cf-main-container {
+    padding: 0.65rem 0.65rem calc(72px + 1.25rem) 0.65rem !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Hero Banner Card */
+  .cf-hero-card {
+    padding: 0.75rem 0.85rem !important;
+    border-radius: 14px !important;
+    gap: 0.65rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-hero-body {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+
+  .cf-hero-details {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .cf-badge-row {
+    gap: 0.3rem !important;
+    margin-bottom: 0.35rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .cf-badge-row .badge {
+    font-size: 0.68rem !important;
+    padding: 0.16rem 0.45rem !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+  }
+
+  .cf-hero-title {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.3rem !important;
+    word-break: break-word !important;
+  }
+
+  .cf-hero-meta {
+    font-size: 0.74rem !important;
+    gap: 0.3rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .cf-code-tag {
+    font-size: 0.7rem !important;
+    padding: 0.1rem 0.35rem !important;
+  }
+
+  /* Compliance / Audit Meter: Super Compact & Sleek */
+  .cf-hero-meter-card {
+    padding: 0.55rem 0.75rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: 10px !important;
+    gap: 0.35rem !important;
+  }
+
+  .cf-meter-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .cf-meter-label {
+    font-size: 0.68rem !important;
+  }
+
+  .cf-meter-score {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .cf-meter-pct {
+    font-size: 1rem !important;
+  }
+
+  .cf-meter-track {
+    height: 6px !important;
+  }
+
+  .cf-meter-caption {
+    font-size: 0.68rem !important;
+  }
+
+  /* Action Toolbar: Full-width Grid & Flex Rows (Zero Horizontal Overflow) */
+  .cf-hero-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.55rem !important;
+    padding-top: 0.65rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-actions-left {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-class-selector-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+  }
+
+  .cf-selector-label {
+    display: none !important;
+  }
+
+  .cf-select-class {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    padding: 0.45rem 0.5rem !important;
+    border-radius: 8px !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+
+  #cf-type-selector-wrap .cf-select-class {
+    max-width: 100% !important;
+  }
+
+  .cf-actions-right {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-btn-group-export {
+    display: flex !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-btn-group-export button {
+    flex: 1 1 0 !important;
+    justify-content: center !important;
+    padding: 0.48rem 0.5rem !important;
+    font-size: 0.76rem !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-btn-group-nav {
+    display: flex !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-btn-group-nav a {
+    flex: 1 1 0 !important;
+    justify-content: center !important;
+    padding: 0.45rem 0.35rem !important;
+    font-size: 0.72rem !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-btn-group-nav svg,
+  .cf-btn-group-export svg {
+    width: 13px !important;
+    height: 13px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Filter Section & Horizontal Tabs */
+  .cf-filter-section {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-tab-pills {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 0.2rem !important;
+    border-radius: 999px !important;
+    box-sizing: border-box !important;
+    scrollbar-width: none !important;
+  }
+
+  .cf-tab-pill {
+    padding: 0.32rem 0.65rem !important;
+    font-size: 0.74rem !important;
+    border-radius: 999px !important;
+  }
+
+  .cf-tab-count {
+    font-size: 0.68rem !important;
+    padding: 0.08rem 0.3rem !important;
+  }
+
+  .cf-search-box {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0.45rem 0.75rem !important;
+    border-radius: 999px !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-search-box input {
+    font-size: 0.78rem !important;
+  }
+
+  /* Artifact Document Cards */
+  .cf-grid-section {
+    gap: 0.55rem !important;
+    width: 100% !important;
+  }
+
+  .cf-artifact-card,
+  .cf-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 0.65rem 0.8rem !important;
+    gap: 0.45rem !important;
+    border-radius: 12px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .cf-card-main-content,
+  .cf-card-top {
+    width: 100% !important;
+    align-items: flex-start !important;
+    gap: 0.6rem !important;
+  }
+
+  .cf-card-num,
+  .cf-card-seq-badge {
+    font-size: 0.72rem !important;
+    padding: 0.18rem 0.45rem !important;
+    border-radius: 6px !important;
+  }
+
+  .cf-card-title {
+    font-size: 0.88rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .cf-card-status-box {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.72rem !important;
+    margin-top: 0.2rem !important;
+  }
+
+  .cf-doc-filename {
+    max-width: 160px !important;
+  }
+
+  .cf-card-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 0.35rem !important;
+    border-top: 1px dashed var(--border-color) !important;
+    padding-top: 0.45rem !important;
+    margin-top: 0.15rem !important;
+  }
+
+  .cf-card-btn {
+    padding: 0.32rem 0.55rem !important;
+    font-size: 0.72rem !important;
+    border-radius: 8px !important;
+    gap: 0.25rem !important;
+  }
 }

@@ -139,9 +139,17 @@
    */
   function getBannerUrl(group = {}) {
     if (group && typeof group.theme_image === 'string' && group.theme_image.trim()) {
-      return group.theme_image.trim();
+      const img = group.theme_image.trim();
+      if (BANNER_POOL.includes(img)) {
+        return img;
+      }
     }
     const themeKey = resolveThemeKey(group);
+    const matching = BANNER_POOL.filter(b => b.includes(themeKey));
+    if (matching.length > 0) {
+      const idSeed = Math.abs(parseInt(group.id || 1, 10)) || 0;
+      return matching[idSeed % matching.length];
+    }
     return `/uploads/classroom-banners/theme_${themeKey}_fallback.svg`;
   }
 

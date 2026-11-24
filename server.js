@@ -147,8 +147,8 @@ function serveFile(filePath, res, status = 200) {
   const ext = path.extname(filePath).toLowerCase();
   const mime = MIME[ext] || 'application/octet-stream';
   const stat = fs.statSync(filePath);
-  const isStaticAsset = ['.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2'].includes(ext);
-  const cacheHeader = isStaticAsset ? 'public, max-age=86400, stale-while-revalidate=604800' : 'no-cache';
+  const isImageOrFont = ['.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2'].includes(ext);
+  const cacheHeader = isImageOrFont ? 'public, max-age=86400' : 'no-cache, no-store, must-revalidate';
   res.writeHead(status, {
     'Content-Type': mime,
     'Content-Length': stat.size,

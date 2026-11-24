@@ -864,8 +864,17 @@ body[data-active-tab="register"] .classroom-body,
 }
 
 /* Add Period Modal & Preset Types */
+.modal-backdrop,
+#add-session-modal,
+#manage-holiday-modal,
+#esp-sync-modal,
+#roll-call-modal,
+#class-attendance-export-modal {
+  z-index: 100200 !important;
+}
+
 #add-session-modal {
-  padding: 1.25rem 0.75rem calc(2.5rem + env(safe-area-inset-bottom, 0px)) !important;
+  padding: 0.75rem 0.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
@@ -873,9 +882,9 @@ body[data-active-tab="register"] .classroom-body,
 
 #add-session-modal .modal-card {
   max-width: 440px;
-  width: min(94vw, 440px);
-  max-height: calc(100vh - 4.5rem);
-  max-height: calc(100dvh - 4.5rem);
+  width: min(96vw, 440px);
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
   display: flex !important;
   flex-direction: column !important;
   border-radius: var(--radius-lg);
@@ -1356,10 +1365,9 @@ body[data-active-tab="register"] .classroom-body,
     gap: 0.45rem !important;
     width: 100% !important;
   }
+  .classroom-reg-header-card .reg-title-wrap,
   .reg-title-wrap {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    overflow: hidden !important;
+    display: none !important;
   }
   .classroom-reg-header-card .badge,
   .classroom-reg-header-card .reg-type-pill,
@@ -1370,19 +1378,18 @@ body[data-active-tab="register"] .classroom-body,
     display: none !important;
   }
   .classroom-reg-header-card #class-reg-title {
-    font-size: 0.82rem !important;
-    font-weight: 800 !important;
-    margin: 0 !important;
-    line-height: 1.25 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    color: var(--text-main) !important;
+    display: none !important;
   }
   .reg-month-nav-wrap {
-    flex: 0 0 auto !important;
+    width: 100% !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.35rem !important;
+  }
+  .month-nav-stepper {
+    flex: 1 1 auto !important;
+    justify-content: center !important;
   }
   .month-nav-pill {
     padding: 0.12rem 0.22rem !important;
@@ -1392,13 +1399,13 @@ body[data-active-tab="register"] .classroom-body,
     padding: 0.15rem 0.28rem !important;
   }
   .month-nav-display {
-    font-size: 0.74rem !important;
+    font-size: 0.76rem !important;
     padding: 0.15rem 0.35rem !important;
     gap: 0.2rem !important;
   }
   .month-nav-today {
-    font-size: 0.7rem !important;
-    padding: 0.15rem 0.4rem !important;
+    font-size: 0.72rem !important;
+    padding: 0.15rem 0.45rem !important;
   }
   .month-short-name {
     display: inline !important;
@@ -1443,42 +1450,59 @@ body[data-active-tab="register"] .classroom-body,
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
+    width: 100% !important;
+    margin-bottom: 0.15rem !important;
   }
   .esp-toolbar > div:last-child,
   .esp-toolbar-actions {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.3rem !important;
-    flex-wrap: nowrap !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.35rem !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
   .esp-date-wrap {
+    grid-column: 1 / -1 !important;
     display: flex !important;
     align-items: center !important;
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-    max-width: 135px !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    max-width: none !important;
     box-sizing: border-box !important;
   }
   .esp-date-label {
-    display: none !important;
+    display: inline-block !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap !important;
   }
   .esp-toolbar input[type="date"] {
-    flex: 1 1 0 !important;
+    flex: 1 1 auto !important;
     min-width: 0 !important;
     width: 100% !important;
     max-width: none !important;
-    height: 28px !important;
-    font-size: 0.74rem !important;
-    padding: 0.15rem 0.3rem !important;
+    height: 30px !important;
+    font-size: 0.8rem !important;
+    padding: 0.2rem 0.5rem !important;
+    border-radius: var(--radius-sm, 6px) !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--bg-surface) !important;
+    color: var(--text-main) !important;
     box-sizing: border-box !important;
   }
+  .esp-toolbar-actions > button,
   .esp-toolbar button {
-    flex: 0 0 auto !important;
+    width: 100% !important;
+    flex: 1 1 0 !important;
     white-space: nowrap !important;
-    font-size: 0.72rem !important;
-    height: 28px !important;
+    font-size: 0.74rem !important;
+    height: 30px !important;
+    padding: 0.2rem 0.3rem !important;
+    gap: 0.25rem !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
     padding: 0.2rem 0.48rem !important;
     gap: 0.25rem !important;
     box-sizing: border-box !important;
@@ -1906,22 +1930,48 @@ body[data-active-tab="register"] .classroom-body,
   user-select: none;
 }
 
-.period-subcol-th[data-today="true"],
+.period-subcol-th {
+  min-width: 28px !important;
+  padding: 0.2rem 0.15rem !important;
+  text-align: center !important;
+  font-family: var(--font-family-mono, monospace) !important;
+  vertical-align: middle !important;
+  background: var(--bg-surface, #f8fafc) !important;
+  border-bottom: 2px solid var(--border-color, #e2e8f0) !important;
+}
+
+.register-table th.period-subcol-th.date-col-today,
 .period-subcol-th.date-col-today {
-  background: var(--color-primary-light, rgba(59, 130, 246, 0.12)) !important;
-  color: var(--color-primary) !important;
-  border-left: 2px solid var(--color-primary) !important;
-  border-right: 2px solid var(--color-primary) !important;
+  background: var(--color-primary, #3b82f6) !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid var(--color-primary, #3b82f6) !important;
 }
 
 .period-badge-subcol {
-  display: inline-block;
-  padding: 1px 4px;
-  border-radius: var(--radius-xs, 3px);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  font-size: 0.62rem;
-  line-height: 1.1;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 0.65rem !important;
+  font-weight: 900 !important;
+  font-family: var(--font-family-mono, monospace) !important;
+  letter-spacing: 0.03em !important;
+  line-height: 1 !important;
+  background: var(--bg-card, #ffffff) !important;
+  color: var(--text-main, #0f172a) !important;
+  border: 1px solid var(--border-color, #cbd5e1) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  white-space: nowrap !important;
+}
+
+.register-table th.date-col-today .period-badge-subcol,
+.period-subcol-th.date-col-today .period-badge-subcol {
+  background: #ffffff !important;
+  color: var(--color-primary, #2563eb) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  font-weight: 900 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
 }
 
 .btn-manage-holidays {
@@ -2426,6 +2476,140 @@ body[data-active-tab="register"] .classroom-body,
     color: #666666 !important;
   }
 }
+
+@media (max-width: 768px) {
+  #btn-add-period-pc,
+  .btn-add-period.hide-on-mobile,
+  .hide-on-mobile {
+    display: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PERIOD DELETION & MANAGEMENT STYLES (MOBILE & DESKTOP)
+   ══════════════════════════════════════════════════════════════ */
+.mobile-period-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+}
+
+.mobile-del-class-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  height: 28px !important;
+  padding: 0 0.55rem !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+.mobile-del-class-btn:hover {
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+  color: #b91c1c !important;
+}
+
+.period-tab-del-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: rgba(220, 38, 38, 0.12) !important;
+  color: #dc2626 !important;
+  margin-left: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+  vertical-align: middle !important;
+}
+
+.period-tab-del-btn:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.mobile-period-btn.active .period-tab-del-btn {
+  background: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.mobile-period-btn.active .period-tab-del-btn:hover {
+  background: #ffffff !important;
+  color: #dc2626 !important;
+}
+
+.btn-period-del-mini {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 4px !important;
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fca5a5 !important;
+  padding: 0 !important;
+  margin-left: 2px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-period-del-mini:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.btn-period-del-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fca5a5 !important;
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-period-del-badge:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.desktop-matrix-del-period {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: #dc2626 !important;
+  border: none !important;
+  margin-left: 3px !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  transition: all 0.15s ease !important;
+}
+
+.desktop-matrix-del-period:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+
 
 
 

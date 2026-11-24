@@ -13,6 +13,15 @@
     return fetchApi(url.replace(/^\/api\/v1/, ''), opts);
   });
 
+// Global Toast Dispatcher Fallback
+if (typeof window.toast !== 'function') {
+  window.toast = function (msg, type = 'info') {
+    if (typeof window.showToast === 'function') window.showToast(msg, type);
+    else if (typeof window.facultyToast === 'function') window.facultyToast(msg, type);
+    else console.log(`[Toast ${type}]:`, msg);
+  };
+}
+
 // Global Application State shared across classroom modules
 window.S = window.S || {
   groupId: null,
@@ -153,7 +162,11 @@ function openModal(id) {
 function closeModal(id) {
   const el = ById(id);
   if (!el) return;
-  el.classList.remove('open');
+  if (el.contains(document.activeElement)) {
+    document.activeElement.blur();
+  }
+  el.classList.remove('open', 'active');
+  el.setAttribute('aria-hidden', 'true');
   el.style.display = 'none';
   if (id === 'modal-enter-marks' || id === 'modal-enter-assignment-marks') {
     document.body.classList.remove('marks-standalone-page');

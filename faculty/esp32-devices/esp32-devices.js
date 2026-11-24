@@ -325,7 +325,7 @@ async function loadEsp32Overview(deptIdOverride) {
 
     const deptPill = document.getElementById('dept-code-pill');
     if (deptPill && department) {
-      deptPill.textContent = `${department.code || 'DEPT'} • AES-256-GCM ENCRYPTED`;
+      deptPill.textContent = `${department.code || 'DEPT'} • Secure Vault`;
     }
 
     if (!selectedDeviceId && devices.length > 0) {
@@ -334,16 +334,19 @@ async function loadEsp32Overview(deptIdOverride) {
       selectedDeviceId = devices[0].id;
     }
 
-    // Populate active device selector
+    // Populate active device selector (only show if multiple machines exist)
     const sel = document.getElementById('active-device-select');
     if (sel) {
-      sel.innerHTML = devices.length
-        ? devices.map(d => {
+      if (devices.length > 1) {
+        sel.style.display = 'inline-block';
+        sel.innerHTML = devices.map(d => {
           const devName = d.name || d.device_name || 'IT Lab Biometric Terminal 01';
-          const devUid = d.device_uid || d.device_uuid || 'ESP32-IT-LAB-01';
-          return `<option value="${d.id}" ${Number(d.id) === Number(selectedDeviceId) ? 'selected' : ''}>${escHtml(devName)} (${escHtml(devUid)})</option>`;
-        }).join('')
-        : `<option value="">No ESP32 Connected Yet</option>`;
+          return `<option value="${d.id}" ${Number(d.id) === Number(selectedDeviceId) ? 'selected' : ''}>${escHtml(devName)}</option>`;
+        }).join('');
+      } else {
+        sel.style.display = 'none';
+        sel.innerHTML = devices.length ? `<option value="${devices[0].id}">${escHtml(devices[0].name || 'Default Machine')}</option>` : '';
+      }
       if (selectedDeviceId) sel.value = String(selectedDeviceId);
     }
 
@@ -455,12 +458,12 @@ function updateKpiCards(devices, students) {
 
   const nodeStatusText = document.getElementById('header-node-status-text');
   if (nodeStatusText) {
-    nodeStatusText.textContent = `${onlineCount} NODE${onlineCount === 1 ? '' : 'S'} ONLINE`;
+    nodeStatusText.textContent = onlineCount > 0 ? (onlineCount === 1 ? '1 MACHINE READY' : `${onlineCount} MACHINES READY`) : 'MACHINE IN STANDBY';
   }
 
   const termCountBadge = document.getElementById('terminal-count-badge');
   if (termCountBadge) {
-    termCountBadge.textContent = `${devices.length} PAIRED`;
+    termCountBadge.textContent = `${devices.length} CONNECTED`;
     termCountBadge.className = `esp-status-pill ${onlineCount > 0 ? 'online' : 'offline'}`;
   }
 
@@ -557,41 +560,39 @@ function renderDevicesList(devices) {
     const isOnline = Boolean(d.is_online);
 
     return `
-      <article class="esp-device-card ${isSelected ? 'selected' : ''}" onclick="onSelectActiveDevice(${d.id})">
-        <div class="esp-dev-header">
+      <article class="esp-device-card ${isSelected ? 'selected' : ''}" onclick="onSelectActiveDevice(${d.id})" style="border:none; padding:0; background:transparent; box-shadow:none; cursor:default;">
+        <div class="esp-dev-header" style="margin-bottom:0.35rem;">
           <div>
-            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-              <strong style="font-size:0.95rem; color:var(--text-main);">${escHtml(devName)}</strong>
-              <span id="dev-status-pill-${d.id}" class="esp-status-pill ${isOnline ? 'online radar-pulse' : 'offline'}">${isOnline ? '● ONLINE' : '○ STANDBY'}</span>
+            <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+              <strong style="font-size:0.88rem; color:var(--text-main);">${escHtml(devName)}</strong>
+              <span id="dev-status-pill-${d.id}" class="esp-status-pill ${isOnline ? 'online radar-pulse' : 'offline'}" style="font-size:0.65rem; padding:0.1rem 0.35rem;">${isOnline ? 'ONLINE' : 'STANDBY'}</span>
             </div>
-            <div style="font-family:var(--font-family-mono); font-size:0.75rem; color:var(--color-primary); margin-top:2px;">
+            <div style="font-family:var(--font-family-mono); font-size:0.7rem; color:var(--color-primary); margin-top:1px;">
               UID: ${escHtml(devUid)} &bull; ${escHtml(d.firmware_version || 'v3.1.0-AES256-GCM')}
             </div>
           </div>
-          <div style="display:flex; gap:0.35rem; flex-wrap:wrap;">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); checkDeviceConnection(${d.id})" title="Ping ESP32 node and check live connection">Ping</button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openOtaUpdateModal(${d.id})" title="Wireless Over-The-Air firmware update">OTA</button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showEspConfigModal(${d.id})" title="View C++ config.h for this ESP32">config.h</button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openAs608SlotManagerModal(${d.id})" title="Audit all 300 AS608 hardware slots &amp; detect duplicates">Slots &amp; Duplicates</button>
-            <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); triggerTemplateSyncToDevice(${d.id})" title="Push all stored student templates from MySQL to this ESP32">Sync Templates</button>
+          <div style="display:flex; gap:0.25rem; flex-wrap:wrap; align-items:center;">
+            <button type="button" class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); checkDeviceConnection(${d.id})" title="Check Connection">Test Link</button>
+            <button type="button" class="btn btn-primary btn-xs" onclick="event.stopPropagation(); triggerTemplateSyncToDevice(${d.id})" title="Sync Templates">Sync</button>
+            <button type="button" class="btn btn-secondary btn-xs" onclick="event.stopPropagation(); openAs608SlotManagerModal(${d.id})" title="Memory Slots">Slots</button>
           </div>
         </div>
 
-        <div class="esp-dev-metrics">
+        <div class="esp-dev-metrics" style="margin-bottom:0.35rem;">
           <div class="esp-dev-metric">
-            <span class="m-lbl">2S Battery</span>
-            <span class="m-val">${volts}V (${battPct}%)</span>
+            <span class="m-lbl">Battery Power</span>
+            <span class="m-val">${battPct}% (${volts}V)</span>
           </div>
           <div class="esp-dev-metric">
-            <span class="m-lbl">Wi-Fi &amp; Signal</span>
-            <span class="m-val">${isOnline ? (d.wifi_rssi || -55) + ' dBm' : 'Standby'}</span>
+            <span class="m-lbl">Network Status</span>
+            <span class="m-val">${isOnline ? 'Connected' : 'Standby'}</span>
           </div>
           <div class="esp-dev-metric">
-            <span class="m-lbl">Offline Queue</span>
+            <span class="m-lbl">Unsynced Records</span>
             <span class="m-val">${d.offline_queue_count || 0} Pending</span>
           </div>
           <div class="esp-dev-metric">
-            <span class="m-lbl">Dept Cloud Templates</span>
+            <span class="m-lbl">Enrolled Students</span>
             <span class="m-val">${d.enrolled_count || 0} Students</span>
           </div>
         </div>
@@ -628,7 +629,7 @@ async function checkDeviceConnection(deviceId) {
     if (d.is_online) {
       if (badge) {
         badge.className = 'esp-status-pill online radar-pulse';
-        badge.textContent = `● ONLINE (${d.seconds_ago}s ago)`;
+        badge.textContent = `ONLINE (${d.seconds_ago}s ago)`;
       }
       showToast(`ESP32 Connected! Ping: ${latency}ms • Signal sent to physical ESP32 OLED display.`, 'success');
       updateOledScreen({
@@ -645,7 +646,7 @@ async function checkDeviceConnection(deviceId) {
     } else {
       if (badge) {
         badge.className = 'esp-status-pill offline';
-        badge.textContent = '○ STANDBY';
+        badge.textContent = 'STANDBY';
       }
       const ago = d.seconds_ago != null ? `${Math.round(d.seconds_ago / 60)} min ago` : 'never';
       showToast(`ESP32 in Standby. Last heartbeat seen: ${ago}. Node will wake on touch or next interval.`, 'warning');
@@ -798,27 +799,24 @@ function renderStudentsBiometricTable() {
         <td data-label="Cloud Template">
           ${isEnrolled ? `
             <div style="display:flex; flex-direction:column; gap:2px;">
-              <span class="esp-status-pill online" style="width:fit-content;">512B TEMPLATE STORED</span>
-              <span style="font-family:var(--font-family-mono); font-size:0.68rem; color:var(--text-muted);" title="Portable SHA-256: ${escHtml(st.template_sha256 || '')}">SHA256: ${escHtml(shaShort)}</span>
+              <span class="esp-status-pill online" style="width:fit-content; font-weight:700;">REGISTERED</span>
+              <span style="font-size:0.72rem; color:var(--text-muted);">Ready for attendance</span>
             </div>
           ` : `
-            <span class="esp-status-pill offline">NOT ENROLLED</span>
+            <span class="esp-status-pill offline" style="font-weight:700;">NOT REGISTERED</span>
           `}
         </td>
         <td data-label="Actions" style="text-align:right;">
-          <div style="display:inline-flex; gap:0.35rem; flex-wrap:wrap; justify-content:flex-end;">
-            <button type="button" class="btn btn-primary btn-sm" onclick="selectStudentForEnrollment(${st.student_id})" title="Select student in Registration Station and trigger AS608 biometric enrollment">
-              Enroll Biometric
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="simulateStudentBiometric(${st.student_id}, 'ENROLL_TEMPLATE')" title="Capture & encrypt 512-byte AS608 template into MySQL">
-              ${isEnrolled ? 'Update Template' : 'Capture Template'}
+          <div style="display:inline-flex; gap:0.4rem; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
+            <button type="button" class="btn ${isEnrolled ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="selectStudentForEnrollment(${st.student_id})" title="${isEnrolled ? 'Re-scan this student fingerprint' : 'Register this student fingerprint'}">
+              ${isEnrolled ? 'Re-Register' : 'Register Fingerprint'}
             </button>
             ${isEnrolled ? `
-              <button type="button" class="btn btn-secondary btn-sm" style="border-color:var(--status-present); color:var(--status-present);" onclick="simulateStudentBiometric(${st.student_id}, 'MARK_ATTENDANCE')" title="Test attendance scan & OLED display for this student">
+              <button type="button" class="btn btn-secondary btn-sm" style="border-color:var(--status-present); color:var(--status-present);" onclick="simulateStudentBiometric(${st.student_id}, 'MARK_ATTENDANCE')" title="Test attendance scan for this student">
                 Test Scan
               </button>
-              <button type="button" class="btn btn-danger btn-sm" onclick="removeStudentCloudTemplate(${st.student_id}, '${escHtml(st.full_name)}', '${st.class_roll_no || ''}')" title="Remove student biometric template from cloud vault & ESP32 hardware slots">
-                Remove
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeStudentCloudTemplate(${st.student_id}, '${escHtml(st.full_name)}', '${st.class_roll_no || ''}')" title="Delete fingerprint record">
+                Delete
               </button>
             ` : ''}
           </div>
@@ -834,38 +832,64 @@ function populateEnrollStudentSelect() {
   filterEnrollStudentDropdown(cohortFilter);
 }
 
-function filterEnrollStudentDropdown(filterVal) {
+function filterEnrollStudentDropdown(legacyFilterVal) {
   const sel = document.getElementById('enroll-student-select');
   if (!sel) return;
   const allStudents = espOverviewData.students || [];
+
+  const statusFilter = document.getElementById('enroll-status-filter')?.value
+    || document.getElementById('enroll-cohort-filter')?.value
+    || (legacyFilterVal === 'all' || legacyFilterVal === '1' || legacyFilterVal === '2' || legacyFilterVal === '3' ? 'all' : (legacyFilterVal || 'pending'));
+
+  const yearFilter = document.getElementById('enroll-year-filter')?.value
+    || (legacyFilterVal === '1' || legacyFilterVal === '2' || legacyFilterVal === '3' ? legacyFilterVal : 'all');
+
+  const searchQuery = (document.getElementById('enroll-student-search')?.value || '').trim().toLowerCase();
+
   let students = allStudents;
 
-  if (filterVal === 'pending') {
-    students = allStudents.filter(s => s.biometric_status !== 'ENROLLED');
-  } else if (filterVal !== 'all') {
-    students = allStudents.filter(s => String(s.year) === String(filterVal));
+  // Status Filter
+  if (statusFilter === 'pending') {
+    students = students.filter(s => s.biometric_status !== 'ENROLLED');
+  } else if (statusFilter === 'enrolled') {
+    students = students.filter(s => s.biometric_status === 'ENROLLED');
+  }
+
+  // Year Filter
+  if (yearFilter !== 'all') {
+    students = students.filter(s => String(s.year) === String(yearFilter));
+  }
+
+  // Search Filter
+  if (searchQuery) {
+    students = students.filter(s => {
+      const name = (s.full_name || '').toLowerCase();
+      const roll = (s.class_roll_no || '').toString().toLowerCase();
+      const ubter = (s.official_enrollment_no || '').toLowerCase();
+      return name.includes(searchQuery) || roll.includes(searchQuery) || ubter.includes(searchQuery);
+    });
   }
 
   const currentVal = sel.value;
 
-  // Group students by Year/Cohort for clean, structured navigation
+  // Group students by Year/Cohort for clean navigation
   const groups = {};
   students.forEach(s => {
     const yr = s.year || 1;
-    const key = `Year ${yr} Cohort`;
+    const key = `Year ${yr}`;
     if (!groups[key]) groups[key] = [];
     groups[key].push(s);
   });
 
-  let optionsHtml = `<option value="">Choose a student (${students.length} ${filterVal === 'pending' ? 'pending' : 'students'})...</option>`;
+  let optionsHtml = `<option value="">Select student (${students.length} found)...</option>`;
 
   Object.keys(groups).sort().forEach(grp => {
     optionsHtml += `<optgroup label="${grp}">`;
     groups[grp].forEach(s => {
       const isEnrolled = s.biometric_status === 'ENROLLED';
-      const statusLabel = isEnrolled ? 'Enrolled' : 'Pending';
+      const statusLabel = isEnrolled ? 'Registered' : 'Pending';
       const roll = s.class_roll_no ? `#${s.class_roll_no}` : (s.official_enrollment_no ? `UBTER ${s.official_enrollment_no}` : 'No Roll');
-      optionsHtml += `<option value="${s.student_id}">${roll} • ${escHtml(s.full_name)} (${statusLabel} — Sem ${s.semester || 1})</option>`;
+      optionsHtml += `<option value="${s.student_id}">${roll} - ${escHtml(s.full_name)} (${statusLabel})</option>`;
     });
     optionsHtml += `</optgroup>`;
   });
@@ -874,9 +898,11 @@ function filterEnrollStudentDropdown(filterVal) {
 
   if (currentVal && students.some(s => String(s.student_id) === String(currentVal))) {
     sel.value = currentVal;
-  } else if (students.length > 0 && !sel.value) {
+  } else if (students.length > 0) {
     const firstPending = students.find(s => s.biometric_status !== 'ENROLLED') || students[0];
     sel.value = String(firstPending.student_id);
+  } else {
+    sel.value = '';
   }
   onSelectEnrollStudent(sel.value);
 }
@@ -947,9 +973,9 @@ function onSelectEnrollStudent(studentId) {
 
   if (msgEl) {
     if (isEnrolled) {
-      msgEl.innerHTML = `<strong>${escHtml(student.full_name)}</strong> has an enrolled 512B AS608 template in MySQL cloud vault. Click <strong>"Test Scan"</strong> to verify attendance, or <strong>"Enroll"</strong> to overwrite template.`;
+      msgEl.innerHTML = `<strong>${escHtml(student.full_name)}</strong> already has a registered fingerprint. Click <strong>"Test Attendance Scan"</strong> to verify, or <strong>"Start Fingerprint Registration"</strong> to re-scan.`;
     } else {
-      msgEl.innerHTML = `<strong>Ready to enroll ${escHtml(student.full_name)}:</strong> Click <strong>"Enroll Fingerprint on ESP32"</strong> below to send enrollment signal to active terminal.`;
+      msgEl.innerHTML = `Ready to register <strong>${escHtml(student.full_name)}</strong>. Click <strong>"Start Fingerprint Registration"</strong> below, then ask the student to touch the scanner machine.`;
     }
   }
 
@@ -1032,7 +1058,7 @@ async function enrollCurrentSelectedStudent() {
   if (step2) step2.classList.add('active');
   if (step3) step3.classList.remove('active');
   if (msgEl) {
-    msgEl.innerHTML = `<strong>Enrolling ${escHtml(student.full_name)}:</strong> Terminal buzzer chiming! Please place finger firmly on AS608 optical sensor.`;
+    msgEl.innerHTML = `<strong>Registering ${escHtml(student.full_name)}:</strong> Terminal is chiming! Ask student to place their finger firmly on the scanner.`;
   }
 
   await queueEnrollCommandForStudent(student.student_id, student.full_name, student.class_roll_no);

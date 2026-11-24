@@ -1,37 +1,38 @@
 /* Unified Register Studio Styles */
 .unified-reg-container {
-  padding: 1rem 1.25rem 2.5rem;
+  padding: 0.75rem 1rem 2rem;
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
 }
 
+/* ── Top Subject Switcher Card ── */
 .reg-subject-switcher-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.85rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1.25rem;
-  margin-bottom: 1.25rem;
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.65rem;
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
   flex-wrap: wrap;
 }
 
 .subject-switcher-left {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .subject-switcher-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm, 6px);
   background: var(--color-primary-light, rgba(59, 130, 246, 0.12));
-  color: var(--color-primary);
+  color: var(--color-primary, #3b82f6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,23 +40,24 @@
 }
 
 .subject-switcher-label {
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   font-weight: 800;
   color: var(--text-main);
   line-height: 1.2;
 }
 
 .subject-switcher-sub {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
+  line-height: 1.25;
 }
 
 .subject-switcher-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
   flex-grow: 1;
-  max-width: 460px;
+  max-width: 440px;
 }
 
 .subject-select-wrapper {
@@ -65,28 +67,418 @@
 
 .unified-subject-dropdown {
   width: 100%;
-  padding: 0.55rem 1rem;
-  font-size: 0.85rem;
+  height: 36px;
+  line-height: normal;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--text-main);
   background: var(--bg-surface);
-  border: 1.5px solid var(--color-primary);
-  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-primary, #3b82f6);
+  border-radius: var(--radius-sm, 6px);
   cursor: pointer;
   outline: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   transition: all 0.15s ease;
+  box-sizing: border-box;
 }
 
 .unified-subject-dropdown:focus {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
+/* ── Desktop & Mobile Header Stepper ── */
+.classroom-reg-header-card {
+  padding: 0.6rem 1rem !important;
+  margin-bottom: 0.65rem !important;
+  border-radius: var(--radius-md, 8px) !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-card) !important;
+}
+
+.esp-toolbar {
+  padding: 0.5rem 0.85rem !important;
+  margin-bottom: 0.65rem !important;
+  border-radius: var(--radius-md, 8px) !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-card) !important;
+}
+
+/* ── Mobile Responsive Optimizations ── */
 @media (max-width: 768px) {
-  .reg-subject-switcher-card {
-    flex-direction: column;
-    align-items: stretch;
+  .unified-reg-container {
+    padding: 0.45rem 0.55rem 1.75rem !important;
   }
+
+  .reg-subject-switcher-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 0.5rem 0.65rem !important;
+    margin-bottom: 0.45rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .subject-switcher-icon {
+    display: none !important;
+  }
+
+  .subject-switcher-sub {
+    display: none !important;
+  }
+
+  .subject-switcher-label {
+    font-size: 0.9rem !important;
+  }
+
   .subject-switcher-right {
-    max-width: 100%;
+    max-width: 100% !important;
+    gap: 0.35rem !important;
+  }
+
+  .subject-switcher-right label {
+    font-size: 0.72rem !important;
+    white-space: nowrap !important;
+  }
+
+  .unified-subject-dropdown {
+    height: 32px !important;
+    padding: 0.25rem 0.55rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Completely hide redundant reg-title-wrap on mobile inside header card to avoid 'I...' truncation */
+  .classroom-reg-header-card .reg-title-wrap {
+    display: none !important;
+  }
+
+  .classroom-reg-header-card {
+    padding: 0.4rem 0.6rem !important;
+    margin-bottom: 0.45rem !important;
+  }
+
+  .classroom-reg-top-bar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .reg-month-nav-wrap {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.4rem !important;
+  }
+
+  .month-nav-stepper {
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+  }
+
+  /* Hide the Add Period button next to Holidays on mobile */
+  #btn-add-period-pc,
+  .btn-add-period.hide-on-mobile,
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  /* Compact ESP toolbar on mobile */
+  .esp-toolbar {
+    padding: 0.45rem 0.65rem !important;
+    margin-bottom: 0.45rem !important;
+    gap: 0.35rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    box-sizing: border-box !important;
+  }
+
+  .esp-toolbar > div:first-child {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-bottom: 0.15rem !important;
+  }
+
+  .esp-toolbar-actions {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .esp-date-wrap {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .esp-date-label {
+    display: inline-block !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap !important;
+  }
+
+  .esp-toolbar input[type="date"] {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 30px !important;
+    font-size: 0.8rem !important;
+    padding: 0.2rem 0.5rem !important;
+    border-radius: var(--radius-sm, 6px) !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--bg-surface) !important;
+    color: var(--text-main) !important;
+    box-sizing: border-box !important;
+  }
+
+  .esp-toolbar-actions > button,
+  .esp-toolbar button {
+    width: 100% !important;
+    flex: 1 1 0 !important;
+    white-space: nowrap !important;
+    font-size: 0.74rem !important;
+    height: 30px !important;
+    padding: 0.2rem 0.3rem !important;
+    gap: 0.25rem !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Compact Mobile Daily Roster */
+  .mobile-compact-section .card {
+    margin-bottom: 0.65rem !important;
+    border-radius: var(--radius-md, 8px) !important;
+  }
+
+  .day-roster-bar {
+    padding: 0.45rem 0.65rem !important;
+  }
+
+  .mobile-period-bar {
+    padding: 0.35rem 0.55rem !important;
+    gap: 0.35rem !important;
+  }
+
+  .mobile-period-btn {
+    height: 28px !important;
+    font-size: 0.74rem !important;
+    padding: 0 0.5rem !important;
+  }
+
+  .mobile-add-class-btn {
+    height: 28px !important;
+    font-size: 0.74rem !important;
+    padding: 0 0.55rem !important;
+  }
+
+  .mobile-filter-strip {
+    padding: 0.35rem 0.55rem !important;
+  }
+
+  .mobile-search-input {
+    height: 30px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .mobile-compact-table th {
+    padding: 0.35rem 0.35rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .mobile-compact-table td {
+    padding: 0.35rem 0.35rem !important;
+    font-size: 0.76rem !important;
+  }
+
+  .mobile-cell-btn {
+    min-width: 32px !important;
+    height: 30px !important;
+    font-size: 0.76rem !important;
+    font-weight: 800 !important;
   }
 }
+
+/* Period Sub-column Header & Badges */
+.register-table th.period-subcol-th {
+  min-width: 28px !important;
+  padding: 0.2rem 0.15rem !important;
+  text-align: center !important;
+  font-family: var(--font-family-mono, monospace) !important;
+  vertical-align: middle !important;
+  background: var(--bg-surface, #f8fafc) !important;
+  border-bottom: 2px solid var(--border-color, #e2e8f0) !important;
+}
+
+.register-table th.period-subcol-th.date-col-today,
+.period-subcol-th.date-col-today {
+  background: var(--color-primary, #3b82f6) !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid var(--color-primary, #3b82f6) !important;
+}
+
+.period-badge-subcol {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 0.65rem !important;
+  font-weight: 900 !important;
+  font-family: var(--font-family-mono, monospace) !important;
+  letter-spacing: 0.03em !important;
+  line-height: 1 !important;
+  background: var(--bg-card, #ffffff) !important;
+  color: var(--text-main, #0f172a) !important;
+  border: 1px solid var(--border-color, #cbd5e1) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  white-space: nowrap !important;
+}
+
+.register-table th.date-col-today .period-badge-subcol,
+.period-subcol-th.date-col-today .period-badge-subcol {
+  background: #ffffff !important;
+  color: var(--color-primary, #2563eb) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  font-weight: 900 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PERIOD DELETION & MANAGEMENT STYLES (MOBILE & DESKTOP)
+   ══════════════════════════════════════════════════════════════ */
+.mobile-period-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+}
+
+.mobile-del-class-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  height: 28px !important;
+  padding: 0 0.55rem !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+.mobile-del-class-btn:hover {
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+  color: #b91c1c !important;
+}
+
+.period-tab-del-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: rgba(220, 38, 38, 0.12) !important;
+  color: #dc2626 !important;
+  margin-left: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+  vertical-align: middle !important;
+}
+
+.period-tab-del-btn:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.mobile-period-btn.active .period-tab-del-btn {
+  background: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.mobile-period-btn.active .period-tab-del-btn:hover {
+  background: #ffffff !important;
+  color: #dc2626 !important;
+}
+
+.btn-period-del-mini {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 4px !important;
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fca5a5 !important;
+  padding: 0 !important;
+  margin-left: 2px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-period-del-mini:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.btn-period-del-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fca5a5 !important;
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-period-del-badge:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.desktop-matrix-del-period {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: #dc2626 !important;
+  border: none !important;
+  margin-left: 3px !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  transition: all 0.15s ease !important;
+}
+
+.desktop-matrix-del-period:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+
