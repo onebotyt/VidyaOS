@@ -1254,8 +1254,8 @@ window.copyCurrentWebUrl = copyCurrentWebUrl;
       title: 'Academic Block',
       description: 'Classrooms, administrative blocks and academic areas',
       images: [
+        ['/login/images/bg3-building.jpg', 'UGIP Institutional and Administrative building'],
         ['/login/images/image.png', 'Administrative and academic block'],
-        ['/login/images/bg3-building.jpg', 'UGIP building'],
         ['/login/images/academic.png', 'Academic facilities'],
         ['/login/images/all.jpg', 'Campus view']
       ]
@@ -1264,10 +1264,10 @@ window.copyCurrentWebUrl = copyCurrentWebUrl;
       title: 'Natural Beauty',
       description: 'Scenic beauty, surrounding mountains and lake city landscape',
       images: [
-        ['/login/images/academic.png', 'Himalayan landscape near Nainital'],
+        ['/login/images/gallery-natural-beauty.jpg', 'Nature and Himalayan scenic beauty near Nainital'],
         ['/login/images/bg4-himalaya.jpg', 'Himalaya range'],
-        ['/login/images/gallery-natural-beauty.jpg', 'Nature near Nainital'],
-        ['/login/images/gallery-nainital.jpg', 'Nainital town']
+        ['/login/images/gallery-nainital.jpg', 'Nainital town'],
+        ['/login/images/academic.png', 'Himalayan landscape near Nainital']
       ]
     }
   };
@@ -1439,4 +1439,54 @@ window.copyCurrentWebUrl = copyCurrentWebUrl;
   });
 
   window.addEventListener('beforeunload', () => uploadedUrls.forEach(URL.revokeObjectURL));
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   SHOWCASE CLEAN CENTER IMAGE ENGINE (80/20 Presentation)
+   ══════════════════════════════════════════════════════════════ */
+(() => {
+  window.switchCleanImage = function(src, title, subtitle, btn) {
+    const img = document.getElementById('showcaseCleanImg');
+    const capTitle = document.getElementById('captionTitle');
+    const capSub = document.getElementById('captionSub');
+    if (!img) return;
+    img.style.opacity = '0';
+    img.style.transform = 'scale(0.985)';
+    setTimeout(() => {
+      img.src = src;
+      if (capTitle && title) capTitle.textContent = title;
+      if (capSub && subtitle) capSub.textContent = subtitle;
+      img.style.opacity = '1';
+      img.style.transform = 'scale(1)';
+    }, 160);
+    if (btn && btn.parentElement) {
+      btn.parentElement.querySelectorAll('.img-pill, .card').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  };
+
+  window.selectShowcaseCard = function(src, title, subtitle, cardEl) {
+    window.switchCleanImage(src, title, subtitle);
+    if (cardEl && cardEl.parentElement) {
+      cardEl.parentElement.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+      cardEl.classList.add('active');
+    }
+  };
+
+  const uploadBtn = document.getElementById('uploadImagesBtn');
+  const uploadInput = document.getElementById('galleryUpload');
+  if (uploadBtn && uploadInput) {
+    uploadBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      uploadInput.click();
+    });
+    uploadInput.addEventListener('change', () => {
+      const selected = Array.from(uploadInput.files || []).filter(f => f.type.startsWith('image/'));
+      if (selected.length) {
+        const url = URL.createObjectURL(selected[0]);
+        const name = selected[0].name.replace(/\.[^/.]+$/, "");
+        window.switchCleanImage(url, name, 'Uploaded Campus Photo', uploadBtn);
+      }
+    });
+  }
 })();

@@ -9,7 +9,7 @@
     display: none !important;
   }
   .desktop-login-layout {
-    display: contents !important;
+    display: flex !important;
   }
 }
 
@@ -17,6 +17,8 @@
   /* Hide Desktop Layout Elements */
   .desktop-login-layout,
   #desktop-login-view,
+  .desktop-showcase-panel,
+  .desktop-login-panel,
   .bg,
   .side-text,
   .page,

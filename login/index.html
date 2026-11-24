@@ -13,8 +13,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="/login/index.css?v=20261119">
-  <link rel="stylesheet" href="/login/mobile-login.css?v=20261119">
+  <link rel="stylesheet" href="/login/index.css?v=20261124_v2">
+  <link rel="stylesheet" href="/login/mobile-login.css?v=20261124_v2">
   <script src="/mobile-bridge.js"></script>
 </head>
 
@@ -25,88 +25,99 @@
        ══════════════════════════════════════════════════════════ -->
   <div id="desktop-login-view" class="desktop-login-layout">
 
-  <!-- Campus Himalayan Slideshow Background -->
-  <div class="bg" role="img" aria-label="Government Polytechnic Nainital campus and Himalayan views">
-    <div class="slide s1"></div>
-    <div class="slide s2"></div>
-    <div class="slide s3"></div>
-    <div class="slide s4"></div>
-  </div>
-
-  <!-- Top-Right Quote -->
-  <div class="side-text">
-    <div class="quote" style="margin-right:30px;">Knowledge Today,<br>A Better Tomorrow.</div>
-  </div>
-
-  <main class="page">
-
-    <!-- ══ LEFT PANEL: INSTITUTIONAL SHOWCASE ══ -->
-    <section class="left">
-      <header class="brand">
-        <div class="logo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"
-            stroke-linecap="round">
-            <path d="M12 4 2 9l10 5 10-5-10-5Z" />
-            <path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.500 6-3v-4.500" />
-            <path d="M22 9v6" />
-          </svg>
+    <!-- ══ 70% LEFT SECTION: HEADER, CENTER CLEAN IMAGE (FULL / NO CUTTING), 4 GALLERY CARDS IN FOOTER SIDE ══ -->
+    <section class="left desktop-showcase-panel">
+      <!-- Top Header Bar on 70% panel -->
+      <header class="showcase-header">
+        <div class="brand">
+          <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"
+              stroke-linecap="round">
+              <path d="M12 4 2 9l10 5 10-5-10-5Z" />
+              <path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.500 6-3v-4.500" />
+              <path d="M22 9v6" />
+            </svg>
+          </div>
+          <div>
+            <h2>VidyaOS</h2>
+            <p>Institutional Campus &amp; Academic Operating System</p>
+          </div>
         </div>
-        <div>
-          <h2 style="color:rgb(235, 227, 227);">VidyaOS</h2>
-          <p>Institutional Campus &amp;<br>Academic Operating System</p>
+
+        <div class="showcase-header-center">
+          <div class="gov">Government Polytechnic</div>
+          <div class="ugip-name">UGIP Nainital, Uttarakhand</div>
+        </div>
+
+        <div class="showcase-header-right">
+          <div class="nba-badge">
+            <svg viewBox="0 0 48 48" width="18" height="18" style="width:18px;height:18px;flex:none;">
+              <path d="M24 3 7 9v13c0 11 7 19 17 23 10-4 17-12 17-23V9L24 3Z" fill="#14246b" stroke="#ffc95b"
+                stroke-width="2.5" />
+              <path
+                d="m24 15 2.800 6 6.500.8-4.800 4.500 1.300 6.500-5.800-3.300-5.800 3.300 1.300-6.500-4.800-4.500 6.500-.8L24 15Z"
+                fill="#ffc95b" />
+            </svg>
+            <span>NBA GUIDELINES</span>
+          </div>
+          <div class="quote">Knowledge Today, A Better Tomorrow.</div>
         </div>
       </header>
 
-      <div>
-        <div class="gov">Government Polytechnic</div>
-        <h1><em>UGIP</em> Nainital</h1>
-      </div>
+      <!-- Center Stage: Clean Image (NOT IN BACKGROUND, FIT IN CENTER FULL, NO CUTTING) -->
+      <main class="showcase-center-stage">
+        <div class="showcase-image-frame">
+          <img id="showcaseCleanImg" class="showcase-clean-img" src="/login/images/bg3-building.jpg" alt="Administrative and Academic Block Government Polytechnic Nainital" />
+          
+          <!-- Image Title / Floating Label -->
+          <div class="showcase-img-caption" id="showcaseImgCaption">
+            <span class="caption-icon">🏛️</span>
+            <div>
+              <strong id="captionTitle">Academic &amp; Administrative Block</strong>
+              <small id="captionSub">Government Polytechnic Nainital (UGIP)</small>
+            </div>
+          </div>
+        </div>
+      </main>
 
-      <div class="state">Uttarakhand</div>
+      <!-- Footer Side: That 4 Images Card We Have -->
+      <div class="showcase-footer-cards">
+        <div class="gallery-tools">
+          <span class="gallery-label">Explore campus photo collection</span>
+          <button class="upload-images" type="button" id="uploadImagesBtn" title="Upload photos to campus gallery"><span>＋</span> Upload Images</button>
+          <input type="file" id="galleryUpload" accept="image/*" multiple hidden>
+        </div>
 
-      <div class="nba">
-        <svg viewBox="0 0 48 48">
-          <path d="M24 3 7 9v13c0 11 7 19 17 23 10-4 17-12 17-23V9L24 3Z" fill="#14246b" stroke="#ffc95b"
-            stroke-width="2.5" />
-          <path
-            d="m24 15 2.800 6 6.500.8-4.800 4.500 1.300 6.500-5.800-3.300-5.800 3.300 1.300-6.500-4.800-4.500 6.500-.8L24 15Z"
-            fill="#ffc95b" />
-        </svg>
-        <div>
-          <small>Completely adhered to</small>
-          <strong>NBA GUIDELINES</strong>
+        <div class="gallery" aria-label="Campus photo categories">
+          <button class="card active" type="button" data-gallery="academic" aria-label="Open Academic Block photo gallery" onclick="selectShowcaseCard('/login/images/bg3-building.jpg', 'Academic & Administrative Block', 'Government Polytechnic Nainital (UGIP)', this)">
+            <img src="/login/images/bg3-building.jpg" alt="Administrative and academic block">
+            <span><i>★</i>Academic Block <b class="card-more">Select ↗</b></span>
+          </button>
+          <button class="card" type="button" data-gallery="campus" aria-label="Open Our Campus photo gallery" onclick="selectShowcaseCard('/login/images/gallery-campus.jpg', 'UGIP Nainital Campus Entrance', 'State-of-the-art Polytechnic Institute', this)">
+            <img src="/login/images/gallery-campus.jpg" alt="UGIP Nainital campus entrance">
+            <span><i>★</i>Our Campus <b class="card-more">Select ↗</b></span>
+          </button>
+          <button class="card" type="button" data-gallery="nainital" aria-label="Open Nainital photo gallery" onclick="selectShowcaseCard('/login/images/gallery-nainital.jpg', 'Nainital Lake & Himalayan Peaks', 'Scenic Mountain Surroundings', this)">
+            <img src="/login/images/gallery-nainital.jpg" alt="Nainital lake and Himalayan peaks">
+            <span><i>★</i>Nainital <b class="card-more">Select ↗</b></span>
+          </button>
+          <button class="card" type="button" data-gallery="nature" aria-label="Open Natural Beauty photo gallery" onclick="selectShowcaseCard('/login/images/gallery-natural-beauty.jpg', 'Natural Beauty & Greenery', 'Peaceful Academic Environment', this)">
+            <img src="/login/images/gallery-natural-beauty.jpg" alt="Himalayan landscape near Nainital">
+            <span><i>★</i>Natural Beauty <b class="card-more">Select ↗</b></span>
+          </button>
         </div>
       </div>
 
-      <div class="gallery-tools">
-        <span class="gallery-label">Explore campus gallery</span>
-        <button class="upload-images" type="button" id="uploadImagesBtn" title="Upload photos to campus gallery"><span>＋</span> Upload Images</button>
-        <input type="file" id="galleryUpload" accept="image/*" multiple hidden>
-      </div>
-
-      <div class="gallery" aria-label="Campus photo categories">
-        <button class="card" type="button" data-gallery="campus" aria-label="Open Our Campus photo gallery">
-          <img src="/login/images/gallery-campus.jpg" alt="UGIP Nainital campus entrance">
-          <span><i>★</i>Our Campus <b class="card-more">View gallery ↗</b></span>
-        </button>
-        <button class="card" type="button" data-gallery="nainital" aria-label="Open Nainital photo gallery">
-          <img src="/login/images/gallery-nainital.jpg" alt="Nainital lake and Himalayan peaks">
-          <span><i>★</i>Nainital <b class="card-more">View gallery ↗</b></span>
-        </button>
-        <button class="card" type="button" data-gallery="academic" aria-label="Open Academic Block photo gallery">
-          <img src="/login/images/image.png" alt="Administrative and academic block">
-          <span><i>★</i>Academic Block <b class="card-more">View gallery ↗</b></span>
-        </button>
-        <button class="card" type="button" data-gallery="nature" aria-label="Open Natural Beauty photo gallery">
-          <img src="/login/images/academic.png" alt="Himalayan landscape near Nainital">
-          <span><i>★</i>Natural Beauty <b class="card-more">View gallery ↗</b></span>
-        </button>
-      </div>
+      <!-- Bottom Footer on 70% panel -->
+      <footer class="showcase-footer">
+        <div class="footer-copy">© 2026 Government Polytechnic Nainital (UGIP) &amp; VidyaOS. All rights reserved.</div>
+        <div class="footer-tag">Official Institutional Portal • Verified Infrastructure</div>
+      </footer>
     </section>
 
-    <!-- ══ RIGHT PANEL: SIGN IN CARD ══ -->
-    <section class="right" style="margin-right:30px">
-      <div class="login">
+    <!-- ══ 30% RIGHT SECTION: FULL PANEL LOGIN CARD ══ -->
+    <section class="right desktop-login-panel">
+      <div class="login full-panel-login">
         <div class="lb">
           <div class="logo">
             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"
@@ -118,7 +129,7 @@
           </div>
           <div>
             <h3>VidyaOS</h3>
-            <p style="color:rgb(139, 179, 179);">Institutional Campus &amp;<br>Academic Operating System</p>
+            <p style="color:rgb(100, 116, 139);">Institutional Campus &amp;<br>Academic Operating System</p>
           </div>
         </div>
 
@@ -225,9 +236,6 @@
               </svg>
               <span>Desktop App</span>
             </button>
-          </div>
-              <span>Beta Testing</span>
-            </button>
             <a href="https://github.com/onebotyt" class="app-action-btn github-btn" target="_blank" rel="noopener noreferrer" title="View @onebotyt GitHub Profile">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
@@ -240,11 +248,7 @@
         <p class="reg">New to VidyaOS? <a href="/login/register/index.html" id="reg-student-link">Create an account →</a></p>
       </div>
     </section>
-  </main>
 
-  <footer class="bar">
-    <div>© 2026 Government Polytechnic Nainital (UGIP) &amp; VidyaOS. All rights reserved.</div>
-  </footer>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
@@ -797,10 +801,10 @@
   </div>
 
   <!-- Scripts -->
-  <script src="/login/core/ui.js?v=20261119"></script>
-  <script src="/login/core/api.js?v=20261119"></script>
-  <script src="/login/core/auth.js?v=20261119"></script>
-  <script src="/login/index.js?v=20261119"></script>
+  <script src="/login/core/ui.js?v=20261124_v2"></script>
+  <script src="/login/core/api.js?v=20261124_v2"></script>
+  <script src="/login/core/auth.js?v=20261124_v2"></script>
+  <script src="/login/index.js?v=20261124_v2"></script>
 </body>
 
 </html>
