@@ -30,14 +30,12 @@
 .slide-wrapper {
   position: absolute;
   aspect-ratio: 16 / 10;
-  width: 62%;
-  max-width: 580px;
   transition: left 0.62s cubic-bezier(0.22, 1.12, 0.36, 1),
               top 0.62s cubic-bezier(0.22, 1.12, 0.36, 1),
               width 0.62s cubic-bezier(0.22, 1.12, 0.36, 1),
               transform 0.62s cubic-bezier(0.22, 1.12, 0.36, 1),
               opacity 0.45s ease;
-  will-change: transform, left, top, opacity;
+  will-change: transform, left, top, opacity, width;
   cursor: pointer;
 }
 
@@ -51,8 +49,7 @@
   background: #ffffff;
   box-shadow: 0 20px 42px -12px rgba(15, 23, 42, 0.22), 0 4px 14px -2px rgba(15, 23, 42, 0.08);
   transform-style: preserve-3d;
-  transition: transform 0.52s cubic-bezier(0.22, 1.24, 0.36, 1),
-              box-shadow 0.3s ease,
+  transition: box-shadow 0.3s ease,
               border-color 0.3s ease;
   will-change: transform;
 }
@@ -71,6 +68,57 @@
   transition: opacity 0.25s ease;
 }
 .slide-card:hover .card-sheen { opacity: 1; }
+
+/* ── 8 Distinct Random Switch Animation Keyframes ── */
+@keyframes animYFlip {
+  0% { transform: perspective(1000px) rotateY(75deg) scale(0.84); opacity: 0.25; }
+  100% { transform: perspective(1000px) rotateY(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes animXPitch {
+  0% { transform: perspective(1000px) rotateX(55deg) scale(0.84); opacity: 0.25; }
+  100% { transform: perspective(1000px) rotateX(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes animScatter {
+  0% { transform: translateX(85px) rotate(7deg) scale(0.82); opacity: 0.25; }
+  100% { transform: translateX(0px) rotate(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes animDiagonal {
+  0% { transform: translate(-65px, -45px) scale(0.80) rotate(-6deg); opacity: 0.25; }
+  100% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes animZoomDrop {
+  0% { transform: scale(1.28) translateZ(60px); opacity: 0.2; }
+  100% { transform: scale(1) translateZ(0); opacity: 1; }
+}
+
+@keyframes animSkewWhip {
+  0% { transform: skewX(-15deg) translateX(55px) scale(0.88); opacity: 0.25; }
+  100% { transform: skewX(0deg) translateX(0px) scale(1); opacity: 1; }
+}
+
+@keyframes animTwist {
+  0% { transform: perspective(1000px) rotateY(-45deg) rotateZ(10deg) scale(0.85); opacity: 0.25; }
+  100% { transform: perspective(1000px) rotateY(0deg) rotateZ(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes animElasticPop {
+  0% { transform: translateY(45px) scale(0.70); opacity: 0.25; }
+  72% { transform: translateY(-4px) scale(1.03); opacity: 1; }
+  100% { transform: translateY(0px) scale(1); opacity: 1; }
+}
+
+.anim-y-flip { animation: animYFlip 0.62s cubic-bezier(0.22, 1.12, 0.36, 1) both; }
+.anim-x-pitch { animation: animXPitch 0.62s cubic-bezier(0.22, 1.12, 0.36, 1) both; }
+.anim-scatter { animation: animScatter 0.62s cubic-bezier(0.22, 1.12, 0.36, 1) both; }
+.anim-diagonal { animation: animDiagonal 0.62s cubic-bezier(0.22, 1.12, 0.36, 1) both; }
+.anim-zoom-drop { animation: animZoomDrop 0.62s cubic-bezier(0.22, 1.12, 0.36, 1) both; }
+.anim-skew-whip { animation: animSkewWhip 0.62s cubic-bezier(0.22, 1.12, 0.36, 1) both; }
+.anim-twist { animation: animTwist 0.62s cubic-bezier(0.22, 1.12, 0.36, 1) both; }
+.anim-elastic-pop { animation: animElasticPop 0.62s cubic-bezier(0.22, 1.18, 0.36, 1) both; }
 
 @keyframes bottomCardPop {
   0% { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.92); }

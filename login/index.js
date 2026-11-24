@@ -1507,6 +1507,7 @@ const DEFAULT_CAMPUS_IMAGES = [
     title: 'UGIP Main Campus',
     subtitle: 'Government Polytechnic Nainital, Uttarakhand',
     category: 'Our Campus',
+    tag: 'Campus & Facilities',
     src: '/login/images/bg1-campus.jpg',
     fallback: '/login/images/all.jpg'
   },
@@ -1514,39 +1515,129 @@ const DEFAULT_CAMPUS_IMAGES = [
     id: 'nainital',
     title: 'Nainital Lake',
     subtitle: 'Scenic Naini Lake, Uttarakhand',
-    category: 'Nainital',
+    category: 'Nainital Lake',
+    tag: 'Nainital',
     src: '/login/images/gallery-nainital.jpg',
     fallback: '/login/images/bg4-himalaya.jpg'
   },
   {
     id: 'academic',
-    title: 'Academic & Administrative Block',
+    title: 'Academic Block',
     subtitle: 'Government Polytechnic Nainital (UGIP)',
     category: 'Academic Block',
+    tag: 'Academic Block',
     src: '/login/images/bg3-building.jpg',
     fallback: '/login/images/academic.png'
   },
   {
     id: 'lab',
     title: 'IT & Computing Lab',
-    subtitle: 'Mountain-View Workstations & Digital Classroom',
-    category: 'Computing Lab',
+    subtitle: 'Mountain-View Workstations',
+    category: 'IT & Computing Lab',
+    tag: 'Labs & Library',
     src: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80',
     fallback: '/login/images/all.jpg'
   },
   {
     id: 'nature',
-    title: 'Himalayan Forest Panorama',
-    subtitle: 'Snow-Capped Himalayan Views & Natural Beauty',
+    title: 'Natural Beauty',
+    subtitle: 'Snow-Capped Himalayan Views',
     category: 'Natural Beauty',
+    tag: 'Natural Beauty',
     src: '/login/images/gallery-natural-beauty.jpg',
     fallback: '/login/images/bg4-himalaya.jpg'
   }
 ];
 
+const PROJECT_TEAM = [
+  {
+    id: 'team-lead',
+    title: 'Team Lead',
+    subtitle: 'Full-Stack Architecture',
+    name: 'Navneet Mishra',
+    role: 'Team Lead',
+    category: 'Team Lead',
+    tag: 'Lead Architect',
+    src: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/bg1-campus.jpg',
+    bio: 'Lead system architect overseeing frontend & backend campus ERP pipelines, database modeling, and institutional deployments at UGIP Nainital.',
+    highlights: ['System Design & Architecture', 'Node.js & MySQL Core APIs', 'Docker & Production Hosting', 'Security & RBAC Enforcement']
+  },
+  {
+    id: 'backend-dev',
+    title: 'Backend Developer',
+    subtitle: 'Node.js & MySQL APIs',
+    name: 'Backend Engineering Team',
+    role: 'Backend Developer',
+    category: 'Backend Developer',
+    tag: 'APIs & Database',
+    src: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/academic.png',
+    bio: 'Engineered scalable RESTful microservices, JWT authentication, role-based access control (RBAC), and automated NBA calculation engines.',
+    highlights: ['Express.js REST Endpoints', 'Normalized MySQL Schemas', 'JWT Auth & Session Takeover', 'NBA Rubric Engine']
+  },
+  {
+    id: 'frontend-dev',
+    title: 'Frontend Developer',
+    subtitle: 'Web Portals & UI',
+    name: 'Frontend Engineering Team',
+    role: 'Frontend Developer',
+    category: 'Frontend Developer',
+    tag: 'UI & Portals',
+    src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/all.jpg',
+    bio: 'Designed responsive user interfaces, accessible forms, mobile course dossiers, and dynamic interactive SVG charts.',
+    highlights: ['Responsive 70/30 Split Layout', 'TailwindCSS & Modern Design', 'Mobile Touch-Optimized UX', 'PWA & Hybrid App Support']
+  },
+  {
+    id: 'hardware-iot',
+    title: 'Hardware & IoT',
+    subtitle: 'ESP32 Biometric Systems',
+    name: 'IoT & Embedded Systems Lab',
+    role: 'Hardware & IoT',
+    tag: 'Biometrics & Hardware',
+    category: 'Hardware & IoT',
+    src: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/bg3-building.jpg',
+    bio: 'Integrated biometric fingerprint scanners, RFID smart attendance hardware, and ESP32 WiFi gateway firmware with VidyaOS cloud.',
+    highlights: ['ESP32 WiFi Gateways', 'Optical Fingerprint Modules', 'Real-Time MQTT Sync', 'Offline Attendance Cache']
+  },
+  {
+    id: 'ui-qa',
+    title: 'UI & QA Engineer',
+    subtitle: 'Design & Testing',
+    name: 'Quality Assurance & Design',
+    role: 'UI & QA Engineer',
+    tag: 'Design & QA',
+    category: 'UI & QA Engineer',
+    src: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/image.png',
+    bio: 'Conducted cross-browser audits, accessibility (a11y) conformance, responsive testing, and end-to-end verification across devices.',
+    highlights: ['WCAG 2.1 Accessibility', 'Cross-Browser Verification', 'Automated E2E Test Suites', 'Performance Optimization']
+  }
+];
+
 let CAMPUS_IMAGES = [...DEFAULT_CAMPUS_IMAGES];
-let carouselSwitchSpeed = 5500;
+// Unified slide list combining all campus images AND all 5 project team cards
+let slides = [...CAMPUS_IMAGES, ...PROJECT_TEAM];
+
+let carouselSwitchSpeed = 3600; // 3.6s auto-advance
 let carouselAutoplayEnabled = true;
+let activeSlideIndex = 0;
+let carouselTimer = null;
+let isCarouselHovered = false;
+let lastAnimationIndex = -1;
+
+const ANIMATION_CLASSES = [
+  'anim-y-flip',
+  'anim-x-pitch',
+  'anim-scatter',
+  'anim-diagonal',
+  'anim-zoom-drop',
+  'anim-skew-whip',
+  'anim-twist',
+  'anim-elastic-pop'
+];
 
 // Load persisted carousel configuration
 function loadCarouselConfig() {
@@ -1556,6 +1647,7 @@ function loadCarouselConfig() {
       const cfg = JSON.parse(raw);
       if (Array.isArray(cfg.images) && cfg.images.length > 0) {
         CAMPUS_IMAGES = cfg.images;
+        slides = [...CAMPUS_IMAGES, ...PROJECT_TEAM];
       }
       if (typeof cfg.switch_speed === 'number' && cfg.switch_speed >= 1000) {
         carouselSwitchSpeed = cfg.switch_speed;
@@ -1575,6 +1667,7 @@ function loadCarouselConfig() {
           let needsUpdate = false;
           if (Array.isArray(res.data.images) && res.data.images.length > 0) {
             CAMPUS_IMAGES = res.data.images;
+            slides = [...CAMPUS_IMAGES, ...PROJECT_TEAM];
             needsUpdate = true;
           }
           if (typeof res.data.switch_speed === 'number' && res.data.switch_speed >= 1000) {
@@ -1586,13 +1679,6 @@ function loadCarouselConfig() {
             needsUpdate = true;
           }
           if (needsUpdate) {
-            try {
-              localStorage.setItem('vidyaos_carousel_config', JSON.stringify({
-                images: CAMPUS_IMAGES,
-                switch_speed: carouselSwitchSpeed,
-                autoplay: carouselAutoplayEnabled
-              }));
-            } catch (_) {}
             renderSlides();
             renderBottomCards();
             startCarouselAutoplay();
@@ -1602,68 +1688,6 @@ function loadCarouselConfig() {
       .catch(() => {});
   }
 }
-
-const TEAM_MEMBERS = [
-  {
-    id: 'team-lead',
-    role: 'Team Lead',
-    subtitle: 'Full-Stack Architecture',
-    name: 'Navneet Mishra',
-    tag: 'Lead Architect',
-    src: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80',
-    fallback: '/login/images/bg1-campus.jpg',
-    bio: 'Lead system architect overseeing frontend & backend campus ERP pipelines, database modeling, and institutional deployments at UGIP Nainital.',
-    highlights: ['System Design & Architecture', 'Node.js & MySQL Core APIs', 'Docker & Production Hosting', 'Security & RBAC Enforcement']
-  },
-  {
-    id: 'backend-dev',
-    role: 'Backend Developer',
-    subtitle: 'Node.js & MySQL APIs',
-    name: 'Backend Engineering Team',
-    tag: 'APIs & Database',
-    src: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80',
-    fallback: '/login/images/academic.png',
-    bio: 'Engineered scalable RESTful microservices, JWT authentication, role-based access control (RBAC), and automated NBA calculation engines.',
-    highlights: ['Express.js REST Endpoints', 'Normalized MySQL Schemas', 'JWT Auth & Session Takeover', 'NBA Rubric Engine']
-  },
-  {
-    id: 'frontend-dev',
-    role: 'Frontend Developer',
-    subtitle: 'Web Portals & UI',
-    name: 'Frontend Engineering Team',
-    tag: 'UI & Portals',
-    src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=600&q=80',
-    fallback: '/login/images/all.jpg',
-    bio: 'Designed responsive user interfaces, accessible forms, mobile course dossiers, and dynamic interactive SVG charts.',
-    highlights: ['Responsive 70/30 Split Layout', 'TailwindCSS & Modern Design', 'Mobile Touch-Optimized UX', 'PWA & Hybrid App Support']
-  },
-  {
-    id: 'hardware-iot',
-    role: 'Hardware & IoT',
-    subtitle: 'ESP32 Biometric Systems',
-    name: 'IoT & Embedded Systems Lab',
-    tag: 'Biometrics & Hardware',
-    src: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
-    fallback: '/login/images/bg3-building.jpg',
-    bio: 'Integrated biometric fingerprint scanners, RFID smart attendance hardware, and ESP32 WiFi gateway firmware with VidyaOS cloud.',
-    highlights: ['ESP32 WiFi Gateways', 'Optical Fingerprint Modules', 'Real-Time MQTT Sync', 'Offline Attendance Cache']
-  },
-  {
-    id: 'ui-qa',
-    role: 'UI & QA Engineer',
-    subtitle: 'Design & Testing',
-    name: 'Quality Assurance & Design',
-    tag: 'Design & QA',
-    src: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80',
-    fallback: '/login/images/image.png',
-    bio: 'Conducted cross-browser audits, accessibility (a11y) conformance, responsive testing, and end-to-end verification across devices.',
-    highlights: ['WCAG 2.1 Accessibility', 'Cross-Browser Verification', 'Automated E2E Test Suites', 'Performance Optimization']
-  }
-];
-
-let activeSlideIndex = 0;
-let carouselTimer = null;
-let isCarouselHovered = false;
 
 function renderSlides() {
   const track = document.getElementById('carouselTrack');
@@ -1675,10 +1699,10 @@ function renderSlides() {
   if (dotsContainer) dotsContainer.innerHTML = '';
   if (mobileStrip) mobileStrip.innerHTML = '';
 
-  const total = CAMPUS_IMAGES.length;
+  const total = slides.length;
 
-  // 1. Render desktop 3D slides
-  CAMPUS_IMAGES.forEach((item, index) => {
+  // Render desktop 3D peek slides
+  slides.forEach((item, index) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'slide-wrapper';
     wrapper.dataset.index = index;
@@ -1694,7 +1718,7 @@ function renderSlides() {
         <div class="card-sheen"></div>
         <div class="absolute top-3 left-3 z-10">
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-900/60 text-white backdrop-blur-xs border border-white/20 shadow-xs">
-            ${item.category}
+            ${item.tag || item.category}
           </span>
         </div>
         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent p-4 sm:p-5 text-white z-10 pointer-events-none">
@@ -1703,6 +1727,26 @@ function renderSlides() {
         </div>
       </div>
     `;
+
+    // 3D Tilt and sheen dynamics on hover
+    const card = wrapper.querySelector('.slide-card');
+    if (card) {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mx', `${x}px`);
+        card.style.setProperty('--my', `${y}px`);
+        if (index === activeSlideIndex) {
+          const rotX = -((y - rect.height / 2) / (rect.height / 2)) * 6;
+          const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 6;
+          card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.01, 1.01, 1.01)`;
+        }
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    }
 
     wrapper.addEventListener('click', () => {
       if (index === activeSlideIndex) {
@@ -1714,11 +1758,11 @@ function renderSlides() {
 
     track.appendChild(wrapper);
 
-    // Render dot
+    // Render dot indicator
     if (dotsContainer) {
       const dot = document.createElement('button');
       dot.type = 'button';
-      dot.setAttribute('aria-label', 'Go to slide ' + (index + 1));
+      dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
       dot.className = index === activeSlideIndex
         ? 'w-5 h-1.5 rounded-full bg-blue-600 transition-all duration-300'
         : 'w-1.5 h-1.5 rounded-full bg-slate-300 hover:bg-slate-400 transition-all cursor-pointer';
@@ -1745,55 +1789,79 @@ function renderSlides() {
     }
   });
 
-  updateSlidePositions();
+  updateSlidePositions(true);
 }
 
-function updateSlidePositions() {
+function updateSlidePositions(isInitial = false) {
   const track = document.getElementById('carouselTrack');
   if (!track) return;
   const wrappers = track.querySelectorAll('.slide-wrapper');
-  const total = CAMPUS_IMAGES.length;
+  const total = slides.length;
 
   wrappers.forEach((w) => {
     const idx = parseInt(w.dataset.index, 10);
     const diff = (idx - activeSlideIndex + total) % total;
+    const card = w.querySelector('.slide-card');
 
     if (diff === 0) {
-      // Center active slide
+      // Center active slide: 58% width, 16:10 aspect, crisp white border, 3D
+      w.style.width = '58%';
+      w.style.maxWidth = '560px';
       w.style.left = '50%';
       w.style.top = '50%';
       w.style.transform = 'translate(-50%, -50%) scale(1) translateZ(0)';
       w.style.zIndex = '30';
       w.style.opacity = '1';
       w.style.pointerEvents = 'auto';
+
+      // Apply random switch animation if not initial render
+      if (!isInitial && card) {
+        let nextAnim;
+        do {
+          nextAnim = Math.floor(Math.random() * ANIMATION_CLASSES.length);
+        } while (nextAnim === lastAnimationIndex && ANIMATION_CLASSES.length > 1);
+        lastAnimationIndex = nextAnim;
+
+        ANIMATION_CLASSES.forEach(cls => card.classList.remove(cls));
+        void card.offsetWidth; // Force CSS reflow to re-trigger keyframe
+        card.classList.add(ANIMATION_CLASSES[nextAnim]);
+      }
     } else if (diff === 1) {
-      // Right slide
-      w.style.left = '80%';
+      // Right side peek: 28% width, rotateY -18deg, scale 0.86, opacity 0.78
+      w.style.width = '28%';
+      w.style.maxWidth = '270px';
+      w.style.left = '86%';
       w.style.top = '50%';
-      w.style.transform = 'translate(-50%, -50%) scale(0.82) rotateY(-16deg) translateZ(-80px)';
+      w.style.transform = 'translate(-50%, -50%) scale(0.86) rotateY(-18deg) translateZ(-60px)';
       w.style.zIndex = '20';
-      w.style.opacity = '0.85';
+      w.style.opacity = '0.78';
       w.style.pointerEvents = 'auto';
+      if (card) ANIMATION_CLASSES.forEach(cls => card.classList.remove(cls));
     } else if (diff === total - 1) {
-      // Left slide
-      w.style.left = '20%';
+      // Left side peek: 28% width, rotateY +18deg, scale 0.86, opacity 0.78
+      w.style.width = '28%';
+      w.style.maxWidth = '270px';
+      w.style.left = '14%';
       w.style.top = '50%';
-      w.style.transform = 'translate(-50%, -50%) scale(0.82) rotateY(16deg) translateZ(-80px)';
+      w.style.transform = 'translate(-50%, -50%) scale(0.86) rotateY(18deg) translateZ(-60px)';
       w.style.zIndex = '20';
-      w.style.opacity = '0.85';
+      w.style.opacity = '0.78';
       w.style.pointerEvents = 'auto';
+      if (card) ANIMATION_CLASSES.forEach(cls => card.classList.remove(cls));
     } else {
-      // Hidden behind
+      // Hidden behind in 3D perspective
+      w.style.width = '28%';
       w.style.left = '50%';
       w.style.top = '50%';
       w.style.transform = 'translate(-50%, -50%) scale(0.6) translateZ(-200px)';
       w.style.zIndex = '10';
       w.style.opacity = '0';
       w.style.pointerEvents = 'none';
+      if (card) ANIMATION_CLASSES.forEach(cls => card.classList.remove(cls));
     }
   });
 
-  // Update dots
+  // Update dots indicator
   const dotsContainer = document.getElementById('carouselDots');
   if (dotsContainer) {
     const dots = dotsContainer.querySelectorAll('button');
@@ -1804,32 +1872,25 @@ function updateSlidePositions() {
     });
   }
 
-  // Update bottom cards active state
-  const bottomCards = document.querySelectorAll('#bottomCards .bottom-card-enter');
+  // Update fixed bottom team cards active highlight
+  // Project team slides start at index 5 (slides 5, 6, 7, 8, 9)
+  const bottomCards = document.querySelectorAll('#bottomCards .bottom-team-card');
   bottomCards.forEach((card, idx) => {
-    const indicator = card.querySelector('.dot-indicator');
-    if (idx === activeSlideIndex) {
-      card.classList.add('border-blue-600', 'ring-2', 'ring-blue-500/30');
+    const isMatchingTeamMember = activeSlideIndex === 5 + idx;
+    if (isMatchingTeamMember) {
+      card.classList.add('ring-2', 'ring-blue-600', 'shadow-lg', '-translate-y-1', 'border-blue-600');
       card.classList.remove('border-white/90');
-      if (indicator) {
-        indicator.classList.remove('bg-white/80');
-        indicator.classList.add('bg-blue-400');
-      }
     } else {
-      card.classList.remove('border-blue-600', 'ring-2', 'ring-blue-500/30');
+      card.classList.remove('ring-2', 'ring-blue-600', 'shadow-lg', '-translate-y-1', 'border-blue-600');
       card.classList.add('border-white/90');
-      if (indicator) {
-        indicator.classList.remove('bg-blue-400');
-        indicator.classList.add('bg-white/80');
-      }
     }
   });
 }
 
 function updateCarousel(index) {
-  const total = CAMPUS_IMAGES.length;
+  const total = slides.length;
   activeSlideIndex = (index + total) % total;
-  updateSlidePositions();
+  updateSlidePositions(false);
 }
 
 function nextCarouselSlide() {
@@ -1872,7 +1933,7 @@ function initCarousel() {
     if (e.key === 'ArrowRight') nextCarouselSlide();
   });
 
-  // Autoplay
+  // Autoplay (3.6s)
   startCarouselAutoplay();
 
   // Cross-tab synchronization via storage events
@@ -1886,43 +1947,49 @@ function initCarousel() {
   });
 }
 
-/* ── Bottom Campus Photo Thumbnails (Pure Image Showcase) ── */
+/* ── Fixed 5-Card Bottom Project Team Row ── */
 function renderBottomCards() {
   const container = document.getElementById('bottomCards');
   if (!container) return;
   container.innerHTML = '';
 
-  CAMPUS_IMAGES.forEach((item, index) => {
+  PROJECT_TEAM.forEach((item, index) => {
     const card = document.createElement('div');
-    const isActive = index === activeSlideIndex;
-    card.className = `bottom-card-enter group relative aspect-[16/10] rounded-xl overflow-hidden shadow-xs hover:shadow-lg border-2 ${isActive ? 'border-blue-600 ring-2 ring-blue-500/30' : 'border-white/90 hover:border-blue-500'} transition-all duration-300 cursor-pointer bg-slate-900`;
-    card.setAttribute('title', `${item.category}: ${item.title}`);
-    card.dataset.index = index;
+    const isMatchingActive = activeSlideIndex === 5 + index;
+
+    card.className = `bottom-team-card bottom-card-enter group relative aspect-[16/10] rounded-xl overflow-hidden shadow-xs hover:shadow-lg border-2 ${
+      isMatchingActive ? 'border-blue-600 ring-2 ring-blue-600 shadow-lg -translate-y-1' : 'border-white/90 hover:border-blue-500'
+    } transition-all duration-300 cursor-pointer bg-slate-900`;
+    card.setAttribute('title', `${item.title}: ${item.subtitle}`);
+    card.dataset.teamIndex = index;
+
     card.innerHTML = `
       <img
         src="${item.src}"
         alt="${item.title}"
-        class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         onerror="this.onerror=null; this.src='${item.fallback}';"
       />
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-80 group-hover:opacity-95 transition-opacity pointer-events-none"></div>
-      <div class="absolute bottom-1.5 inset-x-2 flex items-center justify-between pointer-events-none">
-        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-white drop-shadow-sm truncate">
-          <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-blue-400' : 'bg-white/80'} shrink-0 dot-indicator"></span>
-          ${item.category}
-        </span>
-        <span class="text-[9px] text-blue-200 opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-sm">View ↗</span>
+      <span class="absolute top-1.5 left-1.5 z-10 px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-slate-900/70 text-slate-200 backdrop-blur-xs border border-white/10">
+        ${item.tag}
+      </span>
+      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent p-2 text-white pointer-events-none">
+        <div class="text-[11px] font-bold leading-tight truncate text-white">${item.title}</div>
+        <div class="text-[9.5px] text-slate-300 truncate">${item.subtitle}</div>
       </div>
     `;
+
+    // Clicking fixed bottom card jumps main carousel to that team member's slide
     card.addEventListener('click', () => {
-      updateCarousel(index);
+      updateCarousel(5 + index);
     });
+
     container.appendChild(card);
   });
 }
 
 function showTeamMemberModal(id) {
-  const m = TEAM_MEMBERS.find(t => t.id === id);
+  const m = PROJECT_TEAM.find(t => t.id === id);
   if (!m) return;
 
   const titleEl = document.getElementById('infoModalTitle');
@@ -1994,7 +2061,7 @@ function closeInfoModal() {
 let currentLightboxIndex = 0;
 
 function openLightboxModal(index) {
-  const item = CAMPUS_IMAGES[index];
+  const item = slides[index];
   if (!item) return;
   currentLightboxIndex = index;
 
@@ -2009,10 +2076,10 @@ function openLightboxModal(index) {
     img.src = item.src;
     img.onerror = () => { img.src = item.fallback; };
   }
-  if (cat) cat.textContent = item.category;
+  if (cat) cat.textContent = item.tag || item.category;
   if (title) title.textContent = item.title;
   if (sub) sub.textContent = item.subtitle;
-  if (counter) counter.textContent = `${index + 1} / ${CAMPUS_IMAGES.length}`;
+  if (counter) counter.textContent = `${index + 1} / ${slides.length}`;
 
   if (modal) {
     modal.classList.remove('hidden');
@@ -2029,12 +2096,12 @@ function closeLightboxModal() {
 }
 
 function nextLightboxSlide() {
-  const nextIdx = (currentLightboxIndex + 1) % CAMPUS_IMAGES.length;
+  const nextIdx = (currentLightboxIndex + 1) % slides.length;
   openLightboxModal(nextIdx);
 }
 
 function prevLightboxSlide() {
-  const prevIdx = (currentLightboxIndex - 1 + CAMPUS_IMAGES.length) % CAMPUS_IMAGES.length;
+  const prevIdx = (currentLightboxIndex - 1 + slides.length) % slides.length;
   openLightboxModal(prevIdx);
 }
 
@@ -2343,6 +2410,28 @@ async function handleStudentRegisterSubmit(e) {
   }
 }
 
+function handleQuickRegistration(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const name = document.getElementById('reg-quick-fullname')?.value?.trim() || '';
+  const identifier = document.getElementById('reg-quick-identifier')?.value?.trim() || '';
+  const role = document.getElementById('reg-quick-role')?.value || 'student';
+  const msg = document.getElementById('reg-quick-msg');
+
+  if (role === 'student') {
+    const params = new URLSearchParams();
+    if (name) params.set('name', name);
+    if (identifier) params.set('roll', identifier);
+    params.set('role', 'student');
+    window.location.href = `/login/register/index.html?${params.toString()}`;
+  } else {
+    if (msg) {
+      msg.className = 'p-2.5 rounded-lg text-xs leading-tight font-medium bg-amber-50 text-amber-800 border border-amber-200 block mb-2';
+      msg.innerHTML = `<strong>Institutional Account:</strong> ${role.toUpperCase()} accounts are provisioned directly by Institution Administration. Please sign in or contact the UGIP Office.`;
+      msg.classList.remove('hidden');
+    }
+  }
+}
+
 // Global exports
 window.showNbaGuidelinesModal = showNbaGuidelinesModal;
 window.renderBottomCards = renderBottomCards;
@@ -2357,6 +2446,7 @@ window.handleRegDeptChange = handleRegDeptChange;
 window.toggleRollNotAvailable = toggleRollNotAvailable;
 window.toggleRegPw = toggleRegPw;
 window.handleStudentRegisterSubmit = handleStudentRegisterSubmit;
+window.handleQuickRegistration = handleQuickRegistration;
 
 // Initializer
 if (document.readyState === 'loading') {

@@ -549,6 +549,22 @@ function showSuccessView(info) {
     selectGoogleAccount(qEmail, qName, qSub);
   }
 
+  const pName = params.get('name');
+  const pRoll = params.get('roll');
+  if (pName) {
+    const fnInput = document.getElementById('stu-full-name');
+    if (fnInput) fnInput.value = pName;
+  }
+  if (pRoll) {
+    if (pRoll.includes('@')) {
+      const emInput = document.getElementById('stu-email');
+      if (emInput) emInput.value = pRoll;
+    } else {
+      const enInput = document.getElementById('stu-enroll');
+      if (enInput) enInput.value = pRoll;
+    }
+  }
+
   // Enrollment Number Not Available toggle
   const chkEnrollNotAvailable = document.getElementById('chk-enroll-not-available');
   const stuEnrollInput = document.getElementById('stu-enroll');
