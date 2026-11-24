@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#07153e">
-  <title>VidyaOS | UGIP Nainital — Institutional Campus Operating System</title>
+  <meta name="theme-color" content="#2563eb">
+  <title>VidyaOS | UGIP Nainital — Institutional Sign In</title>
   <meta name="description"
     content="Sign in to VidyaOS at Government Polytechnic Nainital (UGIP) — Institutional Campus & Academic Management System.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,247 +13,284 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="/login/index.css?v=20261124_v2">
-  <link rel="stylesheet" href="/login/mobile-login.css?v=20261124_v2">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="stylesheet" href="/login/index.css?v=20261124_v4">
+  <link rel="stylesheet" href="/login/mobile-login.css?v=20261124_v4">
   <script src="/mobile-bridge.js"></script>
 </head>
 
-<body>
+<body class="bg-white text-slate-900 min-h-screen lg:h-screen lg:overflow-hidden">
 
-  <!-- ══════════════════════════════════════════════════════════
-       DESKTOP VIEW (PC / Tablets > 768px: UGIP Nainital Showcase)
-       ══════════════════════════════════════════════════════════ -->
-  <div id="desktop-login-view" class="desktop-login-layout">
+  <!-- ═════════════════════════════════════════════════════════════════════════
+       DESKTOP VIEW (PC / Laptops / Tablets > 860px: Modern 70/30 Institutional Split)
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="desktop-login-view" class="desktop-login-layout min-h-screen lg:h-screen flex flex-col-reverse lg:flex-row w-full">
 
-    <!-- ══ 70% LEFT SECTION: HEADER, CENTER CLEAN IMAGE (FULL / NO CUTTING), 4 GALLERY CARDS IN FOOTER SIDE ══ -->
-    <section class="left desktop-showcase-panel">
-      <!-- Top Header Bar on 70% panel -->
-      <header class="showcase-header">
-        <div class="brand">
-          <div class="logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"
-              stroke-linecap="round">
-              <path d="M12 4 2 9l10 5 10-5-10-5Z" />
-              <path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.500 6-3v-4.500" />
-              <path d="M22 9v6" />
+    <!-- ── 70% LEFT SECTION: Clean Bright Dual-Tone Carousel + 5 Bottom Gallery Images ── -->
+    <section id="carouselStage" class="w-full lg:w-[70%] stage-bg relative overflow-hidden flex flex-col justify-between p-4 sm:p-6 text-slate-900 min-h-[500px] lg:min-h-0">
+      <div class="stage-grid absolute inset-0 pointer-events-none"></div>
+      <canvas id="ambientCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-80"></canvas>
+
+      <!-- Top Institutional Bar -->
+      <div class="relative z-20 flex flex-wrap items-center justify-between gap-2.5">
+        <div class="flex items-center gap-3">
+          <div>
+            <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-700/80 leading-none">Government Polytechnic</p>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight mt-0.5">UGIP Nainital, Uttarakhand</h2>
+          </div>
+          <span class="hidden xl:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] italic text-slate-600 bg-white/80 border border-slate-200/90 shadow-xs">
+            "Knowledge Today, A Better Tomorrow"
+          </span>
+        </div>
+
+        <button
+          id="nbaGuidelinesBtn"
+          type="button"
+          onclick="showNbaGuidelinesModal()"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100/80 shadow-xs transition cursor-pointer"
+        >
+          <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          NBA Guidelines
+        </button>
+      </div>
+
+      <!-- Desktop 1-by-1 3D Carousel Viewport -->
+      <div class="relative flex-1 my-2 hidden sm:block min-h-[300px]">
+        <div id="carouselTrack" class="relative w-full h-full flex items-center justify-center">
+          <!-- Slides rendered dynamically via JS -->
+        </div>
+
+        <!-- Carousel Prev / Dots / Next Controls -->
+        <div class="pointer-events-none absolute inset-x-0 bottom-1 z-40 flex items-center justify-center gap-3">
+          <button id="carouselPrevBtn" type="button" aria-label="Previous photo" class="pointer-events-auto w-7 h-7 rounded-full bg-white/95 hover:bg-white text-slate-800 border border-slate-200 shadow-md flex items-center justify-center transition active:scale-95 cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div id="carouselDots" class="pointer-events-auto flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/95 border border-slate-200 shadow-md backdrop-blur-xs"></div>
+          <button id="carouselNextBtn" type="button" aria-label="Next photo" class="pointer-events-auto w-7 h-7 rounded-full bg-white/95 hover:bg-white text-slate-800 border border-slate-200 shadow-md flex items-center justify-center transition active:scale-95 cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Horizontal Carousel Strip -->
+      <div id="mobileStrip" class="relative z-20 flex sm:hidden gap-3 overflow-x-auto no-scrollbar py-3 snap-x"></div>
+
+      <!-- Bottom 5 Fixed Images (Just Images Showcase) -->
+      <div class="relative z-20 pt-1.5">
+        <div class="flex items-center justify-between mb-1.5 px-0.5">
+          <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Explore Campus Gallery</span>
+          <span class="text-[10px] text-slate-400">Click photo to preview</span>
+        </div>
+        <div id="bottomCards" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+          <!-- 5 fixed pure image thumbnails rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 30% RIGHT SECTION: Compact Minimal Sign-In Workspace ── -->
+    <section id="desktopLoginPanel" class="w-full lg:w-[30%] lg:min-w-[340px] flex flex-col justify-between bg-white px-5 sm:px-7 py-5 lg:py-6 relative z-10 border-b lg:border-b-0 lg:border-l border-slate-200/80 overflow-y-auto">
+      <header class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-700 text-white flex items-center justify-center shadow-sm shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0120 17.5c-2.5 1.333-5.167 2-8 2s-5.5-.667-8-2a12.083 12.083 0 011.84-6.922L12 14z" />
             </svg>
           </div>
           <div>
-            <h2>VidyaOS</h2>
-            <p>Institutional Campus &amp; Academic Operating System</p>
+            <div class="text-sm font-bold tracking-tight text-slate-900 leading-none">VidyaOS</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Institutional Campus OS</div>
           </div>
         </div>
-
-        <div class="showcase-header-center">
-          <div class="gov">Government Polytechnic</div>
-          <div class="ugip-name">UGIP Nainital, Uttarakhand</div>
-        </div>
-
-        <div class="showcase-header-right">
-          <div class="nba-badge">
-            <svg viewBox="0 0 48 48" width="18" height="18" style="width:18px;height:18px;flex:none;">
-              <path d="M24 3 7 9v13c0 11 7 19 17 23 10-4 17-12 17-23V9L24 3Z" fill="#14246b" stroke="#ffc95b"
-                stroke-width="2.5" />
-              <path
-                d="m24 15 2.800 6 6.500.8-4.800 4.500 1.300 6.500-5.800-3.300-5.800 3.300 1.300-6.500-4.800-4.500 6.500-.8L24 15Z"
-                fill="#ffc95b" />
-            </svg>
-            <span>NBA GUIDELINES</span>
-          </div>
-          <div class="quote">Knowledge Today, A Better Tomorrow.</div>
-        </div>
+        <span class="inline-flex items-center gap-1.5 text-[10px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          UGIP
+        </span>
       </header>
 
-      <!-- Center Stage: Clean Image (NOT IN BACKGROUND, FIT IN CENTER FULL, NO CUTTING) -->
-      <main class="showcase-center-stage">
-        <div class="showcase-image-frame">
-          <img id="showcaseCleanImg" class="showcase-clean-img" src="/login/images/bg3-building.jpg" alt="Administrative and Academic Block Government Polytechnic Nainital" />
-          
-          <!-- Image Title / Floating Label -->
-          <div class="showcase-img-caption" id="showcaseImgCaption">
-            <span class="caption-icon">🏛️</span>
-            <div>
-              <strong id="captionTitle">Academic &amp; Administrative Block</strong>
-              <small id="captionSub">Government Polytechnic Nainital (UGIP)</small>
-            </div>
+      <main class="w-full max-w-[320px] mx-auto my-6 lg:my-0">
+        <!-- Sign In View -->
+        <div id="signInView">
+          <div class="mb-4">
+            <h1 class="text-xl font-bold tracking-tight text-slate-900">
+              Welcome <span class="text-blue-700">back</span>
+            </h1>
+            <p class="text-xs text-slate-500 mt-1">Sign in to access your institutional account</p>
           </div>
+
+          <!-- Conflict Banner -->
+          <div id="conflict-banner" class="hidden mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+            <div class="font-semibold flex items-center gap-1.5 text-amber-800">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              Session Conflict Detected
+            </div>
+            <p class="mt-1 text-[11px] text-amber-700 leading-tight">Another active session was detected for this account. You can disconnect that device and log in here.</p>
+            <button type="button" id="force-login-btn" onclick="submitForceLogin()" class="mt-2 w-full py-1.5 px-2 bg-amber-600 hover:bg-amber-700 text-white rounded text-[11px] font-medium transition cursor-pointer">
+              Disconnect Other Device &amp; Sign In Here
+            </button>
+          </div>
+
+          <!-- Pending Banner -->
+          <div id="pending-banner" class="hidden mb-3 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs">
+            <div class="font-semibold text-blue-800">Registration Under Review</div>
+            <p id="pending-banner-text" class="mt-1 text-[11px] text-blue-700 leading-tight">Your account registration is under review by administration.</p>
+          </div>
+
+          <!-- Status Alert Banner -->
+          <div id="status-alert-banner" class="hidden mb-3 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 text-xs">
+            <div id="status-alert-title" class="font-semibold text-rose-800">Notice</div>
+            <p id="status-alert-body" class="mt-1 text-[11px] text-rose-700 leading-tight"></p>
+            <a id="status-alert-link" href="/login/register/index.html" class="hidden mt-1.5 text-[11px] text-blue-700 font-semibold hover:underline">Register again &rarr;</a>
+          </div>
+
+          <!-- Google 1-Click Sign-In -->
+          <button
+            id="google-signin-btn"
+            type="button"
+            onclick="handleGoogleSignIn()"
+            class="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.99] text-xs font-medium text-slate-700 transition cursor-pointer shadow-xs"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#4285F4" d="M23.745 12.27c0-.79-.07-1.54-.19-2.27h-11.3v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+              <path fill="#34A853" d="M12.255 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96h-3.98v3.09C3.515 21.3 7.565 24 12.255 24z"/>
+              <path fill="#FBBC05" d="M5.525 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62h-3.98a11.86 11.86 0 000 10.76l3.98-3.09z"/>
+              <path fill="#EA4335" d="M12.255 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C18.205 1.19 15.495 0 12.255 0c-4.69 0-8.74 2.7-10.71 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+            </svg>
+            <span id="google-btn-text">Continue with Google</span>
+          </button>
+
+          <div class="relative my-3.5 flex items-center">
+            <div class="flex-grow border-t border-slate-200"></div>
+            <span class="mx-2.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">or</span>
+            <div class="flex-grow border-t border-slate-200"></div>
+          </div>
+
+          <!-- Primary Sign-In Form -->
+          <form id="login-form" class="space-y-3" novalidate>
+            <div>
+              <label for="identifier" class="block text-[11px] font-medium text-slate-700 mb-1">
+                Institutional Email, Mobile or UBTER Roll No.
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-2.5 flex items-center text-slate-400 pointer-events-none">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </span>
+                <input
+                  id="identifier"
+                  name="identifier"
+                  type="text"
+                  required
+                  value="hod@gmail.com"
+                  placeholder="Email, mobile or Roll No."
+                  class="w-full h-9 pl-8 pr-3 text-xs rounded-lg border border-slate-200 bg-slate-50/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="password" class="block text-[11px] font-medium text-slate-700">Password</label>
+                <button id="forgotPasswordBtn" type="button" onclick="handleForgotPassword()" class="text-[11px] font-medium text-blue-700 hover:underline cursor-pointer">
+                  Forgot password?
+                </button>
+              </div>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-2.5 flex items-center text-slate-400 pointer-events-none">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </span>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  placeholder="Enter password"
+                  class="w-full h-9 pl-8 pr-9 text-xs rounded-lg border border-slate-200 bg-slate-50/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition"
+                />
+                <button
+                  id="pw-toggle-btn"
+                  type="button"
+                  onclick="togglePw()"
+                  aria-label="Toggle password visibility"
+                  class="absolute inset-y-0 right-2 flex items-center text-slate-400 hover:text-slate-600 px-1 cursor-pointer"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Message box -->
+            <div id="msg" class="msg text-xs"></div>
+
+            <button
+              id="submit-btn"
+              type="submit"
+              class="w-full h-9 rounded-lg bg-blue-700 hover:bg-blue-800 active:scale-[0.99] text-white text-xs font-semibold shadow-sm transition flex items-center justify-center gap-1.5 mt-1 cursor-pointer"
+            >
+              <span id="submit-text">Sign In</span>
+              <span id="signin-icon">
+                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </span>
+            </button>
+          </form>
+
+          <!-- 3-Action Buttons Row: Android APK, Desktop App, @onebotyt -->
+          <div class="grid grid-cols-3 gap-1.5 mt-3.5">
+            <button type="button" onclick="openDownloadAppModal('android')" class="apk-btn h-7 px-1.5 rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-medium text-slate-600 flex items-center justify-center gap-1 transition cursor-pointer">
+              <svg class="w-3 h-3 text-blue-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span class="truncate">Android APK</span>
+            </button>
+            <button type="button" onclick="openDownloadAppModal('pc')" class="h-7 px-1.5 rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-medium text-slate-600 flex items-center justify-center gap-1 transition cursor-pointer">
+              <svg class="w-3 h-3 text-blue-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span class="truncate">Desktop App</span>
+            </button>
+            <a href="https://github.com/onebotyt" target="_blank" rel="noopener noreferrer" class="h-7 px-1.5 rounded-md border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-medium text-slate-700 flex items-center justify-center gap-1 transition text-decoration-none">
+              <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
+              <span class="truncate">@onebotyt</span>
+            </a>
+          </div>
+
+          <!-- Direct Link to Institutional Student Registration Form (Image 2 & 3) -->
+          <p class="text-center text-[11px] text-slate-500 mt-4">
+            New to VidyaOS?
+            <a href="/login/register/index.html" id="reg-student-link" class="font-semibold text-blue-700 hover:underline">
+              Create an account &rarr;
+            </a>
+          </p>
         </div>
       </main>
 
-      <!-- Footer Side: That 4 Images Card We Have -->
-      <div class="showcase-footer-cards">
-        <div class="gallery-tools">
-          <span class="gallery-label">Explore campus photo collection</span>
-          <button class="upload-images" type="button" id="uploadImagesBtn" title="Upload photos to campus gallery"><span>＋</span> Upload Images</button>
-          <input type="file" id="galleryUpload" accept="image/*" multiple hidden>
-        </div>
-
-        <div class="gallery" aria-label="Campus photo categories">
-          <button class="card active" type="button" data-gallery="academic" aria-label="Open Academic Block photo gallery" onclick="selectShowcaseCard('/login/images/bg3-building.jpg', 'Academic & Administrative Block', 'Government Polytechnic Nainital (UGIP)', this)">
-            <img src="/login/images/bg3-building.jpg" alt="Administrative and academic block">
-            <span><i>★</i>Academic Block <b class="card-more">Select ↗</b></span>
-          </button>
-          <button class="card" type="button" data-gallery="campus" aria-label="Open Our Campus photo gallery" onclick="selectShowcaseCard('/login/images/gallery-campus.jpg', 'UGIP Nainital Campus Entrance', 'State-of-the-art Polytechnic Institute', this)">
-            <img src="/login/images/gallery-campus.jpg" alt="UGIP Nainital campus entrance">
-            <span><i>★</i>Our Campus <b class="card-more">Select ↗</b></span>
-          </button>
-          <button class="card" type="button" data-gallery="nainital" aria-label="Open Nainital photo gallery" onclick="selectShowcaseCard('/login/images/gallery-nainital.jpg', 'Nainital Lake & Himalayan Peaks', 'Scenic Mountain Surroundings', this)">
-            <img src="/login/images/gallery-nainital.jpg" alt="Nainital lake and Himalayan peaks">
-            <span><i>★</i>Nainital <b class="card-more">Select ↗</b></span>
-          </button>
-          <button class="card" type="button" data-gallery="nature" aria-label="Open Natural Beauty photo gallery" onclick="selectShowcaseCard('/login/images/gallery-natural-beauty.jpg', 'Natural Beauty & Greenery', 'Peaceful Academic Environment', this)">
-            <img src="/login/images/gallery-natural-beauty.jpg" alt="Himalayan landscape near Nainital">
-            <span><i>★</i>Natural Beauty <b class="card-more">Select ↗</b></span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Bottom Footer on 70% panel -->
-      <footer class="showcase-footer">
-        <div class="footer-copy">© 2026 Government Polytechnic Nainital (UGIP) &amp; VidyaOS. All rights reserved.</div>
-        <div class="footer-tag">Official Institutional Portal • Verified Infrastructure</div>
+      <footer class="flex items-center justify-between text-[10px] text-slate-400 pt-2 border-t border-slate-100 mt-4">
+        <span>&copy; 2026 UGIP Nainital &amp; VidyaOS</span>
+        <span>Verified Portal</span>
       </footer>
-    </section>
-
-    <!-- ══ 30% RIGHT SECTION: FULL PANEL LOGIN CARD ══ -->
-    <section class="right desktop-login-panel">
-      <div class="login full-panel-login">
-        <div class="lb">
-          <div class="logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"
-              stroke-linecap="round">
-              <path d="M12 4 2 9l10 5 10-5-10-5Z" />
-              <path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.500 6-3v-4.500" />
-              <path d="M22 9v6" />
-            </svg>
-          </div>
-          <div>
-            <h3>VidyaOS</h3>
-            <p style="color:rgb(100, 116, 139);">Institutional Campus &amp;<br>Academic Operating System</p>
-          </div>
-        </div>
-
-        <h2>Welcome <em>back</em></h2>
-        <p class="sub">Sign in to access your institutional account</p>
-
-        <!-- Google 1-Click Sign-In -->
-        <button type="button" class="google" id="google-signin-btn" onclick="handleGoogleSignIn()">
-          <svg viewBox="0 0 48 48">
-            <path fill="#EA4335"
-              d="M24 9.500c3.500 0 6.600 1.200 9.100 3.600l6.800-6.800C35.800 2.400 30.300 0 24 0 14.600 0 6.500 5.400 2.600 13.200l7.900 6.100C12.400 13.600 17.700 9.500 24 9.500Z" />
-            <path fill="#4285F4"
-              d="M46.500 24.500c0-1.600-.1-3.100-.4-4.500H24v9h12.700c-.6 3-2.300 5.500-4.800 7.200l7.500 5.800c4.400-4.100 7.100-10.100 7.100-17.500Z" />
-            <path fill="#FBBC05"
-              d="M10.500 28.700A14.500 14.500 0 0 1 9.500 24c0-1.600.3-3.200.9-4.700l-7.900-6.100A24 24 0 0 0 0 24c0 3.900.9 7.500 2.600 10.800l7.900-6.100Z" />
-            <path fill="#34A853"
-              d="M24 48c6.500 0 11.900-2.100 15.900-5.800l-7.500-5.800c-2.100 1.400-4.800 2.300-8.400 2.300-6.300 0-11.600-4.100-13.500-9.800l-7.900 6.100C6.500 42.600 14.600 48 24 48Z" />
-          </svg>
-          <span id="google-btn-text">Continue with Google</span>
-        </button>
-
-        <div class="or">OR</div>
-
-        <!-- Credentials Login Form -->
-        <form id="login-form" novalidate>
-          <div class="form-label-heading">Institutional Email, Mobile or UBTER Roll No.</div>
-          <div class="field">
-            <svg viewBox="0 0 24 24">
-              <rect x="3" y="5" width="18" height="14" rx="2" />
-              <path d="m3 7 9 6 9-6" />
-            </svg>
-            <div>
-              <label for="identifier" style="display:none;">Email or ID</label>
-              <input id="identifier" name="identifier" type="text" autocomplete="username"
-                placeholder="Email, Mobile or UBTER Roll No." required autofocus>
-            </div>
-          </div>
-
-          <div class="form-label-heading">Password</div>
-          <div class="field">
-            <svg viewBox="0 0 24 24">
-              <rect x="4" y="10" width="16" height="11" rx="2" />
-              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-            </svg>
-            <div>
-              <label for="password" style="display:none;">Password</label>
-              <input id="password" name="password" type="password" autocomplete="current-password"
-                placeholder="Enter your password" required>
-            </div>
-            <button type="button" class="eye" id="pw-toggle-btn" aria-label="Show password" onclick="togglePw()">
-              <svg viewBox="0 0 24 24">
-                <path d="M1.500 12S5.500 5 12 5s10.500 7 10.500 7-4 7-10.500 7S1.500 12 1.500 12Z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </button>
-          </div>
-
-          <a href="#" class="forgot" id="forgot-link" onclick="handleForgotPassword(); return false;">Forgot password?</a>
-
-          <!-- Session Conflict Banner -->
-          <div class="conflict-banner" id="conflict-banner" role="alert" style="display:none;">
-            <div class="conflict-title">⚠️ Account Active on Another Device</div>
-            <div class="conflict-body">This account is currently signed in on another device. Only one active session is allowed at a time.</div>
-            <button type="button" class="btn-force" id="force-login-btn" onclick="submitForceLogin()">Disconnect Other Device &amp; Sign In Here</button>
-          </div>
-
-          <!-- Registration Pending Approval Banner -->
-          <div class="pending-banner" id="pending-banner" role="alert" style="display:none;">
-            <div class="pending-banner-title">Registration Pending Approval</div>
-            <div class="pending-banner-body" id="pending-banner-text">Your registration request is under review by your Department Faculty. You will be able to sign in once approved.</div>
-          </div>
-
-          <!-- Status Notice Alert Banner -->
-          <div class="status-alert-banner" id="status-alert-banner" role="alert" style="display:none;">
-            <div class="status-alert-title" id="status-alert-title">Account Notice</div>
-            <button type="button" class="status-alert-close" id="status-alert-close"
-              onclick="document.getElementById('status-alert-banner').style.display='none'" aria-label="Dismiss notice">&times;</button>
-            <div class="status-alert-body" id="status-alert-body"></div>
-            <a href="/login/register/index.html" class="pending-banner-link" id="status-alert-link" style="display: none;">Submit New Registration →</a>
-          </div>
-
-          <!-- Inline Status Message Box -->
-          <div class="msg" id="msg" role="status" aria-live="polite"></div>
-
-          <button type="submit" class="signin" id="submit-btn">
-            <span id="submit-text">Sign In</span> <span id="signin-icon" aria-hidden="true">→</span>
-          </button>
-
-          <!-- Desktop App Actions: Stable APK & Downloads -->
-          <div class="desktop-app-actions">
-            <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="app-action-btn apk-btn" download title="Download Verified Stable Android APK (VidyaOS.apk)">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              <span>Android APK</span>
-            </a>
-            <button type="button" class="app-action-btn beta-btn" onclick="openDownloadAppModal('pc')" title="Download VidyaOS for PC & Mobile">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="20" height="14" x="2" y="3" rx="2"></rect>
-                <line x1="8" x2="16" y1="21" y2="21"></line>
-                <line x1="12" x2="12" y1="17" y2="21"></line>
-              </svg>
-              <span>Desktop App</span>
-            </button>
-            <a href="https://github.com/onebotyt" class="app-action-btn github-btn" target="_blank" rel="noopener noreferrer" title="View @onebotyt GitHub Profile">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-              <span>@onebotyt</span>
-            </a>
-          </div>
-        </form>
-
-        <p class="reg">New to VidyaOS? <a href="/login/register/index.html" id="reg-student-link">Create an account →</a></p>
-      </div>
     </section>
 
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       MOBILE VIEW (Smartphones <= 768px: Modern Edu Theme)
-       ══════════════════════════════════════════════════════════ -->
+  <!-- ═════════════════════════════════════════════════════════════════════════
+       MOBILE VIEW (Smartphones <= 860px: Modern Edu Theme)
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div id="mobile-login-view" class="mobile-login-layout">
 
     <!-- ── 1. WELCOME / SPLASH SCREEN VIEW ── -->
@@ -450,13 +487,6 @@
               </svg>
               <span>Desktop App</span>
             </button>
-          </div>
-                <rect width="20" height="14" x="2" y="3" rx="2"></rect>
-                <line x1="8" x2="16" y1="21" y2="21"></line>
-                <line x1="12" x2="12" y1="17" y2="21"></line>
-              </svg>
-              <span>Beta Version</span>
-            </button>
             <a href="https://github.com/onebotyt" target="_blank" rel="noopener noreferrer" class="m-subaction-btn github-btn" title="View @onebotyt on GitHub">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
@@ -477,7 +507,65 @@
     </div>
   </div>
 
-  <!-- ══ DOWNLOAD APP MODAL (PC DESKTOP, ANDROID APK & IOS PWA) ══ -->
+  <!-- ═════════════════════════════════════════════════════════════════════════
+       LIGHTBOX PREVIEW MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="lightboxModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4">
+    <div class="relative w-full max-w-2xl bg-slate-900 border border-white/15 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative aspect-[16/10] bg-slate-950 flex items-center justify-center">
+        <img id="lightboxImg" src="" alt="" class="w-full h-full object-cover" />
+        <button id="lightboxClose" type="button" onclick="closeLightboxModal()" aria-label="Close preview" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/75 hover:bg-slate-950 text-white flex items-center justify-center border border-white/15 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <button id="lightboxPrev" type="button" onclick="prevLightboxSlide()" aria-label="Previous photo" class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white flex items-center justify-center border border-white/15 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button id="lightboxNext" type="button" onclick="nextLightboxSlide()" aria-label="Next photo" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white flex items-center justify-center border border-white/15 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+      <div class="p-4 flex items-center justify-between gap-3 text-white">
+        <div>
+          <span id="lightboxCategory" class="text-[10px] font-semibold uppercase tracking-wider text-blue-300"></span>
+          <h3 id="lightboxTitle" class="text-base font-semibold leading-tight mt-0.5"></h3>
+          <p id="lightboxSubtitle" class="text-xs text-slate-400 mt-0.5"></p>
+        </div>
+        <span id="lightboxCounter" class="text-xs text-slate-400 shrink-0"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════
+       INFO & INSTITUTIONAL COMPLIANCE MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="infoModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-5">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <h3 id="infoModalTitle" class="text-base font-bold text-slate-900"></h3>
+        <button id="infoModalClose" type="button" onclick="closeInfoModal()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="infoModalBody" class="text-xs text-slate-600 space-y-2.5 max-h-[70vh] overflow-y-auto pr-1"></div>
+      <div class="mt-4 flex justify-end">
+        <button id="infoModalOk" type="button" onclick="closeInfoModal()" class="px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold transition cursor-pointer">
+          Got it
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════
+       DOWNLOAD APP MODAL (PC DESKTOP, ANDROID APK & IOS PWA)
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div class="modal-overlay" id="download-app-modal" role="dialog" aria-modal="true" aria-labelledby="download-modal-title" style="display:none;" onclick="if(event.target===this)closeDownloadAppModal()">
     <div class="modal-card download-modal-card" onclick="event.stopPropagation()">
       <div class="download-modal-header">
@@ -546,7 +634,6 @@
         </div>
 
         <div style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:8px;">
-          <!-- 1. Download PC Portable Package -->
           <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS-PC-Portable.zip" class="download-primary-btn" download style="background:linear-gradient(135deg, #1d4ed8, #2563eb); color:#ffffff; font-weight:700;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect width="20" height="14" x="2" y="3" rx="2"></rect>
@@ -556,7 +643,6 @@
             <span>Download VidyaOS PC Client (.zip)</span>
           </a>
 
-          <!-- 2. Download VidyaOS Stable APK -->
           <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="download-primary-btn" download style="background:#f8fafc; color:#0f172a; border:1px solid #cbd5e1; font-weight:600;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -570,84 +656,67 @@
 
       <!-- Tab Content: Android APK -->
       <div class="download-tab-panel" id="download-panel-android">
-        <div class="platform-card-badge android-badge" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0;">
-          <span>● Android Mobile Release</span>
-          <span>Verified Stable</span>
+        <div class="platform-card-badge android-badge" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;">
+          <span>● Android Smartphone &amp; Tablet</span>
+          <span>Verified Release APK</span>
         </div>
-        <h4 class="platform-title">Direct Android APK Downloads</h4>
-        <p class="platform-desc">Download the official <strong>VidyaOS Android App</strong> optimized for phones, biometric scanners, and offline-first caching.</p>
-        
+        <h4 class="platform-title">VidyaOS Android APK (v2.4.0)</h4>
+        <p class="platform-desc">Install the standalone Android application for offline-ready mobile performance, biometric authentication, and instant push notifications.</p>
+
         <div class="download-features-list">
           <div class="feature-item">
             <span class="feature-check">✓</span>
-            <span><strong>VidyaOS.apk:</strong> Production verified attendance scanner &amp; portal</span>
+            <span><strong>Biometric Authentication:</strong> Fast fingerprint and device screen lock login</span>
           </div>
           <div class="feature-item">
             <span class="feature-check">✓</span>
-            <span><strong>Low RAM Optimization:</strong> Lightweight WebView architecture with instant loading</span>
+            <span><strong>Offline Attendance Caching:</strong> Take classroom attendance even without internet</span>
           </div>
           <div class="feature-item">
             <span class="feature-check">✓</span>
-            <span>Persistent signing key — updates install cleanly without conflict</span>
+            <span><strong>Direct Download:</strong> Verified signed APK directly from GitHub Releases</span>
           </div>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:10px; width:100%; margin-top:8px;">
-          <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="download-primary-btn android-btn" download style="background:linear-gradient(135deg, #059669, #10b981); color:#ffffff; font-weight:700;">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
+        <div style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:8px;">
+          <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="download-primary-btn" download style="background:linear-gradient(135deg, #059669, #10b981); color:#ffffff; font-weight:700;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-1.0003 0-.5517.4482-.9997.9993-.9997.5517 0 .9997.448.9997.9997 0 .5517-.448 1.0003-.9997 1.0003m-11.046 0c-.5511 0-.9993-.4486-.9993-1.0003 0-.5517.4482-.9997.9993-.9997.5517 0 .9997.448.9997.9997 0 .5517-.448 1.0003-.9997 1.0003m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1522-.5676.416.416 0 00-.5676.1523l-2.0223 3.503C15.5898 8.4116 13.8564 8 12 8s-3.5898.4116-5.1367 1.1499L4.841 5.6469a.416.416 0 00-.5676-.1523.416.416 0 00-.1522.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
             </svg>
-            <span>Download VidyaOS.apk (Official Release)</span>
-          </a>
-
-          <a href="https://github.com/onebotyt/VidyaOS/releases/latest/download/VidyaOS.apk" class="download-primary-btn" download style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; font-weight:600;">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            <span>Download Stable VidyaOS.apk</span>
-          </a>
-        </div>
-
-        <div class="download-footer-links" style="margin-top:12px;">
-          <a href="https://github.com/onebotyt/VidyaOS/releases" target="_blank" rel="noopener noreferrer" class="download-secondary-link">
-            <span>View all GitHub releases &amp; artifacts</span> →
+            <span>Download VidyaOS.apk</span>
           </a>
         </div>
       </div>
 
-      <!-- Tab Content: iOS (PWA Guide) -->
+      <!-- Tab Content: iOS (Safari PWA) -->
       <div class="download-tab-panel" id="download-panel-ios" style="display:none;">
-        <div class="platform-card-badge ios-badge">
-          <span>● Progressive Web App (PWA)</span>
-          <span>iOS 14+</span>
+        <div class="platform-card-badge ios-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">
+          <span>● Apple iOS (iPhone &amp; iPad)</span>
+          <span>Add to Home Screen (PWA)</span>
         </div>
-        <h4 class="platform-title">Install on iPhone or iPad</h4>
-        <p class="platform-desc">Apple iOS supports installing VidyaOS directly to your Home Screen with no App Store needed via Safari PWA.</p>
+        <h4 class="platform-title">Install VidyaOS on iOS</h4>
+        <p class="platform-desc">Apple iOS runs VidyaOS as a standalone Progressive Web App with full-screen native feel and hardware acceleration.</p>
 
-        <div class="ios-steps-container">
+        <div class="ios-install-steps">
           <div class="ios-step-row">
             <div class="ios-step-number">1</div>
             <div class="ios-step-text">
-              <strong>Open Safari</strong>
-              <span>Open this website in <em>Safari</em> on your iPhone or iPad.</span>
+              <strong>Open in Safari</strong>
+              <span>Ensure you are browsing VidyaOS on Apple Safari on your iPhone or iPad.</span>
             </div>
           </div>
           <div class="ios-step-row">
             <div class="ios-step-number">2</div>
             <div class="ios-step-text">
               <strong>Tap the Share Button</strong>
-              <span>Tap the <strong class="ios-symbol">⎋</strong> Share icon in Safari's bottom toolbar.</span>
+              <span>Tap the Share icon at the bottom center of Safari (the square with an arrow pointing upward).</span>
             </div>
           </div>
           <div class="ios-step-row">
             <div class="ios-step-number">3</div>
             <div class="ios-step-text">
               <strong>Select "Add to Home Screen"</strong>
-              <span>Scroll down the action sheet and tap <strong class="ios-symbol">⊞</strong> <strong>Add to Home Screen</strong>.</span>
+              <span>Scroll down the action sheet and tap <strong>Add to Home Screen</strong>.</span>
             </div>
           </div>
           <div class="ios-step-row">
@@ -682,35 +751,9 @@
     </div>
   </div>
 
-  <!-- ══ FULL-SCREEN PHOTO GALLERY MODAL ══ -->
-  <div class="gallery-modal" id="galleryModal" aria-hidden="true" role="dialog" aria-modal="true"
-    aria-labelledby="galleryTitle">
-    <div class="gallery-dialog">
-      <div class="gallery-head">
-        <div>
-          <p class="gallery-kicker">VIDYAOS • PHOTO COLLECTION</p>
-          <h2 id="galleryTitle">Campus Gallery</h2>
-          <p id="galleryDescription">Explore more photos from this collection</p>
-        </div>
-        <button class="gallery-close" id="galleryClose" type="button" aria-label="Close gallery">×</button>
-      </div>
-      <div class="gallery-permissions">
-        <span class="staff-notice">🔒 Uploading or changing gallery photos is reserved for teachers, faculty or
-          administrators.</span>
-        <button class="gallery-upload" id="galleryUploadBtn" type="button">＋ Upload to this gallery</button>
-        <input type="file" id="galleryModalUpload" accept="image/*" multiple hidden>
-      </div>
-      <div class="gallery-feature">
-        <button class="gallery-arrow" id="galleryPrev" type="button" aria-label="Previous image">‹</button>
-        <img id="galleryMainImage" src="" alt="">
-        <button class="gallery-arrow" id="galleryNext" type="button" aria-label="Next image">›</button>
-        <div class="gallery-counter" id="galleryCounter"></div>
-      </div>
-      <div class="gallery-thumbs" id="galleryThumbs" aria-label="Related photos"></div>
-    </div>
-  </div>
-
-  <!-- ══ FIRST-TIME ACTIVATION MODAL ══ -->
+  <!-- ═════════════════════════════════════════════════════════════════════════
+       FIRST-TIME ACTIVATION MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div class="modal-overlay" id="activation-modal" role="dialog" aria-modal="true" aria-labelledby="act-title">
     <div class="modal-card">
       <div class="modal-icon">
@@ -725,7 +768,7 @@
         Please set your permanent password to continue.
       </div>
       <div class="modal-note">
-        <strong>Note:</strong> Logging in as <span id="act-email" style="font-weight:600;color:var(--text-main);">your account</span>.
+        <strong>Note:</strong> Logging in as <span id="act-email" style="font-weight:600;color:var(--text-main, #0f172a);">your account</span>.
       </div>
 
       <form id="activation-form" novalidate>
@@ -744,7 +787,9 @@
     </div>
   </div>
 
-  <!-- Modal: Link Google Account Password Verification -->
+  <!-- ═════════════════════════════════════════════════════════════════════════
+       GOOGLE ACCOUNT PASSWORD VERIFICATION MODAL FOR 1-CLICK LINKING
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div class="modal-overlay" id="google-link-pwd-modal" role="dialog" aria-modal="true" aria-labelledby="glp-modal-title" style="display:none;" onclick="if(event.target===this)closeGoogleLinkPwdModal()">
     <div class="modal-card" style="max-width:440px; text-align:left; padding:1.75rem;" onclick="event.stopPropagation()">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;">
@@ -800,11 +845,11 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="/login/core/ui.js?v=20261124_v2"></script>
-  <script src="/login/core/api.js?v=20261124_v2"></script>
-  <script src="/login/core/auth.js?v=20261124_v2"></script>
-  <script src="/login/index.js?v=20261124_v2"></script>
+  <!-- Core Scripts -->
+  <script src="/login/core/ui.js?v=20261124_v4"></script>
+  <script src="/login/core/api.js?v=20261124_v4"></script>
+  <script src="/login/core/auth.js?v=20261124_v4"></script>
+  <script src="/login/index.js?v=20261124_v4"></script>
 </body>
 
 </html>

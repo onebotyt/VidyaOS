@@ -1490,3 +1490,582 @@ window.copyCurrentWebUrl = copyCurrentWebUrl;
     });
   }
 })();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MODERN DUAL-TONE 70/30 CAROUSEL, PROJECT TEAM & LIGHTBOX ENGINE
+   ══════════════════════════════════════════════════════════════════════════ */
+const CAMPUS_IMAGES = [
+  {
+    id: 'campus',
+    title: 'UGIP Main Campus',
+    subtitle: 'Government Polytechnic Nainital, Uttarakhand',
+    category: 'Our Campus',
+    src: '/login/images/bg1-campus.jpg',
+    fallback: '/login/images/all.jpg'
+  },
+  {
+    id: 'nainital',
+    title: 'Nainital Lake',
+    subtitle: 'Scenic Naini Lake, Uttarakhand',
+    category: 'Nainital',
+    src: '/login/images/gallery-nainital.jpg',
+    fallback: '/login/images/bg4-himalaya.jpg'
+  },
+  {
+    id: 'academic',
+    title: 'Academic & Administrative Block',
+    subtitle: 'Government Polytechnic Nainital (UGIP)',
+    category: 'Academic Block',
+    src: '/login/images/bg3-building.jpg',
+    fallback: '/login/images/academic.png'
+  },
+  {
+    id: 'lab',
+    title: 'IT & Computing Lab',
+    subtitle: 'Mountain-View Workstations & Digital Classroom',
+    category: 'Computing Lab',
+    src: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80',
+    fallback: '/login/images/all.jpg'
+  },
+  {
+    id: 'nature',
+    title: 'Himalayan Forest Panorama',
+    subtitle: 'Snow-Capped Himalayan Views & Natural Beauty',
+    category: 'Natural Beauty',
+    src: '/login/images/gallery-natural-beauty.jpg',
+    fallback: '/login/images/bg4-himalaya.jpg'
+  }
+];
+
+const TEAM_MEMBERS = [
+  {
+    id: 'team-lead',
+    role: 'Team Lead',
+    subtitle: 'Full-Stack Architecture',
+    name: 'Navneet Mishra',
+    tag: 'Lead Architect',
+    src: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/bg1-campus.jpg',
+    bio: 'Lead system architect overseeing frontend & backend campus ERP pipelines, database modeling, and institutional deployments at UGIP Nainital.',
+    highlights: ['System Design & Architecture', 'Node.js & MySQL Core APIs', 'Docker & Production Hosting', 'Security & RBAC Enforcement']
+  },
+  {
+    id: 'backend-dev',
+    role: 'Backend Developer',
+    subtitle: 'Node.js & MySQL APIs',
+    name: 'Backend Engineering Team',
+    tag: 'APIs & Database',
+    src: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/academic.png',
+    bio: 'Engineered scalable RESTful microservices, JWT authentication, role-based access control (RBAC), and automated NBA calculation engines.',
+    highlights: ['Express.js REST Endpoints', 'Normalized MySQL Schemas', 'JWT Auth & Session Takeover', 'NBA Rubric Engine']
+  },
+  {
+    id: 'frontend-dev',
+    role: 'Frontend Developer',
+    subtitle: 'Web Portals & UI',
+    name: 'Frontend Engineering Team',
+    tag: 'UI & Portals',
+    src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/all.jpg',
+    bio: 'Designed responsive user interfaces, accessible forms, mobile course dossiers, and dynamic interactive SVG charts.',
+    highlights: ['Responsive 70/30 Split Layout', 'TailwindCSS & Modern Design', 'Mobile Touch-Optimized UX', 'PWA & Hybrid App Support']
+  },
+  {
+    id: 'hardware-iot',
+    role: 'Hardware & IoT',
+    subtitle: 'ESP32 Biometric Systems',
+    name: 'IoT & Embedded Systems Lab',
+    tag: 'Biometrics & Hardware',
+    src: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/bg3-building.jpg',
+    bio: 'Integrated biometric fingerprint scanners, RFID smart attendance hardware, and ESP32 WiFi gateway firmware with VidyaOS cloud.',
+    highlights: ['ESP32 WiFi Gateways', 'Optical Fingerprint Modules', 'Real-Time MQTT Sync', 'Offline Attendance Cache']
+  },
+  {
+    id: 'ui-qa',
+    role: 'UI & QA Engineer',
+    subtitle: 'Design & Testing',
+    name: 'Quality Assurance & Design',
+    tag: 'Design & QA',
+    src: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80',
+    fallback: '/login/images/image.png',
+    bio: 'Conducted cross-browser audits, accessibility (a11y) conformance, responsive testing, and end-to-end verification across devices.',
+    highlights: ['WCAG 2.1 Accessibility', 'Cross-Browser Verification', 'Automated E2E Test Suites', 'Performance Optimization']
+  }
+];
+
+let activeSlideIndex = 0;
+let carouselTimer = null;
+let isCarouselHovered = false;
+
+function renderSlides() {
+  const track = document.getElementById('carouselTrack');
+  const mobileStrip = document.getElementById('mobileStrip');
+  const dotsContainer = document.getElementById('carouselDots');
+  if (!track) return;
+
+  track.innerHTML = '';
+  if (dotsContainer) dotsContainer.innerHTML = '';
+  if (mobileStrip) mobileStrip.innerHTML = '';
+
+  const total = CAMPUS_IMAGES.length;
+
+  // 1. Render desktop 3D slides
+  CAMPUS_IMAGES.forEach((item, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'slide-wrapper';
+    wrapper.dataset.index = index;
+
+    wrapper.innerHTML = `
+      <div class="slide-card group">
+        <img
+          src="${item.src}"
+          alt="${item.title}"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          onerror="this.onerror=null; this.src='${item.fallback}';"
+        />
+        <div class="card-sheen"></div>
+        <div class="absolute top-3 left-3 z-10">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-900/60 text-white backdrop-blur-xs border border-white/20 shadow-xs">
+            ${item.category}
+          </span>
+        </div>
+        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent p-4 sm:p-5 text-white z-10 pointer-events-none">
+          <h3 class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">${item.title}</h3>
+          <p class="text-xs text-slate-200 mt-0.5">${item.subtitle}</p>
+        </div>
+      </div>
+    `;
+
+    wrapper.addEventListener('click', () => {
+      if (index === activeSlideIndex) {
+        openLightboxModal(index);
+      } else {
+        updateCarousel(index);
+      }
+    });
+
+    track.appendChild(wrapper);
+
+    // Render dot
+    if (dotsContainer) {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.setAttribute('aria-label', 'Go to slide ' + (index + 1));
+      dot.className = index === activeSlideIndex
+        ? 'w-5 h-1.5 rounded-full bg-blue-600 transition-all duration-300'
+        : 'w-1.5 h-1.5 rounded-full bg-slate-300 hover:bg-slate-400 transition-all cursor-pointer';
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        updateCarousel(index);
+      });
+      dotsContainer.appendChild(dot);
+    }
+
+    // Render mobile strip item
+    if (mobileStrip) {
+      const mItem = document.createElement('div');
+      mItem.className = 'shrink-0 w-[240px] aspect-[16/10] rounded-xl overflow-hidden shadow-md relative snap-center cursor-pointer';
+      mItem.innerHTML = `
+        <img src="${item.src}" alt="${item.title}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${item.fallback}';" />
+        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white">
+          <div class="text-xs font-bold truncate">${item.title}</div>
+          <div class="text-[10px] text-slate-300 truncate">${item.subtitle}</div>
+        </div>
+      `;
+      mItem.addEventListener('click', () => openLightboxModal(index));
+      mobileStrip.appendChild(mItem);
+    }
+  });
+
+  updateSlidePositions();
+}
+
+function updateSlidePositions() {
+  const track = document.getElementById('carouselTrack');
+  if (!track) return;
+  const wrappers = track.querySelectorAll('.slide-wrapper');
+  const total = CAMPUS_IMAGES.length;
+
+  wrappers.forEach((w) => {
+    const idx = parseInt(w.dataset.index, 10);
+    const diff = (idx - activeSlideIndex + total) % total;
+
+    if (diff === 0) {
+      // Center active slide
+      w.style.left = '50%';
+      w.style.top = '50%';
+      w.style.transform = 'translate(-50%, -50%) scale(1) translateZ(0)';
+      w.style.zIndex = '30';
+      w.style.opacity = '1';
+      w.style.pointerEvents = 'auto';
+    } else if (diff === 1) {
+      // Right slide
+      w.style.left = '80%';
+      w.style.top = '50%';
+      w.style.transform = 'translate(-50%, -50%) scale(0.82) rotateY(-16deg) translateZ(-80px)';
+      w.style.zIndex = '20';
+      w.style.opacity = '0.85';
+      w.style.pointerEvents = 'auto';
+    } else if (diff === total - 1) {
+      // Left slide
+      w.style.left = '20%';
+      w.style.top = '50%';
+      w.style.transform = 'translate(-50%, -50%) scale(0.82) rotateY(16deg) translateZ(-80px)';
+      w.style.zIndex = '20';
+      w.style.opacity = '0.85';
+      w.style.pointerEvents = 'auto';
+    } else {
+      // Hidden behind
+      w.style.left = '50%';
+      w.style.top = '50%';
+      w.style.transform = 'translate(-50%, -50%) scale(0.6) translateZ(-200px)';
+      w.style.zIndex = '10';
+      w.style.opacity = '0';
+      w.style.pointerEvents = 'none';
+    }
+  });
+
+  // Update dots
+  const dotsContainer = document.getElementById('carouselDots');
+  if (dotsContainer) {
+    const dots = dotsContainer.querySelectorAll('button');
+    dots.forEach((dot, idx) => {
+      dot.className = idx === activeSlideIndex
+        ? 'w-5 h-1.5 rounded-full bg-blue-600 transition-all duration-300'
+        : 'w-1.5 h-1.5 rounded-full bg-slate-300 hover:bg-slate-400 transition-all cursor-pointer';
+    });
+  }
+
+  // Update bottom cards active state
+  const bottomCards = document.querySelectorAll('#bottomCards .bottom-card-enter');
+  bottomCards.forEach((card, idx) => {
+    const indicator = card.querySelector('.dot-indicator');
+    if (idx === activeSlideIndex) {
+      card.classList.add('border-blue-600', 'ring-2', 'ring-blue-500/30');
+      card.classList.remove('border-white/90');
+      if (indicator) {
+        indicator.classList.remove('bg-white/80');
+        indicator.classList.add('bg-blue-400');
+      }
+    } else {
+      card.classList.remove('border-blue-600', 'ring-2', 'ring-blue-500/30');
+      card.classList.add('border-white/90');
+      if (indicator) {
+        indicator.classList.remove('bg-blue-400');
+        indicator.classList.add('bg-white/80');
+      }
+    }
+  });
+}
+
+function updateCarousel(index) {
+  const total = CAMPUS_IMAGES.length;
+  activeSlideIndex = (index + total) % total;
+  updateSlidePositions();
+}
+
+function nextCarouselSlide() {
+  updateCarousel(activeSlideIndex + 1);
+}
+
+function prevCarouselSlide() {
+  updateCarousel(activeSlideIndex - 1);
+}
+
+function initCarousel() {
+  renderSlides();
+
+  const prevBtn = document.getElementById('carouselPrevBtn');
+  const nextBtn = document.getElementById('carouselNextBtn');
+  if (prevBtn) prevBtn.addEventListener('click', prevCarouselSlide);
+  if (nextBtn) nextBtn.addEventListener('click', nextCarouselSlide);
+
+  const stage = document.getElementById('carouselStage');
+  if (stage) {
+    stage.addEventListener('mouseenter', () => { isCarouselHovered = true; });
+    stage.addEventListener('mouseleave', () => { isCarouselHovered = false; });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (document.getElementById('lightboxModal')?.classList.contains('flex')) return;
+    if (e.key === 'ArrowLeft') prevCarouselSlide();
+    if (e.key === 'ArrowRight') nextCarouselSlide();
+  });
+
+  // Autoplay
+  if (carouselTimer) clearInterval(carouselTimer);
+  carouselTimer = setInterval(() => {
+    if (!isCarouselHovered) {
+      nextCarouselSlide();
+    }
+  }, 5500);
+}
+
+/* ── Bottom Campus Photo Thumbnails (Pure Image Showcase) ── */
+function renderBottomCards() {
+  const container = document.getElementById('bottomCards');
+  if (!container) return;
+  container.innerHTML = '';
+
+  CAMPUS_IMAGES.forEach((item, index) => {
+    const card = document.createElement('div');
+    const isActive = index === activeSlideIndex;
+    card.className = `bottom-card-enter group relative aspect-[16/10] rounded-xl overflow-hidden shadow-xs hover:shadow-lg border-2 ${isActive ? 'border-blue-600 ring-2 ring-blue-500/30' : 'border-white/90 hover:border-blue-500'} transition-all duration-300 cursor-pointer bg-slate-900`;
+    card.setAttribute('title', `${item.category}: ${item.title}`);
+    card.dataset.index = index;
+    card.innerHTML = `
+      <img
+        src="${item.src}"
+        alt="${item.title}"
+        class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+        onerror="this.onerror=null; this.src='${item.fallback}';"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent opacity-80 group-hover:opacity-95 transition-opacity pointer-events-none"></div>
+      <div class="absolute bottom-1.5 inset-x-2 flex items-center justify-between pointer-events-none">
+        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-white drop-shadow-sm truncate">
+          <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-blue-400' : 'bg-white/80'} shrink-0 dot-indicator"></span>
+          ${item.category}
+        </span>
+        <span class="text-[9px] text-blue-200 opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-sm">View ↗</span>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      updateCarousel(index);
+    });
+    container.appendChild(card);
+  });
+}
+
+function showTeamMemberModal(id) {
+  const m = TEAM_MEMBERS.find(t => t.id === id);
+  if (!m) return;
+
+  const titleEl = document.getElementById('infoModalTitle');
+  const bodyEl = document.getElementById('infoModalBody');
+  const modal = document.getElementById('infoModal');
+
+  if (titleEl) titleEl.textContent = `${m.role} — ${m.name}`;
+  if (bodyEl) {
+    bodyEl.innerHTML = `
+      <div class="flex items-center gap-3 p-3 bg-blue-50/70 rounded-xl border border-blue-100 mb-3">
+        <img src="${m.src}" alt="${m.role}" class="w-14 h-14 rounded-lg object-cover border border-blue-200 shrink-0" onerror="this.onerror=null; this.src='${m.fallback}';" />
+        <div>
+          <div class="text-xs font-bold text-blue-900">${m.subtitle}</div>
+          <div class="text-[11px] text-blue-700/80 mt-0.5">VidyaOS Institutional Engineering Team</div>
+        </div>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">${m.bio}</p>
+      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Core Technical Contributions</div>
+      <ul class="space-y-1.5 text-xs text-slate-700">
+        ${m.highlights.map(h => `<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span><span>${h}</span></li>`).join('')}
+      </ul>
+    `;
+  }
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+}
+
+function showNbaGuidelinesModal() {
+  const titleEl = document.getElementById('infoModalTitle');
+  const bodyEl = document.getElementById('infoModalBody');
+  const modal = document.getElementById('infoModal');
+
+  if (titleEl) titleEl.textContent = 'National Board of Accreditation (NBA) Compliance';
+  if (bodyEl) {
+    bodyEl.innerHTML = `
+      <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 mb-3 text-amber-900">
+        <div class="text-xs font-bold flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          Outcome Based Education (OBE) Automated Compliance
+        </div>
+        <p class="text-[11px] text-amber-800 mt-1">VidyaOS is engineered specifically to adhere to Tier-I and Tier-II institutional accreditation standards.</p>
+      </div>
+      <div class="space-y-2 text-xs text-slate-700 leading-relaxed">
+        <p><strong>Criterion 3 — Program Outcomes (POs) & Course Outcomes (COs):</strong> Direct assessment rubrics, CO-PO mapping matrix, and target attainment calculations are computed automatically from student exam records.</p>
+        <p><strong>Criterion 4 — Continuous Internal Evaluation (CIE):</strong> Mid-term assessments, tutorials, and assignment tracking with certified PDF dossier generation.</p>
+        <p><strong>Criterion 5 & 6 — Faculty Workload & Department Dossiers:</strong> Auto-compilation of theory class logs, laboratory batches, lesson plans, and HOD approvals.</p>
+      </div>
+    `;
+  }
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+}
+
+function closeInfoModal() {
+  const modal = document.getElementById('infoModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+/* ── Lightbox Modal Engine ── */
+let currentLightboxIndex = 0;
+
+function openLightboxModal(index) {
+  const item = CAMPUS_IMAGES[index];
+  if (!item) return;
+  currentLightboxIndex = index;
+
+  const img = document.getElementById('lightboxImg');
+  const cat = document.getElementById('lightboxCategory');
+  const title = document.getElementById('lightboxTitle');
+  const sub = document.getElementById('lightboxSubtitle');
+  const counter = document.getElementById('lightboxCounter');
+  const modal = document.getElementById('lightboxModal');
+
+  if (img) {
+    img.src = item.src;
+    img.onerror = () => { img.src = item.fallback; };
+  }
+  if (cat) cat.textContent = item.category;
+  if (title) title.textContent = item.title;
+  if (sub) sub.textContent = item.subtitle;
+  if (counter) counter.textContent = `${index + 1} / ${CAMPUS_IMAGES.length}`;
+
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+}
+
+function closeLightboxModal() {
+  const modal = document.getElementById('lightboxModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+function nextLightboxSlide() {
+  const nextIdx = (currentLightboxIndex + 1) % CAMPUS_IMAGES.length;
+  openLightboxModal(nextIdx);
+}
+
+function prevLightboxSlide() {
+  const prevIdx = (currentLightboxIndex - 1 + CAMPUS_IMAGES.length) % CAMPUS_IMAGES.length;
+  openLightboxModal(prevIdx);
+}
+
+// Lightbox keyboard and click-outside listeners
+document.addEventListener('keydown', (e) => {
+  const modal = document.getElementById('lightboxModal');
+  if (modal && modal.classList.contains('flex')) {
+    if (e.key === 'Escape') closeLightboxModal();
+    if (e.key === 'ArrowLeft') prevLightboxSlide();
+    if (e.key === 'ArrowRight') nextLightboxSlide();
+  }
+  const infoModal = document.getElementById('infoModal');
+  if (infoModal && infoModal.classList.contains('flex')) {
+    if (e.key === 'Escape') closeInfoModal();
+  }
+});
+
+const lbModal = document.getElementById('lightboxModal');
+if (lbModal) {
+  lbModal.addEventListener('click', (e) => {
+    if (e.target === lbModal) closeLightboxModal();
+  });
+}
+
+const ifModal = document.getElementById('infoModal');
+if (ifModal) {
+  ifModal.addEventListener('click', (e) => {
+    if (e.target === ifModal) closeInfoModal();
+  });
+}
+
+/* ── Ambient Particles Canvas ── */
+function initAmbientCanvas() {
+  const canvas = document.getElementById('ambientCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = canvas.offsetWidth || window.innerWidth * 0.7;
+  let height = canvas.height = canvas.offsetHeight || window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = canvas.offsetWidth || window.innerWidth * 0.7;
+    height = canvas.height = canvas.offsetHeight || window.innerHeight;
+  });
+
+  const particles = Array.from({ length: 26 }, () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    radius: Math.random() * 2 + 1,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    alpha: Math.random() * 0.35 + 0.15
+  }));
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = width;
+      if (p.x > width) p.x = 0;
+      if (p.y < 0) p.y = height;
+      if (p.y > height) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(37, 99, 235, ${p.alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+/* ── Sign In / Sign Up View Toggling ── */
+function setupViewToggles() {
+  const showSignUpBtn = document.getElementById('showSignUpBtn');
+  const showSignInBtn = document.getElementById('showSignInBtn');
+  const signInView = document.getElementById('signInView');
+  const signUpView = document.getElementById('signUpView');
+
+  if (showSignUpBtn && signInView && signUpView) {
+    showSignUpBtn.addEventListener('click', () => {
+      signInView.classList.add('hidden');
+      signUpView.classList.remove('hidden');
+    });
+  }
+
+  if (showSignInBtn && signInView && signUpView) {
+    showSignInBtn.addEventListener('click', () => {
+      signUpView.classList.add('hidden');
+      signInView.classList.remove('hidden');
+    });
+  }
+}
+
+// Global exports
+window.showNbaGuidelinesModal = showNbaGuidelinesModal;
+window.renderBottomCards = renderBottomCards;
+window.closeInfoModal = closeInfoModal;
+window.openLightboxModal = openLightboxModal;
+window.closeLightboxModal = closeLightboxModal;
+window.nextLightboxSlide = nextLightboxSlide;
+window.prevLightboxSlide = prevLightboxSlide;
+
+// Initializer
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initCarousel();
+    renderBottomCards();
+    initAmbientCanvas();
+  });
+} else {
+  initCarousel();
+  renderBottomCards();
+  initAmbientCanvas();
+}
