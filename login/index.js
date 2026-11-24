@@ -1876,10 +1876,10 @@ function updateSlidePositions(isInitial = false) {
   }
 
   // Update fixed bottom team cards active highlight
-  // Project team slides start at index 5 (slides 5, 6, 7, 8, 9)
+  // Project team slides start at CAMPUS_IMAGES.length
   const bottomCards = document.querySelectorAll('#bottomCards .bottom-team-card');
   bottomCards.forEach((card, idx) => {
-    const isMatchingTeamMember = activeSlideIndex === 5 + idx;
+    const isMatchingTeamMember = activeSlideIndex === (CAMPUS_IMAGES.length + idx);
     if (isMatchingTeamMember) {
       card.classList.add('ring-2', 'ring-blue-600', 'shadow-lg', '-translate-y-1', 'border-blue-600');
       card.classList.remove('border-white/90');
@@ -1961,7 +1961,7 @@ function renderBottomCards() {
 
   PROJECT_TEAM.forEach((item, index) => {
     const card = document.createElement('div');
-    const isMatchingActive = activeSlideIndex === 5 + index;
+    const isMatchingActive = activeSlideIndex === (CAMPUS_IMAGES.length + index);
 
     card.className = `bottom-team-card bottom-card-enter group relative aspect-[16/10] rounded-xl overflow-hidden shadow-xs hover:shadow-lg border-2 ${
       isMatchingActive ? 'border-blue-600 ring-2 ring-blue-600 shadow-lg -translate-y-1' : 'border-white/90 hover:border-blue-500'
@@ -1987,7 +1987,7 @@ function renderBottomCards() {
 
     // Clicking fixed bottom card jumps main carousel to that team member's slide
     card.addEventListener('click', () => {
-      updateCarousel(5 + index);
+      updateCarousel(CAMPUS_IMAGES.length + index);
     });
 
     container.appendChild(card);
