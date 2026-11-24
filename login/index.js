@@ -127,7 +127,6 @@ let currentActivationToken = null;
   function pingHealth() {
     try {
       fetch('/api/v1/health', { cache: 'no-store' }).catch(() => { });
-      fetch('https://vidyaos-backend.onrender.com/api/v1/health', { mode: 'no-cors', cache: 'no-store' }).catch(() => { });
     } catch (_) { }
   }
   pingHealth();
@@ -147,7 +146,7 @@ async function executeLoginWithRetry(payload, maxAttempts = 15) {
       if (attempt > 1) {
         const elapsed = (attempt - 1) * 3;
         if (text) text.textContent = `Server waking up (${elapsed}s)...`;
-        fetch('https://vidyaos-backend.onrender.com/api/v1/health', { mode: 'no-cors', cache: 'no-store' }).catch(() => { });
+        fetch('/api/v1/health', { cache: 'no-store' }).catch(() => { });
       }
       const res = await fetchApi('/auth/login', {
         method: 'POST',
@@ -214,8 +213,8 @@ function togglePw() {
   inp.type = show ? 'text' : 'password';
   if (btn) {
     btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-    btn.classList.toggle('text-blue-700', show);
-    btn.classList.toggle('text-blue-600', !show);
+    btn.classList.toggle('text-blue-600', show);
+    btn.classList.toggle('text-slate-400', !show);
     btn.innerHTML = show
       ? `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
@@ -1655,6 +1654,7 @@ function loadCarouselConfig() {
       if (typeof cfg.autoplay === 'boolean') {
         carouselAutoplayEnabled = cfg.autoplay;
       }
+      startCarouselAutoplay();
     }
   } catch (_) {}
 
@@ -1776,11 +1776,14 @@ function renderSlides() {
     // Render mobile strip item
     if (mobileStrip) {
       const mItem = document.createElement('div');
-      mItem.className = 'shrink-0 w-[240px] aspect-[16/10] rounded-xl overflow-hidden shadow-md relative snap-center cursor-pointer';
+      mItem.className = 'shrink-0 w-[240px] aspect-[16/10] rounded-xl overflow-hidden shadow-md relative snap-center cursor-pointer border-2 border-white/80 active:scale-95 transition-transform duration-200';
       mItem.innerHTML = `
         <img src="${item.src}" alt="${item.title}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${item.fallback}';" />
-        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white">
-          <div class="text-xs font-bold truncate">${item.title}</div>
+        <span class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded text-[9px] font-semibold bg-slate-900/70 text-slate-200 backdrop-blur-xs border border-white/10">
+          ${item.tag || item.category}
+        </span>
+        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent p-2.5 text-white pointer-events-none">
+          <div class="text-xs font-bold truncate text-white">${item.title}</div>
           <div class="text-[10px] text-slate-300 truncate">${item.subtitle}</div>
         </div>
       `;
@@ -1891,6 +1894,7 @@ function updateCarousel(index) {
   const total = slides.length;
   activeSlideIndex = (index + total) % total;
   updateSlidePositions(false);
+  startCarouselAutoplay();
 }
 
 function nextCarouselSlide() {
@@ -1920,10 +1924,12 @@ function initCarousel() {
   if (prevBtn) prevBtn.addEventListener('click', prevCarouselSlide);
   if (nextBtn) nextBtn.addEventListener('click', nextCarouselSlide);
 
-  const stage = document.getElementById('carouselStage');
-  if (stage) {
-    stage.addEventListener('mouseenter', () => { isCarouselHovered = true; });
-    stage.addEventListener('mouseleave', () => { isCarouselHovered = false; });
+  // Pause autoplay only when hovering directly over the active 3D carousel track,
+  // NOT the entire 70% left stage
+  const track = document.getElementById('carouselTrack');
+  if (track) {
+    track.addEventListener('mouseenter', () => { isCarouselHovered = true; });
+    track.addEventListener('mouseleave', () => { isCarouselHovered = false; });
   }
 
   // Keyboard navigation
@@ -1933,7 +1939,7 @@ function initCarousel() {
     if (e.key === 'ArrowRight') nextCarouselSlide();
   });
 
-  // Autoplay (3.6s)
+  // Autoplay (default 3.6s)
   startCarouselAutoplay();
 
   // Cross-tab synchronization via storage events
@@ -2248,8 +2254,8 @@ function toggleRegPw(inputId, btnId) {
   inp.type = show ? 'text' : 'password';
   if (btn) {
     btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-    btn.classList.toggle('text-blue-700', show);
-    btn.classList.toggle('text-blue-600', !show);
+    btn.classList.toggle('text-blue-600', show);
+    btn.classList.toggle('text-slate-400', !show);
     btn.innerHTML = show
       ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
@@ -2447,6 +2453,14 @@ window.toggleRollNotAvailable = toggleRollNotAvailable;
 window.toggleRegPw = toggleRegPw;
 window.handleStudentRegisterSubmit = handleStudentRegisterSubmit;
 window.handleQuickRegistration = handleQuickRegistration;
+window.setCarouselSpeed = function (speedMs) {
+  if (typeof speedMs === 'number' && speedMs >= 500) {
+    carouselSwitchSpeed = speedMs;
+    startCarouselAutoplay();
+    return `Carousel speed set to ${speedMs}ms`;
+  }
+  return `Invalid speed: ${speedMs}`;
+};
 
 // Initializer
 if (document.readyState === 'loading') {

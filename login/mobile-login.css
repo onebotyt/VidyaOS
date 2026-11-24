@@ -5,16 +5,18 @@
    ══════════════════════════════════════════════════════════════ */
 
 @media (min-width: 861px) {
-  .mobile-login-layout {
+  .mobile-login-layout,
+  #mobile-login-view {
     display: none !important;
   }
-  .desktop-login-layout {
+  .desktop-login-layout,
+  #desktop-login-view {
     display: flex !important;
   }
 }
 
 @media (max-width: 860px) {
-  /* Hide Desktop Layout Elements */
+  /* Hide Desktop Layout Elements on Mobile Screens */
   .desktop-login-layout,
   #desktop-login-view,
   .desktop-showcase-panel,
@@ -43,7 +45,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .mobile-login-layout {
+  .mobile-login-layout,
+  #mobile-login-view {
     display: flex !important;
     flex-direction: column;
     width: 100%;
@@ -56,6 +59,7 @@
     box-sizing: border-box;
     overflow: hidden;
   }
+}
 
   /* ══════════════════════════════════════════════════════════════
      1. WELCOME / SPLASH SCREEN VIEW
