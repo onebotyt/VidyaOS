@@ -36,6 +36,10 @@
   function applyInstitutionSettings(settings) {
     if (!settings) return;
 
+    if (typeof window.applyBrandingData === 'function') {
+      window.applyBrandingData(settings);
+    }
+
     const logoSlot = document.getElementById('hero-logo-slot');
     const titleEl = document.getElementById('hero-inst-title');
     const bannerSlot = document.getElementById('hero-banner-slot');

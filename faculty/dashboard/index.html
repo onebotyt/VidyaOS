@@ -16,7 +16,8 @@
   <link rel="stylesheet" href="/faculty/components/faculty-base.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261117">
-  <link rel="stylesheet" href="/faculty/dashboard/dashboard.css?v=20261117">
+  <link rel="stylesheet" href="/global-components/institution-hero/institution-hero.css?v=20261124">
+  <link rel="stylesheet" href="/faculty/dashboard/dashboard.css?v=20261124">
   <script>
     (function () {
       try {
@@ -35,18 +36,27 @@
       <div id="faculty-header-mount"></div>
 
       <main class="dash-container">
-        <!-- Institutional Hero (Dynamically Linked to Admin Settings) -->
-        <section class="hero-card" aria-label="Institutional Showcase">
-          <div class="hero-left">
-            <div class="hero-logo" id="hero-logo-slot">
-              <!-- Dynamically populated from Admin Settings -->
+        <!-- Global Institutional Hero Showcase Component (Self-Mounting & Hydrating) -->
+        <div id="global-hero-mount">
+          <section class="global-inst-hero-card dash-hero-card" id="global-inst-hero" aria-label="Institutional Showcase">
+            <div class="dash-hero-brand-group">
+              <div class="dash-hero-logo-badge">
+                <img id="dash-inst-logo" src="/images/collegelogo.jpeg" alt="Institutional Logo"
+                  onerror="this.onerror=null;this.src='/images/collegelogo.jpeg'">
+              </div>
+              <div class="dash-hero-vdivider"></div>
+              <div class="dash-hero-text">
+                <h1 id="dash-inst-name" class="dash-hero-title">Government Polytechnic College</h1>
+                <p id="dash-inst-tagline" class="dash-hero-subtitle">Uttarakhand | NBA Compliant</p>
+              </div>
             </div>
-            <h1 class="hero-title" id="hero-inst-title">Loading Institution...</h1>
-          </div>
-          <div class="hero-banner" id="hero-banner-slot">
-            <!-- Dynamically populated from Admin Settings -->
-          </div>
-        </section>
+            <div class="dash-hero-banner-wrap" aria-hidden="true">
+              <img id="dash-inst-banner" src="/admin/dashboard/campus-nainital.jpg" alt="College Campus"
+                class="dash-hero-banner-img" onerror="this.onerror=null;this.src='/admin/dashboard/campus-nainital.jpg'">
+              <div class="dash-hero-banner-glow"></div>
+            </div>
+          </section>
+        </div>
 
         <!-- Navigation Capsules & Department Badge -->
         <div class="dash-toolbar">
@@ -240,6 +250,9 @@
 
         <!-- Hidden DOM Compatibility Contract Markers (Preserves API bindings and test contracts) -->
         <div style="display:none;" aria-hidden="true">
+          <div id="hero-logo-slot"></div>
+          <h1 id="hero-inst-title"></h1>
+          <div id="hero-banner-slot"></div>
           <div id="dept-hero-container"></div>
           <div id="hod-dept-command-center"></div>
           <div id="teaching-classes-view"></div>
@@ -263,7 +276,8 @@
   <script src="/faculty/components/core/auth.js"></script>
   <script src="/faculty/components/header/header.js"></script>
   <script src="/faculty/components/sidebar/sidebar.js"></script>
-  <script src="/faculty/dashboard/dashboard.js?v=20261117"></script>
+  <script src="/global-components/institution-hero/institution-hero.js?v=20261124"></script>
+  <script src="/faculty/dashboard/dashboard.js?v=20261124"></script>
 </body>
 
 </html>
