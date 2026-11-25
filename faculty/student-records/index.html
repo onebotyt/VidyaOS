@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="/faculty/components/header/header.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/sidebar/sidebar.css?v=20261117">
   <link rel="stylesheet" href="/faculty/components/delete-modal/delete-modal.css?v=20261117">
-  <link rel="stylesheet" href="/faculty/student-records/records.css?v=20261121_mobile">
+  <link rel="stylesheet" href="/faculty/student-records/records.css?v=20261126_mobile_v10">
   <script>
     (function () {
       try {
@@ -244,206 +244,141 @@
 
       <!-- Top Modal Header: UBTER Roll No & Student Name -->
       <div class="rec-modal-header rec-dossier-header">
-        <div class="rec-header-student-info">
-          <div class="rec-student-avatar-badge" id="dossier-avatar">ST</div>
-          <div class="rec-student-meta">
-            <div class="rec-student-title-line">
-              <h2 id="dossier-modal-name" class="rec-dossier-student-title">Student Academic Dossier</h2>
-              <span class="rec-enrollment-badge">UBTER Roll: <strong id="dossier-enrollment-val">--</strong></span>
+        <div class="rec-dossier-header-top">
+          <div class="rec-header-student-info">
+            <div class="rec-student-avatar-badge" id="dossier-avatar">ST</div>
+            <div class="rec-student-meta">
+              <div class="rec-student-title-line">
+                <h2 id="dossier-modal-name" class="rec-dossier-student-title">Student Profile</h2>
+                <span class="rec-enrollment-badge">UBTER Roll: <strong id="dossier-enrollment-val">--</strong></span>
+              </div>
             </div>
-            <div class="rec-dossier-identifiers">
-              <span class="rec-id-pill secondary">Roll #<strong id="dossier-roll-val">--</strong></span>
-              <span class="rec-id-pill" id="dossier-reg-pill">UBTER Reg: <strong id="dossier-reg-val">--</strong></span>
-              <span class="rec-id-pill" id="dossier-batch-val">Batch --</span>
-              <span class="rec-id-pill" id="dossier-cohort-val">Cohort --</span>
+          </div>
+          <div class="rec-header-actions">
+            <!-- Dedicated Personal Details Export button -->
+            <div class="rec-export-btn-group">
+              <button type="button" class="btn-rec-export-profile" id="btn-profile-export"
+                onclick="toggleProfileExportMenu(event)" title="Export Student Bio-Data & Personal Details">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span class="btn-profile-export-text">Bio-Data</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              <div id="profile-export-menu" class="rec-profile-export-dropdown" style="display:none;">
+                <button type="button" onclick="exportStudentPersonalDetails('pdf')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                  <span>Bio-Data Sheet (PDF)</span>
+                </button>
+                <button type="button" onclick="exportStudentPersonalDetails('excel')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                  <span>Demographics (.xlsx)</span>
+                </button>
+                <button type="button" onclick="exportStudentPersonalDetails('doc')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  </svg>
+                  <span>Bio-Data Word (.doc)</span>
+                </button>
+              </div>
             </div>
+            <button type="button" class="btn-modal-close" onclick="closeDossierModal()" aria-label="Close modal">&times;</button>
           </div>
         </div>
-        <div class="rec-header-actions">
-          <!-- Dedicated Personal Details Export button -->
-          <div class="rec-export-btn-group">
-            <button type="button" class="btn-rec-export-profile" id="btn-profile-export"
-              onclick="toggleProfileExportMenu(event)" title="Export Student Bio-Data & Personal Details">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              <span>Personal Details</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
-            <div id="profile-export-menu" class="rec-profile-export-dropdown" style="display:none;">
-              <button type="button" onclick="exportStudentPersonalDetails('pdf')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                  <rect x="6" y="14" width="12" height="8"></rect>
-                </svg>
-                <span>Bio-Data Sheet (PDF)</span>
-              </button>
-              <button type="button" onclick="exportStudentPersonalDetails('excel')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                <span>Demographics (.xlsx)</span>
-              </button>
-              <button type="button" onclick="exportStudentPersonalDetails('doc')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                </svg>
-                <span>Bio-Data Word (.doc)</span>
-              </button>
-            </div>
-          </div>
-          <button type="button" class="btn-modal-close" onclick="closeDossierModal()">&times;</button>
+        <div class="rec-dossier-identifiers">
+          <span class="rec-id-pill secondary">Roll #<strong id="dossier-roll-val">--</strong></span>
+          <span class="rec-id-pill" id="dossier-reg-pill">UBTER Reg: <strong id="dossier-reg-val">--</strong></span>
+          <span class="rec-id-pill" id="dossier-batch-val">Batch --</span>
+          <span class="rec-id-pill" id="dossier-cohort-val">Cohort --</span>
         </div>
       </div>
 
       <div class="rec-dossier-body">
 
-        <!-- 5 Interactive Status Cards Row -->
-        <div class="rec-status-cards-row">
-          <!-- Card 1: Assignments -->
-          <div class="rec-status-card active" id="card-status-assignments"
-            onclick="selectDossierSection('assignments')">
-            <div class="rec-card-top">
-              <div class="rec-card-icon assignments">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                </svg>
-              </div>
-              <span class="rec-card-tag">Coursework</span>
-            </div>
-            <div class="rec-card-content">
-              <span class="rec-card-label">Assignments</span>
-              <div class="rec-card-metric-line">
-                <span class="rec-card-metric" id="card-metric-assignments">8/8</span>
-                <span class="rec-card-sub" id="card-sub-assignments">Evaluated</span>
-              </div>
-            </div>
-            <button type="button" class="btn-rec-card-view"
-              onclick="event.stopPropagation(); selectDossierSection('assignments')">
-              <span>View Sheet</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
+        <!-- Section Navigation List (Responsive: Compact Select Dropdown on Mobile & Horizontal Tab List on Desktop) -->
+        <div class="rec-section-nav-wrap">
+          <!-- Mobile Single-Select Dropdown Menu -->
+          <div class="rec-section-select-bar">
+            <label for="dossier-section-select" class="rec-section-select-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
               </svg>
-            </button>
+              <span>Record View:</span>
+            </label>
+            <div class="rec-select-custom-wrapper">
+              <select id="dossier-section-select" class="rec-section-select" onchange="selectDossierSection(this.value)">
+                <option value="assignments" id="opt-section-assignments">Coursework (0/0)</option>
+                <option value="tests" id="opt-section-tests">Exams (0/0)</option>
+                <option value="labs" id="opt-section-labs">Practicals (0/0)</option>
+                <option value="attendance" id="opt-section-attendance">Attendance (100%)</option>
+                <option value="documents" id="opt-section-documents">Other Documents (0 Files)</option>
+              </select>
+              <svg class="rec-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
           </div>
 
-          <!-- Card 2: Tests & Exams -->
-          <div class="rec-status-card" id="card-status-tests" onclick="selectDossierSection('tests')">
-            <div class="rec-card-top">
-              <div class="rec-card-icon tests">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="18" y1="20" x2="18" y2="10"></line>
-                  <line x1="12" y1="20" x2="12" y2="4"></line>
-                  <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-              </div>
-              <span class="rec-card-tag">Exams</span>
-            </div>
-            <div class="rec-card-content">
-              <span class="rec-card-label">Class Tests</span>
-              <div class="rec-card-metric-line">
-                <span class="rec-card-metric" id="card-metric-tests">5/5</span>
-                <span class="rec-card-sub" id="card-sub-tests">Completed</span>
-              </div>
-            </div>
-            <button type="button" class="btn-rec-card-view"
-              onclick="event.stopPropagation(); selectDossierSection('tests')">
-              <span>View Sheet</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
+          <!-- Desktop Horizontal Segmented Tab List -->
+          <div class="rec-section-tabs-list" role="tablist">
+            <button type="button" class="rec-section-tab-item active" id="tab-item-assignments" onclick="selectDossierSection('assignments')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
               </svg>
+              <span>Coursework</span>
+              <span class="rec-tab-badge" id="card-metric-assignments">--</span>
             </button>
-          </div>
-
-          <!-- Card 3: Lab Records -->
-          <div class="rec-status-card" id="card-status-labs" onclick="selectDossierSection('labs')">
-            <div class="rec-card-top">
-              <div class="rec-card-icon labs">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M10 2v7.31L4.62 18.5A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.5L14 9.31V2"></path>
-                  <line x1="8" y1="2" x2="16" y2="2"></line>
-                </svg>
-              </div>
-              <span class="rec-card-tag">Practicals</span>
-            </div>
-            <div class="rec-card-content">
-              <span class="rec-card-label">Lab Record</span>
-              <div class="rec-card-metric-line">
-                <span class="rec-card-metric" id="card-metric-labs">9/9</span>
-                <span class="rec-card-sub" id="card-sub-labs">Verified</span>
-              </div>
-            </div>
-            <button type="button" class="btn-rec-card-view"
-              onclick="event.stopPropagation(); selectDossierSection('labs')">
-              <span>View Sheet</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
+            <button type="button" class="rec-section-tab-item" id="tab-item-tests" onclick="selectDossierSection('tests')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
               </svg>
+              <span>Exams</span>
+              <span class="rec-tab-badge" id="card-metric-tests">--</span>
             </button>
-          </div>
-
-          <!-- Card 4: Attendance Matrix -->
-          <div class="rec-status-card" id="card-status-attendance" onclick="selectDossierSection('attendance')">
-            <div class="rec-card-top">
-              <div class="rec-card-icon attendance">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </div>
-              <span class="rec-card-tag">Ledger</span>
-            </div>
-            <div class="rec-card-content">
-              <span class="rec-card-label">Attendance</span>
-              <div class="rec-card-metric-line">
-                <span class="rec-card-metric" id="card-metric-attendance">100%</span>
-                <span class="rec-card-sub" id="card-sub-attendance">Eligible</span>
-              </div>
-            </div>
-            <button type="button" class="btn-rec-card-view"
-              onclick="event.stopPropagation(); selectDossierSection('attendance')">
-              <span>View Matrix</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
+            <button type="button" class="rec-section-tab-item" id="tab-item-labs" onclick="selectDossierSection('labs')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 2v7.31L4.62 18.5A2 2 0 0 0 6.36 21h11.28a2 2 0 0 0 1.74-2.5L14 9.31V2"></path>
+                <line x1="8" y1="2" x2="16" y2="2"></line>
               </svg>
+              <span>Practicals</span>
+              <span class="rec-tab-badge" id="card-metric-labs">--</span>
             </button>
-          </div>
-
-          <!-- Card 5: Other Documents -->
-          <div class="rec-status-card" id="card-status-documents" onclick="selectDossierSection('documents')">
-            <div class="rec-card-top">
-              <div class="rec-card-icon documents">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
-              </div>
-              <span class="rec-card-tag">Official Proofs</span>
-            </div>
-            <div class="rec-card-content">
-              <span class="rec-card-label">Other Documents</span>
-              <div class="rec-card-metric-line">
-                <span class="rec-card-metric" id="card-metric-documents">0 Files</span>
-                <span class="rec-card-sub">Final Proofs</span>
-              </div>
-            </div>
-            <button type="button" class="btn-rec-card-view"
-              onclick="event.stopPropagation(); selectDossierSection('documents')">
-              <span>View Files</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
+            <button type="button" class="rec-section-tab-item" id="tab-item-attendance" onclick="selectDossierSection('attendance')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
+              <span>Attendance</span>
+              <span class="rec-tab-badge" id="card-metric-attendance">100%</span>
+            </button>
+            <button type="button" class="rec-section-tab-item" id="tab-item-documents" onclick="selectDossierSection('documents')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>Other Documents</span>
+              <span class="rec-tab-badge" id="card-metric-documents">0 Files</span>
             </button>
           </div>
         </div>
@@ -508,18 +443,17 @@
             <table class="rec-excel-table">
               <thead>
                 <tr>
-                  <th class="th-num">S.NO</th>
-                  <th>Semester</th>
-                  <th>Subject Short Name</th>
-                  <th>Assignment NO.</th>
+                  <th>Sem</th>
+                  <th>Name</th>
+                  <th class="th-num">A.NO</th>
                   <th class="th-num">Marks</th>
-                  <th>Submission Date</th>
-                  <th style="text-align:center;">Document</th>
+                  <th>SuDate</th>
+                  <th style="text-align:center;">Doc</th>
                 </tr>
               </thead>
               <tbody id="dossier-assignments-body">
                 <tr>
-                  <td colspan="7" class="rec-empty-cell">No assignments recorded for selected semesters.</td>
+                  <td colspan="6" class="rec-empty-cell">No assignments recorded for selected semesters.</td>
                 </tr>
               </tbody>
               <tfoot id="dossier-assignments-foot"></tfoot>
@@ -546,21 +480,17 @@
             <table class="rec-excel-table">
               <thead>
                 <tr>
-                  <th class="th-num">#</th>
-                  <th>Semester</th>
-                  <th>Subject Code</th>
-                  <th>Subject Name</th>
-                  <th>Assessment / Exam Title</th>
-                  <th>Component</th>
-                  <th class="th-num">Max Marks</th>
-                  <th class="th-num">Marks Scored</th>
-                  <th class="th-num">Score %</th>
-                  <th>Performance Grade</th>
+                  <th>Sem</th>
+                  <th>Name</th>
+                  <th class="th-num">T.NO</th>
+                  <th class="th-num">Marks</th>
+                  <th>SuDate</th>
+                  <th style="text-align:center;">Doc</th>
                 </tr>
               </thead>
               <tbody id="dossier-tests-body">
                 <tr>
-                  <td colspan="10" class="rec-empty-cell">No test records found for selected semesters.</td>
+                  <td colspan="6" class="rec-empty-cell">No test records found for selected semesters.</td>
                 </tr>
               </tbody>
               <tfoot id="dossier-tests-foot"></tfoot>
@@ -587,21 +517,17 @@
             <table class="rec-excel-table">
               <thead>
                 <tr>
-                  <th class="th-num">#</th>
-                  <th>Semester</th>
-                  <th>Subject Code</th>
-                  <th>Lab Subject Name</th>
-                  <th>Experiment / Practical Title</th>
-                  <th>Component</th>
-                  <th class="th-num">Max Marks</th>
-                  <th class="th-num">Marks Scored</th>
-                  <th class="th-num">Score %</th>
-                  <th>Record Status</th>
+                  <th>Sem</th>
+                  <th>Name</th>
+                  <th class="th-num">P.NO</th>
+                  <th class="th-num">Marks</th>
+                  <th>SuDate</th>
+                  <th style="text-align:center;">Doc</th>
                 </tr>
               </thead>
               <tbody id="dossier-labs-body">
                 <tr>
-                  <td colspan="10" class="rec-empty-cell">No lab records found for selected semesters.</td>
+                  <td colspan="6" class="rec-empty-cell">No lab records found for selected semesters.</td>
                 </tr>
               </tbody>
               <tfoot id="dossier-labs-foot"></tfoot>
@@ -627,20 +553,19 @@
             <table class="rec-matrix-table" id="rec-matrix-table">
               <thead>
                 <tr id="matrix-header-row">
-                  <th class="col-pinned-left">Month / Session</th>
-                  <th class="col-pinned-left">Subject Name</th>
-                  <th>Code</th>
-                  <!-- Days 1-31 dynamically injected -->
+                  <th class="col-pinned-left">Month</th>
+                  <th>Name</th>
                   <th>Held</th>
-                  <th>Attended</th>
-                  <th>Absent</th>
-                  <th>Att %</th>
+                  <th>Att</th>
+                  <th>Abs</th>
+                  <th>%</th>
                   <th>Status</th>
+                  <!-- Days 1-31 dynamically injected -->
                 </tr>
               </thead>
               <tbody id="dossier-matrix-body">
                 <tr>
-                  <td colspan="39" class="rec-empty-cell">No attendance records found for selected semesters.</td>
+                  <td colspan="38" class="rec-empty-cell">No attendance records found for selected semesters.</td>
                 </tr>
               </tbody>
               <tfoot id="dossier-matrix-foot"></tfoot>
@@ -682,7 +607,7 @@
 
       <!-- Dossier Modal Footer (Multi-Format & Data Section Export) -->
       <div class="rec-modal-footer">
-        <div class="rec-export-settings-wrap">
+        <div class="rec-export-settings-wrap" id="dossier-export-drawer" style="display:none;">
           <!-- Row 1: Data Sections to Include -->
           <div class="rec-export-section-row">
             <span class="rec-export-label">
@@ -694,23 +619,23 @@
             </span>
             <div class="rec-export-checks-group">
               <label class="rec-check-label">
-                <input type="checkbox" id="export-inc-tests" checked>
+                <input type="checkbox" id="export-inc-tests" checked onchange="updateDossierExportBadge()">
                 <span>Tests &amp; Exams</span>
               </label>
               <label class="rec-check-label">
-                <input type="checkbox" id="export-inc-assignments" checked>
+                <input type="checkbox" id="export-inc-assignments" checked onchange="updateDossierExportBadge()">
                 <span>Assignments</span>
               </label>
               <label class="rec-check-label">
-                <input type="checkbox" id="export-inc-labs" checked>
+                <input type="checkbox" id="export-inc-labs" checked onchange="updateDossierExportBadge()">
                 <span>Lab Records</span>
               </label>
               <label class="rec-check-label">
-                <input type="checkbox" id="export-inc-attendance" checked>
+                <input type="checkbox" id="export-inc-attendance" checked onchange="updateDossierExportBadge()">
                 <span>Attendance Matrix</span>
               </label>
               <label class="rec-check-label">
-                <input type="checkbox" id="export-inc-documents" checked>
+                <input type="checkbox" id="export-inc-documents" checked onchange="updateDossierExportBadge()">
                 <span>Official Documents</span>
               </label>
             </div>
@@ -727,15 +652,15 @@
             </span>
             <div class="rec-export-checks-group">
               <label class="rec-format-label">
-                <input type="checkbox" id="export-single-pdf" checked>
+                <input type="checkbox" id="export-single-pdf" checked onchange="updateDossierExportBadge()">
                 <span>PDF Document</span>
               </label>
               <label class="rec-format-label">
-                <input type="checkbox" id="export-single-doc" checked>
+                <input type="checkbox" id="export-single-doc" checked onchange="updateDossierExportBadge()">
                 <span>Word Document (.doc)</span>
               </label>
               <label class="rec-format-label">
-                <input type="checkbox" id="export-single-excel" checked>
+                <input type="checkbox" id="export-single-excel" checked onchange="updateDossierExportBadge()">
                 <span>Excel (.xlsx)</span>
               </label>
             </div>
@@ -743,6 +668,13 @@
         </div>
 
         <div class="rec-footer-actions">
+          <button type="button" class="btn-rec-outline btn-toggle-export-options" id="btn-toggle-export-options" onclick="toggleDossierExportDrawer()" title="Configure formats and data sections to export">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Export Options (<strong id="dossier-export-badge">8</strong>) ▾</span>
+          </button>
           <button type="button" class="btn-rec-outline" onclick="closeDossierModal()">Close</button>
           <button type="button" class="btn-rec-solid" onclick="executeSingleStudentExport()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -750,7 +682,7 @@
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>Export Selected Dossier</span>
+            <span>Export Selected</span>
           </button>
         </div>
       </div>
@@ -1075,7 +1007,7 @@
   <script src="/faculty/components/icons.js?v=20261117"></script>
   <script src="/faculty/components/sidebar/sidebar.js?v=20261117"></script>
   <script src="/faculty/components/header/header.js?v=20261117"></script>
-  <script src="/faculty/student-records/records.js?v=20261121_mobile"></script>
+  <script src="/faculty/student-records/records.js?v=20261126_mobile_v10"></script>
 </body>
 
 </html>

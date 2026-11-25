@@ -1054,11 +1054,18 @@
     if (modal) modal.style.display = 'none';
   };
 
-  // 3. Dropdown Menu Toggle with Dynamic Flip-up
+  // 3. Dropdown Menu Toggle with Dynamic Flip-up & Row Stacking
   window.toggleRecordKebab = function (e, id) {
     e.stopPropagation();
     const allDropdowns = document.querySelectorAll('.rec-dropdown-menu');
     const target = document.getElementById(`rec-dropdown-${id}`);
+    const currentRow = e.currentTarget.closest('.rec-student-row');
+
+    // Reset all other rows' z-index & class
+    document.querySelectorAll('.rec-student-row').forEach(r => {
+      r.classList.remove('kebab-open');
+      r.style.zIndex = '';
+    });
 
     allDropdowns.forEach(d => {
       if (d !== target) d.classList.remove('show', 'flip-up');
@@ -1067,9 +1074,13 @@
     if (target) {
       const isVisible = target.classList.contains('show');
       if (!isVisible) {
+        if (currentRow) {
+          currentRow.classList.add('kebab-open');
+          currentRow.style.zIndex = '50';
+        }
         const btnRect = e.currentTarget.getBoundingClientRect();
         const spaceBelow = window.innerHeight - btnRect.bottom;
-        if (spaceBelow < 180) {
+        if (spaceBelow < 220) {
           target.classList.add('flip-up');
         } else {
           target.classList.remove('flip-up');
@@ -1077,12 +1088,20 @@
         target.classList.add('show');
       } else {
         target.classList.remove('show', 'flip-up');
+        if (currentRow) {
+          currentRow.classList.remove('kebab-open');
+          currentRow.style.zIndex = '';
+        }
       }
     }
   };
 
   document.addEventListener('click', () => {
     document.querySelectorAll('.rec-dropdown-menu').forEach(d => d.classList.remove('show', 'flip-up'));
+    document.querySelectorAll('.rec-student-row').forEach(r => {
+      r.classList.remove('kebab-open');
+      r.style.zIndex = '';
+    });
   });
 
   // 4. Mobile & Touch Row Click Handler
@@ -1264,6 +1283,16 @@
     const modal = document.getElementById('modal-student-dossier');
     if (modal) modal.style.display = 'flex';
 
+    // Reset Export Options Drawer to collapsed on modal open
+    const drawer = document.getElementById('dossier-export-drawer');
+    if (drawer) {
+      drawer.classList.remove('open');
+      drawer.style.display = 'none';
+    }
+    const drawerBtn = document.getElementById('btn-toggle-export-options');
+    if (drawerBtn) drawerBtn.classList.remove('active');
+    updateDossierExportBadge();
+
     state.selectedDossierSemesters = [1, 2, 3, 4, 5, 6];
     document.querySelectorAll('.check-sem-item').forEach(c => c.checked = true);
     const allCheck = document.getElementById('check-sem-all');
@@ -1312,7 +1341,7 @@
 
     // 2. Header Title & Identifiers (Clean Unicode bullets)
     const nameEl = document.getElementById('dossier-modal-name');
-    if (nameEl) nameEl.textContent = `${p.full_name || 'Student Profile'} - Academic Dossier`;
+    if (nameEl) nameEl.textContent = p.full_name || 'Student Profile';
 
     const enrollEl = document.getElementById('dossier-enrollment-val');
     if (enrollEl) enrollEl.textContent = p.official_enrollment_no || '--';
@@ -1348,60 +1377,65 @@
       return !dtype.includes('ASSIGN') && !dtitle.includes('ASSIGN') && !dtitle.includes('HOMEWORK');
     });
 
-    // 6. Update Status Cards Metrics
+    // 6. Update Section Badges & Select Options
+    const evalCount = assignments.filter(a => a.submission_status === 'GRADED' || a.marks_obtained !== null).length;
+    const assignMetric = `${evalCount}/${assignments.length || 0}`;
     const mAssign = document.getElementById('card-metric-assignments');
-    const sAssign = document.getElementById('card-sub-assignments');
-    if (mAssign) {
-      const evalCount = assignments.filter(a => a.submission_status === 'GRADED' || a.marks_obtained !== null).length;
-      mAssign.textContent = `${evalCount}/${assignments.length || 0}`;
-      if (sAssign) sAssign.textContent = `${assignments.length} Assigned`;
-    }
+    if (mAssign) mAssign.textContent = assignMetric;
+    const optAssign = document.getElementById('opt-section-assignments');
+    if (optAssign) optAssign.textContent = `Coursework (${assignMetric})`;
 
+    const testScoredCount = tests.filter(t => t.marks_obtained !== null && t.marks_obtained !== undefined).length;
+    const testMetric = `${testScoredCount}/${tests.length || 0}`;
     const mTests = document.getElementById('card-metric-tests');
-    const sTests = document.getElementById('card-sub-tests');
-    if (mTests) {
-      const scoredCount = tests.filter(t => t.marks_obtained !== null && t.marks_obtained !== undefined).length;
-      mTests.textContent = `${scoredCount}/${tests.length || 0}`;
-      if (sTests) sTests.textContent = `${tests.length} Scheduled`;
-    }
+    if (mTests) mTests.textContent = testMetric;
+    const optTests = document.getElementById('opt-section-tests');
+    if (optTests) optTests.textContent = `Exams (${testMetric})`;
 
+    const labVerifiedCount = labs.filter(l => l.marks_obtained !== null && l.marks_obtained !== undefined).length;
+    const labMetric = `${labVerifiedCount}/${labs.length || 0}`;
     const mLabs = document.getElementById('card-metric-labs');
-    const sLabs = document.getElementById('card-sub-labs');
-    if (mLabs) {
-      const verifiedCount = labs.filter(l => l.marks_obtained !== null && l.marks_obtained !== undefined).length;
-      mLabs.textContent = `${verifiedCount}/${labs.length || 0}`;
-      if (sLabs) sLabs.textContent = `${labs.length} Practicals`;
-    }
+    if (mLabs) mLabs.textContent = labMetric;
+    const optLabs = document.getElementById('opt-section-labs');
+    if (optLabs) optLabs.textContent = `Practicals (${labMetric})`;
 
+    const attMetric = `${overallPct}%`;
     const mAtt = document.getElementById('card-metric-attendance');
-    const sAtt = document.getElementById('card-sub-attendance');
-    if (mAtt) {
-      mAtt.textContent = `${overallPct}%`;
-      if (sAtt) sAtt.textContent = overallPct >= 75 ? 'Eligible' : 'Defaulter';
-    }
+    if (mAtt) mAtt.textContent = attMetric;
+    const optAtt = document.getElementById('opt-section-attendance');
+    if (optAtt) optAtt.textContent = `Attendance (${attMetric})`;
 
+    const docCount = nonAssignDocs.length;
     const mDocs = document.getElementById('card-metric-documents');
-    if (mDocs) {
-      mDocs.textContent = `${nonAssignDocs.length} Files`;
-    }
+    if (mDocs) mDocs.textContent = String(docCount);
+    const optDocs = document.getElementById('opt-section-documents');
+    if (optDocs) optDocs.textContent = `Other Documents (${docCount} Files)`;
 
     // Set default view to 'assignments'
     selectDossierSection(state.activeDossierSection || 'assignments');
   }
   window.populateDossierModal = populateDossierModal;
 
-  // Active Dossier Section Switcher
+  // Active Dossier Section Switcher (Syncs Dropdown on Mobile & Segmented Tab List on Desktop)
   window.selectDossierSection = function (section) {
     state.activeDossierSection = section;
 
-    const cards = ['assignments', 'tests', 'labs', 'attendance', 'documents'];
-    cards.forEach(c => {
-      const cardEl = document.getElementById(`card-status-${c}`);
-      if (cardEl) cardEl.classList.toggle('active', c === section);
+    const selectEl = document.getElementById('dossier-section-select');
+    if (selectEl && selectEl.value !== section) {
+      selectEl.value = section;
+    }
 
-      const studioEl = document.getElementById(`section-studio-${c}`);
+    const sections = ['assignments', 'tests', 'labs', 'attendance', 'documents'];
+    sections.forEach(s => {
+      const tabEl = document.getElementById(`tab-item-${s}`);
+      if (tabEl) tabEl.classList.toggle('active', s === section);
+
+      const cardEl = document.getElementById(`card-status-${s}`);
+      if (cardEl) cardEl.classList.toggle('active', s === section);
+
+      const studioEl = document.getElementById(`section-studio-${s}`);
       if (studioEl) {
-        if (c === section) {
+        if (s === section) {
           studioEl.classList.add('active');
           studioEl.style.display = 'flex';
         } else {
@@ -1427,10 +1461,77 @@
     } else if (section === 'labs') {
       renderLabsStudio(allAssessments.filter(a => classifyAssessment(a) === 'LAB' && selectedSems.includes(Number(a.semester))));
     } else if (section === 'attendance') {
-      renderAttendanceMatrixStudio((state.activeDossier.attendanceSessions || []).filter(s => selectedSems.includes(Number(s.semester))));
+      renderAttendanceMatrixStudio((state.activeDossier.attendanceSessions || []).filter(s => {
+        const sem = s.semester !== null && s.semester !== undefined ? Number(s.semester) : 5;
+        return selectedSems.includes(sem);
+      }));
     } else if (section === 'documents') {
       renderOtherDocumentsStudio(state.activeDossier.documents || []);
     }
+  }
+
+  // Helper to resolve Subject Short Name (human-readable, never raw code)
+  function getSubjectShortName(item) {
+    if (!item) return '--';
+    if (item.subject_short_name && !item.subject_short_name.match(/^[A-Z]{2,4}-?\d{2,4}$/i)) {
+      return item.subject_short_name;
+    }
+    const name = String(item.subject_name || '');
+    if (/data\s*structure/i.test(name)) return 'DSA';
+    if (/database/i.test(name)) return 'DBMS';
+    if (/web\s*dev/i.test(name)) return 'Web Dev';
+    if (/network|cloud/i.test(name)) return 'CN';
+    if (/java/i.test(name)) return 'Java';
+    if (/operating\s*system/i.test(name)) return 'OS';
+    if (/software\s*eng/i.test(name)) return 'SE';
+    if (/machine\s*learn/i.test(name)) return 'ML';
+    if (/cyber|security/i.test(name)) return 'Security';
+    if (/python/i.test(name)) return 'Python';
+    if (/electronic/i.test(name)) return 'Electronics';
+    if (/math/i.test(name)) return 'Maths';
+    if (/unit\s*test/i.test(name)) return 'AUT';
+
+    if (item.subject_short_name) return item.subject_short_name;
+    if (name) {
+      const words = name.trim().split(/\s+/);
+      if (words.length > 2) {
+        return words.map(w => w[0]).join('').toUpperCase();
+      }
+      return name;
+    }
+    return '--';
+  }
+
+  // Helper to extract assessment number (e.g. 1, 2) from assessment object or title
+  function extractAssessmentNumber(item, fallbackIdx) {
+    if (!item) return String(fallbackIdx || 1);
+    const title = String(item.title || '');
+    // Match explicit number after keywords: "Assignment 1", "Test 2", "Practical 1", "Exp 3", "#1", "Mid-Term 1", etc.
+    const keywordMatch = title.match(/(?:assignment|test|practical|sessional|unit|exp|experiment|lab|task|mid-?term|#)\s*#?\s*(\d+)/i);
+    if (keywordMatch && keywordMatch[1]) {
+      return keywordMatch[1];
+    }
+    // Match any isolated or trailing number
+    const numMatch = title.match(/(\d+)/);
+    if (numMatch && numMatch[1]) {
+      return numMatch[1];
+    }
+    // If it's a Mid-Term or Sessional without an explicit number, default to 1
+    if (/mid-?term|sessional|final/i.test(title)) {
+      return '1';
+    }
+    return String(fallbackIdx || 1);
+  }
+
+  // Format compact date DD/MM/YY
+  function formatCompactDate(dateVal) {
+    if (!dateVal) return '--';
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return '--';
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = String(d.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
   }
 
   // 1. Assignments Studio & Uploads Renderer
@@ -1442,7 +1543,7 @@
 
     if (tbody) {
       if (assignments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="rec-empty-cell">No assignments recorded for selected semesters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="rec-empty-cell">No assignments recorded for selected semesters.</td></tr>`;
         if (tfoot) tfoot.innerHTML = '';
       } else {
         let totalMax = 0;
@@ -1458,36 +1559,37 @@
             totalScored += scored;
             scoredCount++;
           }
-          const pct = hasScore ? Math.round((scored / max) * 100) : null;
-          const status = a.submission_status || (hasScore ? 'GRADED' : 'PENDING');
-          const statusClass = status === 'GRADED' ? 'evaluated' : (status === 'SUBMITTED' ? 'submitted' : 'pending');
-          const dateStr = a.submitted_at ? new Date(a.submitted_at).toLocaleDateString() : '--';
+          const dateStr = formatCompactDate(a.submitted_at || a.due_date);
+          const shortName = getSubjectShortName(a);
+          const assignNo = extractAssessmentNumber(a, idx + 1);
+          const fileName = a.original_filename || (a.file_path ? a.file_path.split(/[\/\\]/).pop() : 'Assignment.pdf');
 
           return `
             <tr>
-              <td class="td-num">${idx + 1}</td>
               <td><strong>Sem ${a.semester || '--'}</strong></td>
-              <td><code>${escapeHtml(a.subject_code || '--')}</code></td>
-              <td>${escapeHtml(a.subject_name || '--')}</td>
-              <td><strong>${escapeHtml(a.title || '--')}</strong></td>
-              <td class="td-num">${max}</td>
-              <td class="td-num">${hasScore ? scored : '--'}</td>
-              <td class="td-num">${hasScore ? `${pct}%` : '--'}</td>
-              <td><span class="rec-status-pill ${statusClass}">${escapeHtml(status)}</span></td>
+              <td><strong>${escapeHtml(shortName)}</strong></td>
+              <td class="td-num" title="${escapeHtml(a.title || `Assignment ${assignNo}`)}"><strong>${assignNo}</strong></td>
+              <td class="td-num">${hasScore ? `<strong>${scored}</strong>/${max}` : `<span style="color:var(--text-muted);">--/${max}</span>`}</td>
               <td>${dateStr}</td>
+              <td style="text-align:center;">
+                ${a.file_path ? `
+                  <a href="${escapeHtml(a.file_path)}" target="_blank" download="${escapeHtml(fileName)}" class="btn-rec-doc-pill" title="Download ${escapeHtml(fileName)}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <span>Doc</span>
+                  </a>
+                ` : `<span class="rec-doc-empty">--</span>`}
+              </td>
             </tr>
           `;
         }).join('');
 
         if (tfoot) {
-          const avgPct = scoredCount > 0 ? Math.round((totalScored / (scoredCount * (totalMax / assignments.length))) * 100) : '--';
+          const avgPct = scoredCount > 0 && totalMax > 0 ? Math.round((totalScored / totalMax) * 100) : '--';
           tfoot.innerHTML = `
             <tr>
-              <td colspan="5" style="text-align:right;"><strong>Total / Evaluation Summary:</strong></td>
-              <td class="td-num">${totalMax}</td>
-              <td class="td-num">${totalScored}</td>
-              <td class="td-num">${avgPct !== '--' ? `${avgPct}%` : '--'}</td>
-              <td colspan="2"><strong>${scoredCount} of ${assignments.length} Evaluated</strong></td>
+              <td colspan="3" style="text-align:right;"><strong>Total:</strong></td>
+              <td class="td-num"><strong>${totalScored}/${totalMax}</strong></td>
+              <td colspan="2" style="text-align:center;"><strong>${scoredCount}/${assignments.length} (${avgPct}%)</strong></td>
             </tr>
           `;
         }
@@ -1531,7 +1633,7 @@
                 <div class="rec-upload-details">
                   <div class="rec-upload-title" title="${escapeHtml(a.title || 'Assignment')}">${escapeHtml(a.title || 'Assignment')}</div>
                   <div class="rec-upload-meta">
-                    <span>${escapeHtml(a.subject_code || '')} • Sem ${a.semester}</span>
+                    <span>${escapeHtml(getSubjectShortName(a))} • Sem ${a.semester}</span>
                     <span>• ${a.submitted_at ? new Date(a.submitted_at).toLocaleDateString() : 'Uploaded'}</span>
                   </div>
                 </div>
@@ -1561,7 +1663,7 @@
     if (!tbody) return;
 
     if (tests.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" class="rec-empty-cell">No test or exam records found for selected semesters.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="rec-empty-cell">No test or exam records found for selected semesters.</td></tr>`;
       if (tfoot) tfoot.innerHTML = '';
       return;
     }
@@ -1579,43 +1681,37 @@
         totalScored += scored;
         scoredCount++;
       }
-      const pct = hasScore ? Math.round((scored / max) * 100) : null;
-      let grade = '--';
-      if (pct !== null) {
-        if (pct >= 90) grade = 'A+';
-        else if (pct >= 80) grade = 'A';
-        else if (pct >= 70) grade = 'B+';
-        else if (pct >= 60) grade = 'B';
-        else if (pct >= 50) grade = 'C';
-        else if (pct >= 40) grade = 'Pass';
-        else grade = 'Fail';
-      }
+      const dateStr = formatCompactDate(t.submitted_at || t.created_at);
+      const shortName = getSubjectShortName(t);
+      const testNo = extractAssessmentNumber(t, idx + 1);
+      const fileName = t.original_filename || (t.file_path ? t.file_path.split(/[\/\\]/).pop() : 'Test_Record.pdf');
 
       return `
         <tr>
-          <td class="td-num">${idx + 1}</td>
           <td><strong>Sem ${t.semester || '--'}</strong></td>
-          <td><code>${escapeHtml(t.subject_code || '--')}</code></td>
-          <td>${escapeHtml(t.subject_name || '--')}</td>
-          <td><strong>${escapeHtml(t.title || '--')}</strong></td>
-          <td><span class="rec-meta-badge">${escapeHtml(t.component || 'THEORY')}</span></td>
-          <td class="td-num">${max}</td>
-          <td class="td-num">${hasScore ? scored : '--'}</td>
-          <td class="td-num">${hasScore ? `${pct}%` : '--'}</td>
-          <td><span class="rec-att-badge ${pct !== null && pct < 40 ? 'low' : ''}">${grade}</span></td>
+          <td><strong>${escapeHtml(shortName)}</strong></td>
+          <td class="td-num" title="${escapeHtml(t.title || `Test ${testNo}`)}"><strong>${testNo}</strong></td>
+          <td class="td-num">${hasScore ? `<strong>${scored}</strong>/${max}` : `<span style="color:var(--text-muted);">--/${max}</span>`}</td>
+          <td>${dateStr}</td>
+          <td style="text-align:center;">
+            ${t.file_path ? `
+              <a href="${escapeHtml(t.file_path)}" target="_blank" download="${escapeHtml(fileName)}" class="btn-rec-doc-pill" title="Download ${escapeHtml(fileName)}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <span>Doc</span>
+              </a>
+            ` : `<span class="rec-doc-empty">--</span>`}
+          </td>
         </tr>
       `;
     }).join('');
 
     if (tfoot) {
-      const avgPct = scoredCount > 0 ? Math.round((totalScored / totalMax) * 100) : '--';
+      const avgPct = scoredCount > 0 && totalMax > 0 ? Math.round((totalScored / totalMax) * 100) : '--';
       tfoot.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:right;"><strong>Total Sessional Marks / Overall Grade:</strong></td>
-          <td class="td-num">${totalMax}</td>
-          <td class="td-num">${totalScored}</td>
-          <td class="td-num">${avgPct !== '--' ? `${avgPct}%` : '--'}</td>
-          <td><strong>${scoredCount} Scored</strong></td>
+          <td colspan="3" style="text-align:right;"><strong>Total:</strong></td>
+          <td class="td-num"><strong>${totalScored}/${totalMax}</strong></td>
+          <td colspan="2" style="text-align:center;"><strong>${scoredCount}/${tests.length} (${avgPct}%)</strong></td>
         </tr>
       `;
     }
@@ -1628,7 +1724,7 @@
     if (!tbody) return;
 
     if (labs.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" class="rec-empty-cell">No practical or lab records found for selected semesters.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="rec-empty-cell">No practical or lab records found for selected semesters.</td></tr>`;
       if (tfoot) tfoot.innerHTML = '';
       return;
     }
@@ -1646,35 +1742,37 @@
         totalScored += scored;
         scoredCount++;
       }
-      const pct = hasScore ? Math.round((scored / max) * 100) : null;
-      const status = hasScore ? 'Verified' : 'Pending Verification';
-      const statusClass = hasScore ? 'evaluated' : 'pending';
+      const dateStr = formatCompactDate(l.submitted_at || l.created_at);
+      const shortName = getSubjectShortName(l);
+      const practicalNo = extractAssessmentNumber(l, idx + 1);
+      const fileName = l.original_filename || (l.file_path ? l.file_path.split(/[\/\\]/).pop() : 'Lab_Practical.pdf');
 
       return `
         <tr>
-          <td class="td-num">${idx + 1}</td>
           <td><strong>Sem ${l.semester || '--'}</strong></td>
-          <td><code>${escapeHtml(l.subject_code || '--')}</code></td>
-          <td>${escapeHtml(l.subject_name || '--')}</td>
-          <td><strong>${escapeHtml(l.title || '--')}</strong></td>
-          <td><span class="rec-meta-badge">PRACTICAL</span></td>
-          <td class="td-num">${max}</td>
-          <td class="td-num">${hasScore ? scored : '--'}</td>
-          <td class="td-num">${hasScore ? `${pct}%` : '--'}</td>
-          <td><span class="rec-status-pill ${statusClass}">${status}</span></td>
+          <td><strong>${escapeHtml(shortName)}</strong></td>
+          <td class="td-num" title="${escapeHtml(l.title || `Practical ${practicalNo}`)}"><strong>${practicalNo}</strong></td>
+          <td class="td-num">${hasScore ? `<strong>${scored}</strong>/${max}` : `<span style="color:var(--text-muted);">--/${max}</span>`}</td>
+          <td>${dateStr}</td>
+          <td style="text-align:center;">
+            ${l.file_path ? `
+              <a href="${escapeHtml(l.file_path)}" target="_blank" download="${escapeHtml(fileName)}" class="btn-rec-doc-pill" title="Download ${escapeHtml(fileName)}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <span>Doc</span>
+              </a>
+            ` : `<span class="rec-doc-empty">--</span>`}
+          </td>
         </tr>
       `;
     }).join('');
 
     if (tfoot) {
-      const avgPct = scoredCount > 0 ? Math.round((totalScored / totalMax) * 100) : '--';
+      const avgPct = scoredCount > 0 && totalMax > 0 ? Math.round((totalScored / totalMax) * 100) : '--';
       tfoot.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:right;"><strong>Total Practical Record Marks:</strong></td>
-          <td class="td-num">${totalMax}</td>
-          <td class="td-num">${totalScored}</td>
-          <td class="td-num">${avgPct !== '--' ? `${avgPct}%` : '--'}</td>
-          <td><strong>${scoredCount} Verified</strong></td>
+          <td colspan="3" style="text-align:right;"><strong>Total:</strong></td>
+          <td class="td-num"><strong>${totalScored}/${totalMax}</strong></td>
+          <td colspan="2" style="text-align:center;"><strong>${scoredCount}/${labs.length} (${avgPct}%)</strong></td>
         </tr>
       `;
     }
@@ -1690,23 +1788,22 @@
     if (headerRow) {
       let dayCols = '';
       for (let d = 1; d <= 31; d++) {
-        dayCols += `<th style="width:24px; min-width:24px; padding:0.4rem 0.15rem;">${d}</th>`;
+        dayCols += `<th style="width:22px; min-width:22px; padding:0.35rem 0.1rem;">${d}</th>`;
       }
       headerRow.innerHTML = `
-        <th class="col-pinned-left" style="min-width:130px;">Month / Session</th>
-        <th style="min-width:140px;">Subject Name</th>
-        <th>Code</th>
-        ${dayCols}
+        <th class="col-pinned-left" style="min-width:80px;">Month</th>
+        <th style="min-width:65px;">Name</th>
         <th>Held</th>
-        <th>Attended</th>
-        <th>Absent</th>
-        <th>Att %</th>
+        <th>Att</th>
+        <th>Abs</th>
+        <th>%</th>
         <th>Status</th>
+        ${dayCols}
       `;
     }
 
-    if (sessions.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="39" class="rec-empty-cell">No attendance recorded for selected semesters.</td></tr>`;
+    if (!sessions || sessions.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="38" class="rec-empty-cell">No attendance recorded for selected semesters.</td></tr>`;
       if (tfoot) tfoot.innerHTML = '';
       return;
     }
@@ -1715,13 +1812,15 @@
     sessions.forEach(s => {
       const dateStr = String(s.session_date || '').split('T')[0];
       const monthKey = dateStr ? dateStr.slice(0, 7) : 'Unknown';
-      const subKey = s.subject_code || 'General';
+      const shortName = getSubjectShortName(s);
+      const subKey = s.subject_code || shortName || 'General';
       const groupKey = `${monthKey}__${subKey}`;
 
       if (!groups[groupKey]) {
         groups[groupKey] = {
           monthKey,
           subject_name: s.subject_name || 'Subject',
+          subject_short_name: shortName,
           subject_code: s.subject_code || '--',
           days: {},
           held: 0,
@@ -1743,7 +1842,7 @@
       }
     });
 
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthShortNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     let grandHeld = 0;
     let grandAtt = 0;
     let grandAbs = 0;
@@ -1759,7 +1858,7 @@
       if (g.monthKey && g.monthKey.includes('-')) {
         const [yr, mo] = g.monthKey.split('-');
         const mIdx = parseInt(mo, 10) - 1;
-        monthLabel = `${monthNames[mIdx] || mo} ${yr}`;
+        monthLabel = `${monthShortNames[mIdx] || mo} ${yr.slice(-2)}`;
       }
 
       let dayCells = '';
@@ -1778,15 +1877,14 @@
 
       return `
         <tr>
-          <td class="col-pinned-left"><strong>${monthLabel}</strong></td>
-          <td>${escapeHtml(g.subject_name)}</td>
-          <td><code>${escapeHtml(g.subject_code)}</code></td>
-          ${dayCells}
+          <td class="col-pinned-left" title="${escapeHtml(g.monthKey)}"><strong>${monthLabel}</strong></td>
+          <td title="${escapeHtml(g.subject_name)} (${escapeHtml(g.subject_code)})"><strong>${escapeHtml(g.subject_short_name)}</strong></td>
           <td class="td-num">${g.held}</td>
           <td class="td-num"><strong>${g.attended}</strong></td>
           <td class="td-num">${g.absent}</td>
           <td><span class="rec-att-badge ${pct < 75 ? 'low' : ''}">${pct}%</span></td>
           <td>${pct >= 75 ? '<span style="color:var(--status-present); font-weight:700;">Eligible</span>' : '<span style="color:var(--status-absent); font-weight:700;">Defaulter</span>'}</td>
+          ${dayCells}
         </tr>
       `;
     }).join('');
@@ -1795,13 +1893,13 @@
       const overallPct = grandHeld > 0 ? Math.round((grandAtt * 100) / grandHeld) : 100;
       tfoot.innerHTML = `
         <tr>
-          <td colspan="3" style="text-align:right;"><strong>Total Monthly Attendance Summary:</strong></td>
-          <td colspan="31" style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Day 1 to 31 Lecture Attendance Ledger</td>
-          <td class="td-num">${grandHeld}</td>
+          <td colspan="2" style="text-align:right;"><strong>Total Monthly Summary:</strong></td>
+          <td class="td-num"><strong>${grandHeld}</strong></td>
           <td class="td-num"><strong>${grandAtt}</strong></td>
-          <td class="td-num">${grandAbs}</td>
-          <td><span class="rec-att-badge ${overallPct < 75 ? 'low' : ''}">${overallPct}%</span></td>
+          <td class="td-num"><strong>${grandAbs}</strong></td>
+          <td><span class="rec-att-badge ${overallPct < 75 ? 'low' : ''}"><strong>${overallPct}%</strong></span></td>
           <td><strong>${overallPct >= 75 ? 'Eligible' : 'Defaulter'}</strong></td>
+          <td colspan="31" style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Day 1 to 31 Lecture Attendance Grid</td>
         </tr>
       `;
     }
@@ -1868,6 +1966,36 @@
     state.activeDossier = null;
     const menu = document.getElementById('profile-export-menu');
     if (menu) menu.style.display = 'none';
+    const drawer = document.getElementById('dossier-export-drawer');
+    if (drawer) {
+      drawer.classList.remove('open');
+      drawer.style.display = 'none';
+    }
+    const drawerBtn = document.getElementById('btn-toggle-export-options');
+    if (drawerBtn) drawerBtn.classList.remove('active');
+  };
+
+  window.toggleDossierExportDrawer = function () {
+    const drawer = document.getElementById('dossier-export-drawer');
+    const btn = document.getElementById('btn-toggle-export-options');
+    if (!drawer) return;
+    const isCurrentlyOpen = drawer.classList.contains('open') || drawer.style.display === 'flex';
+    if (isCurrentlyOpen) {
+      drawer.classList.remove('open');
+      drawer.style.display = 'none';
+      if (btn) btn.classList.remove('active');
+    } else {
+      drawer.classList.add('open');
+      drawer.style.display = 'flex';
+      if (btn) btn.classList.add('active');
+    }
+  };
+
+  window.updateDossierExportBadge = function () {
+    const badge = document.getElementById('dossier-export-badge');
+    if (!badge) return;
+    const checks = document.querySelectorAll('#dossier-export-drawer input[type="checkbox"]:checked');
+    badge.textContent = String(checks.length);
   };
 
   // Profile Export Dropdown Menu Toggle
