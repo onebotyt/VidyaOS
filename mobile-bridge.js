@@ -21,7 +21,12 @@
   // Detect whether running in Capacitor / Mobile native shell (Strictly false in web browser)
   const isCapacitor = typeof window !== 'undefined' && (
     window.VIDYAOS_FORCE_NATIVE === true ||
+    window.VIDYAOS_IS_NATIVE === true ||
+    typeof window.NativeSystemUI !== 'undefined' ||
+    typeof window.NativeAuthBridge !== 'undefined' ||
+    typeof window.NativeAppUpdater !== 'undefined' ||
     (typeof window.Capacitor !== 'undefined' && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
+    (typeof navigator !== 'undefined' && /VidyaOSNativeApp/i.test(navigator.userAgent)) ||
     window.location.protocol === 'capacitor:' ||
     (window.location.protocol === 'file:' && /android_asset/i.test(window.location.pathname))
   );
@@ -100,10 +105,26 @@
         sbHeight = 36; // Calibrated Android status bar height in dp
       }
 
-      const currentVal = document.documentElement.style.getPropertyValue('--safe-area-inset-top');
-      if (!currentVal || parseInt(currentVal, 10) === 0) {
-        document.documentElement.style.setProperty('--safe-area-inset-top', `${sbHeight}px`);
-        document.documentElement.style.setProperty('--status-bar-height', `${sbHeight}px`);
+      document.documentElement.style.setProperty('--safe-area-inset-top', `${sbHeight}px`);
+      document.documentElement.style.setProperty('--status-bar-height', `${sbHeight}px`);
+
+      // Immediately apply to existing header and mainWrap if present
+      const applyHeaderInsets = () => {
+        const hEl = document.getElementById('admin-top-header');
+        if (hEl) {
+          hEl.style.paddingTop = `${sbHeight}px`;
+          hEl.style.height = `${56 + sbHeight}px`;
+          hEl.style.minHeight = `${56 + sbHeight}px`;
+          hEl.style.boxSizing = 'border-box';
+        }
+        const mWrap = document.querySelector('.admin-main-wrap');
+        if (mWrap) {
+          mWrap.style.paddingTop = `${56 + sbHeight}px`;
+        }
+      };
+      applyHeaderInsets();
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyHeaderInsets);
       }
     }
   }

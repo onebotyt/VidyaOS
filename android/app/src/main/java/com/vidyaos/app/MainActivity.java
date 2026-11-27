@@ -68,8 +68,12 @@ public class MainActivity extends BridgeActivity {
                     try {
                         if (getBridge() != null && getBridge().getWebView() != null) {
                             getBridge().getWebView().evaluateJavascript(
+                                "document.documentElement.classList.add('is-native-shell');" +
+                                "window.VIDYAOS_IS_NATIVE = true;" +
                                 "document.documentElement.style.setProperty('--safe-area-inset-top', '" + statusBarDp + "px');" +
-                                "document.documentElement.style.setProperty('--status-bar-height', '" + statusBarDp + "px');",
+                                "document.documentElement.style.setProperty('--status-bar-height', '" + statusBarDp + "px');" +
+                                "var h = document.getElementById('admin-top-header'); if(h){ h.style.paddingTop = '" + statusBarDp + "px'; h.style.height = '" + (56 + statusBarDp) + "px'; h.style.minHeight = '" + (56 + statusBarDp) + "px'; h.style.boxSizing = 'border-box'; }" +
+                                "var m = document.querySelector('.admin-main-wrap'); if(m){ m.style.paddingTop = '" + (56 + statusBarDp) + "px'; }",
                                 null
                             );
                         }
@@ -147,6 +151,9 @@ public class MainActivity extends BridgeActivity {
                 String defaultUa = settings.getUserAgentString();
                 if (defaultUa != null) {
                     String cleanUa = defaultUa.replace("; wv", "").replaceAll("Version\\/\\d+\\.\\d+\\s*", "");
+                    if (!cleanUa.contains("VidyaOSNativeApp")) {
+                        cleanUa = cleanUa + " VidyaOSNativeApp/1.0";
+                    }
                     settings.setUserAgentString(cleanUa);
                 }
 

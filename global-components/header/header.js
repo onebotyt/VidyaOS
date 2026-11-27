@@ -14,6 +14,55 @@
 (function () {
   'use strict';
 
+  function checkAndApplyNativeShell() {
+    try {
+      const isNative = Boolean(
+        window.VIDYAOS_FORCE_NATIVE === true ||
+        window.VIDYAOS_IS_NATIVE === true ||
+        typeof window.NativeSystemUI !== 'undefined' ||
+        typeof window.NativeAuthBridge !== 'undefined' ||
+        typeof window.NativeAppUpdater !== 'undefined' ||
+        (typeof window.Capacitor !== 'undefined' && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
+        (typeof navigator !== 'undefined' && /VidyaOSNativeApp/i.test(navigator.userAgent)) ||
+        window.location.protocol === 'capacitor:' ||
+        (window.location.protocol === 'file:' && /android_asset/i.test(window.location.pathname))
+      );
+      if (isNative) {
+        document.documentElement.classList.add('is-native-shell');
+        window.VIDYAOS_IS_NATIVE = true;
+        let sb = 36;
+        if (window.NativeSystemUI && typeof window.NativeSystemUI.getStatusBarHeight === 'function') {
+          try {
+            const h = window.NativeSystemUI.getStatusBarHeight();
+            if (h >= 20) sb = h;
+          } catch (_) {}
+        }
+        document.documentElement.style.setProperty('--safe-area-inset-top', sb + 'px');
+        document.documentElement.style.setProperty('--status-bar-height', sb + 'px');
+
+        const hEl = document.getElementById('admin-top-header');
+        if (hEl) {
+          hEl.style.paddingTop = sb + 'px';
+          hEl.style.height = (56 + sb) + 'px';
+          hEl.style.minHeight = (56 + sb) + 'px';
+          hEl.style.boxSizing = 'border-box';
+        }
+        const mWrap = document.querySelector('.admin-main-wrap');
+        if (mWrap) {
+          mWrap.style.paddingTop = (56 + sb) + 'px';
+        }
+      }
+    } catch (_) {}
+  }
+  checkAndApplyNativeShell();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkAndApplyNativeShell);
+    } else {
+      checkAndApplyNativeShell();
+    }
+  }
+
   /**
    * 1. Mount Top Header if missing from .admin-main-wrap
    */
@@ -21,6 +70,7 @@
     if (typeof document === 'undefined') return;
     const existing = document.getElementById('admin-top-header');
     if (existing) {
+      checkAndApplyNativeShell();
       syncHeaderIdentity();
       setupProfileHover();
       return;
@@ -140,6 +190,7 @@
     `;
 
     layout.insertAdjacentHTML('afterbegin', headerHtml);
+    checkAndApplyNativeShell();
     syncHeaderIdentity();
     setupProfileHover();
   }
