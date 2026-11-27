@@ -11425,12 +11425,19 @@ function toggleSignatureBarVisibility() {
 
 function applySignatureBarVisibility() {
   const bar = document.getElementById('excel-signatures-bar');
+  const printSig = document.getElementById('sheet-print-signatures');
   const btn = document.getElementById('btn-toggle-signatures-bar');
   const lbl = document.getElementById('btn-signatures-label');
+  const viewBtn = document.getElementById('btn-toggle-signatures-view');
+  const viewLbl = document.getElementById('label-view-signatures');
   const isVis = EXCEL_WB.signaturesVisible !== false;
+
   if (bar) bar.style.display = isVis ? 'flex' : 'none';
+  if (printSig) printSig.style.display = 'none';
   if (btn) btn.classList.toggle('active', isVis);
   if (lbl) lbl.textContent = isVis ? 'Signatures: ON' : 'Signatures: OFF';
+  if (viewBtn) viewBtn.classList.toggle('active', isVis);
+  if (viewLbl) viewLbl.textContent = isVis ? 'Signatures: ON' : 'Signatures: OFF';
 
   const teacherName = S.group?.teacher_name || S.user?.full_name || S.user?.name || 'Navneet Mishra';
   const sigTeacher = document.getElementById('sig-teacher-name');
@@ -11950,9 +11957,8 @@ function deleteFormattingTemplate(templateId) {
 }
 
 function togglePrintSignatures() {
-  EXCEL_WB.signaturesVisible = !EXCEL_WB.signaturesVisible;
-  const sig = document.getElementById('sheet-print-signatures');
-  if (sig) sig.style.display = EXCEL_WB.signaturesVisible ? 'flex' : 'none';
+  EXCEL_WB.signaturesVisible = (EXCEL_WB.signaturesVisible === false) ? true : false;
+  applySignatureBarVisibility();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -12047,6 +12053,326 @@ function toggleExportMenu(e) {
   openDropdownOverlay(m, btn);
 }
 
+function toggleAddSheetMenu(e) {
+  if (e) {
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+  }
+  const m = document.getElementById('add-sheet-dropdown-menu');
+  const btn = document.getElementById('btn-add-sheet-dropdown');
+  openDropdownOverlay(m, btn);
+}
+
+function toggleExportAllMenu(e) {
+  if (e) {
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+  }
+  const m = document.getElementById('export-all-dropdown-menu');
+  const btn = document.getElementById('btn-export-all-dropdown');
+  openDropdownOverlay(m, btn);
+}
+
+function getWorkbookStudentsRoster() {
+  let studentList = [];
+  if (S.evalData && Array.isArray(S.evalData.students) && S.evalData.students.length > 0) {
+    studentList = S.evalData.students;
+  } else if (S.evalData && Array.isArray(S.evalData.roster) && S.evalData.roster.length > 0) {
+    studentList = S.evalData.roster;
+  } else if (Array.isArray(S.members) && S.members.length > 0) {
+    studentList = S.members;
+  } else if (Array.isArray(window.S?.allStudents) && window.S.allStudents.length > 0) {
+    studentList = window.S.allStudents;
+  }
+  if (studentList.length > 0) return sortStudentsList(studentList);
+  return Array.from({ length: 20 }, (_, idx) => ({
+    class_roll_no: idx + 1,
+    registration_no: '',
+    official_enrollment_no: '',
+    full_name: '',
+    attendance_percentage: 0,
+    isPlaceholder: true
+  }));
+}
+
+function getUniqueSheetName(baseName) {
+  const existing = new Set((EXCEL_WB.sheets || []).map(s => String(s.name || '').toLowerCase()));
+  if (!existing.has(baseName.toLowerCase())) return baseName;
+  let counter = 2;
+  while (existing.has(`${baseName} ${counter}`.toLowerCase())) {
+    counter++;
+  }
+  return `${baseName} ${counter}`;
+}
+
+function populateRosterIdentityCells(sheet, students, startRow = 2) {
+  students.forEach((stu, idx) => {
+    const r = idx + startRow;
+    const roll = stu.class_roll_no || (idx + 1);
+    const regNo = stu.isPlaceholder ? '' : (stu.registration_no || stu.reg_no || '—');
+    const enroll = stu.isPlaceholder ? '' : (stu.ubter_roll_no || stu.official_enrollment_no || stu.enrollment_no || stu.enrollment_number || '—');
+    const name = stu.full_name || stu.student_name || stu.name || '';
+    sheet.rowHeights[r] = 24;
+    setCell(sheet, r, 0, { raw: idx + 1, v: idx + 1, s: { align: 'center' } });
+    setCell(sheet, r, 1, { raw: roll, v: roll, s: { align: 'center' } });
+    setCell(sheet, r, 2, { raw: regNo, v: regNo, s: { align: 'center' } });
+    setCell(sheet, r, 3, { raw: enroll, v: enroll, s: { align: 'center' } });
+    setCell(sheet, r, 4, { raw: name, v: name, s: { bold: true, align: 'left' } });
+  });
+}
+
+function addSheetByOption(optionType) {
+  closeAllDropdownOverlays();
+  if (!Array.isArray(EXCEL_WB.sheets)) EXCEL_WB.sheets = [];
+
+  if (optionType === 'duplicate') {
+    duplicateWorksheet(EXCEL_WB.activeSheetIndex);
+    if (typeof showToast === 'function') showToast('Duplicated active worksheet', 'success');
+    return;
+  }
+
+  if (optionType === 'blank') {
+    const name = getUniqueSheetName(`Sheet${EXCEL_WB.sheets.length + 1}`);
+    createNewWorksheet(name);
+    if (typeof showToast === 'function') showToast(`Added "${name}"`, 'success');
+    return;
+  }
+
+  const students = getWorkbookStudentsRoster();
+  const totalRows = Math.max(students.length + 8, 45);
+  let newSheet = null;
+
+  if (optionType === 'single-test') {
+    let utNum = 1;
+    const existingNames = new Set(EXCEL_WB.sheets.map(s => String(s.name || '').toUpperCase()));
+    while (existingNames.has(`UT${utNum}`)) utNum++;
+    const sName = `UT${utNum}`;
+    newSheet = createDefaultExcelSheet(sName, {
+      type: 'single-test',
+      testId: `custom_ut_${utNum}`,
+      shortName: sName,
+      rowsCount: totalRows,
+      colsCount: 11,
+      frozenRows: 2,
+      frozenCols: 5
+    });
+    newSheet.rowHeights[0] = 28;
+    newSheet.rowHeights[1] = 24;
+    newSheet.colWidths = { 0: 42, 1: 50, 2: 76, 3: 102, 4: 145, 5: 48, 6: 48, 7: 48, 8: 48, 9: 63, 10: 340 };
+    ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME'].forEach((h, c) => {
+      setCell(newSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)', wrap: true } });
+      newSheet.merges.push({ s: { r: 0, c }, e: { r: 1, c } });
+    });
+    setCell(newSheet, 0, 5, { raw: `Unit Test ${utNum} (20M)`, v: `Unit Test ${utNum} (20M)`, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)' } });
+    newSheet.merges.push({ s: { r: 0, c: 5 }, e: { r: 0, c: 9 } });
+    ['Q1 (5M)', 'Q2 (5M)', 'Q3 (5M)', 'Q4 (5M)', 'TOTAL (20M)', 'INSTRUCTIONS / QUESTIONS'].forEach((h, idx) => {
+      setCell(newSheet, 1, 5 + idx, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+    });
+    populateRosterIdentityCells(newSheet, students, 2);
+    students.forEach((_, idx) => {
+      const r = idx + 2;
+      const er = r + 1;
+      for (let q = 0; q < 4; q++) {
+        setCell(newSheet, r, 5 + q, { raw: '', v: '', s: { align: 'center' } });
+      }
+      setCell(newSheet, r, 9, { raw: `=SUM(F${er}:I${er})`, f: `=SUM(F${er}:I${er})`, s: { bold: true, align: 'center' } });
+    });
+  } else if (optionType === 'assignments') {
+    const sName = getUniqueSheetName('Assignments');
+    newSheet = createDefaultExcelSheet(sName, {
+      type: 'assignments',
+      rowsCount: totalRows,
+      colsCount: 11,
+      frozenRows: 2,
+      frozenCols: 5
+    });
+    newSheet.rowHeights[0] = 28;
+    newSheet.rowHeights[1] = 24;
+    newSheet.colWidths = { 0: 42, 1: 50, 2: 76, 3: 102, 4: 145, 5: 62, 6: 62, 7: 62, 8: 62, 9: 62, 10: 70 };
+    ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME', 'A1', 'A2', 'A3', 'A4', 'A5', 'AVG'].forEach((h, c) => {
+      setCell(newSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)', wrap: true } });
+    });
+    ['Max Marks -->', '', '', '', '', 20, 20, 20, 20, 20, 20].forEach((m, c) => {
+      setCell(newSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+    });
+    newSheet.merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: 4 } });
+    populateRosterIdentityCells(newSheet, students, 2);
+    students.forEach((_, idx) => {
+      const r = idx + 2;
+      const er = r + 1;
+      for (let a = 0; a < 5; a++) {
+        setCell(newSheet, r, 5 + a, { raw: '', v: '', s: { align: 'center' } });
+      }
+      setCell(newSheet, r, 10, { raw: `=AVERAGE(F${er}:J${er})`, f: `=AVERAGE(F${er}:J${er})`, s: { bold: true, align: 'center' } });
+    });
+  } else if (optionType === 'practicals') {
+    const sName = getUniqueSheetName('Practicals');
+    newSheet = createDefaultExcelSheet(sName, {
+      type: 'practicals',
+      rowsCount: totalRows,
+      colsCount: 10,
+      frozenRows: 2,
+      frozenCols: 5
+    });
+    newSheet.rowHeights[0] = 28;
+    newSheet.rowHeights[1] = 24;
+    newSheet.colWidths = { 0: 42, 1: 50, 2: 76, 3: 102, 4: 145, 5: 75, 6: 105, 7: 65, 8: 65, 9: 63 };
+    ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME', 'Lab Record File', 'Creative Work (Model/Chart/Project)', 'Attendance', 'Viva Voce', 'TOTAL'].forEach((h, c) => {
+      setCell(newSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)', wrap: true } });
+    });
+    ['Marks -->', '', '', '', '', 10, 10, 5, 5, 30].forEach((m, c) => {
+      setCell(newSheet, 1, c, { raw: m, v: m, s: { bold: true, align: 'center', bg: 'var(--bg-surface)' } });
+    });
+    newSheet.merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: 4 } });
+    populateRosterIdentityCells(newSheet, students, 2);
+    students.forEach((_, idx) => {
+      const r = idx + 2;
+      const er = r + 1;
+      for (let p = 0; p < 4; p++) {
+        setCell(newSheet, r, 5 + p, { raw: '', v: '', s: { align: 'center' } });
+      }
+      setCell(newSheet, r, 9, { raw: `=SUM(F${er}:I${er})`, f: `=SUM(F${er}:I${er})`, s: { bold: true, align: 'center' } });
+    });
+  } else if (optionType === 'evaluation') {
+    const sName = getUniqueSheetName('Master Evaluation');
+    newSheet = createDefaultExcelSheet(sName, {
+      type: 'evaluation',
+      rowsCount: totalRows,
+      colsCount: 16,
+      frozenRows: 3,
+      frozenCols: 5
+    });
+    newSheet.rowHeights[0] = 28;
+    newSheet.rowHeights[1] = 24;
+    newSheet.rowHeights[2] = 22;
+    newSheet.colWidths = { 0: 42, 1: 50, 2: 76, 3: 102, 4: 145, 5: 62, 6: 62, 7: 62, 8: 62, 9: 65 };
+    ['SR. NO.', 'ROLL NO.', 'REG. NO.', 'UBTER ROLL NO.', 'STUDENT NAME', 'UT Avg', 'Assignments', 'Attendance', 'Practicals', 'GRAND TOTAL'].forEach((h, c) => {
+      setCell(newSheet, 0, c, { raw: h, v: h, s: { bold: true, align: 'center', bg: 'var(--table-th-bg)', wrap: true } });
+    });
+    populateRosterIdentityCells(newSheet, students, 3);
+  }
+
+  if (!newSheet) return;
+  EXCEL_WB.sheets.push(newSheet);
+  switchWorksheet(EXCEL_WB.sheets.length - 1);
+  markWorkbookUnsaved();
+  if (typeof showToast === 'function') {
+    showToast(`Added "${newSheet.name}" to workbook`, 'success');
+  }
+}
+
+async function exportAllWorkbookSheets(format) {
+  closeAllDropdownOverlays();
+  const sheets = Array.isArray(EXCEL_WB.sheets) ? EXCEL_WB.sheets : [];
+  if (!sheets.length) {
+    if (typeof showToast === 'function') showToast('No sheets in workbook to export', 'error');
+    return;
+  }
+
+  const baseName = (EXCEL_WB.name || 'VidyaOS_Workbook').replace(/\.xlsx$/i, '');
+
+  if (format === 'xlsx') {
+    // exportCurrentSheet('xlsx') already exports every sheet in EXCEL_WB.sheets as tabs,
+    // but calls toggleExportMenu() at the end; temporarily guard or call directly.
+    await exportCurrentSheet('xlsx');
+    closeAllDropdownOverlays();
+    return;
+  }
+
+  if (format === 'csv') {
+    const combinedCsv = sheets.map((ws, idx) => {
+      const title = `=== Sheet ${idx + 1}: ${ws.name || `Sheet${idx + 1}`} ===`;
+      return `${title}\r\n${generateActiveSheetCSV(ws)}`;
+    }).join('\r\n\r\n');
+    const blob = new Blob([combinedCsv], { type: 'text/csv;charset=utf-8;' });
+    triggerBrowserDownload(blob, `${baseName}_All_Sheets.csv`);
+    if (typeof showToast === 'function') showToast(`Exported all ${sheets.length} sheets to CSV`, 'success');
+    return;
+  }
+
+  if (format === 'pdf') {
+    const pagesHtml = sheets.map((ws, idx) => {
+      const fullHtml = generateSheetPrintableHtml(ws);
+      const pageMatch = fullHtml.match(/<div class="pdf-sheet-page">[\s\S]*<\/div>\s*<\/body>/i);
+      const pageBlock = pageMatch
+        ? pageMatch[0].replace(/<\/body>\s*$/i, '')
+        : `<div class="pdf-sheet-page"><p>${escapeHtml(ws.name || 'Sheet')}</p></div>`;
+      const breakStyle = idx < sheets.length - 1 ? ' style="page-break-after:always;break-after:page;"' : '';
+      return `<div${breakStyle}>${pageBlock}</div>`;
+    }).join('\n');
+
+    const templateHtml = generateSheetPrintableHtml(sheets[0]);
+    const combinedPrintHtml = templateHtml
+      .replace(/<div class="pdf-sheet-page">[\s\S]*<\/body>/i, `${pagesHtml}\n</body>`)
+      .replace(/•\s*[^<]+\(A4 Landscape\)/, `• All ${sheets.length} Sheets (A4 Landscape)`);
+
+    let iframe = document.getElementById('excel-print-iframe');
+    if (iframe) iframe.remove();
+    iframe = document.createElement('iframe');
+    iframe.id = 'excel-print-iframe';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(combinedPrintHtml);
+    doc.close();
+
+    setTimeout(() => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } catch (_) {
+        window.print();
+      }
+      setTimeout(() => {
+        try { iframe.remove(); } catch (_) { }
+      }, 2000);
+    }, 300);
+    return;
+  }
+
+  if (format === 'doc') {
+    const sections = sheets.map((ws, idx) => {
+      const fullHtml = generateSheetPrintableHtml(ws);
+      const bodyMatch = fullHtml.match(/<div class="pdf-sheet-page">([\s\S]*)<\/div>\s*<\/body>/i);
+      const inner = bodyMatch ? bodyMatch[1] : `<p>${escapeHtml(ws.name || 'Sheet')}</p>`;
+      const pageBreak = idx < sheets.length - 1 ? '<br clear="all" style="page-break-before:always;" />' : '';
+      return `<div class="WordSection1">${inner}</div>${pageBreak}`;
+    }).join('\n');
+
+    const wordDocContent = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="utf-8">
+  <title>${escapeHtml(baseName)} - All Sheets</title>
+  <style>
+    @page { size: 29.7cm 21.0cm; margin: 0.8cm 0.6cm; mso-page-orientation: landscape; }
+    body { font-family: "Segoe UI", Calibri, Arial, sans-serif; color: #0f172a; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 7.5pt; }
+    th, td { border: 1px solid #94a3b8; padding: 3px 2px; word-break: break-word; }
+    .pdf-banner { text-align: center; margin-bottom: 6px; }
+    .pdf-banner-line1 { font-size: 10pt; font-weight: 800; }
+    .pdf-banner-line2 { font-size: 8.5pt; font-weight: 700; }
+    .pdf-banner-line3 { font-size: 7.5pt; color: #475569; margin-bottom: 4px; }
+    .pdf-signatures { margin-top: 14px; display: flex; justify-content: space-between; font-size: 8pt; font-weight: 700; }
+  </style>
+</head>
+<body>${sections}</body>
+</html>`;
+    const docBlob = new Blob(['\ufeff' + wordDocContent], { type: 'application/msword;charset=utf-8' });
+    triggerBrowserDownload(docBlob, `${baseName}_All_Sheets.doc`);
+    if (typeof showToast === 'function') showToast(`Exported all ${sheets.length} sheets to Word (.doc)`, 'success');
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════
    RIBBON HORIZONTAL SCROLL ENGINE & CONTROLS
    ══════════════════════════════════════════════════════════════ */
@@ -12133,7 +12459,7 @@ function sortActiveColumn(dir = 'asc') {
 
 /* Close popup menus on outside click or Escape */
 window.addEventListener('click', (e) => {
-  const isTrigger = e.target.closest('#btn-merge-cells, #btn-border-dropdown, #btn-autosum-dropdown, #btn-view-freeze-panes, #btn-home-freeze-panes, #btn-export-dropdown');
+  const isTrigger = e.target.closest('#btn-merge-cells, #btn-border-dropdown, #btn-autosum-dropdown, #btn-view-freeze-panes, #btn-home-freeze-panes, #btn-export-dropdown, #btn-add-sheet-dropdown, #btn-export-all-dropdown');
   const isMenu = e.target.closest('.excel-dropdown-menu, .excel-mini-menu, .studio-export-menu');
   if (!isTrigger && !isMenu) {
     closeAllDropdownOverlays();
@@ -12225,6 +12551,10 @@ window.toggleBordersMenu = toggleBordersMenu;
 window.toggleAutoSumMenu = toggleAutoSumMenu;
 window.toggleFreezePanesMenu = toggleFreezePanesMenu;
 window.toggleExportMenu = toggleExportMenu;
+window.toggleAddSheetMenu = toggleAddSheetMenu;
+window.addSheetByOption = addSheetByOption;
+window.toggleExportAllMenu = toggleExportAllMenu;
+window.exportAllWorkbookSheets = exportAllWorkbookSheets;
 window.switchRibbonTab = switchRibbonTab;
 window.toggleSignatureBarVisibility = toggleSignatureBarVisibility;
 window.applySignatureBarVisibility = applySignatureBarVisibility;

@@ -1076,7 +1076,7 @@
                           </svg>
                           <span id="label-view-banner">College Banner: ON</span>
                         </button>
-                        <button type="button" class="excel-tool-btn active" id="btn-toggle-signatures-bar"
+                        <button type="button" class="excel-tool-btn active" id="btn-toggle-signatures-view"
                           onclick="toggleSignatureBarVisibility()" title="Show/Hide Faculty &amp; HOD Signatures Block">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -1085,7 +1085,7 @@
                             <line x1="20" y1="8" x2="20" y2="14" />
                             <line x1="23" y1="11" x2="17" y2="11" />
                           </svg>
-                          <span id="btn-signatures-label">Signatures: ON</span>
+                          <span id="label-view-signatures">Signatures: ON</span>
                         </button>
                       </div>
                     </div>
@@ -1341,6 +1341,65 @@
             </div>
             <div id="subsheet-selector-container" class="subsheet-selector-container"></div>
 
+            <!-- Add Sheet Dropdown Button on Studio Bar 3 -->
+            <div class="studio-export-wrapper" style="position:relative;display:inline-block;flex-shrink:0;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-add-sheet-dropdown"
+                onclick="toggleAddSheetMenu(event)" title="Add a new worksheet to this workbook"
+                style="font-size:0.75rem;font-weight:700;padding:0.22rem 0.55rem;display:inline-flex;align-items:center;gap:0.3rem;white-space:nowrap;flex-shrink:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Add Sheet</span>
+                <span class="export-caret" style="font-size:0.65rem;line-height:1;">▼</span>
+              </button>
+              <div id="add-sheet-dropdown-menu" class="studio-export-menu" style="display:none;">
+                <div class="export-menu-header">Choose Sheet to Add</div>
+                <button type="button" class="export-menu-item" onclick="addSheetByOption('single-test')">
+                  <span class="export-item-badge badge-xlsx">UT</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Unit Test Sheet</span>
+                    <span class="export-item-desc">New UT marksheet with Q1–Q4 &amp; roster</span>
+                  </div>
+                </button>
+                <button type="button" class="export-menu-item" onclick="addSheetByOption('assignments')">
+                  <span class="export-item-badge badge-doc">ASN</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Assignment Marksheet</span>
+                    <span class="export-item-desc">Coursework A1–A5 &amp; average sheet</span>
+                  </div>
+                </button>
+                <button type="button" class="export-menu-item" onclick="addSheetByOption('practicals')">
+                  <span class="export-item-badge badge-pdf">LAB</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Practical &amp; Lab Sheet</span>
+                    <span class="export-item-desc">Lab record, creative work, attendance &amp; viva</span>
+                  </div>
+                </button>
+                <button type="button" class="export-menu-item" onclick="addSheetByOption('evaluation')">
+                  <span class="export-item-badge badge-csv">EVAL</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Master Evaluation Sheet</span>
+                    <span class="export-item-desc">Consolidated internal evaluation ledger</span>
+                  </div>
+                </button>
+                <button type="button" class="export-menu-item" onclick="addSheetByOption('blank')">
+                  <span class="export-item-badge badge-xlsx">+</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Blank Custom Sheet</span>
+                    <span class="export-item-desc">Empty spreadsheet tab for custom data</span>
+                  </div>
+                </button>
+                <button type="button" class="export-menu-item" onclick="addSheetByOption('duplicate')">
+                  <span class="export-item-badge badge-doc">DUP</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Duplicate Active Sheet</span>
+                    <span class="export-item-desc">Copy current worksheet with all data</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             <div class="eval-search-input-wrap">
               <svg class="eval-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1475,6 +1534,53 @@
                   <div class="export-item-info">
                     <span class="export-item-title">Raw Data Values</span>
                     <span class="export-item-desc">Comma-separated tabular text (.csv)</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Export All Sheets Dropdown on Studio Bar 3 -->
+            <div class="studio-export-wrapper" style="position:relative;display:inline-block;">
+              <button type="button" class="btn btn-secondary btn-sm studio-export-btn" id="btn-export-all-dropdown"
+                onclick="toggleExportAllMenu(event)" title="Export all sheets in this workbook"
+                style="font-weight:700;padding:0.22rem 0.6rem;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.35rem;white-space:nowrap;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span class="btn-text">Export All</span>
+                <span class="export-caret" style="font-size:0.65rem;line-height:1;">▼</span>
+              </button>
+              <div id="export-all-dropdown-menu" class="studio-export-menu" style="display:none;">
+                <div class="export-menu-header">Export All Workbook Sheets</div>
+                <button type="button" class="export-menu-item" onclick="exportAllWorkbookSheets('xlsx')">
+                  <span class="export-item-badge badge-xlsx">.XLSX</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Full Excel Workbook</span>
+                    <span class="export-item-desc">All sheets as tabs in one .xlsx file</span>
+                  </div>
+                </button>
+                <button type="button" class="export-menu-item" onclick="exportAllWorkbookSheets('pdf')">
+                  <span class="export-item-badge badge-pdf">.PDF</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Combined Printable PDF</span>
+                    <span class="export-item-desc">All sheets in one multi-page A4 PDF</span>
+                  </div>
+                </button>
+                <button type="button" class="export-menu-item" onclick="exportAllWorkbookSheets('doc')">
+                  <span class="export-item-badge badge-doc">.DOC</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Combined Word Document</span>
+                    <span class="export-item-desc">All sheets formatted in one .doc file</span>
+                  </div>
+                </button>
+                <button type="button" class="export-menu-item" onclick="exportAllWorkbookSheets('csv')">
+                  <span class="export-item-badge badge-csv">.CSV</span>
+                  <div class="export-item-info">
+                    <span class="export-item-title">Combined CSV Data</span>
+                    <span class="export-item-desc">All sheets exported into one .csv file</span>
                   </div>
                 </button>
               </div>

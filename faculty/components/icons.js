@@ -288,6 +288,27 @@
       return `<svg class="${cls}" width="${w}" height="${h}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
     },
 
+    document: (opts = {}) => ICONS.fileText(opts),
+
+    gradCap: (opts = {}) => ICONS.brand(opts),
+
+    book: (opts = {}) => ICONS.classes(opts),
+
+    video: (opts = {}) => {
+      const { w, h, stroke, cls } = resolveSize(opts, 18);
+      return `<svg class="${cls}" width="${w}" height="${h}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`;
+    },
+
+    image: (opts = {}) => {
+      const { w, h, stroke, cls } = resolveSize(opts, 18);
+      return `<svg class="${cls}" width="${w}" height="${h}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`;
+    },
+
+    sparkle: (opts = {}) => {
+      const { w, h, stroke, cls } = resolveSize(opts, 18);
+      return `<svg class="${cls}" width="${w}" height="${h}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z"></path></svg>`;
+    },
+
     folder: (opts = {}) => {
       const { w, h, stroke, cls } = resolveSize(opts, 16);
       return `<svg class="${cls}" width="${w}" height="${h}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
@@ -483,5 +504,6 @@
   window.FacultyIcons = FacultyIcons;
   window.FACULTY_ICONS = ICONS;
   window.getFacultyIcon = getFacultyIcon;
+  window.getSvgIcon = getFacultyIcon;
   window.renderFacultyIcons = renderFacultyIcons;
 })();
