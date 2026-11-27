@@ -1185,11 +1185,6 @@ input:checked+.slider:before {
     box-sizing: border-box;
   }
 
-  .btn-reindex {
-    display: none;
-    /* Secondary tool hidden on compact mobile */
-  }
-
   /* Compact Table & Mobile Column Suppression */
   .stu-table-card {
     border-radius: 9px;

@@ -54,10 +54,21 @@
     return `<span class="badge-status badge-status-new">${escapeHtml(s)}</span>`;
   }
 
+  function getAuthHeaders(extraHeaders = {}) {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+    return {
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...extraHeaders
+    };
+  }
+
   // ── 1. Load Statistics ──
   async function loadStatistics() {
     try {
-      const res = await fetch('/api/v1/bug-reports/admin/statistics', { credentials: 'include' });
+      const res = await fetch('/api/v1/bug-reports/admin/statistics', {
+        credentials: 'include',
+        headers: getAuthHeaders()
+      });
       if (!res.ok) return;
       const json = await res.json();
       if (!json.success || !json.data) return;
@@ -95,7 +106,10 @@
     if (dateTo) params.append('date_to', dateTo);
 
     try {
-      const res = await fetch(`/api/v1/bug-reports/admin/all?${params.toString()}`, { credentials: 'include' });
+      const res = await fetch(`/api/v1/bug-reports/admin/all?${params.toString()}`, {
+        credentials: 'include',
+        headers: getAuthHeaders()
+      });
       if (!res.ok) throw new Error('Failed to load bug reports');
       const json = await res.json();
 
@@ -170,7 +184,10 @@
 
     if (!report) {
       try {
-        const res = await fetch(`/api/v1/bug-reports/admin/${reportId}`, { credentials: 'include' });
+        const res = await fetch(`/api/v1/bug-reports/admin/${reportId}`, {
+          credentials: 'include',
+          headers: getAuthHeaders()
+        });
         if (res.ok) {
           const json = await res.json();
           report = json.data;
@@ -274,7 +291,7 @@
     try {
       const res = await fetch(`/api/v1/bug-reports/admin/${_activeReport.report_id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify({
           status,

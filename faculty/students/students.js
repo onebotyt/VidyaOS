@@ -1297,21 +1297,6 @@
     if (modal) modal.style.display = 'none';
   }
 
-  async function reindexRoll() {
-    if (!confirm('Re-sequence class roll numbers sequentially by UBTER roll number?')) return;
-    try {
-      const res = await api('/hod/students/reindex-roll', { method: 'POST', body: JSON.stringify({}) });
-      if (res && res.success) {
-        notify('Roll numbers re-sequenced successfully!', 'success');
-        loadStudentsRoster();
-      } else {
-        throw new Error(res?.error?.message || 'Re-index failed');
-      }
-    } catch (err) {
-      notify(err.message, 'error');
-    }
-  }
-
   async function approveStudentRequest(id, officialEnrollmentNo, btnEl) {
     if (btnEl) {
       btnEl.disabled = true;
@@ -1367,6 +1352,11 @@
   function openAddModal() {
     const m = document.getElementById('modal-add-student');
     if (m) {
+      const errBanner = document.getElementById('add-stu-error-banner');
+      if (errBanner) {
+        errBanner.style.display = 'none';
+        errBanner.textContent = '';
+      }
       const addSemSelect = document.getElementById('add-stu-sem');
       if (addSemSelect) {
         const dept = allStudents[0]?.department_name || allStudents[0]?.department_code || '';
@@ -1378,11 +1368,24 @@
 
   function closeAddModal() {
     const m = document.getElementById('modal-add-student');
-    if (m) m.style.display = 'none';
+    if (m) {
+      m.style.display = 'none';
+      const errBanner = document.getElementById('add-stu-error-banner');
+      if (errBanner) {
+        errBanner.style.display = 'none';
+        errBanner.textContent = '';
+      }
+    }
   }
 
   async function submitAddStudent(e) {
     e.preventDefault();
+    const errBanner = document.getElementById('add-stu-error-banner');
+    if (errBanner) {
+      errBanner.style.display = 'none';
+      errBanner.textContent = '';
+    }
+
     const full_name = document.getElementById('add-stu-name')?.value.trim();
     const class_roll_no = document.getElementById('add-stu-roll')?.value.trim();
     const official_enrollment_no = document.getElementById('add-stu-enroll')?.value.trim();
@@ -1393,8 +1396,55 @@
     const phone = document.getElementById('add-stu-phone')?.value.trim() || null;
 
     if (!full_name || !official_enrollment_no) {
-      notify('Student Name and UBTER Roll No are required', 'error');
+      const msg = 'Student Name and UBTER Roll No are required.';
+      if (errBanner) {
+        errBanner.textContent = msg;
+        errBanner.style.display = 'block';
+      }
+      notify(msg, 'error');
       return;
+    }
+
+    // Validation: UBTER Roll No limit 11 digits numeric
+    const cleanEnroll = official_enrollment_no.replace(/\D/g, '');
+    if (!cleanEnroll || cleanEnroll.length > 11) {
+      const msg = 'UBTER Roll Number must be numeric and maximum 11 digits.';
+      if (errBanner) {
+        errBanner.textContent = msg;
+        errBanner.style.display = 'block';
+      }
+      notify(msg, 'error');
+      return;
+    }
+
+    // Validation: UBTER Reg No limit 8 digits numeric if provided
+    let cleanReg = null;
+    if (registration_no) {
+      cleanReg = registration_no.replace(/\D/g, '');
+      if (!cleanReg || cleanReg.length > 8) {
+        const msg = 'UBTER Registration Number must be numeric and maximum 8 digits.';
+        if (errBanner) {
+          errBanner.textContent = msg;
+          errBanner.style.display = 'block';
+        }
+        notify(msg, 'error');
+        return;
+      }
+    }
+
+    // Validation: Phone Number limit 10 digits numeric if provided
+    let cleanPhone = null;
+    if (phone) {
+      cleanPhone = phone.replace(/\D/g, '');
+      if (cleanPhone.length !== 10) {
+        const msg = 'Phone Number must be a valid 10-digit mobile number.';
+        if (errBanner) {
+          errBanner.textContent = msg;
+          errBanner.style.display = 'block';
+        }
+        notify(msg, 'error');
+        return;
+      }
     }
 
     const submitBtn = document.querySelector('#form-add-student button[type="submit"]');
@@ -1417,13 +1467,13 @@
         body: JSON.stringify({
           full_name,
           class_roll_no: class_roll_no ? parseInt(class_roll_no, 10) : null,
-          ubter_roll_no: official_enrollment_no,
-          official_enrollment_no,
-          registration_no,
+          ubter_roll_no: cleanEnroll,
+          official_enrollment_no: cleanEnroll,
+          registration_no: cleanReg,
           semester,
           year,
           email,
-          phone
+          phone: cleanPhone
         })
       });
       if (res && res.success) {
@@ -1433,13 +1483,18 @@
         const titleEl = document.getElementById('bulk-success-title');
         const descEl = document.getElementById('bulk-success-desc');
         if (titleEl) titleEl.textContent = 'Student Enrolled Successfully!';
-        if (descEl) descEl.textContent = `${full_name} (${official_enrollment_no}) has been enrolled into the department roster.`;
+        if (descEl) descEl.textContent = `${full_name} (${cleanEnroll}) has been enrolled into the department roster.`;
         await loadStudentsRoster();
       } else {
         throw new Error(res?.error?.message || 'Failed to add student');
       }
     } catch (err) {
-      notify(err.message, 'error');
+      const errMsg = err?.message || err?.error?.message || 'Failed to add student';
+      if (errBanner) {
+        errBanner.textContent = errMsg;
+        errBanner.style.display = 'block';
+      }
+      notify(errMsg, 'error');
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -1729,6 +1784,34 @@
     const addForm = document.getElementById('form-add-student');
     if (addForm) addForm.addEventListener('submit', submitAddStudent);
 
+    // Live Numeric Input Restrictors for Add Student Modal
+    const addEnrollInput = document.getElementById('add-stu-enroll');
+    if (addEnrollInput) {
+      addEnrollInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
+        const err = document.getElementById('add-stu-error-banner');
+        if (err) err.style.display = 'none';
+      });
+    }
+
+    const addRegInput = document.getElementById('add-stu-reg');
+    if (addRegInput) {
+      addRegInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 8);
+        const err = document.getElementById('add-stu-error-banner');
+        if (err) err.style.display = 'none';
+      });
+    }
+
+    const addPhoneInput = document.getElementById('add-stu-phone');
+    if (addPhoneInput) {
+      addPhoneInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+        const err = document.getElementById('add-stu-error-banner');
+        if (err) err.style.display = 'none';
+      });
+    }
+
     const bulkForm = document.getElementById('form-bulk-csv');
     if (bulkForm) bulkForm.addEventListener('submit', submitBulkCsv);
 
@@ -1824,7 +1907,6 @@
   window.resetStudentPassword = resetStudentPassword;
   window.deleteStudentMember = deleteStudentMember;
   window.restoreStudentMember = restoreStudentMember;
-  window.reindexRoll = reindexRoll;
   window.openAddStudentModal = openAddModal;
   window.closeAddStudentModal = closeAddModal;
   window.openBulkModal = openBulkModal;
