@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.getcapacitor.BridgeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -55,6 +57,27 @@ public class MainActivity extends BridgeActivity {
         // Ensure webview content strictly starts after status bar indicators
         // and finishes before the mobile system navigation bar
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+
+        // Dynamically measure status bar insets and inject CSS safe-area variable into WebView
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
+            int statusBarPx = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            if (statusBarPx > 0) {
+                float density = getResources().getDisplayMetrics().density;
+                int statusBarDp = Math.round(statusBarPx / density);
+                runOnUiThread(() -> {
+                    try {
+                        if (getBridge() != null && getBridge().getWebView() != null) {
+                            getBridge().getWebView().evaluateJavascript(
+                                "document.documentElement.style.setProperty('--safe-area-inset-top', '" + statusBarDp + "px');" +
+                                "document.documentElement.style.setProperty('--status-bar-height', '" + statusBarDp + "px');",
+                                null
+                            );
+                        }
+                    } catch (Exception ignored) {}
+                });
+            }
+            return insets;
+        });
 
         // Configure system bar colors and sharp dark indicators by default (like Meesho)
         applySystemBarAppearance(false, "#ffffff", "#ffffff");
@@ -154,6 +177,19 @@ public class MainActivity extends BridgeActivity {
         @JavascriptInterface
         public void syncTheme(boolean isDark) {
             applySystemBarAppearance(isDark, isDark ? "#0b1220" : "#ffffff", isDark ? "#0b1220" : "#ffffff");
+        }
+
+        @JavascriptInterface
+        public int getStatusBarHeight() {
+            try {
+                int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+                if (resId > 0) {
+                    int px = getResources().getDimensionPixelSize(resId);
+                    float density = getResources().getDisplayMetrics().density;
+                    return Math.round(px / density);
+                }
+            } catch (Exception ignored) {}
+            return 36;
         }
     }
 

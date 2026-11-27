@@ -359,23 +359,33 @@
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    padding-top: calc(58px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: calc(58px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px))) !important;
     padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 16px) !important;
+  }
+
+  .is-native-shell .faculty-main-wrap,
+  .is-native-shell .admin-main-wrap {
+    padding-top: calc(58px + var(--safe-area-inset-top, max(36px, env(safe-area-inset-top, 0px)))) !important;
   }
 
   /* Slideout Drawer */
   .faculty-sidebar {
     position: fixed !important;
-    top: calc(58px + env(safe-area-inset-top, 0px)) !important;
+    top: calc(58px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px))) !important;
     left: 0 !important;
     bottom: 0 !important;
-    height: calc(100dvh - (58px + env(safe-area-inset-top, 0px)))) !important;
+    height: calc(100dvh - (58px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)))) !important;
     width: 280px !important;
     max-width: 85vw !important;
     transform: translateX(-100%) !important;
     transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
     box-shadow: none !important;
     z-index: 10000 !important;
+  }
+
+  .is-native-shell .faculty-sidebar {
+    top: calc(58px + var(--safe-area-inset-top, max(36px, env(safe-area-inset-top, 0px)))) !important;
+    height: calc(100dvh - (58px + var(--safe-area-inset-top, max(36px, env(safe-area-inset-top, 0px))))) !important;
   }
 
   .faculty-sidebar.open,

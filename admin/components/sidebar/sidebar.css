@@ -1028,10 +1028,10 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   #app-sidebar.admin-sidebar,
   .admin-sidebar {
     position: fixed !important;
-    top: 56px !important;
+    top: calc(56px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px))) !important;
     bottom: 0 !important;
     left: 0 !important;
-    height: calc(100dvh - 56px) !important;
+    height: calc(100dvh - (56px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)))) !important;
     width: 60% !important;
     min-width: 0 !important;
     max-width: 60% !important;
@@ -1047,6 +1047,13 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease !important;
   }
 
+  .is-native-shell #vidya-admin-sidebar,
+  .is-native-shell #app-sidebar.admin-sidebar,
+  .is-native-shell .admin-sidebar {
+    top: calc(56px + var(--safe-area-inset-top, max(36px, env(safe-area-inset-top, 0px)))) !important;
+    height: calc(100dvh - (56px + var(--safe-area-inset-top, max(36px, env(safe-area-inset-top, 0px))))) !important;
+  }
+
   #vidya-admin-sidebar.sidebar-open,
   #vidya-admin-sidebar.open,
   .admin-sidebar.sidebar-open,
@@ -1059,17 +1066,24 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
   .sidebar-backdrop,
   .gc-drawer-backdrop {
     position: fixed !important;
-    top: 56px !important;
+    top: calc(56px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px))) !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
     width: 100vw !important;
-    height: calc(100dvh - 56px) !important;
+    height: calc(100dvh - (56px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)))) !important;
     z-index: 9999 !important;
     background: hsl(0 0% 0% / 0.42) !important;
     backdrop-filter: blur(2px) !important;
     -webkit-backdrop-filter: blur(2px) !important;
     transition: opacity 0.2s ease !important;
+  }
+
+  .is-native-shell #sidebar-backdrop,
+  .is-native-shell .sidebar-backdrop,
+  .is-native-shell .gc-drawer-backdrop {
+    top: calc(56px + var(--safe-area-inset-top, max(36px, env(safe-area-inset-top, 0px)))) !important;
+    height: calc(100dvh - (56px + var(--safe-area-inset-top, max(36px, env(safe-area-inset-top, 0px))))) !important;
   }
 
   #sidebar-backdrop:not(.active):not(.open),
@@ -1096,9 +1110,13 @@ html:not(.sidebar-collapsed) .sidebar-nav-body {
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    padding-top: calc(56px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: calc(56px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px))) !important;
     min-height: calc(100vh - 56px);
     padding-bottom: calc(72px + max(18px, env(safe-area-inset-bottom, 0px))) !important;
+  }
+
+  .is-native-shell .admin-main-wrap {
+    padding-top: calc(56px + var(--safe-area-inset-top, max(36px, env(safe-area-inset-top, 0px)))) !important;
   }
 
   /* Hide rail elements, redundant 'Navigation' drawer headers, and old mobile topbar */
